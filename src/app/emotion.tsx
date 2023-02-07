@@ -4,6 +4,11 @@ import { CacheProvider } from '@emotion/react';
 import { useEmotionCache, MantineProvider, MantineThemeOverride } from '@mantine/core';
 import { useServerInsertedHTML } from 'next/navigation';
 
+import localFont from '@next/font/local'
+
+const workSans = localFont({ src: '../../public/fonts/WorkSans-VariableFont_wght.ttf' })
+const gothamBook = localFont({ src: '../../public/fonts/gotham/GothamBook.ttf' })
+
 const argaBrand: MantineThemeOverride = {
   colorScheme: 'light',
 
@@ -15,8 +20,11 @@ const argaBrand: MantineThemeOverride = {
     wheat: ['#fff7dc', '#ffe8af', '#fed97f', '#feca4d', '#febb1e', '#e4a107', '#b27e01', '#7f5a00', '#4d3600', '#1c1200'],
   },
 
+  fontFamily: workSans.style.fontFamily,
+  fontFamilyMonospace: 'Monaco, Courier, monospace',
+
   headings: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: gothamBook.style.fontFamily,
     sizes: {
       h1: { fontSize: 30 },
     },

@@ -3,7 +3,7 @@
 import { gql, useQuery } from '@apollo/client';
 
 import { Grid } from "@mantine/core";
-import BrowseCard from "./browse-card";
+import { BrowseCard, BrowseCardLoading } from "./browse-card";
 import Loading from './loading';
 
 
@@ -36,30 +36,27 @@ type OverviewResults = {
 
 export default function BrowseData() {
   const { loading, error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
-
-  if (loading) return <Loading/>;
   if (error) return <p>Error : {error.message}</p>;
-  if (!data) return <p>No data</p>;
 
   return (
       <Grid>
         <Grid.Col span={4}>
-          <BrowseCard category="Published datasets" total={data.overview.publishedDatasets}/>
+          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Published datasets" total={data.overview.publishedDatasets} />}
         </Grid.Col>
         <Grid.Col span={4}>
-          <BrowseCard category="Bacteria specimens" total={data.overview.bacteria} />
+          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Bacteria specimens" total={data.overview.bacteria} />}
         </Grid.Col>
         <Grid.Col span={4}>
-          <BrowseCard category="Australian specimens" total={data.overview.inAustralia}/>
+          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Australian specimens" total={data.overview.inAustralia} />}
         </Grid.Col>
         <Grid.Col span={4}>
-          <BrowseCard category="Marine specimens" total={data.overview.marine}/>
+          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Marine specimens" total={data.overview.marine} />}
         </Grid.Col>
         <Grid.Col span={4}>
-          <BrowseCard category="Terrestrial specimens" total={data.overview.terrestrial}/>
+          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Terrestrial specimens" total={data.overview.terrestrial} />}
         </Grid.Col>
         <Grid.Col span={4}>
-          <BrowseCard category="Preserved specimens" total={data.overview.preservedSpecimens}/>
+          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Preserved specimens" total={data.overview.preservedSpecimens} />}
         </Grid.Col>
       </Grid>
   );
