@@ -1,18 +1,29 @@
-import './globals.css'
+'use client';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+import RootStyleRegistry from './emotion';
+import { Shell } from './shell';
+
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const client = new ApolloClient({
+    uri: 'http://localhost:5000/api',
+    cache: new InMemoryCache()
+  });
+
   return (
     <html lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
       <head />
-      <body>{children}</body>
+      <body>
+        <RootStyleRegistry>
+          <ApolloProvider client={client}>
+            <Shell>
+              {children}
+            </Shell>
+          </ApolloProvider>
+        </RootStyleRegistry>
+      </body>
     </html>
   )
 }
