@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Container, Grid, TextInput, Image } from "@mantine/core";
+import { Card, Container, Grid, TextInput, Image, Title } from "@mantine/core";
 import { Search } from "tabler-icons-react";
 import BrowseData from './browse-data';
 
@@ -28,7 +28,7 @@ export default function HomePage() {
       </Card>
 
       <section>
-        <h2>Browse data</h2>
+        <Title order={2} mt={20}>Browse data</Title>
         <BrowseData/>
       </section>
     </div>

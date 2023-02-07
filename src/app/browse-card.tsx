@@ -2,6 +2,7 @@
 
 import * as Humanize from "humanize-plus";
 import { Card, Image, Stack, Button, Flex, Text, Skeleton } from "@mantine/core"
+import Link from "next/link";
 
 
 type Props = {
@@ -50,7 +51,9 @@ function BrowseCard(props: Props) {
       <Stack align="flex-start" spacing="xs" justify="space-between" mt="md" mb="md">
         <Text weight={600} size={30}>{Humanize.compactInteger(props.total)}</Text>
         <Text weight={500} size={22}>{props.category}</Text>
-        <Button color="shellfish">Browse</Button>
+        <Link href="/search">
+          <Button color="shellfish">Browse</Button>
+        </Link>
       </Stack>
     </BrowseCardShell>
   );

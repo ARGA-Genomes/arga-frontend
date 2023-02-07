@@ -5,7 +5,6 @@ import { Flex, Grid, NavLink, createStyles } from '@mantine/core';
 import { Home } from 'tabler-icons-react';
 
 
-
 const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
     color: "white",
