@@ -2,7 +2,8 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, createStyles, Chip } from "@mantine/core";
+import { Text, Paper, Title, createStyles, Chip, Box } from "@mantine/core";
+import SearchFilter from './filter';
 
 
 const useStyles = createStyles((theme, _params, _getRef) => ({
@@ -17,14 +18,14 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
 type SearchItem = {
   id: string,
   scientificName: string,
-  genus: string,
   subgenus: string,
-  kingdom: string,
-  phylum: string,
+  genus: string,
   family: string,
   class: string,
-  speciesGroup: string[],
-  speciesSubgroup: string[],
+  phylum: string,
+  kingdom: string,
+  speciesGroup?: string[],
+  speciesSubgroup?: string[],
   biome: string,
   eventDate: string,
   eventTime: string,
@@ -49,17 +50,17 @@ type QueryResults = {
 const GET_SEARCH_RESULTS = gql`
 query {
   search {
-    withKingdom(kingdom:"Bacteria") {
+    withKingdom(kingdom:"Animalia") {
       total
       records {
         id
         scientificName
-        genus
         subgenus
-        kingdom
-        phylum
+        genus
         family
         class
+        phylum
+        kingdom
         speciesGroup
         speciesSubgroup
         biome
@@ -78,21 +79,34 @@ export default function SearchPage() {
   const { classes } = useStyles();
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SEARCH_RESULTS);
-  console.log(data);
-
+  if (error) return <p>Error : {error.message}</p>;
+  if (loading) return <Text>Loading...</Text>;
   if (!data) return <Text>No data</Text>;
 
   return (
     <div>
+      <Box mb={40}>
+        <Title order={3}>Current filters:</Title>
+        <SearchFilter />
+      </Box>
+
       <Title order={1} mt={20} mb={20}>Search results</Title>
 
-      {data.search.withKingdom.records.map((item) => (
+      {data.search.withKingdom.records.map(item => (
         <Paper mb="md" shadow="md" radius="lg" p="xl" withBorder component="a" href="#" className={classes.item} key={item.id}>
           <Title order={3}>{item.scientificName}</Title>
+          <Text>group: {item.speciesGroup?.join(", ")}</Text>
+          <Text>subgroup: {item.speciesSubgroup?.join(", ")}</Text>
           <Chip.Group position="left" multiple mt={15}>
             <Chip value="1" variant="filled" checked={true}>Kingdom: {item.kingdom}</Chip>
-            <Chip value="2">License: {item.license}</Chip>
-            <Chip value="3">Recorded by: {item.recordedBy}</Chip>
+            <Chip value="2" variant="filled">Phylum: {item.phylum}</Chip>
+            <Chip value="3" variant="filled">Class: {item.class}</Chip>
+            <Chip value="4" variant="filled">Family: {item.family}</Chip>
+            <Chip value="5" variant="filled">Genus: {item.genus}</Chip>
+            <Chip value="6">Biome: {item.biome}</Chip>
+            <Chip value="7">License: {item.license}</Chip>
+            <Chip value="8">Recorded by: {item.recordedBy}</Chip>
+            <Chip value="9">Identified by: {item.identifiedBy}</Chip>
           </Chip.Group>
         </Paper>
       ))}
