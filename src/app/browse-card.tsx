@@ -45,6 +45,7 @@ function BrowseCard(props: Props) {
         src={null}
         height={200}
         width={200}
+        alt=""
         withPlaceholder
       />
 

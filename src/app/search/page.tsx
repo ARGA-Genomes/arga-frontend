@@ -87,7 +87,7 @@ export default function SearchPage() {
       <Title order={1} mt={20} mb={20}>Search results</Title>
 
       {data.search.withKingdom.records.map((item) => (
-        <Paper mb="md" shadow="md" radius="lg" p="xl" withBorder component="a" href="#" className={classes.item}>
+        <Paper mb="md" shadow="md" radius="lg" p="xl" withBorder component="a" href="#" className={classes.item} key={item.id}>
           <Title order={3}>{item.scientificName}</Title>
           <Chip.Group position="left" multiple mt={15}>
             <Chip value="1" variant="filled" checked={true}>Kingdom: {item.kingdom}</Chip>

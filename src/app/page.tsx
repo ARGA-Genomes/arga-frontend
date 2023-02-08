@@ -12,7 +12,7 @@ export default function HomePage() {
         <Container>
           <Grid align="center" gutter={40}>
             <Grid.Col span={4}>
-              <Image src="logo_reversed.png" />
+              <Image src="logo_reversed.png" alt="Australian Reference Genome Atlas" />
             </Grid.Col>
             <Grid.Col span="auto">
               <TextInput
