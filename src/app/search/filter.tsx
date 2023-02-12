@@ -86,7 +86,7 @@ type QueryResults = {
   search: SearchResults,
 };
 
-type FilterParams = {
+export type FilterParams = {
   kingdom: Set<string>,
   phylum: Set<string>,
   class: Set<string>,
@@ -117,19 +117,14 @@ type FilterBarProps = {
 
 function FilterBar(props: FilterBarProps) {
   const [show, setShow] = useState(false);
-  const [type, setType] = useState("");
-  const [val, setVal] = useState("");
-
   const [rank, setRank] = useState<AutocompleteData | null>(null);
 
   const addFilter = (val: string) => {
     if (!rank) return;
 
-    props.onAddFilter(rank.value, val);
-    setVal("");
-    setType("");
     setRank(null);
     setShow(false);
+    props.onAddFilter(rank.value, val);
   };
 
   const addTaxonomy = (val: AutocompleteData) => {
@@ -193,7 +188,11 @@ function FilterTag(props: FilterTagProps) {
 }
 
 
-export default function SearchFilter() {
+type SearchFilterProps = {
+  onChange: (params: FilterParams) => void,
+}
+
+function SearchFilter(props: SearchFilterProps) {
   const [params, setParams] = useState<FilterParams>({
     kingdom: new Set(),
     phylum: new Set(),
@@ -212,6 +211,7 @@ export default function SearchFilter() {
       genus: rank == "Genus" ? new Set([...params.genus, val]) : params.genus,
     };
     setParams(filter);
+    props.onChange(filter);
   }
 
   return (
@@ -228,3 +228,6 @@ export default function SearchFilter() {
     </Paper>
   );
 }
+
+
+export { SearchFilter };
