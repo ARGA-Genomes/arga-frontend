@@ -105,7 +105,7 @@ export default function SearchPage() {
       <Title order={1} mt={20} mb={20}>Search results</Title>
 
       {data.search.filtered.records.map(item => (
-        <Card withBorder shadow="xl" radius="md" mb={20} className={classes.item}>
+        <Card withBorder shadow="xl" radius="md" mb={20} className={classes.item} key={item.id}>
           <Grid>
             <Grid.Col span="auto">
               <Card.Section withBorder inheritPadding py="xs">
