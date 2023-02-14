@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, createStyles, Chip, Box } from "@mantine/core";
+import { Text, Paper, Title, createStyles, Chip, Box, Card, Group, Flex, Stack, Grid } from "@mantine/core";
 import { SearchFilter,  FilterParams } from './filter';
 
 
@@ -32,6 +32,7 @@ type SearchItem = {
   license: string,
   recordedBy: string[],
   identifiedBy: string[],
+  genomicDataRecords: number,
 };
 
 type FilteredResults = {
@@ -69,6 +70,7 @@ query Search($kingdom: String, $phylum: String, $class: String, $family: String,
         license
         recordedBy
         identifiedBy
+        genomicDataRecords
       }
     }
   }
@@ -103,22 +105,40 @@ export default function SearchPage() {
       <Title order={1} mt={20} mb={20}>Search results</Title>
 
       {data.search.filtered.records.map(item => (
-        <Paper mb="md" shadow="md" radius="lg" p="xl" withBorder component="a" href="#" className={classes.item} key={item.id}>
-          <Title order={3}>{item.scientificName}</Title>
-          <Text>group: {item.speciesGroup?.join(", ")}</Text>
-          <Text>subgroup: {item.speciesSubgroup?.join(", ")}</Text>
-          <Chip.Group position="left" multiple mt={15}>
-            <Chip value="1" variant="filled">Kingdom: {item.kingdom}</Chip>
-            <Chip value="2" variant="filled">Phylum: {item.phylum}</Chip>
-            <Chip value="3" variant="filled">Class: {item.class}</Chip>
-            <Chip value="4" variant="filled">Family: {item.family}</Chip>
-            <Chip value="5" variant="filled">Genus: {item.genus}</Chip>
-            <Chip value="6">Biome: {item.biome}</Chip>
-            <Chip value="7">License: {item.license}</Chip>
-            <Chip value="8">Recorded by: {item.recordedBy}</Chip>
-            <Chip value="9">Identified by: {item.identifiedBy}</Chip>
-          </Chip.Group>
-        </Paper>
+        <Card withBorder shadow="xl" radius="md" mb={20} className={classes.item}>
+          <Grid>
+            <Grid.Col span="auto">
+              <Card.Section withBorder inheritPadding py="xs">
+                <Group position="apart">
+                  <Title order={3}>{item.scientificName}</Title>
+                </Group>
+              </Card.Section>
+
+              <Text>Group: {item.speciesGroup?.join(", ")}</Text>
+              <Text>Subgroup: {item.speciesSubgroup?.join(", ")}</Text>
+
+              <Card.Section mt="sm">
+                <Chip.Group position="left" multiple mt={15}>
+                  <Chip value="1" variant="filled">Kingdom: {item.kingdom}</Chip>
+                  <Chip value="2" variant="filled">Phylum: {item.phylum}</Chip>
+                  <Chip value="3" variant="filled">Class: {item.class}</Chip>
+                  <Chip value="4" variant="filled">Family: {item.family}</Chip>
+                  <Chip value="5" variant="filled">Genus: {item.genus}</Chip>
+                  <Chip value="6">Biome: {item.biome}</Chip>
+                  <Chip value="7">License: {item.license}</Chip>
+                  <Chip value="8">Recorded by: {item.recordedBy}</Chip>
+                  <Chip value="9">Identified by: {item.identifiedBy}</Chip>
+                </Chip.Group>
+              </Card.Section>
+            </Grid.Col>
+
+            <Grid.Col span={1} bg="midnight">
+              <Card.Section mt="xl">
+                <Title size={60} color={item.genomicDataRecords == 0 ? "wheat" : "white"} align="center">{item.genomicDataRecords}</Title>
+              </Card.Section>
+            </Grid.Col>
+          </Grid>
+        </Card>
       ))}
     </div>
   );
