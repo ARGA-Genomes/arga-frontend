@@ -1,7 +1,7 @@
 'use client';
 
 import { CacheProvider } from '@emotion/react';
-import { useEmotionCache, MantineProvider, MantineThemeOverride } from '@mantine/core';
+import { useEmotionCache, MantineProvider, MantineThemeOverride, MantineTheme } from '@mantine/core';
 import { useServerInsertedHTML } from 'next/navigation';
 
 import localFont from '@next/font/local'
@@ -29,7 +29,23 @@ const argaBrand: MantineThemeOverride = {
       h1: { fontSize: 30 },
     },
   },
+
+  globalStyles: (theme) => ({
+    body: {
+      ...theme.fn.fontStyles(),
+      backgroundColor: theme.colors["midnight"][8],
+      /* color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black, */
+      /* lineHeight: theme.lineHeight, */
+    },
+
+    a: {
+      outline: "none",
+      textDecoration: "none",
+      color: theme.colors["bushfire"][5],
+    }
+  }),
 };
+
 
 export default function RootStyleRegistry({ children }: { children: React.ReactNode }) {
   const cache = useEmotionCache();

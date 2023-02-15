@@ -9,7 +9,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
     color: "white",
     borderRadius: theme.radius.sm,
-    maxHeight: 26,
+    maxHeight: 40,
 
     "&:hover, &:focus": {
       backgroundColor: theme.colors["moss"][4],

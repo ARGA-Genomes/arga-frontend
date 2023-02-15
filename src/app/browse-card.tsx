@@ -13,7 +13,7 @@ type Props = {
 
 function BrowseCardShell({ children }: { children: React.ReactNode }) {
   return (
-    <Card shadow="sm" p="lg" withBorder>
+    <Card shadow="sm" p="lg" withBorder radius="lg">
       <Card.Section>
         <Flex gap="lg" wrap="wrap" direction="row" justify="flex-start">
           {children}
@@ -26,7 +26,7 @@ function BrowseCardShell({ children }: { children: React.ReactNode }) {
 function BrowseCardLoading() {
   return (
     <BrowseCardShell>
-      <Skeleton height={200} width={200} animate={true}/>
+      <Skeleton height={150} width={150} animate={true}/>
 
       <Stack align="flex-start" spacing="xs" justify="space-between" mt="md" mb="md">
         <Skeleton height={50} width={100} mt="xs" mb="xl" radius="md" animate={true} />
@@ -43,8 +43,8 @@ function BrowseCard(props: Props) {
     <BrowseCardShell>
       <Image
         src={null}
-        height={200}
-        width={200}
+        height={150}
+        width={150}
         alt=""
         withPlaceholder
       />
@@ -53,7 +53,7 @@ function BrowseCard(props: Props) {
         <Text weight={600} size={30}>{Humanize.compactInteger(props.total)}</Text>
         <Text weight={500} size={22}>{props.category}</Text>
         <Link href="/search">
-          <Button color="shellfish">Browse</Button>
+          <Button color="midnight.7">Browse</Button>
         </Link>
       </Stack>
     </BrowseCardShell>

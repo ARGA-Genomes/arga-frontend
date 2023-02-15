@@ -2,7 +2,7 @@
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
-import RootStyleRegistry from './emotion';
+import RootStyleRegistry from './theme';
 import { Shell } from './shell';
 
 

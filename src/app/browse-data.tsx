@@ -37,7 +37,7 @@ export default function BrowseData() {
   if (error) return <p>Error : {error.message}</p>;
 
   return (
-      <Grid>
+      <Grid gutter="xl">
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
           {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Published datasets" total={data.overview.publishedDatasets} />}
         </Grid.Col>
