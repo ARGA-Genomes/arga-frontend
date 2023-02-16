@@ -5,12 +5,36 @@ import { Search } from "tabler-icons-react";
 import BrowseData from './browse-data';
 import MostDownloadedCard from "./most-downloaded";
 import MostViewedCard from "./most-viewed";
+import VisitorGraph from "./visitor_graph";
 
+
+function Highlights() {
+  return (
+    <Box>
+      <Grid gutter={30}>
+        <Grid.Col span={4}>
+          <Stack spacing={30}>
+            <Paper p={30} radius="lg" bg="midnight.5">
+              <MostViewedCard />
+            </Paper>
+
+            <Paper p={30} radius="lg" bg="midnight.5">
+              <MostDownloadedCard />
+            </Paper>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={8}>
+          <VisitorGraph />
+        </Grid.Col>
+      </Grid>
+    </Box>
+  )
+}
 
 export default function HomePage() {
   return (
     <Box m={30}>
-      <Paper pt={60} pb={30} radius="lg" bg="midnight.7">
+      <Paper pt={60} pb={30} radius="lg" bg="midnight.6">
         <Container size="xl">
           <Grid align="center" gutter={40}>
             <Grid.Col span={3}>
@@ -34,22 +58,7 @@ export default function HomePage() {
       </Paper>
 
       <Title order={2} mt={20} color="white" py={20}>This month&apos;s highlights</Title>
-      <Grid>
-        <Grid.Col span={4}>
-          <Stack>
-            <Paper p={30} radius="lg" bg="shellfish.7">
-              <MostViewedCard />
-            </Paper>
-
-            <Paper p={30} radius="lg" bg="shellfish.7">
-              <MostDownloadedCard />
-            </Paper>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={8}>
-
-        </Grid.Col>
-      </Grid>
+      <Highlights />
     </Box>
   );
 }

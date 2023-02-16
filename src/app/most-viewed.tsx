@@ -11,7 +11,7 @@ type DatasetProps = {
 
 function Dataset(params: DatasetProps) {
   return (
-    <Paper px={20} pt={30} pb={60} radius="lg" shadow={undefined} withBorder bg="shellfish.7">
+    <Paper px={20} pt={30} pb={60} radius="lg" shadow={undefined} withBorder bg="midnight.5">
       <Stack align="center" justify="flex-start">
         <Title order={2} color="white">{Humanize.compactInteger(params.total)}</Title>
         <Text size="sm" color="white" align="center">{params.name}</Text>
@@ -24,7 +24,7 @@ function Dataset(params: DatasetProps) {
 export default function MostViewedCard() {
   return (
     <Stack>
-      <Title order={1} color="wheat">Most viewed dataset</Title>
+      <Title order={1} color="wheat.3">Most viewed dataset</Title>
 
       <SimpleGrid cols={3}>
         <Dataset total={23000} name="Whole genome" />

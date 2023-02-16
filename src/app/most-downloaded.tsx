@@ -11,7 +11,7 @@ type DatasetProps = {
 
 function Dataset(params: DatasetProps) {
   return (
-    <Paper py={10} px={30} radius="xl" shadow={undefined} withBorder bg="shellfish.7">
+    <Paper py={10} px={30} radius="xl" shadow={undefined} withBorder bg="midnight.5">
       <Grid>
         <Grid.Col span={6}>
           <Text size="sm" color="white" align="left">{params.name}</Text>
@@ -28,7 +28,7 @@ function Dataset(params: DatasetProps) {
 export default function MostDownloadedCard() {
   return (
     <Stack>
-      <Title order={1} color="wheat">Most downloaded</Title>
+      <Title order={1} color="wheat.3">Most downloaded</Title>
 
       <Stack>
         <Dataset total={14000} name="Whole genome" />

@@ -14,7 +14,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </Header>
       }
       footer={
-        <Box bg="midnight.9" mx={0}>
+        <Box bg="midnight.8" mx={0}>
           <Footer />
           <Flex align="flex-end" justify="flex-end">
                   {/* <Image src="dna_footer.jpg" width={600} height={80} /> */}
