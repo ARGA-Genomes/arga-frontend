@@ -41,7 +41,7 @@ type FilteredResults = {
 };
 
 type SearchResults = {
-  filtered: FilteredResults,
+  filtered2: FilteredResults,
 };
 
 type QueryResults = {
@@ -51,7 +51,7 @@ type QueryResults = {
 const GET_SEARCH_RESULTS = gql`
 query Search($kingdom: String, $phylum: String, $class: String, $family: String, $genus: String) {
   search {
-    filtered(kingdom: $kingdom, phylum: $phylum, class: $class, family: $family, genus: $genus) {
+    filtered2(kingdom: $kingdom, phylum: $phylum, class: $class, family: $family, genus: $genus) {
       total
       records {
         id
@@ -104,7 +104,7 @@ export default function SearchPage() {
 
       <Title order={1} mt={20} mb={20}>Search results</Title>
 
-      {data.search.filtered.records.map(item => (
+      {data.search.filtered2.records.map(item => (
         <Card withBorder shadow="xl" radius="md" mb={20} className={classes.item} key={item.id}>
           <Grid>
             <Grid.Col span="auto">

@@ -1,6 +1,6 @@
 'use client';
 
-import { Paper, Container, Grid, TextInput, Image, Title, Box, Stack } from "@mantine/core";
+import { Paper, Container, Grid, Text, TextInput, Image, Title, Box, Stack } from "@mantine/core";
 import { Search } from "tabler-icons-react";
 import BrowseData from './browse-data';
 import MostDownloadedCard from "./most-downloaded";
@@ -31,9 +31,26 @@ function Highlights() {
   )
 }
 
+function ConferenceInfo() {
+  return (
+    <Paper mt={30} p={30} radius="lg" bg="midnight.5">
+      <Title order={1} color="wheat.3">Up and coming conference</Title>
+      <Grid>
+        <Grid.Col>
+          <Stack mt={40} mb={30}>
+            <Title order={1} color="white">See you at the 2023 eResearch Brisbane</Title>
+            <Text color="white">Building name. Street address and our booth number. See you there.</Text>
+          </Stack>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  )
+}
+
+
 export default function HomePage() {
   return (
-    <Box m={30}>
+    <Box m={30} pb={50}>
       <Paper pt={60} pb={30} radius="lg" bg="midnight.6">
         <Container size="xl">
           <Grid align="center" gutter={40}>
@@ -59,6 +76,8 @@ export default function HomePage() {
 
       <Title order={2} mt={20} color="white" py={20}>This month&apos;s highlights</Title>
       <Highlights />
+
+      <ConferenceInfo />
     </Box>
   );
 }
