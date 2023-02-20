@@ -8,7 +8,7 @@ import { Shell } from './shell';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const client = new ApolloClient({
-    uri: 'http://localhost:5000/api',
+    uri: process.env.NEXT_PUBLIC_ARGA_API_URL,
     cache: new InMemoryCache()
   });
 
