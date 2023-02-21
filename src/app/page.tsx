@@ -1,10 +1,10 @@
 'use client';
 
-import { Paper, Container, Grid, Text, TextInput, Image, Title, Box, Stack } from "@mantine/core";
-import { Search } from "tabler-icons-react";
+import { Paper, Container, Grid, Text, Image, Title, Box, Stack } from "@mantine/core";
 import BrowseData from './browse-data';
 import MostDownloadedCard from "./most-downloaded";
 import MostViewedCard from "./most-viewed";
+import SpeciesSearch from "./species-search";
 import VisitorGraph from "./visitor_graph";
 
 
@@ -58,12 +58,7 @@ export default function HomePage() {
               <Image src="logo_reversed.png" alt="Australian Reference Genome Atlas" />
             </Grid.Col>
             <Grid.Col span="auto">
-              <TextInput
-                radius="md"
-                size="lg"
-                rightSection={<Search size={28} />}
-                rightSectionWidth={50}
-              />
+              <SpeciesSearch />
             </Grid.Col>
           </Grid>
         </Container>
