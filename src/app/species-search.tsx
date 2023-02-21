@@ -54,6 +54,7 @@ const SuggestionItem = forwardRef<HTMLDivElement, ItemProps>(
     </div>
   )
 );
+SuggestionItem.displayName = "SuggestionItem";
 
 
 export default function SpeciesSearch() {
@@ -83,7 +84,7 @@ export default function SpeciesSearch() {
         variables: { query: debounced }
       });
     }
-  }, [debounced]);
+  }, [debounced, getSuggestions]);
 
 
   return (

@@ -18,19 +18,19 @@ export function Footer() {
       <Container size="xl" mb={200}>
         <Grid gutter={100}>
           <Grid.Col span={4}>
-            <Image src="ala_logo.png" width={202} height={89} />
+            <Image src="ala_logo.png" width={202} height={89} alt="" />
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Image src="biocommons_logo.png" width={220} height={65} />
+            <Image src="biocommons_logo.png" width={220} height={65} alt="" />
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Image src="bioplatforms_logo.png" width={228} height={80} />
+            <Image src="bioplatforms_logo.png" width={228} height={80} alt="" />
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Image src="ardc_logo.png" width={295} height={96} />
+            <Image src="ardc_logo.png" width={295} height={96} alt="" />
           </Grid.Col>
 
           <Grid.Col span={4}>
@@ -46,7 +46,7 @@ export function Footer() {
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Image src="ncris_logo.png" width={290} height={210} />
+            <Image src="ncris_logo.png" width={290} height={210} alt="" />
           </Grid.Col>
         </Grid>
       </Container>
