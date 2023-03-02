@@ -70,7 +70,7 @@ jobs:
       - name: Notify arga-ops about the new version
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.ARGA_OPS_DEPLOY_KEY }}
+          token: ${{ secrets.ARGA_OPS_PERSONAL_TOKEN }}
           repository: arga-genomes/arga-ops
           event-type: published
           client-payload: '{"data" : ${{ toJson(env) }} }'
