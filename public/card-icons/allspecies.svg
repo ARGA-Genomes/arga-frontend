@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="143px" height="143px" viewBox="0 0 143 143" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>browse/allspecies</title>
+    <defs>
+        <circle id="path-1" cx="71.5" cy="71.5" r="71.5"></circle>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="browse/allspecies">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="Mask" fill="#D8D8D8" xlink:href="#path-1"></use>
+            <g id="WHEAT" mask="url(#mask-2)" fill="#A2C36E">
+                <g transform="translate(-15.428571, 0.000000)" id="Rectangle">
+                    <rect x="0" y="0" width="163.428571" height="143.160377"></rect>
+                </g>
+            </g>
+            <g id="icons/agricultural" mask="url(#mask-2)" stroke-linecap="round" stroke-linejoin="round">
+                <g transform="translate(13.185000, 13.365000)" id="Group-9">
+                    <g transform="translate(-0.000000, 0.000000)">
+                        <polyline id="Stroke-1" stroke="#FFFFFF" stroke-width="2" points="110.23 85.1785549 58.9321788 58.135 33.22 109.475"></polyline>
+                        <g id="Group-8" transform="translate(0.000000, -0.000000)" stroke="#FFFFFF" stroke-width="2">
+                            <line x1="58.135" y1="58.135" x2="115.353905" y2="49.9057379" id="Stroke-2"></line>
+                            <path d="M116.27,58.135 C116.27,90.2412067 90.2431558,116.27 58.135,116.27 C26.0287933,116.27 0,90.2412067 0,58.135 C0,26.0268442 26.0287933,0 58.135,0 C90.2431558,0 116.27,26.0268442 116.27,58.135 Z" id="Stroke-4"></path>
+                            <polyline id="Stroke-6" points="50.758486 0.472471133 58.1359746 58.1357797 105.706645 24.733396"></polyline>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

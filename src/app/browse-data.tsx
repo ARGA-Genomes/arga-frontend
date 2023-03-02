@@ -32,29 +32,40 @@ type OverviewResults = {
 }
 
 
+function Card({ category, total, image }: { category: string, total: number | undefined, image: string }) {
+  if (!total) {
+    return (<BrowseCardLoading />);
+  } else {
+    return (
+      <BrowseCard category={category} total={total} image={image} />
+    );
+  }
+}
+
+
 export default function BrowseData() {
-  const { loading, error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
+  const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
   if (error) return <p>Error : {error.message}</p>;
 
   return (
-      <Grid gutter="xl">
+      <Grid gutter={37}>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Published datasets" total={data.overview.publishedDatasets} />}
+          <Card total={data?.overview.publishedDatasets} category="Agricultural species and pest" image="card-icons/agricultural.svg" />
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Bacteria specimens" total={data.overview.bacteria} />}
+          <Card total={data?.overview.marine} category="Marine species and aquaculture" image="card-icons/marine.svg"/>
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Australian specimens" total={data.overview.inAustralia} />}
+          <Card total={data?.overview.inAustralia} category="All species" image="card-icons/allspecies.svg" />
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Marine specimens" total={data.overview.marine} />}
+          <Card total={data?.overview.preservedSpecimens} category="Preserved specimens" image="card-icons/preserved.svg" />
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Terrestrial specimens" total={data.overview.terrestrial} />}
+          <Card total={data?.overview.terrestrial} category="Terrestrial biodiversity" image="card-icons/terrestrial.svg" />
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          {loading || !data ? <BrowseCardLoading/> : <BrowseCard category="Preserved specimens" total={data.overview.preservedSpecimens} />}
+          <Card total={data?.overview.bacteria} category="Threatened Species Initiative" image="card-icons/tsi.svg" />
         </Grid.Col>
       </Grid>
   );

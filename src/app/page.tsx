@@ -1,6 +1,6 @@
 'use client';
 
-import { Paper, Container, Grid, Text, Image, Title, Box, Stack } from "@mantine/core";
+import { Paper, Container, Grid, Text, Image, Title, Box, Stack, Flex, Group } from "@mantine/core";
 import BrowseData from './browse-data';
 import MostDownloadedCard from "./most-downloaded";
 import MostViewedCard from "./most-viewed";
@@ -50,21 +50,22 @@ function ConferenceInfo() {
 
 export default function HomePage() {
   return (
-    <Box m={30} pb={50}>
-      <Paper pt={60} pb={30} radius="lg" bg="midnight.6">
-        <Container size="xl">
-          <Grid align="center" gutter={40}>
-            <Grid.Col span={3}>
-              <Image src="logo_reversed.png" alt="Australian Reference Genome Atlas" />
-            </Grid.Col>
-            <Grid.Col span="auto">
-              <SpeciesSearch />
-            </Grid.Col>
-          </Grid>
-        </Container>
+    <Box>
+      <Paper bg="midnight.6" p={0} m={0} radius={35}>
+        <Flex justify="center" align="center" direction="row" wrap="wrap" px={100} pt={100} gap={54}>
+          <Image
+            src="search_logo_reversed.png"
+            alt="Australian Reference Genome Atlas"
+            width={353}
+            height={100}
+            sx={{ flexGrow: 0 }}
+          />
+          <Box sx={{ flexGrow: 1 }}>
+            <SpeciesSearch />
+          </Box>
+        </Flex>
 
-        <Box px={30}>
-          <Title order={2} mt={20} color="white" py={20}>Browse data</Title>
+        <Box pt={136} px={50} pb={58}>
           <BrowseData/>
         </Box>
       </Paper>

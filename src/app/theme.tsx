@@ -13,7 +13,7 @@ const argaBrand: MantineThemeOverride = {
   colorScheme: 'light',
 
   colors: {
-    midnight: ['#e7f4ff', '#c8dce9', '#a8c5d6', '#87aec5', '#6797b4', '#486470', '#2d4d5c', '#193d4d', '#15313f', '#001017'],
+    midnight: ['#e7f4ff', '#c8dce9', '#a8c5d6', '#87aec5', '#6797b4', '#3A637C', '#2d4d5c', '#193d4d', '#15313f', '#001017'],
     shellfish: ['#e1f9f7', '#c6e6e3', '#a8d3cf', '#89c0bc', '#6aafa9', '#509590', '#3d7470', '#295450', '#133331', '#001411'],
     moss: ['#f0fae4', '#daeac4', '#c4daa3', '#aecb80', '#97bc5d', '#7da243', '#627e33', '#455a23', '#283612', '#0b1300'],
     bushfire: ['#ffeedd', '#ffd0b1', '#fbb284', '#f79554', '#f47625', '#da5d0b', '#af7a58', '#7a3303', '#4b1d00', '#1f0700'],

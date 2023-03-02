@@ -1,7 +1,7 @@
 'use client';
 
 import { gql, useLazyQuery } from "@apollo/client";
-import { Autocomplete, AutocompleteItem, Group, Loader, MantineColor, SelectItemProps, Text } from "@mantine/core";
+import { Autocomplete, AutocompleteItem, Box, Group, Loader, MantineColor, SelectItemProps, Text } from "@mantine/core";
 import { useDebouncedValue } from '@mantine/hooks';
 import { forwardRef, useEffect, useState } from "react";
 import { Search } from "tabler-icons-react";
@@ -57,6 +57,7 @@ const SuggestionItem = forwardRef<HTMLDivElement, ItemProps>(
 SuggestionItem.displayName = "SuggestionItem";
 
 
+
 export default function SpeciesSearch() {
   const [value, setValue] = useState('');
   const [suggestions, setSuggestions] = useState<AutocompleteItem[]>([]);
@@ -93,13 +94,14 @@ export default function SpeciesSearch() {
       itemComponent={SuggestionItem}
       data={suggestions}
       onChange={val => setValue(val)}
-      rightSection={loading ? <Loader variant="bars" size={28} /> : <Search size={28} />}
-      rightSectionWidth={50}
-      radius="md"
-      size="lg"
+      rightSection={loading ? <Loader variant="bars" size={28} /> : <Search size={35} />}
+      rightSectionWidth={100}
       limit={5}
       error={error?.message}
       filter={_ => true}
+      size="xl"
+      radius={20}
+      styles={{ input: { height: 90 } }}
     />
   )
 }
