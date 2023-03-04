@@ -3,6 +3,7 @@
 import { gql, useLazyQuery } from "@apollo/client";
 import { Autocomplete, AutocompleteItem, Box, Group, Loader, MantineColor, SelectItemProps, Text } from "@mantine/core";
 import { useDebouncedValue } from '@mantine/hooks';
+import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useState } from "react";
 import { Search } from "tabler-icons-react";
 
@@ -59,6 +60,8 @@ SuggestionItem.displayName = "SuggestionItem";
 
 
 export default function SpeciesSearch() {
+  const router = useRouter();
+
   const [value, setValue] = useState('');
   const [suggestions, setSuggestions] = useState<AutocompleteItem[]>([]);
   const [debounced] = useDebouncedValue(value, 500);
@@ -78,7 +81,6 @@ export default function SpeciesSearch() {
     { onCompleted }
   );
 
-
   useEffect(() => {
     if (debounced) {
       getSuggestions({
@@ -87,13 +89,13 @@ export default function SpeciesSearch() {
     }
   }, [debounced, getSuggestions]);
 
-
   return (
     <Autocomplete
       value={value}
       itemComponent={SuggestionItem}
       data={suggestions}
       onChange={val => setValue(val)}
+      onItemSubmit={item => router.push(`/species/${item.value}`)}
       rightSection={loading ? <Loader variant="bars" size={28} /> : <Search size={35} />}
       rightSectionWidth={100}
       limit={5}

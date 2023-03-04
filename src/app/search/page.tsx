@@ -96,13 +96,13 @@ export default function SearchPage() {
   }
 
   return (
-    <div>
-      <Box mb={40}>
-        <Title order={3}>Current filters:</Title>
+    <Box>
+      <Paper bg="midnight.6" p={40} radius={35}>
+        <Title order={3} color="white">Current filters:</Title>
         <SearchFilter onChange={ onFilterChange } />
-      </Box>
+      </Paper>
 
-      <Title order={1} mt={20} mb={20}>Search results</Title>
+      <Title order={1} mt={20} mb={20} color="white">Search results</Title>
 
       {data.search.filtered.records.map(item => (
         <Card withBorder shadow="xl" radius="md" mb={20} className={classes.item} key={item.id}>
@@ -140,6 +140,6 @@ export default function SearchPage() {
           </Grid>
         </Card>
       ))}
-    </div>
+    </Box>
   );
 }

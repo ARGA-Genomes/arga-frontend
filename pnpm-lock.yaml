@@ -11,6 +11,7 @@ specifiers:
   '@mantine/next': ^5.10.2
   '@next/font': 13.1.6
   '@types/humanize-plus': ^1.8.0
+  '@types/luxon': ^3.2.0
   '@types/node': 18.11.18
   '@types/react': 18.0.27
   '@types/react-dom': 18.0.10
@@ -20,6 +21,7 @@ specifiers:
   eslint-config-next: 13.1.6
   graphql: ^16.6.0
   humanize-plus: ^1.8.2
+  luxon: ^3.2.1
   next: 13.1.6
   react: 18.2.0
   react-chartjs-2: ^5.2.0
@@ -38,6 +40,7 @@ dependencies:
   '@mantine/next': 5.10.2_frkyvidol3cyjondljhrqtyp5u
   '@next/font': 13.1.6
   '@types/humanize-plus': 1.8.0
+  '@types/luxon': 3.2.0
   '@types/node': 18.11.18
   '@types/react': 18.0.27
   '@types/react-dom': 18.0.10
@@ -47,6 +50,7 @@ dependencies:
   eslint-config-next: 13.1.6_4vsywjlpuriuw3tl5oq6zy5a64
   graphql: 16.6.0
   humanize-plus: 1.8.2
+  luxon: 3.2.1
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-chartjs-2: 5.2.0_t5yjg6ab35jnsudnh2qdighszm
@@ -749,6 +753,10 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: false
+
+  /@types/luxon/3.2.0:
+    resolution: {integrity: sha512-lGmaGFoaXHuOLXFvuju2bfvZRqxAqkHPx9Y9IQdQABrinJJshJwfNCKV+u7rR3kJbiqfTF/NhOkcxxAFrObyaA==}
     dev: false
 
   /@types/node/18.11.18:
@@ -2293,6 +2301,11 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+    dev: false
+
+  /luxon/3.2.1:
+    resolution: {integrity: sha512-QrwPArQCNLAKGO/C+ZIilgIuDnEnKx5QYODdDtbFaxzsbZcc/a7WFq7MhsVYgRlwawLtvOUESTlfJ+hc/USqPg==}
+    engines: {node: '>=12'}
     dev: false
 
   /merge2/1.4.1:
