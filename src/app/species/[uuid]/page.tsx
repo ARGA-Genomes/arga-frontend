@@ -165,7 +165,7 @@ export default function SpeciesPage({ params }: { params: { uuid: string } }) {
 
       <SimpleGrid cols={3} p={40}>
         {data.species.specimens.map(specimen => (
-          <SpecimenItem specimen={specimen} />
+          <SpecimenItem key={specimen.accession} specimen={specimen} />
         ))}
       </SimpleGrid>
     </Box>
