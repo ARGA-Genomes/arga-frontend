@@ -50,6 +50,7 @@ jobs:
 
     env:
       registry: ghcr.io/arga-genomes
+      image_names: "frontend"
       image_tag: ${{ github.sha }}
       actor: ${{ github.triggering_actor }}
       repository: ${{ github.repository }}
@@ -72,4 +73,4 @@ jobs:
           token: ${{ secrets.ARGA_OPS_PERSONAL_TOKEN }}
           repository: arga-genomes/arga-ops
           event-type: published
-          client-payload: '{"data" : ${{ toJson({ {image_names: ["frontend"]}, ...env}) }} }'
+          client-payload: '{"data" : ${{ toJson(env) }} }'
