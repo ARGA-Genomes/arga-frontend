@@ -90,12 +90,12 @@ function SpecimenItem({ specimen }: { specimen: Specimen }) {
         <Title order={5}>{specimen.accession}</Title>
         <Badge>{specimen.type.replace("_", " ")}</Badge>
       </Group>
-      <Text c="dimmed">{Humanize.capitalize(specimen.refseqCategory)}</Text>
+      <Text c="dimmed">{specimen.refseqCategory ? Humanize.capitalize(specimen.refseqCategory) : null}</Text>
       <Text c="dimmed">{specimen.dataResource}</Text>
       <Text c="dimmed">{specimen.license} - {specimen.provenance}</Text>
       <Text c="dimmed">{Luxon.DateTime.fromISO(specimen.eventDate).toLocaleString()}</Text>
       <Divider my={20} />
-      <Link href={specimen.accessionUri} target="_blank">
+      <Link href={specimen.accessionUri || "#"} target="_blank">
         <Button color="midnight.5" radius={10}>Get Data</Button>
       </Link>
     </Card>
@@ -127,8 +127,6 @@ function ThreatBadge({ status, children }: { status: string, children: React.Rea
 
 
 export default function SpeciesPage({ params }: { params: { uuid: string } }) {
-  console.log(params.uuid);
-
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
       taxonUuid: params.uuid
