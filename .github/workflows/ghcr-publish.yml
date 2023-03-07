@@ -50,7 +50,7 @@ jobs:
 
     env:
       registry: ghcr.io/arga-genomes
-      image_name: frontend
+      image_names: [frontend]
       image_tag: ${{ github.sha }}
       actor: ${{ github.triggering_actor }}
       repository: ${{ github.repository }}
