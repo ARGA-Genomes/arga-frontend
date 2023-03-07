@@ -2,7 +2,7 @@ name: Build image and publish to ghcr.io
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "bugfix/workflow-image-array" ]
 
 jobs:
   build:
@@ -50,8 +50,7 @@ jobs:
 
     env:
       registry: ghcr.io/arga-genomes
-      image_names:
-        - frontend
+      image_name: frontend
       image_tag: ${{ github.sha }}
       actor: ${{ github.triggering_actor }}
       repository: ${{ github.repository }}
