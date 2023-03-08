@@ -6,6 +6,10 @@ import { Footer } from './footer'
 
 const MAX_WIDTH=1512;
 
+// The shell is the visual layout of the site that wraps all content
+// with the top navigation bar and the footer. It also defines the
+// page dimension constraints to make responsive layouts easier in
+// each page.
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <AppShell

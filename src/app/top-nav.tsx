@@ -5,6 +5,8 @@ import { Flex, Grid, NavLink, createStyles } from '@mantine/core';
 import { Home } from 'tabler-icons-react';
 
 
+// Custom navbar link styles. We define class with emotion here
+// as this particular component wont be used anywhere else
 const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
     color: "white",

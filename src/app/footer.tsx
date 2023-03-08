@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Box, Container, Divider, Flex, Grid, Image, Stack, Text } from '@mantine/core';
+import { Container, Divider, Flex, Grid, Image, Stack, Text } from '@mantine/core';
 
 
 export function Footer() {

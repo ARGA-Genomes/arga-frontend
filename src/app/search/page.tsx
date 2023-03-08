@@ -102,7 +102,7 @@ export default function SearchPage() {
         <SearchFilter onChange={ onFilterChange } />
       </Paper>
 
-      <Title order={1} mt={20} mb={20} color="white">Search results</Title>
+      <Title order={1} mt={20} mb={20}>Search results</Title>
 
       {data.search.filtered.records.map(item => (
         <Card withBorder shadow="xl" radius="md" mb={20} className={classes.item} key={item.id}>

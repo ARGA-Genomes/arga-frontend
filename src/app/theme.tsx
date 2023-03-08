@@ -1,14 +1,18 @@
 'use client';
 
 import { CacheProvider } from '@emotion/react';
-import { useEmotionCache, MantineProvider, MantineThemeOverride, MantineTheme } from '@mantine/core';
+import { useEmotionCache, MantineProvider, MantineThemeOverride } from '@mantine/core';
 import { useServerInsertedHTML } from 'next/navigation';
 
 import localFont from '@next/font/local'
 
+// Serve the fonts ourselves in case blockers reject requests to google font
 const workSans = localFont({ src: '../../public/fonts/WorkSans-VariableFont_wght.ttf' })
 const gothamBook = localFont({ src: '../../public/fonts/gotham/GothamBook.ttf' })
 
+// All global styles should be defined here as a theme override for mantine.
+// This is used as a root theme provider element in the layout and applies
+// to the entire app
 const argaBrand: MantineThemeOverride = {
   colorScheme: 'light',
 
@@ -45,6 +49,7 @@ const argaBrand: MantineThemeOverride = {
 };
 
 
+// The caching root theme provider element.
 export default function RootStyleRegistry({ children }: { children: React.ReactNode }) {
   const cache = useEmotionCache();
   cache.compat = true;
