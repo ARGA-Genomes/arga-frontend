@@ -2,7 +2,7 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Text, Card, SimpleGrid, Group, Button, Divider, Flex, Container } from "@mantine/core";
+import { Paper, Title, Box, Text, Card, SimpleGrid, Group, Button, Divider, Flex, Grid } from "@mantine/core";
 import Link from "next/link";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
@@ -11,20 +11,35 @@ import { Pie } from "react-chartjs-2";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 
+const chartColours = [
+  "#3A637C", "#509590", "#7da243", "#da5d0b", "#e4a107"
+];
+
+
 const GET_STATS = gql`
 query Stats($genus: String) {
   stats {
     genus(genus: $genus) {
 			totalSpecies
       speciesWithData
+      breakdown {
+        name
+        total
+      }
 		}
   }
 }
 `;
 
+type Breakdown = {
+  name: string,
+  total: number,
+};
+
 type GenusStats = {
   totalSpecies: number,
   speciesWithData: number,
+  breakdown: Breakdown[],
 };
 
 type Stats = {
@@ -127,6 +142,82 @@ function RecordItem({ record }: { record: Record }) {
 }
 
 
+function DataCoverage({ stats }: { stats: GenusStats }) {
+  const total = stats.totalSpecies;
+  const withData = stats.speciesWithData;
+
+  const chartData = {
+    labels: ['Species with data', 'Species without data'],
+    datasets: [
+      {
+        label: 'Records',
+        data: [withData, total - withData],
+        backgroundColor: [
+          '#7da243',
+          '#da5d0b',
+        ],
+        borderColor: [
+          'rgba(255, 255, 255, 1)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      }
+    }
+  }
+
+  return (
+    <Box h={200}>
+      <Pie options={options} data={chartData} />
+    </Box>
+  )
+}
+
+function DataBreakdown({ stats }: { stats: GenusStats }) {
+  const breakdown = stats.breakdown;
+
+  const chartData = {
+    labels: breakdown.map(item => item.name),
+    datasets: [
+      {
+        label: 'Records',
+        data: breakdown.map(item => item.total),
+        borderWidth: 1,
+        backgroundColor: chartColours,
+        borderColor: [
+          'rgba(255, 255, 255, 1)',
+        ],
+      },
+    ],
+  };
+
+  const options = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "left" as const,
+        labels: {
+          color: "white",
+        }
+      },
+    },
+  };
+
+  return (
+    <Box h={200}>
+      <Pie options={options} data={chartData} />
+    </Box>
+  )
+}
+
+
 function Statistics({ genus }: { genus: string }) {
   const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
     variables: {
@@ -144,45 +235,16 @@ function Statistics({ genus }: { genus: string }) {
     return (<Text>No data</Text>);
   }
 
-  const total = data.stats.genus.totalSpecies;
-  const withData = data.stats.genus.speciesWithData;
-
-  const chartData = {
-    labels: ['Species with data', 'Species without data'],
-    datasets: [
-      {
-        label: 'Visits',
-        data: [withData, total - withData],
-        backgroundColor: [
-          '#7da243',
-          '#da5d0b',
-        ],
-        borderColor: [
-          'rgba(255, 255, 255, 1)',
-          'rgba(255, 255, 255, 1)',
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    plugins: {
-      legend: {
-        display: false,
-      }
-    }
-  }
-
   return (
     <Box>
-      <Text color="white" c="dimmed">{total} species found</Text>
-      <Text color="white" c="dimmed">{withData} species with data</Text>
+      <Text color="white" c="dimmed">{data.stats.genus.totalSpecies} species found</Text>
+      <Text color="white" c="dimmed">{data.stats.genus.speciesWithData} species with data</Text>
 
-      <Box maw={200} pt={20} pb={10}>
-        <Title color="white" order={3} pb={10}>Data coverage</Title>
-        <Pie options={options} data={chartData} />
-      </Box>
+      <Title color="white" order={3} pb={10} pt={20}>Data coverage</Title>
+      <Flex>
+        <DataCoverage stats={data.stats.genus} />
+        <DataBreakdown stats={data.stats.genus} />
+      </Flex>
     </Box>
   )
 }
