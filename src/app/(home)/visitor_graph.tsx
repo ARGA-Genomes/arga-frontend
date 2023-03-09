@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Paper, Title } from "@mantine/core";
+import { Container, Paper, Title } from "@mantine/core";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
