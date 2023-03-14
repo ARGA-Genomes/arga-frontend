@@ -173,7 +173,7 @@ function DataCoverage({ stats }: { stats: GenusStats }) {
 }
 
 function DataBreakdown({ stats }: { stats: GenusStats }) {
-  const breakdown = stats.breakdown;
+  const breakdown = Array.from(stats.breakdown).sort((a, b) => a.total > b.total ? -1 : 1);
 
   const chartData = {
     labels: breakdown.map(item => item.name),
