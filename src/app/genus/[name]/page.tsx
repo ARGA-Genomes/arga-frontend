@@ -2,7 +2,7 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Text, Card, SimpleGrid, Group, Button, Divider, Flex, Grid } from "@mantine/core";
+import { Paper, Title, Box, Text, Card, SimpleGrid, Group, Button, Divider, Flex, Grid, Stack } from "@mantine/core";
 import Link from "next/link";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
@@ -117,22 +117,14 @@ type QueryResults = {
 function RecordItem({ record }: { record: Record }) {
   return (
     <Card shadow="sm" radius="lg" withBorder>
-      <Group position="apart">
+      <Stack>
         <Title order={5}>{record.scientificName}</Title>
-        <Text color="white" c="dimmed">
-          {record.kingdom}
-          , {record.phylum}
-          , {record.class}
-          {/* , {record.order} */}
-          , {record.family}
-          , {record.genus}
-        </Text>
 
         <Flex align="center" gap="md">
           <Title size={40} color={record.genomicDataRecords == 0 ? "wheat" : "midnight"} align="center">{record.genomicDataRecords}</Title>
           <Text>data records available</Text>
         </Flex>
-      </Group>
+      </Stack>
       <Divider my={20} />
       <Link href={record.speciesUuid || "#"} target="_blank">
         <Button color="midnight.5" radius={10}>View species</Button>
