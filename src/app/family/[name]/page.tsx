@@ -37,7 +37,7 @@ type Breakdown = {
 };
 
 type FamilyStats = {
-  totalGenus: number,
+  totalGenera: number,
   generaWithData: number,
   breakdown: Breakdown[],
 };
@@ -73,6 +73,36 @@ type SearchResults = {
 
 type QueryResults = {
   search: SearchResults,
+};
+
+
+const GET_FAMILY = gql`
+query Family($family: String) {
+  family(family: $family) {
+    taxonomy {
+      canonicalName
+      kingdom
+      phylum
+      class
+      order
+    }
+  }
+}`;
+
+type Taxonomy = {
+  canonicalName: string,
+  kingdom: string,
+  phylum: string,
+  class: string,
+  order: string,
+}
+
+type Family = {
+  taxonomy: Taxonomy,
+};
+
+type FamilyResult = {
+  family: Family,
 };
 
 
@@ -204,10 +234,10 @@ function Statistics({ family }: { family: string }) {
 }
 
 
-export default function FamilyPage({ params }: { params: { name: string } }) {
+function Genera({ family }: { family: string }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_GENERA, {
     variables: {
-      family: params.name
+      family: family
     },
   });
 
@@ -224,17 +254,49 @@ export default function FamilyPage({ params }: { params: { name: string } }) {
   const records = data.search.genus;
 
   return (
+    <SimpleGrid cols={3} p={40}>
+      {records.map(record => (
+        <RecordItem key={record.genusName} record={record} />
+      ))}
+    </SimpleGrid>
+  )
+}
+
+
+export default function FamilyPage({ params }: { params: { name: string } }) {
+  const { loading, error, data } = useQuery<FamilyResult>(GET_FAMILY, {
+    variables: {
+      family: params.name
+    },
+  });
+
+  if (loading) {
+    return (<Text>Loading...</Text>);
+  }
+  if (error) {
+    return (<Text>Error : {error.message}</Text>);
+  }
+  if (!data) {
+    return (<Text>No data</Text>);
+  }
+
+  const taxonomy = data.family.taxonomy;
+
+  return (
     <Box>
       <Paper bg="midnight.6" p={40} radius={35}>
         <Title order={3} color="white">{Humanize.capitalize(params.name)}</Title>
+        <Text color="white" c="dimmed">
+          {taxonomy.kingdom}
+          , {taxonomy.phylum}
+          , {taxonomy.class}
+          , {taxonomy.order}
+        </Text>
+
         <Statistics family={params.name} />
       </Paper>
 
-      <SimpleGrid cols={3} p={40}>
-        {records.map(record => (
-          <RecordItem key={record.genusName} record={record} />
-        ))}
-      </SimpleGrid>
+      <Genera family={params.name}/>
     </Box>
   );
 }
