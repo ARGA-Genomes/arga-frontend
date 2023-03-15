@@ -13,6 +13,7 @@ query Suggestions($query: String) {
     suggestions(query: $query) {
       guid
       speciesName
+      commonName
       matched
     }
   }
@@ -23,6 +24,7 @@ query Suggestions($query: String) {
 type Suggestion = {
   guid: string,
   speciesName: string,
+  commonName: string,
   matched: string,
 };
 
@@ -75,7 +77,7 @@ export default function SpeciesSearch() {
   // few records actually get returned this is negligible
   const onCompleted = (results: QueryResults) => {
     const items = results.search.suggestions.map(suggestion => {
-      const value = suggestion.guid;
+      const value = suggestion.commonName;
       const label = suggestion.matched;
       const speciesName = suggestion.speciesName;
       return { value, label, speciesName, id: `${label}-${value}` };
@@ -107,7 +109,7 @@ export default function SpeciesSearch() {
       itemComponent={SuggestionItem}
       data={suggestions}
       onChange={val => setValue(val)}
-      onItemSubmit={item => router.push(`/species/${item.value}`)}
+      onItemSubmit={item => router.push(`/species/${item.value.replaceAll(" ", "_")}`)}
       rightSection={loading ? <Loader variant="bars" size={28} /> : <Search size={35} />}
       rightSectionWidth={100}
       limit={5}
