@@ -8,8 +8,8 @@ import Link from "next/link";
 
 
 const GET_SPECIES = gql`
-query Species($taxonUuid: String) {
-  species(taxonUuid: $taxonUuid) {
+query Species($canonicalName: String) {
+  species(canonicalName: $canonicalName) {
     taxonomy {
       canonicalName
       authorship
@@ -25,7 +25,7 @@ query Species($taxonUuid: String) {
       threatStatus
       source
     }
-    specimens {
+    data {
       canonicalName
       type
       dataResource
@@ -59,7 +59,7 @@ type Distribution = {
   source: string,
 };
 
-type DataItem = {
+type GenomicData = {
   canonicalName: string,
   type: string,
   dataResource: string,
@@ -75,7 +75,7 @@ type DataItem = {
 type Species = {
   taxonomy: Taxonomy,
   distribution: Distribution[],
-  specimens: DataItem[],
+  data: GenomicData[],
 };
 
 type QueryResults = {
@@ -87,7 +87,7 @@ type QueryResults = {
 // There can be multiple different types of data in the index and
 // each might require different treatment so we abstract it here and
 // encapsulate it as a 'card'.
-function DataItem({ item }: { item: DataItem }) {
+function DataItem({ item }: { item: GenomicData }) {
   return (
     <Card shadow="sm" radius="lg" withBorder>
       <Group position="apart">
@@ -132,10 +132,10 @@ function ThreatBadge({ status, children }: { status: string, children: React.Rea
 }
 
 
-export default function SpeciesPage({ params }: { params: { uuid: string } }) {
+export default function SpeciesPage({ params }: { params: { name: string } }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
-      taxonUuid: params.uuid
+        canonicalName: params.name.replaceAll("_", " "),
     },
   });
 
@@ -161,14 +161,14 @@ export default function SpeciesPage({ params }: { params: { uuid: string } }) {
           , {taxonomy.phylum}
           , {taxonomy.class}
           , {taxonomy.order}
-          , {taxonomy.family}
-          , {taxonomy.genus}
+          , <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
+          , <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
         </Text>
         {status ? <ThreatBadge status={status.threatStatus}>{status.threatStatus} - {status.source} - {status.locality}</ThreatBadge> : null}
       </Paper>
 
       <SimpleGrid cols={3} p={40}>
-        {data.species.specimens.map(item => (
+        {data.species.data.map(item => (
           <DataItem key={item.accession} item={item} />
         ))}
       </SimpleGrid>
