@@ -114,6 +114,38 @@ type QueryResults = {
 };
 
 
+const GET_GENUS = gql`
+query Genus($genus: String) {
+  genus(genus: $genus) {
+    taxonomy {
+      canonicalName
+      kingdom
+      phylum
+      class
+      order
+      family
+    }
+  }
+}`;
+
+type Taxonomy = {
+  canonicalName: string,
+  kingdom: string,
+  phylum: string,
+  class: string,
+  order: string,
+  family: string,
+}
+
+type Genus = {
+  taxonomy: Taxonomy,
+};
+
+type GenusResult = {
+  genus: Genus,
+};
+
+
 function RecordItem({ record }: { record: Record }) {
   return (
     <Card shadow="sm" radius="lg" withBorder>
@@ -126,7 +158,7 @@ function RecordItem({ record }: { record: Record }) {
         </Flex>
       </Stack>
       <Divider my={20} />
-      <Link href={record.speciesUuid || "#"} target="_blank">
+      <Link href={`species/${record.scientificName.replaceAll(' ', '_')}`}>
         <Button color="midnight.5" radius={10}>View species</Button>
       </Link>
     </Card>
@@ -242,10 +274,10 @@ function Statistics({ genus }: { genus: string }) {
 }
 
 
-export default function GenusPage({ params }: { params: { name: string } }) {
+function Species({ genus }: { genus: string }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
-      genus: params.name
+      genus: genus,
     },
   });
 
@@ -262,17 +294,50 @@ export default function GenusPage({ params }: { params: { name: string } }) {
   const records = data.search.filtered2.records;
 
   return (
+    <SimpleGrid cols={3} p={40}>
+      {records.map(record => (
+        <RecordItem key={record.id} record={record} />
+      ))}
+    </SimpleGrid>
+  );
+}
+
+
+export default function GenusPage({ params }: { params: { name: string } }) {
+  const { loading, error, data } = useQuery<GenusResult>(GET_GENUS, {
+    variables: {
+      genus: params.name
+    },
+  });
+
+  if (loading) {
+    return (<Text>Loading...</Text>);
+  }
+  if (error) {
+    return (<Text>Error : {error.message}</Text>);
+  }
+  if (!data) {
+    return (<Text>No data</Text>);
+  }
+
+  const taxonomy = data.genus.taxonomy;
+
+  return (
     <Box>
       <Paper bg="midnight.6" p={40} radius={35}>
         <Title order={3} color="white">{Humanize.capitalize(params.name)}</Title>
+        <Text color="white" c="dimmed">
+          {taxonomy.kingdom}
+          , {taxonomy.phylum}
+          , {taxonomy.class}
+          , {taxonomy.order}
+          , <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
+        </Text>
+
         <Statistics genus={params.name} />
       </Paper>
 
-      <SimpleGrid cols={3} p={40}>
-        {records.map(record => (
-          <RecordItem key={record.id} record={record} />
-        ))}
-      </SimpleGrid>
+      <Species genus={params.name}/>
     </Box>
   );
 }
