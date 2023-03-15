@@ -38,7 +38,7 @@ type Breakdown = {
 
 type FamilyStats = {
   totalGenus: number,
-  genusWithData: number,
+  generaWithData: number,
   breakdown: Breakdown[],
 };
 
@@ -96,7 +96,7 @@ function RecordItem({ record }: { record: Record }) {
 }
 
 
-function DataCoverage({ stats }: { stats: GenusStats }) {
+function DataCoverage({ stats }: { stats: FamilyStats }) {
   const total = stats.totalGenera;
   const withData = stats.generaWithData;
 
@@ -134,7 +134,7 @@ function DataCoverage({ stats }: { stats: GenusStats }) {
   )
 }
 
-function DataBreakdown({ stats }: { stats: GenusStats }) {
+function DataBreakdown({ stats }: { stats: FamilyStats }) {
   const breakdown = Array.from(stats.breakdown).sort((a, b) => a.total > b.total ? -1 : 1);
 
   const chartData = {
@@ -221,9 +221,7 @@ export default function FamilyPage({ params }: { params: { name: string } }) {
     return (<Text>No data</Text>);
   }
 
-  console.log(data);
   const records = data.search.genus;
-  console.log(records);
 
   return (
     <Box>
