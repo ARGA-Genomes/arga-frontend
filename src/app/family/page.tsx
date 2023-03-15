@@ -1,6 +1,6 @@
 'use client';
 
-export default function GenusHomePage() {
+export default function FamilyHomePage() {
   return (
     <>
     </>
