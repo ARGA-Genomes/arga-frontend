@@ -19,6 +19,7 @@ specifiers:
   dayjs: ^1.11.7
   eslint: 8.33.0
   eslint-config-next: 13.1.6
+  flag: ^5.0.1
   graphql: ^16.6.0
   humanize-plus: ^1.8.2
   luxon: ^3.2.1
@@ -48,6 +49,7 @@ dependencies:
   dayjs: 1.11.7
   eslint: 8.33.0
   eslint-config-next: 13.1.6_4vsywjlpuriuw3tl5oq6zy5a64
+  flag: 5.0.1_react@18.2.0
   graphql: 16.6.0
   humanize-plus: 1.8.2
   luxon: 3.2.1
@@ -989,6 +991,10 @@ packages:
     resolution: {integrity: sha512-eBvWn1lvIApYMhzQMsu9ciLfkBY499mFZlNqG+/9WR7PVlroQw0vG30cOQQbaKz3sCEc44TAOu2ykzqXSNnwag==}
     dev: false
 
+  /async-ref/0.1.6:
+    resolution: {integrity: sha512-gIvfC7ahv452pM+nwnxZJd/vhUh8UFMrd1DCvIvWjoy9WrRmYroXTTDxwg91oiD+4CqQKrg+11uCxZrzat4UvQ==}
+    dev: false
+
   /available-typed-arrays/1.0.5:
     resolution: {integrity: sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==}
     engines: {node: '>= 0.4'}
@@ -1722,6 +1728,16 @@ packages:
     dependencies:
       locate-path: 6.0.0
       path-exists: 4.0.0
+    dev: false
+
+  /flag/5.0.1_react@18.2.0:
+    resolution: {integrity: sha512-4P/rvPGKcFBneboyYHMOKbKaJL5ZhNjScbY7bGToas7FgBvrTWbh76yxRaoSoFe3HSjWc6IJ0EajUwSadcP6Lg==}
+    peerDependencies:
+      react: ^18
+    dependencies:
+      '@types/react': 18.0.27
+      async-ref: 0.1.6
+      react: 18.2.0
     dev: false
 
   /flat-cache/3.0.4:

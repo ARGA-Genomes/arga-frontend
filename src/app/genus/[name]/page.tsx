@@ -2,8 +2,11 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Text, Card, SimpleGrid, Group, Button, Divider, Flex, Grid, Stack } from "@mantine/core";
+import { Paper, Title, Box, Text, Card, SimpleGrid, Button, Divider, Flex, Stack } from "@mantine/core";
 import Link from "next/link";
+
+import { FlagOrdering, useFlag } from "../../flags";
+import FeatureToggleMenu from "../../components/feature-toggle";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
@@ -50,6 +53,33 @@ type StatsQueryResults = {
   stats: Stats,
 };
 
+
+const GET_SPECIES_TAXONOMY_ORDER = gql`
+query Species($genus: String) {
+  search {
+    filtered2 (genus: $genus) {
+      total
+      records {
+        id
+        speciesUuid
+        scientificName
+
+        biome
+        class
+        eventDate
+        eventTime
+        family
+        genus
+        identifiedBy
+        kingdom
+        license
+        phylum
+        recordedBy
+        species
+      }
+    }
+  }
+}`;
 
 const GET_SPECIES = gql`
 query Species($genus: String) {
@@ -275,7 +305,10 @@ function Statistics({ genus }: { genus: string }) {
 
 
 function Species({ genus }: { genus: string }) {
-  const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
+  const ordering = useFlag("ordering", FlagOrdering.TotalData);
+  const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES;
+
+  const { loading, error, data } = useQuery<QueryResults>(query, {
     variables: {
       genus: genus,
     },
@@ -337,7 +370,9 @@ export default function GenusPage({ params }: { params: { name: string } }) {
         <Statistics genus={params.name} />
       </Paper>
 
-      <Species genus={params.name}/>
+      <Species genus={params.name} />
+
+      <FeatureToggleMenu/>
     </Box>
   );
 }

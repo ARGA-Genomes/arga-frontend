@@ -28,6 +28,7 @@
     "dayjs": "^1.11.7",
     "eslint": "8.33.0",
     "eslint-config-next": "13.1.6",
+    "flag": "^5.0.1",
     "graphql": "^16.6.0",
     "humanize-plus": "^1.8.2",
     "luxon": "^3.2.1",

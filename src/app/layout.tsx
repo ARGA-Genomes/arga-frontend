@@ -3,6 +3,7 @@
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
 import RootStyleRegistry from './theme';
+import { FeatureFlagProvider } from "./flags";
 import { Shell } from './shell';
 
 
@@ -22,9 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <RootStyleRegistry>
           <ApolloProvider client={client}>
-            <Shell>
-              {children}
-            </Shell>
+            <FeatureFlagProvider>
+              <Shell>
+                {children}
+              </Shell>
+            </FeatureFlagProvider>
           </ApolloProvider>
         </RootStyleRegistry>
       </body>
