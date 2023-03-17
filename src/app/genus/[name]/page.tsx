@@ -55,28 +55,12 @@ type StatsQueryResults = {
 
 
 const GET_SPECIES_TAXONOMY_ORDER = gql`
-query Species($genus: String) {
+query SpeciesTaxonomyOrder($genus: String) {
   search {
-    filtered2 (genus: $genus) {
-      total
-      records {
-        id
-        speciesUuid
-        scientificName
-
-        biome
-        class
-        eventDate
-        eventTime
-        family
-        genus
-        identifiedBy
-        kingdom
-        license
-        phylum
-        recordedBy
-        species
-      }
+    species: speciesTaxonomyOrder (genus: $genus) {
+      scientificName
+      canonicalName
+      totalRecords
     }
   }
 }`;
@@ -84,59 +68,23 @@ query Species($genus: String) {
 const GET_SPECIES = gql`
 query Species($genus: String) {
   search {
-    filtered2 (genus: $genus) {
-      total
-      records {
-        id
-        speciesUuid
-        scientificName
-        genomicDataRecords
-
-        biome
-        class
-        eventDate
-        eventTime
-        family
-        genus
-        identifiedBy
-        kingdom
-        license
-        phylum
-        recordedBy
-        species
-      }
+    species (genus: $genus) {
+      scientificName
+      canonicalName
+      totalRecords
     }
   }
 }`;
 
 
 type Record = {
-  id: string,
-  speciesUuid: string,
   scientificName: string,
-  genomicDataRecords: number,
-
-  biome: string,
-  class: string,
-  eventDate: string,
-  eventTime: string,
-  family: string,
-  genus: string,
-  identifiedBy: string[]
-  kingdom: string,
-  license: string,
-  phylum: string,
-  recordedBy: string,
-  species: string,
-}
-
-type Results = {
-  total: number,
-  records: Record[],
+  canonicalName: string,
+  totalRecords: number,
 }
 
 type SearchResults = {
-  filtered2: Results,
+  species: Record[],
 };
 
 type QueryResults = {
@@ -180,15 +128,15 @@ function RecordItem({ record }: { record: Record }) {
   return (
     <Card shadow="sm" radius="lg" withBorder>
       <Stack>
-        <Title order={5}>{record.scientificName}</Title>
+        <Title order={5}>{record.scientificName || record.canonicalName}</Title>
 
         <Flex align="center" gap="md">
-          <Title size={40} color={record.genomicDataRecords == 0 ? "wheat" : "midnight"} align="center">{record.genomicDataRecords}</Title>
+          <Title size={40} color={record.totalRecords == 0 ? "wheat" : "midnight"} align="center">{record.totalRecords}</Title>
           <Text>data records available</Text>
         </Flex>
       </Stack>
       <Divider my={20} />
-      <Link href={`species/${record.scientificName.replaceAll(' ', '_')}`}>
+      <Link href={`species/${record.canonicalName.replaceAll(' ', '_')}`}>
         <Button color="midnight.5" radius={10}>View species</Button>
       </Link>
     </Card>
@@ -324,12 +272,12 @@ function Species({ genus }: { genus: string }) {
     return (<Text>No data</Text>);
   }
 
-  const records = data.search.filtered2.records;
+  const records = data.search.species;
 
   return (
     <SimpleGrid cols={3} p={40}>
       {records.map(record => (
-        <RecordItem key={record.id} record={record} />
+        <RecordItem key={record.speciesName} record={record} />
       ))}
     </SimpleGrid>
   );
