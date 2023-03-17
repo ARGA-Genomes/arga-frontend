@@ -277,7 +277,7 @@ function Species({ genus }: { genus: string }) {
   return (
     <SimpleGrid cols={3} p={40}>
       {records.map(record => (
-        <RecordItem key={record.speciesName} record={record} />
+        <RecordItem key={record.canonicalName} record={record} />
       ))}
     </SimpleGrid>
   );
