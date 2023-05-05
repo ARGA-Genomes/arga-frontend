@@ -3,8 +3,15 @@
 import * as Luxon from "luxon";
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Badge, Text, Card, SimpleGrid, Group, Button, Divider } from "@mantine/core";
+import { Paper, Title, Box, Badge, Text, Card, SimpleGrid, Group, Button, Divider, Image, Grid, Stack, NavLink } from "@mantine/core";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+
+const RegionMap = dynamic(() => import('../../components/region-map'), {
+  ssr: false,
+  loading: () => <Text>Loading map...</Text>,
+})
 
 
 const GET_SPECIES = gql`
@@ -20,10 +27,25 @@ query Species($canonicalName: String) {
       family
       genus
     }
+    photos {
+			url
+			referenceUrl
+			publisher
+			license
+			rightsHolder
+		}
     distribution {
       locality
       threatStatus
       source
+    }
+    regions {
+      ibra {
+        name
+      }
+      imcra {
+        name
+      }
     }
     data {
       canonicalName
@@ -53,11 +75,23 @@ type Taxonomy = {
   genus: string,
 };
 
+type Photo = {
+  url: string,
+  referenceUrl: string,
+  publisher: string,
+  license: string,
+  rightsHolder: string,
+}
+
 type Distribution = {
   locality: string,
   threatStatus: string,
   source: string,
 };
+
+type Region = {
+  name: string,
+}
 
 type GenomicData = {
   canonicalName: string,
@@ -72,9 +106,16 @@ type GenomicData = {
   refseqCategory: string,
 }
 
+type Regions = {
+  ibra: Region[],
+  imcra: Region[],
+}
+
 type Species = {
   taxonomy: Taxonomy,
+  photos: Photo[],
   distribution: Distribution[],
+  regions: Regions,
   data: GenomicData[],
 };
 
@@ -132,6 +173,49 @@ function ThreatBadge({ status, children }: { status: string, children: React.Rea
 }
 
 
+function SpeciesPhoto({ photo }: { photo: Photo }) {
+  function small(url: string) {
+    return url.replace("original", "medium");
+  }
+
+  return (
+    <Box>
+      <Image width={200} height={300} radius="lg" src={small(photo.url)} alt="Species image" />
+      <Text fz="sm" c="dimmed">&copy; { photo.rightsHolder }</Text>
+      <Text fz="sm" c="dimmed"><a href={ photo.referenceUrl } target="_blank">{ photo.publisher }</a></Text>
+    </Box>
+  )
+}
+
+
+function Taxonomy({ taxonomy, regions }: { taxonomy: Taxonomy, regions: Regions }) {
+  return (
+    <Paper bg="midnight.6" p={40} radius={35}>
+      <Grid>
+        <Grid.Col span={3}>
+          <Stack>
+            <Text color="white" c="dimmed">{taxonomy.kingdom}</Text>
+            <Text color="white" c="dimmed">{taxonomy.phylum}</Text>
+            <Text color="white" c="dimmed">{taxonomy.class}</Text>
+            <Text color="white" c="dimmed">{taxonomy.order}</Text>
+            <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
+            <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
+          </Stack>
+        </Grid.Col>
+
+        <Grid.Col span="auto">
+          <RegionMap regions={ regions.ibra.map(region => region.name) } />
+          <Text color="white" c="dimmed" fz="sm">
+            { regions.ibra.map(region => region.name).join(", ") }
+            { regions.imcra.map(region => region.name).join(", ") }
+          </Text>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  )
+}
+
+
 export default function SpeciesPage({ params }: { params: { name: string } }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
@@ -150,22 +234,28 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
   }
 
   const taxonomy = data.species.taxonomy;
+  const photos = data.species.photos;
+  const regions = data.species.regions;
   const status = data.species.distribution.find(dist => dist.threatStatus != null);
 
   return (
     <Box>
       <Paper bg="midnight.6" p={40} radius={35}>
         <Title order={3} color="white">{taxonomy.canonicalName}, {taxonomy.authorship}</Title>
-        <Text color="white" c="dimmed">
-          {taxonomy.kingdom}
-          , {taxonomy.phylum}
-          , {taxonomy.class}
-          , {taxonomy.order}
-          , <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
-          , <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
-        </Text>
         {status ? <ThreatBadge status={status.threatStatus}>{status.threatStatus} - {status.source} - {status.locality}</ThreatBadge> : null}
       </Paper>
+
+      <Grid p={40}>
+        <Grid.Col span="content">
+          { photos[0]
+            ? <SpeciesPhoto photo={photos[0]}/>
+            : <Image width={200} height={300} radius="lg" alt="Species image" withPlaceholder />
+          }
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Taxonomy taxonomy={taxonomy} regions={regions} />
+        </Grid.Col>
+      </Grid>
 
       <SimpleGrid cols={3} p={40}>
         {data.species.data.map(item => (
