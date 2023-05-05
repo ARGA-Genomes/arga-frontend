@@ -6,6 +6,7 @@ import { Box } from "@mantine/core";
 import { GeoJSON, MapContainer, TileLayer, useMapEvent } from "react-leaflet";
 import { useEffect, useState } from 'react';
 import { gql, useQuery } from "@apollo/client";
+import { LatLngExpression } from 'leaflet';
 
 
 const GET_GEOMETRY = gql`
@@ -45,21 +46,19 @@ function IbraLayers({ regions }: { regions: string[] }) {
 
   const map = useMapEvent('zoomend', () => {
     const invertZoom = (2 ^ map.getMaxZoom()) - (2 ^ map.getZoom());
-    console.log(map.getZoom());
-    console.log(map.getMaxZoom());
-    console.log(invertZoom);
     const tolerance = 0.001 * invertZoom;
-    console.log("tolerance", tolerance);
     setTolerance(tolerance);
   });
 
   return (
-    <GeoJSON key={`${tolerance}-${json}`} data={json} />
+    <>
+    { json ? <GeoJSON key={`${tolerance}-${json}`} data={json} /> : null }
+    </>
   )
 }
 
 export default function RegionMap({ regions }: { regions: string[] }) {
-  const position = [-37.840935, 144.946457];
+  const position = [-37.840935, 144.946457] as LatLngExpression;
   return (
     <Box h={500} w={800}>
       <MapContainer center={position} zoom={5} scrollWheelZoom={true} style={{ height: "100%", width: "100%" }}>
