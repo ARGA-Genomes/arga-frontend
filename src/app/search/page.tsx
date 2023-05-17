@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 type Record = {
   type: string,
   scientificName: string,
+  scientificNameAuthorship: string,
   canonicalName?: string,
   rank?: string,
   taxonomicStatus?: string,
@@ -38,6 +39,7 @@ query FullTextSearch ($query: String) {
         ... on TaxonItem {
           type
           scientificName
+          scientificNameAuthorship
           canonicalName
           rank
           taxonomicStatus
@@ -69,7 +71,7 @@ function TaxonItem({ item } : { item: Record }) {
           </Avatar>
         </Grid.Col>
         <Grid.Col span="auto">
-          <Text>{item.scientificName}</Text>
+          <Text><i>{item.canonicalName || item.scientificName}</i> {item.scientificNameAuthorship}</Text>
           <Text c="dimmed">{item.commonNames?.join(", ")}</Text>
         </Grid.Col>
       </Grid>
