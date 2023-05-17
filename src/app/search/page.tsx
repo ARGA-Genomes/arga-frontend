@@ -2,144 +2,139 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, createStyles, Chip, Box, Card, Group, Flex, Stack, Grid } from "@mantine/core";
-import { SearchFilter,  FilterParams } from './filter';
+import { Text, Paper, Title, createStyles, Chip, Box, Card, Group, Flex, Stack, Grid, Container, SegmentedControl, Center, CardSection, Space } from "@mantine/core";
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
-
-const useStyles = createStyles((theme, _params, _getRef) => ({
-  item: {
-    "&:hover": {
-      backgroundColor: theme.colors["moss"][0],
-    },
-  },
-}));
-
-
-type SearchItem = {
-  id: string,
+type Record = {
   scientificName: string,
-  subgenus: string,
-  genus: string,
-  family: string,
-  class: string,
-  phylum: string,
-  kingdom: string,
-  speciesGroup?: string[],
-  speciesSubgroup?: string[],
-  biome: string,
-  eventDate: string,
-  eventTime: string,
-  license: string,
-  recordedBy: string[],
-  identifiedBy: string[],
-  genomicDataRecords: number,
+  canonicalName?: string,
+  rank?: string,
+  taxonomicStatus?: string,
+  commonNames?: string[],
+  score: number,
 };
 
-type FilteredResults = {
-  total: number,
-  records: SearchItem[],
-};
+type FullTextResults = {
+  records: Record[],
+}
 
 type SearchResults = {
-  filtered: FilteredResults,
+  fullText: FullTextResults,
 };
 
 type QueryResults = {
   search: SearchResults,
 };
 
-const GET_SEARCH_RESULTS = gql`
-query Search($kingdom: String, $phylum: String, $class: String, $family: String, $genus: String) {
+const SEARCH_FULLTEXT = gql`
+query FullTextSearch ($query: String) {
   search {
-    filtered(kingdom: $kingdom, phylum: $phylum, class: $class, family: $family, genus: $genus) {
-      total
+    fullText (query: $query) {
       records {
-        id
-        scientificName
-        subgenus
-        genus
-        family
-        class
-        phylum
-        kingdom
-        speciesGroup
-        speciesSubgroup
-        biome
-        eventDate
-        eventTime
-        license
-        recordedBy
-        identifiedBy
-        genomicDataRecords
+        ... on TaxonItem {
+          scientificName,
+          canonicalName,
+          rank,
+          taxonomicStatus,
+          commonNames,
+          score,
+        }
       }
     }
   }
-}`;
+}`
+
+
+function SearchItem({ item } : { item: Record }) {
+  const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+
+  return (
+    <Paper my={30} h={70} radius="lg" bg="bushfire.5">
+      <Grid p={0}>
+        <Grid.Col span="content">
+          <Space w="md" />
+        </Grid.Col>
+        <Grid.Col span="auto" p={0}>
+          <Link href={`/species/${itemLinkName}`}>
+            <Paper bg="white" h={70} radius="lg" p={10}>
+              <Text>{item.scientificName}</Text>
+              <Text c="dimmed">{item.commonNames?.join(", ")}</Text>
+            </Paper>
+          </Link>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  )
+}
+
+function SearchResults({ results } : { results: Record[] }) {
+  return (
+    <Box>
+      {results.map(record => (
+        <SearchItem item={record} />
+      ))}
+    </Box>
+  )
+}
+
 
 export default function SearchPage() {
-  const { classes } = useStyles();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('q');
 
-  const { loading, error, data, refetch } = useQuery<QueryResults>(GET_SEARCH_RESULTS);
+  const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
+    variables: {
+      query,
+    }
+  });
   if (error) return <p>Error : {error.message}</p>;
   if (loading) return <Text>Loading...</Text>;
   if (!data) return <Text>No data</Text>;
 
-  const onFilterChange = (params: FilterParams) => {
-    const variables = {
-      kingdom: [...params.kingdom][0],
-      phylum: [...params.phylum][0],
-      class: [...params.class][0],
-      family: [...params.family][0],
-      genus: [...params.genus][0],
-    };
-    refetch(variables);
-  }
-
   return (
-    <Box>
-      <Paper bg="midnight.6" p={40} radius={35}>
-        <Title order={3} color="white">Current filters:</Title>
-        <SearchFilter onChange={ onFilterChange } />
+    <Container>
+      <Paper bg="midnight.6" radius="lg" p="xl">
+        <Title color="white" align='center'>Search results</Title>
+        <Text my="lg" c="dimmed">Query: {query}</Text>
+
+        <SegmentedControl size="lg" radius="lg" fullWidth color="bushfire.4" data={[
+          {
+            value: 'all',
+            label: (
+              <Center>
+                <Box ml={10}>All</Box>
+              </Center>
+            ),
+          },
+          {
+            value: 'species',
+            label: (
+              <Center>
+                <Box ml={10}>Species</Box>
+              </Center>
+            ),
+          },
+          {
+            value: 'whole_genomes',
+            label: (
+              <Center>
+                <Box ml={10}>Whole Genomes</Box>
+              </Center>
+            ),
+          },
+          {
+            value: 'barcodes',
+            label: (
+              <Center>
+                <Box ml={10}>Barcodes</Box>
+              </Center>
+            ),
+          },
+        ]} />
       </Paper>
 
-      <Title order={1} mt={20} mb={20}>Search results</Title>
-
-      {data.search.filtered.records.map(item => (
-        <Card withBorder shadow="xl" radius="md" mb={20} className={classes.item} key={item.id}>
-          <Grid>
-            <Grid.Col span="auto">
-              <Card.Section withBorder inheritPadding py="xs">
-                <Group position="apart">
-                  <Title order={3}>{item.scientificName}</Title>
-                </Group>
-              </Card.Section>
-
-              <Text>Group: {item.speciesGroup?.join(", ")}</Text>
-              <Text>Subgroup: {item.speciesSubgroup?.join(", ")}</Text>
-
-              <Card.Section mt="sm">
-                <Chip.Group position="left" multiple mt={15}>
-                  <Chip value="1" variant="filled">Kingdom: {item.kingdom}</Chip>
-                  <Chip value="2" variant="filled">Phylum: {item.phylum}</Chip>
-                  <Chip value="3" variant="filled">Class: {item.class}</Chip>
-                  <Chip value="4" variant="filled">Family: {item.family}</Chip>
-                  <Chip value="5" variant="filled">Genus: {item.genus}</Chip>
-                  <Chip value="6">Biome: {item.biome}</Chip>
-                  <Chip value="7">License: {item.license}</Chip>
-                  <Chip value="8">Recorded by: {item.recordedBy}</Chip>
-                  <Chip value="9">Identified by: {item.identifiedBy}</Chip>
-                </Chip.Group>
-              </Card.Section>
-            </Grid.Col>
-
-            <Grid.Col span={1} bg="midnight">
-              <Card.Section mt="xl">
-                <Title size={60} color={item.genomicDataRecords == 0 ? "wheat" : "white"} align="center">{item.genomicDataRecords}</Title>
-              </Card.Section>
-            </Grid.Col>
-          </Grid>
-        </Card>
-      ))}
-    </Box>
+      <SearchResults results={data.search.fullText.records} />
+    </Container>
   );
 }
