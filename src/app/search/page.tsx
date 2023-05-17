@@ -2,17 +2,20 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, createStyles, Chip, Box, Card, Group, Flex, Stack, Grid, Container, SegmentedControl, Center, CardSection, Space } from "@mantine/core";
+import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Center, Space, Avatar, Image } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 type Record = {
+  type: string,
   scientificName: string,
   canonicalName?: string,
   rank?: string,
   taxonomicStatus?: string,
   commonNames?: string[],
   score: number,
+
+  sequences?: number,
 };
 
 type FullTextResults = {
@@ -33,12 +36,19 @@ query FullTextSearch ($query: String) {
     fullText (query: $query) {
       records {
         ... on TaxonItem {
-          scientificName,
-          canonicalName,
-          rank,
-          taxonomicStatus,
-          commonNames,
-          score,
+          type
+          scientificName
+          canonicalName
+          rank
+          taxonomicStatus
+          commonNames
+          score
+        }
+        ... on WholeGenomeSequenceItem {
+          type
+          scientificName
+          sequences
+          score
         }
       }
     }
@@ -46,26 +56,60 @@ query FullTextSearch ($query: String) {
 }`
 
 
-function SearchItem({ item } : { item: Record }) {
+function TaxonItem({ item } : { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
 
   return (
-    <Paper my={30} h={70} radius="lg" bg="bushfire.5">
-      <Grid p={0}>
+    <Link href={`/species/${itemLinkName}`}>
+    <Paper my={30} p={10} radius="lg">
+      <Grid>
         <Grid.Col span="content">
-          <Space w="md" />
+          <Avatar color="bushfire.5" size="lg" radius="lg" variant="filled">
+            <Image src="/search-icons/taxon.svg" alt="Taxon dashboard" m={5} />
+          </Avatar>
         </Grid.Col>
-        <Grid.Col span="auto" p={0}>
-          <Link href={`/species/${itemLinkName}`}>
-            <Paper bg="white" h={70} radius="lg" p={10}>
-              <Text>{item.scientificName}</Text>
-              <Text c="dimmed">{item.commonNames?.join(", ")}</Text>
-            </Paper>
-          </Link>
+        <Grid.Col span="auto">
+          <Text>{item.scientificName}</Text>
+          <Text c="dimmed">{item.commonNames?.join(", ")}</Text>
         </Grid.Col>
       </Grid>
     </Paper>
+    </Link>
   )
+}
+
+function WholeGenomeSequenceItem({ item } : { item: Record }) {
+  const itemLinkName = item.scientificName.replaceAll(" ", "_");
+
+  return (
+    <Link href={`/species/${itemLinkName}`}>
+    <Paper my={30} p={10} radius="lg">
+      <Grid>
+        <Grid.Col span="content">
+          <Avatar color="shellfish.4" size="lg" radius="lg" variant="filled">
+            <Image src="/search-icons/wgs.svg" alt="Whole Genome Sequence" m={5} />
+          </Avatar>
+        </Grid.Col>
+        <Grid.Col span="auto">
+            <Text>{item.scientificName}</Text>
+            <Text c="dimmed"><strong>{item.sequences || 0}</strong> Sequences found</Text>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+    </Link>
+  )
+}
+
+
+function SearchItem({ item } : { item: Record }) {
+  switch (item.type) {
+      case 'TAXON':
+        return (<TaxonItem item={item} />)
+      case 'WHOLE_GENOME_SEQUENCE':
+        return (<WholeGenomeSequenceItem item={item} />)
+      default:
+        return null
+  }
 }
 
 function SearchResults({ results } : { results: Record[] }) {
