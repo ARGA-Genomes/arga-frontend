@@ -2,9 +2,11 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Center, Space, Avatar, Image } from "@mantine/core";
+import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Center, Avatar, Image, TextInput } from "@mantine/core";
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Search } from 'tabler-icons-react';
 
 type Record = {
   type: string,
@@ -32,9 +34,9 @@ type QueryResults = {
 };
 
 const SEARCH_FULLTEXT = gql`
-query FullTextSearch ($query: String) {
+query FullTextSearch ($query: String, $dataType: String) {
   search {
-    fullText (query: $query) {
+    fullText (query: $query, dataType: $dataType) {
       records {
         ... on TaxonItem {
           type
@@ -222,25 +224,55 @@ function SearchResults({ results } : { results: Record[] }) {
 
 
 export default function SearchPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const query = searchParams.get('q');
+  const [query, setQuery] = useState(searchParams.get('q') || "")
+  const [search, setSearch] = useState(searchParams.get('q') || "")
+  const [dataType, setDataType] = useState(searchParams.get('type') || "all")
 
   const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
       query,
+      dataType: dataType,
     }
   });
+
   if (error) return <p>Error : {error.message}</p>;
   if (loading) return <Text>Loading...</Text>;
   if (!data) return <Text>No data</Text>;
+
+  function onSearch() {
+    router.push(`/search?q=${encodeURIComponent(search)}&type=${dataType}`)
+    setQuery(search)
+  }
+
+  function onFilter(value: string) {
+    router.push(`/search?q=${encodeURIComponent(search)}&type=${value}`)
+    setDataType(value)
+  }
 
   return (
     <Container>
       <Paper bg="midnight.6" radius="lg" p="xl">
         <Title color="white" align='center'>Search results</Title>
-        <Text my="lg" c="dimmed">Query: {query}</Text>
+        <form onSubmit={(ev) => { ev.preventDefault(); onSearch(); }}>
+        <TextInput
+          m={20}
+          radius="md"
+          icon={<Search />}
+          value={search}
+          onChange={(ev) => setSearch(ev.currentTarget.value)}
+        />
+        </form>
 
-        <SegmentedControl size="lg" radius="lg" fullWidth color="bushfire.4" data={[
+        <SegmentedControl
+          size="lg"
+          radius="lg"
+          fullWidth
+          color="bushfire.4"
+          value={dataType}
+          onChange={onFilter}
+          data={[
           {
             value: 'all',
             label: (
