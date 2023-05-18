@@ -46,7 +46,7 @@ query FullTextSearch ($query: String) {
           commonNames
           score
         }
-        ... on WholeGenomeSequenceItem {
+        ... on GenomeSequenceItem {
           type
           scientificName
           sequences
@@ -80,7 +80,7 @@ function TaxonItem({ item } : { item: Record }) {
   )
 }
 
-function WholeGenomeSequenceItem({ item } : { item: Record }) {
+function ReferenceGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
@@ -89,12 +89,100 @@ function WholeGenomeSequenceItem({ item } : { item: Record }) {
       <Grid>
         <Grid.Col span="content">
           <Avatar color="shellfish.4" size="lg" radius="lg" variant="filled">
+            <Image src="/search-icons/wgs.svg" alt="Reference Genome Sequence" m={5} />
+          </Avatar>
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Text><i>{item.scientificName}</i></Text>
+          <Text c="dimmed"><strong>{item.sequences || 0} Reference genome{(item.sequences || 0) > 1 ? "s" : null} found</strong></Text>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+    </Link>
+  )
+}
+
+function WholeGenomeSequenceItem({ item } : { item: Record }) {
+  const itemLinkName = item.scientificName.replaceAll(" ", "_");
+
+  return (
+    <Link href={`/species/${itemLinkName}`}>
+    <Paper my={30} p={10} radius="lg">
+      <Grid>
+        <Grid.Col span="content">
+          <Avatar color="shellfish.3" size="lg" radius="lg" variant="filled">
             <Image src="/search-icons/wgs.svg" alt="Whole Genome Sequence" m={5} />
           </Avatar>
         </Grid.Col>
         <Grid.Col span="auto">
-            <Text>{item.scientificName}</Text>
-            <Text c="dimmed"><strong>{item.sequences || 0}</strong> Sequences found</Text>
+          <Text><i>{item.scientificName}</i></Text>
+          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Whole genome{(item.sequences || 0) > 1 ? "s" : null} found</Text>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+    </Link>
+  )
+}
+
+function PartialGenomeSequenceItem({ item } : { item: Record }) {
+  const itemLinkName = item.scientificName.replaceAll(" ", "_");
+
+  return (
+    <Link href={`/species/${itemLinkName}`}>
+    <Paper my={30} p={10} radius="lg">
+      <Grid>
+        <Grid.Col span="content">
+          <Avatar color="shellfish.1" size="lg" radius="lg" variant="filled">
+            <Image src="/search-icons/partial.svg" alt="Partial Genome Sequence" m={5} />
+          </Avatar>
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Text><i>{item.scientificName}</i></Text>
+          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Partial genome{(item.sequences || 0) > 1 ? "s" : null} found</Text>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+    </Link>
+  )
+}
+
+function UnknownGenomeSequenceItem({ item } : { item: Record }) {
+  const itemLinkName = item.scientificName.replaceAll(" ", "_");
+
+  return (
+    <Link href={`/species/${itemLinkName}`}>
+    <Paper my={30} p={10} radius="lg">
+      <Grid>
+        <Grid.Col span="content">
+          <Avatar color="shellfish.1" size="lg" radius="lg" variant="filled">
+            <Image src="/search-icons/partial.svg" alt="Sequence" m={5} />
+          </Avatar>
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Text><i>{item.scientificName}</i></Text>
+          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Sequence{(item.sequences || 0) > 1 ? "s" : null} found</Text>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+    </Link>
+  )
+}
+
+function BarcodeItem({ item } : { item: Record }) {
+  const itemLinkName = item.scientificName.replaceAll(" ", "_");
+
+  return (
+    <Link href={`/species/${itemLinkName}`}>
+    <Paper my={30} p={10} radius="lg">
+      <Grid>
+        <Grid.Col span="content">
+          <Avatar color="moss.4" size="lg" radius="lg" variant="filled">
+            <Image src="/search-icons/barcode.svg" alt="Barcode" m={10} />
+          </Avatar>
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Text><i>{item.scientificName}</i></Text>
+          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Barcode{(item.sequences || 0) > 1 ? "s" : null} found</Text>
         </Grid.Col>
       </Grid>
     </Paper>
@@ -107,8 +195,16 @@ function SearchItem({ item } : { item: Record }) {
   switch (item.type) {
       case 'TAXON':
         return (<TaxonItem item={item} />)
+      case 'REFERENCE_GENOME_SEQUENCE':
+        return (<ReferenceGenomeSequenceItem item={item} />)
       case 'WHOLE_GENOME_SEQUENCE':
         return (<WholeGenomeSequenceItem item={item} />)
+      case 'PARTIAL_GENOME_SEQUENCE':
+        return (<PartialGenomeSequenceItem item={item} />)
+      case 'UNKNOWN_GENOME_SEQUENCE':
+        return (<UnknownGenomeSequenceItem item={item} />)
+      case 'BARCODE':
+        return (<BarcodeItem item={item} />)
       default:
         return null
   }
