@@ -216,7 +216,7 @@ function SearchResults({ results } : { results: Record[] }) {
   return (
     <Box>
       {results.map(record => (
-        <SearchItem item={record} key={record.scientificName} />
+        <SearchItem item={record} key={`${record.scientificName}-${record.type}`} />
       ))}
     </Box>
   )

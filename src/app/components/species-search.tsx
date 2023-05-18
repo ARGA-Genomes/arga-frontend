@@ -100,10 +100,15 @@ export default function SpeciesSearch() {
     }
   }, [debounced, getSuggestions]);
 
+  function onSearch() {
+    router.push(`/search?q=${encodeURIComponent(value)}&type=all`);
+  }
+
   // the style is hardcoded as the home page search box for now
   // but this can easily be changed if the auto suggest functionality
   // is needed elsewhere
   return (
+    <form onSubmit={(ev) => { ev.preventDefault(); onSearch() }}>
     <Autocomplete
       value={value}
       itemComponent={SuggestionItem}
@@ -119,5 +124,6 @@ export default function SpeciesSearch() {
       radius={20}
       styles={{ input: { height: 90 } }}
     />
+    </form>
   )
 }
