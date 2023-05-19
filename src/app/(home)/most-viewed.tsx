@@ -24,7 +24,7 @@ function Dataset(params: DatasetProps) {
 export default function MostViewedCard() {
   return (
     <Stack>
-      <Title order={1} color="wheat.3">Most viewed dataset</Title>
+      <Title order={2} color="wheat.3">Most viewed dataset</Title>
 
       <SimpleGrid cols={3}>
         <Dataset total={23000} name="Whole genome" />

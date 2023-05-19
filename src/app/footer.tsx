@@ -18,22 +18,22 @@ export function Footer() {
       <Container size="xl" mb={200}>
         <Grid gutter={100}>
           <Grid.Col span={4}>
-            <Image src="/ala_logo.png" width={202} height={89} alt="" />
+            <Image src="/ala-logo.svg" width={248} height={100} alt="" />
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Image src="/biocommons_logo.png" width={220} height={65} alt="" />
+            <Image src="/biocommons-logo.svg" width={338} height={100} alt="" />
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Image src="/bioplatforms_logo.png" width={228} height={80} alt="" />
+            <Image src="/bioplatforms-logo.svg" width={355} height={100} alt="" />
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Image src="/ardc_logo.png" width={295} height={96} alt="" />
+            <Image src="/ardc-logo.svg" width={307} height={100} alt="" />
           </Grid.Col>
 
-          <Grid.Col span={4}>
+          <Grid.Col span="auto">
             <Container size={570}>
               <Text color="white" size="xs">
                 The Australian Reference Genome Atlas (ARGA) is powered by the Atlas of Living Australia,
@@ -45,8 +45,8 @@ export function Footer() {
             </Container>
           </Grid.Col>
 
-          <Grid.Col span={4}>
-            <Image src="/ncris_logo.png" width={290} height={210} alt="" />
+          <Grid.Col span="content">
+            <Image src="/ncris-logo.svg" width={193} height={139} alt="" />
           </Grid.Col>
         </Grid>
       </Container>

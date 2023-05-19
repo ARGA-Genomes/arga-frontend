@@ -1,6 +1,6 @@
 'use client';
 
-import { AppShell, Box, Container, Flex, Header, Image } from '@mantine/core';
+import { AppShell, Box, Container, Flex, Header } from '@mantine/core';
 import { TopNav } from './top-nav';
 import { Footer } from './footer'
 
@@ -15,8 +15,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <AppShell
       padding={0}
       header={
-        <Header height={77} bg="black" withBorder={false}>
-          <Container maw={MAX_WIDTH}>
+        <Header height={160} bg="black" withBorder={false}>
+          <Container maw={MAX_WIDTH} px={30} h="inherit">
             <TopNav />
           </Container>
         </Header>

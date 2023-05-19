@@ -28,7 +28,7 @@ function Dataset(params: DatasetProps) {
 export default function MostDownloadedCard() {
   return (
     <Stack>
-      <Title order={1} color="wheat.3">Most downloaded</Title>
+      <Title order={2} color="wheat.3">Most downloaded</Title>
 
       <Stack>
         <Dataset total={14000} name="Whole genome" />

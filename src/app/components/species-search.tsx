@@ -1,7 +1,7 @@
 'use client';
 
 import { gql, useLazyQuery } from "@apollo/client";
-import { Autocomplete, AutocompleteItem, Box, Group, Loader, MantineColor, SelectItemProps, Text } from "@mantine/core";
+import { Autocomplete, AutocompleteItem, Group, Loader, MantineColor, SelectItemProps, Text } from "@mantine/core";
 import { useDebouncedValue } from '@mantine/hooks';
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useState } from "react";
@@ -61,13 +61,19 @@ const SuggestionItem = forwardRef<HTMLDivElement, ItemProps>(
 SuggestionItem.displayName = "SuggestionItem";
 
 
+interface SpeciesSearchProperties {
+  searchTerms?: string,
+  onSearch: (searchTerms: string) => void,
+}
+
+
 // Search by taxonomy input component. This uses the mantine autocomplete
 // component with dynamic data and custom AutocompleteItems. It will also
 // debounce the input to avoid sending superfluous requests for each change.
-export default function SpeciesSearch() {
+export default function SpeciesSearch(props: SpeciesSearchProperties) {
   const router = useRouter();
 
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(props.searchTerms || "");
   const [suggestions, setSuggestions] = useState<AutocompleteItem[]>([]);
   const [debounced] = useDebouncedValue(value, 500);
 
@@ -100,29 +106,27 @@ export default function SpeciesSearch() {
     }
   }, [debounced, getSuggestions]);
 
-  function onSearch() {
-    router.push(`/search?q=${encodeURIComponent(value)}&type=all`);
-  }
 
   // the style is hardcoded as the home page search box for now
   // but this can easily be changed if the auto suggest functionality
   // is needed elsewhere
   return (
-    <form onSubmit={(ev) => { ev.preventDefault(); onSearch() }}>
+    <form onSubmit={(ev) => { ev.preventDefault(); props.onSearch(value) }}>
     <Autocomplete
+      placeholder="e.g. sequence accession, taxon identifier, genus name"
       value={value}
       itemComponent={SuggestionItem}
       data={suggestions}
       onChange={val => setValue(val)}
       onItemSubmit={item => router.push(`/species/${item.value.replaceAll(" ", "_")}`)}
-      rightSection={loading ? <Loader variant="bars" size={28} /> : <Search size={35} />}
-      rightSectionWidth={100}
+      icon={loading ? <Loader variant="bars" size={28} /> : <Search size={28} />}
+      iconWidth={60}
       limit={5}
       error={error?.message}
       filter={_ => true}
       size="xl"
       radius={20}
-      styles={{ input: { height: 90 } }}
+      styles={{ input: { height: 90, fontSize: "24px", fontWeight: 500, border: 0 } }}
     />
     </form>
   )

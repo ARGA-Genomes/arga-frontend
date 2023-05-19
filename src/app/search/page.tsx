@@ -2,11 +2,12 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Center, Avatar, Image, TextInput } from "@mantine/core";
+import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Center, Avatar, Image, TextInput, createStyles, Stack, Button, LoadingOverlay } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Search } from 'tabler-icons-react';
+import { Search as IconSearch } from 'tabler-icons-react';
+import SpeciesSearch from '../components/species-search';
 
 type Record = {
   type: string,
@@ -223,92 +224,124 @@ function SearchResults({ results } : { results: Record[] }) {
 }
 
 
+interface SearchProperties {
+  onSearch: (searchTerms: string, dataType: string) => void,
+}
+
+function Search(props: SearchProperties) {
+  const segmented = useSearchTypeStyles();
+  const searchParams = useSearchParams();
+
+  const [searchTerms, setSearchTerms] = useState(searchParams.get('q') || "")
+  const [dataType, setDataType] = useState(searchParams.get('type') || "all")
+
+  function onFilter(value: string) {
+      /* router.push(`/search?q=${encodeURIComponent(search)}&type=${value}`) */
+    setDataType(value)
+    props.onSearch(searchTerms, value)
+  }
+
+  function onSearch(value: string) {
+    setSearchTerms(value)
+    props.onSearch(value, dataType)
+  }
+
+  return (
+    <Paper p={20} radius="xl">
+      <SegmentedControl
+        size="lg"
+        fullWidth
+        value={dataType}
+        onChange={onFilter}
+        classNames={segmented.classes}
+        data={[
+          { value: 'all', label: "All" },
+          { value: 'species', label: "Species" },
+          { value: 'whole_genomes', label: "Whole Genomes" },
+          { value: 'barcodes', label: "Barcodes" },
+        ]}
+      />
+
+      <Stack mt={20}>
+        <Grid align="center">
+          <Grid.Col span="auto">
+            <SpeciesSearch searchTerms={searchTerms} onSearch={onSearch} />
+          </Grid.Col>
+
+          <Grid.Col span="content">
+            <Button size="xl" radius="lg" color="midnight.5">Search</Button>
+          </Grid.Col>
+        </Grid>
+      </Stack>
+    </Paper>
+  )
+}
+
+
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || "")
-  const [search, setSearch] = useState(searchParams.get('q') || "")
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
 
-  const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
+  const { loading, error, data, refetch } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
       query,
       dataType: dataType,
     }
   });
 
-  if (error) return <p>Error : {error.message}</p>;
-  if (loading) return <Text>Loading...</Text>;
-  if (!data) return <Text>No data</Text>;
-
-  function onSearch() {
-    router.push(`/search?q=${encodeURIComponent(search)}&type=${dataType}`)
-    setQuery(search)
-  }
-
-  function onFilter(value: string) {
-    router.push(`/search?q=${encodeURIComponent(search)}&type=${value}`)
-    setDataType(value)
+  function onSearch(searchTerms: string, dataType: string) {
+      /* router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=${dataType}`, { shallow: true }) */
+    setQuery(searchTerms)
+    setDataType(dataType)
+    refetch({ variables: { query, dataType }})
   }
 
   return (
     <Container>
-      <Paper bg="midnight.6" radius="lg" p="xl">
+      <Search onSearch={onSearch} />
+
+      <Paper bg="midnight.6" radius="xl" p="xl" mt={40}>
+        <LoadingOverlay visible={loading} overlayBlur={2} />
         <Title color="white" align='center'>Search results</Title>
-        <form onSubmit={(ev) => { ev.preventDefault(); onSearch(); }}>
-        <TextInput
-          m={20}
-          radius="md"
-          icon={<Search />}
-          value={search}
-          onChange={(ev) => setSearch(ev.currentTarget.value)}
-        />
-        </form>
-
-        <SegmentedControl
-          size="lg"
-          radius="lg"
-          fullWidth
-          color="bushfire.4"
-          value={dataType}
-          onChange={onFilter}
-          data={[
-          {
-            value: 'all',
-            label: (
-              <Center>
-                <Box ml={10}>All</Box>
-              </Center>
-            ),
-          },
-          {
-            value: 'species',
-            label: (
-              <Center>
-                <Box ml={10}>Species</Box>
-              </Center>
-            ),
-          },
-          {
-            value: 'whole_genomes',
-            label: (
-              <Center>
-                <Box ml={10}>Whole Genomes</Box>
-              </Center>
-            ),
-          },
-          {
-            value: 'barcodes',
-            label: (
-              <Center>
-                <Box ml={10}>Barcodes</Box>
-              </Center>
-            ),
-          },
-        ]} />
+        <SearchResults results={data?.search.fullText.records || []} />
       </Paper>
-
-      <SearchResults results={data.search.fullText.records} />
     </Container>
   );
 }
+
+
+// Custom segmented control style for the search block
+const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
+  return {
+    root: {
+      color: "white",
+      backgroundColor: "white",
+      paddingLeft: 0,
+      paddingRight: 0,
+      borderWidth: 0,
+      borderRadius: 0,
+      borderBottomColor: "grey",
+      borderBottomWidth: "1px",
+      borderBottomStyle: "solid",
+    },
+    label: {
+      fontSize: "20px",
+      fontWeight: 400,
+      color: "grey",
+    },
+    control: {
+      borderWidth: 0,
+      borderRadius: 0,
+    },
+    active: {
+      bottom: 0,
+      borderRadius: 0,
+      borderBottomColor: theme.colors.bushfire[4],
+      borderBottomWidth: "6px",
+      borderBottomStyle: "solid",
+      boxShadow: "none",
+    },
+  }
+});

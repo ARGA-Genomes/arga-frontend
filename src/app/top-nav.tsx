@@ -1,9 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Flex, Grid, NavLink, createStyles } from '@mantine/core';
-import { Home } from 'tabler-icons-react';
-
+import { NavLink, createStyles, Group, Image } from '@mantine/core';
 
 // Custom navbar link styles. We define class with emotion here
 // as this particular component wont be used anywhere else
@@ -11,15 +9,18 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
     color: "white",
     borderRadius: theme.radius.sm,
-    maxHeight: 40,
+    height: 70,
+    alignItems: "start",
+    paddingLeft: "20px",
+    paddingRight: "20px",
 
     "&:hover, &:focus": {
-      backgroundColor: theme.colors["moss"][4],
+      backgroundColor: "black",
     },
-  },
 
-  link: {
-    textDocration: "none",
+    span: {
+      fontSize: "20px",
+    }
   },
 }));
 
@@ -28,14 +29,22 @@ export function TopNav() {
   const { classes } = useStyles();
 
   return (
-    <Grid>
-      <Grid.Col span="auto">
-        <Flex gap="md" justify="flex-end" align="center" direction="row">
-          <Link href="/" className={classes.link}>
-            <NavLink label="Home" icon={<Home color="white" size={18} />} className={classes.nav_link} />
-          </Link>
-        </Flex>
-      </Grid.Col>
-    </Grid>
+    <Group position="apart" h="inherit">
+      <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={319} height={90} />
+      <Group position="right" align="end" h="inherit">
+        <Link href="/" className={classes.link}>
+          <NavLink label="Home" className={classes.nav_link} />
+        </Link>
+        <Link href="/" className={classes.link}>
+          <NavLink label="Databases" className={classes.nav_link} />
+        </Link>
+        <Link href="/" className={classes.link}>
+          <NavLink label="Resources" className={classes.nav_link} />
+        </Link>
+        <Link href="/" className={classes.link}>
+          <NavLink label="Help" className={classes.nav_link} />
+        </Link>
+      </Group>
+    </Group>
     )
 }
