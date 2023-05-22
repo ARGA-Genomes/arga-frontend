@@ -15,7 +15,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <AppShell
       padding={0}
       header={
-        <Header height={160} bg="black" withBorder={false}>
+        <Header height={160} bg="black" withBorder={false} sx={{ "z-index": 2000 }}>
           <Container maw={MAX_WIDTH} px={30} h="inherit">
             <TopNav />
           </Container>
