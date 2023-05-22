@@ -32,16 +32,16 @@ export function TopNav() {
     <Group position="apart" h="inherit">
       <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={319} height={90} />
       <Group position="right" align="end" h="inherit">
-        <Link href="/" className={classes.link}>
+        <Link href="/">
           <NavLink label="Home" className={classes.nav_link} />
         </Link>
-        <Link href="/" className={classes.link}>
+        <Link href="/">
           <NavLink label="Databases" className={classes.nav_link} />
         </Link>
-        <Link href="/" className={classes.link}>
+        <Link href="/">
           <NavLink label="Resources" className={classes.nav_link} />
         </Link>
-        <Link href="/" className={classes.link}>
+        <Link href="/">
           <NavLink label="Help" className={classes.nav_link} />
         </Link>
       </Group>
