@@ -1,18 +1,11 @@
 'use client';
 
-import * as Luxon from "luxon";
-import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Badge, Text, Card, SimpleGrid, Group, Button, Divider, Image, Grid, Stack, NavLink } from "@mantine/core";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-
-
-const RegionMap = dynamic(() => import('../../components/region-map'), {
-  ssr: false,
-  loading: () => <Text>Loading map...</Text>,
-})
-
+import {Paper, Title, Box, Badge, Text, Tabs, Grid} from "@mantine/core";
+import { Summary } from "src/app/species/[name]/summary";
+import { QueryResults} from "@/app/type";
+import {WholeGenome} from "@/app/species/[name]/wholeGenome";
+import {Resources } from "@/app/species/[name]/resources";
 
 const GET_SPECIES = gql`
 query Species($canonicalName: String) {
@@ -62,92 +55,6 @@ query Species($canonicalName: String) {
   }
 }`;
 
-
-type Taxonomy = {
-  canonicalName: string,
-  authorship: string,
-
-  kingdom: string,
-  phylum: string,
-  class: string,
-  order: string,
-  family: string,
-  genus: string,
-};
-
-type Photo = {
-  url: string,
-  referenceUrl: string,
-  publisher: string,
-  license: string,
-  rightsHolder: string,
-}
-
-type Distribution = {
-  locality: string,
-  threatStatus: string,
-  source: string,
-};
-
-type Region = {
-  name: string,
-}
-
-type GenomicData = {
-  canonicalName: string,
-  type: string,
-  dataResource: string,
-  recordedBy: string[],
-  license: string,
-  provenance: string,
-  eventDate: string,
-  accession: string,
-  accessionUri: string,
-  refseqCategory: string,
-}
-
-type Regions = {
-  ibra: Region[],
-  imcra: Region[],
-}
-
-type Species = {
-  taxonomy: Taxonomy,
-  photos: Photo[],
-  distribution: Distribution[],
-  regions: Regions,
-  data: GenomicData[],
-};
-
-type QueryResults = {
-  species: Species,
-};
-
-
-// A data item in the ARGA index associated with the species.
-// There can be multiple different types of data in the index and
-// each might require different treatment so we abstract it here and
-// encapsulate it as a 'card'.
-function DataItem({ item }: { item: GenomicData }) {
-  return (
-    <Card shadow="sm" radius="lg" withBorder>
-      <Group position="apart">
-        <Title order={5}>{item.accession}</Title>
-        <Badge>{item.type.replace("_", " ")}</Badge>
-      </Group>
-      <Text c="dimmed">{item.refseqCategory ? Humanize.capitalize(item.refseqCategory) : null}</Text>
-      <Text c="dimmed">{item.dataResource}</Text>
-      <Text c="dimmed">{item.license} - {item.provenance}</Text>
-      <Text c="dimmed">{Luxon.DateTime.fromISO(item.eventDate).toLocaleString()}</Text>
-      <Divider my={20} />
-      <Link href={item.accessionUri || "#"} target="_blank">
-        <Button color="midnight.5" radius={10}>Get Data</Button>
-      </Link>
-    </Card>
-  )
-}
-
-
 // A mapping between a thread status value and a colour to
 // associated it with.
 const ThreatColour = {
@@ -172,50 +79,6 @@ function ThreatBadge({ status, children }: { status: string, children: React.Rea
   )
 }
 
-
-function SpeciesPhoto({ photo }: { photo: Photo }) {
-  function small(url: string) {
-    return url.replace("original", "medium");
-  }
-
-  return (
-    <Box>
-      <Image width={200} height={300} radius="lg" src={small(photo.url)} alt="Species image" />
-      <Text fz="sm" c="dimmed">&copy; { photo.rightsHolder }</Text>
-      <Text fz="sm" c="dimmed"><Link href={ photo.referenceUrl } target="_blank">{ photo.publisher }</Link></Text>
-    </Box>
-  )
-}
-
-
-function Taxonomy({ taxonomy, regions }: { taxonomy: Taxonomy, regions: Regions }) {
-  return (
-    <Paper bg="midnight.6" p={40} radius={35}>
-      <Grid>
-        <Grid.Col span={3}>
-          <Stack>
-            <Text color="white" c="dimmed">{taxonomy.kingdom}</Text>
-            <Text color="white" c="dimmed">{taxonomy.phylum}</Text>
-            <Text color="white" c="dimmed">{taxonomy.class}</Text>
-            <Text color="white" c="dimmed">{taxonomy.order}</Text>
-            <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
-            <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
-          </Stack>
-        </Grid.Col>
-
-        <Grid.Col span="auto">
-          <RegionMap regions={ regions.ibra.map(region => region.name) } />
-          <Text color="white" c="dimmed" fz="sm">
-            { regions.ibra.map(region => region.name).join(", ") }
-            { regions.imcra.map(region => region.name).join(", ") }
-          </Text>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  )
-}
-
-
 export default function SpeciesPage({ params }: { params: { name: string } }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
@@ -234,34 +97,63 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
   }
 
   const taxonomy = data.species.taxonomy;
-  const photos = data.species.photos;
-  const regions = data.species.regions;
   const status = data.species.distribution.find(dist => dist.threatStatus != null);
+  const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome");
 
   return (
-    <Box>
+    <><Box>
+      <Title order={3} color="white">{taxonomy.canonicalName}, {taxonomy.authorship}</Title>
+      {status ? <ThreatBadge
+        status={status.threatStatus}>{status.threatStatus} - {status.source} - {status.locality}</ThreatBadge> : null}
       <Paper bg="midnight.6" p={40} radius={35}>
-        <Title order={3} color="white">{taxonomy.canonicalName}, {taxonomy.authorship}</Title>
-        {status ? <ThreatBadge status={status.threatStatus}>{status.threatStatus} - {status.source} - {status.locality}</ThreatBadge> : null}
+        <Title order={3} color="white">Data Summary</Title>
+        <Grid style={{ paddingTop: 25 }}>
+          <Grid.Col span={4}>Whole Genomes : {wholeGenomeRecords.length}</Grid.Col>
+          <Grid.Col span={4}>Mitogenomes</Grid.Col>
+          <Grid.Col span={4}>Other Data</Grid.Col>
+        </Grid>
       </Paper>
-
-      <Grid p={40}>
-        <Grid.Col span="content">
-          { photos[0]
-            ? <SpeciesPhoto photo={photos[0]}/>
-            : <Image width={200} height={300} radius="lg" alt="Species image" withPlaceholder />
-          }
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Taxonomy taxonomy={taxonomy} regions={regions} />
-        </Grid.Col>
-      </Grid>
-
-      <SimpleGrid cols={3} p={40}>
-        {data.species.data.map(item => (
-          <DataItem key={item.accession} item={item} />
-        ))}
-      </SimpleGrid>
     </Box>
+      <Tabs defaultValue="summary">
+        <Tabs.List style={{ paddingTop: 25 }}>
+          <Tabs.Tab value="summary"><Text color="grey">Summary</Text></Tabs.Tab>
+          <Tabs.Tab value="whole_genome"><Text color="grey">Whole Genome Data</Text></Tabs.Tab>
+          <Tabs.Tab value="mitogenome"><Text color="grey">Mitogenome Data</Text></Tabs.Tab>
+          <Tabs.Tab value="barcode"><Text color="grey">Barcode Data</Text></Tabs.Tab>
+          <Tabs.Tab value="other_genomic"><Text color="grey">Other Genomic Data</Text></Tabs.Tab>
+          <Tabs.Tab value="other_nongenomic"><Text color="grey">Other Non genomic Data</Text></Tabs.Tab>
+          <Tabs.Tab value="specimen"><Text color="grey">Specimen</Text></Tabs.Tab>
+          <Tabs.Tab value="gallery"><Text color="grey">Gallery</Text></Tabs.Tab>
+          <Tabs.Tab value="resources"><Text color="grey">Resources</Text></Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="summary" pt="xs">
+          <Summary data={data}/>
+        </Tabs.Panel>
+        <Tabs.Panel value="whole_genome" pt="xs">
+          <WholeGenome data={data}/>
+        </Tabs.Panel>
+        <Tabs.Panel value="mitogenome" pt="xs">
+          tab content
+        </Tabs.Panel>
+        <Tabs.Panel value="barcode" pt="xs">
+          tab content
+        </Tabs.Panel>
+        <Tabs.Panel value="other_genomic" pt="xs">
+          tab content
+        </Tabs.Panel>
+        <Tabs.Panel value="other_nongenomic" pt="xs">
+          tab content
+        </Tabs.Panel>
+        <Tabs.Panel value="specimen" pt="xs">
+          tab content
+        </Tabs.Panel>
+        <Tabs.Panel value="gallery" pt="xs">
+        </Tabs.Panel>
+        <Tabs.Panel value="resources" pt="xs">
+          <Resources data={data}/>
+        </Tabs.Panel>
+      </Tabs>
+    </>
   );
 }
