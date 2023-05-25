@@ -108,9 +108,9 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
       <Paper bg="midnight.6" p={40} radius={35}>
         <Title order={3} color="white">Data Summary</Title>
         <Grid style={{ paddingTop: 25 }}>
-          <Grid.Col span={4}>Whole Genomes : {wholeGenomeRecords.length}</Grid.Col>
-          <Grid.Col span={4}>Mitogenomes</Grid.Col>
-          <Grid.Col span={4}>Other Data</Grid.Col>
+          <Grid.Col span={4}><Text color="white">Whole Genomes : {wholeGenomeRecords.length}</Text></Grid.Col>
+          <Grid.Col span={4}><Text color="white">Mitogenomes</Text></Grid.Col>
+          <Grid.Col span={4}><Text color="white">Other Data</Text></Grid.Col>
         </Grid>
       </Paper>
     </Box>
@@ -151,7 +151,7 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
         <Tabs.Panel value="gallery" pt="xs">
         </Tabs.Panel>
         <Tabs.Panel value="resources" pt="xs">
-          <Resources data={data}/>
+          <Resources data={data.species.data}/>
         </Tabs.Panel>
       </Tabs>
     </>
