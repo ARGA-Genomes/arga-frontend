@@ -1,18 +1,15 @@
 'use client';
 
-import {Component} from "react";
+import {Props} from "html-react-parser/lib/attributes-to-props";
 import {WholeGenomeDetails} from "@/app/species/wholeGenome/wholeGenomeDetails";
 
-export default class WholeGenomePage extends Component {
+export default function WholeGenomePage(props : Props) {
 
-  render() {
-
-    let speciesName = this.props.searchParams.name;
+    const speciesName = props.searchParams.name;
 
     return (
       <>
         <WholeGenomeDetails speciesName={speciesName}/>
       </>
     )
-  }
 }
