@@ -2,11 +2,10 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Center, Avatar, Image, TextInput, createStyles, Stack, Button, LoadingOverlay } from "@mantine/core";
+import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Avatar, Image, createStyles, Stack, Button, LoadingOverlay } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Search as IconSearch } from 'tabler-icons-react';
 import SpeciesSearch from '../components/species-search';
 
 type Record = {
