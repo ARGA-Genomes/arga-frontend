@@ -2,7 +2,7 @@
 
 import {WholeGenomeDetails} from "@/app/species/wholeGenome/wholeGenomeDetails";
 
-export default function WholeGenomePage(props : { searchParams: any }) {
+export default function WholeGenomePage(props : any) {
 
     const speciesName = props.searchParams.name;
 
