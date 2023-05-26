@@ -28,7 +28,7 @@ export function WholeGenomeDetails({ speciesName }: { speciesName : String }) {
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
-      canonicalName: speciesName.replaceAll("_", " "),
+      canonicalName: speciesName?.replaceAll("_", " "),
     },
   });
 
@@ -56,7 +56,7 @@ export function WholeGenomeDetails({ speciesName }: { speciesName : String }) {
             <Grid.Col>
               <Text style={{ paddingBottom: 25 }} color="white">Whole Genome (Refseq)</Text>
               <Stack>
-                <Text color="white">Species Name: {speciesName.replaceAll("_", " ")}</Text>
+                <Text color="white">Species Name: {speciesName?.replaceAll("_", " ")}</Text>
                 <Text c="dimmed">Reference Genome</Text>
                 <Text color="white">Refseq {referenceGenome.map((record => record.accession))}</Text>
                 <Text color="white">{referenceGenome.map((record => record.accessionUri))}</Text>
