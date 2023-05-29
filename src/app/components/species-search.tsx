@@ -75,7 +75,7 @@ export default function SpeciesSearch(props: SpeciesSearchProperties) {
 
   const [value, setValue] = useState(props.searchTerms || "");
   const [suggestions, setSuggestions] = useState<AutocompleteItem[]>([]);
-  const [debounced] = useDebouncedValue(value, 500);
+    /* const [debounced] = useDebouncedValue(value, 500); */
 
   // Construct the autocomplete items from the search suggestion results.
   // Rather than tie the backend payload to the frontend component we add some
@@ -98,13 +98,13 @@ export default function SpeciesSearch(props: SpeciesSearchProperties) {
   );
 
   // debounce and send a search suggestion request when the input changes
-  useEffect(() => {
-    if (debounced) {
-      getSuggestions({
-        variables: { query: debounced }
-      });
-    }
-  }, [debounced, getSuggestions]);
+    /* useEffect(() => {
+  *   if (debounced) {
+  *     getSuggestions({
+  *       variables: { query: debounced }
+  *     });
+  *   }
+  * }, [debounced, getSuggestions]); */
 
 
   // the style is hardcoded as the home page search box for now
@@ -116,7 +116,7 @@ export default function SpeciesSearch(props: SpeciesSearchProperties) {
       placeholder="e.g. sequence accession, taxon identifier, genus name"
       value={value}
       itemComponent={SuggestionItem}
-      data={suggestions}
+      data={[]}
       onChange={val => setValue(val)}
       onItemSubmit={item => router.push(`/species/${item.value.replaceAll(" ", "_")}`)}
       icon={loading ? <Loader variant="bars" size={28} /> : <Search size={28} />}

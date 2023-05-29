@@ -1,10 +1,10 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Card, createStyles, Flex, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image } from "@mantine/core";
+import { Box, Card, createStyles, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image, Grid } from "@mantine/core";
 import Link from "next/link";
 import { useState } from "react";
-import { CircleCheck } from "tabler-icons-react";
+import { CircleCheck, CircleX } from "tabler-icons-react";
 
 
 
@@ -26,6 +26,12 @@ query lists($name: String) {
       photo {
         url
       }
+      dataSummary {
+        wholeGenomes
+        mitogenomes
+        barcodes
+        other
+      }
     }
   }
 }`;
@@ -46,9 +52,17 @@ type Photo = {
   url: string,
 }
 
+type DataSummary = {
+  wholeGenomes: number,
+  mitogenomes: number,
+  barcodes: number,
+  other: number,
+}
+
 type Species = {
   taxonomy: Taxonomy,
   photo: Photo,
+  dataSummary: DataSummary,
 }
 
 type Lists = {
@@ -58,6 +72,19 @@ type Lists = {
 type QueryResults = {
   lists: Lists,
 };
+
+
+function DataItem({ name, count }: { name: string, count: number }) {
+  return (
+    <Grid>
+      <Grid.Col span="content" pb={0} pr={0} mr={0}>
+        { count > 0 ? <CircleCheck color="green" /> : <CircleX color="red" /> }
+      </Grid.Col>
+      <Grid.Col span="auto"><Text>{name}</Text></Grid.Col>
+      <Grid.Col span="content"><Text c="dimmed">{count} records</Text></Grid.Col>
+    </Grid>
+  )
+}
 
 
 function SpeciesCard({ species }: { species: Species }) {
@@ -70,10 +97,10 @@ function SpeciesCard({ species }: { species: Species }) {
       </Link>
 
       <Box py={20}>
-      <Flex gap={8}><CircleCheck color="green"/><Text>Whole genome</Text></Flex>
-      <Flex gap={8}><CircleCheck color="green"/><Text>Mitogenome</Text></Flex>
-      <Flex gap={8}><CircleCheck color="green"/><Text>Barcode</Text></Flex>
-      <Flex gap={8}><CircleCheck color="green"/><Text>Other</Text></Flex>
+        <DataItem name="Whole genome" count={species.dataSummary.wholeGenomes} />
+        <DataItem name="Mitogenome" count={species.dataSummary.mitogenomes} />
+        <DataItem name="Barcode" count={species.dataSummary.barcodes} />
+        <DataItem name="Other" count={species.dataSummary.other} />
       </Box>
 
       <Card.Section>
