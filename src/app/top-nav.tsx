@@ -30,7 +30,9 @@ export function TopNav() {
 
   return (
     <Group position="apart" h="inherit">
-      <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={319} height={90} />
+      <Link href="/">
+        <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={319} height={90} />
+      </Link>
       <Group position="right" align="end" h="inherit">
         <Link href="/">
           <NavLink label="Home" className={classes.nav_link} />

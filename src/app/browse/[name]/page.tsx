@@ -78,10 +78,10 @@ function DataItem({ name, count }: { name: string, count: number }) {
   return (
     <Grid>
       <Grid.Col span="content" pb={0} pr={0} mr={0}>
-        { count > 0 ? <CircleCheck color="green" /> : <CircleX color="red" /> }
+        { count > 0 ? <CircleCheck color="green" /> : <CircleX color="rgb(134, 142, 150)" /> }
       </Grid.Col>
-      <Grid.Col span="auto"><Text>{name}</Text></Grid.Col>
-      <Grid.Col span="content"><Text c="dimmed">{count} records</Text></Grid.Col>
+      <Grid.Col span="auto"><Text c={count > 0 ? "black" : "dimmed"}>{name}</Text></Grid.Col>
+      <Grid.Col span="content"><Text c={count > 0 ? "black" : "dimmed"}>{count} records</Text></Grid.Col>
     </Grid>
   )
 }
@@ -89,6 +89,10 @@ function DataItem({ name, count }: { name: string, count: number }) {
 
 function SpeciesCard({ species }: { species: Species }) {
   const itemLinkName = species.taxonomy.canonicalName.replaceAll(" ", "_");
+
+  function small(photo: Photo) {
+    return photo.url.replaceAll("original", "small");
+  }
 
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
@@ -106,7 +110,7 @@ function SpeciesCard({ species }: { species: Species }) {
       <Card.Section>
         <Link href={`/species/${itemLinkName}`}>
           { species.photo
-            ? <Image src={species.photo.url} height={160} alt={species.taxonomy.canonicalName} />
+            ? <Image src={small(species.photo)} height={160} alt={species.taxonomy.canonicalName} />
             : <Image withPlaceholder height={160} alt={species.taxonomy.canonicalName} />
           }
         </Link>
