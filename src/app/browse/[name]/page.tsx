@@ -2,6 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Card, createStyles, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image, Grid, Pagination, MantineProvider } from "@mantine/core";
+import { useScrollIntoView } from "@mantine/hooks";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CircleCheck, CircleX } from "tabler-icons-react";
@@ -168,6 +169,8 @@ const INVERTEBRATE_FILTERS = [
 const PAGE_SIZE = 20;
 
 export default function BrowseList({ params }: { params: { name: string } }) {
+  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
+
   const segmented = useSearchTypeStyles();
   const [taxaType, setTaxaType] = useState('vertebrates');
   const [filters, setFilters] = useState<FilterItem[]>(VERTEBRATE_FILTERS);
@@ -195,7 +198,7 @@ export default function BrowseList({ params }: { params: { name: string } }) {
 
   return (
     <Box>
-      <Paper bg="midnight.6" p={10} radius="lg">
+      <Paper bg="midnight.6" p={10} radius="lg" ref={targetRef}>
         <MantineProvider theme={{ colorScheme: 'dark' }}>
         <SegmentedControl
           size="md"
@@ -229,7 +232,10 @@ export default function BrowseList({ params }: { params: { name: string } }) {
           withEdges
           total={totalPages}
           page={pagination.page}
-          onChange={(page) => setPagination({page, pageSize: PAGE_SIZE})}
+          onChange={(page) => {
+            setPagination({page, pageSize: PAGE_SIZE})
+            scrollIntoView({ alignment: 'center' })
+          }}
         />
       </Paper>
     </Box>
