@@ -58,10 +58,10 @@ export function WholeGenomeDetails({ speciesName }: { speciesName : String }) {
               <Stack>
                 <Text color="white">Species Name: {speciesName?.replaceAll("_", " ")}</Text>
                 <Text c="dimmed">Reference Genome</Text>
-                <Text color="white">Refseq {referenceGenome.map((record => record.accession))}</Text>
+                <Text color="white">Refseq: {referenceGenome.map((record => record.accession))}</Text>
                 <Text color="white">{referenceGenome.map((record => record.accessionUri))}</Text>
               </Stack>
-
+              <br/>
               <Text style={{ padding: 25 }} color="white">List of other assemblies</Text>
               <GenomeRecords data={ otherWholeGenomeRecords }/>
             </Grid.Col>

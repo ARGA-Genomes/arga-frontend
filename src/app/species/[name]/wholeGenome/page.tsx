@@ -1,6 +1,6 @@
 'use client';
 
-import {WholeGenomeDetails} from "@/app/species/wholeGenome/wholeGenomeDetails";
+import {WholeGenomeDetails} from "@/app/species/[name]/wholeGenome/wholeGenomeDetails";
 
 export default function WholeGenomePage({ params }: { params: { name: string } }) {
 
@@ -8,7 +8,6 @@ export default function WholeGenomePage({ params }: { params: { name: string } }
 
     return (
       <>
-        <h1>{params.name}</h1>
         <WholeGenomeDetails speciesName={speciesName}/>
       </>
     )

@@ -107,7 +107,7 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
 
   return (
     <><Box>
-      <Title order={3} color="white">{taxonomy.canonicalName}, {taxonomy.authorship}</Title>
+      <Title order={3} color="white"><Text italic={true}>{taxonomy.canonicalName}</Text> {taxonomy.authorship}</Title>
       {status ? <ThreatBadge
         status={status.threatStatus}>{status.threatStatus} - {status.source} - {status.locality}</ThreatBadge> : null}
       <Paper bg="midnight.6" p={40} radius={35}>
