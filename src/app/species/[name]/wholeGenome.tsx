@@ -4,6 +4,7 @@ import { Grid, Paper, Text } from "@mantine/core";
 import { QueryResults} from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import PointMap from "@/app/components/point-map";
 
 const RegionMap = dynamic(() => import('../../components/region-map'), {
   ssr: false,
@@ -12,7 +13,12 @@ const RegionMap = dynamic(() => import('../../components/region-map'), {
 
 function WholeGenomeSection({ data }: { data : QueryResults }) {
 
-  const regions = data.species.regions;
+  const otherWholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" &&
+    !record.accession?.includes("GCF_"));
+  const referenceGenome = data.species.data.filter((record) => record.refseqCategory == "reference genome"
+    || record.accession?.includes("GCF_"));
+
+  const coordinates = otherWholeGenomeRecords.map(record => record.coordinates);
 
   return (
     <Paper bg="midnight.6" p={40} radius={35}>
@@ -20,17 +26,12 @@ function WholeGenomeSection({ data }: { data : QueryResults }) {
         <Grid.Col span={3}>
           <Link
             href={{
-              pathname: `/species/wholeGenome`,
-              query: {name : data.species.taxonomy.canonicalName.replaceAll(" ", "_") },
+              pathname: `/species/${data.species.taxonomy.canonicalName.replaceAll(" ", "_")}/wholeGenome`
             }}><Text color="blue">Whole Genome Summary</Text></Link>
         </Grid.Col>
 
         <Grid.Col span="auto">
-          <RegionMap regions={regions.ibra.map(region => region.name)}/>
-          <Text color="white" c="dimmed" fz="sm">
-            {regions.ibra.map(region => region.name).join(", ")}
-            {regions.imcra.map(region => region.name).join(", ")}
-          </Text>
+          <PointMap coordinates={coordinates}/>
         </Grid.Col>
       </Grid>
     </Paper>

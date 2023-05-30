@@ -51,6 +51,10 @@ query Species($canonicalName: String) {
       accession
       accessionUri
       refseqCategory
+      coordinates {
+        latitude
+        longitude
+      }
     }
   }
 }`;
@@ -98,7 +102,8 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
 
   const taxonomy = data.species.taxonomy;
   const status = data.species.distribution.find(dist => dist.threatStatus != null);
-  const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome");
+  const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
+    record.refseqCategory == "reference genome");
 
   return (
     <><Box>

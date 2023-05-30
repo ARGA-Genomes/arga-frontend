@@ -39,6 +39,12 @@ type GenomicData = {
     accession: string,
     accessionUri: string,
     refseqCategory: string,
+    coordinates: Coordinates
+}
+
+type Coordinates = {
+    latitude: string,
+    longitude: string,
 }
 
 type Regions = {
@@ -66,5 +72,6 @@ export type {
     GenomicData,
     Regions,
     Species,
-    QueryResults
+    QueryResults,
+    Coordinates
 };
