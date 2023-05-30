@@ -4,9 +4,8 @@ import { Grid, Paper, Text } from "@mantine/core";
 import { QueryResults} from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import PointMap from "@/app/components/point-map";
 
-const RegionMap = dynamic(() => import('../../components/region-map'), {
+const PointMap = dynamic(() => import('../../components/point-map'), {
   ssr: false,
   loading: () => <Text>Loading map...</Text>,
 })
