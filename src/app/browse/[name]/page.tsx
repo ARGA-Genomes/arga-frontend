@@ -75,13 +75,21 @@ type QueryResults = {
 
 
 function DataItem({ name, count }: { name: string, count: number }) {
+  const hasData = count > 0;
+  const dimmed = 'rgba(134, 142, 150, .5)';
+  const extraDimmed = 'rgba(134, 142, 150, .3)';
+
   return (
     <Grid>
       <Grid.Col span="content" pb={0} pr={0} mr={0}>
-        { count > 0 ? <CircleCheck color="green" /> : <CircleX color="rgb(134, 142, 150)" /> }
+        { hasData ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} /> }
       </Grid.Col>
-      <Grid.Col span="auto"><Text c={count > 0 ? "black" : "dimmed"}>{name}</Text></Grid.Col>
-      <Grid.Col span="content"><Text c={count > 0 ? "black" : "dimmed"}>{count} records</Text></Grid.Col>
+      <Grid.Col span="auto">
+        <Text c={hasData ? "black" : dimmed} fw={hasData ? 500 : 400 }>{name}</Text>
+      </Grid.Col>
+      <Grid.Col span="content">
+        <Text c={hasData ? "black" : dimmed} fw={hasData ? 500 : 400 }>{count} records</Text>
+      </Grid.Col>
     </Grid>
   )
 }

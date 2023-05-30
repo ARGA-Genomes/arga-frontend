@@ -254,10 +254,10 @@ function Search(props: SearchProperties) {
         onChange={onFilter}
         classNames={segmented.classes}
         data={[
-          { value: 'all', label: "All" },
           { value: 'species', label: "Species" },
           { value: 'whole_genomes', label: "Whole Genomes" },
           { value: 'barcodes', label: "Barcodes" },
+          { value: 'all', label: "All" },
         ]}
       />
 
