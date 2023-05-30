@@ -1,16 +1,18 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Card, createStyles, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image, Grid } from "@mantine/core";
+import { Box, Card, createStyles, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image, Grid, Pagination, MantineProvider } from "@mantine/core";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CircleCheck, CircleX } from "tabler-icons-react";
 
 
-
 const GET_TAXA = gql`
-query lists($name: String) {
-  lists(name: $name) {
+query lists($name: String, $pagination: Pagination, $filters: [FilterItem]) {
+  lists(name: $name, pagination: $pagination, filters: $filters) {
+    stats {
+      totalRecords
+    }
     species {
       taxonomy {
         scientificName
@@ -35,6 +37,18 @@ query lists($name: String) {
     }
   }
 }`;
+
+type Pagination = {
+  page: number,
+  pageSize: number,
+}
+
+type FilterItem = {
+  filter: string,
+  action: string,
+  value: string,
+}
+
 
 type Taxonomy = {
   scientificName: string,
@@ -65,7 +79,12 @@ type Species = {
   dataSummary: DataSummary,
 }
 
+type Stats = {
+  totalRecords: number,
+}
+
 type Lists = {
+  stats: Stats,
   species: Species[],
 };
 
@@ -136,19 +155,48 @@ function BrowseResults({ list }: { list: Species[]}) {
   )
 }
 
+const VERTEBRATE_FILTERS = [
+  { filter: 'KINGDOM', action: 'INCLUDE', value: 'Animalia' },
+  { filter: 'PHYLUM', action: 'INCLUDE', value: 'Chordata' },
+];
+
+const INVERTEBRATE_FILTERS = [
+  { filter: 'KINGDOM', action: 'INCLUDE', value: 'Animalia' },
+  { filter: 'PHYLUM', action: 'EXCLUDE', value: 'Chordata' },
+];
+
+const PAGE_SIZE = 20;
+
 export default function BrowseList({ params }: { params: { name: string } }) {
   const segmented = useSearchTypeStyles();
   const [taxaType, setTaxaType] = useState('vertebrates');
+  const [filters, setFilters] = useState<FilterItem[]>(VERTEBRATE_FILTERS);
+  const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE });
+  const [totalPages, setTotalPages] = useState(1)
 
   const { loading, error, data } = useQuery<QueryResults>(GET_TAXA, {
     variables: {
-        name: params.name.replaceAll("_", " "),
+      name: params.name.replaceAll("_", " "),
+      pagination,
+      filters,
     },
   });
+
+  useEffect(() => {
+    setFilters(taxaType == 'vertebrates' ? VERTEBRATE_FILTERS : INVERTEBRATE_FILTERS)
+    setPagination({ page: 1, pageSize: PAGE_SIZE })
+    setTotalPages(1)
+  }, [taxaType, setFilters, setPagination, setTotalPages])
+
+  useEffect(() => {
+    setTotalPages(data ? Math.ceil(data.lists.stats.totalRecords / PAGE_SIZE) : 1)
+  }, [data, setTotalPages])
+
 
   return (
     <Box>
       <Paper bg="midnight.6" p={10} radius="lg">
+        <MantineProvider theme={{ colorScheme: 'dark' }}>
         <SegmentedControl
           size="md"
           m={10}
@@ -160,12 +208,30 @@ export default function BrowseList({ params }: { params: { name: string } }) {
             { value: 'invertebrates', label: 'Invertebrates' },
           ]}
         />
+        </MantineProvider>
       </Paper>
 
       <Box mt={40}>
-        <LoadingOverlay visible={false} />
+        <LoadingOverlay
+          overlayColor="black"
+          transitionDuration={500}
+          loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+          visible={loading}
+        />
         { !loading && data ? <BrowseResults list={data.lists.species} /> : null }
       </Box>
+
+      <Paper bg="midnight.6" p={20} m={40} radius="lg">
+        <Pagination
+          position="center"
+          color="bushfire.5"
+          radius="lg"
+          withEdges
+          total={totalPages}
+          page={pagination.page}
+          onChange={(page) => setPagination({page, pageSize: PAGE_SIZE})}
+        />
+      </Paper>
     </Box>
   );
 }

@@ -302,7 +302,12 @@ export default function SearchPage() {
       <Search onSearch={onSearch} />
 
       <Paper bg="midnight.6" radius="xl" p="xl" mt={40}>
-        <LoadingOverlay visible={loading} overlayBlur={2} />
+        <LoadingOverlay
+          overlayColor="black"
+          transitionDuration={500}
+          loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+          visible={loading}
+        />
         <Title color="white" align='center'>Search results</Title>
         <SearchResults results={data?.search.fullText.records || []} />
       </Paper>
