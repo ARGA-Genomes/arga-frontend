@@ -2,10 +2,10 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Avatar, Image, createStyles, Stack, Button, LoadingOverlay } from "@mantine/core";
+import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Avatar, Image, createStyles, Stack, Button, LoadingOverlay, Group, Center } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SpeciesSearch from '../components/species-search';
 
 type Record = {
@@ -227,6 +227,17 @@ interface SearchProperties {
   onSearch: (searchTerms: string, dataType: string) => void,
 }
 
+function SearchDataTypeItem({ label, image }: { label: string, image: string }) {
+  return (
+    <Center>
+      <Group>
+        <Image src={image} height={24} width={24} />
+        <Text>{label}</Text>
+      </Group>
+    </Center>
+  )
+}
+
 function Search(props: SearchProperties) {
   const segmented = useSearchTypeStyles();
   const searchParams = useSearchParams();
@@ -254,9 +265,9 @@ function Search(props: SearchProperties) {
         onChange={onFilter}
         classNames={segmented.classes}
         data={[
-          { value: 'species', label: "Species" },
-          { value: 'whole_genomes', label: "Whole Genomes" },
-          { value: 'barcodes', label: "Barcodes" },
+          { value: 'species', label: <SearchDataTypeItem label="Species" image="/search-icons/taxon_dark.svg" /> },
+          { value: 'whole_genomes', label: <SearchDataTypeItem label="Whole Genomes" image="/search-icons/wgs.svg" /> },
+          { value: 'barcodes', label: <SearchDataTypeItem label="Barcodes" image="/search-icons/barcode.svg" /> },
           { value: 'all', label: "All" },
         ]}
       />
@@ -277,11 +288,25 @@ function Search(props: SearchProperties) {
 }
 
 
+function formattedDataType(dataType: string) {
+  switch(dataType) {
+      case 'species':
+        return 'species data'
+      case 'whole_genomes':
+        return 'whole genome data'
+      case 'barcodes':
+        return 'barcode data'
+      case 'all':
+        return 'all data'
+    }
+}
+
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || "")
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
+  const [formattedType, setFormattedType] = useState(formattedDataType(dataType))
 
   const { loading, error, data, refetch } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
@@ -297,8 +322,12 @@ export default function SearchPage() {
     refetch({ variables: { query, dataType }})
   }
 
+  useEffect(() => {
+    setFormattedType(formattedDataType(dataType))
+  }, [dataType, setFormattedType])
+
   return (
-    <Container>
+    <Box>
       <Search onSearch={onSearch} />
 
       <Paper bg="midnight.6" radius="xl" p="xl" mt={40}>
@@ -308,10 +337,11 @@ export default function SearchPage() {
           loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
           visible={loading}
         />
-        <Title color="white" align='center'>Search results</Title>
+        <Text color="white" size="xl">Results for <strong>{query}</strong> in <strong>{formattedType}</strong></Text>
+        <Text color="white">Found <strong>{data?.search.fullText.records.length}</strong> records</Text>
         <SearchResults results={data?.search.fullText.records || []} />
       </Paper>
-    </Container>
+    </Box>
   );
 }
 
