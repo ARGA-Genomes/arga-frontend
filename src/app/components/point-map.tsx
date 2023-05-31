@@ -22,9 +22,9 @@ const PopupMarker = ({ content, position }: { content: string, position: LatLngE
 
 const MarkersList = ({ coordinates }: { coordinates: Coordinates[] }) => {
   const items = coordinates.map(item => {
-    const position = [item.latitude, item.longitude] as LatLngExpression;
-    return <PopupMarker content={'' + item} position={position}/>;
-  })
+    let popupMarker = <PopupMarker content={'' + item} position={[item.latitude, item.longitude] as LatLngExpression}/>;
+    return popupMarker
+    });
 
   return <Fragment>{items}</Fragment>
 }
