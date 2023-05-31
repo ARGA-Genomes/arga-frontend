@@ -3,8 +3,8 @@
 import 'leaflet/dist/leaflet.css';
 
 import { Box } from "@mantine/core";
-import {MapContainer, Marker, Popup, TileLayer, useMap} from "react-leaflet";
-import L, {Icon, LatLngExpression} from 'leaflet';
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import {Icon, LatLngExpression} from 'leaflet';
 import { Coordinates } from "@/app/type";
 import React, { Fragment } from 'react';
 
@@ -22,8 +22,11 @@ const PopupMarker = ({ content, position }: { content: string, position: LatLngE
 
 const MarkersList = ({ coordinates }: { coordinates: Coordinates[] }) => {
   const items = coordinates.map(item => {
-    let popupMarker = <PopupMarker content={'' + item} position={[item.latitude, item.longitude] as LatLngExpression}/>;
-    return popupMarker
+    if(item) {
+      let popupMarker = <PopupMarker content={'' + item}
+                                     position={[item.latitude, item.longitude] as LatLngExpression}/>;
+      return popupMarker
+    }
     });
 
   return <Fragment>{items}</Fragment>
