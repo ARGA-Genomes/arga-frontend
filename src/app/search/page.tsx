@@ -2,11 +2,11 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Title, Box, Grid, Container, SegmentedControl, Avatar, Image, createStyles, Stack, Button, LoadingOverlay, Group, Center } from "@mantine/core";
+import { Text, Paper, Box, Grid, SegmentedControl, Avatar, Image, createStyles, Stack, Button, LoadingOverlay, Group, Center, TextInput } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import SpeciesSearch from '../components/species-search';
+import { Search as IconSearch } from "tabler-icons-react";
 
 type Record = {
   type: string,
@@ -242,6 +242,7 @@ function Search(props: SearchProperties) {
   const segmented = useSearchTypeStyles();
   const searchParams = useSearchParams();
 
+  const [value, setValue] = useState(searchParams.get('q') || "")
   const [searchTerms, setSearchTerms] = useState(searchParams.get('q') || "")
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
 
@@ -259,6 +260,7 @@ function Search(props: SearchProperties) {
   return (
     <Paper p={20} radius="xl">
       <SegmentedControl
+        mb={20}
         size="lg"
         fullWidth
         value={dataType}
@@ -272,17 +274,26 @@ function Search(props: SearchProperties) {
         ]}
       />
 
-      <Stack mt={20}>
+      <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
         <Grid align="center">
           <Grid.Col span="auto">
-            <SpeciesSearch searchTerms={searchTerms} onSearch={onSearch} />
+            <TextInput
+              placeholder="e.g. sequence accession, taxon identifier, genus name"
+              value={value}
+              onChange={val => setValue(val.target.value)}
+              iconWidth={60}
+              size="xl"
+              radius={20}
+              styles={{ input: { height: 90, fontSize: "24px", fontWeight: 500, border: 0 } }}
+              icon={<IconSearch size={28} />}
+            />
           </Grid.Col>
 
           <Grid.Col span="content">
-            <Button size="xl" radius="lg" color="midnight.5">Search</Button>
+            <Button size="xl" radius="lg" color="midnight.5" type="submit">Search</Button>
           </Grid.Col>
         </Grid>
-      </Stack>
+      </form>
     </Paper>
   )
 }
