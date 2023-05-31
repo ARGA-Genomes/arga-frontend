@@ -6,6 +6,7 @@ import { Summary } from "src/app/species/[name]/summary";
 import { QueryResults} from "@/app/type";
 import {WholeGenome} from "@/app/species/[name]/wholeGenome";
 import {Resources } from "@/app/species/[name]/resources";
+import SpecimenTable from "./specimens";
 
 const GET_SPECIES = gql`
 query Species($canonicalName: String) {
@@ -21,12 +22,12 @@ query Species($canonicalName: String) {
       genus
     }
     photos {
-			url
-			referenceUrl
-			publisher
-			license
-			rightsHolder
-		}
+      url
+      referenceUrl
+      publisher
+      license
+      rightsHolder
+    }
     distribution {
       locality
       threatStatus
@@ -84,9 +85,11 @@ function ThreatBadge({ status, children }: { status: string, children: React.Rea
 }
 
 export default function SpeciesPage({ params }: { params: { name: string } }) {
+  const canonicalName = params.name.replaceAll("_", " ");
+
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
-        canonicalName: params.name.replaceAll("_", " "),
+        canonicalName,
     },
   });
 
@@ -151,7 +154,9 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
           tab content
         </Tabs.Panel>
         <Tabs.Panel value="specimen" pt="xs">
-          tab content
+          <Paper p={40} radius="lg">
+            <SpecimenTable canonicalName={canonicalName} />
+          </Paper>
         </Tabs.Panel>
         <Tabs.Panel value="gallery" pt="xs">
         </Tabs.Panel>

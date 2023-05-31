@@ -60,6 +60,17 @@ type Species = {
     data: GenomicData[],
 };
 
+type Specimen = {
+    typeStatus: string,
+    institutionName?: string,
+    organismId?: string,
+    locality?: string,
+    latitude?: number,
+    longitude?: number,
+    details?: string,
+    remarks: string,
+}
+
 type QueryResults = {
     species: Species,
 };
@@ -73,5 +84,6 @@ export type {
     Regions,
     Species,
     QueryResults,
-    Coordinates
+    Coordinates,
+    Specimen,
 };
