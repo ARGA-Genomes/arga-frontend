@@ -231,7 +231,7 @@ function SearchDataTypeItem({ label, image }: { label: string, image: string }) 
   return (
     <Center>
       <Group>
-        <Image src={image} height={24} width={24} />
+        <Image src={image} height={24} width={24} alt=""/>
         <Text>{label}</Text>
       </Group>
     </Center>
