@@ -301,15 +301,14 @@ function Search(props: SearchProperties) {
 
 function formattedDataType(dataType: string) {
   switch(dataType) {
-      case 'species':
-        return 'species data'
-      case 'whole_genomes':
-        return 'whole genome data'
-      case 'barcodes':
-        return 'barcode data'
-      case 'all':
-        return 'all data'
-    }
+    case 'species':
+      return 'taxon cards'
+    case 'whole_genomes':
+      return 'whole genomes'
+    case 'barcodes':
+      return 'barcodes'
+  }
+  return null;
 }
 
 export default function SearchPage() {
@@ -348,8 +347,11 @@ export default function SearchPage() {
           loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
           visible={loading}
         />
-        <Text color="white" size="xl">Results for <strong>{query}</strong> in <strong>{formattedType}</strong></Text>
-        <Text color="white">Found <strong>{data?.search.fullText.records.length}</strong> records</Text>
+        <Text color="white" size="xl">
+          <strong>{data?.search.fullText.records.length} </strong>
+          search results found for <strong>{query} </strong>
+          { formattedType ? <>in <strong>{formattedType}</strong></> : null }
+        </Text>
         <SearchResults results={data?.search.fullText.records || []} />
       </Paper>
     </Box>
