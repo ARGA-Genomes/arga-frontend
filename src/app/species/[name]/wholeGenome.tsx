@@ -12,12 +12,10 @@ const PointMap = dynamic(() => import('../../components/point-map'), {
 
 function WholeGenomeSection({ data }: { data : QueryResults }) {
 
-  const otherWholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" &&
-    !record.accession?.includes("GCF_"));
-  const referenceGenome = data.species.data.filter((record) => record.refseqCategory == "reference genome"
-    || record.accession?.includes("GCF_"));
+  const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
+    record.refseqCategory == "reference genome");
 
-  const coordinates = otherWholeGenomeRecords.map(record => record.coordinates);
+  const coordinates = wholeGenomeRecords.map(record => record.coordinates);
 
   return (
     <Paper bg="midnight.6" p={40} radius={35}>

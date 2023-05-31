@@ -43,8 +43,8 @@ type GenomicData = {
 }
 
 type Coordinates = {
-    latitude: string,
-    longitude: string,
+    latitude: number,
+    longitude: number,
 }
 
 type Regions = {
