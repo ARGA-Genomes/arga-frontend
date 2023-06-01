@@ -56,7 +56,7 @@ function GenomeRecordsTable({ data }: { data : GenomicData[] }){
         <td><Text color="white">{row.license}</Text></td>
         <td><Text color="white">{row.provenance}</Text></td>
         <td><Text color="white">{Luxon.DateTime.fromISO(row.eventDate).toLocaleString()}</Text></td>
-        <td><Link href={link}><Text color="white">{row.accessionUri}</Text></Link></td>
+        <td><Link href={link} target="_blank"><Text color="white" underline>{row.accessionUri}</Text></Link></td>
       </tr>
     );
   });
