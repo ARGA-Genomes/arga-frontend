@@ -13,7 +13,7 @@ const PointMap = dynamic(() => import('../../components/point-map'), {
 function WholeGenomeSection({ data }: { data : QueryResults }) {
 
   const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
-    record.refseqCategory == "reference genome");
+    record.refseqCategory == "reference genome" || record.accession?.includes("GC"));
 
   const coordinates = wholeGenomeRecords.map(record => record.coordinates);
 

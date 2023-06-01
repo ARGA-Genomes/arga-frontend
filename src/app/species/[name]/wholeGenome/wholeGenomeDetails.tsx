@@ -4,6 +4,7 @@ import { Grid, Paper, Stack, Text } from "@mantine/core";
 import { QueryResults} from "@/app/type";
 import {gql, useQuery} from "@apollo/client";
 import {GenomeRecords} from "@/app/species/[name]/genomeRecords";
+import {Box} from "@mantine/core";
 
 
 const GET_SPECIES = gql`
@@ -42,8 +43,8 @@ export function WholeGenomeDetails({ speciesName }: { speciesName : String }) {
     return (<Text>No data</Text>);
   }
 
-  const otherWholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" &&
-    !record.accession?.includes("GCF_"));
+  const otherWholeGenomeRecords = data.species.data.filter((record) => (record.refseqCategory == "representative genome" &&
+    !record.accession?.includes("GCF_")) || record.accession?.includes("GCA_"));
   const referenceGenome = data.species.data.filter((record) => record.refseqCategory == "reference genome"
     || record.accession?.includes("GCF_"));
 
@@ -54,12 +55,14 @@ export function WholeGenomeDetails({ speciesName }: { speciesName : String }) {
         <Paper bg="midnight.6" p={40} radius={35}>
           <Grid>
             <Grid.Col>
-              <Text style={{ paddingBottom: 25 }} color="white">Whole Genome (Refseq)</Text>
+              <h2 style={{ paddingBottom: 25 }} color="white">Whole Genome (Refseq)</h2>
               <Stack>
-                <Text color="white">Species Name: {speciesName?.replaceAll("_", " ")}</Text>
-                <Text c="dimmed">Reference Genome</Text>
-                <Text color="white">Refseq: {referenceGenome.map((record => record.accession))}</Text>
-                <Text color="white">{referenceGenome.map((record => record.accessionUri))}</Text>
+                <Paper bg="#3A637C" radius={35}>
+                  <Text color="white" style={{ padding: 15 }}>Species Name: {speciesName?.replaceAll("_", " ")}</Text>
+                  <h3 color="white" style={{ padding: 15 }}>Reference Genome</h3>
+                  <Text color="white" style={{ padding: 15 }}>Refseq: {referenceGenome.map((record => record.accession))}</Text>
+                  <Text color="white" style={{ padding: 15 }}>{referenceGenome.map((record => record.accessionUri))}</Text>
+                </Paper>
               </Stack>
               <br/>
               <Text style={{ padding: 25 }} color="white">List of other assemblies</Text>
