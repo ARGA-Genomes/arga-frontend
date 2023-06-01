@@ -71,6 +71,13 @@ type Specimen = {
     remarks: string,
 }
 
+type StatsSpecies = {
+    total: number,
+    wholeGenomes: number,
+    mitogenomes: number,
+    barcodes: number,
+}
+
 type QueryResults = {
     species: Species,
 };
@@ -86,4 +93,5 @@ export type {
     QueryResults,
     Coordinates,
     Specimen,
+    StatsSpecies,
 };

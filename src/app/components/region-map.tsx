@@ -60,7 +60,7 @@ function IbraLayers({ regions }: { regions: string[] }) {
 export default function RegionMap({ regions }: { regions: string[] }) {
   const position = [-28.30638, 134.38380] as LatLngExpression;
   return (
-    <Box h={500} w={800}>
+    <Box h={500} w={700}>
       <MapContainer center={position} zoom={4} scrollWheelZoom={true} style={{ height: "100%", width: "100%" }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
