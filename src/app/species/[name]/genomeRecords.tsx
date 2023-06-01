@@ -1,6 +1,7 @@
 import { Table, Text, ScrollArea} from '@mantine/core';
 import {GenomicData, QueryResults} from "@/app/type";
 import * as Luxon from "luxon";
+import Link from "next/link";
 
 interface GenomeSequenceRecordDetails {
   key: string;
@@ -45,6 +46,7 @@ const fields: GenomeSequenceRecordDetails[] = [
 
 function GenomeRecordsTable({ data }: { data : GenomicData[] }){
   const rows = data.map((row) => {
+    const link = row.accessionUri ?? "";
     return (
       <tr key={row.accession}>
         <td><Text color="white">{row.accession}</Text></td>
@@ -54,7 +56,7 @@ function GenomeRecordsTable({ data }: { data : GenomicData[] }){
         <td><Text color="white">{row.license}</Text></td>
         <td><Text color="white">{row.provenance}</Text></td>
         <td><Text color="white">{Luxon.DateTime.fromISO(row.eventDate).toLocaleString()}</Text></td>
-        <td><Text color="white">{row.accessionUri}</Text></td>
+        <td><Link href={link}><Text color="white">{row.accessionUri}</Text></Link></td>
       </tr>
     );
   });
@@ -68,7 +70,7 @@ function GenomeRecordsTable({ data }: { data : GenomicData[] }){
 
   return (
     <ScrollArea>
-      <Table sx={{ minWidth: 800 }} verticalSpacing="xs">
+      <Table sx={{ minWidth: 800 }} verticalSpacing="xs" withColumnBorders withBorder>
         <thead>
         <tr>{headers}
         </tr>
