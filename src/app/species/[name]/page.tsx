@@ -7,6 +7,7 @@ import { Species, StatsSpecies } from "@/app/type";
 import { WholeGenome } from "@/app/species/[name]/wholeGenome";
 import { Resources } from "@/app/species/[name]/resources";
 import SpecimenTable from "./specimens";
+import {Barcode} from "@/app/species/[name]/barcode";
 
 const GET_SPECIES = gql`
 query Species($canonicalName: String) {
@@ -127,7 +128,7 @@ function DataTabs({ data }: { data: QueryResults }) {
           tab content
         </Tabs.Panel>
         <Tabs.Panel value="barcode" pt="xs">
-          tab content
+          <Barcode data={data}/>
         </Tabs.Panel>
         <Tabs.Panel value="other_genomic" pt="xs">
           tab content

@@ -44,7 +44,7 @@ const fields: GenomeSequenceRecordDetails[] = [
   },
 ]
 
-function GenomeRecordsTable({ data }: { data : GenomicData[] }){
+function GenomeRecordsTable({ data, expandable }: { data : GenomicData[], expandable: boolean }){
   const rows = data.map((row) => {
     const link = row.accessionUri ?? "";
     return (
@@ -82,9 +82,9 @@ function GenomeRecordsTable({ data }: { data : GenomicData[] }){
 
 }
 
-export function GenomeRecords({ data }: { data : GenomicData[] }) {
+export function GenomeRecords({ data, expandable }: { data : GenomicData[], expandable: boolean }) {
 
   return (
-    <GenomeRecordsTable data={data}/>
+    <GenomeRecordsTable data={data} expandable={expandable}/>
   );
 }
