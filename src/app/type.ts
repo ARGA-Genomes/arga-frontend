@@ -52,9 +52,16 @@ type Regions = {
     imcra: Region[],
 }
 
+type Conservation = {
+    status: string,
+    state?: string,
+    source?: string,
+}
+
 type Species = {
     taxonomy: Taxonomy,
     photos: Photo[],
+    conservation: Conservation[],
     distribution: Distribution[],
     regions: Regions,
     data: GenomicData[],

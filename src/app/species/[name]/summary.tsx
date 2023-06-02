@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Grid, Group, Image, Paper, Stack, Text } from "@mantine/core";
-import { Photo, Taxonomy, Regions, QueryResults} from "@/app/type";
+import { Photo, Taxonomy, Regions, QueryResults, StatsSpecies} from "@/app/type";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
@@ -21,6 +21,29 @@ function SpeciesPhoto({ photo }: { photo: Photo }) {
       <Text fz="sm" c="dimmed">&copy; { photo.rightsHolder }</Text>
       <Text fz="sm" c="dimmed"><Link href={ photo.referenceUrl } target="_blank">{ photo.publisher }</Link></Text>
     </Box>
+  )
+}
+
+function DataSummary({ stats }: { stats: StatsSpecies }) {
+  return (
+    <Paper bg="midnight.6" radius="xl" py={20} px={40}>
+      <Group position="apart">
+        <Text color="white">Whole Genomes</Text>
+        <Text color="white" fw={700} fz={30}>{stats.wholeGenomes}</Text>
+      </Group>
+      <Group position="apart">
+        <Text color="white">Mitogenomes</Text>
+        <Text color="white" fw={700} fz={30}>{stats.mitogenomes}</Text>
+      </Group>
+      <Group position="apart">
+        <Text color="white">Barcodes</Text>
+        <Text color="white" fw={700} fz={30}>{stats.barcodes}</Text>
+      </Group>
+      <Group position="apart">
+        <Text color="white">Other Data</Text>
+        <Text color="white" fw={700} fz={30}>{stats.total - stats.wholeGenomes - stats.mitogenomes - stats.barcodes}</Text>
+      </Group>
+    </Paper>
   )
 }
 
@@ -67,22 +90,30 @@ function Taxonomy({ taxonomy, regions }: { taxonomy: Taxonomy, regions: Regions 
   )
 }
 
-export function Summary({ data }: { data : QueryResults }) {
 
-  const taxonomy = data.species.taxonomy;
-  const photos = data.species.photos;
-  const regions = data.species.regions;
+interface SummaryProps {
+  photos: Photo[],
+  stats: StatsSpecies,
+  taxonomy: Taxonomy,
+  regions: Regions,
+}
 
+export function Summary(props: SummaryProps) {
   return (
     <>
-      <Grid p={40}>
+      <Grid py={40}>
         <Grid.Col span="content">
-          {photos[0]
-            ? <SpeciesPhoto photo={photos[0]}/>
-            : <Image width={300} height={300} radius="lg" alt="Species image" withPlaceholder/>}
+          <Stack>
+          { props.photos[0]
+            ? <SpeciesPhoto photo={props.photos[0]}/>
+            : <Image width={300} height={300} radius="lg" alt="Species image" withPlaceholder/>
+          }
+
+          { props.stats ? <DataSummary stats={props.stats} /> : null }
+          </Stack>
         </Grid.Col>
         <Grid.Col span="auto">
-          <Taxonomy taxonomy={taxonomy} regions={regions}/>
+          <Taxonomy taxonomy={props.taxonomy} regions={props.regions}/>
         </Grid.Col>
       </Grid>
     </>);
