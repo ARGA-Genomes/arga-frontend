@@ -20,11 +20,11 @@ function WholeGenomeSection({ data }: { data : QueryResults }) {
   return (
     <Paper bg="midnight.6" p={40} radius={35}>
       <Grid>
-        <Grid.Col span={3}>
+        <Grid.Col span={8}>
           <Link
             href={{
               pathname: `/species/${data.species.taxonomy.canonicalName.replaceAll(" ", "_")}/wholeGenome`
-            }}><Text color="blue">Whole Genome Summary</Text></Link>
+            }}><Text color="blue" underline>Whole Genome Summary</Text></Link>
         </Grid.Col>
 
         <Grid.Col span="auto">

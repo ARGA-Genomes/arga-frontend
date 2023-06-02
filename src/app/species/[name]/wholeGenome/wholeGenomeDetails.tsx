@@ -4,7 +4,6 @@ import { Grid, Paper, Stack, Text } from "@mantine/core";
 import { QueryResults} from "@/app/type";
 import {gql, useQuery} from "@apollo/client";
 import {GenomeRecords} from "@/app/species/[name]/genomeRecords";
-import {Box} from "@mantine/core";
 import Link from "next/link";
 
 
@@ -69,7 +68,7 @@ export function WholeGenomeDetails({ speciesName }: { speciesName : String }) {
               </Stack>
               <br/>
               <Text style={{ padding: 25 }} color="white">List of other assemblies</Text>
-              <GenomeRecords data={ otherWholeGenomeRecords }/>
+              <GenomeRecords data={ otherWholeGenomeRecords } expandable={false}/>
             </Grid.Col>
           </Grid>
         </Paper>
