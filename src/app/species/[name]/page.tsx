@@ -1,12 +1,13 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Badge, Text, Tabs, Grid, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Paper, Title, Box, Badge, Text, Tabs, Grid, Group, LoadingOverlay, Stack, Center } from "@mantine/core";
 import { Summary } from "src/app/species/[name]/summary";
 import { Species, StatsSpecies } from "@/app/type";
 import { WholeGenome } from "@/app/species/[name]/wholeGenome";
 import { Resources } from "@/app/species/[name]/resources";
 import SpecimenTable from "./specimens";
+import IconBar from "./icon-bar";
 
 const GET_SPECIES = gql`
 query Species($canonicalName: String) {
@@ -35,6 +36,11 @@ query Species($canonicalName: String) {
       publisher
       license
       rightsHolder
+    }
+    conservation {
+      status
+      state
+      source
     }
     distribution {
       locality
@@ -118,7 +124,12 @@ function DataTabs({ data }: { data: QueryResults }) {
       </Tabs.List>
 
         <Tabs.Panel value="summary" pt="xs">
-          <Summary data={data}/>
+          <Summary
+            taxonomy={data.species.taxonomy}
+            photos={data.species.photos}
+            regions={data.species.regions}
+            stats={data.stats.species}
+          />
         </Tabs.Panel>
         <Tabs.Panel value="whole_genome" pt="xs">
           <WholeGenome data={data}/>
@@ -149,38 +160,6 @@ function DataTabs({ data }: { data: QueryResults }) {
   )
 }
 
-function DataSummary({ stats }: { stats: StatsSpecies }) {
-  return (
-    <Paper bg="midnight.6" radius="xl">
-      <Grid pb={20}>
-        <Grid.Col span={3}>
-          <Stack align="center" spacing={0}>
-            <Text color="white" fw={700} fz={40}>{stats.wholeGenomes}</Text>
-            <Text color="white">Whole Genomes</Text>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <Stack align="center" spacing={0}>
-            <Text color="white" fw={700} fz={40}>{stats.mitogenomes}</Text>
-            <Text color="white">Mitogenomes</Text>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <Stack align="center" spacing={0}>
-            <Text color="white" fw={700} fz={40}>{stats.barcodes}</Text>
-            <Text color="white">Barcodes</Text>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <Stack align="center" spacing={0}>
-            <Text color="white" fw={700} fz={40}>{stats.total - stats.wholeGenomes - stats.mitogenomes - stats.barcodes}</Text>
-            <Text color="white">Other Data</Text>
-          </Stack>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  )
-}
 
 export default function SpeciesPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
@@ -197,7 +176,6 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
 
   const taxonomy = data?.species.taxonomy;
   const status = data?.species.distribution.find(dist => dist.threatStatus != null);
-  const stats = data?.stats.species;
 
   return (
     <Box>
@@ -208,12 +186,20 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
         visible={loading}
       />
 
-      <Box mb={30}>
-        <Title order={3} color="white" mb={10}>
-          <Group>
-            <Text italic={true} fw={500}>{taxonomy?.canonicalName}</Text> {taxonomy?.authorship}
-          </Group>
-        </Title>
+      <Box>
+        <Grid>
+          <Grid.Col span="auto">
+            <Title order={3} color="white" mb={10}>
+              <Group>
+                <Text italic={true} fw={500}>{taxonomy?.canonicalName}</Text> {taxonomy?.authorship}
+              </Group>
+            </Title>
+          </Grid.Col>
+          <Grid.Col span="content">
+            { data ? <IconBar species={data.species} /> : null }
+          </Grid.Col>
+        </Grid>
+
 
         {status
         ? <ThreatBadge status={status.threatStatus}>{status.threatStatus} - {status.source} - {status.locality}</ThreatBadge>
@@ -221,7 +207,6 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
         }
       </Box>
 
-      { stats ? <DataSummary stats={stats} /> : null }
       { data ? <DataTabs data={data} /> : null }
     </Box>
   );
