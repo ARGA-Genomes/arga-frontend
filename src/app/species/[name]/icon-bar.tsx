@@ -37,7 +37,7 @@ export default function IconBar({ species }: { species: Species }) {
     <Box>
       <Group>
         { species.conservation.map(cons => (
-            <Icon status={cons.status}/>
+            <Icon status={cons.status} key={cons.status}/>
         ))}
       </Group>
     </Box>
