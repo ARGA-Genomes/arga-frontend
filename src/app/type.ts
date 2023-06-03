@@ -43,6 +43,30 @@ type GenomicData = {
     coordinates: Coordinates
 }
 
+type WholeGenome = {
+    type?: string,
+    dataResource?: string,
+    recordedBy?: string[],
+    license?: string,
+    provenance?: string,
+    eventDate?: string,
+    occurrenceYear?: string[],
+    otherCatalogNumbers?: string[],
+    accession?: string,
+    accessionUri?: string,
+    refseqCategory?: string,
+    coordinates?: Coordinates
+    ncbiNuccore?: string,
+    ncbiBioproject?: string,
+    ncbiBiosample?: string,
+    mixs0000005?: string,
+    mixs0000029?: string,
+    mixs0000026?: string,
+    pairedAsmComp?: string,
+    rawRecordedBy?: string,
+    ncbiReleaseType?: string,
+}
+
 type Coordinates = {
     latitude: number,
     longitude: number,
@@ -66,6 +90,7 @@ type Species = {
     distribution: Distribution[],
     regions: Regions,
     data: GenomicData[],
+    wholeGenomes: WholeGenome[],
 };
 
 type Specimen = {
@@ -96,6 +121,7 @@ export type {
     Distribution,
     Region,
     GenomicData,
+    WholeGenome,
     Regions,
     Species,
     QueryResults,

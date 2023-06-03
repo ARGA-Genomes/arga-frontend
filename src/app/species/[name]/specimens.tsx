@@ -47,19 +47,16 @@ export default function SpecimenTable({ canonicalName }: { canonicalName: string
         </tr>
       </thead>
       <tbody>
-        { data?.species.specimens.map(specimen => {
-          let tr = <>
-            <tr>
-              <td>{specimen.typeStatus}</td>
-              <td>{specimen.institutionName}</td>
-              <td>{specimen.organismId}</td>
-              <td>{specimen.locality}</td>
-              <td>{specimen.details}</td>
-              <td>{specimen.remarks}</td>
-            </tr>
-          </>;
-          return tr
-        })}
+        { data?.species.specimens.map(specimen => (
+          <tr key={specimen.organismId}>
+            <td>{specimen.typeStatus}</td>
+            <td>{specimen.institutionName}</td>
+            <td>{specimen.organismId}</td>
+            <td>{specimen.locality}</td>
+            <td>{specimen.details}</td>
+            <td>{specimen.remarks}</td>
+          </tr>
+        ))}
       </tbody>
     </Table>
   )

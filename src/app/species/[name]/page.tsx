@@ -73,6 +73,32 @@ query Species($canonicalName: String) {
         longitude
       }
     }
+    wholeGenomes {
+      type
+      dataResource
+      recordedBy
+      license
+      provenance
+      eventDate
+      occurrenceYear
+      otherCatalogNumbers
+      accession
+      accessionUri
+      refseqCategory
+      coordinates {
+        latitude
+        longitude
+      }
+      ncbiNuccore
+      ncbiBioproject
+      ncbiBiosample
+      mixs0000005
+      mixs0000029
+      mixs0000026
+      pairedAsmComp
+      rawRecordedBy
+      ncbiReleaseType
+    }
   }
 }`;
 
@@ -134,7 +160,7 @@ function DataTabs({ data }: { data: QueryResults }) {
           />
         </Tabs.Panel>
         <Tabs.Panel value="whole_genome" pt="xs">
-          <WholeGenome data={data}/>
+          <WholeGenome records={data.species.wholeGenomes}/>
         </Tabs.Panel>
         <Tabs.Panel value="mitogenome" pt="xs">
           tab content
@@ -188,7 +214,7 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
         visible={loading}
       />
 
-      <Box>
+      <Stack>
         <Grid>
           <Grid.Col span="auto">
             <Title order={3} color="white" mb={10}>
@@ -202,12 +228,11 @@ export default function SpeciesPage({ params }: { params: { name: string } }) {
           </Grid.Col>
         </Grid>
 
-
         {status
         ? <ThreatBadge status={status.threatStatus}>{status.threatStatus} - {status.source} - {status.locality}</ThreatBadge>
         : null
         }
-      </Box>
+      </Stack>
 
       { data ? <DataTabs data={data} /> : null }
     </Box>
