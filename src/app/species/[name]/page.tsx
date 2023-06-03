@@ -30,6 +30,7 @@ query Species($canonicalName: String) {
       order
       family
       genus
+      vernacularGroup
     }
     photos {
       url

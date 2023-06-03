@@ -2,12 +2,13 @@ type Taxonomy = {
     canonicalName: string,
     authorship: string,
 
-    kingdom: string,
-    phylum: string,
-    class: string,
-    order: string,
-    family: string,
-    genus: string,
+    kingdom?: string,
+    phylum?: string,
+    class?: string,
+    order?: string,
+    family?: string,
+    genus?: string,
+    vernacularGroup?: string,
 };
 
 type Photo = {

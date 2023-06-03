@@ -2,25 +2,117 @@ import { Species } from "@/app/type";
 import { Box, Group, ThemeIcon, Image, Tooltip } from "@mantine/core";
 
 
-function statusIcon(status: string) {
-  switch (status) {
-    case 'Native':
-      return { image: 'native.svg', label: 'Native Species', color: 'wheat.4' }
-    case 'Vulnerable':
-      return { image: 'threatened.svg', label: 'Vulnerable Species', color: 'wheat.6' }
-    case 'Vulnerable (Wildfire)':
-      return { image: 'vulnerable_fire.svg', label: 'Vulnerable to Wildfire', color: 'bushfire.5' }
-    case 'Endangered':
-      return { image: 'threatened_light.svg', label: 'Endangered Species', color: 'bushfire.4' }
-    case 'Critically endangered':
-      return { image: 'threatened.svg', label: 'Critically endangered', color: 'red' }
-    case 'Extinct':
-      return { image: 'threatened_light.svg', label: 'Extinct Species', color: 'black' }
-  }
+interface IconData {
+  image: string,
+  label: string,
+  color: string,
 }
 
-function Icon({ status }: { status: string }) {
-  const icon = statusIcon(status)
+const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
+  'Native': {
+    image: 'native.svg',
+    label: 'Native Species',
+    color: 'wheat.4',
+  },
+  'Vulnerable': {
+    image: 'threatened.svg',
+    label: 'Vulnerable Species',
+    color: 'wheat.6',
+  },
+  'Vulnerable (Wildfire)': {
+    image: 'vulnerable_fire_light.svg',
+    label: 'Vulnerable to Wildfire',
+    color: 'bushfire.5',
+  },
+  'Endangered': {
+    image: 'threatened_light.svg',
+    label: 'Endangered Species',
+    color: 'bushfire.4',
+  },
+  'Critically endangered': {
+    image: 'threatened.svg',
+    label: 'Critically endangered',
+    color: 'red',
+  },
+  'Extinct': {
+    image: 'threatened_light.svg',
+    label: 'Extinct Species',
+    color: 'black',
+  },
+}
+
+const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
+  'bacteria': {
+    image: 'bacteria.svg',
+    label: 'Bacteria',
+    color: 'shellfish.5',
+  },
+  'protists and other unicellular organisms': {
+    image: 'protists.svg',
+    label: 'Protists and other unicellular organisms',
+    color: 'wheat.2',
+  },
+  'mushrooms and other fungi': {
+    image: 'fungi.svg',
+    label: 'Mushrooms and other fungi',
+    color: 'bushfire.5',
+  },
+  'molluscs': {
+    image: 'molluscs.svg',
+    label: 'Molluscs',
+    color: 'bushfire.4',
+  },
+  'marine crustaceans': {
+    image: 'crustaceans.svg',
+    label: 'Marine crustaceans',
+    color: 'red',
+  },
+  'insects': {
+    image: 'insects.svg',
+    label: 'Insects',
+    color: 'black',
+  },
+  'frogs and other amphibians': {
+    image: 'frogs.svg',
+    label: 'Frogs and other amphibians',
+    color: 'black',
+  },
+  'birds': {
+    image: 'birds_light.svg',
+    label: 'Birds',
+    color: 'moss.7',
+  },
+  'mammals': {
+    image: 'mammals.svg',
+    label: 'Mammals',
+    color: 'moss.3',
+  },
+  'seaweeds and other algae': {
+    image: 'seaweed_light.svg',
+    label: 'Seaweeds and other algae',
+    color: 'shellfish',
+  },
+  'higher plants': {
+    image: 'plants_light.svg',
+    label: 'Higher plants',
+    color: 'midnight',
+  },
+}
+
+function ConservationIcon({ status }: { status: string }) {
+  const icon = CONSERVATION_STATUS_ICON[status];
+
+  return (
+    <Tooltip label={icon?.label}>
+      <ThemeIcon radius="xl" size={60} color={icon?.color} p={10}>
+        <Image src={`/species-icons/${icon?.image}`} />
+      </ThemeIcon>
+    </Tooltip>
+  )
+}
+
+function VernacularGroupIcon({ group }: { group: string }) {
+  const icon = VERNACULAR_GROUP_ICON[group]
 
   return (
     <Tooltip label={icon?.label}>
@@ -32,12 +124,38 @@ function Icon({ status }: { status: string }) {
 }
 
 
+function DebugIconBar() {
+  return (
+    <>
+    <VernacularGroupIcon group="bacteria" />
+    <VernacularGroupIcon group="protists and other unicellular organisms" />
+    <VernacularGroupIcon group="mushrooms and other fungi" />
+    <VernacularGroupIcon group="molluscs" />
+    <VernacularGroupIcon group="marine crustaceans" />
+    <VernacularGroupIcon group="insects" />
+    <VernacularGroupIcon group="frogs and other amphibians" />
+    <VernacularGroupIcon group="birds" />
+    <VernacularGroupIcon group="mammals" />
+    <VernacularGroupIcon group="seaweeds and other algae" />
+    <VernacularGroupIcon group="higher plants" />
+    <ConservationIcon status="Native" />
+    <ConservationIcon status="Vulnerable" />
+    <ConservationIcon status="Vulnerable (Wildfire)" />
+    <ConservationIcon status="Endangered" />
+    <ConservationIcon status="Critically endangered" />
+    <ConservationIcon status="Extinct" />
+    </>
+  )
+}
+
+
 export default function IconBar({ species }: { species: Species }) {
   return (
     <Box>
       <Group>
+        { species.taxonomy.vernacularGroup ? <VernacularGroupIcon group={species.taxonomy.vernacularGroup} /> : null }
         { species.conservation.map(cons => (
-            <Icon status={cons.status} key={cons.status}/>
+            <ConservationIcon status={cons.status} key={cons.status}/>
         ))}
       </Group>
     </Box>
