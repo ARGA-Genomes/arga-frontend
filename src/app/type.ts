@@ -91,6 +91,7 @@ type Species = {
     regions: Regions,
     data: GenomicData[],
     wholeGenomes: WholeGenome[],
+    traceFiles: TraceFile[],
 };
 
 type Specimen = {
@@ -111,6 +112,11 @@ type StatsSpecies = {
     barcodes: number,
 }
 
+type TraceFile = {
+    id: string,
+    metadata: any,
+}
+
 type QueryResults = {
     species: Species,
 };
@@ -128,4 +134,5 @@ export type {
     Coordinates,
     Specimen,
     StatsSpecies,
+    TraceFile,
 };

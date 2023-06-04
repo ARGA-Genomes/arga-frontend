@@ -7,6 +7,7 @@ import { Species, StatsSpecies } from "@/app/type";
 import { WholeGenome } from "@/app/species/[name]/wholeGenome";
 import { Resources } from "@/app/species/[name]/resources";
 import SpecimenTable from "./specimens";
+import { TraceTable } from "./traces";
 import {Barcode} from "@/app/species/[name]/barcode";
 import IconBar from "./icon-bar";
 
@@ -99,6 +100,10 @@ query Species($canonicalName: String) {
       rawRecordedBy
       ncbiReleaseType
     }
+    traceFiles {
+      id
+      metadata
+    }
   }
 }`;
 
@@ -142,6 +147,7 @@ function DataTabs({ data }: { data: QueryResults }) {
       <Tabs.List style={{ paddingTop: 25 }}>
         <Tabs.Tab value="summary"><Text color="grey">Summary</Text></Tabs.Tab>
         <Tabs.Tab value="whole_genome"><Text color="grey">Whole Genome Data</Text></Tabs.Tab>
+        <Tabs.Tab value="traces"><Text color="grey">Traces</Text></Tabs.Tab>
         <Tabs.Tab value="mitogenome"><Text color="grey">Mitogenome Data</Text></Tabs.Tab>
         <Tabs.Tab value="barcode"><Text color="grey">Barcode Data</Text></Tabs.Tab>
         <Tabs.Tab value="other_genomic"><Text color="grey">Other Genomic Data</Text></Tabs.Tab>
@@ -161,6 +167,9 @@ function DataTabs({ data }: { data: QueryResults }) {
         </Tabs.Panel>
         <Tabs.Panel value="whole_genome" pt="xs">
           <WholeGenome records={data.species.wholeGenomes}/>
+        </Tabs.Panel>
+        <Tabs.Panel value="traces" pt="xs">
+          <TraceTable records={data.species.traceFiles}/>
         </Tabs.Panel>
         <Tabs.Panel value="mitogenome" pt="xs">
           tab content
