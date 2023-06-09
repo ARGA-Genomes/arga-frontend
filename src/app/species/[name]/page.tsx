@@ -73,6 +73,12 @@ query Species($canonicalName: String) {
         latitude
         longitude
       }
+      associatedSequences {
+        sequenceID
+        genbankAccession
+        markercode
+        nucleotides
+      }
     }
     wholeGenomes {
       type
