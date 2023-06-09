@@ -40,22 +40,13 @@ type GenomicData = {
     accession: string,
     accessionUri: string,
     refseqCategory: string,
-    coordinates: Coordinates
+    coordinates: Coordinates,
+    associatedSequences: AssociatedSequences
 }
 
-type WholeGenome = {
-    type?: string,
-    dataResource?: string,
-    recordedBy?: string[],
-    license?: string,
-    provenance?: string,
-    eventDate?: string,
+type WholeGenome = GenomicData & {
     occurrenceYear?: string[],
     otherCatalogNumbers?: string[],
-    accession?: string,
-    accessionUri?: string,
-    refseqCategory?: string,
-    coordinates?: Coordinates
     ncbiNuccore?: string,
     ncbiBioproject?: string,
     ncbiBiosample?: string,
@@ -65,6 +56,13 @@ type WholeGenome = {
     pairedAsmComp?: string,
     rawRecordedBy?: string,
     ncbiReleaseType?: string,
+}
+
+type AssociatedSequences = {
+    sequenceID: string,
+    genbankAccession: string,
+    markercode: string,
+    nucleotides: string
 }
 
 type Coordinates = {
@@ -121,6 +119,8 @@ type QueryResults = {
     species: Species,
 };
 
+type CommonGenome = GenomicData | WholeGenome;
+
 export type {
     Taxonomy,
     Photo,
@@ -135,4 +135,5 @@ export type {
     Specimen,
     StatsSpecies,
     TraceFile,
+    CommonGenome
 };

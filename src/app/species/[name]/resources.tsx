@@ -1,10 +1,15 @@
-import { Text } from '@mantine/core';
-import {GenomicData} from "@/app/type";
-import {GenomeRecords} from "@/app/species/[name]/genomeRecords";
+import {Paper, Text} from '@mantine/core';
+import {CommonGenome} from "@/app/type";
+import GenomeTable from "@/app/species/[name]/commonGenomeRecordTable";
+import React from "react";
 
-export function Resources({ data }: { data : GenomicData[] }) {
+export function Resources({ data }: { data : CommonGenome[] }) {
 
   return (
-    <><Text style={{padding: 25}} color="white">Genome Sequence Records</Text><GenomeRecords data={data} expandable={false}/></>
+    <><Text style={{padding: 25}} color="white">All Genome Sequence Records</Text>
+      <Paper radius="lg" py={25}>
+        <GenomeTable records={data} />
+      </Paper>
+    </>
   );
 }
