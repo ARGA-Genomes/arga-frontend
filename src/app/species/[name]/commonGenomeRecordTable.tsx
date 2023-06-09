@@ -13,7 +13,7 @@ const FORMATTED_TYPE: Record<string, string> = {
 interface GenomeFieldProps {
   key: string,
   label: string,
-  value?: Object,
+  value?: string | string[] | Object,
   icon: React.ReactNode,
 }
 
@@ -138,7 +138,7 @@ function renderField(key: string, value: string | string[] | Object ) {
   else if (field && isArray){
     return (<>
       <Grid.Col span={3}>
-        <GenomeField label={field.label} value={value?.join(', ')} icon={field.icon} key={key}/>
+        <GenomeField label={field.label} value={JSON.parse(JSON.stringify(value))} icon={field.icon} key={key}/>
       </Grid.Col></>)
   }
   else  if (!field && subFields.includes(key) && value !== null) {
