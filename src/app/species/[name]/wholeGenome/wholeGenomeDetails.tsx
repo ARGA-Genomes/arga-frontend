@@ -58,7 +58,6 @@ export function WholeGenomeDetails({ speciesName }: { speciesName : String }) {
   }
 
   const otherWholeGenomeRecords = data.species.wholeGenomes?.filter((record) => !record.accession?.includes("GCF_"));
-  console.log(data.species.wholeGenomes)
   const referenceGenome = data.species.wholeGenomes?.filter((record) => record.refseqCategory == "reference genome"
     || record.accession?.includes("GCF_"));
 
