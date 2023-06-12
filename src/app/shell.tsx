@@ -4,7 +4,7 @@ import { AppShell, Box, Container, Flex, Header } from '@mantine/core';
 import { TopNav } from './top-nav';
 import { Footer } from './footer'
 
-const MAX_WIDTH=1512;
+const MAX_WIDTH=1280;
 
 // The shell is the visual layout of the site that wraps all content
 // with the top navigation bar and the footer. It also defines the
