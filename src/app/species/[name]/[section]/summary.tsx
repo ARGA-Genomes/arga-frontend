@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 
 
 const GET_SUMMARY = gql`
-query Species($canonicalName: String) {
+query SpeciesSummary($canonicalName: String) {
   stats {
     species(canonicalName: $canonicalName) {
       total

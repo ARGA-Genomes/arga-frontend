@@ -42,7 +42,7 @@ ChartJS.register(
 
 
 const GET_TRACES = gql`
-query Species($canonicalName: String) {
+query SpeciesTraceFiles($canonicalName: String) {
   species (canonicalName: $canonicalName) {
     traceFiles {
       id

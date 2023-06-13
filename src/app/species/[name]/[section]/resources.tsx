@@ -7,7 +7,7 @@ import GenomeTable from "../commonGenomeRecordTable";
 
 
 const GET_RESOURCES = gql`
-query Species($canonicalName: String) {
+query SpeciesResources($canonicalName: String) {
   species(canonicalName: $canonicalName) {
     data {
       canonicalName

@@ -15,7 +15,7 @@ const FORMATTED_TYPE: Record<string, string> = {
 }
 
 const GET_WHOLE_GENOMES = gql`
-query Species($canonicalName: String) {
+query SpeciesWholeGenomes($canonicalName: String) {
   species(canonicalName: $canonicalName) {
     wholeGenomes {
       type

@@ -9,7 +9,7 @@ import GenomeTable from "../commonGenomeRecordTable";
 
 
 const GET_SPECIES = gql`
-query Species($canonicalName: String) {
+query SpeciesBarcodes($canonicalName: String) {
   species(canonicalName: $canonicalName) {
     data {
       canonicalName
