@@ -1,7 +1,8 @@
 'use client';
 
-import { Box, Button, Collapse, Grid, Group, Paper, Table, Text, ThemeIcon } from "@mantine/core";
-import { WholeGenome, QueryResults} from "@/app/type";
+import { gql, useQuery } from "@apollo/client";
+import { Box, Button, Center, Collapse, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Title } from "@mantine/core";
+import { WholeGenome, Coordinates } from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useListState } from "@mantine/hooks";
@@ -13,34 +14,76 @@ const FORMATTED_TYPE: Record<string, string> = {
   'OCCURRENCE': 'Occurrence',
 }
 
+const GET_WHOLE_GENOMES = gql`
+query Species($canonicalName: String) {
+  species(canonicalName: $canonicalName) {
+    wholeGenomes {
+      type
+      dataResource
+      recordedBy
+      license
+      provenance
+      eventDate
+      occurrenceYear
+      otherCatalogNumbers
+      accession
+      accessionUri
+      refseqCategory
+      coordinates {
+        latitude
+        longitude
+      }
+      ncbiNuccore
+      ncbiBioproject
+      ncbiBiosample
+      mixs0000005
+      mixs0000029
+      mixs0000026
+      pairedAsmComp
+      rawRecordedBy
+      ncbiReleaseType
+    }
+  }
+}`;
 
-const PointMap = dynamic(() => import('../../components/point-map'), {
+type Species = {
+  wholeGenomes: WholeGenome[],
+}
+
+type QueryResults = {
+  species: Species,
+};
+
+
+
+
+const PointMap = dynamic(() => import('../../../components/point-map'), {
   ssr: false,
   loading: () => <Text>Loading map...</Text>,
 })
 
-function WholeGenomeSection({ data }: { data : QueryResults }) {
+function UnknownLocation() {
+  return (
+    <Center mih={200}>
+      <Text c="dimmed">Location not supplied</Text>
+    </Center>
+  )
+}
 
-  const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
-    record.refseqCategory == "reference genome" || record.accession?.includes("GC"));
-
-  const coordinates = wholeGenomeRecords.map(record => record.coordinates);
+function ReferenceSequence({ refseq }: { refseq : WholeGenome | undefined }) {
+    /* const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
+  *   record.refseqCategory == "reference genome" || record.accession?.includes("GC")); */
 
   return (
-    <Paper bg="midnight.6" p={40} radius={35}>
       <Grid>
-        <Grid.Col span={8}>
-          <Link
-            href={{
-              pathname: `/species/${data.species.taxonomy.canonicalName.replaceAll(" ", "_")}/wholeGenome`
-            }}><Text color="blue" underline>Whole Genome Summary</Text></Link>
+        <Grid.Col span={9}>
+          { refseq ? <GenomeDetails record={refseq} /> : null }
         </Grid.Col>
 
-        <Grid.Col span="auto">
-          <PointMap coordinates={coordinates}/>
+        <Grid.Col span={3}>
+            {refseq?.coordinates ? <PointMap coordinates={[refseq.coordinates]} /> : <UnknownLocation /> }
         </Grid.Col>
       </Grid>
-    </Paper>
   )
 }
 
@@ -197,10 +240,40 @@ function GenomeTable({ records }: { records: WholeGenome[] }) {
   )
 }
 
-export function WholeGenome({ records }: { records : WholeGenome[] }) {
+export function WholeGenome({ canonicalName }: { canonicalName: string }) {
+  const { loading, error, data } = useQuery<QueryResults>(GET_WHOLE_GENOMES, {
+    variables: {
+      canonicalName,
+    },
+  });
+
+  if (error) {
+    return (<Text>Error : {error.message}</Text>);
+  }
+
+  const records = data?.species.wholeGenomes;
+  const refseq = records?.find(record => record.refseqCategory == "representative genome");
+  /* const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
+  *   record.refseqCategory == "reference genome" || record.accession?.includes("GC")); */
+
   return (
-    <Paper radius="lg" py={25}>
-      <GenomeTable records={records} />
-    </Paper>
+    <Box pos="relative">
+      <LoadingOverlay
+        overlayColor="black"
+        transitionDuration={500}
+        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+        visible={loading}
+      />
+
+      <Title order={3} color="white" py={20}>Reference Genome Sequence</Title>
+      <Paper mb={20} p={30} radius="lg">
+        <ReferenceSequence refseq={refseq} />
+      </Paper>
+
+      <Title order={3} color="white" py={20}>All Sequences</Title>
+      <Paper radius="lg" py={20}>
+        { records ? <GenomeTable records={records} /> : null }
+      </Paper>
+    </Box>
   );
 }

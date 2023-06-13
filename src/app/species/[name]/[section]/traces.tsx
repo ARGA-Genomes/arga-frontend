@@ -41,6 +41,16 @@ ChartJS.register(
 );
 
 
+const GET_TRACES = gql`
+query Species($canonicalName: String) {
+  species (canonicalName: $canonicalName) {
+    traceFiles {
+      id
+      metadata
+    }
+  }
+}`;
+
 const GET_TRACE_DATA = gql`
 query Traces($id: String) {
   traces(uuid: $id) {
@@ -65,8 +75,14 @@ type TraceData = {
   analyzed: AnalyzedData,
 }
 
-type QueryResults = {
+type TraceDataResults = {
   traces: TraceData,
+};
+
+type TraceFilesResults = {
+  species: {
+    traceFiles: TraceFile[]
+  },
 };
 
 
@@ -158,7 +174,7 @@ function TraceField(props: TraceFieldProps) {
 
 
 function TraceDetails({ record }: { record: TraceFile }) {
-  const { loading, error, data } = useQuery<QueryResults>(GET_TRACE_DATA, {
+  const { loading, error, data } = useQuery<TraceDataResults>(GET_TRACE_DATA, {
     variables: { id: record.id },
   });
 
@@ -349,10 +365,33 @@ function FileTable({ records }: { records: TraceFile[] }) {
   )
 }
 
-export function TraceTable({ records }: { records : TraceFile[] }): JSX.Element {
+export function TraceTable({ canonicalName }: { canonicalName : string }): JSX.Element {
+  const { loading, error, data } = useQuery<TraceFilesResults>(GET_TRACES, {
+    variables: {
+      canonicalName,
+    },
+  });
+
+  if (error) {
+    return (<Text>Error : {error.message}</Text>);
+  }
+
+  const records = data?.species.traceFiles;
+  /* const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
+  *   record.refseqCategory == "reference genome" || record.accession?.includes("GC")); */
+
   return (
-    <Paper radius="lg" py={25}>
-      <FileTable records={records} />
-    </Paper>
+    <Box pos="relative">
+      <LoadingOverlay
+        overlayColor="black"
+        transitionDuration={500}
+        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+        visible={loading}
+      />
+
+      <Paper radius="lg" py={25}>
+        { records ? <FileTable records={records} /> : null }
+      </Paper>
+    </Box>
   );
 }
