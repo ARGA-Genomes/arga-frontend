@@ -23,87 +23,87 @@ const fields: GenomeFieldProps[] = [
   {
     key: 'refseqCategory',
     label: 'Category',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'occurrenceYear',
     label: 'Occurred',
-    icon: <IconLink size='1rem' />
+    icon: <IconLink size={16} />
   },
   {
     key: 'license',
     label: 'License',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'provenance',
     label: 'Provenance',
-    icon: <IconLink size='1rem' />
+    icon: <IconLink size={16} />
   },
   {
     key: 'otherCatalogNumbers',
     label: 'Catalog numbers',
-    icon: <IconPencil size='1rem' />
+    icon: <IconPencil size={16} />
   },
   {
     key: 'ncbiBioproject',
     label: 'NCBI BioProject',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'recordedBy',
     label: 'Recorded by',
-    icon: <IconPencil size='1rem' />
+    icon: <IconPencil size={16} />
   },
   {
     key: 'ncbiBiosample',
     label: 'NCBI BioSample',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'ncbiReleaseType',
     label: 'NCBI Release',
-    icon: <IconLink size='1rem' />
+    icon: <IconLink size={16} />
   },
   {
     key: 'ncbiNuccore',
     label: 'NCBI Nuccore',
-    icon: <IconPencil size='1rem' />
+    icon: <IconPencil size={16} />
   },
   {
     key: 'pairedAsmComp',
     label: 'Paired Asm Comp',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'mixs0000005',
     label: 'MIXS 0000005',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'mixs0000029',
     label: 'MIXS 0000029',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'mixs0000026',
     label: 'MIXS 0000026',
-    icon: <IconLicense size='1rem' />
+    icon: <IconLicense size={16} />
   },
   {
     key: 'sequenceID',
     label: 'SequenceID',
-    icon: <IconPencil size='1rem' />
+    icon: <IconPencil size={16} />
   },
   {
     key: 'genbankAccession',
     label: 'Genbank Accession',
-    icon: <IconPencil size='1rem' />
+    icon: <IconPencil size={16} />
   },
   {
     key: 'markercode',
     label: 'Marker Code',
-    icon: <IconPencil size='1rem' />
+    icon: <IconPencil size={16} />
   }
 ]
 
@@ -130,16 +130,18 @@ function renderField(key: string, value: string | string[] | Object ) {
   let isArray = Array.isArray(value)
 
   if (field && !isObject) {
-    return (<>
-      <Grid.Col span={3}>
+    return (
+      <Grid.Col span={3} key={key}>
         <GenomeField label={field.label} value={value} icon={field.icon} key={key}/>
-      </Grid.Col></>)
+      </Grid.Col>
+    )
   }
   else if (field && isArray){
-    return (<>
-      <Grid.Col span={3}>
+    return (
+      <Grid.Col span={3} key={key}>
         <GenomeField label={field.label} value={JSON.parse(JSON.stringify(value))} icon={field.icon} key={key}/>
-      </Grid.Col></>)
+      </Grid.Col>
+    )
   }
   else  if (!field && subFields.includes(key) && value !== null) {
     let subList: any[] = Object.entries(value).map(([k, v]) => {
@@ -160,7 +162,7 @@ function GenomeDetails({ record }: { record: CommonGenome }) {
           <Grid.Col span={6}>
             <Group position="left">
               <ThemeIcon variant='light' size={28} radius='xl'>
-                <IconLicense size='1rem'/>
+                <IconLicense size={16}/>
               </ThemeIcon>
               <Text color='dimmed' size='xs'>Coloured Barcode</Text>
               <Barcode nucleotides={record.associatedSequences.nucleotides}/>
@@ -169,10 +171,10 @@ function GenomeDetails({ record }: { record: CommonGenome }) {
           <Grid.Col span={6}>
             <Group position="left">
               <ThemeIcon variant='light' size={28} radius='xl'>
-                <IconLicense size='1rem'/>
+                <IconLicense size={16}/>
               </ThemeIcon>
               <Text color='dimmed' size='xs'>Nucleotides</Text>
-              <textarea cols={100} rows={10} readOnly={true}>{record.associatedSequences.nucleotides}</textarea>
+              <textarea cols={100} rows={10} readOnly={true} value={record.associatedSequences.nucleotides} />
             </Group>
           </Grid.Col>
         </div>
@@ -209,12 +211,12 @@ function Barcode( { nucleotides }: { nucleotides: string }) {
 
   return (
     <div>
-      { letters.map(letter => {
+      { letters.map((letter, idx) => {
         let bg = GetBarcodeColours(letter);
-          return <>
+          return <span key={idx}>
             <div style={{backgroundColor: bg, height: 10, width: 3, display: "inline-block", verticalAlign: "top"}}></div>
             <div style={{backgroundColor: "#fff", height: 10, width: 2, display: "inline-block", verticalAlign: "top"}}></div>
-          </>
+          </span>
       })}
     </div>
   )
@@ -233,7 +235,7 @@ function GenomeRecord(props: GenomeRecordProps) {
         { props.record.accessionUri &&
           <td>
             <Link href={props.record.accessionUri} target="_blank">
-              <Button size="xs" variant="light" rightIcon={<ArrowUpRight size="1rem"/>}>All details</Button>
+              <Button size="xs" variant="light" rightIcon={<ArrowUpRight size={16}/>}>All details</Button>
             </Link>
           </td>
         }
@@ -275,12 +277,12 @@ export default function GenomeTable({ records }: { records: CommonGenome[] }) {
       </tr>
       </thead>
       <tbody>
-      { records?.map(record => {
+        { records?.map((record, idx) => {
            return <GenomeRecord
             record={record}
             selected={selected.indexOf(record) >= 0}
             onSelected={toggle}
-            key={record.accessionUri}
+            key={idx}
           />
       })}
       </tbody>

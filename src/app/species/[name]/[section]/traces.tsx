@@ -184,91 +184,91 @@ function TraceDetails({ record }: { record: TraceFile }) {
 
       <Grid>
         <Grid.Col span={3}>
-          <TraceField label="Total capillaries" value={record.metadata['total_capillaries']} icon={<IconLink size='1rem' />} />
+          <TraceField label="Total capillaries" value={record.metadata['total_capillaries']} icon={<IconLink size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Run temperature" value={record.metadata['run']['temperature'] + "C"} icon={<Thermometer size='1rem' />} />
+          <TraceField label="Run temperature" value={record.metadata['run']['temperature'] + "C"} icon={<Thermometer size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Protocol" value={record.metadata['run']['protocol_name']} icon={<Thermometer size='1rem' />} />
+          <TraceField label="Protocol" value={record.metadata['run']['protocol_name']} icon={<Thermometer size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Pixel bin size" value={record.metadata['pixel_bin_size']} icon={<IconBox size='1rem' />} />
-        </Grid.Col>
-
-        <Grid.Col span={3}>
-          <TraceField label="Baseline noise - G" value={record.metadata['baseline_noise'][0]} icon={<Speakerphone size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Baseline noise - A" value={record.metadata['baseline_noise'][1]} icon={<Speakerphone size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Baseline noise - T" value={record.metadata['baseline_noise'][2]} icon={<Speakerphone size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Baseline noise - C" value={record.metadata['baseline_noise'][3]} icon={<Speakerphone size='1rem' />} />
+          <TraceField label="Pixel bin size" value={record.metadata['pixel_bin_size']} icon={<IconBox size={16} />} />
         </Grid.Col>
 
         <Grid.Col span={3}>
-          <TraceField label="Dye 1 wavelength" value={record.metadata['dyes']['dye1']['wavelength']} icon={<WaveSine size='1rem' />} />
+          <TraceField label="Baseline noise - G" value={record.metadata['baseline_noise'][0]} icon={<Speakerphone size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Dye 2 wavelength" value={record.metadata['dyes']['dye2']['wavelength']} icon={<WaveSine size='1rem' />} />
+          <TraceField label="Baseline noise - A" value={record.metadata['baseline_noise'][1]} icon={<Speakerphone size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Dye 3 wavelength" value={record.metadata['dyes']['dye3']['wavelength']} icon={<WaveSine size='1rem' />} />
+          <TraceField label="Baseline noise - T" value={record.metadata['baseline_noise'][2]} icon={<Speakerphone size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Dye 4 wavelength" value={record.metadata['dyes']['dye4']['wavelength']} icon={<WaveSine size='1rem' />} />
-        </Grid.Col>
-
-        <Grid.Col span={3}>
-          <TraceField label="Dye 1 signal strength" value={record.metadata['dye_signal_strength'][0]} icon={<AntennaBars5 size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Dye 2 signal strength" value={record.metadata['dye_signal_strength'][1]} icon={<AntennaBars5 size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Dye 3 signal strength" value={record.metadata['dye_signal_strength'][2]} icon={<AntennaBars5 size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Dye 4 signal strength" value={record.metadata['dye_signal_strength'][3]} icon={<AntennaBars5 size='1rem' />} />
+          <TraceField label="Baseline noise - C" value={record.metadata['baseline_noise'][3]} icon={<Speakerphone size={16} />} />
         </Grid.Col>
 
         <Grid.Col span={3}>
-          <TraceField label="Dye name" value={record.metadata['dyes']['name']} icon={<IconTag size='1rem' />} />
+          <TraceField label="Dye 1 wavelength" value={record.metadata['dyes']['dye1']['wavelength']} icon={<WaveSine size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Peak spacing - avg last calculated" value={record.metadata['peak_spacing']['avg_last_calculated']} icon={<Mountain size='1rem' />} />
+          <TraceField label="Dye 2 wavelength" value={record.metadata['dyes']['dye2']['wavelength']} icon={<WaveSine size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Peak spacing - avg used in last analysis" value={record.metadata['peak_spacing']['avg_used_in_last_analysis']} icon={<Mountain size='1rem' />} />
+          <TraceField label="Dye 3 wavelength" value={record.metadata['dyes']['dye3']['wavelength']} icon={<WaveSine size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Basecaller" value={record.metadata['peak_spacing']['basecaller_name']} icon={<IconTag size='1rem' />} />
-        </Grid.Col>
-
-        <Grid.Col span={3}>
-          <TraceField label="Results group" value={record.metadata['results_group']['name']} icon={<IconPencil size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Starting scan" value={record.metadata['analysis']['starting_scan_first']} icon={<ScanEye size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Ending scan" value={record.metadata['analysis']['ending_scan_first']} icon={<ScanEye size='1rem' />} />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <TraceField label="Reference scan" value={record.metadata['analysis']['ref_scan_first']} icon={<ScanEye size='1rem' />} />
+          <TraceField label="Dye 4 wavelength" value={record.metadata['dyes']['dye4']['wavelength']} icon={<WaveSine size={16} />} />
         </Grid.Col>
 
         <Grid.Col span={3}>
-          <TraceField label="Data collection software version" value={record.metadata['software_versions']['data_collection']} icon={<IconVersions size='1rem' />} />
+          <TraceField label="Dye 1 signal strength" value={record.metadata['dye_signal_strength'][0]} icon={<AntennaBars5 size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Firmware version" value={record.metadata['software_versions']['firmware']} icon={<IconVersions size='1rem' />} />
+          <TraceField label="Dye 2 signal strength" value={record.metadata['dye_signal_strength'][1]} icon={<AntennaBars5 size={16} />} />
         </Grid.Col>
         <Grid.Col span={3}>
-          <TraceField label="Sizecaller version" value={record.metadata['software_versions']['sizecaller']} icon={<IconVersions size='1rem' />} />
+          <TraceField label="Dye 3 signal strength" value={record.metadata['dye_signal_strength'][2]} icon={<AntennaBars5 size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Dye 4 signal strength" value={record.metadata['dye_signal_strength'][3]} icon={<AntennaBars5 size={16} />} />
+        </Grid.Col>
+
+        <Grid.Col span={3}>
+          <TraceField label="Dye name" value={record.metadata['dyes']['name']} icon={<IconTag size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Peak spacing - avg last calculated" value={record.metadata['peak_spacing']['avg_last_calculated']} icon={<Mountain size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Peak spacing - avg used in last analysis" value={record.metadata['peak_spacing']['avg_used_in_last_analysis']} icon={<Mountain size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Basecaller" value={record.metadata['peak_spacing']['basecaller_name']} icon={<IconTag size={16} />} />
+        </Grid.Col>
+
+        <Grid.Col span={3}>
+          <TraceField label="Results group" value={record.metadata['results_group']['name']} icon={<IconPencil size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Starting scan" value={record.metadata['analysis']['starting_scan_first']} icon={<ScanEye size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Ending scan" value={record.metadata['analysis']['ending_scan_first']} icon={<ScanEye size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Reference scan" value={record.metadata['analysis']['ref_scan_first']} icon={<ScanEye size={16} />} />
+        </Grid.Col>
+
+        <Grid.Col span={3}>
+          <TraceField label="Data collection software version" value={record.metadata['software_versions']['data_collection']} icon={<IconVersions size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Firmware version" value={record.metadata['software_versions']['firmware']} icon={<IconVersions size={16} />} />
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <TraceField label="Sizecaller version" value={record.metadata['software_versions']['sizecaller']} icon={<IconVersions size={16} />} />
         </Grid.Col>
       </Grid>
 

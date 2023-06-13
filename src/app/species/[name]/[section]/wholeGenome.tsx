@@ -119,49 +119,49 @@ function GenomeDetails({ record }: { record: WholeGenome }) {
   return (
     <Grid>
       <Grid.Col span={3}>
-        <GenomeField label="Provenance" value={record.provenance} icon={<IconLink size='1rem' />} />
+        <GenomeField label="Provenance" value={record.provenance} icon={<IconLink size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <GenomeField label="Recorded by" value={record.recordedBy?.join(', ')} icon={<IconPencil size='1rem' />} />
+        <GenomeField label="Recorded by" value={record.recordedBy?.join(', ')} icon={<IconPencil size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <GenomeField label="License" value={record.license} icon={<IconLicense size='1rem' />} />
+        <GenomeField label="License" value={record.license} icon={<IconLicense size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <GenomeField label="Category" value={record.refseqCategory} icon={<IconLicense size='1rem' />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <GenomeField label="Occurred" value={record.occurrenceYear?.join(', ')} icon={<IconLink size='1rem' />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Catalog numbers" value={record.otherCatalogNumbers?.join(', ')} icon={<IconPencil size='1rem' />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="NCBI BioProject" value={record.ncbiBioproject} icon={<IconLicense size='1rem' />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="NCBI BioSample" value={record.ncbiBiosample} icon={<IconLicense size='1rem' />} />
+        <GenomeField label="Category" value={record.refseqCategory} icon={<IconLicense size={16} />} />
       </Grid.Col>
 
       <Grid.Col span={3}>
-        <GenomeField label="NCBI Release" value={record.ncbiReleaseType} icon={<IconLink size='1rem' />} />
+        <GenomeField label="Occurred" value={record.occurrenceYear?.join(', ')} icon={<IconLink size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <GenomeField label="NCBI Nuccore" value={record.ncbiNuccore} icon={<IconPencil size='1rem' />} />
+        <GenomeField label="Catalog numbers" value={record.otherCatalogNumbers?.join(', ')} icon={<IconPencil size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <GenomeField label="Paired Asm Comp" value={record.pairedAsmComp} icon={<IconLicense size='1rem' />} />
+        <GenomeField label="NCBI BioProject" value={record.ncbiBioproject} icon={<IconLicense size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <GenomeField label="MIXS 0000005" value={record.mixs0000005} icon={<IconLicense size='1rem' />} />
+        <GenomeField label="NCBI BioSample" value={record.ncbiBiosample} icon={<IconLicense size={16} />} />
       </Grid.Col>
 
       <Grid.Col span={3}>
-        <GenomeField label="MIXS 0000026" value={record.mixs0000026} icon={<IconLicense size='1rem' />} />
+        <GenomeField label="NCBI Release" value={record.ncbiReleaseType} icon={<IconLink size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <GenomeField label="MIXS 0000029" value={record.mixs0000029} icon={<IconLicense size='1rem' />} />
+        <GenomeField label="NCBI Nuccore" value={record.ncbiNuccore} icon={<IconPencil size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <GenomeField label="Paired Asm Comp" value={record.pairedAsmComp} icon={<IconLicense size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <GenomeField label="MIXS 0000005" value={record.mixs0000005} icon={<IconLicense size={16} />} />
+      </Grid.Col>
+
+      <Grid.Col span={3}>
+        <GenomeField label="MIXS 0000026" value={record.mixs0000026} icon={<IconLicense size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <GenomeField label="MIXS 0000029" value={record.mixs0000029} icon={<IconLicense size={16} />} />
       </Grid.Col>
     </Grid>
   )
@@ -186,7 +186,7 @@ function GenomeRecord(props: GenomeRecordProps) {
       <td>{props.record.eventDate}</td>
       <td>
         <Link href={genomeDetailsURL()}>
-          <Button size="xs" variant="light" rightIcon={<ArrowUpRight size="1rem" />}>All details</Button>
+          <Button size="xs" variant="light" rightIcon={<ArrowUpRight size={16} />}>All details</Button>
         </Link>
       </td>
     </tr>
