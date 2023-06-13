@@ -1,11 +1,11 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import {Box, Grid, Group, LoadingOverlay, Modal, Paper, Text} from "@mantine/core";
-import { GenomicData } from "@/app/type";
+import {Box, Grid, LoadingOverlay, Paper, Text} from "@mantine/core";
+import { CommonGenome } from "@/app/type";
 import dynamic from "next/dynamic";
 import React from "react";
-import {GenomeRecords} from "./genomeRecords";
+import GenomeTable from "../commonGenomeRecordTable";
 
 
 const GET_SPECIES = gql`
@@ -26,13 +26,19 @@ query Species($canonicalName: String) {
         latitude
         longitude
       }
+      associatedSequences {
+        sequenceID
+        genbankAccession
+        markercode
+        nucleotides
+      }
     }
   }
 }`;
 
 type QueryResults = {
   species: {
-    data: GenomicData[]
+    data: CommonGenome[]
   },
 };
 
@@ -42,31 +48,25 @@ const PointMap = dynamic(() => import('../../../components/point-map'), {
   loading: () => <Text>Loading map...</Text>,
 })
 
+
 function BarcodeDataSection({ data }: { data : QueryResults }) {
-
   const barcodeRecords = data.species.data.filter((record) => record.dataResource?.includes("BOLD"));
-
   const coordinates = barcodeRecords.map(record => record.coordinates);
 
   return (
     <Paper bg="midnight.6" p={40} radius={35}>
       <Grid>
         <Grid.Col span={8}>
-          <h2>Barcode Summary Stats</h2>
           <Text color="white" style={{ padding: 15 }}>No of records: {barcodeRecords.length}</Text>
         </Grid.Col>
         <Grid.Col span="auto">
           <PointMap coordinates={coordinates}/>
         </Grid.Col>
       </Grid>
-      <Grid>
-        <Grid.Col>
-          <Text style={{padding: 25}} color="white">Records</Text><GenomeRecords data={barcodeRecords} expandable={true}/>
-        </Grid.Col>
-      </Grid>
     </Paper>
   )
 }
+
 
 export function Barcode({ canonicalName }: { canonicalName: string }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
@@ -79,6 +79,8 @@ export function Barcode({ canonicalName }: { canonicalName: string }) {
     return (<Text>Error : {error.message}</Text>);
   }
 
+  const barcodeRecords = data?.species.data.filter((record) => record.dataResource?.includes("BOLD"));
+
   return (
     <Box pos="relative">
       <LoadingOverlay
@@ -88,11 +90,10 @@ export function Barcode({ canonicalName }: { canonicalName: string }) {
         visible={loading}
       />
 
-      <Grid p={40}>
-        <Grid.Col span="auto">
-          { data ? <BarcodeDataSection data={data}/> : null }
-        </Grid.Col>
-      </Grid>
+      { data ? <BarcodeDataSection data={data}/> : null }
+      <Paper radius="lg" py={25} mt={15}>
+        { barcodeRecords ? <GenomeTable records={barcodeRecords} /> : null }
+      </Paper>
     </Box>
   );
 }

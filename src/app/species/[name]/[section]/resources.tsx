@@ -1,9 +1,9 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, LoadingOverlay, Text } from '@mantine/core';
-import {GenomicData} from "@/app/type";
-import {GenomeRecords} from "./genomeRecords";
+import { Box, LoadingOverlay, Paper, Text } from '@mantine/core';
+import { CommonGenome } from "@/app/type";
+import GenomeTable from "../commonGenomeRecordTable";
 
 
 const GET_RESOURCES = gql`
@@ -30,7 +30,7 @@ query Species($canonicalName: String) {
 
 type QueryResults = {
   species: {
-    data: GenomicData[]
+    data: CommonGenome[]
   },
 };
 
@@ -54,8 +54,11 @@ export function Resources({ canonicalName }: { canonicalName: string }) {
         loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
         visible={loading}
       />
-      <Text style={{padding: 25}} color="white">Genome Sequence Records</Text>
-      { data ? <GenomeRecords data={data.species.data} expandable={false}/> : null }
+
+      <Text style={{padding: 25}} color="white">All Genome Sequence Records</Text>
+      <Paper radius="lg" py={25}>
+        { data ? <GenomeTable records={data.species.data} /> : null }
+      </Paper>
     </Box>
   );
 }
