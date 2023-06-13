@@ -119,6 +119,13 @@ function GenomeDetails({ record }: { record: WholeGenome }) {
   return (
     <Grid>
       <Grid.Col span={3}>
+        <GenomeField label="Accension" value={record.accession} icon={<IconLink size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <GenomeField label="Data resource" value={record.dataResource} icon={<IconLink size={16} />} />
+      </Grid.Col>
+
+      <Grid.Col span={3}>
         <GenomeField label="Provenance" value={record.provenance} icon={<IconLink size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
@@ -163,6 +170,12 @@ function GenomeDetails({ record }: { record: WholeGenome }) {
       <Grid.Col span={3}>
         <GenomeField label="MIXS 0000029" value={record.mixs0000029} icon={<IconLicense size={16} />} />
       </Grid.Col>
+      <Grid.Col span={3}>
+        <GenomeField label="Type" value={record?.type ? (FORMATTED_TYPE[record.type] || record.type) : "Not Supplied"} icon={<IconLicense size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <GenomeField label="Event" value={record.eventDate} icon={<IconLicense size={16} />} />
+      </Grid.Col>
     </Grid>
   )
 }
@@ -181,9 +194,8 @@ function GenomeRecord(props: GenomeRecordProps) {
       onClick={() => props.onSelected(props.record)}
     >
       <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
-      <td>{props.record?.type ? (FORMATTED_TYPE[props.record.type] || props.record.type) : "Not Supplied"}</td>
+      <td>{props.record.refseqCategory}</td>
       <td>{props.record.dataResource}</td>
-      <td>{props.record.eventDate}</td>
       <td>
         <Link href={genomeDetailsURL()}>
           <Button size="xs" variant="light" rightIcon={<ArrowUpRight size={16} />}>All details</Button>
@@ -220,9 +232,8 @@ function GenomeTable({ records }: { records: WholeGenome[] }) {
       <thead>
         <tr>
           <td style={{ paddingLeft: 25 }}>Accession</td>
-          <td>Type</td>
+          <td>Category</td>
           <td>Data Resource</td>
-          <td>Event Date</td>
           <td></td>
         </tr>
       </thead>
