@@ -3,7 +3,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Table } from "@mantine/core";
 
 const GET_SPECIMENS = gql`
-query Species($canonicalName: String) {
+query SpeciesSpecimens($canonicalName: String) {
   species(canonicalName: $canonicalName) {
     specimens {
       typeStatus

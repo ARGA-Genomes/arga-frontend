@@ -135,5 +135,6 @@ export type {
     Specimen,
     StatsSpecies,
     TraceFile,
-    CommonGenome
+    CommonGenome,
+    Conservation,
 };
