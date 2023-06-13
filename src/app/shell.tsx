@@ -32,7 +32,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </Box>
       }
     >
-      <Container py={36} px={32} maw={MAX_WIDTH}>
+      <Container pb={36} px={32} maw={MAX_WIDTH}>
         {children}
       </Container>
     </AppShell>
