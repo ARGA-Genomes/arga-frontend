@@ -19,7 +19,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     },
 
     span: {
-      fontSize: "20px",
+      fontSize: "16px",
     }
   },
 }));
@@ -31,7 +31,7 @@ export function TopNav() {
   return (
     <Group position="apart" h="inherit">
       <Link href="/">
-        <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={319} height={90} />
+        <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={250} />
       </Link>
       <Group position="right" align="end" h="inherit">
         <Link href="/">

@@ -49,7 +49,7 @@ function BrowseCard(props: Props) {
         <Text size={20} weight={400} h={83} m={0} p={0}>{props.category}</Text>
         <Box h={36} />
         <Link href="/browse/Conservation_NT">
-          <Button color="midnight.5" variant="outline" radius={10} h={60} w={200}>
+          <Button className="secondary_button" size="lg">
             <Text size={20} weight={400}>Browse</Text>
           </Button>
         </Link>

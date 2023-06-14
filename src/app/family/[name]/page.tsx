@@ -119,7 +119,7 @@ function RecordItem({ record }: { record: Record }) {
       </Stack>
       <Divider my={20} />
       <Link href={`/genus/${record.genusName}`}>
-        <Button color="midnight.5" radius={10}>View genus</Button>
+        <Button className="primary_button">View genus</Button>
       </Link>
     </Card>
   )

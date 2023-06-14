@@ -6,7 +6,7 @@ import { Container, Divider, Flex, Grid, Image, Stack, Text } from '@mantine/cor
 
 export function Footer() {
   return (
-    <Flex p={50} mah={444}>
+    <Flex p={50} mah={550}>
       <Stack>
         <Link href="./contact_us">Contact us</Link>
         <Link href="./help">Help</Link>

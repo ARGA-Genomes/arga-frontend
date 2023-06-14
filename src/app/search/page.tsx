@@ -290,7 +290,7 @@ function Search(props: SearchProperties) {
           </Grid.Col>
 
           <Grid.Col span="content">
-            <Button size="xl" radius="lg" color="midnight.5" type="submit">Search</Button>
+            <Button size="xl" className="primary_button" type="submit">Search</Button>
           </Grid.Col>
         </Grid>
       </form>

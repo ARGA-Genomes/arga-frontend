@@ -72,12 +72,12 @@ function Search() {
             iconWidth={60}
             size="xl"
             radius={20}
-            styles={{ input: { height: 90, fontSize: "24px", fontWeight: 500, border: 0 } }}
+            styles={{ input: { height: 90, fontSize: "16px", fontWeight: 'normal', border: 0, color: "#707070" } }}
             icon={<IconSearch size={28} />}
           />
         </Grid.Col>
         <Grid.Col span="content">
-          <Button size="xl" radius="lg" color="midnight.5" type="submit">Search</Button>
+          <Button size="xl" type="submit" className="primary_button">Search</Button>
         </Grid.Col>
       </Grid>
       </form>
@@ -91,23 +91,23 @@ export default function HomePage() {
     <Box>
       <Paper bg="midnight.6" p={0} m={0} radius={35}>
         <Box px={50} py={40}>
-          <Title c="white" py={20}>Search By</Title>
+          <h2 style={{color: 'white', fontWeight: 'normal'}}>Search By</h2>
           <Search />
         </Box>
 
         <Box px={50} pb={58}>
-          <Title c="white" py={20}>Browse By Taxon</Title>
+          <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Taxon</h2>
           <BrowseTaxon/>
         </Box>
 
         <Box px={50} pb={58}>
-          <Title c="white" py={20}>Browse By Groupings</Title>
+          <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Groupings</h2>
           <BrowseData/>
         </Box>
       </Paper>
 
       <Box py={30}>
-        <Title order={1} mt={20} color="white" py={20}>This month&apos;s highlights</Title>
+        <h2 style={{color: 'white', fontWeight: 'normal'}}>This month&apos;s highlights</h2>
         <Highlights />
 
         <ConferenceInfo />
