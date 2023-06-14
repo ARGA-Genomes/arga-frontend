@@ -1,11 +1,64 @@
 'use client';
 
-import { Box, Grid, Group, Image, Paper, Stack, Text } from "@mantine/core";
-import { Photo, Taxonomy, Regions, QueryResults, StatsSpecies} from "@/app/type";
+import { gql, useQuery } from "@apollo/client";
+import { Box, Grid, Group, Image, LoadingOverlay, Paper, Stack, Text } from "@mantine/core";
+import { Photo, Taxonomy, Regions, StatsSpecies, Species} from "@/app/type";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-const RegionMap = dynamic(() => import('../../components/region-map'), {
+
+const GET_SUMMARY = gql`
+query SpeciesSummary($canonicalName: String) {
+  stats {
+    species(canonicalName: $canonicalName) {
+      total
+      wholeGenomes
+      mitogenomes
+      barcodes
+    }
+  }
+  species(canonicalName: $canonicalName) {
+    taxonomy {
+      canonicalName
+      authorship
+      kingdom
+      phylum
+      class
+      order
+      family
+      genus
+      vernacularGroup
+    }
+    photos {
+      url
+      referenceUrl
+      publisher
+      license
+      rightsHolder
+    }
+    regions {
+      ibra {
+        name
+      }
+      imcra {
+        name
+      }
+    }
+  }
+}`;
+
+
+type StatsResults = {
+  species: StatsSpecies,
+}
+
+type QueryResults = {
+  stats: StatsResults,
+  species: Species,
+};
+
+
+const RegionMap = dynamic(() => import('../../../components/region-map'), {
   ssr: false,
   loading: () => <Text>Loading map...</Text>,
 })
@@ -91,29 +144,38 @@ function Taxonomy({ taxonomy, regions }: { taxonomy: Taxonomy, regions: Regions 
 }
 
 
-interface SummaryProps {
-  photos: Photo[],
-  stats: StatsSpecies,
-  taxonomy: Taxonomy,
-  regions: Regions,
-}
+export function Summary({ canonicalName }: { canonicalName: string }) {
+  const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
+    variables: { canonicalName },
+  });
 
-export function Summary(props: SummaryProps) {
+  if (error) {
+    return (<Text>Error : {error.message}</Text>);
+  }
+
+
   return (
     <>
+      <LoadingOverlay
+        overlayColor="black"
+        transitionDuration={500}
+        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+        visible={loading}
+      />
+
       <Grid py={40}>
         <Grid.Col span="content">
           <Stack>
-          { props.photos[0]
-            ? <SpeciesPhoto photo={props.photos[0]}/>
+          { data?.species.photos[0]
+            ? <SpeciesPhoto photo={data?.species.photos[0]}/>
             : <Image width={300} height={300} radius="lg" alt="Species image" withPlaceholder/>
           }
 
-          { props.stats ? <DataSummary stats={props.stats} /> : null }
+          { data?.stats ? <DataSummary stats={data.stats.species} /> : null }
           </Stack>
         </Grid.Col>
         <Grid.Col span="auto">
-          <Taxonomy taxonomy={props.taxonomy} regions={props.regions}/>
+          { data ? <Taxonomy taxonomy={data.species.taxonomy} regions={data.species.regions}/> : null }
         </Grid.Col>
       </Grid>
     </>);

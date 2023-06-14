@@ -1,4 +1,4 @@
-import { Species } from "@/app/type";
+import { Conservation, Taxonomy } from "@/app/type";
 import { Box, Group, ThemeIcon, Image, Tooltip } from "@mantine/core";
 
 
@@ -149,12 +149,17 @@ function DebugIconBar() {
 }
 
 
-export default function IconBar({ species }: { species: Species }) {
+interface IconBarProps {
+  taxonomy: Taxonomy,
+  conservation?: Conservation[],
+}
+
+export default function IconBar({ taxonomy, conservation }: IconBarProps) {
   return (
     <Box>
       <Group>
-        { species.taxonomy.vernacularGroup ? <VernacularGroupIcon group={species.taxonomy.vernacularGroup} /> : null }
-        { species.conservation.map(cons => (
+        { taxonomy.vernacularGroup ? <VernacularGroupIcon group={taxonomy.vernacularGroup} /> : null }
+        { conservation?.map(cons => (
             <ConservationIcon status={cons.status} key={cons.status}/>
         ))}
       </Group>
