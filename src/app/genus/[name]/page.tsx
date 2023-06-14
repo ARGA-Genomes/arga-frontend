@@ -137,7 +137,7 @@ function RecordItem({ record }: { record: Record }) {
       </Stack>
       <Divider my={20} />
       <Link href={`species/${record.canonicalName.replaceAll(' ', '_')}`}>
-        <Button color="midnight.5" radius={10}>View species</Button>
+        <Button className="primary_button">View species</Button>
       </Link>
     </Card>
   )

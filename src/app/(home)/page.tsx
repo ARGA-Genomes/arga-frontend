@@ -77,7 +77,7 @@ function Search() {
           />
         </Grid.Col>
         <Grid.Col span="content">
-          <Button size="xl" radius="lg" color="midnight.5" type="submit">Search</Button>
+          <Button size="xl" type="submit" className="primary_button">Search</Button>
         </Grid.Col>
       </Grid>
       </form>

@@ -45,6 +45,39 @@ const argaBrand: MantineThemeOverride = {
       outline: "none",
       textDecoration: "none",
       color: theme.colors["bushfire"][6],
+    },
+    '.primary_button': {
+      backgroundColor: "#3C6377 !important",
+      border: "1px solid !important",
+      borderColor: "#59A39C !important",
+      borderRadius: "8px !important",
+
+      "&:hover, &:focus": {
+        backgroundColor: "#233C4B !important",
+      },
+
+      span: {
+        fontSize: "18px !important",
+        color: "#ffffff !important",
+        fontFamily: gothamBook.style.fontFamily,
+        paddingTop: "10px"
+      }
+    },
+    '.secondary_button': {
+      backgroundColor: "#ffffff !important",
+      border: "1px solid !important",
+      borderColor: "#000000 !important",
+      borderRadius: "8px !important",
+
+      "&:hover, &:focus": {
+        backgroundColor: "#EFEFEF !important",
+      },
+
+      span: {
+        fontSize: "18px !important",
+        color: "#000000 !important",
+        fontFamily: gothamBook.style.fontFamily,
+      }
     }
   }),
 };
