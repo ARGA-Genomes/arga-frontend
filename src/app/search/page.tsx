@@ -64,7 +64,7 @@ function TaxonItem({ item } : { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}`}>
+    <Link href={`/species/${itemLinkName}/summary`}>
     <Paper my={30} p={10} radius="lg">
       <Grid>
         <Grid.Col span="content">
@@ -86,7 +86,7 @@ function ReferenceGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}`}>
+    <Link href={`/species/${itemLinkName}/whole_genome`}>
     <Paper my={30} p={10} radius="lg">
       <Grid>
         <Grid.Col span="content">
@@ -108,7 +108,7 @@ function WholeGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}`}>
+    <Link href={`/species/${itemLinkName}/whole_genome`}>
     <Paper my={30} p={10} radius="lg">
       <Grid>
         <Grid.Col span="content">
@@ -130,7 +130,7 @@ function PartialGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}`}>
+    <Link href={`/species/${itemLinkName}/whole_genome`}>
     <Paper my={30} p={10} radius="lg">
       <Grid>
         <Grid.Col span="content">
@@ -152,7 +152,7 @@ function UnknownGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}`}>
+    <Link href={`/species/${itemLinkName}/resources`}>
     <Paper my={30} p={10} radius="lg">
       <Grid>
         <Grid.Col span="content">
@@ -174,7 +174,7 @@ function BarcodeItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}`}>
+    <Link href={`/species/${itemLinkName}/barcode`}>
     <Paper my={30} p={10} radius="lg">
       <Grid>
         <Grid.Col span="content">
