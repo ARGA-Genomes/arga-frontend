@@ -194,6 +194,7 @@ function GenomeRecord(props: GenomeRecordProps) {
       onClick={() => props.onSelected(props.record)}
     >
       <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
+      <td>{props.record.type}</td>
       <td>{props.record.refseqCategory}</td>
       <td>{props.record.dataResource}</td>
       <td>
@@ -232,6 +233,7 @@ function GenomeTable({ records }: { records: WholeGenome[] }) {
       <thead>
         <tr>
           <td style={{ paddingLeft: 25 }}>Accession</td>
+          <td>Type</td>
           <td>Category</td>
           <td>Data Resource</td>
           <td></td>
@@ -276,10 +278,12 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
         visible={loading}
       />
 
+      { refseq ? (<>
       <Title order={3} color="white" py={20}>Reference Genome Sequence</Title>
       <Paper mb={20} p={30} radius="lg">
         <ReferenceSequence refseq={refseq} />
       </Paper>
+      </>) : null }
 
       <Title order={3} color="white" py={20}>All Sequences</Title>
       <Paper radius="lg" py={20}>
