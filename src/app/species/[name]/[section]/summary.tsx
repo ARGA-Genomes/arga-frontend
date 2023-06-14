@@ -112,7 +112,7 @@ function Attribution({ name, url }: { name: string, url: string }) {
 function Taxonomy({ taxonomy, regions }: { taxonomy: Taxonomy, regions: Regions }) {
   const attribution = 'Australian Faunal Directory'
   const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`
-  const hasRegions = regions.ibra.length > 0 || regions.imcra.length > 0
+  const allRegions = [...regions.ibra, ...regions.imcra];
 
   return (
     <Paper bg="midnight.6" p={40} radius={35}>
@@ -130,13 +130,12 @@ function Taxonomy({ taxonomy, regions }: { taxonomy: Taxonomy, regions: Regions 
         </Grid.Col>
 
         <Grid.Col span="auto">
-          <RegionMap regions={regions.ibra.map(region => region.name)}/>
+          <RegionMap regions={allRegions.map(region => region.name)}/>
           <Text c="dimmed" fz="sm">
-            {regions.ibra.map(region => region.name).join(", ")}
-            {regions.imcra.map(region => region.name).join(", ")}
+            {allRegions.map(region => region.name).join(", ")}
           </Text>
 
-          { hasRegions ? <Attribution name={attribution} url={sourceUrl} /> : null }
+          { allRegions.length > 0 ? <Attribution name={attribution} url={sourceUrl} /> : null }
         </Grid.Col>
       </Grid>
     </Paper>

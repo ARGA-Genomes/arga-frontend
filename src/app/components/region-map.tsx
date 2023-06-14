@@ -10,16 +10,18 @@ import { LatLngExpression } from 'leaflet';
 
 
 const GET_GEOMETRY = gql`
-query Maps($regions: [String], $tolerance: Float) {
+query BioRegions($regions: [String], $tolerance: Float) {
   maps(tolerance: $tolerance) {
     ibra(regions: $regions)
+    imcraProvincial(regions: $regions)
+    imcraMesoscale(regions: $regions)
   }
 }`;
 
-
-
 type Maps = {
   ibra: string,
+  imcraProvincial: string,
+  imcraMesoscale: string,
 };
 
 type QueryResults = {
@@ -27,8 +29,10 @@ type QueryResults = {
 };
 
 
-function IbraLayers({ regions }: { regions: string[] }) {
-  const [json, setJson] = useState(undefined);
+function BioRegionLayers({ regions }: { regions: string[] }) {
+  const [ibra, setIbra] = useState(undefined);
+  const [imcraProvincial, setImcraProvincial] = useState(undefined);
+  const [imcraMesoscale, setImcraMesoscale] = useState(undefined);
   const [tolerance, setTolerance] = useState(0.1);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
@@ -40,9 +44,11 @@ function IbraLayers({ regions }: { regions: string[] }) {
 
   useEffect(() => {
     if (data) {
-      setJson(JSON.parse(data.maps.ibra))
+      setIbra(JSON.parse(data.maps.ibra))
+      setImcraProvincial(JSON.parse(data.maps.imcraProvincial))
+      setImcraMesoscale(JSON.parse(data.maps.imcraMesoscale))
     }
-  }, [data, setJson]);
+  }, [data, setIbra, setImcraProvincial, setImcraMesoscale]);
 
   const map = useMapEvent('zoomend', () => {
     const invertZoom = (2 ^ map.getMaxZoom()) - (2 ^ map.getZoom());
@@ -52,7 +58,9 @@ function IbraLayers({ regions }: { regions: string[] }) {
 
   return (
     <>
-    { json ? <GeoJSON key={`${tolerance}-${json}`} data={json} /> : null }
+    { ibra ? <GeoJSON key={`${tolerance}-${ibra}`} data={ibra} /> : null }
+    { imcraProvincial ? <GeoJSON key={`${tolerance}-${imcraProvincial}`} data={imcraProvincial} /> : null }
+    { imcraMesoscale ? <GeoJSON key={`${tolerance}-${imcraMesoscale}`} data={imcraMesoscale} /> : null }
     </>
   )
 }
@@ -67,7 +75,7 @@ export default function RegionMap({ regions }: { regions: string[] }) {
           url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <IbraLayers regions={regions} />
+        <BioRegionLayers regions={regions} />
       </MapContainer>
     </Box>
   );
