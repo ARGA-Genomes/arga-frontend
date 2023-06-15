@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Paper, Tabs, Text } from "@mantine/core";
+import {Box, Paper, Tabs, Text, Tooltip} from "@mantine/core";
 import { Barcode } from "./barcode";
 import { Resources } from "./resources";
 import SpecimenTable from "./specimens";
@@ -21,10 +21,10 @@ function DataTabs({ name, section }: { name: string, section: string }) {
   return (
     <Tabs defaultValue="summary" value={section} onTabChange={changeTab}>
       <Tabs.List style={{ paddingTop: 25 }}>
-        <Tabs.Tab value="summary"><Text color="grey">Summary</Text></Tabs.Tab>
-        <Tabs.Tab value="whole_genome"><Text color="grey">Whole Genome Data</Text></Tabs.Tab>
+        <Tooltip label="Summary"><Tabs.Tab value="summary"><Text color="grey">Summary</Text></Tabs.Tab></Tooltip>
+        <Tabs.Tab value="whole_genome"><Text color="grey">Whole Genomes</Text></Tabs.Tab>
         <Tabs.Tab value="traces"><Text color="grey">Traces</Text></Tabs.Tab>
-        <Tabs.Tab value="mitogenome"><Text color="grey">Mitogenome Data</Text></Tabs.Tab>
+        <Tabs.Tab value="mitogenome"><Text color="grey">Organellar Genomes</Text></Tabs.Tab>
         <Tabs.Tab value="barcode"><Text color="grey">Barcode Data</Text></Tabs.Tab>
         <Tabs.Tab value="other_genomic"><Text color="grey">Other Genomic Data</Text></Tabs.Tab>
         <Tabs.Tab value="other_nongenomic"><Text color="grey">Other Non genomic Data</Text></Tabs.Tab>
