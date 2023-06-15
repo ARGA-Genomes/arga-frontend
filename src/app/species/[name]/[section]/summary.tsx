@@ -118,7 +118,7 @@ function Taxonomy({ taxonomy, regions }: { taxonomy: Taxonomy, regions: Regions 
     <Paper bg="midnight.6" p={40} radius={35}>
       <Grid>
         <Grid.Col span={3}>
-          <Text style={{ paddingBottom: 25 }} color="white">Taxonomy Classification</Text>
+          <Text style={{ paddingBottom: 25 }} color="white">Taxonomy</Text>
           <Stack>
             <Text color="white" c="dimmed">{taxonomy.kingdom}</Text>
             <Text color="white" c="dimmed">{taxonomy.phylum}</Text>

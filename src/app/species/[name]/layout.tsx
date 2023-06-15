@@ -48,7 +48,7 @@ function Header({ taxonomy, conservation }: HeaderProps) {
         <Grid.Col span="auto">
           <Title order={3} color="white" mb={10}>
             <Group>
-              <Text italic={true} fw={500}>{taxonomy.canonicalName}</Text> {taxonomy.authorship}
+              <Text italic={true} fw={500}>{taxonomy.canonicalName}</Text><Text fw="normal">{taxonomy.authorship}</Text>
             </Group>
           </Title>
         </Grid.Col>
