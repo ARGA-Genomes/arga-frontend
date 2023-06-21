@@ -260,7 +260,7 @@ function GenomeBioSample({ record }: { record: BioSample }) {
       </Grid.Col>
 
       { record.attributes?.map(attr => (
-        <Grid.Col span={3}>
+        <Grid.Col span={3} key={`${record.id}-${attr.name}-${attr.value}`}>
           <GenomeField label={attr.name} value={attr.value} icon={<IconPencil size={16} />} />
         </Grid.Col>
       ))}
