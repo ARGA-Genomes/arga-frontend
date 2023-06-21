@@ -58,6 +58,67 @@ type WholeGenome = GenomicData & {
     ncbiReleaseType?: string,
 }
 
+type AssemblyStats = {
+    id: string,
+    componentCount?: number,
+    contigCount?: number,
+    contigL50?: number,
+    contigN50?: number,
+    gcPerc?: number,
+    moleculeCount?: number,
+    regionCount?: number,
+    scaffoldCount?: number,
+    scaffoldL50?: number,
+    scaffoldN50?: number,
+    scaffoldN75?: number,
+    scaffoldN90?: number,
+    totalLength?: number,
+    topLevelCount?: number,
+    totalGapLength?: number,
+    spannedGaps?: number,
+    unspannedGaps?: number,
+}
+
+type BioSample = {
+    id: string,
+    accession: string,
+    sra?: string,
+    submissionDate?: string,
+    publicationDate?: string,
+    lastUpdate?: string,
+    title?: string,
+    owner?: string,
+    attributes?: BioSampleAttribute[],
+}
+
+type BioSampleAttribute = {
+    name: string,
+    harmonized_name: string,
+    value: string,
+}
+
+type Assembly = {
+    id: string,
+    accession: string,
+    nuccore: string,
+    refseqCategory: string,
+    specificHost: string,
+    cloneStrain: string,
+    versionStatus: string,
+    contamScreenInput: string,
+    releaseType: string,
+    genomeRep: string,
+    gbrsPairedAsm: string,
+    pairedAsmComp: string,
+    excludedFromRefseq: string,
+    relationToTypeMaterial: string,
+    asmNotLiveDate: string,
+    otherCatalogNumbers: string,
+    recordedBy: string,
+    geneticAccessionUri: string,
+    eventDate: string,
+}
+
 type AssociatedSequences = {
     sequenceID: string,
     genbankAccession: string,
@@ -128,6 +189,7 @@ export type {
     Region,
     GenomicData,
     WholeGenome,
+    AssemblyStats,
     Regions,
     Species,
     QueryResults,
@@ -137,4 +199,7 @@ export type {
     TraceFile,
     CommonGenome,
     Conservation,
+    BioSample,
+    BioSampleAttribute,
+    Assembly,
 };
