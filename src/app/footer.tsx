@@ -8,18 +8,20 @@ export function Footer() {
   return (
     <Flex py={50} align="center">
       <Grid>
-        <Grid.Col xs={12} sm={12} md={3} lg={3} xl={3} style={{borderRight: "groove"}}>
-          <Stack>
-            <Link href="./contact_us">Contact us</Link>
-            <Link href="./about">About us</Link>
-            <Link href="./help">Help</Link>
-            <Link href="./acknowledging">Acknowledging ARGA</Link>
+        <MediaQuery largerThan="md" styles={{borderRight: "groove"}}>
+          <Grid.Col xs={12} sm={12} md={3} lg={3} xl={3}>
+            <Stack>
+              <Link href="./contact_us">Contact us</Link>
+              <Link href="./about">About us</Link>
+              <Link href="./help">Help</Link>
+              <Link href="./acknowledging">Acknowledging ARGA</Link>
 
-            <MediaQuery largerThan="md"  styles={{ display: 'none' }}>
-              <Divider/>
-            </MediaQuery>
-          </Stack>
-        </Grid.Col>
+              <MediaQuery largerThan="md"  styles={{ display: 'none' }}>
+                <Divider/>
+              </MediaQuery>
+            </Stack>
+          </Grid.Col>
+        </MediaQuery>
         <Grid.Col xs={12} sm={12} md={9} lg={9} xl={9}>
           <Container size="xl">
             <Grid gutter={100}>

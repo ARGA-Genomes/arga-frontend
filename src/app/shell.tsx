@@ -10,8 +10,7 @@ import { Footer } from './footer'
 // each page.
 export function Shell({ children }: { children: React.ReactNode }) {
 
-  const width = window.innerWidth;
-  const MAX_WIDTH = {sm: width, lg: width -300};
+  const MAX_WIDTH = "80%";
 
   return (
     <AppShell
