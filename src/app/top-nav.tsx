@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { NavLink, createStyles, Group, Image } from '@mantine/core';
+import {NavLink, createStyles, Group, Image, Grid, MediaQuery} from '@mantine/core';
 
 // Custom navbar link styles. We define class with emotion here
 // as this particular component wont be used anywhere else
@@ -33,20 +33,46 @@ export function TopNav() {
       <Link href="/">
         <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={250} />
       </Link>
-      <Group position="right" align="end" h="inherit">
-        <Link href="/">
-          <NavLink label="Home" className={classes.nav_link} />
-        </Link>
-        <Link href="/">
-          <NavLink label="Databases" className={classes.nav_link} />
-        </Link>
-        <Link href="/">
-          <NavLink label="Resources" className={classes.nav_link} />
-        </Link>
-        <Link href="/">
-          <NavLink label="Help" className={classes.nav_link} />
-        </Link>
-      </Group>
+      <MediaQuery smallerThan="md"  styles={{ display: 'none' }}>
+        <Group position="right" align="end" h="inherit">
+          <Link href="/">
+            <NavLink label="Home" className={classes.nav_link} />
+          </Link>
+          <Link href="/">
+            <NavLink label="Databases" className={classes.nav_link} />
+          </Link>
+          <Link href="/">
+            <NavLink label="Resources" className={classes.nav_link} />
+          </Link>
+          <Link href="/">
+            <NavLink label="Help" className={classes.nav_link} />
+          </Link>
+        </Group>
+      </MediaQuery>
+      <MediaQuery largerThan="md"  styles={{ display: 'none' }}>
+        <Grid>
+          <Grid.Col span={3}>
+            <Link href="/">
+              <NavLink label="Home" className={classes.nav_link} />
+            </Link>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Link href="/">
+              <NavLink label="Databases" className={classes.nav_link} />
+            </Link>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Link href="/">
+              <NavLink label="Resources" className={classes.nav_link} />
+            </Link>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Link href="/">
+              <NavLink label="Help" className={classes.nav_link} />
+            </Link>
+          </Grid.Col>
+        </Grid>
+      </MediaQuery>
     </Group>
     )
 }
