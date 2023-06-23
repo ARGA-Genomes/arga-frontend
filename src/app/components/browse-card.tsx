@@ -14,11 +14,9 @@ type Props = {
 
 function BrowseCardShell({ children }: { children: React.ReactNode }) {
   return (
-    <Card shadow={undefined} withBorder radius={35} mih={325} px={20} pt={20} pb={25}>
+    <Card shadow={undefined} radius={35} pb={35} bg="#306274">
       <Card.Section>
-        <Flex gap="lg" wrap="wrap" direction="row" justify="flex-start">
           {children}
-        </Flex>
       </Card.Section>
     </Card>
   );
@@ -27,9 +25,11 @@ function BrowseCardShell({ children }: { children: React.ReactNode }) {
 function BrowseCardLoading() {
   return (
     <BrowseCardShell>
-      <Skeleton height={143} width={143} ml={20} mt={20} circle animate={true}/>
+      <center>
+        <Skeleton height={143} width={143} mt={20} circle animate={true}/>
+      </center>
 
-      <Stack align="flex-start" spacing="xs" justify="space-between" mt="md" mb="md">
+      <Stack align="flex-start" spacing="xs" justify="space-between" mt="md" mb="md" ml={20}>
         <Skeleton height={50} width={100} mt="xs" mb="xl" radius="md" animate={true} />
         <Skeleton height={8} width={200} radius="xl" animate={true} />
         <Skeleton height={8} mt={6} radius="xl" animate={true} />
@@ -42,12 +42,15 @@ function BrowseCardLoading() {
 function BrowseCard(props: Props) {
   return (
     <BrowseCardShell>
-      <Image src={props.image} height={143} width={143} alt="" pl={20} pt={20} />
+      <center>
+        <Image src={props.image} height={143} width={143} alt="" pt={20} />
+      </center>
 
-      <Stack mx={20} w={200}>
-        <Text size={40} weight={500} m={0} p={0}>{Humanize.compactInteger(props.total)}</Text>
-        <Text size={20} weight={400} h={83} m={0} p={0}>{props.category}</Text>
-        <Box h={36} />
+      <Stack ml={20}>
+        <Text size={30} weight={500} m={0} p={0} color="white" h={20}>{Humanize.compactInteger(props.total)}</Text>
+        <Text size={14} m={0} p={0} color="white">Records</Text>
+        <Text size={20} weight={400} m={0} pt={10} color="white" h={62}>{props.category}</Text>
+        {/*<Box h={36} />*/}
         <Link href="/browse/Conservation_NT">
           <Button className="secondary_button" size="lg">
             <Text size={20} weight={400}>Browse</Text>

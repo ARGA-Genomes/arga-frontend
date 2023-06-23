@@ -11,7 +11,7 @@ type DatasetProps = {
 
 function Dataset(params: DatasetProps) {
   return (
-    <Paper px={20} pt={30} pb={60} radius="lg" shadow={undefined} withBorder bg="midnight.5">
+    <Paper px={20} pt={30} pb={20} radius="lg" shadow={undefined} withBorder bg="midnight.5">
       <Stack align="center" justify="flex-start">
         <Title order={2} color="white">{Humanize.compactInteger(params.total)}</Title>
         <Text size="sm" color="white" align="center">{params.name}</Text>

@@ -267,10 +267,10 @@ function Search(props: SearchProperties) {
         onChange={onFilter}
         classNames={segmented.classes}
         data={[
-          { value: 'species', label: <SearchDataTypeItem label="Species" image="/search-icons/taxon_dark.svg" /> },
-          { value: 'whole_genomes', label: <SearchDataTypeItem label="Whole Genomes" image="/search-icons/wgs.svg" /> },
-          { value: 'barcodes', label: <SearchDataTypeItem label="Barcodes" image="/search-icons/barcode.svg" /> },
           { value: 'all', label: "All" },
+          { value: 'species', label: <SearchDataTypeItem label="Taxonomy" image="/search-icons/taxon_dark.svg" /> },
+          { value: 'whole_genomes', label: <SearchDataTypeItem label="Genome assemblies" image="/search-icons/wgs.svg" /> },
+          { value: 'barcodes', label: <SearchDataTypeItem label="Barcodes*" image="/search-icons/barcode.svg" /> }
         ]}
       />
 

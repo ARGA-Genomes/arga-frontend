@@ -2,20 +2,21 @@
 
 import { Paper, Grid, Text, Title, Box, Stack, Button, TextInput } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import BrowseData from './browse-data';
+import BrowseGrouping from './browse-grouping';
 import BrowseTaxon from "./browse-taxon";
 import MostDownloadedCard from "./most-downloaded";
 import MostViewedCard from "./most-viewed";
 import VisitorGraph from "./visitor_graph";
 import { Search as IconSearch } from "tabler-icons-react";
 import { useState } from "react";
+import BrowseData from "@/app/(home)/browse-data";
 
 
 function Highlights() {
   return (
     <Box>
       <Grid gutter={30}>
-        <Grid.Col span={4}>
+        <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
           <Stack spacing={30}>
             <Paper p={30} radius="lg" bg="midnight.6">
               <MostViewedCard />
@@ -26,7 +27,7 @@ function Highlights() {
             </Paper>
           </Stack>
         </Grid.Col>
-        <Grid.Col span={8}>
+        <Grid.Col xs={12} sm={12} md={8} lg={8} xl={8}>
           <VisitorGraph />
         </Grid.Col>
       </Grid>
@@ -57,11 +58,11 @@ function Search() {
   const [value, setValue] = useState("");
 
   function onSearch(searchTerms: string) {
-    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=species`)
+    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=all`)
   }
 
   return (
-    <Paper p={20} radius="xl">
+    // <Paper p={20} radius="xl">
       <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
       <Grid align="center">
         <Grid.Col span="auto">
@@ -72,7 +73,7 @@ function Search() {
             iconWidth={60}
             size="xl"
             radius={20}
-            styles={{ input: { height: 90, fontSize: "16px", fontWeight: 'normal', border: 0, color: "#707070" } }}
+            styles={{ input: { height: 55, fontSize: "16px", fontWeight: 'normal', border: 0, color: "#707070" } }}
             icon={<IconSearch size={28} />}
           />
         </Grid.Col>
@@ -81,7 +82,7 @@ function Search() {
         </Grid.Col>
       </Grid>
       </form>
-    </Paper>
+    // </Paper>
   )
 }
 
@@ -95,6 +96,11 @@ export default function HomePage() {
           <Search />
         </Box>
 
+        {/*<Box px={50} pb={58}>*/}
+        {/*  <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Data Types</h2>*/}
+        {/*  <BrowseData/>*/}
+        {/*</Box>*/}
+
         <Box px={50} pb={58}>
           <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Taxon</h2>
           <BrowseTaxon/>
@@ -102,7 +108,7 @@ export default function HomePage() {
 
         <Box px={50} pb={58}>
           <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Groupings</h2>
-          <BrowseData/>
+          <BrowseGrouping/>
         </Box>
       </Paper>
 
