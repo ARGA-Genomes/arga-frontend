@@ -58,14 +58,6 @@ query FullTextSearch ($query: String, $dataType: String) {
           taxonomicStatus
           commonNames
           score
-          classification {
-            kingdom
-            phylum
-            class
-            order
-            family
-            genus
-          }
         }
         ... on GenomeSequenceItem {
           type
