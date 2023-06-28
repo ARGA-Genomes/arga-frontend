@@ -9,6 +9,15 @@ import { useState } from 'react';
 import { Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
 
+type Classification = {
+  kingdom?: string,
+  phylum?: string,
+  class?: string,
+  order?: string,
+  family?: string,
+  genus?: string,
+}
+
 type Record = {
   type: string,
   scientificName: string,
@@ -18,6 +27,7 @@ type Record = {
   taxonomicStatus?: string,
   commonNames?: string[],
   score: number,
+  classification?: Classification,
 
   sequences?: number,
 };
@@ -48,6 +58,14 @@ query FullTextSearch ($query: String, $dataType: String) {
           taxonomicStatus
           commonNames
           score
+          classification {
+            kingdom
+            phylum
+            class
+            order
+            family
+            genus
+          }
         }
         ... on GenomeSequenceItem {
           type
@@ -59,22 +77,6 @@ query FullTextSearch ($query: String, $dataType: String) {
     }
   }
 }`
-
-
-
-/* <Link href={`/species/${itemLinkName}/summary`}>
-*   <Grid>
-*     <Grid.Col span="auto">
-*       <Group position="apart">
-*         <Text><i>{item.canonicalName || item.scientificName}</i> {item.scientificNameAuthorship}</Text>
-*         <Text c="dimmed">{item.commonNames?.join(", ")}</Text>
-*       </Group>
-
-*     </Grid.Col>
-*   </Grid>
-* </Link> */
-
-/* <Paper my={20} p={10} radius="lg" sx={{ border: "1px solid #b5b5b5" }}> */
 
 
 function TaxonItem({ item }: { item: Record }) {
@@ -125,19 +127,21 @@ function TaxonDetails({ item }: { item: Record }) {
       }}>
         <Text size="lg" weight={550}>Scientific classification</Text>
         <Flex gap="lg">
-          <Classification label="Kingdom" value="Animalia" />
-          <Classification label="Phylum" value="Chrodata" />
-          <Classification label="Class" value="Mammalia" />
-          <Classification label="Order" value="Carnivora" />
-          <Classification label="Family" value="Canidae" />
-          <Classification label="Genus" value="Canis" />
+          <Classification label="Kingdom" value={item.classification?.kingdom} />
+          <Classification label="Phylum" value={item.classification?.phylum} />
+          <Classification label="Class" value={item.classification?.class} />
+          <Classification label="Order" value={item.classification?.order} />
+          <Classification label="Family" value={item.classification?.family} />
+          <Classification label="Genus" value={item.classification?.genus} />
         </Flex>
       </Stack>
     </Box>
   )
 }
 
-function Classification({ label, value }: { label: string, value: string }) {
+function Classification({ label, value }: { label: string, value: string | undefined }) {
+  value ||= "Not specified";
+
   return (
     <Stack spacing={0}>
       <Text size="sm">{label}</Text>
@@ -267,7 +271,7 @@ function SearchItem({ item } : { item: Record }) {
 
 function SearchResults({ results } : { results: Record[] }) {
   return (
-    <Accordion variant="separated" defaultValue="expanded" radius="lg" >
+    <Accordion variant="separated" radius="lg" multiple>
       {results.map(record => (
         <SearchItem item={record} key={`${record.scientificName}-${record.type}`} />
       ))}
