@@ -58,7 +58,7 @@ function Search() {
   const [value, setValue] = useState("");
 
   function onSearch(searchTerms: string) {
-    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=all`)
+    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=species`)
   }
 
   return (
