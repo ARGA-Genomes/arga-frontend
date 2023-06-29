@@ -2,11 +2,21 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Box, Grid, SegmentedControl, Avatar, Image, createStyles, Stack, Button, LoadingOverlay, Group, Center, TextInput } from "@mantine/core";
+import { Text, Paper, Box, Grid, SegmentedControl, createStyles, Button, LoadingOverlay, Group, Center, TextInput, MantineProvider, Accordion, Divider, Stack, useMantineTheme, Flex } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Search as IconSearch } from "tabler-icons-react";
+import { argaBrandLight } from '../theme';
+
+type Classification = {
+  kingdom?: string,
+  phylum?: string,
+  class?: string,
+  order?: string,
+  family?: string,
+  genus?: string,
+}
 
 type Record = {
   type: string,
@@ -17,6 +27,7 @@ type Record = {
   taxonomicStatus?: string,
   commonNames?: string[],
   score: number,
+  classification?: Classification,
 
   sequences?: number,
 };
@@ -60,25 +71,78 @@ query FullTextSearch ($query: String, $dataType: String) {
 }`
 
 
-function TaxonItem({ item } : { item: Record }) {
+function TaxonItem({ item }: { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}/summary`}>
-    <Paper my={30} p={10} radius="lg">
-      <Grid>
-        <Grid.Col span="content">
-          <Avatar color="bushfire.5" size="lg" radius="lg" variant="filled">
-            <Image src="/search-icons/taxon.svg" alt="Taxon dashboard" m={5} />
-          </Avatar>
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Text><i>{item.canonicalName || item.scientificName}</i> {item.scientificNameAuthorship}</Text>
-          <Text c="dimmed">{item.commonNames?.join(", ")}</Text>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-    </Link>
+    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+      <Accordion.Control>
+        <Group position="apart">
+          <Link href={`/species/${itemLinkName}/summary`}>
+            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+          </Link>
+          <Group>
+            <Text size="lg">Whole genomes <strong>{item.sequences}</strong></Text>
+            <Divider size="sm" orientation="vertical" />
+            <Text size="lg">Reference genomes</Text>
+            <Divider size="sm" orientation="vertical" />
+            <Text size="lg">Partial genomes</Text>
+            <Divider size="sm" orientation="vertical" />
+            <Text size="lg">Barcodes*</Text>
+          </Group>
+        </Group>
+      </Accordion.Control>
+      <Accordion.Panel>
+        <TaxonDetails item={item} />
+      </Accordion.Panel>
+    </Accordion.Item>
+  )
+}
+
+function TaxonDetails({ item }: { item: Record }) {
+  const theme = useMantineTheme();
+
+  return (
+    <Box>
+      <Stack spacing={0} mt={10} mb={30}>
+        <Text size="sm">Common names</Text>
+        { item.commonNames && item.commonNames.length > 0
+        ? <Text size="lg" weight={550}>{item.commonNames?.join(", ")}</Text>
+        : <Text size="lg" weight={550} c="dimmed">None</Text>
+        }
+      </Stack>
+
+      <Stack pl={16} sx={{
+        borderLeftWidth: 5,
+        borderLeftStyle: "solid",
+        borderLeftColor: theme.colors.bushfire[4],
+      }}>
+        <Text size="lg" weight={550}>Scientific classification</Text>
+        <Flex gap="lg">
+          <Classification label="Kingdom" value={item.classification?.kingdom} />
+          <Classification label="Phylum" value={item.classification?.phylum} />
+          <Classification label="Class" value={item.classification?.class} />
+          <Classification label="Order" value={item.classification?.order} />
+          <Classification label="Family" value={item.classification?.family} />
+          <Classification label="Genus" value={item.classification?.genus} />
+        </Flex>
+      </Stack>
+    </Box>
+  )
+}
+
+function Classification({ label, value }: { label: string, value: string | undefined }) {
+  value ||= "Not specified";
+
+  return (
+    <Stack spacing={0}>
+      <Text size="sm">{label}</Text>
+      <Link href="#">
+        <Paper py={5} px={15} bg="#f5f5f5" radius="md">
+          <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
+        </Paper>
+      </Link>
+    </Stack>
   )
 }
 
@@ -86,21 +150,18 @@ function ReferenceGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}/whole_genome`}>
-    <Paper my={30} p={10} radius="lg">
-      <Grid>
-        <Grid.Col span="content">
-          <Avatar color="shellfish.4" size="lg" radius="lg" variant="filled">
-            <Image src="/search-icons/wgs.svg" alt="Reference Genome Sequence" m={5} />
-          </Avatar>
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Text><i>{item.scientificName}</i></Text>
-          <Text c="dimmed"><strong>{item.sequences || 0} Reference genome{(item.sequences || 0) > 1 ? "s" : null} found</strong></Text>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-    </Link>
+    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+      <Accordion.Control>
+        <Group position="apart">
+          <Link href={`/species/${itemLinkName}/whole_genome`}>
+            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+          </Link>
+          <Group>
+            <Text size="lg">Reference genomes <strong>{item.sequences}</strong></Text>
+          </Group>
+        </Group>
+      </Accordion.Control>
+    </Accordion.Item>
   )
 }
 
@@ -108,21 +169,18 @@ function WholeGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}/whole_genome`}>
-    <Paper my={30} p={10} radius="lg">
-      <Grid>
-        <Grid.Col span="content">
-          <Avatar color="shellfish.3" size="lg" radius="lg" variant="filled">
-            <Image src="/search-icons/wgs.svg" alt="Whole Genome Sequence" m={5} />
-          </Avatar>
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Text><i>{item.scientificName}</i></Text>
-          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Whole genome{(item.sequences || 0) > 1 ? "s" : null} found</Text>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-    </Link>
+    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+      <Accordion.Control>
+        <Group position="apart">
+          <Link href={`/species/${itemLinkName}/whole_genome`}>
+            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+          </Link>
+          <Group>
+            <Text size="lg">Whole genomes <strong>{item.sequences}</strong></Text>
+          </Group>
+        </Group>
+      </Accordion.Control>
+    </Accordion.Item>
   )
 }
 
@@ -130,21 +188,18 @@ function PartialGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}/whole_genome`}>
-    <Paper my={30} p={10} radius="lg">
-      <Grid>
-        <Grid.Col span="content">
-          <Avatar color="shellfish.1" size="lg" radius="lg" variant="filled">
-            <Image src="/search-icons/partial.svg" alt="Partial Genome Sequence" m={5} />
-          </Avatar>
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Text><i>{item.scientificName}</i></Text>
-          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Partial genome{(item.sequences || 0) > 1 ? "s" : null} found</Text>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-    </Link>
+    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+      <Accordion.Control>
+        <Group position="apart">
+          <Link href={`/species/${itemLinkName}/whole_genome`}>
+            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+          </Link>
+          <Group>
+            <Text size="lg">Partial genomes <strong>{item.sequences}</strong></Text>
+          </Group>
+        </Group>
+      </Accordion.Control>
+    </Accordion.Item>
   )
 }
 
@@ -152,21 +207,18 @@ function UnknownGenomeSequenceItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}/resources`}>
-    <Paper my={30} p={10} radius="lg">
-      <Grid>
-        <Grid.Col span="content">
-          <Avatar color="shellfish.1" size="lg" radius="lg" variant="filled">
-            <Image src="/search-icons/partial.svg" alt="Sequence" m={5} />
-          </Avatar>
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Text><i>{item.scientificName}</i></Text>
-          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Sequence{(item.sequences || 0) > 1 ? "s" : null} found</Text>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-    </Link>
+    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+      <Accordion.Control>
+        <Group position="apart">
+          <Link href={`/species/${itemLinkName}/whole_genome`}>
+            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+          </Link>
+          <Group>
+            <Text size="lg">Other genomes <strong>{item.sequences}</strong></Text>
+          </Group>
+        </Group>
+      </Accordion.Control>
+    </Accordion.Item>
   )
 }
 
@@ -174,21 +226,18 @@ function BarcodeItem({ item } : { item: Record }) {
   const itemLinkName = item.scientificName.replaceAll(" ", "_");
 
   return (
-    <Link href={`/species/${itemLinkName}/barcode`}>
-    <Paper my={30} p={10} radius="lg">
-      <Grid>
-        <Grid.Col span="content">
-          <Avatar color="moss.4" size="lg" radius="lg" variant="filled">
-            <Image src="/search-icons/barcode.svg" alt="Barcode" m={10} />
-          </Avatar>
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Text><i>{item.scientificName}</i></Text>
-          <Text c="dimmed"><strong>{item.sequences || 0}</strong> Barcode{(item.sequences || 0) > 1 ? "s" : null} found</Text>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-    </Link>
+    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+      <Accordion.Control>
+        <Group position="apart">
+          <Link href={`/species/${itemLinkName}/barcode`}>
+            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+          </Link>
+          <Group>
+            <Text size="lg">Barcodes* <strong>{item.sequences}</strong></Text>
+          </Group>
+        </Group>
+      </Accordion.Control>
+    </Accordion.Item>
   )
 }
 
@@ -214,11 +263,11 @@ function SearchItem({ item } : { item: Record }) {
 
 function SearchResults({ results } : { results: Record[] }) {
   return (
-    <Box>
+    <Accordion variant="separated" radius="lg" multiple>
       {results.map(record => (
         <SearchItem item={record} key={`${record.scientificName}-${record.type}`} />
       ))}
-    </Box>
+    </Accordion>
   )
 }
 
@@ -227,13 +276,10 @@ interface SearchProperties {
   onSearch: (searchTerms: string, dataType: string) => void,
 }
 
-function SearchDataTypeItem({ label, image }: { label: string, image: string }) {
+function SearchDataTypeItem({ label }: { label: string }) {
   return (
-    <Center>
-      <Group>
-        <Image src={image} height={24} width={24} alt=""/>
-        <Text>{label}</Text>
-      </Group>
+    <Center m={10}>
+      <Text>{label}</Text>
     </Center>
   )
 }
@@ -247,7 +293,6 @@ function Search(props: SearchProperties) {
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
 
   function onFilter(value: string) {
-      /* router.push(`/search?q=${encodeURIComponent(search)}&type=${value}`) */
     setDataType(value)
     props.onSearch(searchTerms, value)
   }
@@ -258,24 +303,9 @@ function Search(props: SearchProperties) {
   }
 
   return (
-    <Paper p={20} radius="xl">
-      <SegmentedControl
-        mb={20}
-        size="lg"
-        fullWidth
-        value={dataType}
-        onChange={onFilter}
-        classNames={segmented.classes}
-        data={[
-          { value: 'all', label: "All" },
-          { value: 'species', label: <SearchDataTypeItem label="Taxonomy" image="/search-icons/taxon_dark.svg" /> },
-          { value: 'whole_genomes', label: <SearchDataTypeItem label="Genome assemblies" image="/search-icons/wgs.svg" /> },
-          { value: 'barcodes', label: <SearchDataTypeItem label="Barcodes*" image="/search-icons/barcode.svg" /> }
-        ]}
-      />
-
+    <Box>
       <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
-        <Grid align="center">
+        <Grid align="center" m={20}>
           <Grid.Col span="auto">
             <TextInput
               placeholder="e.g. sequence accession, taxon identifier, genus name"
@@ -283,8 +313,7 @@ function Search(props: SearchProperties) {
               onChange={val => setValue(val.target.value)}
               iconWidth={60}
               size="xl"
-              radius={20}
-              styles={{ input: { height: 90, fontSize: "24px", fontWeight: 500, border: 0 } }}
+              radius={16}
               icon={<IconSearch size={28} />}
             />
           </Grid.Col>
@@ -294,31 +323,33 @@ function Search(props: SearchProperties) {
           </Grid.Col>
         </Grid>
       </form>
-    </Paper>
+
+      <SegmentedControl
+        size="lg"
+        fullWidth
+        value={dataType}
+        onChange={onFilter}
+        classNames={segmented.classes}
+        data={[
+          { value: 'all', label: "All" },
+          { value: 'species', label: <SearchDataTypeItem label="Taxonomy" /> },
+          { value: 'whole_genomes', label: <SearchDataTypeItem label="Genome assemblies" /> },
+          { value: 'barcodes', label: <SearchDataTypeItem label="Barcodes*" /> }
+        ]}
+      />
+    </Box>
   )
 }
 
 
-function formattedDataType(dataType: string) {
-  switch(dataType) {
-    case 'species':
-      return 'taxon cards'
-    case 'whole_genomes':
-      return 'whole genomes'
-    case 'barcodes':
-      return 'barcodes'
-  }
-  return null;
-}
-
 export default function SearchPage() {
+  const theme = useMantineTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || "")
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
-  const [formattedType, setFormattedType] = useState(formattedDataType(dataType))
 
-  const { loading, error, data, refetch } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
+  const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
       query,
       dataType: dataType,
@@ -326,35 +357,34 @@ export default function SearchPage() {
   });
 
   function onSearch(searchTerms: string, dataType: string) {
-      /* router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=${dataType}`, { shallow: true }) */
     setQuery(searchTerms)
     setDataType(dataType)
-    refetch({ variables: { query, dataType }})
+    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=${dataType}`)
   }
 
-  useEffect(() => {
-    setFormattedType(formattedDataType(dataType))
-  }, [dataType, setFormattedType])
-
   return (
+    <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
     <Box>
       <Search onSearch={onSearch} />
 
-      <Paper bg="midnight.6" radius="xl" p="xl" mt={40}>
+      <Paper radius="xl" p="xl" mt={40} sx={{ border: "1px solid #dbdbdb" }} pos="relative">
         <LoadingOverlay
-          overlayColor="black"
+          overlayColor={theme.colors.midnight[0]}
           transitionDuration={500}
           loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
           visible={loading}
+          radius="xl"
         />
-        <Text color="white" size="xl">
-          <strong>{data?.search.fullText.records.length} </strong>
-          search results found for <strong>{query} </strong>
-          { formattedType ? <>in <strong>{formattedType}</strong></> : null }
+        <Text size="lg" ml={20} mb={30}>
+          { !loading && data
+            ? (<><strong>{data?.search.fullText.records.length} </strong> search results found for <strong>{query} </strong></>)
+            : null
+          }
         </Text>
         <SearchResults results={data?.search.fullText.records || []} />
       </Paper>
     </Box>
+    </MantineProvider>
   );
 }
 
@@ -363,31 +393,23 @@ export default function SearchPage() {
 const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
   return {
     root: {
-      color: "white",
-      backgroundColor: "white",
+      backgroundColor: "#f0f0f0",
       paddingLeft: 0,
       paddingRight: 0,
       borderWidth: 0,
       borderRadius: 0,
-      borderBottomColor: "grey",
-      borderBottomWidth: "1px",
-      borderBottomStyle: "solid",
     },
     label: {
-      fontSize: "20px",
       fontWeight: 400,
-      color: "grey",
+      color: theme.colors.midnight[5],
     },
     control: {
       borderWidth: 0,
-      borderRadius: 0,
     },
     active: {
-      bottom: 0,
-      borderRadius: 0,
-      borderBottomColor: theme.colors.bushfire[4],
-      borderBottomWidth: "6px",
-      borderBottomStyle: "solid",
+      backgroundColor: theme.colors.wheat[0],
+      borderWidth: 0,
+      borderRadius: 10,
       boxShadow: "none",
     },
   }
