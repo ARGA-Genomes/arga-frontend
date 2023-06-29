@@ -15,9 +15,9 @@ type Overview = {
 const GET_OVERVIEW = gql`
 query {
   overview {
-    animals
-    plants
-    fungi
+    genomes
+    organelles
+    barcodes
   }
 }`;
 
@@ -26,12 +26,12 @@ type OverviewResults = {
 }
 
 
-function Card({ category, total, image }: { category: string, total: number | undefined, image: string }) {
+function Card({ category, total, image, link }: { category: string, total: number | undefined, image: string, link: string }) {
   if (!total) {
     return (<BrowseCardLoading />);
   } else {
     return (
-      <BrowseCard category={category} total={total} image={image} />
+      <BrowseCard category={category} total={total} image={image} link={link}/>
     );
   }
 }
@@ -44,13 +44,13 @@ export default function BrowseData() {
   return (
       <Grid gutter={37}>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          <Card total={data?.overview.genomes} category="Genomes" image="card-icons/agricultural.svg" />
+          <Card total={data?.overview.genomes} category="Genomes" image="card-icons/agricultural.svg" link="/browse/genomes"/>
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          <Card total={data?.overview.organelles} category="Organelles" image="card-icons/marine.svg"/>
+          <Card total={data?.overview.organelles} category="Organelles" image="card-icons/marine.svg" link="/browse/organelles"/>
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
-          <Card total={data?.overview.barcodes} category="Barcodes*" image="card-icons/allspecies.svg" />
+          <Card total={data?.overview.barcodes} category="Barcodes*" image="card-icons/allspecies.svg" link="/browse/barcodes"/>
         </Grid.Col>
       </Grid>
   );

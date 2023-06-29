@@ -96,10 +96,10 @@ export default function HomePage() {
           <Search />
         </Box>
 
-        {/*<Box px={50} pb={58}>*/}
-        {/*  <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Data Types</h2>*/}
-        {/*  <BrowseData/>*/}
-        {/*</Box>*/}
+        <Box px={50} pb={58}>
+          <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Data Types</h2>
+          <BrowseData/>
+        </Box>
 
         <Box px={50} pb={58}>
           <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Taxon</h2>
