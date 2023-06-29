@@ -7,22 +7,42 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CircleCheck, CircleX } from "tabler-icons-react";
 
-const GET_SPECIES_STAT = gql`
-  query SpeciesStat {
-    search {
-      species {
-        canonicalName
+
+const GET_TAXA = gql`
+query lists($name: String, $pagination: Pagination, $filters: [FilterItem]) {
+  lists(name: $name, pagination: $pagination, filters: $filters) {
+    stats {
+      totalRecords
+    }
+    species {
+      taxonomy {
         scientificName
-        dataSummary{
-          wholeGenomes
-          partialGenomes
-          barcodes
-          mitogenomes
-          other
-        }
+        canonicalName
+        authorship
+        kingdom
+        phylum
+        class
+        order
+        family
+        genus
+      }
+      photo {
+        url
+      }
+      dataSummary {
+        wholeGenomes
+        mitogenomes
+        barcodes
+        other
       }
     }
-  }`;
+  }
+}`;
+
+type Pagination = {
+  page: number,
+  pageSize: number,
+}
 
 type FilterItem = {
   filter: string,
@@ -30,30 +50,47 @@ type FilterItem = {
   value: string,
 }
 
+
+type Taxonomy = {
+  scientificName: string,
+  canonicalName: string,
+  authorship: string,
+  kingdom: string,
+  phylum: string,
+  class: string,
+  order: string,
+  family: string,
+  genus: string,
+};
+
 type Photo = {
   url: string,
 }
 
 type DataSummary = {
   wholeGenomes: number,
-  partialGenomes: number,
   mitogenomes: number,
   barcodes: number,
   other: number,
 }
 
 type Species = {
-  canonicalName: string,
-  scientificName: string,
+  taxonomy: Taxonomy,
+  photo: Photo,
   dataSummary: DataSummary,
 }
 
-type search = {
+type Stats = {
+  totalRecords: number,
+}
+
+type Lists = {
+  stats: Stats,
   species: Species[],
 };
 
 type QueryResults = {
-  search: search,
+  lists: Lists,
 };
 
 
@@ -79,7 +116,7 @@ function DataItem({ name, count }: { name: string, count: number }) {
 
 
 function SpeciesCard({ species }: { species: Species }) {
-  const itemLinkName = species.canonicalName.replaceAll(" ", "_");
+  const itemLinkName = species.taxonomy.canonicalName.replaceAll(" ", "_");
 
   function small(photo: Photo) {
     return photo.url.replaceAll("original", "small");
@@ -88,12 +125,11 @@ function SpeciesCard({ species }: { species: Species }) {
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
       <Link href={`/species/${itemLinkName}/summary`}>
-        <Title order={4}>{ species.canonicalName }</Title>
+        <Title order={4}>{ species.taxonomy.canonicalName }</Title>
       </Link>
 
       <Box py={20}>
         <DataItem name="Whole genome" count={species.dataSummary.wholeGenomes} />
-        <DataItem name="Partial genome" count={species.dataSummary.partialGenomes} />
         <DataItem name="Mitogenome" count={species.dataSummary.mitogenomes} />
         <DataItem name="Barcode" count={species.dataSummary.barcodes} />
         <DataItem name="Other" count={species.dataSummary.other} />
@@ -101,8 +137,9 @@ function SpeciesCard({ species }: { species: Species }) {
 
       <Card.Section>
         <Link href={`/species/${itemLinkName}/summary`}>
-          {
-            <Image withPlaceholder height={160} alt={species.canonicalName} />
+          { species.photo
+            ? <Image src={small(species.photo)} height={160} alt={species.taxonomy.canonicalName} />
+            : <Image withPlaceholder height={160} alt={species.taxonomy.canonicalName} />
           }
         </Link>
       </Card.Section>
@@ -114,7 +151,7 @@ function SpeciesCard({ species }: { species: Species }) {
 function BrowseResults({ list }: { list: Species[]}) {
   return (
     <SimpleGrid cols={4}>
-      { list.map(item => (<SpeciesCard species={item} key={item.scientificName} />)) }
+      { list.map(item => (<SpeciesCard species={item} key={item.taxonomy.scientificName} />)) }
     </SimpleGrid>
   )
 }
@@ -140,7 +177,13 @@ export default function BrowseList({ params }: { params: { name: string } }) {
   const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE });
   const [totalPages, setTotalPages] = useState(1)
 
-  const {loading, error, data} = useQuery<QueryResults>(GET_SPECIES_STAT);
+  const { loading, error, data } = useQuery<QueryResults>(GET_TAXA, {
+    variables: {
+      name: params.name.replaceAll("_", " "),
+      pagination,
+      filters,
+    },
+  });
 
   useEffect(() => {
     setFilters(taxaType == 'vertebrates' ? VERTEBRATE_FILTERS : INVERTEBRATE_FILTERS)
@@ -149,7 +192,7 @@ export default function BrowseList({ params }: { params: { name: string } }) {
   }, [taxaType, setFilters, setPagination, setTotalPages])
 
   useEffect(() => {
-    setTotalPages(data ? 10 : 1)
+    setTotalPages(data ? Math.ceil(data.lists.stats.totalRecords / PAGE_SIZE) : 1)
   }, [data, setTotalPages])
 
 
@@ -157,17 +200,17 @@ export default function BrowseList({ params }: { params: { name: string } }) {
     <Box>
       <Paper bg="midnight.6" p={10} radius="lg" ref={targetRef}>
         <MantineProvider theme={{ colorScheme: 'dark' }}>
-          <SegmentedControl
-            size="md"
-            m={10}
-            value={taxaType}
-            onChange={setTaxaType}
-            classNames={segmented.classes}
-            data={[
-              { value: 'vertebrates', label: 'Vertebrates' },
-              { value: 'invertebrates', label: 'Invertebrates' },
-            ]}
-          />
+        <SegmentedControl
+          size="md"
+          m={10}
+          value={taxaType}
+          onChange={setTaxaType}
+          classNames={segmented.classes}
+          data={[
+            { value: 'vertebrates', label: 'Vertebrates' },
+            { value: 'invertebrates', label: 'Invertebrates' },
+          ]}
+        />
         </MantineProvider>
       </Paper>
 
@@ -178,7 +221,7 @@ export default function BrowseList({ params }: { params: { name: string } }) {
           loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
           visible={loading}
         />
-        { !loading && data ? <BrowseResults list={data.search.species} /> : null }
+        { !loading && data ? <BrowseResults list={data.lists.species} /> : null }
       </Box>
 
       <Paper bg="midnight.6" p={20} m={40} radius="lg">

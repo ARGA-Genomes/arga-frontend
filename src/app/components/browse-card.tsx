@@ -9,6 +9,7 @@ type Props = {
   total: number,
   category: string,
   image: string,
+  link: string
 };
 
 
@@ -51,7 +52,7 @@ function BrowseCard(props: Props) {
         <Text size={14} m={0} p={0} color="white">Records</Text>
         <Text size={20} weight={400} m={0} pt={10} color="white" h={62}>{props.category}</Text>
         {/*<Box h={36} />*/}
-        <Link href="/browse/Conservation_NT">
+        <Link href={props.link}>
           <Button className="secondary_button" size="lg">
             <Text size={20} weight={400}>Browse</Text>
           </Button>
