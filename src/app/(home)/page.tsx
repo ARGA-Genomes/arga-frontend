@@ -74,7 +74,7 @@ function Search() {
             size="xl"
             radius={20}
             styles={{ input: { height: 55, fontSize: "16px", fontWeight: 'normal', border: 0, color: "#707070" } }}
-            icon={<IconSearch size={28} />}
+            icon={<IconSearch size={28} color="black"/>}
           />
         </Grid.Col>
         <Grid.Col span="content">
