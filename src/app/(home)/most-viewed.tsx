@@ -1,7 +1,7 @@
 'use client';
 
 import * as Humanize from "humanize-plus";
-import { Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { SimpleGrid, Stack, Text, Title, useMantineTheme} from "@mantine/core";
 
 
 type DatasetProps = {
@@ -10,21 +10,27 @@ type DatasetProps = {
 };
 
 function Dataset(params: DatasetProps) {
-  return (
-    <Paper px={20} pt={30} pb={20} radius="lg" shadow={undefined} withBorder bg="midnight.5">
-      <Stack align="center" justify="flex-start">
-        <Title order={2} color="white">{Humanize.compactInteger(params.total)}</Title>
+  const theme = useMantineTheme();
+  return (<>
+      <div>
+        <div style={{ backgroundColor: theme.colors.midnight[7], borderRadius: "50%", border:"1px solid #59A39C", height: "70%",
+          aspectRatio:"1/1", margin:"auto"}}>
+          <Stack style={{ transform: "translate(0, 2.5vw)"}}>
+            <Text size={30} color="white" m={0} p={0} h={20} align={"center"}>{Humanize.compactInteger(params.total)}</Text>
+            <Text size="sm" color="white" align="center" m={0} p={0}>views</Text>
+          </Stack>
+        </div>
         <Text size="sm" color="white" align="center">{params.name}</Text>
-      </Stack>
-    </Paper>
+      </div>
+    </>
   )
 }
 
 
 export default function MostViewedCard() {
   return (
-    <Stack>
-      <Title order={2} color="wheat.3">Most viewed dataset</Title>
+    <Stack mah={{base:"180px", xl:"240px"}}>
+      <Title order={3} color="wheat.3" align={"center"} weight={10}>Most viewed datasets</Title>
 
       <SimpleGrid cols={3}>
         <Dataset total={23000} name="Whole genome" />
