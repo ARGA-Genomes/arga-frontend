@@ -1,0 +1,76 @@
+name: Build image and publish to ghcr.io
+
+on:
+  push:
+    branches: [ "staging" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      REGISTRY: ghcr.io/arga-genomes
+      IMAGE_NAME: frontend-staging
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build container image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: latest ${{ github.sha }}
+          containerfiles: |
+            ./Containerfile-staging
+
+      - name: Log in to the GitHub container registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to GitHub container registry
+        id: push-to-ghcr
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}
+
+
+  notify-arga-ops:
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      registry: ghcr.io/arga-genomes
+      image_name: frontend-staging
+      image_tag: ${{ github.sha }}
+      actor: ${{ github.triggering_actor }}
+      repository: ${{ github.repository }}
+      ref: ${{ github.ref }}
+      sha: ${{ github.sha }}
+      workflow: ${{ github.workflow }}
+      workflow_ref: ${{ github.workflow_ref }}
+      workflow_sha: ${{ github.workflow_sha }}
+      run_id: ${{ github.run_id }}
+      run_number: ${{ github.run_number }}
+      run_attempt: ${{ github.run_attempt }}
+
+    steps:
+      - name: Dump payload data
+        run: echo '${{ toJson(env) }}'
+
+      - name: Notify arga-ops about the new version
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.ARGA_OPS_PERSONAL_TOKEN }}
+          repository: arga-genomes/arga-ops
+          event-type: published
+          client-payload: '{"data" : ${{ toJson(env) }} }'

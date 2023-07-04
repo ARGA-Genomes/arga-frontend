@@ -16,9 +16,9 @@ function Highlights() {
   return (
     <Box>
       <Grid gutter={30}>
-        <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
           <Stack spacing={30}>
-            <Paper p={30} radius="lg" bg="midnight.6">
+            <Paper p={30} radius="xl" bg="midnight.6">
               <MostViewedCard />
             </Paper>
 
@@ -27,7 +27,7 @@ function Highlights() {
             </Paper>
           </Stack>
         </Grid.Col>
-        <Grid.Col xs={12} sm={12} md={8} lg={8} xl={8}>
+        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
           <VisitorGraph />
         </Grid.Col>
       </Grid>
@@ -90,7 +90,7 @@ function Search() {
 export default function HomePage() {
   return (
     <Box>
-      <Paper bg="midnight.6" p={0} m={0} radius={35}>
+      <Paper bg="midnight.6" px={{xs: "0px", sm: "0px", md: "40px", lg: "60px", xl: "80px" }} m={0} radius={35}>
         <Box px={50} py={40}>
           <h2 style={{color: 'white', fontWeight: 'normal'}}>Search By</h2>
           <Search />

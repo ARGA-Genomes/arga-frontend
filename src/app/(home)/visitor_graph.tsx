@@ -44,9 +44,9 @@ const options = {
 
 export default function VisitorGraph() {
   return (
-    <Paper radius="lg">
+    <Paper radius="xl" h="100%">
       <Title order={2} align="center" pt={40}>Top 5 national and international visitors</Title>
-      <Container px={100} sx={{ maxHeight: 454 }}>
+      <Container px={100}>
         <Pie options={options} data={data} />
       </Container>
     </Paper>
