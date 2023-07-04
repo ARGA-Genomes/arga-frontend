@@ -18,6 +18,13 @@ type Classification = {
   genus?: string,
 }
 
+type AssemblySummary = {
+  referenceGenomes: number,
+  wholeGenomes: number,
+  partialGenomes: number,
+  barcodes: number,
+}
+
 type Record = {
   type: string,
   scientificName: string,
@@ -28,6 +35,7 @@ type Record = {
   commonNames?: string[],
   score: number,
   classification?: Classification,
+  assemblySummary?: AssemblySummary,
 
   sequences?: number,
 };
@@ -58,6 +66,20 @@ query FullTextSearch ($query: String, $dataType: String) {
           taxonomicStatus
           commonNames
           score
+          classification {
+            kingdom
+            phylum
+            class
+            order
+            family
+            genus
+          }
+          assemblySummary {
+            referenceGenomes
+            wholeGenomes
+            partialGenomes
+            barcodes
+          }
         }
         ... on GenomeSequenceItem {
           type
@@ -82,13 +104,7 @@ function TaxonItem({ item }: { item: Record }) {
             <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
           </Link>
           <Group>
-            <Text size="lg">Whole genomes <strong>{item.sequences}</strong></Text>
-            <Divider size="sm" orientation="vertical" />
-            <Text size="lg">Reference genomes</Text>
-            <Divider size="sm" orientation="vertical" />
-            <Text size="lg">Partial genomes</Text>
-            <Divider size="sm" orientation="vertical" />
-            <Text size="lg">Barcodes*</Text>
+            { item.assemblySummary ? <TaxonSummary summary={item.assemblySummary} /> : null }
           </Group>
         </Group>
       </Accordion.Control>
@@ -96,6 +112,26 @@ function TaxonItem({ item }: { item: Record }) {
         <TaxonDetails item={item} />
       </Accordion.Panel>
     </Accordion.Item>
+  )
+}
+
+function Summary({ label, count }: { label: string, count: number }) {
+  return (
+    <>
+      <Text size="lg">{label} <strong>{count}</strong></Text>
+      <Divider size="sm" orientation="vertical" />
+    </>
+  )
+}
+
+function TaxonSummary({ summary }: { summary: AssemblySummary }) {
+  return (
+    <>
+      { summary.wholeGenomes ? <Summary label="Whole genomes" count={summary.wholeGenomes} /> : null }
+      { summary.referenceGenomes ? <Summary label="Reference genomes" count={summary.referenceGenomes} /> : null }
+      { summary.partialGenomes ? <Summary label="Partial genomes" count={summary.partialGenomes} /> : null }
+      { summary.barcodes ? <Summary label="Barcodes*" count={summary.barcodes} /> : null }
+    </>
   )
 }
 
