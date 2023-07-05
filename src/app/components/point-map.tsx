@@ -2,9 +2,9 @@
 
 import 'leaflet/dist/leaflet.css';
 
-import { Box, Text } from "@mantine/core";
+import { Box, Text, Button } from "@mantine/core";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import {Icon, LatLngExpression } from 'leaflet';
+import { Icon, LatLngExpression } from 'leaflet';
 import { Coordinates } from "@/app/type";
 
 const customMarker = new Icon({
@@ -41,6 +41,7 @@ function MarkersList({ coordinates }: { coordinates: Coordinates[] }) {
 interface PointMapProperties {
   coordinates?: Coordinates[],
   borderRadius?: string,
+  children?: React.ReactNode,
 }
 
 export default function PointMap(props: PointMapProperties) {
@@ -59,6 +60,8 @@ export default function PointMap(props: PointMapProperties) {
           url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         { props.coordinates ? <MarkersList coordinates={props.coordinates}/> : null }
+
+        {props.children}
       </MapContainer>
     </Box>
   );

@@ -1,12 +1,13 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Collapse, Grid, Group, LoadingOverlay, Overlay, Paper, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
+import { Box, Button, Center, Collapse, Drawer, Grid, Group, LoadingOverlay, Overlay, Paper, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
 import { WholeGenome, Coordinates } from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useListState } from "@mantine/hooks";
-import { Link as IconLink, Pencil as IconPencil, License as IconLicense, ArrowUpRight } from 'tabler-icons-react';
+import { Link as IconLink, Pencil as IconPencil, License as IconLicense, ArrowUpRight, ArrowsMaximize, ArrowsMinimize } from 'tabler-icons-react';
+import { useState } from "react";
 
 
 const REFSEQ_MAP_HEIGHT = 400;
@@ -245,16 +246,36 @@ function GenomeTable({ records }: { records: WholeGenome[] }) {
 }
 
 
-function GenomeMap({ records }: { records: WholeGenome[] | undefined }) {
+interface GenomeMapProperties {
+  records?: WholeGenome[],
+  onExpandToggle: () => void,
+}
+
+function GenomeMap({ records, onExpandToggle }: GenomeMapProperties) {
   let positions = records?.map(record => record.coordinates).filter(record => record);
+
   return (
-    <PointMap coordinates={positions} borderRadius="0 16px 16px 0" />
+    <PointMap coordinates={positions} borderRadius="0 16px 16px 0">
+      <Button sx={{ zIndex: 1000, right: 20, top: 20, position: "absolute"}} rightIcon={<ArrowsMaximize />} onClick={() => onExpandToggle()}>Expand</Button>
+    </PointMap>
+  )
+}
+
+
+function MapViewer({ records, onExpandToggle }: GenomeMapProperties) {
+  let positions = records?.map(record => record.coordinates).filter(record => record);
+
+  return (
+    <PointMap coordinates={positions} borderRadius="0 16px 16px 0">
+      <Button sx={{ zIndex: 1000, right: 20, top: 20, position: "absolute" }} rightIcon={<ArrowsMinimize />} onClick={() => onExpandToggle()}>Close</Button>
+    </PointMap>
   )
 }
 
 
 export function WholeGenome({ canonicalName }: { canonicalName: string }) {
   const theme = useMantineTheme();
+  const [mapExpand, setMapExpand] = useState(false);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_WHOLE_GENOMES, {
     variables: {
@@ -299,10 +320,23 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
         </Grid.Col>
 
         <Grid.Col pos="relative" span={4} h={GENOME_MAP_HEIGHT} p={0} m={0}>
-          <GenomeMap records={records} />
+          <GenomeMap records={records} onExpandToggle={() => setMapExpand(true)} />
         </Grid.Col>
       </Grid>
       </Paper>
+
+      <Drawer
+        opened={mapExpand}
+        onClose={() => setMapExpand(false)}
+        overlayOpacity={0.55}
+        overlayBlur={3}
+        zIndex={2000}
+        position="right"
+        size="75%"
+        withCloseButton={false}
+      >
+        <MapViewer records={records} onExpandToggle={() => setMapExpand(false)}/>
+      </Drawer>
     </Box>
   );
 }
