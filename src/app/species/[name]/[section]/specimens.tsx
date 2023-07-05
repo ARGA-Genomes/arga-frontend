@@ -164,7 +164,7 @@ function EventTimeline({ events, onSelected }: EventTimelineProps) {
   return (
     <Timeline active={active} lineWidth={4}>
       { events.map((event, idx) => (
-        <Timeline.Item title="Collection" bulletSize={34} bullet={<IconVaccineBottle />} onClick={() => onClick(event, idx)} lineVariant="dashed">
+        <Timeline.Item key={idx} title="Collection" bulletSize={34} bullet={<IconVaccineBottle />} onClick={() => onClick(event, idx)} lineVariant="dashed">
           <Text color="dimmed" size="sm">
             Date: {event.eventDate}
           </Text>
@@ -465,10 +465,6 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
     },
   });
 
-  if (error) {
-    return (<Text>Error : {error.message}</Text>);
-  }
-
   const records = data?.species.specimens;
   const holotypeId = records?.find(record => record.typeStatus == "HOLOTYPE")?.id;
 
@@ -478,6 +474,9 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
     },
   });
 
+  if (error) {
+    return (<Text>Error : {error.message}</Text>);
+  }
 
   return (
     <Box pos="relative">
