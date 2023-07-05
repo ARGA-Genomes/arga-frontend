@@ -72,7 +72,7 @@ function SpeciesPhoto({ photo }: { photo: Photo }) {
     <Box>
       <Image width={300} height={300} radius="lg" src={small(photo.url)} alt="Species image" />
       <Text fz="sm" c="dimmed">&copy; { photo.rightsHolder }</Text>
-      <Text fz="sm" c="dimmed"><Link href={ photo.referenceUrl } target="_blank">{ photo.publisher }</Link></Text>
+      <Text fz="sm" c="dimmed"><Link href={ photo.referenceUrl || "#" } target="_blank">{ photo.publisher }</Link></Text>
     </Box>
   )
 }

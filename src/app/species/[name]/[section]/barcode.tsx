@@ -53,8 +53,6 @@ function BarcodeDataSection({ data }: { data : QueryResults }) {
   const barcodeRecords = data.species.data.filter((record) => record.dataResource?.includes("BOLD"));
   const coordinates = barcodeRecords.map(record => record.coordinates);
 
-  console.log(coordinates);
-
   return (
     <Box pos="relative" h={300}>
       <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" />
