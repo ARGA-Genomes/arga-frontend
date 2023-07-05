@@ -58,9 +58,9 @@ function BioRegionLayers({ regions }: { regions: string[] }) {
 
   return (
     <>
-    { ibra ? <GeoJSON key={`${tolerance}-${ibra}`} data={ibra} /> : null }
-    { imcraProvincial ? <GeoJSON key={`${tolerance}-${imcraProvincial}`} data={imcraProvincial} /> : null }
-    { imcraMesoscale ? <GeoJSON key={`${tolerance}-${imcraMesoscale}`} data={imcraMesoscale} /> : null }
+    { ibra ? <GeoJSON key={`ibra-${tolerance}`} data={ibra} /> : null }
+    { imcraProvincial ? <GeoJSON key={`imcra-prov-${tolerance}`} data={imcraProvincial} /> : null }
+    { imcraMesoscale ? <GeoJSON key={`imcra-meso-${tolerance}`} data={imcraMesoscale} /> : null }
     </>
   )
 }

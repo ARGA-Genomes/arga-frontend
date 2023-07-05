@@ -1,7 +1,7 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import {Box, Grid, LoadingOverlay, Paper, Text} from "@mantine/core";
+import {Box, Grid, LoadingOverlay, Paper, Text, useMantineTheme} from "@mantine/core";
 import { CommonGenome } from "@/app/type";
 import dynamic from "next/dynamic";
 import React from "react";
@@ -54,21 +54,16 @@ function BarcodeDataSection({ data }: { data : QueryResults }) {
   const coordinates = barcodeRecords.map(record => record.coordinates);
 
   return (
-    <Paper bg="midnight.6" p={40} radius={35}>
-      <Grid>
-        <Grid.Col span={8}>
-          <Text color="white" style={{ padding: 15 }}>No of records: {barcodeRecords.length}</Text>
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <PointMap coordinates={coordinates}/>
-        </Grid.Col>
-      </Grid>
-    </Paper>
+    <Box pos="relative" h={300}>
+      <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" />
+    </Box>
   )
 }
 
 
 export function Barcode({ canonicalName }: { canonicalName: string }) {
+  const theme = useMantineTheme();
+
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
       canonicalName,
@@ -84,14 +79,15 @@ export function Barcode({ canonicalName }: { canonicalName: string }) {
   return (
     <Box pos="relative">
       <LoadingOverlay
-        overlayColor="black"
+        overlayColor={theme.colors.midnight[0]}
         transitionDuration={500}
         loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
         visible={loading}
+        radius="xl"
       />
 
-      { data ? <BarcodeDataSection data={data}/> : null }
-      <Paper radius="lg" py={25} mt={15}>
+      <Paper radius="lg" mt={15}>
+        { data ? <BarcodeDataSection data={data}/> : null }
         { barcodeRecords ? <GenomeTable records={barcodeRecords} /> : null }
       </Paper>
     </Box>

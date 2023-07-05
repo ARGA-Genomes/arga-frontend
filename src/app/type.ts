@@ -154,14 +154,19 @@ type Species = {
 };
 
 type Specimen = {
+    id: string,
     typeStatus: string,
     institutionName?: string,
+    institutionCode?: string,
+    collectionCode?: string,
+    catalogNumber?: string,
+    recordedBy?: string,
     organismId?: string,
     locality?: string,
     latitude?: number,
     longitude?: number,
     details?: string,
-    remarks: string,
+    remarks?: string,
 }
 
 type StatsSpecies = {
