@@ -194,95 +194,95 @@ function EventTimeline({ events, onSelected }: EventTimelineProps) {
   )
 }
 
-function EventDetails({ event }: { event: Event }) {
+function EventDetails({ event }: { event: Event | undefined }) {
   return (
     <Grid>
       <Grid.Col span={3}>
-        <SpecimenField label="Event Date" value={event.eventDate} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Event Date" value={event?.eventDate} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Event ID" value={event.eventId} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Event ID" value={event?.eventId} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Event Remarks" value={event.eventRemarks} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Event Remarks" value={event?.eventRemarks} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Field notes" value={event.fieldNotes} icon={<IconBuildingBank size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <SpecimenField label="Field number" value={event.fieldNumber} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Habitat" value={event.habitat} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Sampling effort" value={event.samplingEffort} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Sampling protocol" value={event.samplingProtocol} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Field notes" value={event?.fieldNotes} icon={<IconBuildingBank size={16} />} />
       </Grid.Col>
 
       <Grid.Col span={3}>
-        <SpecimenField label="Sampling size unit" value={event.samplingSizeUnit} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Field number" value={event?.fieldNumber} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Sampling size value" value={event.samplingSizeValue} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Habitat" value={event?.habitat} icon={<IconClipboardList size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <SpecimenField label="Sampling effort" value={event?.samplingEffort} icon={<IconClipboardList size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <SpecimenField label="Sampling protocol" value={event?.samplingProtocol} icon={<IconBuildingBank size={16} />} />
+      </Grid.Col>
+
+      <Grid.Col span={3}>
+        <SpecimenField label="Sampling size unit" value={event?.samplingSizeUnit} icon={<IconClipboardList size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <SpecimenField label="Sampling size value" value={event?.samplingSizeValue} icon={<IconBuildingBank size={16} />} />
       </Grid.Col>
     </Grid>
   )
 }
 
-function CollectionEventDetails({ event }: { event: CollectionEvent }) {
+function CollectionEventDetails({ event }: { event: CollectionEvent | undefined }) {
   return (
     <Grid>
       <Grid.Col span={3}>
-        <SpecimenField label="Behavior" value={event.behavior} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Behavior" value={event?.behavior} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Catalog number" value={event.catalogNumber} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Catalog number" value={event?.catalogNumber} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Degree of establishment" value={event.degreeOfEstablishment} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Degree of establishment" value={event?.degreeOfEstablishment} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Establishment means" value={event.establishmentMeans} icon={<IconBuildingBank size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <SpecimenField label="Individual count" value={event.individualCount} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Life stage" value={JSON.parse(event.lifeStage)["concept"]} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Occurrence status" value={event.occurrenceStatus} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Organism quantity" value={event.organismQuantity} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Establishment means" value={event?.establishmentMeans} icon={<IconBuildingBank size={16} />} />
       </Grid.Col>
 
       <Grid.Col span={3}>
-        <SpecimenField label="Organism quantity type" value={event.organismQuantityType} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Individual count" value={event?.individualCount} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Other catalog numbers" value={event.otherCatalogNumbers} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Life stage" value={ event ? JSON.parse(event.lifeStage)["concept"] : undefined} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Pathway" value={event.pathway} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Occurrence status" value={event?.occurrenceStatus} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Preparation" value={event.preparation} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Organism quantity" value={event?.organismQuantity} icon={<IconBuildingBank size={16} />} />
       </Grid.Col>
 
       <Grid.Col span={3}>
-        <SpecimenField label="Record number" value={event.recordNumber} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Organism quantity type" value={event?.organismQuantityType} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Reproductive condition" value={event.reproductiveCondition} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Other catalog numbers" value={event?.otherCatalogNumbers} icon={<IconBuildingBank size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Sex" value={event.sex} icon={<IconBuildingBank size={16} />} />
+        <SpecimenField label="Pathway" value={event?.pathway} icon={<IconBuildingBank size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <SpecimenField label="Preparation" value={event?.preparation} icon={<IconBuildingBank size={16} />} />
+      </Grid.Col>
+
+      <Grid.Col span={3}>
+        <SpecimenField label="Record number" value={event?.recordNumber} icon={<IconBuildingBank size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <SpecimenField label="Reproductive condition" value={event?.reproductiveCondition} icon={<IconBuildingBank size={16} />} />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <SpecimenField label="Sex" value={event?.sex} icon={<IconBuildingBank size={16} />} />
       </Grid.Col>
     </Grid>
   )
@@ -290,7 +290,7 @@ function CollectionEventDetails({ event }: { event: CollectionEvent }) {
 
 
 function SpecimenEvents({ specimen }: { specimen : SpecimenDetails }) {
-  const [event, setEvent] = useState<Event>(specimen.events[0]);
+  const [event, setEvent] = useState<Event | undefined>(specimen.events[0]);
 
   return (
       <Grid>
@@ -306,7 +306,7 @@ function SpecimenEvents({ specimen }: { specimen : SpecimenDetails }) {
           <EventDetails event={event} />
 
           <Title order={5} mt={20}>Collection</Title>
-          <CollectionEventDetails event={event.events[0]} />
+          <CollectionEventDetails event={event?.events[0]} />
         </Grid.Col>
       </Grid>
   )

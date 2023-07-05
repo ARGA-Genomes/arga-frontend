@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   // if we observe very common requests this is a good place to optimise both
   // the responsiveness of the app and the server load
   const client = new ApolloClient({
-    uri: process.env.NEXT_PUBLIC_ARGA_API_URL,
+    uri: process.env.NEXT_PUBLIC_ARGA_API_URL || "/api",
     cache: new InMemoryCache()
   });
 
