@@ -1,8 +1,8 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Collapse, Divider, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Title } from "@mantine/core";
-import { WholeGenome, Coordinates, AssemblyStats, BioSample, BioSampleAttribute } from "@/app/type";
+import { Box, Button, Center, Collapse, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Title } from "@mantine/core";
+import { WholeGenome, Coordinates } from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useListState } from "@mantine/hooks";
@@ -61,26 +61,16 @@ const PointMap = dynamic(() => import('../../../components/point-map'), {
   loading: () => <Text>Loading map...</Text>,
 })
 
-function UnknownLocation() {
-  return (
-    <Center mih={200}>
-      <Text c="dimmed">Location not supplied</Text>
-    </Center>
-  )
-}
 
 function ReferenceSequence({ refseq }: { refseq : WholeGenome | undefined }) {
-    /* const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
-  *   record.refseqCategory == "reference genome" || record.accession?.includes("GC")); */
-
   return (
-      <Grid>
-        <Grid.Col span={9}>
+    <Grid mah={400} pos="relative" m={0}>
+        <Grid.Col span={9} p={30}>
           { refseq ? <GenomeDetails record={refseq} /> : null }
         </Grid.Col>
 
-        <Grid.Col span={3}>
-            {refseq?.coordinates ? <PointMap coordinates={[refseq.coordinates]} /> : <UnknownLocation /> }
+        <Grid.Col span={3} w={200} pos="relative" m={0} p={0}>
+          <PointMap coordinates={refseq?.coordinates ? [refseq.coordinates] : undefined} />
         </Grid.Col>
       </Grid>
   )
@@ -174,100 +164,6 @@ function GenomeDetails({ record }: { record: WholeGenome }) {
   )
 }
 
-function GenomeStats({ record }: { record: AssemblyStats }) {
-  return (
-    <Grid>
-      <Grid.Col span={3}>
-        <GenomeField label="Total Length" value={record.totalLength} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Total Gap Length" value={record.totalGapLength} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Spanned Gaps" value={record.spannedGaps} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Unspanned Gaps" value={record.unspannedGaps} icon={<IconLink size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <GenomeField label="Top Level Count" value={record.topLevelCount} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Region Count" value={record.regionCount} icon={<IconPencil size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Molecule Count" value={record.moleculeCount} icon={<IconLicense size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Component Count" value={record.componentCount} icon={<IconLicense size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <GenomeField label="Contig Count" value={record.contigCount} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Contig L50" value={record.contigL50} icon={<IconPencil size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Contig N50" value={record.contigN50} icon={<IconLicense size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="GC Perc" value={record.gcPerc} icon={<IconLicense size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <GenomeField label="Scaffold Count" value={record.scaffoldCount} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Scaffold L50" value={record.scaffoldL50} icon={<IconPencil size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Scaffold N50" value={record.scaffoldN50} icon={<IconLicense size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Scaffold N75" value={record.scaffoldN75} icon={<IconLicense size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <GenomeField label="Scaffold N90" value={record.scaffoldN90} icon={<IconLicense size={16} />} />
-      </Grid.Col>
-    </Grid>
-  )
-}
-
-function GenomeBioSample({ record }: { record: BioSample }) {
-  return (
-    <Grid>
-      <Grid.Col span={3}>
-        <GenomeField label="Accession" value={record.accession} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="SRA" value={record.sra} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Submission Date" value={record.submissionDate} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Publication Date" value={record.publicationDate} icon={<IconLink size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <GenomeField label="Title" value={record.title} icon={<IconLink size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <GenomeField label="Owner" value={record.owner} icon={<IconPencil size={16} />} />
-      </Grid.Col>
-
-      { record.attributes?.map(attr => (
-        <Grid.Col span={3} key={`${record.id}-${attr.name}-${attr.value}`}>
-          <GenomeField label={attr.name} value={attr.value} icon={<IconPencil size={16} />} />
-        </Grid.Col>
-      ))}
-    </Grid>
-  )
-}
-
 interface GenomeRecordProps {
   record: WholeGenome,
   selected: boolean,
@@ -354,8 +250,6 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
 
   const records = data?.species.wholeGenomes;
   const refseq = records?.find(record => record.refseqCategory == "representative genome");
-  /* const wholeGenomeRecords = data.species.data.filter((record) => record.refseqCategory == "representative genome" ||
-  *   record.refseqCategory == "reference genome" || record.accession?.includes("GC")); */
 
   return (
     <Box pos="relative">
@@ -368,7 +262,7 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
 
       { refseq ? (<>
       <Title order={3} color="white" py={20}>Reference Genome Sequence</Title>
-      <Paper mb={20} p={30} radius="lg">
+      <Paper mb={20} radius="lg">
         <ReferenceSequence refseq={refseq} />
       </Paper>
       </>) : null }

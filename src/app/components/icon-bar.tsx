@@ -68,14 +68,14 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     color: 'red',
   },
   'insects': {
-    image: 'insects.svg',
+    image: 'insects_light.svg',
     label: 'Insects',
     color: 'black',
   },
   'frogs and other amphibians': {
     image: 'frogs.svg',
     label: 'Frogs and other amphibians',
-    color: 'black',
+    color: 'moss.5',
   },
   'birds': {
     image: 'birds_light.svg',

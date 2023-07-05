@@ -3,7 +3,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, Group, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
 import { Conservation, Taxonomy } from "@/app/type";
-import IconBar from "./icon-bar";
+import IconBar from "../../components/icon-bar";
 
 
 const GET_SPECIES = gql`
