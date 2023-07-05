@@ -3,7 +3,7 @@
 import {Box, Paper, Tabs, Text, Tooltip} from "@mantine/core";
 import { Barcode } from "./barcode";
 import { Resources } from "./resources";
-import SpecimenTable from "./specimens";
+import { Specimens } from "./specimens";
 import { Summary } from "./summary";
 import { TraceTable } from "./traces";
 import { WholeGenome } from "./wholeGenome";
@@ -55,9 +55,7 @@ function DataTabs({ name, section }: { name: string, section: string }) {
         tab content
       </Tabs.Panel>
       <Tabs.Panel value="specimen" pt="xs">
-        <Paper p={40} radius="lg">
-          <SpecimenTable canonicalName={canonicalName} />
-        </Paper>
+        <Specimens canonicalName={canonicalName} />
       </Tabs.Panel>
       <Tabs.Panel value="gallery" pt="xs">
       </Tabs.Panel>
