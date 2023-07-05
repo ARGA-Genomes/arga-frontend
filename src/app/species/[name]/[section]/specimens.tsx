@@ -253,7 +253,7 @@ function CollectionEventDetails({ event }: { event: CollectionEvent | undefined 
         <SpecimenField label="Individual count" value={event?.individualCount} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
-        <SpecimenField label="Life stage" value={ event ? JSON.parse(event.lifeStage)["concept"] : undefined} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Life stage" value={ event ? JSON.parse(event.lifeStage)?.concept : undefined} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
         <SpecimenField label="Occurrence status" value={event?.occurrenceStatus} icon={<IconClipboardList size={16} />} />
