@@ -26,19 +26,19 @@ export function Footer() {
           <Container size="xl">
             <Grid gutter={100}>
             <Grid.Col xs={12} sm={12} md={6} lg={4} xl={4}>
-              <Image src="/ala-logo.svg" width={248} height={100} alt="" />
+              <Image src="/ala-logo.svg" maw={{xs:"30%", sm:"30%", md:"50%", lg:"100%", xl:"100%"}} fit="scale-down" alt="" />
             </Grid.Col>
 
             <Grid.Col xs={12} sm={12} md={6} lg={4} xl={4}>
-              <Image src="/biocommons-logo.svg" width={338} height={100} alt="" />
+              <Image src="/biocommons-logo.svg" maw={{xs:"30%", sm:"30%", md:"50%", lg:"100%", xl:"100%"}} fit="scale-down" alt="" />
             </Grid.Col>
 
             <Grid.Col xs={12} sm={12} md={6} lg={4} xl={4}>
-              <Image src="/bioplatforms-logo.svg" width={355} height={100} alt="" />
+              <Image src="/bioplatforms-logo.svg" maw={{xs:"30%", sm:"30%", md:"50%", lg:"100%", xl:"100%"}} fit="scale-down" alt="" />
             </Grid.Col>
 
             <Grid.Col xs={12} sm={12} md={6} lg={4} xl={4}>
-              <Image src="/ardc-logo.svg" width={307} height={100} alt="" />
+              <Image src="/ardc-logo.svg" maw={{xs:"30%", sm:"30%", md:"50%", lg:"100%", xl:"100%"}} fit="scale-down" alt="" />
             </Grid.Col>
 
             <Grid.Col xs={12} sm={12} md={6} lg={4} xl={4}>
@@ -54,7 +54,7 @@ export function Footer() {
             </Grid.Col>
 
             <Grid.Col xs={12} sm={12} md={6} lg={4} xl={4}>
-              <Image src="/ncris-logo.svg" width={193} height={139} alt="" />
+              <Image src="/ncris-logo.svg" maw={{xs:"30%", sm:"30%", md:"50%", lg:"100%", xl:"100%"}} fit="scale-down" alt="" />
             </Grid.Col>
           </Grid>
           </Container>
