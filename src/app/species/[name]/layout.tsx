@@ -18,6 +18,7 @@ import {
 import { Conservation, Taxonomy } from "@/app/type";
 import IconBar from "../../components/icon-bar";
 import { ExternalLink } from "tabler-icons-react";
+import { useEffect, useState } from "react";
 
 const GET_SPECIES = gql`
   query SpeciesWithConservation($canonicalName: String) {
@@ -54,9 +55,39 @@ interface HeaderProps {
   conservation?: Conservation[];
 }
 
+interface TaxonMatch {
+  identifier: string;
+  name: string;
+  acceptedIdentifier: string;
+  acceptedName: string;
+}
+
 function Header({ taxonomy, conservation }: HeaderProps) {
+  const [matchedTaxon, setMatchedTaxon] = useState<string[] | null>(null);
   const hasFrogID = false;
-  const hasAFD = true;
+  const hasAFD = false;
+
+  // Fetch the taxon UID from the given name
+  useEffect(() => {
+    async function matchTaxon() {
+      try {
+        const response = await fetch(
+          `https://api.ala.org.au/species/guid/${encodeURIComponent(
+            taxonomy.canonicalName
+          )}`
+        );
+        const matches = (await response.json()) as TaxonMatch[];
+        setMatchedTaxon(
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
+        );
+      } catch (error) {
+        setMatchedTaxon([]);
+      }
+    }
+
+    matchTaxon();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Grid>
@@ -70,10 +101,17 @@ function Header({ taxonomy, conservation }: HeaderProps) {
           </Text>
           <Group mt="md" spacing="xs">
             <Button
+              component="a"
               radius="md"
               color="midnight"
               size="xs"
               leftIcon={<ExternalLink size="1rem" />}
+              loading={!matchedTaxon}
+              disabled={
+                Array.isArray(matchedTaxon) && matchedTaxon.length === 0
+              }
+              href={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`}
+              target="_blank"
               sx={(theme) => ({
                 border: `1px solid ${theme.colors["shellfish"][6]}`,
               })}

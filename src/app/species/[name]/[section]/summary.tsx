@@ -88,6 +88,7 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
             borderBottomRightRadius: 0,
           },
         }}
+        withPlaceholder
       />
       {photo && (
         <Group px="md" py="xs" position="apart">
