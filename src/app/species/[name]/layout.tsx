@@ -55,6 +55,8 @@ interface HeaderProps {
 }
 
 function Header({ taxonomy, conservation }: HeaderProps) {
+  const hasFrogID = false;
+
   return (
     <Grid>
       <Grid.Col span="auto">
@@ -62,20 +64,35 @@ function Header({ taxonomy, conservation }: HeaderProps) {
           <Title order={3} color="white" size={26}>
             <i>{taxonomy.canonicalName}</i> {taxonomy.authorship}
           </Title>
-          <Box mt={4}>
+          <Text color="gray" mt={-8}>
+            <b>Taxonomic Status: </b>Unknown
+          </Text>
+          <Group mt="md" spacing="xs">
             <Button
               radius="md"
               color="shellfish"
               size="xs"
               leftIcon={<ExternalLink size="1rem" />}
             >
-              View on ALA
+              View on&nbsp;<b>ALA</b>
             </Button>
-          </Box>
+            {hasFrogID && (
+              <Button
+                radius="md"
+                color="shellfish"
+                size="xs"
+                leftIcon={<ExternalLink size="1rem" />}
+              >
+                View on&nbsp;<b>FrogID</b>
+              </Button>
+            )}
+          </Group>
         </Stack>
       </Grid.Col>
       <Grid.Col span="content">
-        <IconBar taxonomy={taxonomy} conservation={conservation} />
+        <Stack h="100%" justify="center">
+          <IconBar taxonomy={taxonomy} conservation={conservation} />
+        </Stack>
       </Grid.Col>
     </Grid>
   );

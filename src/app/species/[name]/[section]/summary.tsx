@@ -240,7 +240,7 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
         visible={loading}
       />
 
-      <Grid py={40}>
+      <Grid pb={40} pt="xl">
         <Grid.Col span="content">
           <Stack>
             <SpeciesPhoto photo={data?.species.photos[0]} />
