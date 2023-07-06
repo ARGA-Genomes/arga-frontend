@@ -26,11 +26,11 @@ function DataTabs({ name, section }: { name: string; section: string }) {
       styles={(theme) => ({
         tab: {
           ...theme.fn.focusStyles(),
-          backgroundColor: theme.colors["midnight"][6],
+          backgroundColor: theme.colors["midnight"][7],
           color: theme.white,
           padding: `${theme.spacing.xs} ${theme.spacing.md}`,
           cursor: "pointer",
-          fontSize: theme.fontSizes.sm,
+          fontSize: 18,
           display: "flex",
           alignItems: "center",
           borderTopLeftRadius: theme.radius.md,
@@ -42,12 +42,12 @@ function DataTabs({ name, section }: { name: string; section: string }) {
           },
 
           ":hover": {
-            backgroundColor: theme.colors["midnight"][4],
-            borderColor: theme.colors["midnight"][4],
+            backgroundColor: theme.colors["midnight"][6],
+            borderColor: theme.colors["midnight"][5],
           },
 
           "&[data-active]": {
-            backgroundColor: theme.colors["midnight"][5],
+            backgroundColor: theme.colors["midnight"][6],
             borderColor: theme.colors["shellfish"][5],
             color: theme.white,
             fontWeight: "bold",

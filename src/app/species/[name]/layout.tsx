@@ -56,6 +56,7 @@ interface HeaderProps {
 
 function Header({ taxonomy, conservation }: HeaderProps) {
   const hasFrogID = false;
+  const hasAFD = true;
 
   return (
     <Grid>
@@ -70,20 +71,39 @@ function Header({ taxonomy, conservation }: HeaderProps) {
           <Group mt="md" spacing="xs">
             <Button
               radius="md"
-              color="shellfish"
+              color="midnight"
               size="xs"
               leftIcon={<ExternalLink size="1rem" />}
+              sx={(theme) => ({
+                border: `1px solid ${theme.colors["shellfish"][6]}`,
+              })}
             >
               View on&nbsp;<b>ALA</b>
             </Button>
             {hasFrogID && (
               <Button
                 radius="md"
-                color="shellfish"
+                color="midnight"
                 size="xs"
                 leftIcon={<ExternalLink size="1rem" />}
+                sx={(theme) => ({
+                  border: `1px solid ${theme.colors["shellfish"][6]}`,
+                })}
               >
                 View on&nbsp;<b>FrogID</b>
+              </Button>
+            )}
+            {hasAFD && (
+              <Button
+                radius="md"
+                color="midnight"
+                size="xs"
+                leftIcon={<ExternalLink size="1rem" />}
+                sx={(theme) => ({
+                  border: `1px solid ${theme.colors["shellfish"][6]}`,
+                })}
+              >
+                View on&nbsp;<b>AFD</b>
               </Button>
             )}
           </Group>
