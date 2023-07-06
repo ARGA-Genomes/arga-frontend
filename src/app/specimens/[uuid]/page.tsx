@@ -1,19 +1,13 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Specimen, SpecimenDetails } from "@/app/type";
+import { SpecimenDetails } from "@/app/type";
 import { SpecimenEvents } from "./specimen-details";
 import {
   Box,
-  Button,
-  Divider,
-  Flex,
-  Grid,
   LoadingOverlay,
   Paper,
   Text,
-  Title,
   useMantineTheme,
 } from "@mantine/core";
 
@@ -93,14 +87,6 @@ query SpecimenDetails($specimenId: String) {
   }
 }`;
 
-type Species = {
-  specimens: Specimen[],
-}
-
-type QueryResults = {
-  species: Species,
-}
-
 type SpecimenQueryResults = {
   specimen: SpecimenDetails,
 }
@@ -131,11 +117,6 @@ export default function SpecimenPage({ params,}: { params: { uuid: string }}) {
 
       <Paper radius="lg">
         { data ? <SpecimenEvents specimen={data.specimen} /> : null }
-              {/* {data && <Details assembly={data.assembly} />}
-        {data?.assembly.stats && <Stats stats={data.assembly.stats} />}
-        {data?.assembly.biosamples.map((biosample) => (
-          <BioSample biosample={biosample} key={biosample.id} />
-        ))} */}
       </Paper>
     </Box>
   );

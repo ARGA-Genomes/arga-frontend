@@ -1,8 +1,8 @@
+'use client';
+
 import PointMap from "@/app/components/point-map";
 import { Coordinates, Specimen, SpecimenDetails, Event, CollectionEvent, SequencingEvent, SequencingRunEvent } from "@/app/type";
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Collapse, Divider, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Timeline, Title, useMantineTheme } from "@mantine/core";
-import { useListState } from "@mantine/hooks";
+import { Box, Divider, Grid, Group, Text, ThemeIcon, Timeline, Title} from "@mantine/core";
 import Link from "next/link";
 import { useState } from "react";
 import { ClipboardList as IconClipboardList, Pencil as IconPencil, BuildingBank as IconBuildingBank, Cell as IconCell, Map2 as IconMap, ArrowUpRight, VaccineBottle as IconVaccineBottle, Tag as IconTag, WaveSine as IconWaveSine, Microscope as IconMicroscope, BuildingWarehouse as IconBuildingWarehouse, SeparatorVertical } from 'tabler-icons-react';
