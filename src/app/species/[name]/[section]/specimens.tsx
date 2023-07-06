@@ -1,4 +1,5 @@
 import PointMap from "@/app/components/point-map";
+import { SpecimenEvents } from "@/app/specimens/[uuid]/specimen-details";
 import { Coordinates, Specimen, SpecimenDetails, Event, CollectionEvent } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Collapse, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Timeline, Title, useMantineTheme } from "@mantine/core";
@@ -233,30 +234,6 @@ function CollectionEventDetails({ event }: { event: CollectionEvent | undefined 
         <SpecimenField label="Sex" value={event?.sex} icon={<IconBuildingBank size={16} />} />
       </Grid.Col>
     </Grid>
-  )
-}
-
-
-function SpecimenEvents({ specimen }: { specimen : SpecimenDetails }) {
-  const [event, setEvent] = useState<Event | undefined>(specimen.events[0]);
-
-  return (
-      <Grid>
-        <Grid.Col span={2} bg="midnight.0" p={30} sx={{ borderRadius: "16px 0 0 16px" }}>
-          <EventTimeline events={specimen.events} onSelected={setEvent} />
-        </Grid.Col>
-
-        <Grid.Col span={10} p={30}>
-          <Title order={5}>Specimen</Title>
-          <SpecimenDetails record={specimen} />
-
-          <Title order={5} mt={20}>Event</Title>
-          <EventDetails event={event} />
-
-          <Title order={5} mt={20}>Collection</Title>
-          <CollectionEventDetails event={event?.events[0]} />
-        </Grid.Col>
-      </Grid>
   )
 }
 

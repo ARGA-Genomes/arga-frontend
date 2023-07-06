@@ -29,7 +29,7 @@ function EventTimeline({ events, onSelected }: EventTimelineProps) {
   return (
     <Timeline active={active} lineWidth={4}>
       { collection.map((event, idx) => (
-        <Timeline.Item key={idx} title="Collection" bulletSize={34} bullet={<IconVaccineBottle />} onClick={() => onClick(event, idx)}>
+        <Timeline.Item key={idx} title="Collection" bulletSize={34} bullet={<IconVaccineBottle />}>
           <Text color="dimmed" size="sm">
             Date: Not supplied
                   {/* Date: {event.eventDate} */}
@@ -55,8 +55,8 @@ function EventTimeline({ events, onSelected }: EventTimelineProps) {
       </Timeline.Item>
 
       { sequencing.map((event, idx) => (
-        <Timeline.Item key={idx} title="Sequencing" bulletSize={34} bullet={<IconWaveSine />} onClick={() => onClick(event, idx)}>
-          <Text color="dimmed" size="sm">{event.runs.length > 0 ? event.runs[0].sequencingDate : "Not supplied"}</Text>
+        <Timeline.Item key={idx} title="Sequencing" bulletSize={34} bullet={<IconWaveSine />}>
+          <Text color="dimmed" size="sm">{event.runs?.length > 0 ? event.runs[0].sequencingDate : "Not supplied"}</Text>
         </Timeline.Item>
       ))}
       { sequencing.length == 0 && (

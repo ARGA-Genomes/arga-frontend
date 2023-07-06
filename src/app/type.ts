@@ -186,6 +186,7 @@ type Event = {
 }
 
 type CollectionEvent = {
+  __typename: string,
   id: string,
   behavior: string,
   catalogNumber: string,
@@ -206,6 +207,7 @@ type CollectionEvent = {
 }
 
 type SequencingEvent = {
+  __typename: string,
   id: string,
   organismId?: string,
   sequenceId?: string,
