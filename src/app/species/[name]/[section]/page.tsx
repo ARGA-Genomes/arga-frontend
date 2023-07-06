@@ -30,7 +30,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
           color: theme.white,
           padding: `${theme.spacing.xs} ${theme.spacing.md}`,
           cursor: "pointer",
-          fontSize: 18,
+          fontSize: 17,
           display: "flex",
           alignItems: "center",
           borderTopLeftRadius: theme.radius.md,
