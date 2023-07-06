@@ -144,7 +144,7 @@ function Attribution({ name, url }: { name: string; url: string }) {
   return (
     <Text color="dimmed" size="sm" weight="bold">
       Source:{" "}
-      <Link style={{ fontSize: 14 }} href={url}>
+      <Link style={{ fontSize: 14 }} href={url} target="_blank">
         {name}
       </Link>
     </Text>
