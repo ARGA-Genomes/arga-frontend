@@ -2,7 +2,6 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {
-  Box,
   Grid,
   Group,
   Image,
@@ -70,29 +69,39 @@ const RegionMap = dynamic(() => import("../../../components/region-map"), {
   loading: () => <Text>Loading map...</Text>,
 });
 
-function SpeciesPhoto({ photo }: { photo: Photo }) {
+function SpeciesPhoto({ photo }: { photo?: Photo }) {
   function small(url: string) {
     return url.replace("original", "medium");
   }
 
   return (
-    <Box>
+    <Paper bg="midnight.6" radius="lg">
       <Image
-        width={300}
-        height={300}
+        width={375}
+        height={250}
         radius="lg"
-        src={small(photo.url)}
+        src={photo ? small(photo.url) : ""}
         alt="Species image"
+        styles={{
+          image: {
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+          },
+        }}
       />
-      <Text fz="sm" c="dimmed">
-        &copy; {photo.rightsHolder}
-      </Text>
-      <Text fz="sm" c="dimmed">
-        <Link href={photo.referenceUrl || "#"} target="_blank">
-          {photo.publisher}
-        </Link>
-      </Text>
-    </Box>
+      {photo && (
+        <Group px="md" py="xs" position="apart">
+          <Text fz="sm" c="dimmed">
+            &copy; {photo?.rightsHolder}
+          </Text>
+          <Text fz="sm" c="dimmed">
+            <Link href={photo?.referenceUrl || "#"} target="_blank">
+              {photo?.publisher}
+            </Link>
+          </Text>
+        </Group>
+      )}
+    </Paper>
   );
 }
 
@@ -132,10 +141,12 @@ function DataSummary({ stats }: { stats: StatsSpecies }) {
 
 function Attribution({ name, url }: { name: string; url: string }) {
   return (
-    <Group position="right" mt={20}>
-      <Text color="dimmed">Source:</Text>
-      <Link href={url}>{name}</Link>
-    </Group>
+    <Text color="dimmed" size="sm" weight="bold">
+      Source:{" "}
+      <Link style={{ fontSize: 14 }} href={url}>
+        {name}
+      </Link>
+    </Text>
   );
 }
 
@@ -151,13 +162,13 @@ function Taxonomy({
   const allRegions = [...regions.ibra, ...regions.imcra];
 
   return (
-    <Paper bg="midnight.6" p="lg" radius="lg">
-      <Grid>
-        <Grid.Col span={3}>
-          <Text size="xl" weight={600} color="white">
+    <Paper bg="midnight.6" radius="lg">
+      <Grid gutter={0}>
+        <Grid.Col span="content" py="xl" px={30} miw={200}>
+          <Text size="xl" weight={600} color="white" mb="sm">
             Taxonomy
           </Text>
-          <Stack>
+          <Stack spacing={8}>
             <Text color="white" c="dimmed">
               {taxonomy.kingdom}
             </Text>
@@ -174,17 +185,38 @@ function Taxonomy({
             <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
           </Stack>
         </Grid.Col>
-
         <Grid.Col span="auto">
-          <RegionMap regions={allRegions.map((region) => region.name)} />
-          <Text c="dimmed" fz="sm">
-            {allRegions.map((region) => region.name).join(", ")}
-          </Text>
-
-          {allRegions.length > 0 ? (
-            <Attribution name={attribution} url={sourceUrl} />
-          ) : null}
+          <RegionMap
+            regions={allRegions.map((region) => region.name)}
+            sx={(theme) => ({
+              overflow: "hidden",
+              borderTopRightRadius: theme.radius.lg,
+              borderBottomRightRadius:
+                allRegions.length > 0 ? 0 : theme.radius.lg,
+            })}
+          />
         </Grid.Col>
+        {allRegions.length > 0 && (
+          <Grid.Col span={12}>
+            <Paper
+              bg="midnight.8"
+              py="md"
+              px={30}
+              sx={(theme) => ({
+                overflow: "hidden",
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                borderBottomLeftRadius: theme.radius.lg,
+                borderBottomRightRadius: theme.radius.lg,
+              })}
+            >
+              <Text c="dimmed" size="sm" mb="xs">
+                {allRegions.map((region) => region.name).join(", ")}
+              </Text>
+              <Attribution name={attribution} url={sourceUrl} />
+            </Paper>
+          </Grid.Col>
+        )}
       </Grid>
     </Paper>
   );
@@ -211,28 +243,17 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
       <Grid py={40}>
         <Grid.Col span="content">
           <Stack>
-            {data?.species.photos[0] ? (
-              <SpeciesPhoto photo={data?.species.photos[0]} />
-            ) : (
-              <Image
-                width={300}
-                height={300}
-                radius="lg"
-                alt="Species image"
-                withPlaceholder
-              />
-            )}
-
+            <SpeciesPhoto photo={data?.species.photos[0]} />
             {data?.stats ? <DataSummary stats={data.stats.species} /> : null}
           </Stack>
         </Grid.Col>
         <Grid.Col span="auto">
-          {data ? (
+          {data && (
             <Taxonomy
               taxonomy={data.species.taxonomy}
               regions={data.species.regions}
             />
-          ) : null}
+          )}
         </Grid.Col>
       </Grid>
     </>
