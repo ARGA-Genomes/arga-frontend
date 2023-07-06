@@ -65,7 +65,7 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
           justifyContent: "space-between",
         }}
       >
-        <Stack spacing={4}>
+        <Stack w="100%" spacing={4}>
           <Skeleton className={classes.skeleton} visible={loading} color="red">
             <Text size="md" weight={600} color="white">
               {category || "Category Here"}
