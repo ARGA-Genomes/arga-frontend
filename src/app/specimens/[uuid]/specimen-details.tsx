@@ -1,5 +1,3 @@
-'use client';
-
 import PointMap from "@/app/components/point-map";
 import { Coordinates, Specimen, SpecimenDetails, Event, CollectionEvent, SequencingEvent, SequencingRunEvent } from "@/app/type";
 import { Box, Divider, Grid, Group, Text, ThemeIcon, Timeline, Title} from "@mantine/core";
@@ -334,7 +332,7 @@ function SpecimenDetails({ record }: { record: Specimen }) {
 }
 
 
-export function SpecimenEvents({ specimen }: { specimen : SpecimenDetails }) {
+export default function SpecimenEvents({ specimen }: { specimen : SpecimenDetails }) {
   const [event, setEvent] = useState<Event | undefined>(specimen.events[0]);
   const coords = specimen.latitude && specimen.longitude ? [specimen] as Coordinates[] : undefined;
 
@@ -351,7 +349,7 @@ export function SpecimenEvents({ specimen }: { specimen : SpecimenDetails }) {
                 <SpecimenDetails record={specimen} />
               </Grid.Col>
               <Grid.Col span={4} p={0} m={0} pos="relative">
-                <PointMap coordinates={coords} center={coords && coords[0]} borderRadius="0 16px 0 0" />
+                      {/* <PointMap coordinates={coords} center={coords && coords[0]} borderRadius="0 16px 0 0" /> */}
               </Grid.Col>
             </Grid>
 

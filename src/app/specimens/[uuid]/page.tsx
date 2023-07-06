@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { SpecimenDetails } from "@/app/type";
-import { SpecimenEvents } from "./specimen-details";
+import SpecimenEvents from "./specimen-details";
 import {
   Box,
   LoadingOverlay,

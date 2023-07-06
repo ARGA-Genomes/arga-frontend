@@ -1,8 +1,8 @@
 'use client';
 
 import PointMap from "@/app/components/point-map";
-import { SpecimenEvents } from "@/app/specimens/[uuid]/specimen-details";
-import { Coordinates, Specimen, SpecimenDetails} from "@/app/type";
+import SpecimenEvents from "@/app/specimens/[uuid]/specimen-details";
+import { Coordinates, Specimen, SpecimenDetails } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Collapse, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
@@ -248,7 +248,7 @@ function SpecimenMap({ specimens }: { specimens: Specimen[] }) {
 
   return (
     <Box pos="relative" h={300}>
-      <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" />
+          {/* <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" /> */}
     </Box>
   )
 }
