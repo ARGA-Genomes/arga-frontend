@@ -1,8 +1,17 @@
-'use client';
+"use client";
 
-import { Paper, Grid, Text, Title, Box, Stack, Button, TextInput } from "@mantine/core";
+import {
+  Paper,
+  Grid,
+  Text,
+  Title,
+  Box,
+  Stack,
+  Button,
+  TextInput,
+} from "@mantine/core";
 import { useRouter } from "next/navigation";
-import BrowseGrouping from './browse-grouping';
+import BrowseGrouping from "./browse-grouping";
 import BrowseTaxon from "./browse-taxon";
 import MostDownloadedCard from "./most-downloaded";
 import MostViewedCard from "./most-viewed";
@@ -10,7 +19,6 @@ import VisitorGraph from "./visitor_graph";
 import { Search as IconSearch } from "tabler-icons-react";
 import { useState } from "react";
 import BrowseData from "@/app/(home)/browse-data";
-
 
 function Highlights() {
   return (
@@ -32,25 +40,30 @@ function Highlights() {
         </Grid.Col>
       </Grid>
     </Box>
-  )
+  );
 }
 
 function ConferenceInfo() {
   return (
     <Paper mt={30} p={30} radius="lg" bg="midnight.5">
-      <Title order={2} color="wheat.3">Up and coming conference</Title>
+      <Title order={2} color="wheat.3">
+        Up and coming conference
+      </Title>
       <Grid>
         <Grid.Col>
           <Stack mt={40} mb={30}>
-            <Title order={1} color="white">See you at the 2023 eResearch Brisbane</Title>
-            <Text color="white">Building name. Street address and our booth number. See you there.</Text>
+            <Title order={1} color="white">
+              See you at the 2023 eResearch Brisbane
+            </Title>
+            <Text color="white">
+              Building name. Street address and our booth number. See you there.
+            </Text>
           </Stack>
         </Grid.Col>
       </Grid>
     </Paper>
-  )
+  );
 }
-
 
 function Search() {
   const router = useRouter();
@@ -58,62 +71,84 @@ function Search() {
   const [value, setValue] = useState("");
 
   function onSearch(searchTerms: string) {
-    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=species`)
+    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=species`);
   }
 
   return (
     // <Paper p={20} radius="xl">
-      <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
+    <form
+      onSubmit={(ev) => {
+        ev.preventDefault();
+        onSearch(value);
+      }}
+    >
       <Grid align="center">
         <Grid.Col span="auto">
           <TextInput
             placeholder="e.g. sequence accession, taxon identifier, genus name"
             value={value}
-            onChange={val => setValue(val.target.value)}
+            onChange={(val) => setValue(val.target.value)}
             iconWidth={60}
             size="xl"
-            radius={20}
-            styles={{ input: { height: 55, fontSize: "16px", fontWeight: 'normal', border: 0, color: "#707070" } }}
-            icon={<IconSearch size={28} color="black"/>}
+            radius="lg"
+            styles={{
+              input: {
+                height: 55,
+                fontSize: "16px",
+                fontWeight: "normal",
+                border: 0,
+                color: "#707070",
+              },
+            }}
+            icon={<IconSearch size={28} color="black" />}
           />
         </Grid.Col>
         <Grid.Col span="content">
-          <Button size="xl" type="submit" className="primary_button">Search</Button>
+          <Button size="xl" type="submit" className="primary_button">
+            Search
+          </Button>
         </Grid.Col>
       </Grid>
-      </form>
+    </form>
     // </Paper>
-  )
+  );
 }
-
 
 export default function HomePage() {
   return (
     <Box>
-      <Paper bg="midnight.6" px={{xs: "0px", sm: "0px", md: "40px", lg: "60px", xl: "80px" }} m={0} radius={35}>
+      <Paper bg="midnight.6" radius={35}>
         <Box px={50} py={40}>
-          <h2 style={{color: 'white', fontWeight: 'normal'}}>Search By</h2>
+          <h2 style={{ color: "white", fontWeight: "normal" }}>Search By</h2>
           <Search />
         </Box>
 
         <Box px={50} pb={58}>
-          <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Data Types</h2>
-          <BrowseData/>
+          <h2 style={{ color: "white", fontWeight: "normal" }}>
+            Browse By Data Types
+          </h2>
+          <BrowseData />
         </Box>
 
         <Box px={50} pb={58}>
-          <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Taxon</h2>
-          <BrowseTaxon/>
+          <h2 style={{ color: "white", fontWeight: "normal" }}>
+            Browse By Taxon
+          </h2>
+          <BrowseTaxon />
         </Box>
 
         <Box px={50} pb={58}>
-          <h2 style={{color: 'white', fontWeight: 'normal'}}>Browse By Groupings</h2>
-          <BrowseGrouping/>
+          <h2 style={{ color: "white", fontWeight: "normal" }}>
+            Browse By Groupings
+          </h2>
+          <BrowseGrouping />
         </Box>
       </Paper>
 
       <Box py={30}>
-        <h2 style={{color: 'white', fontWeight: 'normal'}}>This month&apos;s highlights</h2>
+        <h2 style={{ color: "white", fontWeight: "normal" }}>
+          This month&apos;s highlights
+        </h2>
         <Highlights />
 
         <ConferenceInfo />

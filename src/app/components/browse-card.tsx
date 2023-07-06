@@ -1,61 +1,100 @@
-'use client';
+"use client";
 
 import * as Humanize from "humanize-plus";
-import { Card, Image, Stack, Text, Skeleton } from "@mantine/core"
+import {
+  Card,
+  Image,
+  Stack,
+  Text,
+  Skeleton,
+  Box,
+  createStyles,
+} from "@mantine/core";
 import Link from "next/link";
 
+interface BrowseCardProps {
+  total?: number;
+  category: string;
+  image: string;
+  link: string;
+}
 
-type Props = {
-  total: number,
-  category: string,
-  image: string,
-  link: string
-};
-
-
-function BrowseCardShell({ children, link }: { children: React.ReactNode, link: string }) {
+function BrowseCardShell({
+  children,
+  link,
+}: {
+  children: React.ReactNode;
+  link: string;
+}) {
   return (
-    <Link href={link}>
-      <Card shadow={undefined} radius={35} pb={35} bg="#306274" sx={{'&:hover': {backgroundColor: '#285464'}}}>
-        <Card.Section>
-            {children}
-        </Card.Section>
+    <Link href={link} style={{ height: "100%" }}>
+      <Card
+        shadow="none"
+        radius="lg"
+        bg="#306274"
+        sx={{ "&:hover": { backgroundColor: "#285464" } }}
+        h="100%"
+      >
+        <Card.Section p="md">{children}</Card.Section>
       </Card>
     </Link>
   );
 }
 
-function BrowseCardLoading() {
-  return (
-    <BrowseCardShell link="">
-      <center>
-        <Skeleton height={120} width={120} mt={20} circle animate={true}/>
-      </center>
+const useStyles = createStyles({
+  skeleton: {
+    "::before": {
+      background: "#486471",
+    },
+    "::after": {
+      background: "#6797b4",
+    },
+  },
+});
 
-      <Stack align="flex-start" spacing="xs" justify="space-between" mt="md" mb="md" ml={20} pb={35}>
-        <Skeleton height={8} width={100} radius="xl" animate={true} />
-        <Skeleton height={8} width={100} radius="xl" animate={true} />
-        <Skeleton height={8} mt={10} width="70%" radius="xl" animate={true} />
-      </Stack>
+function BrowseCard({ link, category, total, image }: BrowseCardProps) {
+  const { classes } = useStyles();
+  const loading = !total;
+
+  return (
+    <BrowseCardShell link={link || ""}>
+      <Box
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Stack spacing={4}>
+          <Skeleton className={classes.skeleton} visible={loading} color="red">
+            <Text size="md" weight={600} color="white">
+              {category || "Category Here"}
+            </Text>
+          </Skeleton>
+          <Skeleton className={classes.skeleton} visible={loading}>
+            <Text size={30} weight={500} color="white">
+              {Humanize.compactInteger(total || 100000)}
+            </Text>
+            <Text size={14} color="white" mt={-6}>
+              Records
+            </Text>
+          </Skeleton>
+        </Stack>
+        <Skeleton
+          className={classes.skeleton}
+          visible={loading}
+          circle
+          width={80}
+          height={80}
+          miw={80}
+          mih={80}
+          ml="sm"
+        >
+          <Image src={image} height={80} width={80} alt="" />
+        </Skeleton>
+      </Box>
     </BrowseCardShell>
   );
 }
 
-function BrowseCard(props: Props) {
-  return (
-    <BrowseCardShell link={props.link}>
-      <center>
-        <Image src={props.image} height={120} width={120} alt="" pt={20} />
-      </center>
-
-      <Stack ml={20}>
-        <Text size={30} weight={500} m={0} p={0} color="white" h={20}>{Humanize.compactInteger(props.total)}</Text>
-        <Text size={14} m={0} p={0} color="white">Records</Text>
-        <Text size={20} weight={400} m={0} pt={0} color="white" h={62}>{props.category}</Text>
-      </Stack>
-    </BrowseCardShell>
-  );
-}
-
-
-export { BrowseCard, BrowseCardLoading };
+export { BrowseCard };
