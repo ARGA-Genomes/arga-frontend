@@ -1,13 +1,18 @@
 'use client';
 
-import PointMap from "@/app/components/point-map";
 import SpecimenEvents from "@/app/specimens/[uuid]/specimen-details";
 import { Coordinates, Specimen, SpecimenDetails } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Collapse, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ClipboardList as IconClipboardList, Pencil as IconPencil, BuildingBank as IconBuildingBank, Cell as IconCell, Map2 as IconMap, ArrowUpRight} from 'tabler-icons-react';
+
+const PointMap = dynamic(() => import('../../../components/point-map'), {
+  ssr: false,
+  loading: () => <Text>Loading map...</Text>,
+})
 
 
 const GET_SPECIMENS = gql`
@@ -248,7 +253,7 @@ function SpecimenMap({ specimens }: { specimens: Specimen[] }) {
 
   return (
     <Box pos="relative" h={300}>
-          {/* <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" /> */}
+      <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" />
     </Box>
   )
 }

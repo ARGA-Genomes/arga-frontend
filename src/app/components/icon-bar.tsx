@@ -9,35 +9,45 @@ interface IconData {
 }
 
 const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
-  'Native': {
+  'native': {
     image: 'native.svg',
     label: 'Native Species',
     color: 'wheat.4',
   },
-  'Vulnerable': {
+  'vulnerable': {
     image: 'threatened.svg',
     label: 'Vulnerable Species',
     color: 'wheat.6',
   },
-  'Vulnerable (Wildfire)': {
+  'vulnerable (wildfire)': {
     image: 'vulnerable_fire_light.svg',
     label: 'Vulnerable to Wildfire',
     color: 'bushfire.5',
   },
-  'Endangered': {
+  'endangered': {
     image: 'threatened_light.svg',
     label: 'Endangered Species',
     color: 'bushfire.4',
   },
-  'Critically endangered': {
+  'critically endangered': {
     image: 'threatened.svg',
     label: 'Critically endangered',
     color: 'red',
   },
-  'Extinct': {
+  'extinct': {
     image: 'threatened_light.svg',
     label: 'Extinct Species',
     color: 'black',
+  },
+  'least concern': {
+    image: 'threatened.svg',
+    label: 'Least concern',
+    color: 'moss.4',
+  },
+  'unlisted': {
+    image: 'threatened.svg',
+    label: 'Unlisted',
+    color: 'moss.4',
   },
 }
 
@@ -103,7 +113,7 @@ function ConservationIcon({ status }: { status: string }) {
   const icon = CONSERVATION_STATUS_ICON[status];
 
   return (
-    <Tooltip label={icon?.label}>
+    <Tooltip label={icon?.label || status}>
       <ThemeIcon radius="xl" size={60} color={icon?.color} p={10}>
         <Image src={`/species-icons/${icon?.image}`} />
       </ThemeIcon>
@@ -138,12 +148,12 @@ function DebugIconBar() {
     <VernacularGroupIcon group="mammals" />
     <VernacularGroupIcon group="seaweeds and other algae" />
     <VernacularGroupIcon group="higher plants" />
-    <ConservationIcon status="Native" />
-    <ConservationIcon status="Vulnerable" />
-    <ConservationIcon status="Vulnerable (Wildfire)" />
-    <ConservationIcon status="Endangered" />
-    <ConservationIcon status="Critically endangered" />
-    <ConservationIcon status="Extinct" />
+    <ConservationIcon status="native" />
+    <ConservationIcon status="vulnerable" />
+    <ConservationIcon status="vulnerable (wildfire)" />
+    <ConservationIcon status="endangered" />
+    <ConservationIcon status="critically endangered" />
+    <ConservationIcon status="extinct" />
     </>
   )
 }
@@ -160,7 +170,7 @@ export default function IconBar({ taxonomy, conservation }: IconBarProps) {
       <Group>
         { taxonomy.vernacularGroup ? <VernacularGroupIcon group={taxonomy.vernacularGroup} /> : null }
         { conservation?.map(cons => (
-            <ConservationIcon status={cons.status} key={cons.status}/>
+          <ConservationIcon status={cons.status.toLowerCase()} key={cons.status}/>
         ))}
       </Group>
     </Box>

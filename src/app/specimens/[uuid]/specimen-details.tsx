@@ -1,10 +1,14 @@
-import PointMap from "@/app/components/point-map";
 import { Coordinates, Specimen, SpecimenDetails, Event, CollectionEvent, SequencingEvent, SequencingRunEvent } from "@/app/type";
 import { Box, Divider, Grid, Group, Text, ThemeIcon, Timeline, Title} from "@mantine/core";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { ClipboardList as IconClipboardList, Pencil as IconPencil, BuildingBank as IconBuildingBank, Cell as IconCell, Map2 as IconMap, ArrowUpRight, VaccineBottle as IconVaccineBottle, Tag as IconTag, WaveSine as IconWaveSine, Microscope as IconMicroscope, BuildingWarehouse as IconBuildingWarehouse, SeparatorVertical } from 'tabler-icons-react';
 
+const PointMap = dynamic(() => import('../../components/point-map'), {
+  ssr: false,
+  loading: () => <Text>Loading map...</Text>,
+})
 
 
 interface EventTimelineProps {
@@ -349,7 +353,7 @@ export default function SpecimenEvents({ specimen }: { specimen : SpecimenDetail
                 <SpecimenDetails record={specimen} />
               </Grid.Col>
               <Grid.Col span={4} p={0} m={0} pos="relative">
-                      {/* <PointMap coordinates={coords} center={coords && coords[0]} borderRadius="0 16px 0 0" /> */}
+                <PointMap coordinates={coords} center={coords && coords[0]} borderRadius="0 16px 0 0" />
               </Grid.Col>
             </Grid>
 
