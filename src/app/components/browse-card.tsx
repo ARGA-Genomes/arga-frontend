@@ -31,8 +31,8 @@ function BrowseCardShell({
       <Card
         shadow="none"
         radius="lg"
-        bg="#306274"
-        sx={{ "&:hover": { backgroundColor: "#285464" } }}
+        bg="shellfish.0"
+        sx={{ "&:hover": { backgroundColor: "#c6e6e3" } }}
         h="100%"
       >
         <Card.Section p="md">{children}</Card.Section>
@@ -65,21 +65,6 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
           justifyContent: "space-between",
         }}
       >
-        <Stack w="100%" spacing={4}>
-          <Skeleton className={classes.skeleton} visible={loading} color="red">
-            <Text size="md" weight={600} color="white">
-              {category || "Category Here"}
-            </Text>
-          </Skeleton>
-          <Skeleton className={classes.skeleton} visible={loading}>
-            <Text size={30} weight={500} color="white">
-              {Humanize.compactInteger(total || 100000)}
-            </Text>
-            <Text size={14} color="white" mt={-6}>
-              Records
-            </Text>
-          </Skeleton>
-        </Stack>
         <Skeleton
           className={classes.skeleton}
           visible={loading}
@@ -88,10 +73,25 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
           height={80}
           miw={80}
           mih={80}
-          ml="sm"
+          mr="lg"
         >
           <Image src={image} height={80} width={80} alt="" />
         </Skeleton>
+        <Stack w="100%" spacing={4}>
+          <Skeleton className={classes.skeleton} visible={loading} color="red">
+            <Text size="md" weight={600}>
+              {category || "Category Here"}
+            </Text>
+          </Skeleton>
+          <Skeleton className={classes.skeleton} visible={loading}>
+            <Text size={30} weight={500}>
+              {Humanize.compactInteger(total || 100000)}
+            </Text>
+            <Text size={14} mt={-6}>
+              Records
+            </Text>
+          </Skeleton>
+        </Stack>
       </Box>
     </BrowseCardShell>
   );
