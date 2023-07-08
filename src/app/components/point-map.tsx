@@ -27,7 +27,7 @@ function PopupMarker({ position, children }: { position: Coordinates, children: 
 }
 
 function MarkersList({ coordinates }: { coordinates: Coordinates[] }) {
-  const markers = coordinates.map((position, idx) => (
+  const markers = coordinates.filter(c => c?.latitude && c?.longitude).map((position, idx) => (
     <PopupMarker position={position} key={idx}>
       <Text>Latitude: {position.latitude}</Text>
       <Text>Longitude: {position.longitude}</Text>

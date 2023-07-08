@@ -2,14 +2,14 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Text, Card, SimpleGrid, Button, Divider, Flex, Stack } from "@mantine/core";
-import Link from "next/link";
+import { Paper, Title, Box, Text, Card, SimpleGrid, Flex, Stack, LoadingOverlay, Grid, Group, Image } from "@mantine/core";
 
-import { FlagOrdering, useFlag } from "../../flags";
 import FeatureToggleMenu from "../../components/feature-toggle";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
+import Link from "next/link";
+import { CircleCheck, CircleX } from "tabler-icons-react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -23,19 +23,19 @@ const GET_STATS = gql`
 query Stats($genus: String) {
   stats {
     genus(genus: $genus) {
-			totalSpecies
+      totalSpecies
       speciesWithData
       breakdown {
-        name
+        canonicalName
         total
       }
-		}
+    }
   }
 }
 `;
 
 type Breakdown = {
-  name: string,
+  canonicalName: string,
   total: number,
 };
 
@@ -76,11 +76,63 @@ query Species($genus: String) {
   }
 }`;
 
+const GET_GENUS_SPECIES = gql`
+query GenusSpecies($genus: String) {
+  genus (genus: $genus) {
+    species {
+      taxonomy {
+        scientificName
+        canonicalName
+        authorship
+        kingdom
+        phylum
+        class
+        order
+        family
+        genus
+      }
+      photo {
+        url
+      }
+      dataSummary {
+        wholeGenomes
+        mitogenomes
+        barcodes
+        other
+      }
+    }
+  }
+}
+`
+
+
+type Taxonomy = {
+  scientificName?: string,
+  canonicalName?: string,
+  authorship?: string,
+  kingdom?: string,
+  phylum?: string,
+  class?: string,
+  order?: string,
+  family?: string,
+  genus?: string,
+};
+
+type Photo = {
+  url: string,
+}
+
+type DataSummary = {
+  wholeGenomes: number,
+  mitogenomes: number,
+  barcodes: number,
+  other: number,
+}
 
 type Record = {
-  scientificName: string,
-  canonicalName: string,
-  totalRecords: number,
+  taxonomy: Taxonomy,
+  photo?: Photo,
+  dataSummary: DataSummary,
 }
 
 type SearchResults = {
@@ -88,7 +140,7 @@ type SearchResults = {
 };
 
 type QueryResults = {
-  search: SearchResults,
+  genus: SearchResults,
 };
 
 
@@ -106,15 +158,6 @@ query Genus($genus: String) {
   }
 }`;
 
-type Taxonomy = {
-  canonicalName: string,
-  kingdom: string,
-  phylum: string,
-  class: string,
-  order: string,
-  family: string,
-}
-
 type Genus = {
   taxonomy: Taxonomy,
 };
@@ -122,26 +165,6 @@ type Genus = {
 type GenusResult = {
   genus: Genus,
 };
-
-
-function RecordItem({ record }: { record: Record }) {
-  return (
-    <Card shadow="sm" radius="lg" withBorder>
-      <Stack>
-        <Title order={5}>{record.scientificName || record.canonicalName}</Title>
-
-        <Flex align="center" gap="md">
-          <Title size={40} color={record.totalRecords == 0 ? "wheat" : "midnight"} align="center">{record.totalRecords}</Title>
-          <Text>data records available</Text>
-        </Flex>
-      </Stack>
-      <Divider my={20} />
-      <Link href={`species/${record.canonicalName.replaceAll(' ', '_')}`}>
-        <Button className="primary_button">View species</Button>
-      </Link>
-    </Card>
-  )
-}
 
 
 function DataCoverage({ stats }: { stats: GenusStats }) {
@@ -186,7 +209,7 @@ function DataBreakdown({ stats }: { stats: GenusStats }) {
   const breakdown = Array.from(stats.breakdown).sort((a, b) => a.total > b.total ? -1 : 1);
 
   const chartData = {
-    labels: breakdown.map(item => item.name),
+    labels: breakdown.map(item => item.canonicalName),
     datasets: [
       {
         label: 'Records',
@@ -220,6 +243,24 @@ function DataBreakdown({ stats }: { stats: GenusStats }) {
 }
 
 
+function StatCard({ metric, value }: { metric: string, value: number }) {
+  return (
+    <Card shadow="none" radius="lg" bg="shellfish.0" m={10}>
+      <Card.Section p="md">
+        <Stack w="100%" spacing={4}>
+          <Text size="md" weight={600}>
+            {metric}
+          </Text>
+          <Text size={30} weight={500}>
+            {Humanize.compactInteger(value)}
+          </Text>
+        </Stack>
+      </Card.Section>
+    </Card>
+  )
+}
+
+
 function Statistics({ genus }: { genus: string }) {
   const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
     variables: {
@@ -239,8 +280,14 @@ function Statistics({ genus }: { genus: string }) {
 
   return (
     <Box>
-      <Text color="white" c="dimmed">{data.stats.genus.totalSpecies} species found</Text>
-      <Text color="white" c="dimmed">{data.stats.genus.speciesWithData} species with data</Text>
+      <SimpleGrid cols={5}>
+          <StatCard metric="Species (valid)" value={data.stats.genus.totalSpecies} />
+          <StatCard metric="Species (all)" value={data.stats.genus.totalSpecies} />
+
+          <StatCard metric="Genomes" value={data.stats.genus.speciesWithData} />
+          <StatCard metric="Genetic markers" value={0} />
+          <StatCard metric="Other genomic data" value={0} />
+      </SimpleGrid>
 
       <Title color="white" order={3} pb={10} pt={20}>Data coverage</Title>
       <Flex>
@@ -252,11 +299,64 @@ function Statistics({ genus }: { genus: string }) {
 }
 
 
-function Species({ genus }: { genus: string }) {
-  const ordering = useFlag("ordering", FlagOrdering.TotalData);
-  const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES;
+function DataItem({ name, count }: { name: string, count: number }) {
+  const hasData = count > 0;
+  const dimmed = 'rgba(134, 142, 150, .5)';
+  const extraDimmed = 'rgba(134, 142, 150, .3)';
 
-  const { loading, error, data } = useQuery<QueryResults>(query, {
+  return (
+    <Grid>
+      <Grid.Col span="content" pb={0} pr={0} mr={0}>
+        { hasData ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} /> }
+      </Grid.Col>
+      <Grid.Col span="auto">
+        <Text c={hasData ? "black" : dimmed} fw={hasData ? 500 : 400 }>{name}</Text>
+      </Grid.Col>
+      <Grid.Col span="content">
+        <Text c={hasData ? "black" : dimmed} fw={hasData ? 500 : 400 }>{count} records</Text>
+      </Grid.Col>
+    </Grid>
+  )
+}
+
+function SpeciesCard({ species }: { species: Record }) {
+  const itemLinkName = species.taxonomy.canonicalName?.replaceAll(" ", "_");
+
+  function small(photo: Photo) {
+    return photo.url.replaceAll("original", "small");
+  }
+
+  return (
+    <Card shadow="sm" p={20} radius="lg" withBorder>
+      <Link href={`/species/${itemLinkName}/summary`}>
+        <Title order={4}>{ species.taxonomy.canonicalName }</Title>
+      </Link>
+
+      <Box py={20}>
+        <DataItem name="Whole genome" count={species.dataSummary.wholeGenomes} />
+        <DataItem name="Mitogenome" count={species.dataSummary.mitogenomes} />
+        <DataItem name="Barcode" count={species.dataSummary.barcodes} />
+        <DataItem name="Other" count={species.dataSummary.other} />
+      </Box>
+
+      <Card.Section>
+        <Link href={`/species/${itemLinkName}/summary`}>
+          { species.photo
+            ? <Image src={small(species.photo)} height={160} alt={species.taxonomy.canonicalName} />
+            : <Image withPlaceholder height={160} alt={species.taxonomy.canonicalName} />
+          }
+        </Link>
+      </Card.Section>
+    </Card>
+  )
+}
+
+
+function Species({ genus }: { genus: string }) {
+    /* const ordering = useFlag("ordering", FlagOrdering.TotalData);
+  * const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES; */
+
+  const { loading, error, data } = useQuery<QueryResults>(GET_GENUS_SPECIES, {
     variables: {
       genus: genus,
     },
@@ -272,14 +372,42 @@ function Species({ genus }: { genus: string }) {
     return (<Text>No data</Text>);
   }
 
-  const records = data.search.species;
+  const records = data.genus.species;
 
   return (
     <SimpleGrid cols={3} p={40}>
       {records.map(record => (
-        <RecordItem key={record.canonicalName} record={record} />
+        <SpeciesCard key={record.taxonomy.scientificName} species={record} />
       ))}
     </SimpleGrid>
+  );
+}
+
+
+interface HeaderProps {
+  taxonomy: Taxonomy;
+}
+
+function Header({ taxonomy }: HeaderProps) {
+  return (
+    <Grid>
+      <Grid.Col span="auto">
+        <Stack justify="center" h="100%" spacing={0} pt="sm">
+          <Title order={3} color="white" size={26}>
+            <i>{taxonomy.canonicalName}</i> {taxonomy.authorship}
+          </Title>
+          <Text color="gray" mt={-8}>
+            <b>Taxonomic Status: </b>Unknown
+          </Text>
+          <Group mt="md" spacing="xs">
+          </Group>
+        </Stack>
+      </Grid.Col>
+      <Grid.Col span="content">
+        <Stack h="100%" justify="center">
+        </Stack>
+      </Grid.Col>
+    </Grid>
   );
 }
 
@@ -291,36 +419,31 @@ export default function GenusPage({ params }: { params: { name: string } }) {
     },
   });
 
-  if (loading) {
-    return (<Text>Loading...</Text>);
-  }
   if (error) {
     return (<Text>Error : {error.message}</Text>);
   }
-  if (!data) {
-    return (<Text>No data</Text>);
-  }
 
-  const taxonomy = data.genus.taxonomy;
+  const taxonomy = data?.genus.taxonomy;
 
   return (
     <Box>
-      <Paper bg="midnight.6" p={40} radius={35}>
-        <Title order={3} color="white">{Humanize.capitalize(params.name)}</Title>
-        <Text color="white" c="dimmed">
-          {taxonomy.kingdom}
-          , {taxonomy.phylum}
-          , {taxonomy.class}
-          , {taxonomy.order}
-          , <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
-        </Text>
+      <LoadingOverlay
+        overlayColor="black"
+        transitionDuration={500}
+        loaderProps={{ variant: "bars", size: "xl", color: "moss.5" }}
+        visible={loading}
+      />
+      {taxonomy && <Header taxonomy={taxonomy} />}
 
+    <Box>
+      <Paper bg="midnight.6" p={40} radius={35}>
         <Statistics genus={params.name} />
       </Paper>
 
       <Species genus={params.name} />
 
       <FeatureToggleMenu/>
+    </Box>
     </Box>
   );
 }
