@@ -118,26 +118,26 @@ export default function HomePage() {
   return (
     <Box>
       <Paper bg="midnight.6" radius={35}>
-        <Box px={50} py={40}>
+        <Box px={50} py={20}>
           <h2 style={{ color: "white", fontWeight: "normal" }}>Search By</h2>
           <Search />
         </Box>
 
-        <Box px={50} pb={58}>
+        <Box px={50} pb={20}>
           <h2 style={{ color: "white", fontWeight: "normal" }}>
             Browse By Data Types
           </h2>
           <BrowseData />
         </Box>
 
-        <Box px={50} pb={58}>
+        <Box px={50} pb={20}>
           <h2 style={{ color: "white", fontWeight: "normal" }}>
             Browse By Taxon
           </h2>
           <BrowseTaxon />
         </Box>
 
-        <Box px={50} pb={58}>
+        <Box px={50} pb={30}>
           <h2 style={{ color: "white", fontWeight: "normal" }}>
             Browse By Groupings
           </h2>
