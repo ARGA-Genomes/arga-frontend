@@ -83,9 +83,7 @@ function DataItem({ name, count }: { name: string, count: number }) {
 
 
 function SpeciesCard({ species, withRecordType }: { species: Species , withRecordType: String}) {
-  const itemLinkName = species.canonicalName.replaceAll(" ", "_");
-
-  console.log(withRecordType)
+  const itemLinkName = species.canonicalName?.replaceAll(" ", "_");
 
   function small(photo: Photo) {
     return photo.url.replaceAll("original", "small");
