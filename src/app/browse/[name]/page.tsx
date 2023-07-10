@@ -162,10 +162,6 @@ export default function BrowseList({ params }: { params: { name: string } }) {
     variables:  { withRecordType: params.name.toUpperCase() },
   });
 
-  if(params.name == "organelles"){
-    //data.search.species = []
-  }
-
   useEffect(() => {
     setFilters(taxaType == 'vertebrates' ? VERTEBRATE_FILTERS : INVERTEBRATE_FILTERS)
     setPagination({ page: 1, pageSize: PAGE_SIZE })
