@@ -8,9 +8,9 @@ import { useEffect, useState } from "react";
 import { CircleCheck, CircleX } from "tabler-icons-react";
 
 const GET_SPECIES_STAT = gql`
-  query SpeciesStat {
+  query SpeciesStat($withRecordType: String){
     search {
-      species {
+      species (withRecordType:$withRecordType){
         canonicalName
         scientificName
         dataSummary{
@@ -19,6 +19,9 @@ const GET_SPECIES_STAT = gql`
           barcodes
           mitogenomes
           other
+        }
+        photo{
+          url
         }
       }
     }
@@ -46,6 +49,7 @@ type Species = {
   canonicalName: string,
   scientificName: string,
   dataSummary: DataSummary,
+  photo: Photo,
 }
 
 type search = {
@@ -78,31 +82,43 @@ function DataItem({ name, count }: { name: string, count: number }) {
 }
 
 
-function SpeciesCard({ species }: { species: Species }) {
-  const itemLinkName = species.canonicalName.replaceAll(" ", "_");
+function SpeciesCard({ species, withRecordType }: { species: Species , withRecordType: String}) {
+  const itemLinkName = species.canonicalName?.replaceAll(" ", "_");
 
   function small(photo: Photo) {
     return photo.url.replaceAll("original", "small");
   }
 
+  let tab = "summary";
+  if(withRecordType == "genomes") { tab = "whole_genome"}
+  else if (withRecordType == "barcodes") { tab = "barcode"}
+  else if (withRecordType == "organelles") { tab = "mitogenome"}
+
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
-      <Link href={`/species/${itemLinkName}/summary`}>
+      <Link href={`/species/${itemLinkName}/${tab}`}>
         <Title order={4}>{ species.canonicalName }</Title>
       </Link>
 
       <Box py={20}>
-        <DataItem name="Whole genome" count={species.dataSummary.wholeGenomes} />
-        <DataItem name="Partial genome" count={species.dataSummary.partialGenomes} />
-        <DataItem name="Mitogenome" count={species.dataSummary.mitogenomes} />
-        <DataItem name="Barcode" count={species.dataSummary.barcodes} />
+        { withRecordType == "genomes" &&
+          <><DataItem name="Whole genome" count={species.dataSummary.wholeGenomes}/>
+            <DataItem name="Partial genome" count={species.dataSummary.partialGenomes}/></>
+        }
+        { withRecordType == "organelles" &&
+          <DataItem name="Mitogenome" count={species.dataSummary.mitogenomes}/>
+        }
+        { withRecordType == "barcodes" &&
+          <DataItem name="Barcode" count={species.dataSummary.barcodes}/>
+        }
         <DataItem name="Other" count={species.dataSummary.other} />
       </Box>
 
       <Card.Section>
         <Link href={`/species/${itemLinkName}/summary`}>
-          {
-            <Image withPlaceholder height={160} alt={species.canonicalName} />
+          { species.photo
+            ? <Image src={small(species.photo)} height={160} alt={species.canonicalName} />
+            : <Image withPlaceholder height={160} alt={species.canonicalName} />
           }
         </Link>
       </Card.Section>
@@ -111,10 +127,10 @@ function SpeciesCard({ species }: { species: Species }) {
 }
 
 
-function BrowseResults({ list }: { list: Species[]}) {
+function BrowseResults({ list , withRecordType}: { list: Species[], withRecordType: String}) {
   return (
     <SimpleGrid cols={4}>
-      { list.map(item => (<SpeciesCard species={item} key={item.scientificName} />)) }
+      { list.map(item => (<SpeciesCard species={item} key={item.scientificName} withRecordType={withRecordType}/>)) }
     </SimpleGrid>
   )
 }
@@ -140,7 +156,9 @@ export default function BrowseList({ params }: { params: { name: string } }) {
   const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE });
   const [totalPages, setTotalPages] = useState(1)
 
-  const {loading, error, data} = useQuery<QueryResults>(GET_SPECIES_STAT);
+  let {loading, error, data} = useQuery<QueryResults>(GET_SPECIES_STAT, {
+    variables:  { withRecordType: params.name.toUpperCase() },
+  });
 
   useEffect(() => {
     setFilters(taxaType == 'vertebrates' ? VERTEBRATE_FILTERS : INVERTEBRATE_FILTERS)
@@ -152,24 +170,26 @@ export default function BrowseList({ params }: { params: { name: string } }) {
     setTotalPages(data ? 10 : 1)
   }, [data, setTotalPages])
 
+  let title = params.name
 
   return (
     <Box>
-      <Paper bg="midnight.6" p={10} radius="lg" ref={targetRef}>
-        <MantineProvider theme={{ colorScheme: 'dark' }}>
-          <SegmentedControl
-            size="md"
-            m={10}
-            value={taxaType}
-            onChange={setTaxaType}
-            classNames={segmented.classes}
-            data={[
-              { value: 'vertebrates', label: 'Vertebrates' },
-              { value: 'invertebrates', label: 'Invertebrates' },
-            ]}
-          />
-        </MantineProvider>
-      </Paper>
+      {/*<Paper bg="midnight.6" p={10} radius="lg" ref={targetRef}>*/}
+      {/*  <MantineProvider theme={{ colorScheme: 'dark' }}>*/}
+          {/*<SegmentedControl*/}
+          {/*  size="md"*/}
+          {/*  m={10}*/}
+          {/*  value={taxaType}*/}
+          {/*  onChange={setTaxaType}*/}
+          {/*  classNames={segmented.classes}*/}
+          {/*  data={[*/}
+          {/*    { value: 'vertebrates', label: 'Vertebrates' },*/}
+          {/*    { value: 'invertebrates', label: 'Invertebrates' },*/}
+          {/*  ]}*/}
+          {/*/>*/}
+        {/*</MantineProvider>*/}
+      {/*</Paper>*/}
+      <Title color="white" style={{textTransform: 'capitalize'}}>{title}</Title>
 
       <Box mt={40}>
         <LoadingOverlay
@@ -178,7 +198,7 @@ export default function BrowseList({ params }: { params: { name: string } }) {
           loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
           visible={loading}
         />
-        { !loading && data ? <BrowseResults list={data.search.species} /> : null }
+        { !loading && data ? <BrowseResults list={data.search.species} withRecordType={params.name}/> : null }
       </Box>
 
       <Paper bg="midnight.6" p={20} m={40} radius="lg">
