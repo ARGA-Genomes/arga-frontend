@@ -116,7 +116,7 @@ function DataItem({ name, count }: { name: string, count: number }) {
 
 
 function SpeciesCard({ species }: { species: Species }) {
-  const itemLinkName = species.taxonomy.canonicalName.replaceAll(" ", "_");
+  const itemLinkName = species.taxonomy.canonicalName?.replaceAll(" ", "_");
 
   function small(photo: Photo) {
     return photo.url.replaceAll("original", "small");

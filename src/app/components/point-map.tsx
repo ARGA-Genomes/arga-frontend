@@ -27,7 +27,7 @@ function PopupMarker({ position, children }: { position: Coordinates, children: 
 }
 
 function MarkersList({ coordinates }: { coordinates: Coordinates[] }) {
-  const markers = coordinates.map((position, idx) => (
+  const markers = coordinates.filter(c => c?.latitude && c?.longitude).map((position, idx) => (
     <PopupMarker position={position} key={idx}>
       <Text>Latitude: {position.latitude}</Text>
       <Text>Longitude: {position.longitude}</Text>
@@ -41,11 +41,15 @@ function MarkersList({ coordinates }: { coordinates: Coordinates[] }) {
 interface PointMapProperties {
   coordinates?: Coordinates[],
   borderRadius?: string,
+  center?: Coordinates,
   children?: React.ReactNode,
 }
 
 export default function PointMap(props: PointMapProperties) {
-  const position = [-28.30638, 134.38380] as LatLngExpression;
+  const position = [
+    props.center?.latitude || -28.30638,
+    props.center?.longitude || 134.38380
+  ] as LatLngExpression;
 
   return (
     <Box m={0}>

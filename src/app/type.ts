@@ -169,6 +169,88 @@ type Specimen = {
     remarks?: string,
 }
 
+type Event = {
+  id: string,
+  eventDate: string,
+  eventId: string,
+  eventRemarks: string,
+  fieldNotes: string,
+  fieldNumber: string,
+  habitat: string,
+  samplingEffort: string,
+  samplingProtocol: string,
+  samplingSizeUnit: string,
+  samplingSizeValue: string,
+
+  events: [CollectionEvent | SequencingEvent]
+}
+
+type CollectionEvent = {
+  __typename: string,
+  id: string,
+  behavior: string,
+  catalogNumber: string,
+  degreeOfEstablishment: string,
+  establishmentMeans: string,
+  individualCount: string,
+  lifeStage: string,
+  occurrenceStatus: string,
+  organismId: string,
+  organismQuantity: string,
+  organismQuantityType: string,
+  otherCatalogNumbers: string,
+  pathway: string,
+  preparation: string,
+  recordNumber: string,
+  reproductiveCondition: string,
+  sex: string,
+}
+
+type SequencingEvent = {
+  __typename: string,
+  id: string,
+  organismId?: string,
+  sequenceId?: string,
+  genbankAccession?: string,
+  targetGene?: string,
+  dnaSequence?: string,
+  runs: SequencingRunEvent[],
+}
+
+type SequencingRunEvent = {
+  id: string,
+  traceId: string,
+  traceName: string,
+  traceLink: string,
+  sequencingDate: string,
+  sequencingCenter: string,
+  targetGene: string,
+  direction: string,
+  pcrPrimerNameForward: string,
+  pcrPrimerNameReverse: string,
+  sequencePrimerForwardName: string,
+  sequencePrimerReverseName: string,
+}
+
+
+
+type SpecimenDetails = {
+  id: string,
+  typeStatus: string,
+  institutionName?: string,
+  institutionCode?: string,
+  collectionCode?: string,
+  catalogNumber?: string,
+  recordedBy?: string,
+  organismId?: string,
+  locality?: string,
+  latitude?: number,
+  longitude?: number,
+  remarks?: string,
+
+  events: Event[],
+}
+
 type StatsSpecies = {
     total: number,
     wholeGenomes: number,
@@ -207,4 +289,9 @@ export type {
     BioSample,
     BioSampleAttribute,
     Assembly,
+    SpecimenDetails,
+    Event,
+    CollectionEvent,
+    SequencingEvent,
+    SequencingRunEvent,
 };
