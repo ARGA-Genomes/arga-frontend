@@ -79,15 +79,15 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
         </Skeleton>
         <Stack w="100%" spacing={4}>
           <Skeleton className={classes.skeleton} visible={loading} color="red">
-            <Text size="md" weight={600}>
+            <Text size="xl" weight={600} ta={"right"}>
               {category || "Category Here"}
             </Text>
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading}>
-            <Text size={30} weight={500}>
-              {Humanize.compactInteger(total || 100000)}
+            <Text size={20} weight={300} ta={"right"}>
+              {total}
             </Text>
-            <Text size={14} mt={-6}>
+            <Text size={14} mt={-6} ta={"right"}>
               Records
             </Text>
           </Skeleton>
