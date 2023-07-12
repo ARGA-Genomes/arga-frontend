@@ -71,7 +71,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
         </Tooltip>
         <Tabs.Tab value="whole_genome">Whole Genomes</Tabs.Tab>
         <Tabs.Tab value="traces">Traces</Tabs.Tab>
-        {/*<Tabs.Tab value="mitogenome">Organellar Genomes</Tabs.Tab>*/}
+        {/*<Tabs.Tab value="organelles">Organellar Genomes</Tabs.Tab>*/}
         <Tabs.Tab value="barcode">Barcode Data</Tabs.Tab>
          <Tabs.Tab value="other_genomic">Other genetic data</Tabs.Tab>
         {/* <Tabs.Tab value="other_nongenomic">Other Non genomic Data</Tabs.Tab> */}
@@ -89,7 +89,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
       <Tabs.Panel value="traces" pt="xs">
         <TraceTable canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="mitogenome" pt="xs">
+      <Tabs.Panel value="organelles" pt="xs">
         tab content
       </Tabs.Panel>
       <Tabs.Panel value="barcode" pt="xs">

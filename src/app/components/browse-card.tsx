@@ -54,7 +54,7 @@ const useStyles = createStyles({
 
 function BrowseCard({ link, category, total, image }: BrowseCardProps) {
   const { classes } = useStyles();
-  const loading = !total;
+  const loading = total === undefined;
 
   return (
     <BrowseCardShell link={link || ""}>

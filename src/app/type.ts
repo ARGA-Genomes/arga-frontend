@@ -254,7 +254,7 @@ type SpecimenDetails = {
 type StatsSpecies = {
     total: number,
     wholeGenomes: number,
-    mitogenomes: number,
+    organelles: number,
     barcodes: number,
 }
 

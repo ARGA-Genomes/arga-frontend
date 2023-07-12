@@ -20,7 +20,7 @@ const GET_SUMMARY = gql`
       species(canonicalName: $canonicalName) {
         total
         wholeGenomes
-        mitogenomes
+        organelles
         barcodes
       }
     }
@@ -116,9 +116,9 @@ function DataSummary({ stats }: { stats: StatsSpecies }) {
         </Text>
       </Group>
       <Group position="apart">
-        <Text color="white">Mitogenomes</Text>
+        <Text color="white">Organelles</Text>
         <Text color="white" fw={700} fz={30}>
-          {stats.mitogenomes}
+          {stats.organelles}
         </Text>
       </Group>
       <Group position="apart">
@@ -132,7 +132,7 @@ function DataSummary({ stats }: { stats: StatsSpecies }) {
         <Text color="white" fw={700} fz={30}>
           {stats.total -
             stats.wholeGenomes -
-            stats.mitogenomes -
+            stats.organelles -
             stats.barcodes}
         </Text>
       </Group>
