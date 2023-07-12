@@ -1,29 +1,53 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Card, createStyles, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image, Grid, Pagination, MantineProvider } from "@mantine/core";
+import {
+  Box,
+  Card,
+  createStyles,
+  LoadingOverlay,
+  Paper,
+  SimpleGrid,
+  Text,
+  Title,
+  Image,
+  Grid,
+  Pagination,
+} from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CircleCheck, CircleX } from "tabler-icons-react";
+import {Pie} from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const GET_SPECIES_STAT = gql`
-  query SpeciesStat($withRecordType: String){
+  query SpeciesStat($kingdom: String, $withRecordType: String, $pagination: Pagination){
     search {
-      species (withRecordType:$withRecordType){
+      species (kingdom: $kingdom, withRecordType:$withRecordType, pagination: $pagination){
         canonicalName
         scientificName
+        totalRecords
         dataSummary{
           wholeGenomes
           partialGenomes
           barcodes
-          mitogenomes
+          organelles
           other
         }
         photo{
           url
         }
       }
+    }
+    overview {
+      wholeGenomes
+      partialGenomes
+      barcodes
+      organelles
+      allRecords
     }
   }`;
 
@@ -40,7 +64,7 @@ type Photo = {
 type DataSummary = {
   wholeGenomes: number,
   partialGenomes: number,
-  mitogenomes: number,
+  organelles: number,
   barcodes: number,
   other: number,
 }
@@ -50,7 +74,21 @@ type Species = {
   scientificName: string,
   dataSummary: DataSummary,
   photo: Photo,
+  totalRecords: number,
 }
+
+type Pagination = {
+  page: number,
+  pageSize: number,
+}
+
+type Overview = {
+  wholeGenomes: number;
+  partialGenomes: number;
+  organelles: number;
+  barcodes: number;
+  allRecords: number;
+};
 
 type search = {
   species: Species[],
@@ -58,6 +96,7 @@ type search = {
 
 type QueryResults = {
   search: search,
+  overview: Overview
 };
 
 
@@ -83,7 +122,7 @@ function DataItem({ name, count }: { name: string, count: number }) {
 
 
 function SpeciesCard({ species, withRecordType }: { species: Species , withRecordType: String}) {
-  const itemLinkName = species.canonicalName?.replaceAll(" ", "_");
+  const itemLinkName = species.canonicalName.replaceAll(" ", "_");
 
   function small(photo: Photo) {
     return photo.url.replaceAll("original", "small");
@@ -92,7 +131,7 @@ function SpeciesCard({ species, withRecordType }: { species: Species , withRecor
   let tab = "summary";
   if(withRecordType == "genomes") { tab = "whole_genome"}
   else if (withRecordType == "barcodes") { tab = "barcode"}
-  else if (withRecordType == "organelles") { tab = "mitogenome"}
+  else if (withRecordType == "organelles") { tab = "organelles"}
 
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
@@ -101,17 +140,17 @@ function SpeciesCard({ species, withRecordType }: { species: Species , withRecor
       </Link>
 
       <Box py={20}>
+        <DataItem name="Total Records" count={species.totalRecords} />
         { withRecordType == "genomes" &&
           <><DataItem name="Whole genome" count={species.dataSummary.wholeGenomes}/>
             <DataItem name="Partial genome" count={species.dataSummary.partialGenomes}/></>
         }
         { withRecordType == "organelles" &&
-          <DataItem name="Mitogenome" count={species.dataSummary.mitogenomes}/>
+          <DataItem name="Organelles" count={species.dataSummary.organelles}/>
         }
         { withRecordType == "barcodes" &&
           <DataItem name="Barcode" count={species.dataSummary.barcodes}/>
         }
-        <DataItem name="Other" count={species.dataSummary.other} />
       </Box>
 
       <Card.Section>
@@ -156,8 +195,23 @@ export default function BrowseList({ params }: { params: { name: string } }) {
   const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE });
   const [totalPages, setTotalPages] = useState(1)
 
+  let kingdom, withRecordType;
+
+  if(params.name == "animals") {
+    kingdom = "Animalia";
+  }
+  else if(params.name == "plants") {
+    kingdom = "Plantae";
+  }
+  else if(params.name == "fungi") {
+    kingdom = "Fungi";
+  }
+  else if (params.name == "genomes" ||  params.name == "organelles" ||  params.name == "barcodes") {
+    withRecordType = params.name.toUpperCase();
+  }
+
   let {loading, error, data} = useQuery<QueryResults>(GET_SPECIES_STAT, {
-    variables:  { withRecordType: params.name.toUpperCase() },
+    variables:  { kingdom: kingdom, withRecordType: withRecordType, pagination }
   });
 
   useEffect(() => {
@@ -167,14 +221,25 @@ export default function BrowseList({ params }: { params: { name: string } }) {
   }, [taxaType, setFilters, setPagination, setTotalPages])
 
   useEffect(() => {
-    setTotalPages(data ? 10 : 1)
+    setTotalPages(data ? 10 : 1) //TODO
   }, [data, setTotalPages])
 
   let title = params.name
 
   return (
     <Box>
-      {/*<Paper bg="midnight.6" p={10} radius="lg" ref={targetRef}>*/}
+      <Paper bg="midnight.6" p={10} radius="lg" ref={targetRef}>
+        <Title color="white" style={{textTransform: 'capitalize'}} pt={30} pl={30}>{title}</Title>
+        { !loading && data && params.name == "genomes" &&
+          <Grid>
+            <Grid.Col span={6}>
+              <Graph total={data.overview.allRecords} data={data.overview.wholeGenomes} type="Whole genome"/>
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <Graph total={data.overview.allRecords} data={data.overview.partialGenomes} type="Partial genome"/>
+            </Grid.Col>
+          </Grid>
+        }
       {/*  <MantineProvider theme={{ colorScheme: 'dark' }}>*/}
           {/*<SegmentedControl*/}
           {/*  size="md"*/}
@@ -188,8 +253,7 @@ export default function BrowseList({ params }: { params: { name: string } }) {
           {/*  ]}*/}
           {/*/>*/}
         {/*</MantineProvider>*/}
-      {/*</Paper>*/}
-      <Title color="white" style={{textTransform: 'capitalize'}}>{title}</Title>
+      </Paper>
 
       <Box mt={40}>
         <LoadingOverlay
@@ -262,3 +326,42 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
     },
   }
 });
+
+function Graph({ total, data, type }: { total: number, data: number, type: string }) {
+
+  const chartData = {
+    labels: [`${type} records`, 'Other records'],
+    datasets: [
+      {
+        label: 'Records',
+        data: [data, total - data],
+        backgroundColor: [
+          '#7da243',
+          '#da5d0b',
+        ],
+        borderColor: [
+          'rgba(255, 255, 255, 1)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "left" as const,
+        labels: {
+          color: "white",
+        }
+      }
+    }
+  }
+
+  return (
+    <Box h={200}>
+      <Pie options={options} data={chartData} />
+    </Box>
+  )
+}

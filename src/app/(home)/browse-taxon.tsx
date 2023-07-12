@@ -36,7 +36,7 @@ export default function BrowseTaxon() {
           total={data?.overview.animals}
           category="Animals"
           image="card-icons/marine.svg"
-          link="/browse/list/Conservation_NT"
+          link="/browse/animals"
         />
       </Grid.Col>
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
@@ -44,7 +44,7 @@ export default function BrowseTaxon() {
           total={data?.overview.plants}
           category="Plants"
           image="card-icons/agricultural.svg"
-          link="/browse/list/Conservation_NT"
+          link="/browse/plants"
         />
       </Grid.Col>
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
@@ -52,7 +52,7 @@ export default function BrowseTaxon() {
           total={data?.overview.fungi}
           category="Fungi"
           image="card-icons/allspecies.svg"
-          link="/browse/list/Conservation_NT"
+          link="/browse/fungi"
         />
       </Grid.Col>
     </Grid>

@@ -96,7 +96,7 @@ query GenusSpecies($genus: String) {
       }
       dataSummary {
         wholeGenomes
-        mitogenomes
+        organelles
         barcodes
         other
       }
@@ -124,7 +124,7 @@ type Photo = {
 
 type DataSummary = {
   wholeGenomes: number,
-  mitogenomes: number,
+  organelles: number,
   barcodes: number,
   other: number,
 }
@@ -334,7 +334,7 @@ function SpeciesCard({ species }: { species: Record }) {
 
       <Box py={20}>
         <DataItem name="Whole genome" count={species.dataSummary.wholeGenomes} />
-        <DataItem name="Mitogenome" count={species.dataSummary.mitogenomes} />
+        <DataItem name="Organelles" count={species.dataSummary.organelles} />
         <DataItem name="Barcode" count={species.dataSummary.barcodes} />
         <DataItem name="Other" count={species.dataSummary.other} />
       </Box>
