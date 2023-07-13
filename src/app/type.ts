@@ -233,6 +233,23 @@ type SequencingRunEvent = {
 }
 
 
+type Marker = {
+  id: string,
+  accession: string,
+  basepairs?: number,
+  fastaUrl?: string,
+  sourceUrl?: string,
+  gbAcs?: string,
+  markerCode?: string,
+  materialSampleId?: string,
+  nucleotide?: string,
+  recordedBy?: string,
+  shape?: string,
+  type?: string,
+  version?: string,
+  extraData?: any,
+}
+
 
 type SpecimenDetails = {
   id: string,
@@ -294,4 +311,5 @@ export type {
     CollectionEvent,
     SequencingEvent,
     SequencingRunEvent,
+    Marker,
 };
