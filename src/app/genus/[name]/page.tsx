@@ -13,7 +13,6 @@ import {
   Stack,
   LoadingOverlay,
   Grid,
-  Group,
   Image,
 } from "@mantine/core";
 
@@ -26,7 +25,18 @@ import { CircleCheck, CircleX } from "tabler-icons-react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const chartColours = ["#3A637C", "#509590", "#7da243", "#da5d0b", "#e4a107"];
+const chartColours = [
+  "#3A637C",
+  "#509590",
+  "#7da243",
+  "#da5d0b",
+  "#e4a107",
+  "#7592a3",
+  "#85b5b1",
+  "#b1c78e",
+  "#e99e6d",
+  "#efc76a",
+];
 
 const GET_STATS = gql`
   query Stats($genus: String) {
@@ -382,6 +392,7 @@ function SpeciesCard({ species }: { species: Record }) {
 const speciesTotalRecords = (species: Record) => {
   return (
     species.dataSummary.wholeGenomes +
+    species.dataSummary.organelles +
     species.dataSummary.barcodes +
     species.dataSummary.other
   );
