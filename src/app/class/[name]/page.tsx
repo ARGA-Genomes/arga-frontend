@@ -39,13 +39,13 @@ const chartColours = [
 ];
 
 const GET_STATS = gql`
-  query Stats($genus: String) {
+  query Stats($class: String) {
     stats {
-      genus(genus: $genus) {
-        totalSpecies
-        speciesWithData
+      class(class: $class) {
+        totalOrders
+        ordersWithData
         breakdown {
-          canonicalName
+          name
           total
         }
       }
@@ -54,51 +54,27 @@ const GET_STATS = gql`
 `;
 
 type Breakdown = {
-  canonicalName: string;
+  name: string;
   total: number;
 };
 
-type GenusStats = {
-  totalSpecies: number;
-  speciesWithData: number;
+type ClassStats = {
+  totalOrders: number;
+  ordersWithData: number;
   breakdown: Breakdown[];
 };
 
 type Stats = {
-  genus: GenusStats;
+  class: ClassStats;
 };
 
 type StatsQueryResults = {
   stats: Stats;
 };
 
-const GET_SPECIES_TAXONOMY_ORDER = gql`
-  query SpeciesTaxonomyOrder($genus: String) {
-    search {
-      species: speciesTaxonomyOrder(genus: $genus) {
-        scientificName
-        canonicalName
-        totalRecords
-      }
-    }
-  }
-`;
-
-const GET_SPECIES = gql`
-  query Species($genus: String) {
-    search {
-      species(genus: $genus) {
-        scientificName
-        canonicalName
-        totalRecords
-      }
-    }
-  }
-`;
-
-const GET_GENUS_SPECIES = gql`
-  query GenusSpecies($genus: String) {
-    genus(genus: $genus) {
+const GET_CLASS_SPECIES = gql`
+  query ClassSpecies($class: String) {
+    class(class: $class) {
       species {
         taxonomy {
           scientificName
@@ -159,12 +135,12 @@ type SearchResults = {
 };
 
 type QueryResults = {
-  genus: SearchResults;
+  class: SearchResults;
 };
 
-const GET_GENUS = gql`
-  query Genus($genus: String) {
-    genus(genus: $genus) {
+const GET_CLASS = gql`
+  query Class($class: String) {
+    class(class: $class) {
       taxonomy {
         canonicalName
         kingdom
@@ -177,20 +153,20 @@ const GET_GENUS = gql`
   }
 `;
 
-type Genus = {
+type Class = {
   taxonomy: Taxonomy;
 };
 
-type GenusResult = {
-  genus: Genus;
+type ClassResult = {
+  class: Class;
 };
 
-function DataCoverage({ stats }: { stats: GenusStats }) {
-  const total = stats.totalSpecies;
-  const withData = stats.speciesWithData;
+function DataCoverage({ stats }: { stats: ClassStats }) {
+  const total = stats.totalOrders;
+  const withData = stats.ordersWithData;
 
   const chartData = {
-    labels: ["Species with data", "Species without data"],
+    labels: ["Orders with data", "Orders without data"],
     datasets: [
       {
         label: "Records",
@@ -218,13 +194,13 @@ function DataCoverage({ stats }: { stats: GenusStats }) {
   );
 }
 
-function DataBreakdown({ stats }: { stats: GenusStats }) {
+function DataBreakdown({ stats }: { stats: ClassStats }) {
   const breakdown = Array.from(stats.breakdown).sort((a, b) =>
     a.total > b.total ? -1 : 1
   );
 
   const chartData = {
-    labels: breakdown.map((item) => item.canonicalName),
+    labels: breakdown.map((item) => item.name),
     datasets: [
       {
         label: "Records",
@@ -272,10 +248,10 @@ function StatCard({ metric, value }: { metric: string; value: number }) {
   );
 }
 
-function Statistics({ genus }: { genus: string }) {
+function Statistics({ class: value }: { class: string }) {
   const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
     variables: {
-      genus: genus,
+      class: value,
     },
   });
 
@@ -293,15 +269,12 @@ function Statistics({ genus }: { genus: string }) {
     <Box>
       <SimpleGrid cols={5}>
         <StatCard
-          metric="Species (valid)"
-          value={data.stats.genus.totalSpecies}
+          metric="Orders (valid)"
+          value={data.stats.class.totalOrders}
         />
-        <StatCard
-          metric="Species (all)"
-          value={data.stats.genus.totalSpecies}
-        />
+        <StatCard metric="Orders (all)" value={data.stats.class.totalOrders} />
 
-        <StatCard metric="Genomes" value={data.stats.genus.speciesWithData} />
+        <StatCard metric="Genomes" value={data.stats.class.ordersWithData} />
         <StatCard metric="Genetic markers" value={0} />
         <StatCard metric="Other genomic data" value={0} />
       </SimpleGrid>
@@ -310,8 +283,8 @@ function Statistics({ genus }: { genus: string }) {
         Data coverage
       </Title>
       <Flex>
-        <DataCoverage stats={data.stats.genus} />
-        <DataBreakdown stats={data.stats.genus} />
+        <DataCoverage stats={data.stats.class} />
+        <DataBreakdown stats={data.stats.class} />
       </Flex>
     </Box>
   );
@@ -359,12 +332,8 @@ function SpeciesCard({ species }: { species: Record }) {
       </Link>
 
       <Box py={20}>
-        <DataItem
-          name="Whole genome"
-          count={species.dataSummary.wholeGenomes}
-        />
-        <DataItem name="Organelles" count={species.dataSummary.organelles} />
-        <DataItem name="Barcode" count={species.dataSummary.barcodes} />
+        <DataItem name="Genomes" count={species.dataSummary.wholeGenomes} />
+        <DataItem name="Genetic Loci*" count={species.dataSummary.barcodes} />
         <DataItem name="Other" count={species.dataSummary.other} />
       </Box>
 
@@ -398,13 +367,13 @@ const speciesTotalRecords = (species: Record) => {
   );
 };
 
-function Species({ genus }: { genus: string }) {
+function Species({ class: value }: { class: string }) {
   /* const ordering = useFlag("ordering", FlagOrdering.TotalData);
    * const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES; */
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_GENUS_SPECIES, {
+  const { loading, error, data } = useQuery<QueryResults>(GET_CLASS_SPECIES, {
     variables: {
-      genus: genus,
+      class: value,
     },
   });
 
@@ -418,7 +387,7 @@ function Species({ genus }: { genus: string }) {
     return <Text>No data</Text>;
   }
 
-  const records = Array.from(data.genus.species);
+  const records = Array.from(data.class.species);
   const ordered = records.sort(
     (spa, spb) => speciesTotalRecords(spb) - speciesTotalRecords(spa)
   );
@@ -433,19 +402,19 @@ function Species({ genus }: { genus: string }) {
 }
 
 interface HeaderProps {
-  taxonomy: Taxonomy;
+  class: string;
 }
 
-function Header({ taxonomy }: HeaderProps) {
+function Header({ class: value }: HeaderProps) {
   return (
     <Grid>
       <Grid.Col span="auto">
         <Stack justify="center" h="100%" spacing={0} pt="sm" pb="xl">
           <Title order={3} color="white" size={26}>
-            <i>{taxonomy.canonicalName}</i> {taxonomy.authorship}
+            {value}
           </Title>
           <Text color="gray" mt={-8}>
-            <b>Taxonomic Status: </b>Unknown
+            <b>Classification: </b>Class
           </Text>
         </Stack>
       </Grid.Col>
@@ -457,9 +426,9 @@ function Header({ taxonomy }: HeaderProps) {
 }
 
 export default function GenusPage({ params }: { params: { name: string } }) {
-  const { loading, error, data } = useQuery<GenusResult>(GET_GENUS, {
+  const { loading, error, data } = useQuery<ClassResult>(GET_CLASS, {
     variables: {
-      genus: params.name,
+      class: params.name,
     },
   });
 
@@ -467,7 +436,7 @@ export default function GenusPage({ params }: { params: { name: string } }) {
     return <Text>Error : {error.message}</Text>;
   }
 
-  const taxonomy = data?.genus.taxonomy;
+  const taxonomy = data?.class.taxonomy;
 
   return (
     <Box>
@@ -477,14 +446,14 @@ export default function GenusPage({ params }: { params: { name: string } }) {
         loaderProps={{ variant: "bars", size: "xl", color: "moss.5" }}
         visible={loading}
       />
-      {taxonomy && <Header taxonomy={taxonomy} />}
+      {taxonomy && <Header class={params.name} />}
 
       <Box>
         <Paper bg="midnight.6" p={40} radius="lg">
-          <Statistics genus={params.name} />
+          <Statistics class={params.name} />
         </Paper>
 
-        <Species genus={params.name} />
+        <Species class={params.name} />
 
         <FeatureToggleMenu />
       </Box>
