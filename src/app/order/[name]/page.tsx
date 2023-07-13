@@ -351,6 +351,14 @@ function SpeciesCard({ species }: { species: Record }) {
   );
 }
 
+const speciesTotalRecords = (species: Record) => {
+  return (
+    species.dataSummary.wholeGenomes +
+    species.dataSummary.barcodes +
+    species.dataSummary.other
+  );
+};
+
 function Species({ order }: { order: string }) {
   /* const ordering = useFlag("ordering", FlagOrdering.TotalData);
    * const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES; */
@@ -371,11 +379,14 @@ function Species({ order }: { order: string }) {
     return <Text>No data</Text>;
   }
 
-  const records = data.order.species;
+  const records = Array.from(data.order.species);
+  const ordered = records.sort(
+    (spa, spb) => speciesTotalRecords(spb) - speciesTotalRecords(spa)
+  );
 
   return (
     <SimpleGrid cols={3} pt={40}>
-      {records.map((record) => (
+      {ordered.map((record) => (
         <SpeciesCard key={record.taxonomy.scientificName} species={record} />
       ))}
     </SimpleGrid>
