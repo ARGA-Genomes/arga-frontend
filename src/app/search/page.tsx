@@ -33,6 +33,9 @@ type Record = {
   rank?: string,
   taxonomicStatus?: string,
   commonNames?: string[],
+  subspecies?: string[],
+  synonyms?: string[],
+  undescribedSpecies?: string[],
   score: number,
   classification?: Classification,
   assemblySummary?: AssemblySummary,
@@ -62,9 +65,30 @@ query FullTextSearch ($query: String, $dataType: String) {
           scientificName
           scientificNameAuthorship
           canonicalName
-          rank
-          taxonomicStatus
           commonNames
+          subspecies
+          synonyms
+          score
+          classification {
+            kingdom
+            phylum
+            class
+            order
+            family
+            genus
+          }
+          assemblySummary {
+            referenceGenomes
+            wholeGenomes
+            partialGenomes
+            barcodes
+          }
+        }
+        ... on GenusItem {
+          type
+          scientificNameAuthorship
+          canonicalName
+          undescribedSpecies
           score
           classification {
             kingdom
@@ -100,9 +124,52 @@ function TaxonItem({ item }: { item: Record }) {
     <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={`/species/${itemLinkName}/summary`}>
-            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
-          </Link>
+          <Stack spacing={0}>
+            <Link href={`/species/${itemLinkName}/summary`}>
+              <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+            </Link>
+            { item.subspecies?.map(subspecies => (
+              <Text size="sm" ml={5} key={subspecies}>
+                <Link href={`/species/${itemLinkName}/summary`}>
+                  {subspecies}
+                </Link>
+              </Text>
+            )) }
+            { item.synonyms?.map(synonym => (
+              <Text size="sm" ml={5} key={synonym}>
+                  {synonym}
+              </Text>
+            )) }
+          </Stack>
+          <Group>
+            { item.assemblySummary ? <TaxonSummary summary={item.assemblySummary} /> : null }
+          </Group>
+        </Group>
+      </Accordion.Control>
+      <Accordion.Panel>
+        <TaxonDetails item={item} />
+      </Accordion.Panel>
+    </Accordion.Item>
+  )
+}
+
+function GenusItem({ item }: { item: Record }) {
+  return (
+    <Accordion.Item p={10} value={item.canonicalName || item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+      <Accordion.Control>
+        <Group position="apart">
+          <Stack spacing={0}>
+            <Link href={`/genus/${item.canonicalName}`}>
+              <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+            </Link>
+            { item.undescribedSpecies?.map(undescribed => (
+              <Text size="sm" ml={5}>
+                <Link href={`/species/${undescribed}/summary`}>
+                  {undescribed}
+                </Link>
+              </Text>
+            )) }
+          </Stack>
           <Group>
             { item.assemblySummary ? <TaxonSummary summary={item.assemblySummary} /> : null }
           </Group>
@@ -282,6 +349,8 @@ function SearchItem({ item } : { item: Record }) {
   switch (item.type) {
       case 'TAXON':
         return (<TaxonItem item={item} />)
+      case 'GENUS':
+        return (<GenusItem item={item} />)
       case 'REFERENCE_GENOME_SEQUENCE':
         return (<ReferenceGenomeSequenceItem item={item} />)
       case 'WHOLE_GENOME_SEQUENCE':
