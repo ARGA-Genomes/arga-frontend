@@ -82,6 +82,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "insects_light.svg",
     label: "Insects",
     color: "black",
+    link: "/class/Insecta",
   },
   "frogs and other amphibians": {
     image: "frogs_light.svg",
@@ -93,11 +94,13 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "birds_light.svg",
     label: "Birds",
     color: "moss.7",
+    link: "/class/Aves",
   },
   mammals: {
     image: "mammals.svg",
     label: "Mammals",
     color: "moss.3",
+    link: "/class/Mammalia",
   },
   "seaweeds and other algae": {
     image: "seaweed_light.svg",

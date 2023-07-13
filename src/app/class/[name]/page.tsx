@@ -269,13 +269,10 @@ function Statistics({ class: value }: { class: string }) {
     <Box>
       <SimpleGrid cols={5}>
         <StatCard
-          metric="Families (valid)"
+          metric="Orders (valid)"
           value={data.stats.class.totalOrders}
         />
-        <StatCard
-          metric="Families (all)"
-          value={data.stats.class.totalOrders}
-        />
+        <StatCard metric="Orders (all)" value={data.stats.class.totalOrders} />
 
         <StatCard metric="Genomes" value={data.stats.class.ordersWithData} />
         <StatCard metric="Genetic markers" value={0} />
