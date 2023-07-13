@@ -39,11 +39,11 @@ const chartColours = [
 ];
 
 const GET_STATS = gql`
-  query Stats($order: String) {
+  query Stats($class: String) {
     stats {
-      order(order: $order) {
-        totalFamilies
-        familiesWithData
+      class(class: $class) {
+        totalOrders
+        ordersWithData
         breakdown {
           name
           total
@@ -58,23 +58,23 @@ type Breakdown = {
   total: number;
 };
 
-type OrderStats = {
-  totalFamilies: number;
-  familiesWithData: number;
+type ClassStats = {
+  totalOrders: number;
+  ordersWithData: number;
   breakdown: Breakdown[];
 };
 
 type Stats = {
-  order: OrderStats;
+  class: ClassStats;
 };
 
 type StatsQueryResults = {
   stats: Stats;
 };
 
-const GET_ORDER_SPECIES = gql`
-  query OrderSpecies($order: String) {
-    order(order: $order) {
+const GET_CLASS_SPECIES = gql`
+  query ClassSpecies($class: String) {
+    class(class: $class) {
       species {
         taxonomy {
           scientificName
@@ -135,12 +135,12 @@ type SearchResults = {
 };
 
 type QueryResults = {
-  order: SearchResults;
+  class: SearchResults;
 };
 
-const GET_ORDER = gql`
-  query Order($order: String) {
-    order(order: $order) {
+const GET_CLASS = gql`
+  query Class($class: String) {
+    class(class: $class) {
       taxonomy {
         canonicalName
         kingdom
@@ -153,20 +153,20 @@ const GET_ORDER = gql`
   }
 `;
 
-type Order = {
+type Class = {
   taxonomy: Taxonomy;
 };
 
-type OrderResult = {
-  order: Order;
+type ClassResult = {
+  class: Class;
 };
 
-function DataCoverage({ stats }: { stats: OrderStats }) {
-  const total = stats.totalFamilies;
-  const withData = stats.familiesWithData;
+function DataCoverage({ stats }: { stats: ClassStats }) {
+  const total = stats.totalOrders;
+  const withData = stats.ordersWithData;
 
   const chartData = {
-    labels: ["Families with data", "Families without data"],
+    labels: ["Orders with data", "Orders without data"],
     datasets: [
       {
         label: "Records",
@@ -194,7 +194,7 @@ function DataCoverage({ stats }: { stats: OrderStats }) {
   );
 }
 
-function DataBreakdown({ stats }: { stats: OrderStats }) {
+function DataBreakdown({ stats }: { stats: ClassStats }) {
   const breakdown = Array.from(stats.breakdown).sort((a, b) =>
     a.total > b.total ? -1 : 1
   );
@@ -248,10 +248,10 @@ function StatCard({ metric, value }: { metric: string; value: number }) {
   );
 }
 
-function Statistics({ order }: { order: string }) {
+function Statistics({ class: value }: { class: string }) {
   const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
     variables: {
-      order,
+      class: value,
     },
   });
 
@@ -270,14 +270,14 @@ function Statistics({ order }: { order: string }) {
       <SimpleGrid cols={5}>
         <StatCard
           metric="Families (valid)"
-          value={data.stats.order.totalFamilies}
+          value={data.stats.class.totalOrders}
         />
         <StatCard
           metric="Families (all)"
-          value={data.stats.order.totalFamilies}
+          value={data.stats.class.totalOrders}
         />
 
-        <StatCard metric="Genomes" value={data.stats.order.familiesWithData} />
+        <StatCard metric="Genomes" value={data.stats.class.ordersWithData} />
         <StatCard metric="Genetic markers" value={0} />
         <StatCard metric="Other genomic data" value={0} />
       </SimpleGrid>
@@ -286,8 +286,8 @@ function Statistics({ order }: { order: string }) {
         Data coverage
       </Title>
       <Flex>
-        <DataCoverage stats={data.stats.order} />
-        <DataBreakdown stats={data.stats.order} />
+        <DataCoverage stats={data.stats.class} />
+        <DataBreakdown stats={data.stats.class} />
       </Flex>
     </Box>
   );
@@ -370,13 +370,13 @@ const speciesTotalRecords = (species: Record) => {
   );
 };
 
-function Species({ order }: { order: string }) {
+function Species({ class: value }: { class: string }) {
   /* const ordering = useFlag("ordering", FlagOrdering.TotalData);
    * const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES; */
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_ORDER_SPECIES, {
+  const { loading, error, data } = useQuery<QueryResults>(GET_CLASS_SPECIES, {
     variables: {
-      order,
+      class: value,
     },
   });
 
@@ -390,7 +390,7 @@ function Species({ order }: { order: string }) {
     return <Text>No data</Text>;
   }
 
-  const records = Array.from(data.order.species);
+  const records = Array.from(data.class.species);
   const ordered = records.sort(
     (spa, spb) => speciesTotalRecords(spb) - speciesTotalRecords(spa)
   );
@@ -405,19 +405,19 @@ function Species({ order }: { order: string }) {
 }
 
 interface HeaderProps {
-  order: string;
+  class: string;
 }
 
-function Header({ order }: HeaderProps) {
+function Header({ class: value }: HeaderProps) {
   return (
     <Grid>
       <Grid.Col span="auto">
         <Stack justify="center" h="100%" spacing={0} pt="sm" pb="xl">
           <Title order={3} color="white" size={26}>
-            {order}
+            {value}
           </Title>
           <Text color="gray" mt={-8}>
-            <b>Classification: </b>Order
+            <b>Classification: </b>Class
           </Text>
         </Stack>
       </Grid.Col>
@@ -429,9 +429,9 @@ function Header({ order }: HeaderProps) {
 }
 
 export default function GenusPage({ params }: { params: { name: string } }) {
-  const { loading, error, data } = useQuery<OrderResult>(GET_ORDER, {
+  const { loading, error, data } = useQuery<ClassResult>(GET_CLASS, {
     variables: {
-      order: params.name,
+      class: params.name,
     },
   });
 
@@ -439,7 +439,7 @@ export default function GenusPage({ params }: { params: { name: string } }) {
     return <Text>Error : {error.message}</Text>;
   }
 
-  const taxonomy = data?.order.taxonomy;
+  const taxonomy = data?.class.taxonomy;
 
   return (
     <Box>
@@ -449,14 +449,14 @@ export default function GenusPage({ params }: { params: { name: string } }) {
         loaderProps={{ variant: "bars", size: "xl", color: "moss.5" }}
         visible={loading}
       />
-      {taxonomy && <Header order={params.name} />}
+      {taxonomy && <Header class={params.name} />}
 
       <Box>
         <Paper bg="midnight.6" p={40} radius="lg">
-          <Statistics order={params.name} />
+          <Statistics class={params.name} />
         </Paper>
 
-        <Species order={params.name} />
+        <Species class={params.name} />
 
         <FeatureToggleMenu />
       </Box>
