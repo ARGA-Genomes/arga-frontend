@@ -446,7 +446,7 @@ export default function GenusPage({ params }: { params: { name: string } }) {
         loaderProps={{ variant: "bars", size: "xl", color: "moss.5" }}
         visible={loading}
       />
-      {taxonomy && <Header class={params.name} />}
+      {taxonomy && <Header class={taxonomy.class || params.name} />}
 
       <Box>
         <Paper bg="midnight.6" p={40} radius="lg">

@@ -433,19 +433,19 @@ function Species({ genus }: { genus: string }) {
 }
 
 interface HeaderProps {
-  taxonomy: Taxonomy;
+  genus: string;
 }
 
-function Header({ taxonomy }: HeaderProps) {
+function Header({ genus }: HeaderProps) {
   return (
     <Grid>
       <Grid.Col span="auto">
         <Stack justify="center" h="100%" spacing={0} pt="sm" pb="xl">
           <Title order={3} color="white" size={26}>
-            <i>{taxonomy.canonicalName}</i> {taxonomy.authorship}
+            {genus}
           </Title>
           <Text color="gray" mt={-8}>
-            <b>Taxonomic Status: </b>Unknown
+            <b>Classification: </b>Genus
           </Text>
         </Stack>
       </Grid.Col>
@@ -477,7 +477,7 @@ export default function GenusPage({ params }: { params: { name: string } }) {
         loaderProps={{ variant: "bars", size: "xl", color: "moss.5" }}
         visible={loading}
       />
-      {taxonomy && <Header taxonomy={taxonomy} />}
+      {taxonomy && <Header genus={taxonomy.genus || params.name} />}
 
       <Box>
         <Paper bg="midnight.6" p={40} radius="lg">
