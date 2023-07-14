@@ -144,15 +144,6 @@ export default function HomePage() {
           <BrowseGrouping />
         </Box>
       </Paper>
-
-      <Box py={30}>
-        <h2 style={{ color: "white", fontWeight: "normal" }}>
-          This month&apos;s highlights
-        </h2>
-        <Highlights />
-
-        <ConferenceInfo />
-      </Box>
     </Box>
   );
 }
