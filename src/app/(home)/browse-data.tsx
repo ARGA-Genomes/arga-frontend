@@ -50,7 +50,7 @@ export default function BrowseData() {
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <BrowseCard
           total={data?.overview.barcodes}
-          category="Barcodes*"
+          category="Genetic Loci*"
           image="card-icons/allspecies.svg"
           link="/browse/barcodes"
         />

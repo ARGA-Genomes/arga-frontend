@@ -197,7 +197,7 @@ function TaxonSummary({ summary }: { summary: AssemblySummary }) {
       { summary.wholeGenomes ? <Summary label="Whole genomes" count={summary.wholeGenomes} /> : null }
       { summary.referenceGenomes ? <Summary label="Reference genomes" count={summary.referenceGenomes} /> : null }
       { summary.partialGenomes ? <Summary label="Partial genomes" count={summary.partialGenomes} /> : null }
-      { summary.barcodes ? <Summary label="Barcodes*" count={summary.barcodes} /> : null }
+      { summary.barcodes ? <Summary label="Genetic loci**" count={summary.barcodes} /> : null }
     </>
   )
 }
@@ -336,7 +336,7 @@ function BarcodeItem({ item } : { item: Record }) {
             <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
           </Link>
           <Group>
-            <Text size="lg">Barcodes* <strong>{item.sequences}</strong></Text>
+            <Text size="lg">Genetic loci* <strong>{item.sequences}</strong></Text>
           </Group>
         </Group>
       </Accordion.Control>
@@ -439,7 +439,7 @@ function Search(props: SearchProperties) {
           { value: 'all', label: "All" },
           { value: 'species', label: <SearchDataTypeItem label="Taxonomy" /> },
           { value: 'whole_genomes', label: <SearchDataTypeItem label="Genome assemblies" /> },
-          { value: 'barcodes', label: <SearchDataTypeItem label="Barcodes*" /> }
+          { value: 'barcodes', label: <SearchDataTypeItem label="Genetic loci*" /> }
         ]}
       />
     </Box>

@@ -122,7 +122,7 @@ function DataSummary({ stats }: { stats: StatsSpecies }) {
         </Text>
       </Group>
       <Group position="apart">
-        <Text color="white">Barcodes</Text>
+        <Text color="white">Genetic Loci*</Text>
         <Text color="white" fw={700} fz={30}>
           {stats.barcodes}
         </Text>
