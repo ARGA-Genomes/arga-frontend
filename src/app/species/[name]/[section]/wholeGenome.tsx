@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Center, Collapse, Drawer, Grid, Group, LoadingOverlay, Overlay, Paper, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
-import { WholeGenome, Coordinates } from "@/app/type";
+import {WholeGenome, Coordinates, GenomicData, CommonGenome} from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useListState } from "@mantine/hooks";
@@ -48,11 +48,27 @@ query SpeciesWholeGenomes($canonicalName: String) {
       rawRecordedBy
       ncbiReleaseType
     }
+    data {
+      type
+      dataResource
+      recordedBy
+      license
+      provenance
+      eventDate
+      accession
+      accessionUri
+      refseqCategory
+      coordinates {
+        latitude
+        longitude
+      }
+    }
   }
 }`;
 
 type Species = {
   wholeGenomes: WholeGenome[],
+  data: GenomicData[]
 }
 
 type QueryResults = {
@@ -173,9 +189,9 @@ function GenomeDetails({ record, columns }: { record: WholeGenome, columns: numb
 }
 
 interface GenomeRecordProps {
-  record: WholeGenome,
+  record: CommonGenome,
   selected: boolean,
-  onSelected: (record: WholeGenome) => void;
+  onSelected: (record: CommonGenome) => void;
 }
 
 function GenomeRecord(props: GenomeRecordProps) {
@@ -208,7 +224,7 @@ function GenomeRecord(props: GenomeRecordProps) {
   )
 }
 
-function GenomeTable({ records }: { records: WholeGenome[] }) {
+function GenomeTable({ records }: { records: CommonGenome[] }) {
   const [selected, handler] = useListState<WholeGenome>([]);
 
   function toggle(record: WholeGenome) {
@@ -247,7 +263,7 @@ function GenomeTable({ records }: { records: WholeGenome[] }) {
 
 
 interface GenomeMapProperties {
-  records?: WholeGenome[],
+  records?: CommonGenome[],
   onExpandToggle: () => void,
 }
 
@@ -287,11 +303,10 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
     return (<Text>Error : {error.message}</Text>);
   }
 
-  const records = data?.species.wholeGenomes;
+  const records = data ? data.species.wholeGenomes : [];
+  const otherRecords = data ? data.species.data.filter(record => record.dataResource.includes("BPA")) : [];
   const refseq = records?.find(record => record.refseqCategory == "representative genome");
-
-  console.log(records?.map(record => record.coordinates))
-  console.log(refseq?.coordinates)
+  const allRecords = [...records, ...otherRecords];
 
   return (
     <Box pos="relative">
@@ -316,7 +331,7 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
       <Paper radius="lg">
       <Grid pl={10}>
         <Grid.Col span={8} px={0} mx={0}>
-          { records ? <GenomeTable records={records} /> : null }
+          { allRecords ? <GenomeTable records={allRecords}/> : null }
         </Grid.Col>
 
         <Grid.Col pos="relative" span={4} h={GENOME_MAP_HEIGHT} p={0} m={0}>
