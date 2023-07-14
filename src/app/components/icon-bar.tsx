@@ -57,11 +57,13 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "bacteria.svg",
     label: "Bacteria",
     color: "shellfish.5",
+    link: "/kingdom/Bacteria",
   },
   "protists and other unicellular organisms": {
     image: "protists.svg",
     label: "Protists and other unicellular organisms",
     color: "wheat.2",
+    link: "/kingdom/Protozoa",
   },
   "mushrooms and other fungi": {
     image: "fungi.svg",
@@ -72,11 +74,13 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "molluscs.svg",
     label: "Molluscs",
     color: "bushfire.4",
+    link: "/phylum/Mollusca",
   },
   "marine crustaceans": {
     image: "crustaceans.svg",
     label: "Marine crustaceans",
     color: "red",
+    link: "/order/Crustacea",
   },
   insects: {
     image: "insects_light.svg",
@@ -111,6 +115,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "plants_light.svg",
     label: "Higher plants",
     color: "midnight",
+    link: "/kingdom/Plantae",
   },
 };
 

@@ -1,8 +1,5 @@
-'use client';
+"use client";
 
 export default function FamilyHomePage() {
-  return (
-    <>
-    </>
-  )
+  return <></>;
 }

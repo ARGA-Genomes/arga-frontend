@@ -39,11 +39,11 @@ const chartColours = [
 ];
 
 const GET_STATS = gql`
-  query Stats($family: String) {
+  query Stats($kingdom: String) {
     stats {
-      family(family: $family) {
-        totalGenera
-        generaWithData
+      kingdom(kingdom: $kingdom) {
+        totalPhyla
+        phylaWithData
         breakdown {
           name
           total
@@ -58,23 +58,23 @@ type Breakdown = {
   total: number;
 };
 
-type FamilyStats = {
-  totalGenera: number;
-  generaWithData: number;
+type KingdomStats = {
+  totalPhyla: number;
+  phylaWithData: number;
   breakdown: Breakdown[];
 };
 
 type Stats = {
-  family: FamilyStats;
+  kingdom: KingdomStats;
 };
 
 type StatsQueryResults = {
   stats: Stats;
 };
 
-const GET_FAMILY_SPECIES = gql`
-  query FamilySpecies($family: String) {
-    family(family: $family) {
+const GET_KINGDOM_SPECIES = gql`
+  query KingdomSpecies($kingdom: String) {
+    kingdom(kingdom: $kingdom) {
       species {
         taxonomy {
           scientificName
@@ -135,12 +135,12 @@ type SearchResults = {
 };
 
 type QueryResults = {
-  family: SearchResults;
+  kingdom: SearchResults;
 };
 
-const GET_FAMILY = gql`
-  query Family($family: String) {
-    family(family: $family) {
+const GET_KINGDOM = gql`
+  query Kingdom($kingdom: String) {
+    kingdom(kingdom: $kingdom) {
       taxonomy {
         canonicalName
         kingdom
@@ -153,20 +153,20 @@ const GET_FAMILY = gql`
   }
 `;
 
-type Family = {
+type Kingdom = {
   taxonomy: Taxonomy;
 };
 
-type FamilyResult = {
-  family: Family;
+type KingdomResult = {
+  kingdom: Kingdom;
 };
 
-function DataCoverage({ stats }: { stats: FamilyStats }) {
-  const total = stats.totalGenera;
-  const withData = stats.generaWithData;
+function DataCoverage({ stats }: { stats: KingdomStats }) {
+  const total = stats.totalPhyla;
+  const withData = stats.phylaWithData;
 
   const chartData = {
-    labels: ["Genera with data", "Genera without data"],
+    labels: ["Phyla with data", "Phyla without data"],
     datasets: [
       {
         label: "Records",
@@ -194,7 +194,7 @@ function DataCoverage({ stats }: { stats: FamilyStats }) {
   );
 }
 
-function DataBreakdown({ stats }: { stats: FamilyStats }) {
+function DataBreakdown({ stats }: { stats: KingdomStats }) {
   const breakdown = Array.from(stats.breakdown).sort((a, b) =>
     a.total > b.total ? -1 : 1
   );
@@ -248,10 +248,10 @@ function StatCard({ metric, value }: { metric: string; value: number }) {
   );
 }
 
-function Statistics({ family }: { family: string }) {
+function Statistics({ kingdom }: { kingdom: string }) {
   const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
     variables: {
-      family,
+      kingdom,
     },
   });
 
@@ -269,12 +269,12 @@ function Statistics({ family }: { family: string }) {
     <Box>
       <SimpleGrid cols={5}>
         <StatCard
-          metric="Genera (valid)"
-          value={data.stats.family.totalGenera}
+          metric="Phyla (valid)"
+          value={data.stats.kingdom.totalPhyla}
         />
-        <StatCard metric="Genera (all)" value={data.stats.family.totalGenera} />
+        <StatCard metric="Phyla (all)" value={data.stats.kingdom.totalPhyla} />
 
-        <StatCard metric="Genomes" value={data.stats.family.generaWithData} />
+        <StatCard metric="Genomes" value={data.stats.kingdom.phylaWithData} />
         <StatCard metric="Genetic markers" value={0} />
         <StatCard metric="Other genomic data" value={0} />
       </SimpleGrid>
@@ -283,8 +283,8 @@ function Statistics({ family }: { family: string }) {
         Data coverage
       </Title>
       <Flex>
-        <DataCoverage stats={data.stats.family} />
-        <DataBreakdown stats={data.stats.family} />
+        <DataCoverage stats={data.stats.kingdom} />
+        <DataBreakdown stats={data.stats.kingdom} />
       </Flex>
     </Box>
   );
@@ -367,13 +367,13 @@ const speciesTotalRecords = (species: Record) => {
   );
 };
 
-function Species({ family }: { family: string }) {
+function Species({ kingdom }: { kingdom: string }) {
   /* const ordering = useFlag("ordering", FlagOrdering.TotalData);
    * const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES; */
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_FAMILY_SPECIES, {
+  const { loading, error, data } = useQuery<QueryResults>(GET_KINGDOM_SPECIES, {
     variables: {
-      family,
+      kingdom,
     },
   });
 
@@ -387,7 +387,7 @@ function Species({ family }: { family: string }) {
     return <Text>No data</Text>;
   }
 
-  const records = Array.from(data.family.species);
+  const records = Array.from(data.kingdom.species);
   const ordered = records.sort(
     (spa, spb) => speciesTotalRecords(spb) - speciesTotalRecords(spa)
   );
@@ -402,19 +402,19 @@ function Species({ family }: { family: string }) {
 }
 
 interface HeaderProps {
-  family: string;
+  kingdom: string;
 }
 
-function Header({ family }: HeaderProps) {
+function Header({ kingdom }: HeaderProps) {
   return (
     <Grid>
       <Grid.Col span="auto">
         <Stack justify="center" h="100%" spacing={0} pt="sm" pb="xl">
           <Title order={3} color="white" size={26}>
-            {family}
+            {kingdom}
           </Title>
           <Text color="gray" mt={-8}>
-            <b>Classification: </b>Family
+            <b>Classification: </b>Kingdom
           </Text>
         </Stack>
       </Grid.Col>
@@ -426,9 +426,9 @@ function Header({ family }: HeaderProps) {
 }
 
 export default function GenusPage({ params }: { params: { name: string } }) {
-  const { loading, error, data } = useQuery<FamilyResult>(GET_FAMILY, {
+  const { loading, error, data } = useQuery<KingdomResult>(GET_KINGDOM, {
     variables: {
-      family: params.name,
+      kingdom: params.name,
     },
   });
 
@@ -436,7 +436,7 @@ export default function GenusPage({ params }: { params: { name: string } }) {
     return <Text>Error : {error.message}</Text>;
   }
 
-  const taxonomy = data?.family.taxonomy;
+  const taxonomy = data?.kingdom.taxonomy;
 
   return (
     <Box>
@@ -446,14 +446,14 @@ export default function GenusPage({ params }: { params: { name: string } }) {
         loaderProps={{ variant: "bars", size: "xl", color: "moss.5" }}
         visible={loading}
       />
-      {taxonomy && <Header family={taxonomy.family || params.name} />}
+      {taxonomy && <Header kingdom={taxonomy.kingdom || params.name} />}
 
       <Box>
         <Paper bg="midnight.6" p={40} radius="lg">
-          <Statistics family={params.name} />
+          <Statistics kingdom={params.name} />
         </Paper>
 
-        <Species family={params.name} />
+        <Species kingdom={params.name} />
 
         <FeatureToggleMenu />
       </Box>
