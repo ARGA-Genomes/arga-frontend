@@ -122,7 +122,7 @@ function ConservationIcon({ status }: { status: string }) {
       <ThemeIcon radius="xl" size={60} color={icon?.color} p={10}>
         <Image
           src={`/species-icons/${icon?.image}`}
-          alt={`Icon of ${icon.label}`}
+          alt={`Icon of ${icon?.label}`}
         />
       </ThemeIcon>
     </Tooltip>
