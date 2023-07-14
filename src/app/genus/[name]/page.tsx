@@ -45,7 +45,7 @@ const GET_STATS = gql`
         totalSpecies
         speciesWithData
         breakdown {
-          canonicalName
+          name
           total
         }
       }
@@ -54,7 +54,7 @@ const GET_STATS = gql`
 `;
 
 type Breakdown = {
-  canonicalName: string;
+  name: string;
   total: number;
 };
 
@@ -224,7 +224,7 @@ function DataBreakdown({ stats }: { stats: GenusStats }) {
   );
 
   const chartData = {
-    labels: breakdown.map((item) => item.canonicalName),
+    labels: breakdown.map((item) => item.name),
     datasets: [
       {
         label: "Records",
