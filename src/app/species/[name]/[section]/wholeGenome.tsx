@@ -127,7 +127,7 @@ function GenomeDetails({ record, columns }: { record: WholeGenome, columns: numb
   return (
     <Grid>
       <Grid.Col span={cols}>
-        <GenomeField label="Accension" value={record.accession} icon={<IconLink size={16} />} />
+        <GenomeField label="Accession" value={record.accession} icon={<IconLink size={16} />} />
       </Grid.Col>
       <Grid.Col span={cols}>
         <GenomeField label="Data resource" value={record.dataResource} icon={<IconLink size={16} />} />

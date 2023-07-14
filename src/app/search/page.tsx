@@ -164,7 +164,7 @@ function GenusItem({ item }: { item: Record }) {
             </Link>
             { item.undescribedSpecies?.map(undescribed => (
               <Text size="sm" ml={5} key={undescribed}>
-                <Link href={`/species/${undescribed}/summary`}>
+                <Link href={`/species/${undescribed.replaceAll(" ", "_")}/summary`}>
                   {undescribed}
                 </Link>
               </Text>
