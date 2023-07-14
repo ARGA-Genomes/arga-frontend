@@ -170,18 +170,10 @@ function Taxonomy({
             Taxonomy
           </Text>
           <Stack spacing={8}>
-            <Text color="white" c="dimmed">
-              {taxonomy.kingdom}
-            </Text>
-            <Text color="white" c="dimmed">
-              {taxonomy.phylum}
-            </Text>
-            <Text color="white" c="dimmed">
-              {taxonomy.class}
-            </Text>
-            <Text color="white" c="dimmed">
-              {taxonomy.order}
-            </Text>
+            <Link href={`/kingdom/${taxonomy.kingdom}`}>{taxonomy.kingdom}</Link>
+            <Link href={`/phylum/${taxonomy.phylum}`}>{taxonomy.phylum}</Link>
+            <Link href={`/class/${taxonomy.class}`}>{taxonomy.class}</Link>
+            <Link href={`/order/${taxonomy.order}`}>{taxonomy.order}</Link>
             <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
             <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
           </Stack>

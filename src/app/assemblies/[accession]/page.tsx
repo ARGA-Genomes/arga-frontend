@@ -75,7 +75,7 @@ const GET_ASSEMBLY = gql`
 `;
 
 type AssemblyDetails = Assembly & {
-  stats: AssemblyStats;
+  stats?: AssemblyStats;
   biosamples: BioSample[];
 };
 
