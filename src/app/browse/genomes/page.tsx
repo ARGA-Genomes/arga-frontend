@@ -139,7 +139,7 @@ export default function GenomesList({ params }: { params: { name: string } }) {
 
   useEffect(() => {
     if (data?.assemblies.species.total) {
-      setTotalPages(data.assemblies.species.total / 16)
+      setTotalPages(Math.ceil(data.assemblies.species.total / 16))
     }
   }, [data]);
 
