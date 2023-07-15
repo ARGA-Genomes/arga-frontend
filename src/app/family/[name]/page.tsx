@@ -14,6 +14,7 @@ import {
   LoadingOverlay,
   Grid,
   Image,
+  Pagination,
 } from "@mantine/core";
 
 import FeatureToggleMenu from "../../components/feature-toggle";
@@ -22,6 +23,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import Link from "next/link";
 import { CircleCheck, CircleX } from "tabler-icons-react";
+import { useEffect, useState } from "react";
+import { useScrollIntoView } from "@mantine/hooks";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -73,45 +76,28 @@ type StatsQueryResults = {
 };
 
 const GET_FAMILY_SPECIES = gql`
-  query FamilySpecies($family: String) {
+  query FamilySpecies($family: String, $page: Int) {
     family(family: $family) {
-      species {
-        taxonomy {
-          scientificName
-          canonicalName
-          authorship
-          kingdom
-          phylum
-          class
-          order
-          family
-          genus
-        }
-        photo {
-          url
-        }
-        dataSummary {
-          wholeGenomes
-          organelles
-          barcodes
-          other
+      species(page: $page) {
+        total
+        records {
+          taxonomy {
+            canonicalName
+          }
+          photo {
+            url
+          }
+          dataSummary {
+            wholeGenomes
+            organelles
+            barcodes
+            other
+          }
         }
       }
     }
   }
 `;
-
-type Taxonomy = {
-  scientificName?: string;
-  canonicalName?: string;
-  authorship?: string;
-  kingdom?: string;
-  phylum?: string;
-  class?: string;
-  order?: string;
-  family?: string;
-  genus?: string;
-};
 
 type Photo = {
   url: string;
@@ -125,24 +111,27 @@ type DataSummary = {
 };
 
 type Record = {
-  taxonomy: Taxonomy;
+  taxonomy: { canonicalName?: string };
   photo?: Photo;
   dataSummary: DataSummary;
 };
 
 type SearchResults = {
-  species: Record[];
+  species: {
+    records: Record[],
+    total: number
+  };
 };
 
 type QueryResults = {
   family: SearchResults;
 };
 
+
 const GET_FAMILY = gql`
   query Family($family: String) {
     family(family: $family) {
       taxonomy {
-        canonicalName
         kingdom
         phylum
         class
@@ -153,12 +142,16 @@ const GET_FAMILY = gql`
   }
 `;
 
-type Family = {
-  taxonomy: Taxonomy;
+type Taxonomy = {
+  kingdom?: string;
+  phylum?: string;
+  class?: string;
+  order?: string;
+  family?: string;
 };
 
 type FamilyResult = {
-  family: Family;
+  family: { taxonomy: Taxonomy };
 };
 
 function DataCoverage({ stats }: { stats: FamilyStats }) {
@@ -368,14 +361,23 @@ const speciesTotalRecords = (species: Record) => {
 };
 
 function Species({ family }: { family: string }) {
-  /* const ordering = useFlag("ordering", FlagOrdering.TotalData);
-   * const query = ordering == FlagOrdering.Taxonomy ? GET_SPECIES_TAXONOMY_ORDER : GET_SPECIES; */
+  const [activePage, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
 
   const { loading, error, data } = useQuery<QueryResults>(GET_FAMILY_SPECIES, {
     variables: {
       family,
+      page: activePage
     },
   });
+
+  useEffect(() => {
+    if (data?.family.species.total) {
+      setTotalPages(Math.ceil(data.family.species.total / 16))
+    }
+  }, [data]);
+
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -387,17 +389,34 @@ function Species({ family }: { family: string }) {
     return <Text>No data</Text>;
   }
 
-  const records = Array.from(data.family.species);
+  const records = Array.from(data.family.species.records);
   const ordered = records.sort(
     (spa, spb) => speciesTotalRecords(spb) - speciesTotalRecords(spa)
   );
 
   return (
-    <SimpleGrid cols={3} pt={40}>
-      {ordered.map((record) => (
-        <SpeciesCard key={record.taxonomy.scientificName} species={record} />
-      ))}
-    </SimpleGrid>
+    <Box>
+      <SimpleGrid cols={3} pt={40}>
+        {ordered.map((record) => (
+          <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
+        ))}
+      </SimpleGrid>
+
+      <Paper bg="midnight.0" p={20} m={40} radius="lg">
+        <Pagination
+          color="midnight.6"
+          size="lg"
+          radius="md"
+          position="center"
+          page={activePage}
+          total={totalPages}
+          onChange={page => {
+            setPage(page)
+            scrollIntoView({ alignment: 'center' })
+          }}
+        />
+      </Paper>
+    </Box>
   );
 }
 
