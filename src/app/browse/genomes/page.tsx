@@ -9,55 +9,31 @@ import { CircleCheck, CircleX } from "tabler-icons-react";
 
 
 const GET_SPECIES = gql`
-query SpeciesWithAssemblies {
+query SpeciesWithAssemblies($page: Int) {
   assemblies {
-    species {
-      taxonomy {
-        scientificName
-        canonicalName
-        authorship
-        kingdom
-        phylum
-        class
-        order
-        family
-        genus
-      }
-      photo {
-        url
-      }
-      dataSummary {
-        barcodes
-        other
-        partialGenomes
-        wholeGenomes
+    species(page: $page) {
+      total
+      records {
+        taxonomy {
+          canonicalName
+        }
+        photo {
+          url
+        }
+        dataSummary {
+          barcodes
+          other
+          partialGenomes
+          wholeGenomes
+        }
       }
     }
   }
 }`;
 
-type Pagination = {
-  page: number,
-  pageSize: number,
-}
-
-type FilterItem = {
-  filter: string,
-  action: string,
-  value: string,
-}
-
 
 type Taxonomy = {
-  scientificName: string,
   canonicalName: string,
-  authorship: string,
-  kingdom: string,
-  phylum: string,
-  class: string,
-  order: string,
-  family: string,
-  genus: string,
 };
 
 type Photo = {
@@ -78,7 +54,10 @@ type Species = {
 }
 
 type Assemblies = {
-  species: Species[],
+  species: {
+    records: Species[],
+    total: number,
+  },
 };
 
 type QueryResults = {
@@ -143,38 +122,55 @@ function SpeciesCard({ species }: { species: Species }) {
 function BrowseResults({ list }: { list: Species[]}) {
   return (
     <SimpleGrid cols={4}>
-      { list.map(item => (<SpeciesCard species={item} key={item.taxonomy.scientificName} />)) }
+      { list.map(item => (<SpeciesCard species={item} key={item.taxonomy.canonicalName} />)) }
     </SimpleGrid>
   )
 }
 
-const VERTEBRATE_FILTERS = [
-  { filter: 'KINGDOM', action: 'INCLUDE', value: 'Animalia' },
-  { filter: 'PHYLUM', action: 'INCLUDE', value: 'Chordata' },
-];
-
-const INVERTEBRATE_FILTERS = [
-  { filter: 'KINGDOM', action: 'INCLUDE', value: 'Animalia' },
-  { filter: 'PHYLUM', action: 'EXCLUDE', value: 'Chordata' },
-];
-
-const PAGE_SIZE = 20;
 
 export default function GenomesList({ params }: { params: { name: string } }) {
+  const [activePage, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES);
+  const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
+    variables: { page: activePage }
+  });
+
+  useEffect(() => {
+    if (data?.assemblies.species.total) {
+      setTotalPages(data.assemblies.species.total / 16)
+    }
+  }, [data]);
 
   return (
     <Box>
-      <Box mt={40}>
+      <Box mt={20}>
         <LoadingOverlay
           overlayColor="black"
           transitionDuration={500}
           loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
           visible={loading}
         />
-        { !loading && data ? <BrowseResults list={data.assemblies.species} /> : null }
+
+        <Title order={2} color="white" mb={20}>Genomes</Title>
+
+        { !loading && data ? <BrowseResults list={data.assemblies.species.records} /> : null }
+
+        <Paper bg="midnight.0" p={20} m={40} radius="lg">
+        <Pagination
+          color="midnight.6"
+          size="lg"
+          radius="md"
+          position="center"
+          page={activePage}
+          total={totalPages}
+          onChange={page => {
+            setPage(page)
+            scrollIntoView({ alignment: 'center' })
+          }}
+        />
+        </Paper>
       </Box>
     </Box>
   );
