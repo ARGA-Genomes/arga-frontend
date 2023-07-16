@@ -169,7 +169,7 @@ function TaxonSummary({ summary }: { summary: DataSummary }) {
       { summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} /> : null }
       { summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} /> : null }
       { summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} /> : null }
-      { summary.barcodes ? <Summary label="Genetic loci**" value={summary.barcodes} /> : null }
+      { summary.barcodes ? <Summary label="Genetic loci*" value={summary.barcodes} /> : null }
     </>
   )
 }
