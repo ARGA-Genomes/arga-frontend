@@ -6,7 +6,7 @@ import { Text, Paper, Box, Grid, SegmentedControl, createStyles, Button, Loading
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Search as IconSearch } from "tabler-icons-react";
+import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
 
 type Classification = {
@@ -18,7 +18,7 @@ type Classification = {
   genus?: string,
 }
 
-type AssemblySummary = {
+type DataSummary = {
   referenceGenomes: number,
   wholeGenomes: number,
   partialGenomes: number,
@@ -27,20 +27,21 @@ type AssemblySummary = {
 
 type Record = {
   type: string,
-  scientificName: string,
-  scientificNameAuthorship: string,
-  canonicalName?: string,
-  rank?: string,
-  taxonomicStatus?: string,
-  commonNames?: string[],
+  score: number,
+  status: string,
+  canonicalName: string,
   subspecies?: string[],
   synonyms?: string[],
-  undescribedSpecies?: string[],
-  score: number,
+  commonNames?: string[],
   classification?: Classification,
-  assemblySummary?: AssemblySummary,
+  dataSummary?: DataSummary,
 
-  sequences?: number,
+  accession?: string,
+  genomeRep?: string,
+  dataSource?: string,
+  level?: string,
+  referenceGenome?: boolean,
+  releaseDate?: string,
 };
 
 type FullTextResults = {
@@ -62,13 +63,12 @@ query FullTextSearch ($query: String, $dataType: String) {
       records {
         ... on TaxonItem {
           type
-          scientificName
-          scientificNameAuthorship
+          status
+          score
           canonicalName
-          commonNames
           subspecies
           synonyms
-          score
+          commonNames
           classification {
             kingdom
             phylum
@@ -77,39 +77,24 @@ query FullTextSearch ($query: String, $dataType: String) {
             family
             genus
           }
-          assemblySummary {
+          dataSummary {
             referenceGenomes
             wholeGenomes
             partialGenomes
             barcodes
           }
         }
-        ... on GenusItem {
+        ... on GenomeItem {
           type
-          scientificNameAuthorship
+          status
+          score
           canonicalName
-          undescribedSpecies
-          score
-          classification {
-            kingdom
-            phylum
-            class
-            order
-            family
-            genus
-          }
-          assemblySummary {
-            referenceGenomes
-            wholeGenomes
-            partialGenomes
-            barcodes
-          }
-        }
-        ... on GenomeSequenceItem {
-          type
-          scientificName
-          sequences
-          score
+          accession
+          genomeRep
+          dataSource
+          level
+          referenceGenome
+          releaseDate
         }
       }
     }
@@ -117,16 +102,41 @@ query FullTextSearch ($query: String, $dataType: String) {
 }`
 
 
+function Summary({ label, value }: { label: string, value: number | string | React.ReactNode }) {
+  return (
+    <>
+      <Text size="lg">{label} <strong>{value}</strong></Text>
+      <Divider size="sm" orientation="vertical" />
+    </>
+  )
+}
+
+function Attribute({ label, value }: { label: string, value: string | undefined }) {
+  value ||= "Not specified";
+
+  return (
+    <Stack spacing={0}>
+      <Text size="sm">{label}</Text>
+      <Link href="#">
+        <Paper py={5} px={15} bg="#f5f5f5" radius="md">
+          <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
+        </Paper>
+      </Link>
+    </Stack>
+  )
+}
+
+
 function TaxonItem({ item }: { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
 
   return (
-    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
           <Stack spacing={0}>
             <Link href={`/species/${itemLinkName}/summary`}>
-              <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+              <Text size="lg"><i>{item.canonicalName}</i></Text>
             </Link>
             { item.subspecies?.map(subspecies => (
               <Text size="sm" ml={5} key={subspecies}>
@@ -142,7 +152,7 @@ function TaxonItem({ item }: { item: Record }) {
             )) }
           </Stack>
           <Group>
-            { item.assemblySummary ? <TaxonSummary summary={item.assemblySummary} /> : null }
+            { item.dataSummary ? <TaxonSummary summary={item.dataSummary} /> : null }
           </Group>
         </Group>
       </Accordion.Control>
@@ -153,51 +163,13 @@ function TaxonItem({ item }: { item: Record }) {
   )
 }
 
-function GenusItem({ item }: { item: Record }) {
-  return (
-    <Accordion.Item p={10} value={item.canonicalName || item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control>
-        <Group position="apart">
-          <Stack spacing={0}>
-            <Link href={`/genus/${item.canonicalName}`}>
-              <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
-            </Link>
-            { item.undescribedSpecies?.map(undescribed => (
-              <Text size="sm" ml={5} key={undescribed}>
-                <Link href={`/species/${undescribed.replaceAll(" ", "_")}/summary`}>
-                  {undescribed}
-                </Link>
-              </Text>
-            )) }
-          </Stack>
-          <Group>
-            { item.assemblySummary ? <TaxonSummary summary={item.assemblySummary} /> : null }
-          </Group>
-        </Group>
-      </Accordion.Control>
-      <Accordion.Panel>
-        <TaxonDetails item={item} />
-      </Accordion.Panel>
-    </Accordion.Item>
-  )
-}
-
-function Summary({ label, count }: { label: string, count: number }) {
+function TaxonSummary({ summary }: { summary: DataSummary }) {
   return (
     <>
-      <Text size="lg">{label} <strong>{count}</strong></Text>
-      <Divider size="sm" orientation="vertical" />
-    </>
-  )
-}
-
-function TaxonSummary({ summary }: { summary: AssemblySummary }) {
-  return (
-    <>
-      { summary.wholeGenomes ? <Summary label="Whole genomes" count={summary.wholeGenomes} /> : null }
-      { summary.referenceGenomes ? <Summary label="Reference genomes" count={summary.referenceGenomes} /> : null }
-      { summary.partialGenomes ? <Summary label="Partial genomes" count={summary.partialGenomes} /> : null }
-      { summary.barcodes ? <Summary label="Genetic loci**" count={summary.barcodes} /> : null }
+      { summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} /> : null }
+      { summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} /> : null }
+      { summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} /> : null }
+      { summary.barcodes ? <Summary label="Genetic loci**" value={summary.barcodes} /> : null }
     </>
   )
 }
@@ -222,121 +194,81 @@ function TaxonDetails({ item }: { item: Record }) {
       }}>
         <Text size="lg" weight={550}>Scientific classification</Text>
         <Flex gap="lg">
-          <Classification label="Kingdom" value={item.classification?.kingdom} />
-          <Classification label="Phylum" value={item.classification?.phylum} />
-          <Classification label="Class" value={item.classification?.class} />
-          <Classification label="Order" value={item.classification?.order} />
-          <Classification label="Family" value={item.classification?.family} />
-          <Classification label="Genus" value={item.classification?.genus} />
+          <Attribute label="Kingdom" value={item.classification?.kingdom} />
+          <Attribute label="Phylum" value={item.classification?.phylum} />
+          <Attribute label="Class" value={item.classification?.class} />
+          <Attribute label="Order" value={item.classification?.order} />
+          <Attribute label="Family" value={item.classification?.family} />
+          <Attribute label="Genus" value={item.classification?.genus} />
         </Flex>
       </Stack>
     </Box>
   )
 }
 
-function Classification({ label, value }: { label: string, value: string | undefined }) {
-  value ||= "Not specified";
 
+function GenomeItem({ item } : { item: Record }) {
   return (
-    <Stack spacing={0}>
-      <Text size="sm">{label}</Text>
-      <Link href="#">
-        <Paper py={5} px={15} bg="#f5f5f5" radius="md">
-          <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
-        </Paper>
-      </Link>
-    </Stack>
-  )
-}
-
-function ReferenceGenomeSequenceItem({ item } : { item: Record }) {
-  const itemLinkName = item.scientificName.replaceAll(" ", "_");
-
-  return (
-    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession || ""} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={`/species/${itemLinkName}/whole_genome`}>
-            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+          <Link href={`/assemblies/${item.accession}`}>
+            <Text size="lg"><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
-            <Text size="lg">Reference genomes <strong>{item.sequences}</strong></Text>
+            <GenomeSummary item={item} />
           </Group>
         </Group>
       </Accordion.Control>
+      <Accordion.Panel>
+        <GenomeDetails item={item} />
+      </Accordion.Panel>
     </Accordion.Item>
   )
 }
 
-function WholeGenomeSequenceItem({ item } : { item: Record }) {
-  const itemLinkName = item.scientificName.replaceAll(" ", "_");
-
+function GenomeSummary({ item }: { item: Record }) {
   return (
-    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control>
-        <Group position="apart">
-          <Link href={`/species/${itemLinkName}/whole_genome`}>
-            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
-          </Link>
-          <Group>
-            <Text size="lg">Whole genomes <strong>{item.sequences}</strong></Text>
-          </Group>
-        </Group>
-      </Accordion.Control>
-    </Accordion.Item>
+    <>
+      <Summary label="Accession:" value={`${item.accession} (${item.genomeRep})`} />
+      <Summary label="Reference genome" value={item.referenceGenome ? <CircleCheck size={20} color="green" /> : <CircleX size={20} color="red" />} />
+    </>
   )
 }
 
-function PartialGenomeSequenceItem({ item } : { item: Record }) {
-  const itemLinkName = item.scientificName.replaceAll(" ", "_");
+function GenomeDetails({ item }: { item: Record }) {
+  const theme = useMantineTheme();
 
   return (
-    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control>
-        <Group position="apart">
-          <Link href={`/species/${itemLinkName}/whole_genome`}>
-            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
-          </Link>
-          <Group>
-            <Text size="lg">Partial genomes <strong>{item.sequences}</strong></Text>
-          </Group>
-        </Group>
-      </Accordion.Control>
-    </Accordion.Item>
-  )
-}
-
-function UnknownGenomeSequenceItem({ item } : { item: Record }) {
-  const itemLinkName = item.scientificName.replaceAll(" ", "_");
-
-  return (
-    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control>
-        <Group position="apart">
-          <Link href={`/species/${itemLinkName}/whole_genome`}>
-            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
-          </Link>
-          <Group>
-            <Text size="lg">Other genomes <strong>{item.sequences}</strong></Text>
-          </Group>
-        </Group>
-      </Accordion.Control>
-    </Accordion.Item>
+    <Box>
+      <Stack pl={16} sx={{
+        borderLeftWidth: 5,
+        borderLeftStyle: "solid",
+        borderLeftColor: theme.colors.bushfire[4],
+      }}>
+        <Text size="lg" weight={550}>Attributes</Text>
+        <Flex gap="lg">
+          <Attribute label="Data source" value={item.dataSource} />
+          <Attribute label="Level" value={item.level} />
+          <Attribute label="Released date" value={item.releaseDate} />
+        </Flex>
+      </Stack>
+    </Box>
   )
 }
 
 function BarcodeItem({ item } : { item: Record }) {
-  const itemLinkName = item.scientificName.replaceAll(" ", "_");
+  const itemLinkName = item.canonicalName.replaceAll(" ", "_");
 
   return (
-    <Accordion.Item p={10} value={item.scientificName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
           <Link href={`/species/${itemLinkName}/barcode`}>
-            <Text size="lg"><i>{item.canonicalName || item.scientificName}</i></Text>
+            <Text size="lg"><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
-            <Text size="lg">Genetic loci* <strong>{item.sequences}</strong></Text>
+            <Text size="lg">Genetic loci* <strong></strong></Text>
           </Group>
         </Group>
       </Accordion.Control>
@@ -349,16 +281,8 @@ function SearchItem({ item } : { item: Record }) {
   switch (item.type) {
       case 'TAXON':
         return (<TaxonItem item={item} />)
-      case 'GENUS':
-        return (<GenusItem item={item} />)
-      case 'REFERENCE_GENOME_SEQUENCE':
-        return (<ReferenceGenomeSequenceItem item={item} />)
-      case 'WHOLE_GENOME_SEQUENCE':
-        return (<WholeGenomeSequenceItem item={item} />)
-      case 'PARTIAL_GENOME_SEQUENCE':
-        return (<PartialGenomeSequenceItem item={item} />)
-      case 'UNKNOWN_GENOME_SEQUENCE':
-        return (<UnknownGenomeSequenceItem item={item} />)
+      case 'GENOME':
+        return (<GenomeItem item={item} />)
       case 'BARCODE':
         return (<BarcodeItem item={item} />)
       default:
@@ -370,7 +294,7 @@ function SearchResults({ results } : { results: Record[] }) {
   return (
     <Accordion variant="separated" radius="lg" multiple>
       {results.map(record => (
-        <SearchItem item={record} key={`${record.scientificName}-${record.type}`} />
+        <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
       ))}
     </Accordion>
   )
@@ -437,9 +361,9 @@ function Search(props: SearchProperties) {
         classNames={segmented.classes}
         data={[
           { value: 'all', label: "All" },
-          { value: 'species', label: <SearchDataTypeItem label="Taxonomy" /> },
-          { value: 'whole_genomes', label: <SearchDataTypeItem label="Genome assemblies" /> },
-          { value: 'barcodes', label: <SearchDataTypeItem label="Genetic loci*" /> }
+          { value: 'taxonomy', label: <SearchDataTypeItem label="Taxonomy" /> },
+          { value: 'genomes', label: <SearchDataTypeItem label="Genome assemblies" /> },
+          { value: 'loci', label: <SearchDataTypeItem label="Genetic loci*" /> }
         ]}
       />
     </Box>
