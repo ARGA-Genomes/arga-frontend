@@ -61,6 +61,11 @@ type Record = {
   level?: string,
   referenceGenome?: boolean,
   releaseDate?: string,
+
+  locusType?: string,
+  voucherStatus?: string,
+  eventDate?: string,
+  eventLocation?: string,
 };
 
 type FullTextResults = {
@@ -82,6 +87,7 @@ const SEARCH_FULLTEXT = gql`
 query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination,) {
   search {
     fullText (query: $query, dataType: $dataType, pagination: $pagination,) {
+      total
       records {
         ... on TaxonItem {
           type
@@ -117,6 +123,18 @@ query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination
           level
           referenceGenome
           releaseDate
+        }
+        ... on LocusItem {
+          type
+          status
+          score
+          canonicalName
+          accession
+          locusType
+          dataSource
+          voucherStatus
+          eventDate
+          eventLocation
         }
       }
     }
@@ -257,7 +275,7 @@ function GenomeItem({ item } : { item: Record }) {
 function GenomeSummary({ item }: { item: Record }) {
   return (
     <>
-      <Summary label="Accession:" value={`${item.accession} (${item.genomeRep})`} />
+      <Summary label="Accession no." value={`${item.accession} (${item.genomeRep})`} />
       <Summary label="Reference genome" value={item.referenceGenome ? <CircleCheck size={20} color="green" /> : <CircleX size={20} color="red" />} />
     </>
   )
@@ -284,22 +302,54 @@ function GenomeDetails({ item }: { item: Record }) {
   )
 }
 
-function BarcodeItem({ item } : { item: Record }) {
-  const itemLinkName = item.canonicalName.replaceAll(" ", "_");
-
+function LocusItem({ item } : { item: Record }) {
   return (
-    <Accordion.Item p={10} value={item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession || ""} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={`/species/${itemLinkName}/barcode`}>
+          <Link href={`/markers/${item.accession}`}>
             <Text size="lg"><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
-            <Text size="lg">Genetic loci* <strong></strong></Text>
+            <LocusSummary item={item} />
           </Group>
         </Group>
       </Accordion.Control>
+      <Accordion.Panel>
+        <LocusDetails item={item} />
+      </Accordion.Panel>
     </Accordion.Item>
+  )
+}
+
+function LocusSummary({ item }: { item: Record }) {
+  return (
+    <>
+      <Summary label="Accession no." value={item.accession} />
+      <Summary label="Locus" value={item.locusType} />
+    </>
+  )
+}
+
+function LocusDetails({ item }: { item: Record }) {
+  const theme = useMantineTheme();
+
+  return (
+    <Box>
+      <Stack pl={16} sx={{
+        borderLeftWidth: 5,
+        borderLeftStyle: "solid",
+        borderLeftColor: theme.colors.bushfire[4],
+      }}>
+        <Text size="lg" weight={550}>Attributes</Text>
+        <Flex gap="lg">
+          <Attribute label="Data source" value={item.dataSource} />
+          <Attribute label="Voucher status" value={item.voucherStatus} />
+          <Attribute label="Occurrence date" value={item.eventDate} />
+          <Attribute label="Occurrence location" value={item.eventLocation} />
+        </Flex>
+      </Stack>
+    </Box>
   )
 }
 
@@ -310,8 +360,8 @@ function SearchItem({ item } : { item: Record }) {
         return (<TaxonItem item={item} />)
       case 'GENOME':
         return (<GenomeItem item={item} />)
-      case 'BARCODE':
-        return (<BarcodeItem item={item} />)
+      case 'LOCUS':
+        return (<LocusItem item={item} />)
       default:
         return null
   }
@@ -445,7 +495,7 @@ export default function SearchPage() {
         />
         <Text size="lg" ml={20} mb={30}>
           { !loading && data
-            ? (<><strong>{data?.search.fullText.records.length} </strong> search results found for <strong>{query} </strong></>)
+            ? (<><strong>{data?.search.fullText.total} </strong> search results found for <strong>{query} </strong></>)
             : null
           }
         </Text>
