@@ -2,10 +2,29 @@
 
 import { gql, useQuery } from '@apollo/client';
 
-import { Text, Paper, Box, Grid, SegmentedControl, createStyles, Button, LoadingOverlay, Group, Center, TextInput, MantineProvider, Accordion, Divider, Stack, useMantineTheme, Flex } from "@mantine/core";
+import {
+  Text,
+  Paper,
+  Box,
+  Grid,
+  SegmentedControl,
+  createStyles,
+  Button,
+  LoadingOverlay,
+  Group,
+  Center,
+  TextInput,
+  MantineProvider,
+  Accordion,
+  Divider,
+  Stack,
+  useMantineTheme,
+  Flex,
+  Pagination
+} from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
 
@@ -46,6 +65,7 @@ type Record = {
 
 type FullTextResults = {
   records: Record[],
+  total: number
 }
 
 type SearchResults = {
@@ -56,10 +76,12 @@ type QueryResults = {
   search: SearchResults,
 };
 
+const PAGE_SIZE = 20;
+
 const SEARCH_FULLTEXT = gql`
-query FullTextSearch ($query: String, $dataType: String) {
+query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination,) {
   search {
-    fullText (query: $query, dataType: $dataType) {
+    fullText (query: $query, dataType: $dataType, pagination: $pagination,) {
       records {
         ... on TaxonItem {
           type
@@ -100,6 +122,11 @@ query FullTextSearch ($query: String, $dataType: String) {
     }
   }
 }`
+
+type Pagination = {
+  page: number,
+  pageSize: number,
+}
 
 
 function Summary({ label, value }: { label: string, value: number | string | React.ReactNode }) {
@@ -334,7 +361,7 @@ function Search(props: SearchProperties) {
   return (
     <Box>
       <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
-        <Grid align="center" m={20}>
+        <Grid align="center" m={10}>
           <Grid.Col span="auto">
             <TextInput
               placeholder="e.g. sequence accession, taxon identifier, genus name"
@@ -360,7 +387,7 @@ function Search(props: SearchProperties) {
         onChange={onFilter}
         classNames={segmented.classes}
         data={[
-          { value: 'all', label: "All" },
+          { value: 'all', label: <SearchDataTypeItem label="All" />},
           { value: 'taxonomy', label: <SearchDataTypeItem label="Taxonomy" /> },
           { value: 'genomes', label: <SearchDataTypeItem label="Genome assemblies" /> },
           { value: 'loci', label: <SearchDataTypeItem label="Genetic loci*" /> }
@@ -377,13 +404,25 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || "")
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
+  const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE });
+  const [totalPages, setTotalPages] = useState(1)
 
   const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
       query,
       dataType: dataType,
+      pagination
     }
   });
+
+  useEffect(() => {
+    setPagination({ page: 1, pageSize: PAGE_SIZE })
+    setTotalPages(1)
+  }, [setPagination, setTotalPages])
+
+  useEffect(() => {
+    setTotalPages(data ? Math.ceil(data.search.fullText.total / PAGE_SIZE) : 1)
+  }, [data, setTotalPages])
 
   function onSearch(searchTerms: string, dataType: string) {
     setQuery(searchTerms)
@@ -396,7 +435,7 @@ export default function SearchPage() {
     <Box>
       <Search onSearch={onSearch} />
 
-      <Paper radius="xl" p="xl" mt={40} sx={{ border: "1px solid #dbdbdb" }} pos="relative">
+      <Paper radius="xl" p="xl" mt={10} sx={{ border: "1px solid #dbdbdb" }} pos="relative">
         <LoadingOverlay
           overlayColor={theme.colors.midnight[0]}
           transitionDuration={500}
@@ -411,6 +450,19 @@ export default function SearchPage() {
           }
         </Text>
         <SearchResults results={data?.search.fullText.records || []} />
+      </Paper>
+      <Paper bg="midnight.0" p={20} m={40} radius="lg">
+        <Pagination
+          color="midnight.6"
+          size="lg"
+          radius="md"
+          position="center"
+          total={totalPages}
+          page={pagination.page}
+          onChange={page => {
+            setPagination({page, pageSize: PAGE_SIZE})
+          }}
+        />
       </Paper>
     </Box>
     </MantineProvider>
