@@ -326,7 +326,7 @@ function LocusSummary({ item }: { item: Record }) {
   return (
     <>
       <Summary label="Accession no." value={item.accession} />
-      <Summary label="Locus" value={item.locusType} />
+      <Summary label="Source molecule" value={item.locusType} />
     </>
   )
 }
