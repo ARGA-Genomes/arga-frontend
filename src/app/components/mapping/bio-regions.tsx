@@ -1,12 +1,8 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
-
-import { Box, BoxProps } from "@mantine/core";
-import { GeoJSON, MapContainer, TileLayer, useMapEvent } from "react-leaflet";
+import { GeoJSON, useMapEvent } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { LatLngExpression } from "leaflet";
 
 const GET_GEOMETRY = gql`
   query BioRegions($regions: [String], $tolerance: Float) {
@@ -18,17 +14,16 @@ const GET_GEOMETRY = gql`
   }
 `;
 
-type Maps = {
-  ibra: string;
-  imcraProvincial: string;
-  imcraMesoscale: string;
-};
-
 type QueryResults = {
-  maps: Maps;
+  maps: {
+    ibra: string;
+    imcraProvincial: string;
+    imcraMesoscale: string;
+  };
 };
 
-function BioRegionLayers({ regions }: { regions: string[] }) {
+
+export function BioRegionLayers({ regions }: { regions: string[] }) {
   const [ibra, setIbra] = useState(undefined);
   const [imcraProvincial, setImcraProvincial] = useState(undefined);
   const [imcraMesoscale, setImcraMesoscale] = useState(undefined);
@@ -65,30 +60,5 @@ function BioRegionLayers({ regions }: { regions: string[] }) {
         <GeoJSON key={`imcra-meso-${tolerance}`} data={imcraMesoscale} />
       ) : null}
     </>
-  );
-}
-
-interface RegionMapProps extends BoxProps {
-  regions: string[];
-}
-
-export default function RegionMap({ regions, ...rest }: RegionMapProps) {
-  const position = [-28.30638, 134.3838] as LatLngExpression;
-  return (
-    <Box h={500} {...rest}>
-      <MapContainer
-        center={position}
-        zoom={4}
-        scrollWheelZoom={true}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        <BioRegionLayers regions={regions} />
-      </MapContainer>
-    </Box>
   );
 }

@@ -2,6 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {
+  Box,
   Grid,
   Group,
   Image,
@@ -10,9 +11,11 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { Photo, Taxonomy, Regions, StatsSpecies, Species } from "@/app/type";
+import { Photo, Taxonomy, Regions, StatsSpecies, Species, Specimen } from "@/app/type";
 import Link from "next/link";
-import dynamic from "next/dynamic";
+
+import { Map, BioRegionLayers, SpecimensLayer } from "@/app/components/mapping";
+
 
 const GET_SUMMARY = gql`
   query SpeciesSummary($canonicalName: String) {
@@ -27,14 +30,16 @@ const GET_SUMMARY = gql`
     species(canonicalName: $canonicalName) {
       taxonomy {
         canonicalName
-        authorship
+        authority
         kingdom
         phylum
         class
         order
         family
         genus
-        vernacularGroup
+        synonyms {
+          scientificName
+        }
       }
       photos {
         url
@@ -51,6 +56,14 @@ const GET_SUMMARY = gql`
           name
         }
       }
+      specimens {
+        id
+        typeStatus
+        catalogNumber
+        latitude
+        longitude
+        institutionName
+      }
     }
   }
 `;
@@ -64,10 +77,6 @@ type QueryResults = {
   species: Species;
 };
 
-const RegionMap = dynamic(() => import("../../../components/region-map"), {
-  ssr: false,
-  loading: () => <Text>Loading map...</Text>,
-});
 
 function SpeciesPhoto({ photo }: { photo?: Photo }) {
   function small(url: string) {
@@ -106,7 +115,7 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
   );
 }
 
-function DataSummary({ stats }: { stats: StatsSpecies }) {
+function DataSummary({ stats, specimens }: { stats: StatsSpecies, specimens: Specimen[] | undefined }) {
   return (
     <Paper bg="midnight.6" radius="lg" p="lg">
       <Group position="apart">
@@ -125,6 +134,12 @@ function DataSummary({ stats }: { stats: StatsSpecies }) {
         <Text color="white">Genetic Loci*</Text>
         <Text color="white" fw={700} fz={30}>
           {stats.barcodes}
+        </Text>
+      </Group>
+      <Group position="apart">
+        <Text color="white">Specimens</Text>
+        <Text color="white" fw={700} fz={30}>
+          {specimens?.length || 0}
         </Text>
       </Group>
       <Group position="apart">
@@ -151,13 +166,14 @@ function Attribution({ name, url }: { name: string; url: string }) {
   );
 }
 
-function Taxonomy({
-  taxonomy,
-  regions,
-}: {
-  taxonomy: Taxonomy;
-  regions: Regions;
-}) {
+
+interface TaxonomyProps {
+  taxonomy: Taxonomy,
+  regions: Regions,
+  specimens?: Specimen[],
+}
+
+function Taxonomy({ taxonomy, regions, specimens }: TaxonomyProps) {
   const attribution = "Australian Faunal Directory";
   const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`;
   const allRegions = [...regions.ibra, ...regions.imcra];
@@ -169,26 +185,41 @@ function Taxonomy({
           <Text size="xl" weight={600} color="white" mb="sm">
             Taxonomy
           </Text>
-          <Stack spacing={8}>
+          <Stack spacing={8} mb={20}>
             <Link href={`/kingdom/${taxonomy.kingdom}`}>{taxonomy.kingdom}</Link>
             <Link href={`/phylum/${taxonomy.phylum}`}>{taxonomy.phylum}</Link>
             <Link href={`/class/${taxonomy.class}`}>{taxonomy.class}</Link>
             <Link href={`/order/${taxonomy.order}`}>{taxonomy.order}</Link>
             <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
             <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
+            <Text color="white" italic>{taxonomy.canonicalName}</Text>
           </Stack>
+
+          { taxonomy.synonyms.length > 0 && <>
+            <Text size="md" weight={600} color="white" mb="sm">
+              Synonyms
+            </Text>
+            <Stack spacing={8}>
+              { taxonomy.synonyms.map(synonym => (
+                <Text color="white" italic key={synonym.scientificName}>{synonym.scientificName}</Text>
+              ))}
+            </Stack>
+          </>}
         </Grid.Col>
+
         <Grid.Col span="auto">
-          <RegionMap
-            regions={allRegions.map((region) => region.name)}
-            sx={(theme) => ({
-              overflow: "hidden",
-              borderTopRightRadius: theme.radius.lg,
-              borderBottomRightRadius:
-                allRegions.length > 0 ? 0 : theme.radius.lg,
-            })}
-          />
+          <Box h={500} sx={(theme) => ({
+            overflow: "hidden",
+            borderTopRightRadius: theme.radius.lg,
+            borderBottomRightRadius: allRegions.length > 0 ? 0 : theme.radius.lg,
+          })}>
+            <Map>
+              <BioRegionLayers regions={allRegions.map(region => region.name)} />
+              {specimens && <SpecimensLayer specimens={specimens} />}
+            </Map>
+          </Box>
         </Grid.Col>
+
         {allRegions.length > 0 && (
           <Grid.Col span={12}>
             <Paper
@@ -237,7 +268,7 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
         <Grid.Col span="content">
           <Stack>
             <SpeciesPhoto photo={data?.species.photos[0]} />
-            {data?.stats ? <DataSummary stats={data.stats.species} /> : null}
+            {data?.stats ? <DataSummary stats={data.stats.species} specimens={data.species.specimens} /> : null}
           </Stack>
         </Grid.Col>
         <Grid.Col span="auto">
@@ -245,6 +276,7 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
             <Taxonomy
               taxonomy={data.species.taxonomy}
               regions={data.species.regions}
+              specimens={data.species.specimens}
             />
           )}
         </Grid.Col>

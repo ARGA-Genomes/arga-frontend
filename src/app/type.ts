@@ -1,7 +1,7 @@
 type Taxonomy = {
     canonicalName: string,
-    authorship: string,
-
+    authority: string,
+    status: string,
     kingdom?: string,
     phylum?: string,
     class?: string,
@@ -9,6 +9,8 @@ type Taxonomy = {
     family?: string,
     genus?: string,
     vernacularGroup?: string,
+    vernacularNames: { name: string }[],
+    synonyms: { scientificName: string }[],
 };
 
 type Photo = {
@@ -151,6 +153,7 @@ type Species = {
     data: GenomicData[],
     wholeGenomes: WholeGenome[],
     traceFiles: TraceFile[],
+    specimens?: Specimen[],
 };
 
 type Specimen = {

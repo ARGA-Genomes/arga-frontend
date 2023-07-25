@@ -3,8 +3,8 @@
 import 'leaflet/dist/leaflet.css';
 
 import { Box, Text, Button } from "@mantine/core";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { Icon, LatLngExpression } from 'leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { Icon, LatLngBoundsExpression, LatLngExpression } from 'leaflet';
 import { Coordinates } from "@/app/type";
 
 const customMarker = new Icon({
@@ -38,6 +38,37 @@ function MarkersList({ coordinates }: { coordinates: Coordinates[] }) {
 }
 
 
+function MapBounds({ coordinates }: { coordinates: Coordinates[] }) {
+  const map = useMap();
+
+  let min = coordinates[0];
+  let max = coordinates[0];
+
+  for (let coord of coordinates) {
+    if (coord.latitude <= min.latitude) {
+      min = { latitude: coord.latitude, longitude: min.longitude };
+    }
+    if (coord.longitude <= min.longitude) {
+      min = { latitude: min.latitude, longitude: coord.longitude };
+    }
+
+    if (coord.latitude >= max.latitude) {
+      max = { latitude: coord.latitude, longitude: max.longitude };
+    }
+    if (coord.longitude >= max.longitude) {
+      max = { latitude: max.latitude, longitude: coord.longitude };
+    }
+  }
+
+  const bounds = [
+    [min.latitude, min.longitude],
+    [max.latitude, max.longitude],
+  ];
+  map.fitBounds(bounds as LatLngBoundsExpression);
+  return null;
+}
+
+
 interface PointMapProperties {
   coordinates?: Coordinates[],
   borderRadius?: string,
@@ -66,6 +97,8 @@ export default function PointMap(props: PointMapProperties) {
         { props.coordinates ? <MarkersList coordinates={props.coordinates}/> : null }
 
         {props.children}
+
+        { props.coordinates && props.coordinates.length > 1 ? <MapBounds coordinates={props.coordinates} /> : null }
       </MapContainer>
     </Box>
   );
