@@ -14,7 +14,7 @@ import {
 import { Photo, Taxonomy, Regions, StatsSpecies, Species, Specimen } from "@/app/type";
 import Link from "next/link";
 
-import { Map, BioRegionLayers, SpecimensLayer } from "@/app/components/mapping";
+import { ArgaMap, BioRegionLayers, SpecimensLayer } from "@/app/components/mapping";
 
 
 const GET_SUMMARY = gql`
@@ -213,10 +213,10 @@ function Taxonomy({ taxonomy, regions, specimens }: TaxonomyProps) {
             borderTopRightRadius: theme.radius.lg,
             borderBottomRightRadius: allRegions.length > 0 ? 0 : theme.radius.lg,
           })}>
-            <Map>
+            <ArgaMap>
               <BioRegionLayers regions={allRegions.map(region => region.name)} />
               {specimens && <SpecimensLayer specimens={specimens} />}
-            </Map>
+            </ArgaMap>
           </Box>
         </Grid.Col>
 
