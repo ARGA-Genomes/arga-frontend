@@ -3,11 +3,13 @@
 import { gql, useQuery } from "@apollo/client";
 import {
   Box,
+  Button,
   Grid,
   Group,
   Image,
   LoadingOverlay,
   Paper,
+  SimpleGrid,
   Stack,
   Text,
 } from "@mantine/core";
@@ -15,6 +17,9 @@ import { Photo, Taxonomy, Regions, StatsSpecies, Species, Specimen } from "@/app
 import Link from "next/link";
 
 import { ArgaMap, BioRegionLayers, SpecimensLayer } from "@/app/components/mapping";
+import { Attribute, HighlightStack } from "@/app/components/highlight-stack";
+import { ExternalLink } from "tabler-icons-react";
+import { useEffect, useState } from "react";
 
 
 const GET_SUMMARY = gql`
@@ -84,11 +89,11 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
   }
 
   return (
-    <Paper bg="midnight.6" radius="lg">
+    <Paper radius="md" sx={{ border: "1px solid #c1c1c1" }}>
       <Image
         width={375}
-        height={250}
-        radius="lg"
+        height={300}
+        radius="md"
         src={photo ? small(photo.url) : ""}
         alt="Species image"
         styles={{
@@ -115,45 +120,158 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
   );
 }
 
-function DataSummary({ stats, specimens }: { stats: StatsSpecies, specimens: Specimen[] | undefined }) {
+
+interface DataSummaryProps {
+  canonicalName: string,
+  stats: StatsSpecies,
+  specimens?: Specimen[],
+}
+
+function DataSummary({ canonicalName, stats, specimens }: DataSummaryProps) {
+  const name = canonicalName.replaceAll(" ", "_");
+  const otherData = stats.total - stats.wholeGenomes - stats.organelles - stats.barcodes;
+
   return (
-    <Paper bg="midnight.6" radius="lg" p="lg">
-      <Group position="apart">
-        <Text color="white">Whole Genomes</Text>
-        <Text color="white" fw={700} fz={30}>
-          {stats.wholeGenomes}
-        </Text>
-      </Group>
-      <Group position="apart">
-        <Text color="white">Organelles</Text>
-        <Text color="white" fw={700} fz={30}>
-          {stats.organelles}
-        </Text>
-      </Group>
-      <Group position="apart">
-        <Text color="white">Genetic Loci*</Text>
-        <Text color="white" fw={700} fz={30}>
-          {stats.barcodes}
-        </Text>
-      </Group>
-      <Group position="apart">
-        <Text color="white">Specimens</Text>
-        <Text color="white" fw={700} fz={30}>
-          {specimens?.length || 0}
-        </Text>
-      </Group>
-      <Group position="apart">
-        <Text color="white">Other Data</Text>
-        <Text color="white" fw={700} fz={30}>
-          {stats.total -
-            stats.wholeGenomes -
-            stats.organelles -
-            stats.barcodes}
-        </Text>
-      </Group>
+    <HighlightStack>
+      <Text fw={700}>Data available</Text>
+    <SimpleGrid cols={4}>
+      <Attribute label="Whole Genomes" value={stats.wholeGenomes} href={`/species/${name}/whole_genome`} />
+      <Attribute label="Genetic Loci*" value={stats.barcodes} href={`/species/${name}/barcode`} />
+      <Attribute label="Specimens" value={specimens?.length} href={`/species/${name}/specimen`} />
+      <Attribute label="Other Data" value={otherData} href={`/species/${name}/other_genomic`} />
+    </SimpleGrid>
+    </HighlightStack>
+  );
+}
+
+
+interface DistributionProps {
+  taxonomy: Taxonomy,
+  regions: Regions,
+  specimens?: Specimen[],
+}
+
+function Distribution({ taxonomy, regions, specimens }: DistributionProps) {
+  const attribution = "Australian Faunal Directory";
+  const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`;
+  const allRegions = [...regions.ibra, ...regions.imcra];
+
+  return (
+    <Paper radius="md" bg="attribute.0" sx={{ border: "1px solid #c1c1c1" }}>
+      <Grid gutter={0}>
+        <Grid.Col span="auto">
+          <Box h={500} sx={(theme) => ({
+            overflow: "hidden",
+            borderTopLeftRadius: theme.radius.md,
+            borderBottomLeftRadius: allRegions.length > 0 ? 0 : theme.radius.md,
+          })}>
+            <ArgaMap>
+              <BioRegionLayers regions={allRegions.map(region => region.name)} />
+              {specimens && <SpecimensLayer specimens={specimens} />}
+            </ArgaMap>
+          </Box>
+        </Grid.Col>
+
+        <Grid.Col span={4} py="xs" px={30} miw={200}>
+          <Text size="xl" weight={600} mb="sm">
+            Distribution
+          </Text>
+
+              <Text c="dimmed" size="sm" mb="xs">
+                {allRegions.map((region) => region.name).join(", ")}
+              </Text>
+              <Attribution name={attribution} url={sourceUrl} />
+
+        </Grid.Col>
+      </Grid>
     </Paper>
   );
 }
+
+
+interface TaxonMatch {
+  identifier: string;
+  name: string;
+  acceptedIdentifier: string;
+  acceptedName: string;
+}
+
+function ExternalLinks({ canonicalName }: { canonicalName: string }) {
+  const [matchedTaxon, setMatchedTaxon] = useState<string[] | null>(null);
+  const hasFrogID = false;
+  const hasAFD = false;
+
+  // Fetch the taxon UID from the given name
+  useEffect(() => {
+    async function matchTaxon() {
+      try {
+        const response = await fetch(
+          `https://api.ala.org.au/species/guid/${encodeURIComponent(canonicalName)}`
+        );
+        const matches = (await response.json()) as TaxonMatch[];
+        setMatchedTaxon(
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
+        );
+      } catch (error) {
+        setMatchedTaxon([]);
+      }
+    }
+
+    matchTaxon();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <Box>
+      <Text fw={700}>External links</Text>
+      <Group mt="md" spacing="xs">
+        <Button
+          component="a"
+          radius="md"
+          color="gray"
+          variant="light"
+          size="xs"
+          leftIcon={<ExternalLink size="1rem" color="black" />}
+          loading={!matchedTaxon}
+          disabled={Array.isArray(matchedTaxon) && matchedTaxon.length === 0}
+          href={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`}
+          target="_blank"
+          sx={(theme) => ({
+            border: `1px solid ${theme.colors["gray"][6]}`,
+          })}
+        >
+          <Text color="black">View on&nbsp;<b>ALA</b></Text>
+        </Button>
+        {hasFrogID && (
+          <Button
+            radius="md"
+            color="midnight"
+            size="xs"
+            leftIcon={<ExternalLink size="1rem" />}
+            sx={(theme) => ({
+              border: `1px solid ${theme.colors["shellfish"][6]}`,
+            })}
+          >
+            View on&nbsp;<b>FrogID</b>
+          </Button>
+        )}
+        {hasAFD && (
+          <Button
+            radius="md"
+            color="midnight"
+            size="xs"
+            leftIcon={<ExternalLink size="1rem" />}
+            sx={(theme) => ({
+              border: `1px solid ${theme.colors["shellfish"][6]}`,
+            })}
+          >
+            View on&nbsp;<b>AFD</b>
+          </Button>
+        )}
+      </Group>
+    </Box>
+  );
+}
+
 
 function Attribution({ name, url }: { name: string; url: string }) {
   return (
@@ -169,82 +287,35 @@ function Attribution({ name, url }: { name: string; url: string }) {
 
 interface TaxonomyProps {
   taxonomy: Taxonomy,
-  regions: Regions,
-  specimens?: Specimen[],
 }
 
-function Taxonomy({ taxonomy, regions, specimens }: TaxonomyProps) {
+function Taxonomy({ taxonomy }: TaxonomyProps) {
   const attribution = "Australian Faunal Directory";
   const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`;
-  const allRegions = [...regions.ibra, ...regions.imcra];
 
   return (
-    <Paper bg="midnight.6" radius="lg">
-      <Grid gutter={0}>
-        <Grid.Col span="content" py="xl" px={30} miw={200}>
-          <Text size="xl" weight={600} color="white" mb="sm">
-            Taxonomy
-          </Text>
-          <Stack spacing={8} mb={20}>
-            <Link href={`/kingdom/${taxonomy.kingdom}`}>{taxonomy.kingdom}</Link>
-            <Link href={`/phylum/${taxonomy.phylum}`}>{taxonomy.phylum}</Link>
-            <Link href={`/class/${taxonomy.class}`}>{taxonomy.class}</Link>
-            <Link href={`/order/${taxonomy.order}`}>{taxonomy.order}</Link>
-            <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
-            <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
-            <Text color="white" italic>{taxonomy.canonicalName}</Text>
-          </Stack>
+    <Box>
+      <HighlightStack spacing={0}>
+        <Text fw={700} mb={10}>Taxonomy</Text>
+          <Link href={`/kingdom/${taxonomy.kingdom}`}>{taxonomy.kingdom}</Link>
+          <Link href={`/phylum/${taxonomy.phylum}`}>{taxonomy.phylum}</Link>
+          <Link href={`/class/${taxonomy.class}`}>{taxonomy.class}</Link>
+          <Link href={`/order/${taxonomy.order}`}>{taxonomy.order}</Link>
+          <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
+          <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
+          <Text color="black" italic>{taxonomy.canonicalName}</Text>
 
-          { taxonomy.synonyms.length > 0 && <>
-            <Text size="md" weight={600} color="white" mb="sm">
-              Synonyms
-            </Text>
-            <Stack spacing={8}>
-              { taxonomy.synonyms.map(synonym => (
-                <Text color="white" italic key={synonym.scientificName}>{synonym.scientificName}</Text>
-              ))}
-            </Stack>
-          </>}
-        </Grid.Col>
-
-        <Grid.Col span="auto">
-          <Box h={500} sx={(theme) => ({
-            overflow: "hidden",
-            borderTopRightRadius: theme.radius.lg,
-            borderBottomRightRadius: allRegions.length > 0 ? 0 : theme.radius.lg,
-          })}>
-            <ArgaMap>
-              <BioRegionLayers regions={allRegions.map(region => region.name)} />
-              {specimens && <SpecimensLayer specimens={specimens} />}
-            </ArgaMap>
-          </Box>
-        </Grid.Col>
-
-        {allRegions.length > 0 && (
-          <Grid.Col span={12}>
-            <Paper
-              bg="midnight.8"
-              py="md"
-              px={30}
-              sx={(theme) => ({
-                overflow: "hidden",
-                borderTopLeftRadius: 0,
-                borderTopRightRadius: 0,
-                borderBottomLeftRadius: theme.radius.lg,
-                borderBottomRightRadius: theme.radius.lg,
-              })}
-            >
-              <Text c="dimmed" size="sm" mb="xs">
-                {allRegions.map((region) => region.name).join(", ")}
-              </Text>
-              <Attribution name={attribution} url={sourceUrl} />
-            </Paper>
-          </Grid.Col>
-        )}
-      </Grid>
-    </Paper>
+        { taxonomy.synonyms.length > 0 && <>
+          <Text fw={700} mb={10} mt={20}>Synonyms</Text>
+          { taxonomy.synonyms.map(synonym => (
+            <Text key={synonym.scientificName}>{synonym.scientificName}</Text>
+          ))}
+        </>}
+      </HighlightStack>
+    </Box>
   );
 }
+
 
 export function Summary({ canonicalName }: { canonicalName: string }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
@@ -256,7 +327,7 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
   }
 
   return (
-    <>
+    <Stack p={30} spacing={20}>
       <LoadingOverlay
         overlayColor="black"
         transitionDuration={500}
@@ -264,23 +335,27 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
         visible={loading}
       />
 
-      <Grid pb={40} pt="xl">
+      <Grid>
         <Grid.Col span="content">
-          <Stack>
+          <Stack spacing={20}>
             <SpeciesPhoto photo={data?.species.photos[0]} />
-            {data?.stats ? <DataSummary stats={data.stats.species} specimens={data.species.specimens} /> : null}
+            {data && <Taxonomy taxonomy={data.species.taxonomy} /> }
+            <ExternalLinks canonicalName={canonicalName} />
           </Stack>
         </Grid.Col>
         <Grid.Col span="auto">
+          <Stack spacing={30}>
+          {data?.stats ? <DataSummary canonicalName={canonicalName} stats={data.stats.species} specimens={data.species.specimens} /> : null}
           {data && (
-            <Taxonomy
+            <Distribution
               taxonomy={data.species.taxonomy}
               regions={data.species.regions}
               specimens={data.species.specimens}
             />
           )}
+          </Stack>
         </Grid.Col>
       </Grid>
-    </>
+    </Stack>
   );
 }

@@ -19,6 +19,8 @@ function DataTabs({ name, section }: { name: string; section: string }) {
 
   return (
     <Tabs
+      variant="outline"
+      radius={10}
       mt={40}
       defaultValue="summary"
       value={section}
@@ -26,33 +28,24 @@ function DataTabs({ name, section }: { name: string; section: string }) {
       styles={(theme) => ({
         tab: {
           ...theme.fn.focusStyles(),
-          backgroundColor: theme.colors["midnight"][7],
-          color: theme.white,
-          padding: `${theme.spacing.xs} ${theme.spacing.md}`,
+          color: theme.colors["link"][0],
+          padding: 25,
+          paddingTop: 15,
           cursor: "pointer",
-          fontSize: 17,
+          fontSize: 18,
           display: "flex",
           alignItems: "center",
-          borderTopLeftRadius: theme.radius.md,
-          borderTopRightRadius: theme.radius.md,
-          borderColor: theme.colors["midnight"][5],
-          "&:disabled": {
-            opacity: 0.5,
-            cursor: "not-allowed",
-          },
-
           ":hover": {
-            backgroundColor: theme.colors["midnight"][6],
-            borderColor: theme.colors["midnight"][5],
+            backgroundColor: theme.white,
+            borderColor: theme.white,
           },
 
           "&[data-active]": {
-            backgroundColor: theme.colors["midnight"][6],
-            borderColor: theme.colors["shellfish"][5],
-            color: theme.white,
-            fontWeight: "bold",
+            backgroundColor: theme.white,
+            borderColor: theme.white,
+            color: theme.black,
             ":hover": {
-              borderColor: theme.colors["shellfish"][5],
+              borderColor: theme.white,
             },
           },
 
@@ -61,7 +54,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
           },
         },
         tabsList: {
-          borderColor: theme.colors["midnight"][5],
+          border: "none",
         },
       })}
     >
@@ -71,41 +64,27 @@ function DataTabs({ name, section }: { name: string; section: string }) {
         </Tooltip>
         <Tabs.Tab value="whole_genome">Whole Genomes</Tabs.Tab>
         <Tabs.Tab value="traces">Traces</Tabs.Tab>
-        {/*<Tabs.Tab value="organelles">Organellar Genomes</Tabs.Tab>*/}
         <Tabs.Tab value="barcode">Genetic Loci*</Tabs.Tab>
-         <Tabs.Tab value="other_genomic">Other genetic data</Tabs.Tab>
-        {/* <Tabs.Tab value="other_nongenomic">Other Non genomic Data</Tabs.Tab> */}
+        <Tabs.Tab value="other_genomic">Other genetic data</Tabs.Tab>
         <Tabs.Tab value="specimen">Specimen</Tabs.Tab>
-        {/* <Tabs.Tab value="gallery">Gallery</Tabs.Tab> */}
-        {/* <Tabs.Tab value="resources">Resources</Tabs.Tab> */}
       </Tabs.List>
 
-      <Tabs.Panel value="summary" pt="xs">
+      <Tabs.Panel value="summary" bg="white" style={{ borderRadius: 20, borderTopLeftRadius: 0 }}>
         <Summary canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="whole_genome" pt="xs">
+      <Tabs.Panel value="whole_genome" bg="white" style={{ borderRadius: 20 }}>
         <WholeGenome canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="traces" pt="xs">
+      <Tabs.Panel value="traces" bg="white" style={{ borderRadius: 20 }}>
         <TraceTable canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="organelles" pt="xs">
-        tab content
-      </Tabs.Panel>
-      <Tabs.Panel value="barcode" pt="xs">
+      <Tabs.Panel value="barcode" bg="white" style={{ borderRadius: 20 }}>
         <Barcode canonicalName={canonicalName} />
       </Tabs.Panel>
-      {/* <Tabs.Panel value="other_genomic" pt="xs">
-        tab content
-      </Tabs.Panel> */}
-      {/* <Tabs.Panel value="other_nongenomic" pt="xs">
-        tab content
-      </Tabs.Panel> */}
-      <Tabs.Panel value="specimen" pt="xs">
+      <Tabs.Panel value="specimen" bg="white" style={{ borderRadius: 20 }}>
         <Specimens canonicalName={canonicalName} />
       </Tabs.Panel>
-      {/* <Tabs.Panel value="gallery" pt="xs" /> */}
-      <Tabs.Panel value="resources" pt="xs">
+      <Tabs.Panel value="other_genomic" bg="white" style={{ borderRadius: 20 }}>
         <Resources canonicalName={canonicalName} />
       </Tabs.Panel>
     </Tabs>

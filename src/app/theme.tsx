@@ -39,6 +39,10 @@ export const argaBrand: MantineThemeOverride = {
       outline: "none",
       textDecoration: "none",
       color: theme.colors["bushfire"][6],
+
+      "&:hover, &:focus": {
+        textDecoration: "underline",
+      },
     },
     '.primary_button': {
       backgroundColor: "#3C6377 !important",
@@ -78,24 +82,44 @@ export const argaBrand: MantineThemeOverride = {
 
 export const argaBrandDark: MantineThemeOverride = {
   ...argaBrand,
+
+  colors: {
+    ...argaBrand.colors,
+    link: ["#e7f4ff"],
+    attribute: ["#f5f5f5", "#e5e5e5", "#d5d5d5", "#c5c5c5", "#b5b5b5", "#a5a5a5", "#959595", "#858585", "#757575", "#656565"],
+  },
+
   globalStyles: (theme) => ({
     ...(argaBrand.globalStyles ? argaBrand.globalStyles(theme) : {}),
 
     body: {
       ...theme.fn.fontStyles(),
       backgroundColor: theme.colors["midnight"][7],
+      color: "white",
     },
+
   }),
 };
 
 export const argaBrandLight: MantineThemeOverride = {
   ...argaBrand,
+
+  colors: {
+    ...argaBrand.colors,
+    link: ["#3C6377"],
+    attribute: ["#f5f5f5", "#e5e5e5", "#d5d5d5", "#c5c5c5", "#b5b5b5", "#a5a5a5", "#959595", "#858585", "#757575", "#656565"],
+  },
+
   globalStyles: (theme) => ({
     ...(argaBrand.globalStyles ? argaBrand.globalStyles(theme) : {}),
 
     body: {
       ...theme.fn.fontStyles(),
       backgroundColor: "#f0f0f0",
+    },
+
+    a: {
+      color: theme.colors["link"][0],
     },
   }),
 };
