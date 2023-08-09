@@ -16,7 +16,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const headerLinks:HeaderResponsiveProps = {
     links: [
       {link: "/", label: "Home"},
-      {link: "/", label: "Databases"},
+      {link: "http://google.com", label: "Databases"},
       {link: "/", label: "Resources"},
       {link: "/", label: "Help"},
   ]

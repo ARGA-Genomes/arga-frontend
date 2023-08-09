@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {NavLink, createStyles, Group, Image, Grid, MediaQuery} from '@mantine/core';
+import {NavLink, createStyles, Group, Image, Grid, MediaQuery, Stack} from '@mantine/core';
 import {
   Header,
   Container,
@@ -11,98 +11,78 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
+import { HeaderResponsiveProps } from './type';
 
 // Custom navbar link styles. We define class with emotion here
 // as this particular component wont be used anywhere else
 const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
-    color: "white",
+    color: 'white',
     borderRadius: theme.radius.sm,
     height: 70,
-    alignItems: "start",
-    paddingLeft: "20px",
-    paddingRight: "20px",
+    alignItems: 'start',
+    paddingLeft: '20px',
+    paddingRight: '20px',
 
-    "&:hover, &:focus": {
-      backgroundColor: "black",
+    '&:hover, &:focus': {
+      backgroundColor: 'black',
     },
 
     span: {
-      fontSize: "16px",
-    },
+      fontSize: '16px',
+    }
   },
   dropdown: {
     position: 'absolute',
-    top: 70,
+    top: 120,
     left: 0,
     right: 0,
-    zIndex: 0,
-    borderTopRightRadius: 0,
-    borderTopLeftRadius: 0,
-    borderTopWidth: 0,
     overflow: 'hidden',
+    background: theme.colors.midnight[8],
 
-    [theme.fn.largerThan('md')]: {
+    [theme.fn.largerThan('sm')]: {
       display: 'none',
     },
   },
 
-  header: {
-    color: "white",    
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: '100%',
-  },
-
   links: {
-    [theme.fn.smallerThan('md')]: {
+    [theme.fn.smallerThan('sm')]: {
       display: 'none',
     },
   },
 
   burger: {
-    color: 'white',
-    [theme.fn.largerThan('md')]: {
+    [theme.fn.largerThan('sm')]: {
       display: 'none',
     },
+    height: 'unset'
   },
 
   link: {
-    display: 'block',
     lineHeight: 1,
-    // padding: `${rem(8)} ${rem(12)}`,
     borderRadius: theme.radius.sm,
-    textDecoration: 'none',
-    fontSize: theme.fontSizes.sm,
-    fontWeight: 500,
-
-    '&:hover': {
-      backgroundColor: "black",
-    },
-
-    [theme.fn.smallerThan('md')]: {
-      borderRadius: 0,
-      padding: theme.spacing.md,
-    },
   },
 
   root: {
-    position: 'relative',
-    zIndex: 1,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    border: 'none'
   },
 
   linkActive: {
-    '&, &:hover': {
-      backgroundColor: "black",
-      color: "white",
-    },
+    backgroundColor: 'black',
   },
-}));
 
-interface HeaderResponsiveProps {
-  links: { link: string; label: string }[];
-}
+  header: {
+    height: 'inherit',
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+
+  argaImg: {
+    height: 'inherit',
+    alignItems: 'center'
+  }
+}));
 
 
 export function TopNav({ links }: HeaderResponsiveProps) {
@@ -110,86 +90,40 @@ export function TopNav({ links }: HeaderResponsiveProps) {
   const { classes, cx } = useStyles();
   const [active, setActive] = useState(links[0]);
   const items = links.map((link) => (
-    <a
+    <Link
       key={link.label}
-      href={link.link}
+      href='/'
       className={cx(classes.link, { [classes.linkActive]: active === link })}
-      onClick={(event) => {
-        event.preventDefault();
-        console.log(link)
+      onClick={() => {
         setActive(link);
         close();
       }}
     >
-      {link.label}
-    </a>
+      <NavLink label={link.label} className={classes.nav_link}/>
+    </Link>
   ));
-
-  // return (
-
-  //   <Group position="apart" h="inherit">
-  //     <Link href="/">
-  //       <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={250} />
-  //     </Link>
-  //       <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm">
-  //             <Link href="/">
-  //               <NavLink label="Home" className={classes.nav_link} />
-  //             </Link>
-  //             <Link href="/">
-  //               <NavLink label="Databases" className={classes.nav_link} />
-  //             </Link>
-  //             <Link href="/">
-  //               <NavLink label="Resources" className={classes.nav_link} />
-  //             </Link>
-  //             <Link href="/">
-  //               <NavLink label="Help" className={classes.nav_link} />
-  //             </Link>
-  //       </Burger>     
-  //     <MediaQuery largerThan="md"  styles={{ display: 'none' }}>
-  //       <Grid>
-  //         <Grid.Col span={3}>
-  //           <Link href="/">
-  //             <NavLink label="Home" className={classes.nav_link} />
-  //           </Link>
-  //         </Grid.Col>
-  //         <Grid.Col span={3}>
-  //           <Link href="/">
-  //             <NavLink label="Databases" className={classes.nav_link} />
-  //           </Link>
-  //         </Grid.Col>
-  //         <Grid.Col span={3}>
-  //           <Link href="/">
-  //             <NavLink label="Resources" className={classes.nav_link} />
-  //           </Link>
-  //         </Grid.Col>
-  //         <Grid.Col span={3}>
-  //           <Link href="/">
-  //             <NavLink label="Help" className={classes.nav_link} />
-  //           </Link>
-  //         </Grid.Col>
-  //       </Grid>
-  //     </MediaQuery>
-  //   </Group>
-
-  //   )
-
     return (
-      <Header height="rem(60)" mb={120} className={classes.root}>
+      <Header className={classes.root} height='inherit'>
         <Container className={classes.header}>
-          <Group spacing={5} className={classes.links}>
-          <Link href="/">
-            <Image src="/arga-logo.svg" alt="Australian Reference Genome Atlas" width={250} />
+        <Group position='right' align='center' h='inherit'>
+          <Link href='/' >
+              <Image src='/arga-logo.svg' alt='Australian Reference Genome Atlas' width={250} />
           </Link>
+        </Group>
+
+        <Group position='apart' h='inherit' className={classes.links}>
+          <Group position='right' align='end' h='inherit'>
             {items}
           </Group>
+        </Group>
   
-          <Burger opened={opened} onClick={toggle} className={classes.burger} size="md" />
+          <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color='white'/>
   
-          <Transition transition="pop-top-right" duration={200} mounted={opened}>
+          <Transition transition='pop-top-right' duration={200} mounted={opened}>
             {(styles) => (
-              <Paper className={classes.dropdown} withBorder style={styles}>
+              <Stack className={classes.dropdown}>
                 {items}
-              </Paper>
+              </Stack>
             )}
           </Transition>
         </Container>
