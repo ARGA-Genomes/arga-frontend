@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {NavLink, createStyles, Group, Image, Grid, MediaQuery, Stack} from '@mantine/core';
+import { NavLink, createStyles, Group, Image, Grid, MediaQuery, Stack } from '@mantine/core';
 import {
   Header,
   Container,
@@ -99,15 +99,15 @@ export function TopNav({ links }: HeaderResponsiveProps) {
         close();
       }}
     >
-      <NavLink label={link.label} className={classes.nav_link}/>
+      <NavLink label={link.label} className={classes.nav_link} />
     </Link>
   ));
-    return (
-      <Header className={classes.root} height='inherit'>
-        <Container className={classes.header}>
+  return (
+    <Header className={classes.root} height='inherit'>
+      <Container className={classes.header}>
         <Group position='right' align='center' h='inherit'>
           <Link href='/' >
-              <Image src='/arga-logo.svg' alt='Australian Reference Genome Atlas' width={250} />
+            <Image src='/arga-logo.svg' alt='Australian Reference Genome Atlas' width={250} />
           </Link>
         </Group>
 
@@ -116,17 +116,17 @@ export function TopNav({ links }: HeaderResponsiveProps) {
             {items}
           </Group>
         </Group>
-  
-          <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color='white'/>
-  
-          <Transition transition='pop-top-right' duration={200} mounted={opened}>
-            {(styles) => (
-              <Stack className={classes.dropdown}>
-                {items}
-              </Stack>
-            )}
-          </Transition>
-        </Container>
-      </Header>
-    );
+
+        <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color='white' />
+
+        <Transition transition='pop-top-right' duration={200} mounted={opened}>
+          {(styles) => (
+            <Stack className={classes.dropdown}>
+              {items}
+            </Stack>
+          )}
+        </Transition>
+      </Container>
+    </Header>
+  );
 }
