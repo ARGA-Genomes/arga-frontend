@@ -317,6 +317,6 @@ export type {
     Marker,
 };
 
-export interface HeaderResponsiveProps {
+export interface HeaderAndFooterProps {
     links: { link: string; label: string }[];
   }

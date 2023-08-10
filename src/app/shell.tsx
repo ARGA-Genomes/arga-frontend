@@ -3,7 +3,7 @@
 import { AppShell, Box, Container, Flex, Header } from '@mantine/core';
 import { TopNav } from './top-nav';
 import { Footer } from './footer'
-import { headerLinks } from './constants';
+import { footerLinks, headerLinks } from './constants';
 
 // The shell is the visual layout of the site that wraps all content
 // with the top navigation bar and the footer. It also defines the
@@ -26,7 +26,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       footer={
         <Box bg="midnight.8" mx={0}>
           <Container maw={MAX_WIDTH}>
-            <Footer />
+            <Footer links={footerLinks.links}/>
           </Container>
           <Flex align="flex-end" justify="flex-end">
                   {/* <Image src="dna_footer.jpg" width={600} height={80} /> */}

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Header, Container, Burger, Transition, NavLink, createStyles, Group, Image, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
-import { HeaderResponsiveProps } from './type';
+import { HeaderAndFooterProps } from './type';
 
 // Custom navbar link styles. We define class with emotion here
 // as this particular component wont be used anywhere else
@@ -78,7 +78,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
 }));
 
 
-export function TopNav({ links }: HeaderResponsiveProps) {
+export function TopNav({ links }: HeaderAndFooterProps) {
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
   const [active, setActive] = useState(links[0]);

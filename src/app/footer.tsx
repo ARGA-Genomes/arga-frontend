@@ -2,20 +2,22 @@
 
 import Link from 'next/link';
 import {Container, Divider, Flex, Grid, Image, MediaQuery, Stack, Text} from '@mantine/core';
+import { HeaderAndFooterProps } from './type';
 
 
-export function Footer() {
+export function Footer({ links }: HeaderAndFooterProps) {
+
+  const footerLinks = links.map((link) => (
+    <Link key={link.label} href='/'> {link.label} </Link>
+  ));
+
   return (
     <Flex py={50} align="center">
       <Grid>
         <MediaQuery largerThan="md" styles={{borderRight: "groove"}}>
           <Grid.Col xs={12} sm={12} md={3} lg={3} xl={3}>
             <Stack>
-              <Link href="./contact_us">Contact us</Link>
-              <Link href="./about">About us</Link>
-              <Link href="./help">Help</Link>
-              <Link href="./acknowledging">Acknowledging ARGA</Link>
-
+              {footerLinks}
               <MediaQuery largerThan="md"  styles={{ display: 'none' }}>
                 <Divider/>
               </MediaQuery>
