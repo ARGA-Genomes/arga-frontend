@@ -289,10 +289,6 @@ type QueryResults = {
 
 type CommonGenome = GenomicData | WholeGenome;
 
-export interface HeaderResponsiveProps {
-    links: { link: string; label: string }[];
-  }
-
 export type {
     Taxonomy,
     Photo,
@@ -320,3 +316,7 @@ export type {
     SequencingRunEvent,
     Marker,
 };
+
+export interface HeaderResponsiveProps {
+    links: { link: string; label: string }[];
+  }

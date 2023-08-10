@@ -1,14 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { NavLink, createStyles, Group, Image, Grid, MediaQuery, Stack } from '@mantine/core';
-import {
-  Header,
-  Container,
-  Burger,
-  Paper,
-  Transition
-} from '@mantine/core';
+import { Header, Container, Burger, Transition, NavLink, createStyles, Group, Image, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import { HeaderResponsiveProps } from './type';

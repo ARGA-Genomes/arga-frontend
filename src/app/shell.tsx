@@ -3,7 +3,6 @@
 import { AppShell, Box, Container, Flex, Header } from '@mantine/core';
 import { TopNav } from './top-nav';
 import { Footer } from './footer'
-import {HeaderResponsiveProps} from './type'
 import { headerLinks } from './constants';
 
 // The shell is the visual layout of the site that wraps all content
