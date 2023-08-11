@@ -16,12 +16,10 @@ export function SurveyModal() {
   return (
     <Modal opened={opened} onClose={closeAndDontShowAgain} title={<Title order={3}>Feedback Survey</Title>} zIndex={1000} centered>
       <Text>
-        This survey will help the Australian Reference Genome Atlas (ARGA) project team understand
-        how the ARGA platform performs in relation to user needs and determine directions for
-        future development.
+        ARGA is currently in development! This is a pre-launch beta version and data processing is still underway.
       </Text>
       <Text>
-        It should take roughly 5 to 10 minutes to complete.
+        Please let us know what you think by filling out our feedback survey - it should take roughly 5 to 10 minutes to complete.
       </Text>
 
       <Divider my={20} />
