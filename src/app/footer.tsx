@@ -1,14 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import {Container, Divider, Flex, Grid, Image, MediaQuery, NavLink, Stack, Text, createStyles} from '@mantine/core';
+import {Container, Divider, Flex, Grid, Image, MediaQuery, Stack, Text, createStyles} from '@mantine/core';
 import { HeaderAndFooterProps } from './type';
+import theme from './theme';
 
+const useStyles = createStyles((theme, _params, _getRef) => ({
+  footerLink: {
+    color: theme.colors["bushfire"][6]
+  }
+}));
 
 export function Footer({ links }: HeaderAndFooterProps) {
 
+  const { classes } = useStyles();
+
   const footerLinks = links.map((link) => (
-    <Link key={link.label} href={link.link}> {link.label} </Link>
+    <Link key={link.label} href={link.link} className={classes.footerLink}> {link.label} </Link>
   ));
 
   const maxWidth: string = "200px"
