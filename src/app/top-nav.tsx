@@ -11,18 +11,22 @@ import { HeaderAndFooterProps } from './type';
 const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
     color: 'white',
-    borderRadius: theme.radius.sm,
     height: 70,
     alignItems: 'start',
     paddingLeft: '20px',
     paddingRight: '20px',
-
-    '&:hover, &:focus': {
-      backgroundColor: 'black',
+    '&:hover': {
+      background: theme.colors.midnight[8],
+      borderBottom: '5px solid',
+      [theme.fn.smallerThan('sm')]: {
+        borderBottom: 'none', 
+        textDecoration: 'underline 5px white',
+        textUnderlineOffset: '10px'  
+      },
     },
-
     span: {
       fontSize: '16px',
+      height: '70px'
     }
   },
   dropdown: {
@@ -52,9 +56,8 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
   },
 
   link: {
-    lineHeight: 1,
-    borderRadius: theme.radius.sm,
-  },
+    lineHeight: 1
+    },
 
   root: {
     backgroundColor: 'transparent',
@@ -62,7 +65,18 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
   },
 
   linkActive: {
-    backgroundColor: 'black',
+    borderBottom: '5px solid',
+    borderBottomColor: 'white',
+    height: 70,
+    [theme.fn.smallerThan('sm')]: {
+      borderBottom: 'none', 
+      textDecoration: 'underline 5px white',
+      textUnderlineOffset: '10px'  
+    },
+    '&:hover': {
+      borderBottom: 'none'
+    },
+
   },
 
   header: {
@@ -83,17 +97,17 @@ export function TopNav({ links }: HeaderAndFooterProps) {
   const { classes, cx } = useStyles();
   const [active, setActive] = useState(links[0]);
   const items = links.map((link) => (
-    <Link
-      key={link.label}
-      href='/'
-      className={cx(classes.link, { [classes.linkActive]: active === link })}
-      onClick={() => {
-        setActive(link);
-        close();
-      }}
-    >
-      <NavLink label={link.label} className={classes.nav_link} />
-    </Link>
+        <Link
+        key={link.label}
+        href='/'
+        className={cx(classes.link, { [classes.linkActive]: active === link })}
+        onClick={() => {
+          setActive(link);
+          close();
+        }}
+      >
+        <NavLink label={link.label} className={classes.nav_link} />
+      </Link>
   ));
   return (
     <Header className={classes.root} height='inherit'>
