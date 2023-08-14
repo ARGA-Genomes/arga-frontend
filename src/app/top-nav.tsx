@@ -13,15 +13,15 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     color: 'white',
     height: 70,
     alignItems: 'start',
-    paddingLeft: '20px',
-    paddingRight: '20px',
+    paddingLeft: '30px',
+    paddingRight: '30px',
     '&:hover': {
       background: theme.colors.midnight[8],
       borderBottom: '5px solid',
       [theme.fn.smallerThan('sm')]: {
-        borderBottom: 'none', 
+        borderBottom: 'none',
         textDecoration: 'underline 5px white',
-        textUnderlineOffset: '10px'  
+        textUnderlineOffset: '10px'
       },
     },
     span: {
@@ -46,6 +46,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     [theme.fn.smallerThan('sm')]: {
       display: 'none',
     },
+    gap: '0px'
   },
 
   burger: {
@@ -56,8 +57,8 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
   },
 
   link: {
-    lineHeight: 1
-    },
+    lineHeight: 1,
+  },
 
   root: {
     backgroundColor: 'transparent',
@@ -69,9 +70,9 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     borderBottomColor: 'white',
     height: 70,
     [theme.fn.smallerThan('sm')]: {
-      borderBottom: 'none', 
+      borderBottom: 'none',
       textDecoration: 'underline 5px white',
-      textUnderlineOffset: '10px'  
+      textUnderlineOffset: '10px'
     },
     '&:hover': {
       borderBottom: 'none'
@@ -97,17 +98,17 @@ export function TopNav({ links }: HeaderAndFooterProps) {
   const { classes, cx } = useStyles();
   const [active, setActive] = useState(links[0]);
   const items = links.map((link) => (
-        <Link
-        key={link.label}
-        href='/'
-        className={cx(classes.link, { [classes.linkActive]: active === link })}
-        onClick={() => {
-          setActive(link);
-          close();
-        }}
-      >
-        <NavLink label={link.label} className={classes.nav_link} />
-      </Link>
+    <Link
+      key={link.label}
+      href='/'
+      className={cx(classes.link, { [classes.linkActive]: active === link })}
+      onClick={() => {
+        setActive(link);
+        close();
+      }}
+    >
+      <NavLink label={link.label} className={classes.nav_link} />
+    </Link>
   ));
   return (
     <Header className={classes.root} height='inherit'>
@@ -118,10 +119,8 @@ export function TopNav({ links }: HeaderAndFooterProps) {
           </Link>
         </Group>
 
-        <Group position='apart' h='inherit' className={classes.links}>
-          <Group position='right' align='end' h='inherit'>
-            {items}
-          </Group>
+        <Group position='right' align='end' h='inherit' className={classes.links}>
+          {items}
         </Group>
 
         <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color='white' />
