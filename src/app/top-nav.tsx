@@ -100,7 +100,7 @@ export function TopNav({ links }: HeaderAndFooterProps) {
   const items = links.map((link) => (
     <Link
       key={link.label}
-      href='/'
+      href={link.link}
       className={cx(classes.link, { [classes.linkActive]: active === link })}
       onClick={() => {
         setActive(link);

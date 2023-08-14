@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import {Container, Divider, Flex, Grid, Image, MediaQuery, Stack, Text, createStyles} from '@mantine/core';
+import {Container, Divider, Flex, Grid, Image, MediaQuery, NavLink, Stack, Text, createStyles} from '@mantine/core';
 import { HeaderAndFooterProps } from './type';
 
 
 export function Footer({ links }: HeaderAndFooterProps) {
 
   const footerLinks = links.map((link) => (
-    <Link key={link.label} href='/'> {link.label} </Link>
+    <Link key={link.label} href={link.link}> {link.label} </Link>
   ));
 
   const maxWidth: string = "200px"
