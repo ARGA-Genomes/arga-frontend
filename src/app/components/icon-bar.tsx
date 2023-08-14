@@ -1,11 +1,13 @@
 import { Conservation, Taxonomy } from "@/app/type";
-import { Box, Group, ThemeIcon, Image, Tooltip } from "@mantine/core";
+import { Box, Group, ThemeIcon, Image, Tooltip, Text } from "@mantine/core";
 import Link from "next/link";
 
 interface IconData {
-  image: string;
-  label: string;
   color: string;
+  label?: string;
+  image?: string;
+  text?: string;
+  text_color?: string;
   link?: string;
 }
 
@@ -15,41 +17,69 @@ const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
     label: "Native Species",
     color: "wheat.4",
   },
+  extinct: {
+    text: "EX",
+    label: "Extinct Species",
+    color: "black",
+    text_color: "red",
+  },
+  "extinct in the wild": {
+    text: "EW",
+    label: "Extinct in the Wild",
+    color: "black",
+  },
+  "critically endangered": {
+    text: "CR",
+    label: "Critically Endangered",
+    color: "red",
+  },
+  endangered: {
+    text: "EN",
+    label: "Endangered Species",
+    color: "bushfire.4",
+    text_color: "bushfire.0",
+  },
   vulnerable: {
-    image: "threatened.svg",
+    text: "VU",
     label: "Vulnerable Species",
-    color: "wheat.6",
+    color: "wheat.5",
   },
   "vulnerable (wildfire)": {
-    image: "vulnerable_fire_light.svg",
+    text: "VU",
     label: "Vulnerable to Wildfire",
     color: "bushfire.5",
   },
-  endangered: {
-    image: "threatened_light.svg",
-    label: "Endangered Species",
-    color: "bushfire.4",
+  threatened: {
+    text: "VU",
+    label: "Threatened Species",
+    color: "wheat.5",
   },
-  "critically endangered": {
-    image: "threatened.svg",
-    label: "Critically endangered",
-    color: "red",
+  rare: {
+    text: "RA",
+    label: "Rare Species",
+    color: "shellfish.6",
+    text_color: "moss.1",
   },
-  extinct: {
-    image: "threatened_light.svg",
-    label: "Extinct Species",
-    color: "black",
+  "near threatened": {
+    text: "NT",
+    label: "Near Threatened Species",
+    color: "shellfish.6",
+    text_color: "moss.1",
   },
   "least concern": {
-    image: "threatened.svg",
+    text: "LC",
     label: "Least concern",
-    color: "moss.4",
+    color: "shellfish.6",
   },
   unlisted: {
-    image: "threatened.svg",
+    text: "UL",
     label: "Unlisted",
-    color: "moss.4",
+    color: "shellfish.6",
   },
+  no_status: {
+    image: "threatened.svg",
+    color: "gray",
+  }
 };
 
 const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
@@ -119,16 +149,24 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   },
 };
 
-function ConservationIcon({ status }: { status: string }) {
-  const icon = CONSERVATION_STATUS_ICON[status];
+function ConservationIcon({ status, source }: { status: string, source: string | undefined }) {
+  const icon = CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
+  const tooltip = `${icon.label || status} | ${source}`;
 
   return (
-    <Tooltip label={icon?.label || status}>
-      <ThemeIcon radius="xl" size={60} color={icon?.color} p={10}>
-        <Image
-          src={`/species-icons/${icon?.image}`}
-          alt={`Icon of ${icon?.label}`}
-        />
+    <Tooltip label={tooltip}>
+      <ThemeIcon radius="xl" size={60} color={icon.color} p={10}>
+        {icon.text &&
+         <Text weight={700} fz={30} color={icon.text_color || "white"}>
+           {icon.text}
+         </Text>
+        }
+        {icon.image &&
+         <Image
+           src={`/species-icons/${icon?.image}`}
+           alt={icon.label || status}
+         />
+        }
       </ThemeIcon>
     </Tooltip>
   );
@@ -137,12 +175,14 @@ function ConservationIcon({ status }: { status: string }) {
 function VernacularGroupIcon({ group }: { group: string }) {
   const icon = VERNACULAR_GROUP_ICON[group];
   const component = (
-    <ThemeIcon radius="xl" size={60} color={icon?.color} p={10}>
-      <Image
-        src={`/species-icons/${icon?.image}`}
-        alt={`Icon of ${icon.label}`}
-      />
-    </ThemeIcon>
+    <Tooltip label={icon?.label}>
+      <ThemeIcon radius="xl" size={60} color={icon?.color} p={10}>
+        <Image
+          src={`/species-icons/${icon?.image}`}
+          alt={`Icon of ${icon.label}`}
+        />
+      </ThemeIcon>
+    </Tooltip>
   );
 
   return (
@@ -166,12 +206,18 @@ function DebugIconBar() {
       <VernacularGroupIcon group="mammals" />
       <VernacularGroupIcon group="seaweeds and other algae" />
       <VernacularGroupIcon group="higher plants" />
-      <ConservationIcon status="native" />
-      <ConservationIcon status="vulnerable" />
-      <ConservationIcon status="vulnerable (wildfire)" />
-      <ConservationIcon status="endangered" />
-      <ConservationIcon status="critically endangered" />
-      <ConservationIcon status="extinct" />
+      <ConservationIcon status="native" source="Debug List" />
+      <ConservationIcon status="unlisted" source="Debug List" />
+      <ConservationIcon status="least concern" source="Debug List" />
+      <ConservationIcon status="near threatened" source="Debug List" />
+      <ConservationIcon status="rare" source="Debug List" />
+      <ConservationIcon status="threatened" source="Debug List" />
+      <ConservationIcon status="vulnerable" source="Debug List" />
+      <ConservationIcon status="vulnerable (wildfire)" source="Debug List" />
+      <ConservationIcon status="endangered" source="Debug List" />
+      <ConservationIcon status="critically endangered" source="Debug List" />
+      <ConservationIcon status="extinct in the wild" source="Debug List" />
+      <ConservationIcon status="extinct" source="Debug List" />
     </>
   );
 }
@@ -191,7 +237,8 @@ export default function IconBar({ taxonomy, conservation }: IconBarProps) {
         {conservation?.map((cons) => (
           <ConservationIcon
             status={cons.status.toLowerCase()}
-            key={cons.status}
+            source={cons.source}
+            key={cons.status + cons.source}
           />
         ))}
       </Group>

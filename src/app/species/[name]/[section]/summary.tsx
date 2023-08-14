@@ -20,6 +20,7 @@ import { ArgaMap, BioRegionLayers, SpecimensLayer } from "@/app/components/mappi
 import { Attribute, HighlightStack } from "@/app/components/highlight-stack";
 import { ExternalLink } from "tabler-icons-react";
 import { useEffect, useState } from "react";
+import { SurveyModal } from "@/app/components/survey-modal";
 
 
 const GET_SUMMARY = gql`
@@ -328,6 +329,7 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
 
   return (
     <Stack p={30} spacing={20}>
+      <SurveyModal />
       <LoadingOverlay
         overlayColor="black"
         transitionDuration={500}
