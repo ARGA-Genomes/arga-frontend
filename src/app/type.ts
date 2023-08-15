@@ -316,3 +316,7 @@ export type {
     SequencingRunEvent,
     Marker,
 };
+
+export interface HeaderAndFooterProps {
+    links: { link: string; label: string }[];
+  }

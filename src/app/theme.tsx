@@ -41,7 +41,7 @@ export const argaBrand: MantineThemeOverride = {
       color: theme.colors["bushfire"][6],
 
       "&:hover, &:focus": {
-        textDecoration: "underline",
+        textDecoration: "none",
       },
     },
     '.primary_button': {
