@@ -1,7 +1,7 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Collapse, Drawer, Grid, Group, LoadingOverlay, Overlay, Paper, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
+import { Box, Button, Center, Collapse, Drawer, Grid, Group, LoadingOverlay, Overlay, Paper, Stack, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
 import {WholeGenome, Coordinates, GenomicData, CommonGenome} from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -83,18 +83,37 @@ const PointMap = dynamic(() => import('../../../components/point-map'), {
 })
 
 
-function ReferenceSequence({ refseq }: { refseq : WholeGenome | undefined }) {
+function ReferenceSequence({ refseq }: { refseq: WholeGenome | undefined }) {
   return (
     <Grid mah={REFSEQ_MAP_HEIGHT} pos="relative" m={0}>
-        <Grid.Col span={3} h={REFSEQ_MAP_HEIGHT} w={200} pos="relative" m={0} p={0}>
-          <PointMap coordinates={refseq?.coordinates ? [refseq.coordinates] : undefined} borderRadius="16px 0 0 16px" />
-          <Overlay color="grey" opacity={0.7} blur={0.4} sx={{ "z-index": 1000, borderRadius: "16px 0 0 16px" }} />
-        </Grid.Col>
+      <Grid.Col span={9} p={20}>
+        <Title order={3}>Reference Genome Sequence</Title>
+        { refseq ? <GenomeDetails record={refseq} columns={3} /> : null }
+      </Grid.Col>
+      <Grid.Col span={3} h={REFSEQ_MAP_HEIGHT} w={200} pos="relative" m={0} p={0}>
+        <PointMap coordinates={refseq?.coordinates ? [refseq.coordinates] : undefined} borderRadius="0 16px 0 0" />
+      </Grid.Col>
+    </Grid>
+  )
+}
 
-        <Grid.Col span={9} p={30}>
-          { refseq ? <GenomeDetails record={refseq} columns={3} /> : null }
-        </Grid.Col>
-      </Grid>
+
+interface AllSequencesProps {
+  records: GenomicData[],
+  onExpandToggle: () => void,
+}
+
+function AllSequences({ records, onExpandToggle }: AllSequencesProps) {
+  return (
+    <Grid mah={GENOME_MAP_HEIGHT} pos="relative" m={0}>
+      <Grid.Col span={9} p={20}>
+        <Title order={3}>All Sequences</Title>
+        { records ? <GenomeTable records={records}/> : null }
+      </Grid.Col>
+      <Grid.Col span={3} h={GENOME_MAP_HEIGHT} w={200} pos="relative" m={0} p={0}>
+        <GenomeMap records={records} onExpandToggle={onExpandToggle} />
+      </Grid.Col>
+    </Grid>
   )
 }
 
@@ -271,7 +290,7 @@ function GenomeMap({ records, onExpandToggle }: GenomeMapProperties) {
   let positions = records?.map(record => record.coordinates).filter(record => record);
 
   return (
-    <PointMap coordinates={positions} borderRadius="0 16px 16px 0">
+    <PointMap coordinates={positions} borderRadius="0 0 16px 0">
       <Button sx={{ zIndex: 1000, right: 20, top: 20, position: "absolute"}} rightIcon={<ArrowsMaximize />} onClick={() => onExpandToggle()}>Expand</Button>
     </PointMap>
   )
@@ -315,30 +334,13 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
         transitionDuration={500}
         loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
         visible={loading}
-        radius="xl"
+        radius={20}
       />
 
-      <Grid mah={600}>
-        <Grid.Col span="auto">
-          <Title order={3} color="white" py={20}>Reference Genome Sequence</Title>
-          <Paper mb={20} radius="lg">
-            <ReferenceSequence refseq={refseq} />
-          </Paper>
-        </Grid.Col>
-      </Grid>
-
-      <Title order={3} color="white" py={20}>All Sequences</Title>
-      <Paper radius="lg">
-      <Grid pl={10}>
-        <Grid.Col span={8} px={0} mx={0}>
-          { allRecords ? <GenomeTable records={allRecords}/> : null }
-        </Grid.Col>
-
-        <Grid.Col pos="relative" span={4} h={GENOME_MAP_HEIGHT} p={0} m={0}>
-          <GenomeMap records={records} onExpandToggle={() => setMapExpand(true)} />
-        </Grid.Col>
-      </Grid>
-      </Paper>
+      <Stack spacing={30}>
+      <ReferenceSequence refseq={refseq} />
+      <AllSequences records={allRecords} onExpandToggle={() => setMapExpand(true)} />
+      </Stack>
 
       <Drawer
         opened={mapExpand}

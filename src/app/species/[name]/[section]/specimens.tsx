@@ -298,7 +298,7 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
         </Paper>
       </>) : null }
 
-      <Paper radius="lg" mt={0}>
+      <Paper radius="lg" mt={0} pb={20}>
         <SpecimenMap specimens={records || []} />
         { records ? <SpecimenTable records={records} /> : null }
       </Paper>

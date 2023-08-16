@@ -225,7 +225,7 @@ export function Barcode({ canonicalName }: { canonicalName: string }) {
         radius="xl"
       />
 
-      <Paper radius="lg" mt={15} pb={20}>
+      <Paper radius="lg" mt={0} pb={20}>
         { data ? <BarcodeDataSection data={data}/> : null }
         { data?.species.markers ? <MarkerTable records={data.species.markers} /> : null }
       </Paper>
