@@ -292,7 +292,6 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
       />
 
       { holotype.data ? (<>
-        <Title order={3} color="white" py={20}>Holotype</Title>
         <Paper radius="lg">
           <SpecimenEvents specimen={holotype.data.specimen} />
         </Paper>
