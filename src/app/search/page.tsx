@@ -304,7 +304,7 @@ function GenomeDetails({ item }: { item: Record }) {
 
 function LocusItem({ item } : { item: Record }) {
   return (
-    <Accordion.Item p={10} value={item.accession || ""} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.canonicalName || ""} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
           <Link href={`/markers/${item.accession}`}>
@@ -369,7 +369,7 @@ function SearchItem({ item } : { item: Record }) {
 
 function SearchResults({ results } : { results: Record[] }) {
   return (
-    <Accordion variant="separated" radius="lg" multiple>
+    <Accordion variant="separated" radius="lg" defaultValue={[results[0] ? results[0].canonicalName: ""]} multiple>
       {results.map(record => (
         <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
       ))}
@@ -478,6 +478,17 @@ export default function SearchPage() {
     setQuery(searchTerms)
     setDataType(dataType)
     router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=${dataType}`)
+  }
+
+  if (loading) {
+    return <div>Loading</div>;  // Change this to a proper loading output
+  }
+  if (error) {
+    return (
+      <div>
+        {error.message}
+      </div>
+    );
   }
 
   return (
