@@ -76,6 +76,19 @@ export const argaBrand: MantineThemeOverride = {
         color: "#000000 !important",
         fontFamily: gothamBook.style.fontFamily,
       }
+    },
+    '.mantine-Accordion-chevron	': {
+      fill: '#C1C1C1',
+      '&:hover': {
+        fill: '#3c6377'
+      },
+    },
+    '.mantine-Accordion-item': {
+      '&:hover': {
+        '.mantine-Accordion-chevron': {
+          fill: '#3c6377'
+        }
+      },
     }
   }),
 };

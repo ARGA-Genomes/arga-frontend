@@ -25,8 +25,9 @@ import {
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
-import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
+import { ChevronDown, CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
+import ChevronCircleAccordion from 'public/search-icons/chevron-circle-accordion';
 
 type Classification = {
   kingdom?: string,
@@ -158,12 +159,14 @@ function Summary({ label, value }: { label: string, value: number | string | Rea
 
 function Attribute({ label, value }: { label: string, value: string | undefined }) {
   value ||= "Not specified";
+  const { classes } = useSearchTypeStyles();
+
 
   return (
     <Stack spacing={0}>
       <Text size="sm">{label}</Text>
       <Link href="#">
-        <Paper py={5} px={15} bg="#f5f5f5" radius="md">
+        <Paper py={5} px={15} radius="md" sx={{maxWidth:'300px'}} className={classes.attribute}>
           <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
         </Paper>
       </Link>
@@ -221,6 +224,16 @@ function TaxonSummary({ summary }: { summary: DataSummary }) {
 
 function TaxonDetails({ item }: { item: Record }) {
   const theme = useMantineTheme();
+  const { classes } = useSearchTypeStyles();
+
+  const attributes = <>
+    <Attribute label="Kingdom" value={item.classification?.kingdom} />
+    <Attribute label="Phylum" value={item.classification?.phylum} />
+    <Attribute label="Class" value={item.classification?.class} />
+    <Attribute label="Order" value={item.classification?.order} />
+    <Attribute label="Family" value={item.classification?.family} />
+    <Attribute label="Genus" value={item.classification?.genus} />
+  </>
 
   return (
     <Box>
@@ -236,16 +249,21 @@ function TaxonDetails({ item }: { item: Record }) {
         borderLeftWidth: 5,
         borderLeftStyle: "solid",
         borderLeftColor: theme.colors.bushfire[4],
-      }}>
+      }}
+      className={classes.horizontalGrouping}>
         <Text size="lg" weight={550}>Scientific classification</Text>
-        <Flex gap="lg">
-          <Attribute label="Kingdom" value={item.classification?.kingdom} />
-          <Attribute label="Phylum" value={item.classification?.phylum} />
-          <Attribute label="Class" value={item.classification?.class} />
-          <Attribute label="Order" value={item.classification?.order} />
-          <Attribute label="Family" value={item.classification?.family} />
-          <Attribute label="Genus" value={item.classification?.genus} />
+        <Flex gap="lg" >
+          {attributes}
         </Flex>
+      </Stack>
+      <Stack pl={16} sx={{
+        borderLeftWidth: 5,
+        borderLeftStyle: "solid",
+        borderLeftColor: theme.colors.bushfire[4],
+      }}
+        className={classes.verticalGrouping}>
+        <Text size="lg" weight={550}>Scientific classification</Text>
+          {attributes}
       </Stack>
     </Box>
   )
@@ -369,7 +387,11 @@ function SearchItem({ item } : { item: Record }) {
 
 function SearchResults({ results } : { results: Record[] }) {
   return (
-    <Accordion variant="separated" radius="lg" defaultValue={[results[0] ? results[0].canonicalName: ""]} multiple>
+    <Accordion variant="separated" 
+      radius="lg" 
+      defaultValue={[results[0] ? results[0].canonicalName: ""]} 
+      chevron={ChevronCircleAccordion()}
+      multiple>
       {results.map(record => (
         <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
       ))}
@@ -496,7 +518,7 @@ export default function SearchPage() {
     <Box>
       <Search onSearch={onSearch} />
 
-      <Paper radius="xl" p="xl" mt={10} sx={{ border: "1px solid #dbdbdb" }} pos="relative">
+      <Paper radius="xl" p="xl"  sx={{ border: "1px solid #dbdbdb" }} pos="relative">
         <LoadingOverlay
           overlayColor={theme.colors.midnight[0]}
           transitionDuration={500}
@@ -554,5 +576,23 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
       borderRadius: 10,
       boxShadow: "none",
     },
+    horizontalGrouping: {
+      [theme.fn.smallerThan('lg')]: {
+        display: 'none',
+      },
+    },
+    verticalGrouping: {
+      [theme.fn.largerThan('lg')]: {
+        display: 'none',
+      },
+    },
+    attribute: {
+      background:theme.colors.attribute[0],
+      '&:hover, &:focus': {
+        textDecoration: 'underline',
+        background: theme.colors.attribute[2]
+      }
+    }
+    
   }
 });
