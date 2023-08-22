@@ -11,8 +11,8 @@ export const headerLinks: HeaderAndFooterProps = {
 
 export const footerLinks: HeaderAndFooterProps = {
     links: [
-        { link: "./contact_us", label: "Contact us" },
-        { link: "./about", label: "About us" },
+        { link: "https://arga.org.au/contact/", label: "Contact us" },
+        { link: "https://arga.org.au/about/", label: "About us" },
         { link: "./help", label: "Help" },
         { link: "/acknowledging", label: "Acknowledging ARGA" },
     ]

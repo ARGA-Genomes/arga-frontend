@@ -25,7 +25,7 @@ import {
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
-import { ChevronDown, CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
+import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
 import ChevronCircleAccordion from 'public/search-icons/chevron-circle-accordion';
 
@@ -515,39 +515,41 @@ export default function SearchPage() {
 
   return (
     <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
-    <Box>
-      <Search onSearch={onSearch} />
+      <Box>
+        <Search onSearch={onSearch} />
 
-      <Paper radius="xl" p="xl"  sx={{ border: "1px solid #dbdbdb" }} pos="relative">
-        <LoadingOverlay
-          overlayColor={theme.colors.midnight[0]}
-          transitionDuration={500}
-          loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-          visible={loading}
-          radius="xl"
-        />
-        <Text size="lg" ml={20} mb={30}>
-          { !loading && data
-            ? (<><strong>{data?.search.fullText.total} </strong> search results found for <strong>{query} </strong></>)
-            : null
-          }
-        </Text>
-        <SearchResults results={data?.search.fullText.records || []} />
-      </Paper>
-      <Paper bg="midnight.0" p={20} m={40} radius="lg">
-        <Pagination
-          color="midnight.6"
-          size="lg"
-          radius="md"
-          position="center"
-          total={totalPages}
-          page={pagination.page}
-          onChange={page => {
-            setPagination({page, pageSize: PAGE_SIZE})
-          }}
-        />
-      </Paper>
-    </Box>
+        <Paper radius="xl" p="xl" sx={{ border: "1px solid #dbdbdb" }} pos="relative">
+          <LoadingOverlay
+            overlayColor={theme.colors.midnight[0]}
+            transitionDuration={500}
+            loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+            visible={loading}
+            radius="xl"
+          />
+          <Text size="lg" ml={20} mb={30}>
+            {!loading && data
+              ? (<><strong>{data?.search.fullText.total} </strong> search results found for <strong>{query} </strong></>)
+              : null
+            }
+          </Text>
+          <SearchResults results={data?.search.fullText.records || []} />
+
+          <Paper bg="white" p={20} m={40} radius="lg">
+            <Pagination
+              color={"attribute.2"}
+              size="lg"
+              radius="xl"
+              position="center"
+              spacing="md"
+              total={totalPages}
+              page={pagination.page}
+              onChange={page => {
+                setPagination({ page, pageSize: PAGE_SIZE })
+              }}
+            />
+          </Paper>
+        </Paper>
+      </Box>
     </MantineProvider>
   );
 }
@@ -592,7 +594,6 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
         textDecoration: 'underline',
         background: theme.colors.attribute[2]
       }
-    }
-    
+    }   
   }
 });
