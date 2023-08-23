@@ -27,6 +27,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
 import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
+import ChevronCircleAccordion from 'public/search-icons/chevron-circle-accordion';
 
 type Classification = {
   kingdom?: string,
@@ -158,12 +159,14 @@ function Summary({ label, value }: { label: string, value: number | string | Rea
 
 function Attribute({ label, value }: { label: string, value: string | undefined }) {
   value ||= "Not specified";
+  const { classes } = useSearchTypeStyles();
+
 
   return (
     <Stack spacing={0}>
       <Text size="sm">{label}</Text>
       <Link href="#">
-        <Paper py={5} px={15} bg="#f5f5f5" radius="md">
+        <Paper py={5} px={15} radius="md" sx={{maxWidth:'300px'}} className={classes.attribute}>
           <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
         </Paper>
       </Link>
@@ -221,6 +224,16 @@ function TaxonSummary({ summary }: { summary: DataSummary }) {
 
 function TaxonDetails({ item }: { item: Record }) {
   const theme = useMantineTheme();
+  const { classes } = useSearchTypeStyles();
+
+  const attributes = <>
+    <Attribute label="Kingdom" value={item.classification?.kingdom} />
+    <Attribute label="Phylum" value={item.classification?.phylum} />
+    <Attribute label="Class" value={item.classification?.class} />
+    <Attribute label="Order" value={item.classification?.order} />
+    <Attribute label="Family" value={item.classification?.family} />
+    <Attribute label="Genus" value={item.classification?.genus} />
+  </>
 
   return (
     <Box>
@@ -236,16 +249,21 @@ function TaxonDetails({ item }: { item: Record }) {
         borderLeftWidth: 5,
         borderLeftStyle: "solid",
         borderLeftColor: theme.colors.bushfire[4],
-      }}>
+      }}
+      className={classes.horizontalGrouping}>
         <Text size="lg" weight={550}>Scientific classification</Text>
-        <Flex gap="lg">
-          <Attribute label="Kingdom" value={item.classification?.kingdom} />
-          <Attribute label="Phylum" value={item.classification?.phylum} />
-          <Attribute label="Class" value={item.classification?.class} />
-          <Attribute label="Order" value={item.classification?.order} />
-          <Attribute label="Family" value={item.classification?.family} />
-          <Attribute label="Genus" value={item.classification?.genus} />
+        <Flex gap="lg" >
+          {attributes}
         </Flex>
+      </Stack>
+      <Stack pl={16} sx={{
+        borderLeftWidth: 5,
+        borderLeftStyle: "solid",
+        borderLeftColor: theme.colors.bushfire[4],
+      }}
+        className={classes.verticalGrouping}>
+        <Text size="lg" weight={550}>Scientific classification</Text>
+          {attributes}
       </Stack>
     </Box>
   )
@@ -304,7 +322,7 @@ function GenomeDetails({ item }: { item: Record }) {
 
 function LocusItem({ item } : { item: Record }) {
   return (
-    <Accordion.Item p={10} value={item.accession || ""} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.canonicalName || ""} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
           <Link href={`/markers/${item.accession}`}>
@@ -369,7 +387,11 @@ function SearchItem({ item } : { item: Record }) {
 
 function SearchResults({ results } : { results: Record[] }) {
   return (
-    <Accordion variant="separated" radius="lg" multiple>
+    <Accordion variant="separated" 
+      radius="lg" 
+      defaultValue={[results[0] ? results[0].canonicalName: ""]} 
+      chevron={ChevronCircleAccordion()}
+      multiple>
       {results.map(record => (
         <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
       ))}
@@ -480,41 +502,54 @@ export default function SearchPage() {
     router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=${dataType}`)
   }
 
+  if (loading) {
+    return <div>Loading</div>;  // Change this to a proper loading output
+  }
+  if (error) {
+    return (
+      <div>
+        {error.message}
+      </div>
+    );
+  }
+
   return (
     <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
-    <Box>
-      <Search onSearch={onSearch} />
+      <Box>
+        <Search onSearch={onSearch} />
 
-      <Paper radius="xl" p="xl" mt={10} sx={{ border: "1px solid #dbdbdb" }} pos="relative">
-        <LoadingOverlay
-          overlayColor={theme.colors.midnight[0]}
-          transitionDuration={500}
-          loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-          visible={loading}
-          radius="xl"
-        />
-        <Text size="lg" ml={20} mb={30}>
-          { !loading && data
-            ? (<><strong>{data?.search.fullText.total} </strong> search results found for <strong>{query} </strong></>)
-            : null
-          }
-        </Text>
-        <SearchResults results={data?.search.fullText.records || []} />
-      </Paper>
-      <Paper bg="midnight.0" p={20} m={40} radius="lg">
-        <Pagination
-          color="midnight.6"
-          size="lg"
-          radius="md"
-          position="center"
-          total={totalPages}
-          page={pagination.page}
-          onChange={page => {
-            setPagination({page, pageSize: PAGE_SIZE})
-          }}
-        />
-      </Paper>
-    </Box>
+        <Paper radius="xl" p="xl" sx={{ border: "1px solid #dbdbdb" }} pos="relative">
+          <LoadingOverlay
+            overlayColor={theme.colors.midnight[0]}
+            transitionDuration={500}
+            loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+            visible={loading}
+            radius="xl"
+          />
+          <Text size="lg" ml={20} mb={30}>
+            {!loading && data
+              ? (<><strong>{data?.search.fullText.total} </strong> search results found for <strong>{query} </strong></>)
+              : null
+            }
+          </Text>
+          <SearchResults results={data?.search.fullText.records || []} />
+
+          <Paper bg="white" p={20} m={40} radius="lg">
+            <Pagination
+              color={"attribute.2"}
+              size="lg"
+              radius="xl"
+              position="center"
+              spacing="md"
+              total={totalPages}
+              page={pagination.page}
+              onChange={page => {
+                setPagination({ page, pageSize: PAGE_SIZE })
+              }}
+            />
+          </Paper>
+        </Paper>
+      </Box>
     </MantineProvider>
   );
 }
@@ -543,5 +578,22 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
       borderRadius: 10,
       boxShadow: "none",
     },
+    horizontalGrouping: {
+      [theme.fn.smallerThan('lg')]: {
+        display: 'none',
+      },
+    },
+    verticalGrouping: {
+      [theme.fn.largerThan('lg')]: {
+        display: 'none',
+      },
+    },
+    attribute: {
+      background:theme.colors.attribute[0],
+      '&:hover, &:focus': {
+        textDecoration: 'underline',
+        background: theme.colors.attribute[2]
+      }
+    }   
   }
 });

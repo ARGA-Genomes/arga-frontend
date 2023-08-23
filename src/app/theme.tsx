@@ -76,7 +76,43 @@ export const argaBrand: MantineThemeOverride = {
         color: "#000000 !important",
         fontFamily: gothamBook.style.fontFamily,
       }
-    }
+    },
+    '.mantine-Accordion-chevron	': {
+      fill: '#C1C1C1',
+      '&:hover': {
+        fill: '#3c6377'
+      },
+    },
+    '.mantine-Accordion-item': {
+      '&:hover': {
+        '.mantine-Accordion-chevron': {
+          fill: '#3c6377'
+        }
+      },
+    },
+
+    // Mantine v5 does not have options to tweak next, and previous arrows, as well as individual buttons
+    // Using CSS to individually modify the arrows. When we upgrade to V6, please remove this and use the built in pagination options instead
+    '.mantine-Pagination-item': {
+      border: "none !important",
+      '&[data-active]': {
+        color: 'black !important',
+      },
+      '&[disabled]': {
+        opacity: '0.2 !important',
+      },
+      '& svg': {
+        '& path': {
+          d: 'path("")',//blank svg to override the default mantine arrow svg, then replace by the svg below
+        },
+        backgroundImage: 'url("search-icons/pagination-arrow.svg")'
+      },
+      '&: first-of-type': {
+        '& svg': {
+          transform: 'rotate(180deg)',
+        }
+      },
+    },
   }),
 };
 
