@@ -18,7 +18,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     '&:hover': {
       background: theme.colors.midnight[8],
       borderBottom: '5px solid',
-      [theme.fn.smallerThan('sm')]: {
+      [theme.fn.smallerThan('md')]: {
         borderBottom: 'none',
         textDecoration: 'underline 5px white',
         textUnderlineOffset: '10px'
@@ -37,20 +37,20 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     overflow: 'hidden',
     background: theme.colors.midnight[8],
 
-    [theme.fn.largerThan('sm')]: {
+    [theme.fn.largerThan('md')]: {
       display: 'none',
     },
   },
 
   links: {
-    [theme.fn.smallerThan('sm')]: {
+    [theme.fn.smallerThan('md')]: {
       display: 'none',
     },
     gap: '0px'
   },
 
   burger: {
-    [theme.fn.largerThan('sm')]: {
+    [theme.fn.largerThan('md')]: {
       display: 'none',
     },
     height: 'unset'
@@ -69,7 +69,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     borderBottom: '5px solid',
     borderBottomColor: 'white',
     height: 70,
-    [theme.fn.smallerThan('sm')]: {
+    [theme.fn.smallerThan('md')]: {
       borderBottom: 'none',
       textDecoration: 'underline 5px white',
       textUnderlineOffset: '10px'
@@ -83,7 +83,8 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
   header: {
     height: 'inherit',
     display: 'flex',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    maxWidth: '100%'
   },
 
   argaImg: {
