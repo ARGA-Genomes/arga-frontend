@@ -1,6 +1,9 @@
-import { Conservation, Taxonomy } from "@/app/type";
-import { Box, Group, ThemeIcon, Image, Tooltip, Text } from "@mantine/core";
+import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
+import { Box, Group, ThemeIcon, Image, Tooltip, Text, Popover, Stack, SimpleGrid } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
+import { CircleCheck, CircleX } from "tabler-icons-react";
+import { AttributeIcon } from "./highlight-stack";
 
 interface IconData {
   color: string;
@@ -149,6 +152,27 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   },
 };
 
+const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
+  kamilaroi: {
+    label: "Kamilaroi Plant and Animal Encyclopaedia",
+    image: "iek_kamilaroi.svg",
+    color: "#f47c2e",
+    link: "/list/Kamilaroi",
+  },
+  south_east_arnhem_land: {
+    label: "South East Arnhem Land",
+    image: "iek_south_east_arnhem_land.svg",
+    color: "#a2c36e",
+    link: "/list/South_East_Arnhem_Land",
+  },
+  noongar_boodjar: {
+    label: "Noongar Boodjar Plants and Animals",
+    image: "iek_noongar_boodjar.svg",
+    color: "#fec743",
+    link: "/list/Noongar_Boodjar",
+  },
+}
+
 function ConservationIcon({ status, source }: { status: string, source: string | undefined }) {
   const icon = CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
   const tooltip = `${icon.label || status} | ${source}`;
@@ -192,6 +216,44 @@ function VernacularGroupIcon({ group }: { group: string }) {
   );
 }
 
+interface IndigenousLanguageGroupIconProps {
+  group: string,
+  trait: IndigenousEcologicalKnowledge,
+}
+
+function IndigenousLanguageGroupIcon({ group, trait }: IndigenousLanguageGroupIconProps) {
+  const [opened, { close, open }] = useDisclosure(false);
+  const extraDimmed = 'rgba(134, 142, 150, .3)';
+
+  const icon = INDIGENOUS_LANGUAGE_GROUP_ICON[group];
+  const component = (
+    <Popover position="bottom" withArrow shadow="md" opened={opened}>
+      <Popover.Target>
+        <ThemeIcon radius="xl" size={60} color={icon?.color} p={10} onMouseEnter={open} onMouseLeave={close}>
+          <Image src={`/species-icons/${icon?.image}`} alt="" />
+        </ThemeIcon>
+      </Popover.Target>
+      <Popover.Dropdown>
+        <Stack>
+          <Text>{icon?.label}</Text>
+          <Text size="sm"><strong>Name:</strong> {trait.name}</Text>
+          <SimpleGrid cols={3}>
+            <AttributeIcon label="Food use" icon={trait.foodUse ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} />} />
+            <AttributeIcon label="Medicinal use" icon={trait.medicinalUse ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} />} />
+            <AttributeIcon label="Cultural connection" icon={trait.culturalConnection ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} />} />
+          </SimpleGrid>
+        </Stack>
+      </Popover.Dropdown>
+    </Popover>
+  );
+
+  return (
+    <>
+      {icon?.link ? <Link href={icon?.link}>{component}</Link> : component}
+    </>
+  );
+}
+
 function DebugIconBar() {
   return (
     <>
@@ -223,11 +285,12 @@ function DebugIconBar() {
 }
 
 interface IconBarProps {
-  taxonomy: Taxonomy;
-  conservation?: Conservation[];
+  taxonomy: Taxonomy,
+  conservation?: Conservation[],
+  traits?: IndigenousEcologicalKnowledge[],
 }
 
-export default function IconBar({ taxonomy, conservation }: IconBarProps) {
+export default function IconBar({ taxonomy, conservation, traits }: IconBarProps) {
   return (
     <Box>
       <Group>
@@ -239,6 +302,13 @@ export default function IconBar({ taxonomy, conservation }: IconBarProps) {
             status={cons.status.toLowerCase()}
             source={cons.source}
             key={cons.status + cons.source}
+          />
+        ))}
+        {traits?.map((trait) => (
+          <IndigenousLanguageGroupIcon
+            group="kamilaroi"
+            trait={trait}
+            key={trait.id}
           />
         ))}
       </Group>
