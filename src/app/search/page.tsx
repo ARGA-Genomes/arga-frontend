@@ -187,14 +187,18 @@ function TaxonItem({ item }: { item: Record }) {
               <Text size="lg"><i>{item.canonicalName}</i></Text>
             </Link>
             { item.subspecies?.map(subspecies => (
-              <Text size="sm" ml={5} key={subspecies}>
+              <Text size="sm" ml={5} key={subspecies} className='subspeciesAccordion'>
                 <Link href={`/species/${itemLinkName}/summary`}>
                   {subspecies}
                 </Link>
               </Text>
             )) }
+            {
+              <Text size="sm" ml={5} className="synonymClosed">
+                  {item.synonyms? item.synonyms[0]: null}
+              </Text>            }
             { item.synonyms?.map(synonym => (
-              <Text size="sm" ml={5} key={synonym}>
+              <Text size="sm" ml={5} key={synonym} className="synonymOpened">
                   {synonym}
               </Text>
             )) }
