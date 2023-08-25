@@ -1,5 +1,6 @@
-import { Paper, Stack, Text, useMantineTheme } from "@mantine/core";
+import { Center, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
 import Link from "next/link";
+import { ReactNode } from "react";
 
 
 interface HighlightStackProps {
@@ -42,6 +43,23 @@ export function Attribute({ label, value, href }: AttributeProps) {
           <Link href={href || "#"}>
             <Text size="lg" align="center">{value}</Text>
           </Link>
+        </Paper>
+    </Stack>
+  )
+}
+
+
+interface AttributeIconProps {
+  label: string,
+  icon: React.ReactNode,
+}
+
+export function AttributeIcon({ label, icon}: AttributeIconProps) {
+  return (
+    <Stack spacing={0}>
+      <Text size="sm">{label}</Text>
+        <Paper py={5} px={15} bg="#f5f5f5" radius="md">
+          <Center>{icon}</Center>
         </Paper>
     </Stack>
   )
