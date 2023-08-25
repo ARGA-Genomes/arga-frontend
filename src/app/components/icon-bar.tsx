@@ -153,19 +153,19 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
 };
 
 const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
-  kamilaroi: {
+  "Kamilaroi Plant and Animal Encyclopaedia": {
     label: "Kamilaroi Plant and Animal Encyclopaedia",
     image: "iek_kamilaroi.svg",
     color: "#f47c2e",
     link: "/list/Kamilaroi",
   },
-  south_east_arnhem_land: {
+  "South East Arnhem Land": {
     label: "South East Arnhem Land",
     image: "iek_south_east_arnhem_land.svg",
     color: "#a2c36e",
     link: "/list/South_East_Arnhem_Land",
   },
-  noongar_boodjar: {
+  "Noongar Boodjar Plants and Animals": {
     label: "Noongar Boodjar Plants and Animals",
     image: "iek_noongar_boodjar.svg",
     color: "#fec743",
@@ -249,7 +249,7 @@ function IndigenousLanguageGroupIcon({ group, trait }: IndigenousLanguageGroupIc
 
   return (
     <>
-      {icon?.link ? <Link href={icon?.link}>{component}</Link> : component}
+      {icon?.link ? <Link href={trait.sourceUrl} target="_blank">{component}</Link> : component}
     </>
   );
 }
@@ -306,7 +306,7 @@ export default function IconBar({ taxonomy, conservation, traits }: IconBarProps
         ))}
         {traits?.map((trait) => (
           <IndigenousLanguageGroupIcon
-            group="kamilaroi"
+            group={trait.datasetName}
             trait={trait}
             key={trait.id}
           />

@@ -286,6 +286,7 @@ type TraceFile = {
 type IndigenousEcologicalKnowledge = {
   id: string,
   name: string,
+  datasetName: string,
   culturalConnection: boolean,
   foodUse: boolean,
   medicinalUse: boolean,

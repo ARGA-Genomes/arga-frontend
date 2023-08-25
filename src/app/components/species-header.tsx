@@ -35,6 +35,7 @@ query SpeciesWithConservation($canonicalName: String) {
     indigenousEcologicalKnowledge {
       id
       name
+      datasetName
       culturalConnection
       foodUse
       medicinalUse
