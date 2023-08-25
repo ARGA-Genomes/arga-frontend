@@ -84,11 +84,29 @@ export const argaBrand: MantineThemeOverride = {
       },
     },
     '.mantine-Accordion-item': {
+      minHeight: '100px',
       '&:hover': {
         '.mantine-Accordion-chevron': {
           fill: '#3c6377'
         }
       },
+      '& .subspeciesAccordion': {
+        display: 'none'
+      },
+      '&[data-active]': {
+        '& .synonymClosed': {
+          display: 'none'
+        },
+        '& .subspeciesAccordion': {
+          display: 'block'
+        },
+        '& .synonymOpened': {
+          display: 'block'
+        },
+      },
+    },
+    '.synonymOpened':{
+      display: 'none'
     },
 
     // Mantine v5 does not have options to tweak next, and previous arrows, as well as individual buttons
