@@ -101,15 +101,21 @@ export const argaBrand: MantineThemeOverride = {
       '&[disabled]': {
         opacity: '0.2 !important',
       },
-      '& svg': {
-        '& path': {
-          d: 'path("")',//blank svg to override the default mantine arrow svg, then replace by the svg below
-        },
-        backgroundImage: 'url("search-icons/pagination-arrow.svg")'
-      },
       '&: first-of-type': {
         '& svg': {
           transform: 'rotate(180deg)',
+          '& path': {
+            d: 'path("")',//blank svg to override the default mantine arrow svg, then replace by the svg below
+          },
+          backgroundImage: 'url("search-icons/pagination-arrow.svg")',
+        }
+      },
+      '&: last-of-type': {
+        '& svg': {
+          '& path': {
+            d: 'path("")',//blank svg to override the default mantine arrow svg, then replace by the svg below
+          },
+          backgroundImage: 'url("search-icons/pagination-arrow.svg")',
         }
       },
     },

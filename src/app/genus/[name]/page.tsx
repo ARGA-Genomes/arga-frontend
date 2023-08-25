@@ -414,9 +414,9 @@ function Species({ genus }: { genus: string }) {
 
       <Paper bg="midnight.0" p={20} m={40} radius="lg">
         <Pagination
-          color="midnight.6"
+          color={"attribute.2"}
           size="lg"
-          radius="md"
+          radius="xl"
           position="center"
           page={activePage}
           total={totalPages}

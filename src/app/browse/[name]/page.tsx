@@ -268,8 +268,8 @@ export default function BrowseList({ params }: { params: { name: string } }) {
       <Paper bg="midnight.6" p={20} m={40} radius="lg">
         <Pagination
           position="center"
-          color="bushfire.5"
-          radius="lg"
+          color={"attribute.2"}
+          radius="xl"
           withEdges
           total={totalPages}
           page={pagination.page}
