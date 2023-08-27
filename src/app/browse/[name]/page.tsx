@@ -265,20 +265,23 @@ export default function BrowseList({ params }: { params: { name: string } }) {
         { !loading && data ? <BrowseResults list={data.search.species} withRecordType={params.name}/> : null }
       </Box>
 
-      <Paper bg="midnight.6" p={20} m={40} radius="lg">
-        <Pagination
-          position="center"
-          color={"attribute.2"}
-          radius="xl"
-          withEdges
-          total={totalPages}
-          page={pagination.page}
-          onChange={(page) => {
-            setPagination({page, pageSize: PAGE_SIZE})
-            scrollIntoView({ alignment: 'center' })
-          }}
-        />
-      </Paper>
+      {
+        totalPages == 1 ? null : //Show pagination only if there is more than 1 page
+          <Paper bg="midnight.6" p={20} m={40} radius="lg">
+            <Pagination
+              position="center"
+              color={"attribute.2"}
+              radius="xl"
+              withEdges
+              total={totalPages}
+              page={pagination.page}
+              onChange={(page) => {
+                setPagination({ page, pageSize: PAGE_SIZE })
+                scrollIntoView({ alignment: 'center' })
+              }}
+            />
+          </Paper>
+      }
     </Box>
   );
 }

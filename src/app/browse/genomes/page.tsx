@@ -157,20 +157,23 @@ export default function GenomesList({ params }: { params: { name: string } }) {
 
         { !loading && data ? <BrowseResults list={data.assemblies.species.records} /> : null }
 
-        <Paper bg="midnight.0" p={20} m={40} radius="lg">
-          <Pagination
-            color={"attribute.2"}
-            size="lg"
-            radius="xl"
-            position="center"
-            page={activePage}
-            total={totalPages}
-            onChange={page => {
-              setPage(page)
-              scrollIntoView({ alignment: 'center' })
-            }}
-          />
-        </Paper>
+        {
+          totalPages == 1 ? null : //Show pagination only if there is more than 1 page
+            <Paper bg="midnight.0" p={20} m={40} radius="lg">
+              <Pagination
+                color={"attribute.2"}
+                size="lg"
+                radius="xl"
+                position="center"
+                page={activePage}
+                total={totalPages}
+                onChange={page => {
+                  setPage(page)
+                  scrollIntoView({ alignment: 'center' })
+                }}
+              />
+            </Paper>
+        }
       </Box>
     </Box>
   );

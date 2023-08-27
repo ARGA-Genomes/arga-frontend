@@ -538,20 +538,24 @@ export default function SearchPage() {
           </Text>
           <SearchResults results={data?.search.fullText.records || []} />
 
-          <Paper bg="white" p={20} m={40} radius="lg">
-            <Pagination
-              color={"attribute.2"}
-              size="lg"
-              radius="xl"
-              position="center"
-              spacing="md"
-              total={totalPages}
-              page={pagination.page}
-              onChange={page => {
-                setPagination({ page, pageSize: PAGE_SIZE })
-              }}
-            />
-          </Paper>
+          
+          {
+            totalPages === 1 ? null : //Show pagination only if there is more than 1 page
+              <Paper bg="white" p={20} m={40} radius="lg">
+                <Pagination
+                  color={"attribute.2"}
+                  size="lg"
+                  radius="xl"
+                  position="center"
+                  spacing="md"
+                  total={totalPages}
+                  page={pagination.page}
+                  onChange={page => {
+                    setPagination({ page, pageSize: PAGE_SIZE })
+                  }}
+                />
+              </Paper>
+          }
         </Paper>
       </Box>
     </MantineProvider>
