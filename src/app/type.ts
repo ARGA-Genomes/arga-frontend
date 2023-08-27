@@ -283,6 +283,16 @@ type TraceFile = {
     metadata: any,
 }
 
+type IndigenousEcologicalKnowledge = {
+  id: string,
+  name: string,
+  datasetName: string,
+  culturalConnection: boolean,
+  foodUse: boolean,
+  medicinalUse: boolean,
+  sourceUrl: string,
+}
+
 type QueryResults = {
     species: Species,
 };
@@ -315,6 +325,7 @@ export type {
     SequencingEvent,
     SequencingRunEvent,
     Marker,
+    IndigenousEcologicalKnowledge,
 };
 
 export interface HeaderAndFooterProps {

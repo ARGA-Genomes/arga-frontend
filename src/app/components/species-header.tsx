@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, LoadingOverlay, Paper, Stack, Text, Title } from "@mantine/core";
-import { Conservation, Taxonomy } from "@/app/type";
+import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
 
 
@@ -32,6 +32,15 @@ query SpeciesWithConservation($canonicalName: String) {
       state
       source
     }
+    indigenousEcologicalKnowledge {
+      id
+      name
+      datasetName
+      culturalConnection
+      foodUse
+      medicinalUse
+      sourceUrl
+    }
   }
 }`;
 
@@ -39,6 +48,7 @@ type QueryResults = {
   species: {
     taxonomy: Taxonomy,
     conservation: Conservation[],
+    indigenousEcologicalKnowledge: IndigenousEcologicalKnowledge[],
   },
 };
 
@@ -46,9 +56,10 @@ type QueryResults = {
 interface HeaderProps {
   taxonomy: Taxonomy,
   conservation?: Conservation[],
+  traits?: IndigenousEcologicalKnowledge[],
 }
 
-function Header({ taxonomy, conservation }: HeaderProps) {
+function Header({ taxonomy, conservation, traits }: HeaderProps) {
   return (
     <Grid>
       <Grid.Col span="auto">
@@ -63,7 +74,7 @@ function Header({ taxonomy, conservation }: HeaderProps) {
       </Grid.Col>
       <Grid.Col span="content">
         <Stack h="100%" justify="center">
-          <IconBar taxonomy={taxonomy} conservation={conservation} />
+          <IconBar taxonomy={taxonomy} conservation={conservation} traits={traits} />
         </Stack>
       </Grid.Col>
     </Grid>
@@ -84,6 +95,7 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
 
   const taxonomy = data?.species.taxonomy;
   const conservation = data?.species.conservation;
+  const traits = data?.species.indigenousEcologicalKnowledge;
 
   return (
     <Box pos="relative">
@@ -94,7 +106,7 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
         loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
         visible={loading}
       />
-      { taxonomy ? <Header taxonomy={taxonomy} conservation={conservation} /> : null }
+      { taxonomy ? <Header taxonomy={taxonomy} conservation={conservation} traits={traits} /> : null }
       </Paper>
     </Box>
   )
