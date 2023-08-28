@@ -92,7 +92,7 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
   if (error) {
     return (<Text>Error : {error.message}</Text>);
   }
-
+  
   const taxonomy = data?.species.taxonomy;
   const conservation = data?.species.conservation;
   const traits = data?.species.indigenousEcologicalKnowledge;

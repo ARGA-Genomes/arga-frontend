@@ -24,7 +24,7 @@ import {
 } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import {useEffect, useState} from 'react';
+import { useEffect, useState} from 'react';
 import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
 import ChevronCircleAccordion from 'public/search-icons/chevron-circle-accordion';
@@ -174,17 +174,17 @@ function Attribute({ label, value }: { label: string, value: string | undefined 
   )
 }
 
-
 function TaxonItem({ item }: { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   const { classes } = useSearchTypeStyles();
+  const searchParams = useSearchParams();
 
   return (
     <Accordion.Item p={10} value={item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
           <Stack spacing={0}>
-            <Link href={`/species/${itemLinkName}/summary`} className={classes.canonicalName}>
+            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } className={classes.canonicalName}>
               <Text size="lg"><i>{item.canonicalName}</i></Text>
             </Link>
             { item.subspecies?.map(subspecies => (
@@ -392,15 +392,15 @@ function SearchItem({ item } : { item: Record }) {
 
 function SearchResults({ results } : { results: Record[] }) {
   return (
-    <Accordion variant="separated" 
-      radius="lg" 
-      defaultValue={[results[0] ? results[0].canonicalName: ""]} 
-      chevron={ChevronCircleAccordion()}
-      multiple>
-      {results.map(record => (
-        <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
-      ))}
-    </Accordion>
+      <Accordion variant="separated" 
+        radius="lg" 
+        defaultValue={[results[0] ? results[0].canonicalName: ""]} 
+        chevron={ChevronCircleAccordion()}
+        multiple>
+        {results.map(record => (
+          <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
+        ))}
+      </Accordion>
   )
 }
 
