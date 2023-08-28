@@ -160,12 +160,12 @@ function Summary({ label, value }: { label: string, value: number | string | Rea
 function Attribute({ label, value }: { label: string, value: string | undefined }) {
   value ||= "Not specified";
   const { classes } = useSearchTypeStyles();
-
+  const link = "/" + label.toLowerCase() + "/" + value
 
   return (
     <Stack spacing={0}>
       <Text size="sm">{label}</Text>
-      <Link href="#">
+      <Link href={link}>
         <Paper py={5} px={15} radius="md" sx={{maxWidth:'300px'}} className={classes.attribute}>
           <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
         </Paper>
@@ -595,7 +595,6 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
     attribute: {
       background:theme.colors.attribute[0],
       '&:hover, &:focus': {
-        textDecoration: 'underline',
         background: theme.colors.attribute[2]
       }
     }   
