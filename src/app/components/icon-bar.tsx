@@ -157,19 +157,19 @@ const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
     label: "Kamilaroi Plant and Animal Encyclopaedia",
     image: "iek_kamilaroi.svg",
     color: "#f47c2e",
-    link: "/list/Kamilaroi",
+    link: "/browse/datasets/Kamilaroi_Plant_and_Animal_Encyclopaedia",
   },
   "South East Arnhem Land": {
     label: "South East Arnhem Land",
     image: "iek_south_east_arnhem_land.svg",
     color: "#a2c36e",
-    link: "/list/South_East_Arnhem_Land",
+    link: "/browse/datasets/South_East_Arnhem_Land",
   },
   "Noongar Boodjar Plants and Animals": {
     label: "Noongar Boodjar Plants and Animals",
     image: "iek_noongar_boodjar.svg",
     color: "#fec743",
-    link: "/list/Noongar_Boodjar",
+    link: "/browse/datasets/Noongar_Boodjar_Plants_and_Animals",
   },
 }
 
@@ -249,7 +249,7 @@ function IndigenousLanguageGroupIcon({ group, trait }: IndigenousLanguageGroupIc
 
   return (
     <>
-      {icon?.link ? <Link href={trait.sourceUrl} target="_blank">{component}</Link> : component}
+      {icon?.link ? <Link href={icon.link}>{component}</Link> : component}
     </>
   );
 }
