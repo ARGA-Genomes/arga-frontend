@@ -153,23 +153,23 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
 };
 
 const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
-  "Kamilaroi Plant and Animal Encyclopaedia": {
-    label: "Kamilaroi Plant and Animal Encyclopaedia",
+  "Indigenous Ecological Knowledge species: Kamilaroi People": {
+    label: "Indigenous Ecological Knowledge species: Kamilaroi People",
     image: "iek_kamilaroi.svg",
     color: "#f47c2e",
-    link: "/browse/datasets/Kamilaroi_Plant_and_Animal_Encyclopaedia",
+    link: "/browse/datasets/Indigenous_Ecological_Knowledge_species:_Kamilaroi_People",
   },
-  "South East Arnhem Land": {
-    label: "South East Arnhem Land",
+  "Indigenous Ecological Knowledge species: South East Arnhem Land People": {
+    label: "Indigenous Ecological Knowledge species: South East Arnhem Land People",
     image: "iek_south_east_arnhem_land.svg",
     color: "#a2c36e",
     link: "/browse/datasets/South_East_Arnhem_Land",
   },
-  "Noongar Boodjar Plants and Animals": {
-    label: "Noongar Boodjar Plants and Animals",
+  "Indigenous Ecological Knowledge species: Noongar Boodjar People": {
+    label: "Indigenous Ecological Knowledge species: Noongar Boodjar People",
     image: "iek_noongar_boodjar.svg",
     color: "#fec743",
-    link: "/browse/datasets/Noongar_Boodjar_Plants_and_Animals",
+    link: "/browse/datasets/Indigenous_Ecological_Knowledge_species:_Noongar_Boodjar_People",
   },
 }
 

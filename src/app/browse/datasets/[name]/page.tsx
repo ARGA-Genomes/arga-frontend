@@ -119,7 +119,7 @@ function Species({ dataset }: { dataset: string }) {
 
 
 export default function BrowseDataset({ params }: { params: { name: string } }) {
-  const dataset = params.name.replaceAll("_", " ");
+  const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
   return (
     <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
