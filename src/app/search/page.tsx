@@ -177,13 +177,14 @@ function Attribute({ label, value }: { label: string, value: string | undefined 
 
 function TaxonItem({ item }: { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const { classes } = useSearchTypeStyles();
 
   return (
     <Accordion.Item p={10} value={item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
           <Stack spacing={0}>
-            <Link href={`/species/${itemLinkName}/summary`}>
+            <Link href={`/species/${itemLinkName}/summary`} className={classes.canonicalName}>
               <Text size="lg"><i>{item.canonicalName}</i></Text>
             </Link>
             { item.subspecies?.map(subspecies => (
@@ -601,6 +602,11 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
       '&:hover, &:focus': {
         background: theme.colors.attribute[2]
       }
-    }   
+    },
+    canonicalName: {
+      '&:hover, &:focus': {
+        textDecoration: 'underline'
+      }
+    }      
   }
 });
