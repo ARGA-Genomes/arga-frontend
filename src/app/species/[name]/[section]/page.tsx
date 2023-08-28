@@ -65,7 +65,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
         <Tabs.Tab value="whole_genome">Whole Genomes</Tabs.Tab>
         <Tabs.Tab value="traces">Traces</Tabs.Tab>
         <Tabs.Tab value="barcode">Genetic Loci*</Tabs.Tab>
-        <Tabs.Tab value="other_genomic">Other genetic data</Tabs.Tab>
+        <Tabs.Tab value="other_genomic">Other Genetic Data</Tabs.Tab>
         <Tabs.Tab value="specimen">Specimen</Tabs.Tab>
       </Tabs.List>
 

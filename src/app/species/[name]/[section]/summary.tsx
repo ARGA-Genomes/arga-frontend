@@ -134,12 +134,12 @@ function DataSummary({ canonicalName, stats, specimens }: DataSummaryProps) {
 
   return (
     <HighlightStack>
-      <Text fw={700}>Data available</Text>
+      <Text fw={700}>Indexed Data</Text>
     <SimpleGrid cols={4}>
       <Attribute label="Whole Genomes" value={stats.wholeGenomes} href={`/species/${name}/whole_genome`} />
       <Attribute label="Genetic Loci*" value={stats.barcodes} href={`/species/${name}/barcode`} />
       <Attribute label="Specimens" value={specimens?.length} href={`/species/${name}/specimen`} />
-      <Attribute label="Other Data" value={otherData} href={`/species/${name}/other_genomic`} />
+      <Attribute label="Other Genetic Data" value={otherData} href={`/species/${name}/other_genomic`} />
     </SimpleGrid>
     </HighlightStack>
   );
