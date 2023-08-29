@@ -286,12 +286,13 @@ function TaxonDetails({ item }: { item: Record }) {
 
 function GenomeItem({ item } : { item: Record }) {
   const { classes } = useSearchTypeStyles();
+  const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   const searchParams = useSearchParams();
   return (
     <Accordion.Item p={10} value={item.accession? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={{pathname: `/assemblies/${item.accession}`, query: {previousUrl : searchParams.toString()}} } >
+          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } >
             <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
@@ -340,11 +341,12 @@ function GenomeDetails({ item }: { item: Record }) {
 function LocusItem({ item } : { item: Record }) {
   const { classes } = useSearchTypeStyles();
   const searchParams = useSearchParams();
+  const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   return (
     <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={{pathname: `/markers/${item.accession}`, query: {previousUrl : searchParams.toString()}} } >
+          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } >
             <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
