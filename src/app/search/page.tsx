@@ -180,7 +180,7 @@ function TaxonItem({ item }: { item: Record }) {
   const searchParams = useSearchParams();
 
   return (
-    <Accordion.Item p={10} value={item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
           <Stack spacing={0}>
@@ -394,7 +394,7 @@ function SearchResults({ results } : { results: Record[] }) {
   return (
       <Accordion variant="separated" 
         radius="lg" 
-        defaultValue={[results[0] ? results[0].canonicalName: ""]} 
+        defaultValue={[results[0] ? (results[0].accession ? results[0].accession :results[0].canonicalName): ""]} 
         chevron={ChevronCircleAccordion()}
         multiple>
         {results.map(record => (
