@@ -148,7 +148,16 @@ type Pagination = {
 }
 
 
-function Summary({ label, value }: { label: string, value: number | string | React.ReactNode }) {
+function Summary({ label, value, url = null}: { label: string, value: number | string | React.ReactNode, url: { pathname: string; query: { previousUrl: string; } } | null }) {
+  const { classes } = useSearchTypeStyles();
+  if (url !== null) {
+    return (
+      <>
+        <Text size="lg">{label} <Link href={url}><strong className={classes.accession}>{value}</strong></Link></Text>
+        <Divider size="sm" orientation="vertical" />
+      </>
+    )
+  }
   return (
     <>
       <Text size="lg">{label} <strong>{value}</strong></Text>
@@ -184,8 +193,8 @@ function TaxonItem({ item }: { item: Record }) {
       <Accordion.Control>
         <Group position="apart">
           <Stack spacing={0}>
-            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } className={classes.canonicalName}>
-              <Text size="lg"><i>{item.canonicalName}</i></Text>
+            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } >
+              <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
             { item.subspecies?.map(subspecies => (
               <Text size="sm" ml={5} key={subspecies} className='subspeciesAccordion'>
@@ -219,10 +228,10 @@ function TaxonItem({ item }: { item: Record }) {
 function TaxonSummary({ summary }: { summary: DataSummary }) {
   return (
     <>
-      { summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} /> : null }
-      { summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} /> : null }
-      { summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} /> : null }
-      { summary.barcodes ? <Summary label="Genetic loci*" value={summary.barcodes} /> : null }
+      { summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} url={null} /> : null }
+      { summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} url={null} /> : null }
+      { summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} url={null} /> : null }
+      { summary.barcodes ? <Summary label="Genetic loci*" value={summary.barcodes} url={null} /> : null }
     </>
   )
 }
@@ -276,12 +285,14 @@ function TaxonDetails({ item }: { item: Record }) {
 
 
 function GenomeItem({ item } : { item: Record }) {
+  const { classes } = useSearchTypeStyles();
+  const searchParams = useSearchParams();
   return (
-    <Accordion.Item p={10} value={item.accession || ""} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={`/assemblies/${item.accession}`}>
-            <Text size="lg"><i>{item.canonicalName}</i></Text>
+          <Link href={{pathname: `/assemblies/${item.accession}`, query: {previousUrl : searchParams.toString()}} } >
+            <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
             <GenomeSummary item={item} />
@@ -296,10 +307,11 @@ function GenomeItem({ item } : { item: Record }) {
 }
 
 function GenomeSummary({ item }: { item: Record }) {
+  const searchParams = useSearchParams();
   return (
     <>
-      <Summary label="Accession no." value={`${item.accession} (${item.genomeRep})`} />
-      <Summary label="Reference genome" value={item.referenceGenome ? <CircleCheck size={20} color="green" /> : <CircleX size={20} color="red" />} />
+      <Summary label="Accession no." value={`${item.accession} (${item.genomeRep})`} url={{pathname: `/assemblies/${item.accession}`, query: {previousUrl : searchParams.toString()}}}/>
+      <Summary label="Reference genome" value={item.referenceGenome ? <CircleCheck size={20} color="green" /> : <CircleX size={20} color="red" />} url={null} />
     </>
   )
 }
@@ -326,12 +338,14 @@ function GenomeDetails({ item }: { item: Record }) {
 }
 
 function LocusItem({ item } : { item: Record }) {
+  const { classes } = useSearchTypeStyles();
+  const searchParams = useSearchParams();
   return (
-    <Accordion.Item p={10} value={item.canonicalName || ""} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={`/markers/${item.accession}`}>
-            <Text size="lg"><i>{item.canonicalName}</i></Text>
+          <Link href={{pathname: `/markers/${item.accession}`, query: {previousUrl : searchParams.toString()}} } >
+            <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
             <LocusSummary item={item} />
@@ -346,10 +360,11 @@ function LocusItem({ item } : { item: Record }) {
 }
 
 function LocusSummary({ item }: { item: Record }) {
+  const searchParams = useSearchParams();
   return (
     <>
-      <Summary label="Accession no." value={item.accession} />
-      <Summary label="Source molecule" value={item.locusType} />
+      <Summary label="Accession no." value={item.accession} url={{pathname: `/markers/${item.accession}`, query: {previousUrl : searchParams.toString()}}}/>
+      <Summary label="Source molecule" value={item.locusType} url={null}/>
     </>
   )
 }
@@ -607,6 +622,11 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
       '&:hover, &:focus': {
         textDecoration: 'underline'
       }
-    }      
+    },
+    accession: {
+      '&:hover, &:focus': {
+        textDecoration: 'underline'
+      }
+    }        
   }
 });
