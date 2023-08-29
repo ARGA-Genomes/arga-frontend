@@ -7,6 +7,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Box, Paper, SimpleGrid, Text, Pagination, MantineProvider, Title } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { useEffect, useState } from "react";
+import { BarChart } from "@/app/components/graphing/bar";
 
 
 const GET_DATASET_SPECIES = gql`
@@ -157,14 +158,18 @@ function DataSummary({ dataset }: { dataset: string }) {
     },
   });
 
+  const sampleData = [
+    { name: "data1", value: 30},
+    { name: "data2", value: 78},
+    { name: "data3", value: 10},
+    { name: "data4", value: 40},
+  ];
+
   return (
     <Box p={40}>
-      <PieChart width={500} height={300} data={[
-        { name: "data1", value: 30},
-        { name: "data2", value: 78},
-        { name: "data3", value: 10},
-        { name: "data4", value: 40},
-      ]}/>
+      <BarChart w={500} h={250} data={sampleData} spacing={0.1} />
+      <PieChart w={500} h={300} data={sampleData} labelled />
+      <PieChart w={500} h={300} data={sampleData} />
     </Box>
   )
 }
@@ -181,7 +186,7 @@ export default function BrowseDataset({ params }: { params: { name: string } }) 
 
       <Box mt={30}>
         <Title order={3} mb={10}>Data summary</Title>
-        <Paper>
+        <Paper radius="lg">
           <DataSummary dataset={dataset} />
         </Paper>
       </Box>
