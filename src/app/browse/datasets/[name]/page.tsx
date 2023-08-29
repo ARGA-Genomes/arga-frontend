@@ -1,6 +1,7 @@
 'use client';
 
 import { SpeciesCard } from "@/app/components/species-card";
+import { PieChart } from "@/app/components/graphing/pie";
 import { argaBrandLight } from "@/app/theme";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Paper, SimpleGrid, Text, Pagination, MantineProvider, Title } from "@mantine/core";
@@ -60,6 +61,37 @@ type QueryResults = {
 };
 
 
+const GET_STATS = gql`
+  query DatasetStats($name: String) {
+    stats {
+      dataset(name: $name) {
+        totalSpecies
+        speciesWithData
+        breakdown {
+          name
+          total
+        }
+      }
+    }
+  }
+`;
+
+type Breakdown = {
+  name: string;
+  total: number;
+};
+
+type DatasetStats = {
+  totalSpecies: number;
+  speciesWithData: number;
+  breakdown: Breakdown[];
+};
+
+type StatsQueryResults = {
+  stats: { dataset: DatasetStats };
+};
+
+
 function Species({ dataset }: { dataset: string }) {
   const [activePage, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -93,7 +125,7 @@ function Species({ dataset }: { dataset: string }) {
 
   return (
     <Box>
-      <SimpleGrid cols={3} pt={40}>
+      <SimpleGrid cols={3}>
         {records.map((record) => (
           <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
         ))}
@@ -118,6 +150,26 @@ function Species({ dataset }: { dataset: string }) {
 }
 
 
+function DataSummary({ dataset }: { dataset: string }) {
+  const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
+    variables: {
+      name: dataset,
+    },
+  });
+
+  return (
+    <Box p={40}>
+      <PieChart width={500} height={300} data={[
+        { name: "data1", value: 30},
+        { name: "data2", value: 78},
+        { name: "data3", value: 10},
+        { name: "data4", value: 40},
+      ]}/>
+    </Box>
+  )
+}
+
+
 export default function BrowseDataset({ params }: { params: { name: string } }) {
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
@@ -126,7 +178,16 @@ export default function BrowseDataset({ params }: { params: { name: string } }) 
       <Box>
         <Title order={2}>{dataset}</Title>
       </Box>
-      <Box>
+
+      <Box mt={30}>
+        <Title order={3} mb={10}>Data summary</Title>
+        <Paper>
+          <DataSummary dataset={dataset} />
+        </Paper>
+      </Box>
+
+      <Box mt={30}>
+        <Title order={3} mb={10}>Browse species</Title>
         <Species dataset={dataset}/>
       </Box>
     </MantineProvider>

@@ -20,6 +20,8 @@
     "@mantine/hooks": "^5.10.2",
     "@mantine/next": "^5.10.2",
     "@next/font": "13.1.6",
+    "@react-spring/web": "^9.7.3",
+    "@types/d3": "^7.4.0",
     "@types/humanize-plus": "^1.8.0",
     "@types/leaflet": "^1.9.3",
     "@types/luxon": "^3.2.0",
@@ -27,6 +29,7 @@
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
     "chart.js": "^4.2.1",
+    "d3": "^7.8.5",
     "dayjs": "^1.11.7",
     "eslint": "8.33.0",
     "eslint-config-next": "13.1.6",
@@ -41,7 +44,6 @@
     "react-dom": "18.2.0",
     "react-leaflet": "^4.2.1",
     "tabler-icons-react": "^1.56.0",
-    "typescript": "4.9.5",
-    "env-cmd": "10.1.0"
+    "typescript": "4.9.5"
   }
 }
