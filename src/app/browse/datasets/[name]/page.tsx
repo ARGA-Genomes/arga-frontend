@@ -4,10 +4,11 @@ import { SpeciesCard } from "@/app/components/species-card";
 import { PieChart } from "@/app/components/graphing/pie";
 import { argaBrandLight } from "@/app/theme";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Paper, SimpleGrid, Text, Pagination, MantineProvider, Title } from "@mantine/core";
+import { Box, Paper, SimpleGrid, Text, Pagination, MantineProvider, Title, Group } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { BarChart } from "@/app/components/graphing/bar";
+import { TachoChart } from "@/app/components/graphing/tacho";
 
 
 const GET_DATASET_SPECIES = gql`
@@ -165,11 +166,24 @@ function DataSummary({ dataset }: { dataset: string }) {
     { name: "data4", value: 40},
   ];
 
+  const sampleGauge = [
+    { name: "bad", color: "#f47625", start: 0, end: 50 },
+    { name: "decent", color: "#febb1e", start: 50, end: 75 },
+    { name: "great", color: "#97bc5d", start: 75, end: 100 },
+  ]
+
   return (
     <Box p={40}>
-      <BarChart w={500} h={250} data={sampleData} spacing={0.1} />
-      <PieChart w={500} h={300} data={sampleData} labelled />
-      <PieChart w={500} h={300} data={sampleData} />
+      <Group>
+        <TachoChart w={400} h={250} thresholds={sampleGauge} value={12} />
+        <TachoChart w={400} h={250} thresholds={sampleGauge} value={68} />
+        <TachoChart w={400} h={250} thresholds={sampleGauge} value={94} />
+      </Group>
+      <BarChart w={500} h={200} data={sampleData} spacing={0.1} />
+      <Group>
+        <PieChart w={500} h={300} data={sampleData} labelled />
+        <PieChart w={500} h={300} data={sampleData} />
+      </Group>
     </Box>
   )
 }

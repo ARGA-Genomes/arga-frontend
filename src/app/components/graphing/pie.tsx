@@ -22,8 +22,7 @@ interface ArcProps {
   onHighlight: (datum: PieDatum | undefined) => void,
 }
 
-function Arc(props: ArcProps & SVGProps<SVGPathElement>)
-{
+function Arc(props: ArcProps & SVGProps<SVGPathElement>) {
   // unwrap properties for convenience
   const {
     data,
@@ -56,8 +55,7 @@ function Arc(props: ArcProps & SVGProps<SVGPathElement>)
   )
 };
 
-function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>)
-{
+function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
   // unwrap properties for convenience
   const {
     data,
@@ -151,7 +149,7 @@ export function PieChart({ data, labelled, ...rest }: PieChartProps & BoxProps) 
   const [highlighted, setHighlighted] = useState<PieDatum|undefined>();
   const radius = Math.min(width - 2 * MARGIN_X, height - 2 * MARGIN_Y) / 2;
 
-  const pieGenerator = d3.pie<PieDatum>().value((d) => d.value);
+  const pieGenerator = d3.pie<PieDatum>().value(d => d.value);
   const arcs = pieGenerator(data);
 
   const color = d3
