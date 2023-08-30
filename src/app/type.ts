@@ -154,6 +154,7 @@ type Species = {
     wholeGenomes: WholeGenome[],
     traceFiles: TraceFile[],
     specimens?: Specimen[],
+    indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[],
 };
 
 type Specimen = {

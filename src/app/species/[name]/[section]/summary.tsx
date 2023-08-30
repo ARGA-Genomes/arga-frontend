@@ -70,6 +70,10 @@ const GET_SUMMARY = gql`
         longitude
         institutionName
       }
+      indigenousEcologicalKnowledge {
+        id
+        sourceUrl
+      }
     }
   }
 `;
@@ -197,7 +201,12 @@ interface TaxonMatch {
   acceptedName: string;
 }
 
-function ExternalLinks({ canonicalName }: { canonicalName: string }) {
+interface ExternalLinksProps {
+  canonicalName: string,
+  species?: Species,
+}
+
+function ExternalLinks(props: ExternalLinksProps) {
   const [matchedTaxon, setMatchedTaxon] = useState<string[] | null>(null);
   const hasFrogID = false;
   const hasAFD = false;
@@ -207,7 +216,7 @@ function ExternalLinks({ canonicalName }: { canonicalName: string }) {
     async function matchTaxon() {
       try {
         const response = await fetch(
-          `https://api.ala.org.au/species/guid/${encodeURIComponent(canonicalName)}`
+          `https://api.ala.org.au/species/guid/${encodeURIComponent(props.canonicalName)}`
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
@@ -221,6 +230,7 @@ function ExternalLinks({ canonicalName }: { canonicalName: string }) {
     matchTaxon();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <Box>
       <Text fw={700}>External links</Text>
@@ -242,6 +252,26 @@ function ExternalLinks({ canonicalName }: { canonicalName: string }) {
         >
           <Text color="black">View on&nbsp;<b>ALA</b></Text>
         </Button>
+
+        {props.species?.indigenousEcologicalKnowledge?.map(iek => (
+          <Button
+            key={iek.id}
+            component="a"
+            radius="md"
+            color="gray"
+            variant="light"
+            size="xs"
+            leftIcon={<ExternalLink size="1rem" color="black" />}
+            href={iek.sourceUrl}
+            target="_blank"
+            sx={(theme) => ({
+              border: `1px solid ${theme.colors["gray"][6]}`,
+            })}
+          >
+            <Text color="black">View on&nbsp;<b>Profiles</b></Text>
+          </Button>
+        ))}
+
         {hasFrogID && (
           <Button
             radius="md"
@@ -342,7 +372,7 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
           <Stack spacing={20}>
             <SpeciesPhoto photo={data?.species.photos[0]} />
             {data && <Taxonomy taxonomy={data.species.taxonomy} /> }
-            <ExternalLinks canonicalName={canonicalName} />
+            <ExternalLinks canonicalName={canonicalName} species={data?.species} />
           </Stack>
         </Grid.Col>
         <Grid.Col span="auto">
