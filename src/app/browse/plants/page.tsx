@@ -11,22 +11,33 @@ import { useState } from "react";
 const PAGE_SIZE = 15;
 
 const GET_SPECIES = gql`
-query SpeciesWithAssemblies($page: Int, $perPage: Int) {
-  assemblies {
+query PlantaeTaxaSpecies($page: Int, $perPage: Int) {
+  taxa(filters: [
+      { filter: KINGDOM, action: INCLUDE, value: "Plantae" }
+    ]) {
     species(page: $page, perPage: $perPage) {
-      total
+      total,
       records {
         taxonomy {
+          scientificName
           canonicalName
+          authority
+          kingdom
+          phylum
+          class
+          order
+          family
+          genus
         }
         photo {
           url
         }
         dataSummary {
+          wholeGenomes
+          partialGenomes
+          organelles
           barcodes
           other
-          partialGenomes
-          wholeGenomes
         }
       }
     }
@@ -46,7 +57,7 @@ type Species = {
   dataSummary: DataSummary,
 }
 
-type Assemblies = {
+type Taxa = {
   species: {
     records: Species[],
     total: number,
@@ -54,7 +65,7 @@ type Assemblies = {
 };
 
 type QueryResults = {
-  assemblies: Assemblies,
+  taxa: Taxa,
 };
 
 
@@ -62,14 +73,14 @@ function BrowseResults({ list }: { list: Species[]}) {
   if (list.length === 0) return <Title>No data found</Title>
 
   return (
-    <SimpleGrid cols={4}>
+    <SimpleGrid cols={3}>
       { list.map(item => (<SpeciesCard species={item} key={item.taxonomy.canonicalName} />)) }
     </SimpleGrid>
   )
 }
 
 
-export default function GenomesList() {
+export default function PlantsList() {
   const theme = useMantineTheme();
   const [page, setPage] = useState(1);
   const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
@@ -89,13 +100,13 @@ export default function GenomesList() {
           radius="xl"
         />
 
-        <Title order={2} mb={20}>Genomes</Title>
+        <Title order={2} mb={20}>Plants</Title>
 
         { error ? <Title order={4}>{error.message}</Title> : null }
-        { !loading && data ? <BrowseResults list={data.assemblies.species.records} /> : null }
+        { !loading && data ? <BrowseResults list={data.taxa.species.records} /> : null }
 
         <PaginationBar
-          total={data?.assemblies.species.total}
+          total={data?.taxa.species.total}
           page={page}
           pageSize={PAGE_SIZE}
           onChange={page => { setPage(page); scrollIntoView() }}

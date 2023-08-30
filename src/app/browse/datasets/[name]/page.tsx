@@ -1,11 +1,14 @@
 'use client';
 
 import { SpeciesCard } from "@/app/components/species-card";
+import { PieChart } from "@/app/components/graphing/pie";
 import { argaBrandLight } from "@/app/theme";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Paper, SimpleGrid, Text, Pagination, MantineProvider, Title } from "@mantine/core";
+import { Box, Paper, SimpleGrid, Text, Pagination, MantineProvider, Title, Group } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { useEffect, useState } from "react";
+import { BarChart } from "@/app/components/graphing/bar";
+import { TachoChart } from "@/app/components/graphing/tacho";
 
 
 const GET_DATASET_SPECIES = gql`
@@ -60,6 +63,37 @@ type QueryResults = {
 };
 
 
+const GET_STATS = gql`
+  query DatasetStats($name: String) {
+    stats {
+      dataset(name: $name) {
+        totalSpecies
+        speciesWithData
+        breakdown {
+          name
+          total
+        }
+      }
+    }
+  }
+`;
+
+type Breakdown = {
+  name: string;
+  total: number;
+};
+
+type DatasetStats = {
+  totalSpecies: number;
+  speciesWithData: number;
+  breakdown: Breakdown[];
+};
+
+type StatsQueryResults = {
+  stats: { dataset: DatasetStats };
+};
+
+
 function Species({ dataset }: { dataset: string }) {
   const [activePage, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -93,7 +127,7 @@ function Species({ dataset }: { dataset: string }) {
 
   return (
     <Box>
-      <SimpleGrid cols={3} pt={40}>
+      <SimpleGrid cols={3}>
         {records.map((record) => (
           <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
         ))}
@@ -118,6 +152,43 @@ function Species({ dataset }: { dataset: string }) {
 }
 
 
+function DataSummary({ dataset }: { dataset: string }) {
+  const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
+    variables: {
+      name: dataset,
+    },
+  });
+
+  const sampleData = [
+    { name: "data1", value: 30},
+    { name: "data2", value: 78},
+    { name: "data3", value: 10},
+    { name: "data4", value: 40},
+  ];
+
+  const sampleGauge = [
+    { name: "bad", color: "#f47625", start: 0, end: 50 },
+    { name: "decent", color: "#febb1e", start: 50, end: 75 },
+    { name: "great", color: "#97bc5d", start: 75, end: 100 },
+  ]
+
+  return (
+    <Box p={40}>
+      <Group>
+        <TachoChart w={400} h={250} thresholds={sampleGauge} value={12} />
+        <TachoChart w={400} h={250} thresholds={sampleGauge} value={68} />
+        <TachoChart w={400} h={250} thresholds={sampleGauge} value={94} />
+      </Group>
+      <BarChart w={500} h={200} data={sampleData} spacing={0.1} />
+      <Group>
+        <PieChart w={500} h={300} data={sampleData} labelled />
+        <PieChart w={500} h={300} data={sampleData} />
+      </Group>
+    </Box>
+  )
+}
+
+
 export default function BrowseDataset({ params }: { params: { name: string } }) {
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
@@ -126,7 +197,16 @@ export default function BrowseDataset({ params }: { params: { name: string } }) 
       <Box>
         <Title order={2}>{dataset}</Title>
       </Box>
-      <Box>
+
+      <Box mt={30}>
+        <Title order={3} mb={10}>Data summary</Title>
+        <Paper radius="lg">
+          <DataSummary dataset={dataset} />
+        </Paper>
+      </Box>
+
+      <Box mt={30}>
+        <Title order={3} mb={10}>Browse species</Title>
         <Species dataset={dataset}/>
       </Box>
     </MantineProvider>

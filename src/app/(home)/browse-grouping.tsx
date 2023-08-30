@@ -18,12 +18,6 @@ type Overview = {
 const GET_OVERVIEW = gql`
   query {
     overview {
-      agriculturalAndAquacultureAndCommercial
-      bioSecurityAndPest
-      inAustralia
-      marine
-      terrestrial
-      threatenedSpecies
       allSpecies
     }
   }
@@ -42,7 +36,7 @@ export default function BrowseGrouping() {
     <Grid gutter={37}>
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <BrowseCard
-          total={data?.overview.agriculturalAndAquacultureAndCommercial}
+          total={0}
           category="Agriculture, aquaculture and commercial species"
           image="card-icons/agricultural.svg"
           link="/browse/list/Conservation_NT"
@@ -50,7 +44,7 @@ export default function BrowseGrouping() {
       </Grid.Col>
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <BrowseCard
-          total={data?.overview.marine}
+          total={0}
           category="Marine biodiversity"
           image="card-icons/marine.svg"
           link="/browse/list/Conservation_NT"
@@ -58,7 +52,7 @@ export default function BrowseGrouping() {
       </Grid.Col>
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <BrowseCard
-          total={data?.overview.terrestrial}
+          total={0}
           category="Terrestrial biodiversity"
           image="card-icons/allspecies.svg"
           link="/browse/list/Conservation_NT"
@@ -66,7 +60,7 @@ export default function BrowseGrouping() {
       </Grid.Col>
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <BrowseCard
-          total={data?.overview.bioSecurityAndPest}
+          total={0}
           category="Biosecurity and pest species"
           image="card-icons/preserved.svg"
           link="/browse/list/Conservation_NT"
@@ -74,7 +68,7 @@ export default function BrowseGrouping() {
       </Grid.Col>
       <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <BrowseCard
-          total={data?.overview.threatenedSpecies}
+          total={0}
           category="Threatened biodiversity"
           image="card-icons/tsi.svg"
           link="/browse/list/Conservation_NT"

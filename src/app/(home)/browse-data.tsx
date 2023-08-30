@@ -15,7 +15,6 @@ const GET_OVERVIEW = gql`
   query {
     overview {
       genomes
-      organelles
       barcodes
     }
   }
