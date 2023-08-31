@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  createStyles,
   Grid,
   Group,
   Image,
@@ -323,23 +324,24 @@ interface TaxonomyProps {
 function Taxonomy({ taxonomy }: TaxonomyProps) {
   const attribution = "Australian Faunal Directory";
   const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`;
-
+  const { classes } = useSpeciesSummaryStyles();
+  
   return (
     <Box>
       <HighlightStack spacing={0}>
         <Text fw={700} mb={10}>Higher Classification</Text>
-          <Link href={`/kingdom/${taxonomy.kingdom}`}>{taxonomy.kingdom}</Link>
-          <Link href={`/phylum/${taxonomy.phylum}`}>{taxonomy.phylum}</Link>
-          <Link href={`/class/${taxonomy.class}`}>{taxonomy.class}</Link>
-          <Link href={`/order/${taxonomy.order}`}>{taxonomy.order}</Link>
-          <Link href={`/family/${taxonomy.family}`}>{taxonomy.family}</Link>
-          <Link href={`/genus/${taxonomy.genus}`}>{taxonomy.genus}</Link>
-          <Text color="black" italic>{taxonomy.canonicalName}</Text>
+          <Link href={`/kingdom/${taxonomy.kingdom}`} className={classes.indent}>{taxonomy.kingdom}</Link>
+          <Link href={`/phylum/${taxonomy.phylum}`} className={classes.indent}>{taxonomy.phylum}</Link>
+          <Link href={`/class/${taxonomy.class}`} className={classes.indent}>{taxonomy.class}</Link>
+          <Link href={`/order/${taxonomy.order}`} className={classes.indent}>{taxonomy.order}</Link>
+          <Link href={`/family/${taxonomy.family}`} className={classes.indent}>{taxonomy.family}</Link>
+          <Link href={`/genus/${taxonomy.genus}`} className={classes.indent}>{taxonomy.genus}</Link>
+          <Text color="black" italic className={classes.indent}>{taxonomy.canonicalName}</Text>
 
         { taxonomy.synonyms.length > 0 && <>
           <Text fw={700} mb={10} mt={20}>Synonyms</Text>
           { taxonomy.synonyms.map(synonym => (
-            <Text key={synonym.scientificName}>{synonym.scientificName}</Text>
+            <Text key={synonym.scientificName} className={classes.indent}>{synonym.scientificName}</Text>
           ))}
         </>}
       </HighlightStack>
@@ -391,3 +393,11 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
     </Stack>
   );
 }
+
+const useSpeciesSummaryStyles = createStyles((theme, _params, _getRef) => {
+  return {
+    indent: {
+      marginLeft: '10px'
+    }
+  }
+});
