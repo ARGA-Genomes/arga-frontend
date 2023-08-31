@@ -1,9 +1,10 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Grid, LoadingOverlay, Paper, Stack, Text, Title } from "@mantine/core";
+import { Box, Grid, Group, LoadingOverlay, Paper, Stack, Text, Title } from "@mantine/core";
 import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
+import Link from "next/link";
 
 
 const GET_SPECIES = gql`
@@ -59,7 +60,36 @@ interface HeaderProps {
   traits?: IndigenousEcologicalKnowledge[],
 }
 
+function taxonomicStatusColors(taxonomyStatus: string) {
+  if (taxonomyStatus === 'valid' || taxonomyStatus === 'accepted') {
+    return 'green'
+  }
+  else if (taxonomyStatus === 'invalid' || taxonomyStatus === 'not accepted') {
+    return 'red'
+  }
+  return 'gray'
+}
+function getVernacularNames (names: { name: string }[]) {
+  let vernacularNames = names.map(function(name) {
+    return name['name']
+  })
+  return vernacularNames.join(", ")
+}
+
+function Attribution({ name, url }: { name: string; url: string }) {
+  return (
+    <Text color="gray" weight="bold">
+      Source:{" "}
+      <Link href={url} target="_blank">
+        {name}
+      </Link>
+    </Text>
+  );
+}
+
 function Header({ taxonomy, conservation, traits }: HeaderProps) {
+  const attribution = "Australian Faunal Directory";
+  const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`;
   return (
     <Grid>
       <Grid.Col span="auto">
@@ -68,8 +98,17 @@ function Header({ taxonomy, conservation, traits }: HeaderProps) {
             <i>{taxonomy.canonicalName}</i> {taxonomy.authority}
           </Title>
           <Text color="gray" mt={-8}>
-            <b>Taxonomic Status: </b>{taxonomy.status.toLowerCase()}
+            <Group><b>Taxonomic Status: </b> <Text color={taxonomicStatusColors(taxonomy.status.toLowerCase())}>{taxonomy.status.toLowerCase()}</Text></Group>
+            <Attribution name={attribution} url={sourceUrl} />
           </Text>
+          <Group>
+            <Text color="gray"><b>Common names: </b></Text>
+            { taxonomy.vernacularNames && taxonomy.vernacularNames.length > 0
+              ? <Text size="md" weight={550}>{getVernacularNames(taxonomy.vernacularNames)}</Text>
+              : <Text size="md" weight={550} c="dimmed">None</Text>
+            }
+          </Group>
+        
         </Stack>
       </Grid.Col>
       <Grid.Col span="content">

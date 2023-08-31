@@ -137,7 +137,7 @@ function DataSummary({ canonicalName, stats, specimens }: DataSummaryProps) {
   const otherData = stats.total - stats.wholeGenomes - stats.organelles - stats.barcodes;
 
   return (
-    <HighlightStack>
+    <Stack>
       <Text fw={700}>Indexed Data</Text>
     <SimpleGrid cols={4}>
       <Attribute label="Whole Genomes" value={stats.wholeGenomes} href={`/species/${name}/whole_genome`} />
@@ -145,7 +145,7 @@ function DataSummary({ canonicalName, stats, specimens }: DataSummaryProps) {
       <Attribute label="Specimens" value={specimens?.length} href={`/species/${name}/specimen`} />
       <Attribute label="Other Genetic Data" value={otherData} href={`/species/${name}/other_genomic`} />
     </SimpleGrid>
-    </HighlightStack>
+    </Stack>
   );
 }
 
@@ -233,7 +233,7 @@ function ExternalLinks(props: ExternalLinksProps) {
 
   return (
     <Box>
-      <Text fw={700}>External links</Text>
+      <Text size="xl" weight={600} mb="sm">External links</Text>
       <Group mt="md" spacing="xs">
         <Button
           component="a"
@@ -327,7 +327,7 @@ function Taxonomy({ taxonomy }: TaxonomyProps) {
   return (
     <Box>
       <HighlightStack spacing={0}>
-        <Text fw={700} mb={10}>Taxonomy</Text>
+        <Text fw={700} mb={10}>Higher Classification</Text>
           <Link href={`/kingdom/${taxonomy.kingdom}`}>{taxonomy.kingdom}</Link>
           <Link href={`/phylum/${taxonomy.phylum}`}>{taxonomy.phylum}</Link>
           <Link href={`/class/${taxonomy.class}`}>{taxonomy.class}</Link>
