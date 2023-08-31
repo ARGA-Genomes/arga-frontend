@@ -62,8 +62,9 @@ interface HeaderProps {
 }
 
 function taxonomicStatusColors(taxonomyStatus: string) {
+  const { classes } = useSpeciesHeaderStyles();
   if (taxonomyStatus === 'valid' || taxonomyStatus === 'accepted') {
-    return 'green'
+    return 'successGreen.0'
   }
   else if (taxonomyStatus === 'invalid' || taxonomyStatus === 'not accepted') {
     return 'red'
