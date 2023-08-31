@@ -62,8 +62,9 @@ interface HeaderProps {
 }
 
 function taxonomicStatusColors(taxonomyStatus: string) {
+  const { classes } = useSpeciesHeaderStyles();
   if (taxonomyStatus === 'valid' || taxonomyStatus === 'accepted') {
-    return 'green'
+    return 'successGreen.0'
   }
   else if (taxonomyStatus === 'invalid' || taxonomyStatus === 'not accepted') {
     return 'red'
@@ -102,18 +103,18 @@ function Header({ taxonomy, conservation, traits }: HeaderProps) {
           <Title order={3} size={26}>
             <i>{taxonomy.canonicalName}</i> {taxonomy.authority}
           </Title>
-          <Text color="gray" mt={-8}>
+          <Text color="gray" mt={-8} size="sm">
             <Group><b>Taxonomic Status: </b> <Text color={taxonomicStatusColors(taxonomy.status.toLowerCase())}>{taxonomy.status.toLowerCase()}</Text></Group>
             <Attribution name={attribution} url={sourceUrl} />
           </Text>
           <Group>
-            <Text color="gray" className = {classes.commonNameHeader}><b>Common names: </b></Text>
+            <Text color="gray" size="sm" className = {classes.commonNameHeader}><b>Common names: </b></Text>
             { taxonomy.vernacularNames && taxonomy.vernacularNames.length > 0
               ? <>
-                  <Text size="md" weight={550} className={fullCommonNames ? classes.commonNames : classes.ellipsedCommonNames}>{getVernacularNames(taxonomy.vernacularNames)}</Text>
+                  <Text size="sm" weight={550} className={fullCommonNames ? classes.commonNames : classes.ellipsedCommonNames}>{getVernacularNames(taxonomy.vernacularNames)}</Text>
                   <Button className= {classes.showMoreButton} onClick={() => setFullCommonNames((prevDisplay) => !prevDisplay)}> {fullCommonNames ? "Show Less" : "Show More"} </Button>
                 </>
-              : <Text size="md" weight={550} c="dimmed">None</Text>
+              : <Text size="sm" weight={550} c="dimmed">None</Text>
             }
           </Group>
         
