@@ -1,10 +1,11 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Grid, Group, LoadingOverlay, Paper, Stack, Text, Title } from "@mantine/core";
+import { Box, Button, createStyles, Grid, Group, LoadingOverlay, Paper, Stack, Text, Title } from "@mantine/core";
 import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
 import Link from "next/link";
+import { useState } from "react";
 
 
 const GET_SPECIES = gql`
@@ -90,6 +91,10 @@ function Attribution({ name, url }: { name: string; url: string }) {
 function Header({ taxonomy, conservation, traits }: HeaderProps) {
   const attribution = "Australian Faunal Directory";
   const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`;
+  const { classes } = useSpeciesHeaderStyles();
+  const [fullCommonNames, setFullCommonNames] = useState(false);
+
+
   return (
     <Grid>
       <Grid.Col span="auto">
@@ -102,16 +107,19 @@ function Header({ taxonomy, conservation, traits }: HeaderProps) {
             <Attribution name={attribution} url={sourceUrl} />
           </Text>
           <Group>
-            <Text color="gray"><b>Common names: </b></Text>
+            <Text color="gray" className = {classes.commonNameHeader}><b>Common names: </b></Text>
             { taxonomy.vernacularNames && taxonomy.vernacularNames.length > 0
-              ? <Text size="md" weight={550}>{getVernacularNames(taxonomy.vernacularNames)}</Text>
+              ? <>
+                  <Text size="md" weight={550} className={fullCommonNames ? classes.commonNames : classes.ellipsedCommonNames}>{getVernacularNames(taxonomy.vernacularNames)}</Text>
+                  <Button className= {classes.showMoreButton} onClick={() => setFullCommonNames((prevDisplay) => !prevDisplay)}> {fullCommonNames ? "Show Less" : "Show More"} </Button>
+                </>
               : <Text size="md" weight={550} c="dimmed">None</Text>
             }
           </Group>
         
         </Stack>
       </Grid.Col>
-      <Grid.Col span="content">
+      <Grid.Col span="content" className={classes.traits}>
         <Stack h="100%" justify="center">
           <IconBar taxonomy={taxonomy} conservation={conservation} traits={traits} />
         </Stack>
@@ -150,3 +158,41 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
     </Box>
   )
 }
+
+const useSpeciesHeaderStyles = createStyles((theme, _params, _getRef) => {
+  return {
+    ellipsedCommonNames: {
+      width: '300px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      marginRight: '-10px'
+    },
+    commonNames: {
+      width: '300px',
+      overflow: 'inherit',
+      textAlign: 'justify',
+      marginRight: '-10px'
+    },
+    commonNameHeader: {
+      marginBottom: 'auto'
+    },
+    showMoreButton: {
+      border: 'none',
+      background: 'none',
+      color: theme.colors.link,
+      textDecoration: 'underline',
+      paddingLeft: '0px',
+      marginTop: '-1px',
+      height: 'inherit',
+      font: 'inherit',
+      marginBottom: 'auto',
+      '&:hover, &:focus': {
+        background: 'none'
+      }
+    },
+    traits: {
+      marginBottom: 'auto'
+    }
+  }
+});
