@@ -153,23 +153,23 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
 };
 
 const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
-  "Indigenous Ecological Knowledge species: Kamilaroi People": {
-    label: "Indigenous Ecological Knowledge species: Kamilaroi People",
+  "Indigenous Ecological Knowledge: Kamilaroi People": {
+    label: "Indigenous Ecological Knowledge: Kamilaroi People",
     image: "iek_kamilaroi.svg",
     color: "#f47c2e",
-    link: "/browse/datasets/Indigenous_Ecological_Knowledge_species:_Kamilaroi_People",
+    link: "/browse/datasets/Indigenous Ecological Knowledge: Kamilaroi People",
   },
-  "Indigenous Ecological Knowledge species: South East Arnhem Land People": {
-    label: "Indigenous Ecological Knowledge species: South East Arnhem Land People",
+  "Indigenous Ecological Knowledge: South East Arnhem Land": {
+    label: "Indigenous Ecological Knowledge: South East Arnhem Land",
     image: "iek_south_east_arnhem_land.svg",
     color: "#a2c36e",
-    link: "/browse/datasets/South_East_Arnhem_Land",
+    link: "/browse/datasets/Indigenous Ecological Knowledge: South East Arnhem Land",
   },
-  "Indigenous Ecological Knowledge species: Noongar Boodjar People": {
-    label: "Indigenous Ecological Knowledge species: Noongar Boodjar People",
+  "Indigenous Ecological Knowledge: Noongar Boodjar People": {
+    label: "Indigenous Ecological Knowledge: Noongar Boodjar People",
     image: "iek_noongar_boodjar.svg",
     color: "#fec743",
-    link: "/browse/datasets/Indigenous_Ecological_Knowledge_species:_Noongar_Boodjar_People",
+    link: "/browse/datasets/Indigenous Ecological Knowledge: Noongar Boodjar People",
   },
 }
 
