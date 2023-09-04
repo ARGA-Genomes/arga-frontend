@@ -86,69 +86,130 @@ const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
 };
 
 const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
-  bacteria: {
+  BACTERIA: {
     image: "bacteria.svg",
     label: "Bacteria",
     color: "shellfish.5",
     link: "/kingdom/Bacteria",
   },
-  "protists and other unicellular organisms": {
+  PROTISTS_AND_OTHER_UNICELLULAR_ORGANISMS: {
     image: "protists.svg",
     label: "Protists and other unicellular organisms",
     color: "wheat.2",
     link: "/kingdom/Protozoa",
   },
-  "mushrooms and other fungi": {
+  FUNGI: {
     image: "fungi.svg",
     label: "Mushrooms and other fungi",
     color: "bushfire.5",
+    link: "/kingdom/Fungi",
   },
-  molluscs: {
+  MOLLUSCS: {
     image: "molluscs.svg",
     label: "Molluscs",
     color: "bushfire.4",
     link: "/phylum/Mollusca",
   },
-  "marine crustaceans": {
+  CRUSTACEANS: {
     image: "crustaceans.svg",
     label: "Marine crustaceans",
     color: "red",
-    link: "/order/Crustacea",
   },
-  insects: {
+  INSECTS: {
     image: "insects_light.svg",
     label: "Insects",
     color: "black",
     link: "/class/Insecta",
   },
-  "frogs and other amphibians": {
+  FROGS_AND_OTHER_AMPHIBIANS: {
     image: "frogs_light.svg",
     label: "Frogs and other amphibians",
     color: "moss.5",
-    link: "/order/Anura",
+    link: "/class/Amphibia",
   },
-  birds: {
+  BIRDS: {
     image: "birds_light.svg",
     label: "Birds",
     color: "moss.7",
     link: "/class/Aves",
   },
-  mammals: {
+  MAMMALS: {
     image: "mammals.svg",
     label: "Mammals",
     color: "moss.3",
     link: "/class/Mammalia",
   },
-  "seaweeds and other algae": {
+  SEAWEEDS: {
     image: "seaweed_light.svg",
-    label: "Seaweeds and other algae",
+    label: "Seaweeds",
     color: "shellfish",
+    link: "/kingdom/Chromista",
   },
-  "higher plants": {
+  HIGHER_PLANTS: {
     image: "plants_light.svg",
     label: "Higher plants",
     color: "midnight",
     link: "/kingdom/Plantae",
+  },
+
+  FLOWERING_PLANTS: {
+      image: "plants_light.svg",
+      label: "Flowering plants",
+      color: "midnight",
+      link: "/kingdom/Plantae",
+  },
+  ANIMALS: {
+      image: "",
+      label: "Animals",
+      color: "midnight",
+      link: "/kingdom/Animalia",
+  },
+  BROWN_ALGAE: {
+      image: "",
+      label: "Brown algae",
+      color: "midnight",
+      link: "/phylum/Phaeophycea",
+  },
+  RED_ALGAE: {
+      image: "",
+      label: "Red algae",
+      color: "midnight",
+      link: "/phylum/Rhodophyta",
+  },
+  GREEN_ALGAE: {
+      image: "",
+      label: "Green algae",
+      color: "midnight",
+      link: "/phylum/Chlorophyta",
+  },
+  ECHINODERMS: {
+      image: "",
+      label: "Echinoderms",
+      color: "midnight",
+      link: "/phylum/Echinodermata",
+  },
+  FIN_FISHES: {
+      image: "",
+      label: "Fin fishes",
+      color: "midnight",
+      link: "/class/Actinopterygii",
+  },
+  CORALS_AND_JELLYFISHES: {
+      image: "",
+      label: "Corals and jellyfishes",
+      color: "midnight",
+      link: "/phylum/Cnidaria",
+  },
+  CYANOBACTERIA: {
+      image: "",
+      label: "Cyanobacteria",
+      color: "midnight",
+      link: "/phylum/Cyanobacteria",
+  },
+  SHARKS_AND_RAYS: {
+      image: "",
+      label: "Sharks and rays",
+      color: "midnight",
   },
 };
 
@@ -198,11 +259,13 @@ function ConservationIcon({ status, source }: { status: string, source: string |
 
 function VernacularGroupIcon({ group }: { group: string }) {
   const icon = VERNACULAR_GROUP_ICON[group];
+  if (!icon) return null;
+
   const component = (
-    <Tooltip label={icon?.label}>
-      <ThemeIcon radius="xl" size={60} color={icon?.color} p={10}>
+    <Tooltip label={icon.label}>
+      <ThemeIcon radius="xl" size={60} color={icon.color} p={10}>
         <Image
-          src={`/species-icons/${icon?.image}`}
+          src={`/species-icons/${icon.image}`}
           alt={`Icon of ${icon.label}`}
         />
       </ThemeIcon>
@@ -210,8 +273,8 @@ function VernacularGroupIcon({ group }: { group: string }) {
   );
 
   return (
-    <Tooltip label={icon?.label}>
-      {icon?.link ? <Link href={icon?.link}>{component}</Link> : component}
+    <Tooltip label={icon.label}>
+      {icon.link ? <Link href={icon.link}>{component}</Link> : component}
     </Tooltip>
   );
 }
