@@ -5,7 +5,9 @@ import { Box, Button, createStyles, Grid, Group, LoadingOverlay, Paper, Stack, T
 import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
 import Link from "next/link";
-import { useState } from "react";
+import { createElement, useCallback, useState } from "react";
+import { renderToStaticMarkup } from "react-dom/server"
+
 
 
 const GET_SPECIES = gql`
@@ -89,13 +91,24 @@ function Attribution({ name, url }: { name: string; url: string }) {
   );
 }
 
+function determineButtonClass(commonNamesString: string, truncateLength: number) { //This is to determine whether the show more button should be displayed or not
+  const { classes } = useSpeciesHeaderStyles();
+    if (commonNamesString.length > truncateLength) {
+        return classes.showMoreButton
+    }
+        return classes.hideButton
+}
+
+
 function Header({ taxonomy, conservation, traits }: HeaderProps) {
   const attribution = "Australian Faunal Directory";
   const sourceUrl = `https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`;
   const { classes } = useSpeciesHeaderStyles();
+  const truncateLength = 25
   const [fullCommonNames, setFullCommonNames] = useState(false);
-
-
+  const commonNamesString = getVernacularNames(taxonomy.vernacularNames)
+  const truncatedString = commonNamesString.length > truncateLength ? commonNamesString.substring(0,truncateLength).concat('...') : commonNamesString
+  
   return (
     <Grid>
       <Grid.Col span="auto">
@@ -111,8 +124,8 @@ function Header({ taxonomy, conservation, traits }: HeaderProps) {
             <Text color="gray" size="sm" className = {classes.commonNameHeader}><b>Common names: </b></Text>
             { taxonomy.vernacularNames && taxonomy.vernacularNames.length > 0
               ? <>
-                  <Text size="sm" weight={550} className={fullCommonNames ? classes.commonNames : classes.ellipsedCommonNames}>{getVernacularNames(taxonomy.vernacularNames)}</Text>
-                  <Button className= {classes.showMoreButton} onClick={() => setFullCommonNames((prevDisplay) => !prevDisplay)}> {fullCommonNames ? "Show Less" : "Show More"} </Button>
+                  <Text size="sm" weight={550} className={fullCommonNames ? classes.commonNames : classes.ellipsedCommonNames}>{fullCommonNames ? commonNamesString : truncatedString}</Text>
+                  <Button className = {determineButtonClass(commonNamesString, truncateLength)} onClick={() => setFullCommonNames((prevDisplay) => !prevDisplay)}> {fullCommonNames ? "Show less" : "Show more"} </Button>
                 </>
               : <Text size="sm" weight={550} c="dimmed">None</Text>
             }
@@ -163,14 +176,14 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
 const useSpeciesHeaderStyles = createStyles((theme, _params, _getRef) => {
   return {
     ellipsedCommonNames: {
-      width: '300px',
+      width: '25em',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       marginRight: '-10px'
     },
     commonNames: {
-      width: '300px',
+      width: '25em',
       overflow: 'inherit',
       textAlign: 'justify',
       marginRight: '-10px'
@@ -194,6 +207,9 @@ const useSpeciesHeaderStyles = createStyles((theme, _params, _getRef) => {
     },
     traits: {
       marginBottom: 'auto'
+    },
+    hideButton: {
+      display: 'none'
     }
   }
 });
