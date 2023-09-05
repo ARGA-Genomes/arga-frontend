@@ -116,7 +116,7 @@ function Header({ taxonomy, conservation, traits }: HeaderProps) {
             <i>{taxonomy.canonicalName}</i> {taxonomy.authority}
           </Title>
           <Text color="gray" mt={-8} size="sm">
-            <Group><b>Taxonomic Status: </b> <Text color={taxonomicStatusColors(taxonomy.status.toLowerCase())}>{taxonomy.status.toLowerCase()}</Text></Group>
+            <Group><b>Taxonomic status: </b> <Text color={taxonomicStatusColors(taxonomy.status.toLowerCase())}>{taxonomy.status.toLowerCase()}</Text></Group>
             <Attribution name={attribution} url={sourceUrl} />
           </Text>
           <Group>
