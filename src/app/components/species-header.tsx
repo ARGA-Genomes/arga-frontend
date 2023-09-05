@@ -175,7 +175,7 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
 const useSpeciesHeaderStyles = createStyles((theme, _params, _getRef) => {
   return {
     ellipsedCommonNames: {
-      width: '25em',
+      // width: '25em',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
