@@ -90,13 +90,7 @@ function Attribution({ name, url }: { name: string; url: string }) {
   );
 }
 
-function determineButtonClass(commonNamesString: string, truncateLength: number) { //This is to determine whether the show more button should be displayed or not
-  const { classes } = useSpeciesHeaderStyles();
-    if (commonNamesString.length > truncateLength) {
-        return classes.showMoreButton
-    }
-        return classes.hideButton
-}
+
 
 
 function Header({ taxonomy, conservation, traits }: HeaderProps) {
@@ -124,7 +118,7 @@ function Header({ taxonomy, conservation, traits }: HeaderProps) {
             { taxonomy.vernacularNames && taxonomy.vernacularNames.length > 0
               ? <>
                   <Text size="sm" weight={550} className={fullCommonNames ? classes.commonNames : classes.ellipsedCommonNames}>{fullCommonNames ? commonNamesString : truncatedString}</Text>
-                  <Button className = {determineButtonClass(commonNamesString, truncateLength)} onClick={() => setFullCommonNames((prevDisplay) => !prevDisplay)}> {fullCommonNames ? "Show less" : "Show more"} </Button>
+                  <Button className = {commonNamesString.length > truncateLength ? classes.showMoreButton : classes.hideButton} onClick={() => setFullCommonNames((prevDisplay) => !prevDisplay)}> {fullCommonNames ? "Show less" : "Show more"} </Button>
                 </>
               : <Text size="sm" weight={550} c="dimmed">None</Text>
             }
