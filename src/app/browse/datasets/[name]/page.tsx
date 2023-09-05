@@ -4,16 +4,44 @@ import { SpeciesCard } from "@/app/components/species-card";
 import { PieChart } from "@/app/components/graphing/pie";
 import { argaBrandLight } from "@/app/theme";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Paper, SimpleGrid, Text, Pagination, MantineProvider, Title, Group } from "@mantine/core";
+import { Box, Paper, SimpleGrid, Text, MantineProvider, Title, Group, useMantineTheme, LoadingOverlay } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BarChart } from "@/app/components/graphing/bar";
 import { TachoChart } from "@/app/components/graphing/tacho";
+import { PaginationBar } from "@/app/components/pagination";
+import Link from "next/link";
 
 
-const GET_DATASET_SPECIES = gql`
+const PAGE_SIZE = 16;
+
+const GET_DATASET = gql`
+query DatasetDetails($name: String) {
+  dataset(name: $name) {
+    citation
+    license
+    rightsHolder
+    url
+    updatedAt
+  }
+}`;
+
+type Dataset = {
+  citation?: string,
+  license?: string,
+  rightsHolder?: string,
+  url?: string,
+  updatedAt: string,
+};
+
+type DetailsQueryResults = {
+  dataset: Dataset,
+};
+
+
+const GET_SPECIES = gql`
 query DatasetSpecies($name: String, $page: Int) {
-  datasets(name: $name) {
+  dataset(name: $name) {
     species(page: $page) {
       total
       records {
@@ -51,15 +79,15 @@ type Record = {
   dataSummary: DataSummary,
 }
 
-type SearchResults = {
+type DatasetSpecies = {
   species: {
     records: Record[],
     total: number,
   }
 };
 
-type QueryResults = {
-  datasets: SearchResults,
+type SpeciesQueryResults = {
+  dataset: DatasetSpecies,
 };
 
 
@@ -95,58 +123,49 @@ type StatsQueryResults = {
 
 
 function Species({ dataset }: { dataset: string }) {
-  const [activePage, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const theme = useMantineTheme();
+  const [page, setPage] = useState(1);
   const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_DATASET_SPECIES, {
-    variables: {
-      name: dataset,
-      page: activePage,
-    },
+  const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
+    variables: { name: dataset, page },
   });
-
-  useEffect(() => {
-    if (data?.datasets.species.total) {
-      setTotalPages(Math.ceil(data.datasets.species.total / 16))
-    }
-  }, [data]);
-
 
   if (loading) {
     return <Text>Loading...</Text>;
-  }
-  if (error) {
-    return <Text>Error : {error.message}</Text>;
   }
   if (!data) {
     return <Text>No data</Text>;
   }
 
-  const records = Array.from(data.datasets.species.records);
+  const records = Array.from(data.dataset.species.records);
 
   return (
     <Box>
-      <SimpleGrid cols={3}>
-        {records.map((record) => (
-          <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
-        ))}
-      </SimpleGrid>
+      <LoadingOverlay
+        overlayColor={theme.colors.midnight[0]}
+        transitionDuration={500}
+        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+        visible={loading}
+        radius="xl"
+      />
 
-      <Paper bg="midnight.0" p={20} m={40} radius="lg">
-        <Pagination
-          color={"attribute.2"}
-          size="lg"
-          radius="xl"
-          position="center"
-          page={activePage}
-          total={totalPages}
-          onChange={page => {
-            setPage(page)
-            scrollIntoView({ alignment: 'center' })
-          }}
-        />
-      </Paper>
+      { error ? <Title order={4}>{error.message}</Title> : null }
+
+      { !loading && data &&
+        <SimpleGrid cols={4}>
+          {records.map((record) => (
+            <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
+          ))}
+        </SimpleGrid>
+      }
+
+      <PaginationBar
+        total={data?.dataset.species.total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        onChange={page => { setPage(page); scrollIntoView() }}
+      />
     </Box>
   );
 }
@@ -154,9 +173,7 @@ function Species({ dataset }: { dataset: string }) {
 
 function DataSummary({ dataset }: { dataset: string }) {
   const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
-    variables: {
-      name: dataset,
-    },
+    variables: { name: dataset }
   });
 
   const sampleData = [
@@ -189,6 +206,34 @@ function DataSummary({ dataset }: { dataset: string }) {
 }
 
 
+function DatasetDetails({ dataset }: { dataset: string }) {
+  const theme = useMantineTheme();
+  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DATASET, {
+    variables: { name: dataset }
+  });
+
+  return (
+    <Box>
+      <LoadingOverlay
+        overlayColor={theme.colors.midnight[0]}
+        transitionDuration={500}
+        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
+        visible={loading}
+        radius="xl"
+      />
+      { error ? <Text>{error.message}</Text> : null }
+      {data?.dataset.url &&
+       <Text weight={700} c="dimmed" size="sm">
+         Source: <Link href={data?.dataset.url} target="_blank">ALA Profiles</Link>
+       </Text>
+      }
+      <Text c="dimmed" size="xs">{data?.dataset.citation}</Text>
+      <Text c="dimmed" size="xs">&copy; {data?.dataset.rightsHolder}</Text>
+    </Box>
+  )
+}
+
+
 export default function BrowseDataset({ params }: { params: { name: string } }) {
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
@@ -196,6 +241,7 @@ export default function BrowseDataset({ params }: { params: { name: string } }) 
     <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
       <Box>
         <Title order={2}>{dataset}</Title>
+        <DatasetDetails dataset={dataset} />
       </Box>
 
       <Box mt={30}>
