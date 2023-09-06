@@ -101,7 +101,7 @@ function Filters({ filters, onChange }: FiltersProps) {
       classifications,
       vernacularGroup,
     })
-  }, [classifications, vernacularGroup]);
+  }, [classifications, vernacularGroup, onChange]);
 
   const addFilter = () => {
     handler.append({
@@ -163,7 +163,7 @@ export default function AnimalsList() {
     variables: {
       page,
       perPage: PAGE_SIZE,
-      filters: flattenFilters(filters).map(intoFilterItem)
+      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item)
     }
   });
 
