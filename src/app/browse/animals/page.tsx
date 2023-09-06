@@ -2,6 +2,7 @@
 
 import { Filter, intoFilterItem } from "@/app/components/filtering/common";
 import { HigherClassificationFilters } from "@/app/components/filtering/higher-classification";
+import { VernacularGroupFilters } from "@/app/components/filtering/vernacular-group";
 import { PaginationBar } from "@/app/components/pagination";
 import { SpeciesCard } from "@/app/components/species-card";
 import { gql, useQuery } from "@apollo/client";
@@ -81,17 +82,29 @@ function BrowseResults({ list }: { list: Species[]}) {
 }
 
 
-interface FiltersProps {
-  initialFilters: Filter[],
-  onChange: (filters: Filter[]) => void,
+type Filters = {
+  classifications: Filter[],
+  vernacularGroup?: Filter,
 }
 
-function Filters({ initialFilters, onChange }: FiltersProps) {
-  const [filters, handlers] = useListState<Filter>(initialFilters);
-  useEffect(() => onChange(filters), [filters]);
+interface FiltersProps {
+  filters: Filters,
+  onChange: (filters: Filters) => void,
+}
+
+function Filters({ filters, onChange }: FiltersProps) {
+  const [classifications, handler] = useListState(filters.classifications);
+  const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(filters.vernacularGroup)
+
+  useEffect(() => {
+    onChange({
+      classifications,
+      vernacularGroup,
+    })
+  }, [classifications, vernacularGroup]);
 
   const addFilter = () => {
-    handlers.append({
+    handler.append({
       filter: "",
       action: "INCLUDE",
       value: "",
@@ -100,18 +113,18 @@ function Filters({ initialFilters, onChange }: FiltersProps) {
   }
 
   const removeFilter = (index: number) => {
-    handlers.remove(index);
+    handler.remove(index);
   }
 
   const changeFilter = (index: number, item: Filter) => {
-    handlers.setItem(index, item)
+    handler.setItem(index, item)
   }
 
   return (
     <Stack p={20}>
       <Title order={5}>Higher classification</Title>
       <HigherClassificationFilters
-        filters={filters}
+        filters={classifications}
         onAdd={addFilter}
         onRemove={removeFilter}
         onChange={changeFilter}
@@ -120,7 +133,7 @@ function Filters({ initialFilters, onChange }: FiltersProps) {
       <Divider m={20} />
 
       <Title order={5}>Vernacular group</Title>
-      <Button leftIcon={<Plus />}>Add filter</Button>
+      <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
     </Stack>
   )
 }
@@ -132,14 +145,25 @@ export default function AnimalsList() {
   const [opened, { open, close }] = useDisclosure(false);
   const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
 
-  const initialFilters = [{ filter: "KINGDOM", action: "INCLUDE", value: "Animalia", editable: false }];
-  const [filters, setFilters] = useState<Filter[]>(initialFilters);
+  const [filters, setFilters] = useState<Filters>({
+    classifications: [{ filter: "KINGDOM", action: "INCLUDE", value: "Animalia", editable: false }],
+  });
+
+
+  const flattenFilters = (filters: Filters) => {
+    const items = [
+      ...filters.classifications,
+      filters.vernacularGroup,
+    ];
+
+    return items.filter((item): item is Filter => !!item);
+  }
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
       page,
       perPage: PAGE_SIZE,
-      filters: filters.map(intoFilterItem).filter(item => item)
+      filters: flattenFilters(filters).map(intoFilterItem)
     }
   });
 
@@ -147,7 +171,7 @@ export default function AnimalsList() {
     <Box>
       <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box mt={120}>
-          <Filters initialFilters={initialFilters} onChange={setFilters} />
+          <Filters filters={filters} onChange={setFilters} />
         </Box>
       </Drawer>
 
