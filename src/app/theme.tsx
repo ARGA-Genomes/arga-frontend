@@ -139,9 +139,15 @@ export const argaBrand: MantineThemeOverride = {
       },
     },
     '.mantine-Carousel-control': {
+      backgroundColor: `${theme.colors["bushfire"][4]} !important`,
+      border: 'none !important',
+      color: 'white !important',
       marginLeft: '-80px',
       marginRight: '-80px',
-
+      '& svg': {
+        width:'32px',
+        height: '32px',
+      }
     }
   }),
 };

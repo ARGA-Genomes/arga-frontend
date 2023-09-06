@@ -7,7 +7,7 @@ import theme from './theme';
 
 const useStyles = createStyles((theme, _params, _getRef) => ({
   footerLink: {
-    color: theme.colors["bushfire"][6]
+    color: theme.colors["bushfire"][4]
   }
 }));
 
