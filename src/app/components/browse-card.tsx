@@ -1,6 +1,5 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
 import {
   Card,
   Image,
@@ -31,7 +30,7 @@ function BrowseCardShell({
       <Card
         shadow="none"
         radius="lg"
-        bg="shellfish.0"
+        bg="inherit"
         sx={{ "&:hover": { backgroundColor: "#c6e6e3" } }}
         h="100%"
       >
@@ -62,33 +61,30 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "center",
         }}
       >
-        <Skeleton
-          className={classes.skeleton}
-          visible={loading}
-          circle
-          width={80}
-          height={80}
-          miw={80}
-          mih={80}
-          mr="lg"
-        >
-          <Image src={image} height={80} width={80} alt="" />
-        </Skeleton>
-        <Stack w="100%" spacing={4}>
+
+        <Stack  align={"center"} spacing={4}>
+          <Skeleton
+            className={classes.skeleton}
+            visible={loading}
+            circle
+            width={80}
+            height={80}
+            miw={80}
+            mih={80}
+          >
+            <Image src={image} height={80} width={80} alt="" ml="auto" mr="auto" display={"block"} />
+          </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading} color="red">
-            <Text size="xl" weight={600} ta={"right"}>
+            <Text size="xl" weight={600} ta={"center"} color="bushfire.4">
               {category || "Category Here"}
             </Text>
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading}>
-            <Text size={20} weight={300} ta={"right"}>
-              {total}
-            </Text>
-            <Text size={14} mt={-6} ta={"right"}>
-              Records
+            <Text size={20} weight={300} ta={"center"} color="white">
+              {total} records
             </Text>
           </Skeleton>
         </Stack>
