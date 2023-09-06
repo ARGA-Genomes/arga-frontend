@@ -10,6 +10,27 @@ import { HeaderAndFooterProps } from './type';
 // as this particular component wont be used anywhere else
 const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
+    color: theme.colors.bushfire[4],
+    height: 70,
+    alignItems: 'start',
+    paddingLeft: '30px',
+    paddingRight: '30px',
+    '&:hover': {
+      background: theme.colors.midnight[8],
+      borderBottom: '5px solid white',
+      color: 'white',
+      [theme.fn.smallerThan('md')]: {
+        borderBottom: 'none',
+        textDecoration: 'underline 5px white',
+        textUnderlineOffset: '10px'
+      },
+    },
+    span: {
+      fontSize: '16px',
+      height: '70px'
+    }
+  },
+  nav_link_active: {
     color: 'white',
     height: 70,
     alignItems: 'start',
@@ -17,7 +38,8 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     paddingRight: '30px',
     '&:hover': {
       background: theme.colors.midnight[8],
-      borderBottom: '5px solid',
+      borderBottom: '5px solid white',
+      color: 'white',
       [theme.fn.smallerThan('md')]: {
         borderBottom: 'none',
         textDecoration: 'underline 5px white',
@@ -96,7 +118,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
 
 export function TopNav({ links }: HeaderAndFooterProps) {
   const [opened, { toggle, close }] = useDisclosure(false);
-  const { classes, cx } = useStyles();
+  const { classes, cx, theme } = useStyles();
   const [active, setActive] = useState(links[0]);
   const items = links.map((link) => (
     <Link
@@ -108,7 +130,7 @@ export function TopNav({ links }: HeaderAndFooterProps) {
         close();
       }}
     >
-      <NavLink label={link.label} className={classes.nav_link} />
+      <NavLink label={link.label} className={cx(classes.nav_link, { [classes.nav_link_active]: active === link })} />
     </Link>
   ));
   return (
@@ -124,7 +146,7 @@ export function TopNav({ links }: HeaderAndFooterProps) {
           {items}
         </Group>
 
-        <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color='white' />
+        <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color={theme.colors.bushfire[4]}/>
 
         <Transition transition='pop-top-right' duration={200} mounted={opened}>
           {(styles) => (
