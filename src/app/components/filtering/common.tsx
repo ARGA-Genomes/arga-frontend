@@ -45,7 +45,7 @@ export function DebouncedInputFilter({ initialValue, onChange, ...props }: Debou
   const [value, setValue] = useState(initialValue || '');
   const [debounced] = useDebouncedValue(value, 200);
 
-  useEffect(() => onChange(debounced), [debounced])
+  useEffect(() => onChange(debounced), [debounced, onChange])
 
   return (
     <Input
