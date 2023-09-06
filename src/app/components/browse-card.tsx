@@ -32,9 +32,9 @@ function BrowseCardShell({
         shadow="none"
         radius={30}
         bg="inherit"
-        maw={245}
+        maw={265}
         m={'auto'}
-        sx={(theme) => ({ "&:hover": {backgroundColor: theme.colors.midnight[8] }, height: '250px', display: 'flex', flexDirection: 'column', justifyContent: 'center' })}
+        sx={(theme) => ({ "&:hover": {backgroundColor: theme.colors.midnight[8] }, height: '270px', display: 'flex', flexDirection: 'column', justifyContent: 'center' })}
       >
         <Card.Section>{children}</Card.Section>
       </Card>
