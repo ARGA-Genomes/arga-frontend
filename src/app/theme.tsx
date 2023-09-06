@@ -138,6 +138,11 @@ export const argaBrand: MantineThemeOverride = {
         }
       },
     },
+    '.mantine-Carousel-control': {
+      marginLeft: '-80px',
+      marginRight: '-80px',
+
+    }
   }),
 };
 

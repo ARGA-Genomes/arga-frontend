@@ -1,8 +1,6 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-
-import { Grid } from "@mantine/core";
 import { BrowseCard } from "../components/browse-card";
 import {Carousel} from "@mantine/carousel";
 
@@ -36,11 +34,23 @@ export default function BrowseGrouping() {
   return (
     <Carousel sx={{ width: '100%'}} 
       mx="auto" 
-      withIndicators height={300} 
-      slidesToScroll={3}
+      height={300} 
+      slidesToScroll='auto'
       slideSize="33.333333%"
       slideGap="md"
       align="start"
+      breakpoints={[
+        { maxWidth: 'md', slideSize: '50%' },
+        { maxWidth: 'sm', slideSize: '100%', slideGap: 0},
+      ]}
+      styles={{
+        control: {
+          '&[data-inactive]': {
+            opacity: 0,
+            cursor: 'default',
+          },
+        },
+      }}
       >
       <Carousel.Slide>
         <BrowseCard

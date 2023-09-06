@@ -5,9 +5,7 @@ import { Box, Button, createStyles, Grid, Group, LoadingOverlay, Paper, Stack, T
 import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
 import Link from "next/link";
-import { createElement, useCallback, useState } from "react";
-import { renderToStaticMarkup } from "react-dom/server"
-
+import { useState } from "react";
 
 
 const GET_SPECIES = gql`

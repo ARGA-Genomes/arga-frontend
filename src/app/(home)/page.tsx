@@ -117,7 +117,7 @@ function Search() {
 export default function HomePage() {
   return (
     <Box>
-      <Paper bg="midnight.6" h={400} pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-4px'>
+      <Paper bg="midnight.6" h={400} pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-40px'>
         <Box px={50} py={20}>
           <h2 style={{ color: "white", fontSize: '24px', fontWeight: '550'}}>Search data</h2>
           <Search />
