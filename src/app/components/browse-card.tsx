@@ -26,17 +26,19 @@ function BrowseCardShell({
   link: string;
 }) {
   return (
+
     <Link href={link} style={{ height: "100%" }}>
       <Card
         shadow="none"
-        radius="lg"
+        radius={30}
         bg="inherit"
-        sx={{ "&:hover": { backgroundColor: "#c6e6e3" } }}
-        h="100%"
+        maw={245}
+        sx={(theme) => ({ "&:hover": {backgroundColor: theme.colors.midnight[8] }, height: '250px', display: 'flex', flexDirection: 'column', justifyContent: 'center' })}
       >
-        <Card.Section p="md">{children}</Card.Section>
+        <Card.Section>{children}</Card.Section>
       </Card>
     </Link>
+
   );
 }
 
@@ -65,7 +67,7 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
         }}
       >
 
-        <Stack  align={"center"} spacing={4}>
+        <Stack  align={"center"} spacing={4} >
           <Skeleton
             className={classes.skeleton}
             visible={loading}
@@ -75,15 +77,15 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
             miw={80}
             mih={80}
           >
-            <Image src={image} height={80} width={80} alt="" ml="auto" mr="auto" display={"block"} />
+            <Image src={image} height={80} width={80} alt="" />
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading} color="red">
-            <Text size="xl" weight={600} ta={"center"} color="bushfire.4">
+            <Text size="xl" weight={550} ta={"center"} color="bushfire.4">
               {category || "Category Here"}
             </Text>
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading}>
-            <Text size={20} weight={300} ta={"center"} color="white">
+            <Text size={16} weight={300} ta={"center"} color="white">
               {total} records
             </Text>
           </Skeleton>
