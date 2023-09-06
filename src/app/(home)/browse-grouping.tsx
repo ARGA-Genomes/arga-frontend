@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 
 import { Grid } from "@mantine/core";
 import { BrowseCard } from "../components/browse-card";
+import {Carousel} from "@mantine/carousel";
 
 type Overview = {
   agriculturalAndAquacultureAndCommercial: number;
@@ -33,55 +34,67 @@ export default function BrowseGrouping() {
 
   // TODO: get the proper data from the backend once the categories are settled
   return (
-    <Grid gutter={37}>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+    <Carousel sx={{ width: '100%'}} 
+      mx="auto" 
+      withIndicators height={300} 
+      slidesToScroll={3}
+      slideSize="33.333333%"
+      slideGap="md"
+      align="start"
+      >
+      <Carousel.Slide>
         <BrowseCard
           total={0}
           category="Agriculture, aquaculture and commercial species"
           image="card-icons/agricultural.svg"
           link="/browse/list/Conservation_NT"
         />
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      </Carousel.Slide>
+
+      <Carousel.Slide>
         <BrowseCard
           total={0}
           category="Marine biodiversity"
           image="card-icons/marine.svg"
           link="/browse/list/Conservation_NT"
         />
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      </Carousel.Slide>
+
+      <Carousel.Slide>
         <BrowseCard
           total={0}
           category="Terrestrial biodiversity"
           image="card-icons/allspecies.svg"
           link="/browse/list/Conservation_NT"
         />
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      </Carousel.Slide>
+
+      <Carousel.Slide>
         <BrowseCard
           total={0}
           category="Biosecurity and pest species"
           image="card-icons/preserved.svg"
           link="/browse/list/Conservation_NT"
         />
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      </Carousel.Slide>
+
+      <Carousel.Slide>
         <BrowseCard
           total={0}
           category="Threatened biodiversity"
           image="card-icons/tsi.svg"
           link="/browse/list/Conservation_NT"
         />
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      </Carousel.Slide>
+
+      <Carousel.Slide>
         <BrowseCard
           total={data?.overview.allSpecies}
           category="All species"
           image="card-icons/terrestrial.svg"
           link="/browse/list/Conservation_NT"
         />
-      </Grid.Col>
-    </Grid>
+      </Carousel.Slide>
+    </Carousel>
   );
 }
