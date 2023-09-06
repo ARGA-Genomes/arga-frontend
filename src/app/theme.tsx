@@ -48,7 +48,7 @@ export const argaBrand: MantineThemeOverride = {
     '.primary_button': {
       backgroundColor: "#3C6377 !important",
       border: "1px solid !important",
-      borderColor: "#59A39C !important",
+      borderColor: "#3C6377 !important",
       borderRadius: "8px !important",
 
       "&:hover, &:focus": {

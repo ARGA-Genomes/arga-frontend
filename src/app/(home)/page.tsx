@@ -18,7 +18,7 @@ import MostViewedCard from "./most-viewed";
 import VisitorGraph from "./visitor_graph";
 import { Search as IconSearch } from "tabler-icons-react";
 import { useState } from "react";
-import BrowseData from "@/app/(home)/browse-data";
+import BrowseType from "@/app/(home)/browse-type";
 
 function Highlights() {
   return (
@@ -105,7 +105,7 @@ function Search() {
         </Grid.Col>
         <Grid.Col span="content">
           <Button size="xl" type="submit" className="primary_button">
-            Search
+             Search
           </Button>
         </Grid.Col>
       </Grid>
@@ -117,33 +117,54 @@ function Search() {
 export default function HomePage() {
   return (
     <Box>
-      <Paper bg="midnight.6" radius={35}>
+      <Paper bg="midnight.6" h={400} pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-4px'>
         <Box px={50} py={20}>
-          <h2 style={{ color: "white", fontWeight: "normal" }}>Search By</h2>
+          <h2 style={{ color: "white", fontSize: '24px', fontWeight: '550'}}>Search data</h2>
           <Search />
         </Box>
+        <Box px={50} py={20}>
+          <Stack
+            pl={16}
+            spacing={1}
+            sx={{
+              borderLeftWidth: 5,
+              borderLeftStyle: "solid",
+              borderLeftColor: "#a2c36e",
+            }}
+          >
+            <h2 style={{ color: "#a2c36e", marginTop: '0px', marginBottom: '0px', fontWeight: '550' }}>
+              Deepen discovery - trawl traits - curate collections
+            </h2>
+            <p style={{ color: "white" }}>For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
+              Genome Atlas (ARGA) locates and aggregates genomic data, including <b> reference genome assemblies &#x2022;
+                genome annotations &#x2022; population and variant sets &#x2022; DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022;
+                raw genomics data
+              </b>
+            </p>
+          </Stack> 
+        </Box>
+      </Paper>
 
         <Box px={50} pb={20}>
-          <h2 style={{ color: "white", fontWeight: "normal" }}>
-            Browse By Data Types
+          <h2 style={{ color: "white", fontWeight: '550', textAlign: 'center'  }}>
+            Browse By type
           </h2>
-          <BrowseData />
+          <BrowseType />
         </Box>
 
         <Box px={50} pb={20}>
-          <h2 style={{ color: "white", fontWeight: "normal" }}>
-            Browse By Taxon
+          <h2 style={{ color: "white", fontWeight: '550', textAlign: 'center'  }}>
+            Browse By taxon
           </h2>
           <BrowseTaxon />
         </Box>
 
         <Box px={50} pb={30}>
-          <h2 style={{ color: "white", fontWeight: "normal" }}>
-            Browse By Groupings
+          <h2 style={{ color: "white", fontWeight: '550', textAlign: 'center'  }}>
+            Browse By group
           </h2>
           <BrowseGrouping />
         </Box>
-      </Paper>
     </Box>
   );
 }
