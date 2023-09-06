@@ -1,5 +1,6 @@
 import { Button, Stack, Grid, Select, Flex } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
+import { useEffect } from "react";
 import { Minus, Plus } from "tabler-icons-react";
 import { CommonFiltersProps, DebouncedInputFilter, Filter } from "./common";
 
@@ -14,56 +15,67 @@ const CLASSIFICATIONS = [
 ]
 
 
-export function HigherClassificationFilters({ filters, onAdd, onRemove, onChange }: CommonFiltersProps) {
-  const [used, handler] = useListState(filters.map(item => item.filter));
+interface HigherClassificationFiltersProps {
+  filters: Filter[],
+  onChange: (items: Filter[]) => void,
+}
 
-  const valueChanged = (idx: number, item: Filter, value: string | null) => {
+export function HigherClassificationFilters({ filters, onChange }: HigherClassificationFiltersProps) {
+  const [items, handlers] = useListState<Filter>(filters);
+  useEffect(() => onChange(items), [items, onChange]);
+
+  const addFilter = () => {
+    handlers.append({
+      filter: "",
+      action: "INCLUDE",
+      value: "",
+      editable: true,
+    });
+  }
+
+  const removeFilter = (index: number) => {
+    handlers.remove(index);
+  }
+
+  const filterChanged = (index: number, value: string | null) => {
     if (value) {
-      item.value = value;
-      onChange(idx, item);
+      handlers.setItemProp(index, 'filter', value);
     }
   }
-  const filterChanged = (idx: number, item: Filter, value: string | null) => {
-    if (value) {
-      handler.setItem(idx, value);
-      item.filter = value;
-      onChange(idx, item);
-    }
-  }
-  const filterRemoved = (idx: number) => {
-    handler.remove(idx);
-    onRemove(idx);
+
+  const valueChanged = (index: number, value: string) => {
+    handlers.setItemProp(index, 'value', value);
   }
 
   return (
     <Stack>
-      { filters.map((item, idx) => (
+      { items.map((item, idx) => (
         <Grid key={`classification-filter-${idx}`}>
           <Grid.Col span="auto">
             <Flex>
               <Select
                 value={item.filter}
                 disabled={!item.editable}
-                onChange={value => filterChanged(idx, item, value)}
+                onChange={value => filterChanged(idx, value)}
                 data={CLASSIFICATIONS.map(option => { return {
                   value: option.value,
                   label: option.label,
-                  disabled: used.indexOf(option.value) >= 0,
+                  disabled: items.findIndex(item => item.filter == option.value) !== -1,
                 }})}
               />
               <DebouncedInputFilter
                 initialValue={item.value}
                 disabled={!item.editable}
-                onChange={value => valueChanged(idx, item, value)}
+                onChange={value => valueChanged(idx, value)}
               />
             </Flex>
           </Grid.Col>
           <Grid.Col span="content">
-            <Button color="red" onClick={() => filterRemoved(idx)} disabled={!item.editable}><Minus /></Button>
+            <Button color="red" onClick={() => removeFilter(idx)} disabled={!item.editable}><Minus /></Button>
           </Grid.Col>
         </Grid>
       ))}
-      <Button leftIcon={<Plus />} onClick={onAdd}>Add filter</Button>
+      <Button leftIcon={<Plus />} onClick={addFilter}>Add filter</Button>
     </Stack>
   )
 }

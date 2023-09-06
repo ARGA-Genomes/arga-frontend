@@ -93,7 +93,7 @@ interface FiltersProps {
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, handler] = useListState(filters.classifications);
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
   const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(filters.vernacularGroup)
 
   useEffect(() => {
@@ -103,31 +103,12 @@ function Filters({ filters, onChange }: FiltersProps) {
     })
   }, [classifications, vernacularGroup, onChange]);
 
-  const addFilter = () => {
-    handler.append({
-      filter: "",
-      action: "INCLUDE",
-      value: "",
-      editable: true,
-    });
-  }
-
-  const removeFilter = (index: number) => {
-    handler.remove(index);
-  }
-
-  const changeFilter = (index: number, item: Filter) => {
-    handler.setItem(index, item)
-  }
-
   return (
     <Stack p={20}>
       <Title order={5}>Higher classification</Title>
       <HigherClassificationFilters
         filters={classifications}
-        onAdd={addFilter}
-        onRemove={removeFilter}
-        onChange={changeFilter}
+        onChange={setClassifications}
       />
 
       <Divider m={20} />

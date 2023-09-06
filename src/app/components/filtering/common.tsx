@@ -43,9 +43,9 @@ interface DebouncedInputFilterProps {
 
 export function DebouncedInputFilter({ initialValue, onChange, ...props }: DebouncedInputFilterProps & InputProps) {
   const [value, setValue] = useState(initialValue || '');
-  const [debounced] = useDebouncedValue(value, 200);
+  const [debounced] = useDebouncedValue(value, 400);
 
-  useEffect(() => onChange(debounced), [debounced, onChange])
+  useEffect(() => onChange(debounced), [debounced])
 
   return (
     <Input
