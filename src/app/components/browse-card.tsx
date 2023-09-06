@@ -33,6 +33,7 @@ function BrowseCardShell({
         radius={30}
         bg="inherit"
         maw={245}
+        m={'auto'}
         sx={(theme) => ({ "&:hover": {backgroundColor: theme.colors.midnight[8] }, height: '250px', display: 'flex', flexDirection: 'column', justifyContent: 'center' })}
       >
         <Card.Section>{children}</Card.Section>
@@ -56,6 +57,7 @@ const useStyles = createStyles({
 function BrowseCard({ link, category, total, image }: BrowseCardProps) {
   const { classes } = useStyles();
   const loading = total === undefined;
+  const imageSize = 122
 
   return (
     <BrowseCardShell link={link || ""}>
@@ -72,12 +74,12 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
             className={classes.skeleton}
             visible={loading}
             circle
-            width={80}
-            height={80}
-            miw={80}
-            mih={80}
+            width={imageSize}
+            height={imageSize}
+            miw={imageSize}
+            mih={imageSize}
           >
-            <Image src={image} height={80} width={80} alt="" />
+            <Image src={image} height={imageSize} width={imageSize} alt="" />
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading} color="red">
             <Text size="xl" weight={550} ta={"center"} color="bushfire.4">
