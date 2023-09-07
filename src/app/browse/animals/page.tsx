@@ -108,6 +108,9 @@ type Filters = {
   vernacularGroup?: Filter,
   ecology?: Filter,
   ibra?: Filter,
+  imcra?: Filter,
+  state?: Filter,
+  drainageBasin?: Filter,
 }
 
 interface FiltersProps {
