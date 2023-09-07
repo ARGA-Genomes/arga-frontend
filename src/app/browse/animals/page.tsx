@@ -3,6 +3,11 @@
 import { Filter, intoFilterItem } from "@/app/components/filtering/common";
 import { HigherClassificationFilters } from "@/app/components/filtering/higher-classification";
 import { VernacularGroupFilters } from "@/app/components/filtering/vernacular-group";
+import { EcologyFilters } from "@/app/components/filtering/ecology";
+import { IbraFilters } from "@/app/components/filtering/ibra";
+import { ImcraFilters } from "@/app/components/filtering/imcra";
+import { StateFilters } from "@/app/components/filtering/state";
+import { DrainageBasinFilters } from "@/app/components/filtering/drainage-basin";
 import { PaginationBar } from "@/app/components/pagination";
 import { SpeciesCard } from "@/app/components/species-card";
 import { gql, useQuery } from "@apollo/client";
@@ -43,6 +48,13 @@ query AnimaliaTaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
         }
       }
     }
+    filterOptions {
+      ecology
+      ibra
+      imcra
+      state
+      drainageBasin
+    }
   }
 }`;
 
@@ -59,11 +71,20 @@ type Species = {
   dataSummary: DataSummary,
 }
 
+type FilterOptions = {
+  ecology: string[],
+  ibra: string[],
+  imcra: string[],
+  state: string[],
+  drainageBasin: string[],
+}
+
 type Taxa = {
   species: {
     records: Species[],
     total: number,
   },
+  filterOptions: FilterOptions,
 };
 
 type QueryResults = {
@@ -85,23 +106,36 @@ function BrowseResults({ list }: { list: Species[]}) {
 type Filters = {
   classifications: Filter[],
   vernacularGroup?: Filter,
+  ecology?: Filter,
+  ibra?: Filter,
 }
 
 interface FiltersProps {
   filters: Filters,
+  options?: FilterOptions,
   onChange: (filters: Filters) => void,
 }
 
-function Filters({ filters, onChange }: FiltersProps) {
+function Filters({ filters, options, onChange }: FiltersProps) {
   const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
   const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(filters.vernacularGroup)
+  const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology)
+  const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra)
+  const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra)
+  const [state, setState] = useState<Filter | undefined>(filters.state)
+  const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin)
 
   useEffect(() => {
     onChange({
       classifications,
       vernacularGroup,
+      ecology,
+      ibra,
+      imcra,
+      state,
+      drainageBasin,
     })
-  }, [classifications, vernacularGroup, onChange]);
+  }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, onChange]);
 
   return (
     <Stack p={20}>
@@ -111,10 +145,23 @@ function Filters({ filters, onChange }: FiltersProps) {
         onChange={setClassifications}
       />
 
-      <Divider m={20} />
-
       <Title order={5}>Vernacular group</Title>
       <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
+
+      <Title order={5}>Ecology</Title>
+      <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
+
+      <Title order={5}>Ibra Region</Title>
+      <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
+
+      <Title order={5}>Imcra Region</Title>
+      <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
+
+      <Title order={5}>State</Title>
+      <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
+
+      <Title order={5}>Drainage Basin</Title>
+      <DrainageBasinFilters value={drainageBasin?.value} options={options?.drainageBasin || []} onChange={setDrainageBasin} />
     </Stack>
   )
 }
@@ -135,6 +182,11 @@ export default function AnimalsList() {
     const items = [
       ...filters.classifications,
       filters.vernacularGroup,
+      filters.ecology,
+      filters.ibra,
+      filters.imcra,
+      filters.state,
+      filters.drainageBasin,
     ];
 
     return items.filter((item): item is Filter => !!item);
@@ -152,7 +204,7 @@ export default function AnimalsList() {
     <Box>
       <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box mt={120}>
-          <Filters filters={filters} onChange={setFilters} />
+          <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
         </Box>
       </Drawer>
 
