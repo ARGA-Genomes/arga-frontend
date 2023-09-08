@@ -75,7 +75,7 @@ function SourceRow({ source }: { source: Source }) {
       <Title>{source.name}</Title>
       <Text c="dimmed">{source.author}</Text>
       <Text c="dimmed">&copy; {source.rightsHolder}</Text>
-      { source.datasets.map(dataset => <DatasetRow dataset={dataset} />) }
+      { source.datasets.map(dataset => <DatasetRow dataset={dataset} key={dataset.name} />) }
     </Box>
   )
 }
@@ -93,7 +93,7 @@ export default function DatasetsPage() {
         visible={loading}
         radius="xl"
       />
-      { data?.sources.map(source => <SourceRow source={source} />) }
+      { data?.sources.map(source => <SourceRow source={source} key={source.name} />) }
     </>
   );
 }
