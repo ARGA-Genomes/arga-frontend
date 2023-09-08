@@ -1,12 +1,20 @@
 'use client';
 
+import { Filter, intoFilterItem } from "@/app/components/filtering/common";
+import { HigherClassificationFilters } from "@/app/components/filtering/higher-classification";
+import { VernacularGroupFilters } from "@/app/components/filtering/vernacular-group";
+import { EcologyFilters } from "@/app/components/filtering/ecology";
+import { IbraFilters } from "@/app/components/filtering/ibra";
+import { ImcraFilters } from "@/app/components/filtering/imcra";
+import { StateFilters } from "@/app/components/filtering/state";
+import { DrainageBasinFilters } from "@/app/components/filtering/drainage-basin";
 import { PaginationBar } from "@/app/components/pagination";
 import { SpeciesCard } from "@/app/components/species-card";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Drawer, Group, LoadingOverlay, SimpleGrid, Title, Text, useMantineTheme, Stack, Divider, Input, Grid, Select, Flex } from "@mantine/core";
 import { useDisclosure, useListState, useScrollIntoView } from "@mantine/hooks";
-import { useState } from "react";
-import { Filter as IconFilter, Minus, Plus } from "tabler-icons-react";
+import { useEffect, useState } from "react";
+import { Filter as IconFilter, Plus } from "tabler-icons-react";
 
 
 const PAGE_SIZE = 15;
@@ -40,6 +48,13 @@ query AnimaliaTaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
         }
       }
     }
+    filterOptions {
+      ecology
+      ibra
+      imcra
+      state
+      drainageBasin
+    }
   }
 }`;
 
@@ -56,11 +71,20 @@ type Species = {
   dataSummary: DataSummary,
 }
 
+type FilterOptions = {
+  ecology: string[],
+  ibra: string[],
+  imcra: string[],
+  state: string[],
+  drainageBasin: string[],
+}
+
 type Taxa = {
   species: {
     records: Species[],
     total: number,
   },
+  filterOptions: FilterOptions,
 };
 
 type QueryResults = {
@@ -79,77 +103,68 @@ function BrowseResults({ list }: { list: Species[]}) {
 }
 
 
-type Filter = {
-  filter: string,
-  action: string,
-  value: string,
-  editable: boolean,
+type Filters = {
+  classifications: Filter[],
+  vernacularGroup?: Filter,
+  ecology?: Filter,
+  ibra?: Filter,
+  imcra?: Filter,
+  state?: Filter,
+  drainageBasin?: Filter,
 }
-
-
-const CLASSIFICATIONS = [
-  {value: "KINGDOM", label: "Kingdom"},
-  {value: "PHYLUM", label: "Phylum"},
-  {value: "CLASS", label: "Class"},
-  {value: "ORDER", label: "Order"},
-  {value: "FAMILY", label: "Family"},
-  {value: "GENUS", label: "Genus"},
-]
-
 
 interface FiltersProps {
-  filters: Filter[],
-  onAdd: () => void,
-  onRemove: (index: number) => void,
-  onChange: (index: number, filter: Filter) => void,
+  filters: Filters,
+  options?: FilterOptions,
+  onChange: (filters: Filters) => void,
 }
 
-function Filters({ filters, onAdd, onRemove, onChange }: FiltersProps) {
+function Filters({ filters, options, onChange }: FiltersProps) {
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
+  const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(filters.vernacularGroup)
+  const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology)
+  const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra)
+  const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra)
+  const [state, setState] = useState<Filter | undefined>(filters.state)
+  const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin)
 
-  const valueChanged = (idx: number, filter: Filter, value: string|null) => {
-    if (value) {
-      filter.value = value;
-      onChange(idx, filter);
-    }
-  }
-  const filterChanged = (idx: number, filter: Filter, value: string|null) => {
-    if (value) {
-      filter.filter = value;
-      onChange(idx, filter);
-    }
-  }
+  useEffect(() => {
+    onChange({
+      classifications,
+      vernacularGroup,
+      ecology,
+      ibra,
+      imcra,
+      state,
+      drainageBasin,
+    })
+  }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, onChange]);
 
   return (
     <Stack p={20}>
-        <Title order={5}>Higher classification</Title>
-        { filters.map((item, idx) => (
-          <Grid key={`classification-filter-${idx}`}>
-            <Grid.Col span="auto">
-              <Flex>
-                <Select
-                  data={CLASSIFICATIONS}
-                  value={item.filter}
-                  disabled={!item.editable}
-                  onChange={value => filterChanged(idx, item, value)}
-                />
-                <Input
-                  value={item.value}
-                  disabled={!item.editable}
-                  onChange={el => valueChanged(idx, item, el.currentTarget.value)}
-                />
-              </Flex>
-            </Grid.Col>
-            <Grid.Col span="content">
-              <Button color="red" onClick={() => onRemove(idx)} disabled={!item.editable}><Minus /></Button>
-            </Grid.Col>
-          </Grid>
-        ))}
-        <Button leftIcon={<Plus />} onClick={onAdd}>Add filter</Button>
+      <Title order={5}>Higher classification</Title>
+      <HigherClassificationFilters
+        filters={classifications}
+        onChange={setClassifications}
+      />
 
-        <Divider m={20} />
+      <Title order={5}>Vernacular group</Title>
+      <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
 
-        <Title order={5}>Vernacular group</Title>
-        <Button leftIcon={<Plus />}>Add filter</Button>
+      <Title order={5}>Ecology</Title>
+      <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
+
+      <Title order={5}>Ibra Region</Title>
+      <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
+
+      <Title order={5}>Imcra Region</Title>
+      <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
+
+      <Title order={5}>State</Title>
+      <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
+
+      <Title order={5}>Drainage Basin</Title>
+      <DrainageBasinFilters value={drainageBasin?.value} options={options?.drainageBasin || []} onChange={setDrainageBasin} />
     </Stack>
   )
 }
@@ -161,45 +176,30 @@ export default function AnimalsList() {
   const [opened, { open, close }] = useDisclosure(false);
   const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
 
-  const [classifications, handlers] = useListState<Filter>([
-    { filter: "KINGDOM", action: "INCLUDE", value: "Animalia", editable: false }
-  ]);
+  const [filters, setFilters] = useState<Filters>({
+    classifications: [{ filter: "KINGDOM", action: "INCLUDE", value: "Animalia", editable: false }],
+  });
 
-  const addFilter = () => {
-    handlers.append({
-      filter: "",
-      action: "INCLUDE",
-      value: "",
-      editable: true,
-    })
+
+  const flattenFilters = (filters: Filters) => {
+    const items = [
+      ...filters.classifications,
+      filters.vernacularGroup,
+      filters.ecology,
+      filters.ibra,
+      filters.imcra,
+      filters.state,
+      filters.drainageBasin,
+    ];
+
+    return items.filter((item): item is Filter => !!item);
   }
-
-  const removeFilter = (index: number) => {
-    handlers.remove(index)
-  }
-
-  const changeFilter = (index: number, item: Filter) => {
-    handlers.setItem(index, item)
-  }
-
-  const convertFilter = (item: Filter) => {
-    if (item.filter && item.action && item.value) {
-      return {
-        filter: item.filter,
-        action: item.action,
-        value: item.value,
-      }
-    }
-
-    return undefined;
-  }
-
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
       page,
       perPage: PAGE_SIZE,
-      filters: classifications.map(convertFilter).filter(item => item)
+      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item)
     }
   });
 
@@ -207,7 +207,7 @@ export default function AnimalsList() {
     <Box>
       <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box mt={120}>
-          <Filters filters={classifications} onAdd={addFilter} onRemove={removeFilter} onChange={changeFilter} />
+          <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
         </Box>
       </Drawer>
 
