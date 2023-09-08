@@ -10,7 +10,7 @@ import { HeaderAndFooterProps } from './type';
 // as this particular component wont be used anywhere else
 const useStyles = createStyles((theme, _params, _getRef) => ({
   nav_link: {
-    color: theme.colors.bushfire[4],
+    color: 'white',
     height: 70,
     alignItems: 'start',
     paddingLeft: '30px',
@@ -18,7 +18,7 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     '&:hover': {
       background: theme.colors.midnight[8],
       borderBottom: '5px solid white',
-      color: 'white',
+      color: theme.colors.bushfire[4],
       [theme.fn.smallerThan('md')]: {
         borderBottom: 'none',
         textDecoration: 'underline 5px white',
@@ -31,15 +31,15 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
     }
   },
   nav_link_active: {
-    color: 'white',
+    color: theme.colors.wheat[4],
     height: 70,
     alignItems: 'start',
     paddingLeft: '30px',
     paddingRight: '30px',
     '&:hover': {
+      color: theme.colors.wheat[4],
       background: theme.colors.midnight[8],
       borderBottom: '5px solid white',
-      color: 'white',
       [theme.fn.smallerThan('md')]: {
         borderBottom: 'none',
         textDecoration: 'underline 5px white',
@@ -146,7 +146,7 @@ export function TopNav({ links }: HeaderAndFooterProps) {
           {items}
         </Group>
 
-        <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color={theme.colors.bushfire[4]}/>
+        <Burger opened={opened} onClick={toggle} className={classes.burger} size='md' color={'white'}/>
 
         <Transition transition='pop-top-right' duration={200} mounted={opened}>
           {(styles) => (

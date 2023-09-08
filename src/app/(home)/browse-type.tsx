@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 
 import { Grid } from "@mantine/core";
 import { BrowseCard } from "../components/browse-card";
+import {Carousel} from "@mantine/carousel";
 
 type Overview = {
   genomes: number;
@@ -29,31 +30,50 @@ export default function BrowseType() {
   if (error) return <p>Error : {error.message}</p>;
 
   return (
-    <Grid gutter={37}>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+    <Carousel sx={{ width: '100%'}} 
+      mx="auto" 
+      height={300} 
+      slidesToScroll='auto'
+      slideSize="33.333333%"
+      slideGap="md"
+      align="start"
+      breakpoints={[
+        { maxWidth: 'md', slideSize: '50%' },
+        { maxWidth: 'sm', slideSize: '100%', slideGap: 0 },
+      ]}
+      styles={{
+        control: {
+          '&[data-inactive]': {
+            opacity: 0,
+            cursor: 'default',
+          },
+        },
+      }}
+      >
+      <Carousel.Slide>
         <BrowseCard
           total={data?.overview.genomes}
           category="Whole genomes"
           image="card-icons/agricultural.svg"
           link="/browse/genomes"
         />
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      </Carousel.Slide>
+      <Carousel.Slide>
         <BrowseCard
           total={0} // TODO: total={data?.overview.organelles}
           category="Mitogenomes"
           image="card-icons/marine.svg"
           link="/browse/organelles"
         />
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      </Carousel.Slide>
+      <Carousel.Slide>
         <BrowseCard
           total={data?.overview.barcodes}
           category="Markers"
           image="card-icons/allspecies.svg"
           link="/browse/barcodes"
         />
-      </Grid.Col>
-    </Grid>
+      </Carousel.Slide>
+    </Carousel>
   );
 }
