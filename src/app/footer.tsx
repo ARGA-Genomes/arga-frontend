@@ -51,7 +51,7 @@ export function Footer({ links }: HeaderAndFooterProps) {
 
               <Image src="/ncris-logo.svg" mx = {20} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
               </Group>
-              <Container size={'100%'}>
+              <Container fluid={true}>
                 <Text color="white" size="sm">
                   The Australian Reference Genome Atlas (ARGA) is powered by the Atlas of Living Australia,
                   in collaboration with Bioplatforms Australia and Australian BioCommons. The platform is
