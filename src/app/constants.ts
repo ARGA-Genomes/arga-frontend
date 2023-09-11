@@ -3,7 +3,7 @@ import { HeaderAndFooterProps } from "./type";
 export const headerLinks: HeaderAndFooterProps = {
     links: [
         { link: "/", label: "Home" },
-        { link: "/", label: "Databases" },
+        { link: "/datasets", label: "Datasets" },
         { link: "/", label: "Resources" },
         { link: "/", label: "Help" },
     ]
