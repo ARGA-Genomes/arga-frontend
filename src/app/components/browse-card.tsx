@@ -57,7 +57,16 @@ const useStyles = createStyles({
 function BrowseCard({ link, category, total, image }: BrowseCardProps) {
   const { classes } = useStyles();
   const loading = total === undefined;
-  const imageSize = 122
+  const imageSize = 150
+
+  function displayShortenedTotal ( total: number): string {
+    if (total > 999 && total < 1000000) {
+      return (parseFloat(total/1000).toFixed(2) + 'K')
+    }else if (total > 999999 && total < 1000000000) {
+      return (parseFloat(total/1000000).toFixed(2) + 'M')
+    }
+    return total
+  }
 
   return (
     <BrowseCardShell link={link || ""} >
@@ -84,13 +93,13 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
             <Image src={image} height={imageSize} width={imageSize} alt="" />
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading} color="red">
-            <Text size="xl" weight={550} ta={"center"} color="grey.0">
+            <Text size="md" weight={450} ta={"center"} color="grey.0">
               {category || "Category Here"}
             </Text>
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading}>
-            <Text size={17} weight={400} ta={"center"} color="grey.4">
-              {total} records
+            <Text size="sm" weight={400} ta={"center"} color="grey.4">
+              {displayShortenedTotal(total)} records
             </Text>
           </Skeleton>
         </Stack>

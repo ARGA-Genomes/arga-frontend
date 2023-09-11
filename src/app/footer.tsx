@@ -19,8 +19,8 @@ export function Footer({ links }: HeaderAndFooterProps) {
     <Link key={link.label} href={link.link} className={classes.footerLink}> {link.label} </Link>
   ));
 
-  const maxWidth: string = "200px"
-  const minWidth: string = "200px"
+  const maxWidth: string = "150px"
+  const minWidth: string = "150px"
   const mawImage = {
     base: "50%", xs:maxWidth, sm:maxWidth, md:maxWidth, lg:maxWidth, xl: maxWidth
   }
@@ -41,15 +41,15 @@ export function Footer({ links }: HeaderAndFooterProps) {
         <Grid.Col xs={12} sm={12} md={10} lg={10} xl={10}>
             
               <Group position="center" style={{width: "100%", justifyContent: "space-between"}} >
-              <Image src="/ala-logo.svg" mx = {50} my = {50 } maw = {mawImage } miw={minWidth} fit="scale-down" alt="" />
+              <Image src="/ala-logo.svg" mx = {20} my = {50 } maw = {mawImage } miw={minWidth} fit="scale-down" alt="" />
 
-              <Image src="/biocommons-logo.svg" mx = {50} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
+              <Image src="/biocommons-logo.svg" mx = {20} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
 
-              <Image src="/bioplatforms-logo.svg" mx = {50} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
+              <Image src="/bioplatforms-logo.svg" mx = {20} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
 
-              <Image src="/ardc-logo.svg" mx = {50} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
+              <Image src="/ardc-logo.svg" mx = {20} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
 
-              <Image src="/ncris-logo.svg" mx = {50} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
+              <Image src="/ncris-logo.svg" mx = {20} my = {50 } maw = {mawImage} miw={minWidth} fit="scale-down" alt="" />
               </Group>
               <Container size={'100%'}>
                 <Text color="white" size="sm">
