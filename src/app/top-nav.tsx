@@ -140,7 +140,7 @@ export function TopNav({ links }: HeaderAndFooterProps) {
       <Container className={classes.header}>
         <Group position='right' align='center' h='inherit'>
           <Link href='/' >
-            <Image src='/arga-logo.svg' alt='Australian Reference Genome Atlas' width={250} />
+            <Image src='/arga-logo.svg' alt='Australian Reference Genome Atlas' width={450} />
           </Link>
         </Group>
 

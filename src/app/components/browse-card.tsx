@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import Link from "next/link";
 
-interface BrowseCardProps {
+export interface BrowseCardProps {
   total?: number;
   category: string;
   image: string;

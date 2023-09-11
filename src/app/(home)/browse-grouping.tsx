@@ -55,8 +55,8 @@ export default function BrowseGrouping() {
       <Carousel.Slide>
         <BrowseCard
           total={0}
-          category="Agriculture, aquaculture and commercial species"
-          image="card-icons/agricultural.svg"
+          category="Agriculture"
+          image="card-icons/list_group_agriculture.svg"
           link="/browse/list/Conservation_NT"
         />
       </Carousel.Slide>
@@ -64,8 +64,8 @@ export default function BrowseGrouping() {
       <Carousel.Slide>
         <BrowseCard
           total={0}
-          category="Marine biodiversity"
-          image="card-icons/marine.svg"
+          category="Aquaculture"
+          image="card-icons/list_group_Aquaculture.svg"
           link="/browse/list/Conservation_NT"
         />
       </Carousel.Slide>
@@ -73,8 +73,17 @@ export default function BrowseGrouping() {
       <Carousel.Slide>
         <BrowseCard
           total={0}
-          category="Terrestrial biodiversity"
-          image="card-icons/allspecies.svg"
+          category="Terrestrial"
+          image="card-icons/list_group_terrestrial.svg"
+          link="/browse/list/Conservation_NT"
+        />
+      </Carousel.Slide>
+
+      <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Marine"
+          image="card-icons/list_group_marine.svg"
           link="/browse/list/Conservation_NT"
         />
       </Carousel.Slide>
@@ -91,8 +100,8 @@ export default function BrowseGrouping() {
       <Carousel.Slide>
         <BrowseCard
           total={0}
-          category="Threatened biodiversity"
-          image="card-icons/tsi.svg"
+          category="Threatened"
+          image="card-icons/list_group_threatened_top_110_species.svg"
           link="/browse/list/Conservation_NT"
         />
       </Carousel.Slide>
@@ -101,7 +110,7 @@ export default function BrowseGrouping() {
         <BrowseCard
           total={data?.overview.allSpecies}
           category="All species"
-          image="card-icons/terrestrial.svg"
+          image="card-icons/view_all.svg"
           link="/browse/list/Conservation_NT"
         />
       </Carousel.Slide>

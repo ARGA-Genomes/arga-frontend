@@ -55,7 +55,7 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={data?.overview.animals}
           category="Animals"
-          image="card-icons/marine.svg"
+          image="card-icons/taxon_Animals(Animalia).svg"
           link="/browse/animals"
         />
       </Carousel.Slide>  
@@ -63,7 +63,7 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={data?.overview.plants}
           category="Plants"
-          image="card-icons/agricultural.svg"
+          image="card-icons/taxon_Floweringplants(Plantae).svg"
           link="/browse/plants"
         />
       </Carousel.Slide> 
@@ -71,8 +71,144 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={data?.overview.fungi}
           category="Fungi"
-          image="card-icons/allspecies.svg"
+          image="card-icons/taxon_Fungi(Fungi).svg"
           link="/browse/fungi"
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Cnideria"
+          image="card-icons/taxon_Anemones_coralsandjellyfishes(Cnidaria).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Bacteria"
+          image="card-icons/taxon_Bacteria.svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Birds"
+          image="card-icons/taxon_Birds(Aves).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Phaeophyceae"
+          image="card-icons/taxon_Brownalgae(Phaeophyceae).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Crustacea"
+          image="card-icons/taxon_Crustaceans(Crustacea).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Cyanobacteria"
+          image="card-icons/taxon_Cyanobacteria.svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Echinodermata"
+          image="card-icons/taxon_Echinoderms(Echinodermata).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Actinopterygii"
+          image="card-icons/taxon_Finfishes(Actinopterygii).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Anura"
+          image="card-icons/taxon_Frogsandtoads(Anura).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Chlorophyta"
+          image="card-icons/taxon_Greenalgae(Chlorophyta).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Insecta"
+          image="card-icons/taxon_Insects(Insecta).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Mammalia"
+          image="card-icons/taxon_Mammals(Mammalia).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Mollusca"
+          image="card-icons/taxon_Molluscs(Mollusca).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Protista"
+          image="card-icons/taxon_Protists(Protista).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Rhodophyta"
+          image="card-icons/taxon_Redalgae(Rhodophyta).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Elasmobranchii"
+          image="card-icons/taxon_Sharksandrays(Elasmobranchii).svg"
+          link=""
+        />
+        </Carousel.Slide>
+        <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Porifera"
+          image="card-icons/taxon_Sponges(Porifera).svg"
+          link=""
         />
         </Carousel.Slide>
     </Carousel>
