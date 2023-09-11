@@ -59,11 +59,11 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
   const loading = total === undefined;
   const imageSize = 150
 
-  function displayShortenedTotal ( total: number): string {
+  function displayShortenedTotal ( total: number): string  | number {
     if (total > 999 && total < 1000000) {
-      return (parseFloat(total/1000).toFixed(2).toString() + 'K')
+      return ((total/1000).toFixed(2) + 'K')
     }else if (total > 999999 && total < 1000000000) {
-      return (parseFloat(total/1000000).toFixed(2).toString() + 'M')
+      return ((total/1000000).toFixed(2) + 'M')
     }
     return total
   }
