@@ -19,6 +19,10 @@ import VisitorGraph from "./visitor_graph";
 import { Search as IconSearch } from "tabler-icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
+import {createStyles} from '@mantine/core';
+
+const useStyles = createStyles((theme, _params, _getRef) => ({
+}));
 
 function Highlights() {
   return (
@@ -115,6 +119,8 @@ function Search() {
 }
 
 export default function HomePage() {
+  const {  theme } = useStyles();
+
   return (
     <Box>
       <Paper bg="midnight.6" h={400} pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-40px'>
@@ -123,16 +129,8 @@ export default function HomePage() {
           <Search />
         </Box>
         <Box px={50} py={20}>
-          <Stack
-            pl={16}
-            spacing={1}
-            sx={{
-              borderLeftWidth: 5,
-              borderLeftStyle: "solid",
-              borderLeftColor: "#a2c36e",
-            }}
-          >
-            <h2 style={{ color: "#a2c36e", marginTop: '0px', marginBottom: '0px', fontWeight: '550' }}>
+          
+            <h2 style={{ color: theme.colors.wheat[4], marginTop: '0px', marginBottom: '0px', fontWeight: '550' }}>
               Deepen discovery - trawl traits - curate collections
             </h2>
             <p style={{ color: "white" }}>For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
@@ -141,7 +139,6 @@ export default function HomePage() {
                 raw genomics data
               </b>
             </p>
-          </Stack> 
         </Box>
       </Paper>
 

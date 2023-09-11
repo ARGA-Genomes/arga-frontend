@@ -1,6 +1,6 @@
 'use client';
 
-import { AppShell, Box, Container, Flex, Header } from '@mantine/core';
+import { AppShell, Box, Container, Flex, Header, Image } from '@mantine/core';
 import { TopNav } from './top-nav';
 import { Footer } from './footer'
 import { footerLinks, headerLinks } from './constants';
@@ -29,7 +29,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Footer links={footerLinks.links}/>
           </Container>
           <Flex align="flex-end" justify="flex-end">
-                  {/* <Image src="dna_footer.jpg" width={600} height={80} /> */}
+                  <Image src="dna_footer.jpg" width={'100%'} height={160} /> 
           </Flex>
         </Box>
       }

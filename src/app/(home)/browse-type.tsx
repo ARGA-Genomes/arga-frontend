@@ -30,13 +30,13 @@ export default function BrowseType() {
   if (error) return <p>Error : {error.message}</p>;
 
   return (
-    <Carousel sx={{ width: '100%'}} 
-      mx="auto" 
-      height={300} 
+    <Carousel sx={{maxWidth:'100%'}}
+      // mx="auto" //use this if you'd like to center the carousel
+      height={340} 
       slidesToScroll='auto'
-      slideSize="33.333333%"
-      slideGap="md"
-      align="start"
+      slideSize="200px"
+      slideGap="xs"
+      align="center"
       breakpoints={[
         { maxWidth: 'md', slideSize: '50%' },
         { maxWidth: 'sm', slideSize: '100%', slideGap: 0 },

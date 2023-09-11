@@ -33,11 +33,11 @@ export default function BrowseTaxon() {
   return (
     <Carousel sx={{ width: '100%'}} 
       mx="auto" 
-      height={300} 
+      height={340} 
       slidesToScroll='auto'
-      slideSize="33.333333%"
+      slideSize="200px"
       slideGap="md"
-      align="start"
+      align="center"
       breakpoints={[
         { maxWidth: 'md', slideSize: '50%' },
         { maxWidth: 'sm', slideSize: '100%', slideGap: 0},

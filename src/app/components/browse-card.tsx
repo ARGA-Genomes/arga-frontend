@@ -34,7 +34,7 @@ function BrowseCardShell({
         bg="inherit"
         maw={265}
         m={'auto'}
-        sx={(theme) => ({ "&:hover": {backgroundColor: theme.colors.midnight[8] }, height: '270px', display: 'flex', flexDirection: 'column', justifyContent: 'center' })}
+        sx={(theme) => ({ "&:hover": {backgroundColor: theme.colors.midnight[8] }, height: '340px', display: 'flex', flexDirection: 'column', justifyContent: 'start' })}
       >
         <Card.Section>{children}</Card.Section>
       </Card>
@@ -60,16 +60,18 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
   const imageSize = 122
 
   return (
-    <BrowseCardShell link={link || ""}>
+    <BrowseCardShell link={link || ""} >
       <Box
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "center",
+          paddingTop: "30px"
         }}
       >
 
-        <Stack  align={"center"} spacing={4} >
+        <Stack  align={"center"} spacing={4}
+>
           <Skeleton
             className={classes.skeleton}
             visible={loading}
