@@ -37,7 +37,7 @@ export default function BrowseTaxon() {
       slidesToScroll='auto'
       slideSize="200px"
       slideGap="md"
-      align="center"
+      align="start"
       breakpoints={[
         { maxWidth: 'md', slideSize: '50%' },
         { maxWidth: 'sm', slideSize: '100%', slideGap: 0},

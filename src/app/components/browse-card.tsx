@@ -84,12 +84,12 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
             <Image src={image} height={imageSize} width={imageSize} alt="" />
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading} color="red">
-            <Text size="xl" weight={550} ta={"center"} color="bushfire.4">
+            <Text size="xl" weight={550} ta={"center"} color="grey.0">
               {category || "Category Here"}
             </Text>
           </Skeleton>
           <Skeleton className={classes.skeleton} visible={loading}>
-            <Text size={16} weight={300} ta={"center"} color="white">
+            <Text size={17} weight={400} ta={"center"} color="grey.4">
               {total} records
             </Text>
           </Skeleton>

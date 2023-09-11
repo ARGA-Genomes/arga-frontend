@@ -22,6 +22,7 @@ export const argaBrand: MantineThemeOverride = {
     moss: ['#f0fae4', '#daeac4', '#c4daa3', '#aecb80', '#97bc5d', '#7da243', '#627e33', '#455a23', '#283612', '#0b1300'],
     bushfire: ['#ffeedd', '#ffd0b1', '#fbb284', '#f79554', '#f47625', '#da5d0b', '#af7a58', '#7a3303', '#4b1d00', '#1f0700'],
     wheat: ['#f3e6c4', '#ffe8af', '#fed97f', '#fcc743', '#febb1e', '#e4a107', '#b27e01', '#7f5a00', '#4d3600', '#1c1200'],
+    grey: ['#ffffff', '#f1f1f1', '#e4e4e4', '#d3d3d3', '#a8a8a8', '#939393', '#3f3f3f', '#000000' ]
   },
 
   fontFamily: workSans.style.fontFamily,

@@ -36,7 +36,7 @@ export default function BrowseType() {
       slidesToScroll='auto'
       slideSize="200px"
       slideGap="xs"
-      align="center"
+      align="start"
       breakpoints={[
         { maxWidth: 'md', slideSize: '50%' },
         { maxWidth: 'sm', slideSize: '100%', slideGap: 0 },

@@ -87,7 +87,7 @@ function Search() {
       }}
     >
       <Grid align="center">
-        <Grid.Col span="auto">
+        <Grid.Col xs={12} sm={12} md={10} lg={10} xl={8} span="auto">
           <TextInput
             placeholder="e.g. sequence accession, taxon identifier, genus name"
             value={value}
@@ -108,9 +108,9 @@ function Search() {
           />
         </Grid.Col>
         <Grid.Col span="content">
-          <Button size="xl" type="submit" className="primary_button">
+          {/* <Button size="xl" type="submit" className="primary_button">
              Search
-          </Button>
+          </Button> */}
         </Grid.Col>
       </Grid>
     </form>
@@ -123,15 +123,15 @@ export default function HomePage() {
 
   return (
     <Box>
-      <Paper bg="midnight.6" h={400} pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-40px'>
-        <Box px={50} py={20}>
-          <h2 style={{ color: "white", fontSize: '24px', fontWeight: '550'}}>Search data</h2>
-          <Search />
-        </Box>
-        <Box px={50} py={20}>
+      <Paper bg="midnight.6" h={'auto'} pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-40px'>
+        <Box  py={80} sx={{ textAlign: 'justify'}}>
+        <Grid gutter={30}>
+          <Grid.Col xs={1} sm={1} md={1} lg={1} xl={1}>
+          </Grid.Col>  
+          <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
           
             <h2 style={{ color: theme.colors.wheat[4], marginTop: '0px', marginBottom: '0px', fontWeight: '550' }}>
-              Deepen discovery - trawl traits - curate collections
+              deepen discovery - trawl traits - curate collections
             </h2>
             <p style={{ color: "white" }}>For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
               Genome Atlas (ARGA) locates and aggregates genomic data, including <b> reference genome assemblies &#x2022;
@@ -139,25 +139,32 @@ export default function HomePage() {
                 raw genomics data
               </b>
             </p>
+          </Grid.Col>
+        </Grid>
         </Box>
       </Paper>
 
-        <Box px={50} pb={20}>
-          <h2 style={{ color: "white", fontWeight: '550', textAlign: 'center'  }}>
-            Browse By type
-          </h2>
-          <BrowseType />
+        <Box px={50} py={20}>
+          <h2 style={{ color: theme.colors.moss[3], fontSize: '24px', fontWeight: '550'}}>Search for data</h2>
+          <Search />
         </Box>
 
-        <Box px={50} pb={20}>
-          <h2 style={{ color: "white", fontWeight: '550', textAlign: 'center'  }}>
+        <Box px={50} py={20}>
+          <h2 style={{ color: theme.colors.moss[3], fontWeight: '550' }}>
+            Browse By type
+          </h2>
+          <BrowseType style={{alignItems:"left"}}/>
+        </Box>
+
+        <Box px={50} py={20}>
+          <h2 style={{ color: theme.colors.moss[3], fontWeight: '550' }}>
             Browse By taxon
           </h2>
           <BrowseTaxon />
         </Box>
 
-        <Box px={50} pb={30}>
-          <h2 style={{ color: "white", fontWeight: '550', textAlign: 'center'  }}>
+        <Box px={50} py={30}>
+          <h2 style={{ color: theme.colors.moss[3], fontWeight: '550'  }}>
             Browse By group
           </h2>
           <BrowseGrouping />

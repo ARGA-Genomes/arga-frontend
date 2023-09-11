@@ -11,7 +11,7 @@ import { footerLinks, headerLinks } from './constants';
 // each page.
 export function Shell({ children }: { children: React.ReactNode }) {
 
-  const MAX_WIDTH = {xs: "100%", sm: "100%", md: "100%", lg: "88%", xl: "80%" };
+  const MAX_WIDTH = {xs: "100%", sm: "100%", md: "100%", lg: "95%", xl: "95%" };
 
   return (
     <AppShell
