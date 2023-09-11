@@ -26,7 +26,8 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
       },
     },
     span: {
-      fontSize: '16px',
+      fontSize: '22px',
+      fontWeight: '600',
       height: '70px'
     }
   },
@@ -47,7 +48,8 @@ const useStyles = createStyles((theme, _params, _getRef) => ({
       },
     },
     span: {
-      fontSize: '16px',
+      fontSize: '22px',
+      fonWeight: '600',
       height: '70px'
     }
   },
