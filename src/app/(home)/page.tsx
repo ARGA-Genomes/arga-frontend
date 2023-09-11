@@ -153,7 +153,7 @@ export default function HomePage() {
           <h2 style={{ color: theme.colors.moss[3], fontWeight: '550' }}>
             Browse By type
           </h2>
-          <BrowseType style={{alignItems:"left"}}/>
+          <BrowseType />
         </Box>
 
         <Box px={50} py={20}>
