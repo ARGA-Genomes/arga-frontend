@@ -192,7 +192,7 @@ function TaxonItem({ item }: { item: Record }) {
   return (
     <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control ml={-20} mt={-20}>
-        <Group position="apart">
+        <Group position="apart" >
           <Stack spacing={0}>
             <Container style={{
               position: "relative",
@@ -226,7 +226,7 @@ function TaxonItem({ item }: { item: Record }) {
               </Text>
             ))}
           </Stack>
-          <Group>
+          <Group pt={20}>
             {item.dataSummary ? <TaxonSummary summary={item.dataSummary} /> : null}
           </Group>
         </Group>
@@ -322,7 +322,7 @@ function GenomeItem({ item }: { item: Record }) {
               <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
           </Stack>
-          <Group>
+          <Group pt={20}>
             <GenomeSummary item={item} />
           </Group>
         </Group>
@@ -390,7 +390,7 @@ function LocusItem({ item }: { item: Record }) {
               <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
           </Stack>
-          <Group>
+          <Group pt={20}>
             <LocusSummary item={item} />
           </Group>
         </Group>

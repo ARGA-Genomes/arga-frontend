@@ -80,6 +80,7 @@ export const argaBrand: MantineThemeOverride = {
       }
     },
     '.mantine-Accordion-chevron	': {
+      paddingTop: '20px',
       fill: '#C1C1C1',
       '&:hover': {
         fill: '#3c6377'
