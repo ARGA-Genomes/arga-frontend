@@ -78,7 +78,7 @@ export default function BrowseTaxon() {
         <Carousel.Slide>
         <BrowseCard
           total={0}
-          category="Cnideria"
+          category="Cnidaria"
           image="card-icons/taxon_Anemones_coralsandjellyfishes(Cnidaria).svg"
           link=""
         />

@@ -151,21 +151,21 @@ export default function HomePage() {
 
         <Box px={50} py={20}>
           <h2 style={{ color: theme.colors.moss[3], fontWeight: '550' }}>
-            Browse By type
+            Browse by data type
           </h2>
           <BrowseType />
         </Box>
 
         <Box px={50} py={20}>
           <h2 style={{ color: theme.colors.moss[3], fontWeight: '550' }}>
-            Browse By taxon
+            Browse by taxonomic group
           </h2>
           <BrowseTaxon />
         </Box>
 
         <Box px={50} py={30}>
           <h2 style={{ color: theme.colors.moss[3], fontWeight: '550'  }}>
-            Browse By group
+            Browse by functional or ecological group
           </h2>
           <BrowseGrouping />
         </Box>

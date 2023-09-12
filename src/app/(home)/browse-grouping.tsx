@@ -88,14 +88,15 @@ export default function BrowseGrouping() {
         />
       </Carousel.Slide>
 
-      <Carousel.Slide>
+      {/* <Carousel.Slide>
         <BrowseCard
           total={0}
           category="Biosecurity and pest species"
           image="card-icons/preserved.svg"
           link="/browse/list/Conservation_NT"
         />
-      </Carousel.Slide>
+      </Carousel.Slide> */}
+      
 
       <Carousel.Slide>
         <BrowseCard
