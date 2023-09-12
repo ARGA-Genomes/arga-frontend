@@ -12,7 +12,6 @@ import {
   Button,
   LoadingOverlay,
   Group,
-  Center,
   TextInput,
   MantineProvider,
   Accordion,
@@ -205,7 +204,7 @@ function TaxonItem({ item }: { item: Record }) {
               marginLeft: 0,
               marginRight: 0
             }}>
-              <Image src={"search-icons/data_type_higher_taxon_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+              <Image src={"search-icons/data_type_species_and_subspecies_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
               <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
@@ -453,7 +452,8 @@ function SearchResults({ results }: { results: Record[] }) {
   return (
     <Accordion variant="separated"
       radius="lg"
-      defaultValue={[results[0] ? (results[0].accession ? results[0].accession : results[0].canonicalName) : ""]}
+      // Uncomment line below if tyou want the first search result always expanded
+      // defaultValue={[results[0] ? (results[0].accession ? results[0].accession : results[0].canonicalName) : ""]}
       chevron={ChevronCircleAccordion()}
       multiple>
       {results.map(record => (
@@ -493,7 +493,7 @@ function Search(props: SearchProperties) {
         <Box>
           <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
             <Grid align="center" m={10}>
-              <Grid.Col span="auto">
+              <Grid.Col xs={12} sm={12} md={10} lg={10} xl={10}>
                 <TextInput
                   placeholder="e.g. sequence accession, taxon identifier, genus name"
                   value={value}
@@ -504,8 +504,8 @@ function Search(props: SearchProperties) {
                   icon={<IconSearch size={28} />}
                 />
               </Grid.Col>
-              <Grid.Col span="content">
-                <Button size="xl" className="primary_button" type="submit">Search</Button>
+              <Grid.Col xs={12} sm={12} md={2} lg={2} xl={2}>
+                <Button h="65px" w="100%" className="primary_button" type="submit">Search</Button>
               </Grid.Col>
             </Grid>
           </form>
