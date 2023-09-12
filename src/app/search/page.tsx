@@ -21,7 +21,8 @@ import {
   useMantineTheme,
   Flex,
   NativeSelect,
-  Pagination
+  Pagination,
+  Container
 } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -191,11 +192,22 @@ function TaxonItem({ item }: { item: Record }) {
 
   return (
     <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control>
+      <Accordion.Control ml={-20} mt={-20}>
         <Group position="apart">
           <Stack spacing={0}>
-            <Image src={"search-icons/data_type_higher_taxon_reports.svg"} fit="contain" width={200} pos="absolute" mt={-41} ml={-40} alt="" />
-            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{paddingTop: "20px"}}>
+          <Container style={{
+              position: "relative",
+              top: "0px",
+              left: "0px",
+              overflow: "hidden",
+              width: "200px",
+              height: "35px",
+              marginLeft: 0,
+              marginRight: 0
+            }}>
+            <Image src={"search-icons/data_type_higher_taxon_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+            </Container>
+            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{marginTop: "0px"}}>
               <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
             { item.subspecies?.map(subspecies => (
@@ -292,12 +304,25 @@ function GenomeItem({ item } : { item: Record }) {
   const searchParams = useSearchParams();
   return (
     <Accordion.Item p={10} value={item.accession? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control>
+      <Accordion.Control ml={-20} mt={-20}>
         <Group position="apart">
-        <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="absolute" mt={70} ml={-40} alt="" />
-          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{paddingTop: "20px"}} >
-            <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
-          </Link>
+          <Stack>
+            <Container style={{
+              position: "relative",
+              top: "0px",
+              left: "0px",
+              overflow: "hidden",
+              width: "200px",
+              height: "35px",
+              marginLeft: 0,
+              marginRight: 0
+            }}>
+              <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+            </Container>
+            <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }} >
+              <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+            </Link>
+          </Stack>
           <Group>
             <GenomeSummary item={item} />
           </Group>
@@ -347,15 +372,28 @@ function LocusItem({ item } : { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   return (
     <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control>
-        <Group position="apart">
-        <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="absolute" mt={70} ml={-40} alt="" />
-          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{paddingTop: "20px"}}>
-            <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
-          </Link>
-          <Group>
-            <LocusSummary item={item} />
-          </Group>
+      <Accordion.Control ml={-20} mt={-20}>
+        <Group position="apart" >
+          <Stack>
+          <Container style={{
+            position: "relative",
+            top: "0px",
+            left: "0px",
+            overflow: "hidden",
+            width:"200px",
+            height:"35px",
+            marginLeft: 0,
+            marginRight: 0
+          }}>
+            <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+          </Container>
+            <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
+              <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+            </Link>
+          </Stack>
+            <Group>
+              <LocusSummary item={item} />
+            </Group>
         </Group>
       </Accordion.Control>
       <Accordion.Panel>
