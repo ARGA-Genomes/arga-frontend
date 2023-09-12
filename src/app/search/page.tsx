@@ -207,7 +207,7 @@ function TaxonItem({ item }: { item: Record }) {
               <Image src={"search-icons/data_type_species_and_subspecies_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
-              <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+              <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
             {item.subspecies?.map(subspecies => (
               <Text size="sm" ml={5} key={subspecies} className='subspeciesAccordion'>
