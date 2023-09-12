@@ -20,6 +20,7 @@ import {
   Stack,
   useMantineTheme,
   Flex,
+  NativeSelect,
   Pagination
 } from "@mantine/core";
 import Link from 'next/link';
@@ -453,41 +454,49 @@ function Search(props: SearchProperties) {
   }
 
   return (
-    <Box>
-      <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
-        <Grid align="center" m={10}>
-          <Grid.Col span="auto">
-            <TextInput
-              placeholder="e.g. sequence accession, taxon identifier, genus name"
-              value={value}
-              onChange={val => setValue(val.target.value)}
-              iconWidth={60}
-              size="xl"
-              radius={16}
-              icon={<IconSearch size={28} />}
-            />
-          </Grid.Col>
+    <>
+      <Paper bg="midnight.6" pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-40px' pt = '60px' pb='60px' mb='20px'>
+        <Box>
+          <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
+            <Grid align="center" m={10}>
+              <Grid.Col span="auto">
+                <TextInput
+                  placeholder="e.g. sequence accession, taxon identifier, genus name"
+                  value={value}
+                  onChange={val => setValue(val.target.value)}
+                  iconWidth={60}
+                  size="xl"
+                  radius={16}
+                  icon={<IconSearch size={28} />}
+                />
+              </Grid.Col>
 
-          <Grid.Col span="content">
-            <Button size="xl" className="primary_button" type="submit">Search</Button>
-          </Grid.Col>
-        </Grid>
-      </form>
-
-      <SegmentedControl
-        size="lg"
-        fullWidth
-        value={dataType}
-        onChange={onFilter}
-        classNames={segmented.classes}
-        data={[
-          { value: 'all', label: <SearchDataTypeItem label="All" />},
-          { value: 'taxonomy', label: <SearchDataTypeItem label="Taxonomy" /> },
-          { value: 'genomes', label: <SearchDataTypeItem label="Genome assemblies" /> },
-          { value: 'loci', label: <SearchDataTypeItem label="Genetic loci*" /> }
-        ]}
-      />
-    </Box>
+              <Grid.Col span="content">
+                <Button size="xl" className="primary_button" type="submit">Search</Button>
+              </Grid.Col>
+            </Grid>
+          </form>
+        </Box>
+      </Paper>
+    
+      <Box>
+        <Group position="right" >
+          <NativeSelect
+            style={{ width: "200px", paddingBottom: "40px", paddingRight: "16px" }}
+            label="Filter by"
+            value={dataType}
+            onChange={(event) => onFilter(event.currentTarget.value)}
+            size="sm"
+            data={[
+              { value: 'all', label: 'All' },
+              { value: 'taxonomy', label: 'Taxonomy' },
+              { value: 'genomes', label: 'Genome assemblies' },
+              { value: 'loci', label: 'Genetic loci*' }
+            ]}
+          />
+        </Group>
+      </Box>
+    </>    
   )
 }
 
