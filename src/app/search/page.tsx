@@ -319,7 +319,7 @@ function GenomeItem({ item }: { item: Record }) {
               <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }} >
-              <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+              <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
           </Stack>
           <Group>
@@ -387,7 +387,7 @@ function LocusItem({ item }: { item: Record }) {
               <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
-              <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+              <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
           </Stack>
           <Group>
