@@ -26,7 +26,7 @@ import {
 } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
 import { argaBrandLight } from '../theme';
 import ChevronCircleAccordion from 'public/search-icons/chevron-circle-accordion';
@@ -150,7 +150,7 @@ type Pagination = {
 }
 
 
-function Summary({ label, value, url = null}: { label: string, value: number | string | React.ReactNode, url: { pathname: string; query: { previousUrl: string; } } | null }) {
+function Summary({ label, value, url = null }: { label: string, value: number | string | React.ReactNode, url: { pathname: string; query: { previousUrl: string; } } | null }) {
   const { classes } = useSearchTypeStyles();
   if (url !== null) {
     return (
@@ -177,7 +177,7 @@ function Attribute({ label, value }: { label: string, value: string | undefined 
     <Stack spacing={0}>
       <Text size="sm">{label}</Text>
       <Link href={link}>
-        <Paper py={5} px={15} radius="md" sx={{maxWidth:'300px'}} className={classes.attribute}>
+        <Paper py={5} px={15} radius="md" sx={{ maxWidth: '300px' }} className={classes.attribute}>
           <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
         </Paper>
       </Link>
@@ -195,7 +195,7 @@ function TaxonItem({ item }: { item: Record }) {
       <Accordion.Control ml={-20} mt={-20}>
         <Group position="apart">
           <Stack spacing={0}>
-          <Container style={{
+            <Container style={{
               position: "relative",
               top: "0px",
               left: "0px",
@@ -205,30 +205,30 @@ function TaxonItem({ item }: { item: Record }) {
               marginLeft: 0,
               marginRight: 0
             }}>
-            <Image src={"search-icons/data_type_higher_taxon_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+              <Image src={"search-icons/data_type_higher_taxon_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
-            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{marginTop: "0px"}}>
+            <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
               <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
-            { item.subspecies?.map(subspecies => (
+            {item.subspecies?.map(subspecies => (
               <Text size="sm" ml={5} key={subspecies} className='subspeciesAccordion'>
                 <Link href={`/species/${itemLinkName}/summary`}>
                   {subspecies}
                 </Link>
               </Text>
-            )) }
+            ))}
             {
               <Text size="sm" ml={5} className="synonymClosed">
-                  {item.synonyms? item.synonyms[0]: null}
-              </Text>            }
-            { item.synonyms?.map(synonym => (
+                {item.synonyms ? item.synonyms[0] : null}
+              </Text>}
+            {item.synonyms?.map(synonym => (
               <Text size="sm" ml={5} key={synonym} className="synonymOpened">
-                  {synonym}
+                {synonym}
               </Text>
-            )) }
+            ))}
           </Stack>
           <Group>
-            { item.dataSummary ? <TaxonSummary summary={item.dataSummary} /> : null }
+            {item.dataSummary ? <TaxonSummary summary={item.dataSummary} /> : null}
           </Group>
         </Group>
       </Accordion.Control>
@@ -242,10 +242,10 @@ function TaxonItem({ item }: { item: Record }) {
 function TaxonSummary({ summary }: { summary: DataSummary }) {
   return (
     <>
-      { summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} url={null} /> : null }
-      { summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} url={null} /> : null }
-      { summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} url={null} /> : null }
-      { summary.barcodes ? <Summary label="Genetic loci*" value={summary.barcodes} url={null} /> : null }
+      {summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} url={null} /> : null}
+      {summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} url={null} /> : null}
+      {summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} url={null} /> : null}
+      {summary.barcodes ? <Summary label="Genetic loci*" value={summary.barcodes} url={null} /> : null}
     </>
   )
 }
@@ -267,9 +267,9 @@ function TaxonDetails({ item }: { item: Record }) {
     <Box>
       <Stack spacing={0} mt={10} mb={30}>
         <Text size="sm">Common names</Text>
-        { item.commonNames && item.commonNames.length > 0
-        ? <Text size="lg" weight={550}>{item.commonNames?.join(", ")}</Text>
-        : <Text size="lg" weight={550} c="dimmed">None</Text>
+        {item.commonNames && item.commonNames.length > 0
+          ? <Text size="lg" weight={550}>{item.commonNames?.join(", ")}</Text>
+          : <Text size="lg" weight={550} c="dimmed">None</Text>
         }
       </Stack>
 
@@ -278,7 +278,7 @@ function TaxonDetails({ item }: { item: Record }) {
         borderLeftStyle: "solid",
         borderLeftColor: theme.colors.bushfire[4],
       }}
-      className={classes.horizontalGrouping}>
+        className={classes.horizontalGrouping}>
         <Text size="lg" weight={550}>Scientific classification</Text>
         <Flex gap="lg" >
           {attributes}
@@ -291,19 +291,19 @@ function TaxonDetails({ item }: { item: Record }) {
       }}
         className={classes.verticalGrouping}>
         <Text size="lg" weight={550}>Scientific classification</Text>
-          {attributes}
+        {attributes}
       </Stack>
     </Box>
   )
 }
 
 
-function GenomeItem({ item } : { item: Record }) {
+function GenomeItem({ item }: { item: Record }) {
   const { classes } = useSearchTypeStyles();
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   const searchParams = useSearchParams();
   return (
-    <Accordion.Item p={10} value={item.accession? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control ml={-20} mt={-20}>
         <Group position="apart">
           <Stack>
@@ -339,7 +339,7 @@ function GenomeSummary({ item }: { item: Record }) {
   const searchParams = useSearchParams();
   return (
     <>
-      <Summary label="Accession no." value={`${item.accession} (${item.genomeRep})`} url={{pathname: `/assemblies/${item.accession}`, query: {previousUrl : searchParams.toString()}}}/>
+      <Summary label="Accession no." value={`${item.accession} (${item.genomeRep})`} url={{ pathname: `/assemblies/${item.accession}`, query: { previousUrl: searchParams.toString() } }} />
       <Summary label="Reference genome" value={item.referenceGenome ? <CircleCheck size={20} color="green" /> : <CircleX size={20} color="red" />} url={null} />
     </>
   )
@@ -366,7 +366,7 @@ function GenomeDetails({ item }: { item: Record }) {
   )
 }
 
-function LocusItem({ item } : { item: Record }) {
+function LocusItem({ item }: { item: Record }) {
   const { classes } = useSearchTypeStyles();
   const searchParams = useSearchParams();
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
@@ -375,25 +375,25 @@ function LocusItem({ item } : { item: Record }) {
       <Accordion.Control ml={-20} mt={-20}>
         <Group position="apart" >
           <Stack>
-          <Container style={{
-            position: "relative",
-            top: "0px",
-            left: "0px",
-            overflow: "hidden",
-            width:"200px",
-            height:"35px",
-            marginLeft: 0,
-            marginRight: 0
-          }}>
-            <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
-          </Container>
+            <Container style={{
+              position: "relative",
+              top: "0px",
+              left: "0px",
+              overflow: "hidden",
+              width: "200px",
+              height: "35px",
+              marginLeft: 0,
+              marginRight: 0
+            }}>
+              <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+            </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/summary`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
               <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
           </Stack>
-            <Group>
-              <LocusSummary item={item} />
-            </Group>
+          <Group>
+            <LocusSummary item={item} />
+          </Group>
         </Group>
       </Accordion.Control>
       <Accordion.Panel>
@@ -407,8 +407,8 @@ function LocusSummary({ item }: { item: Record }) {
   const searchParams = useSearchParams();
   return (
     <>
-      <Summary label="Accession no." value={item.accession} url={{pathname: `/markers/${item.accession}`, query: {previousUrl : searchParams.toString()}}}/>
-      <Summary label="Source molecule" value={item.locusType} url={null}/>
+      <Summary label="Accession no." value={item.accession} url={{ pathname: `/markers/${item.accession}`, query: { previousUrl: searchParams.toString() } }} />
+      <Summary label="Source molecule" value={item.locusType} url={null} />
     </>
   )
 }
@@ -436,48 +436,41 @@ function LocusDetails({ item }: { item: Record }) {
 }
 
 
-function SearchItem({ item } : { item: Record }) {
+function SearchItem({ item }: { item: Record }) {
   switch (item.type) {
-      case 'TAXON':
-        return (<TaxonItem item={item} />)
-      case 'GENOME':
-        return (<GenomeItem item={item} />)
-      case 'LOCUS':
-        return (<LocusItem item={item} />)
-      default:
-        return null
+    case 'TAXON':
+      return (<TaxonItem item={item} />)
+    case 'GENOME':
+      return (<GenomeItem item={item} />)
+    case 'LOCUS':
+      return (<LocusItem item={item} />)
+    default:
+      return null
   }
 }
 
-function SearchResults({ results } : { results: Record[] }) {
+function SearchResults({ results }: { results: Record[] }) {
   return (
-      <Accordion variant="separated" 
-        radius="lg" 
-        defaultValue={[results[0] ? (results[0].accession ? results[0].accession :results[0].canonicalName): ""]} 
-        chevron={ChevronCircleAccordion()}
-        multiple>
-        {results.map(record => (
-          <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
-        ))}
-      </Accordion>
+    <Accordion variant="separated"
+      radius="lg"
+      defaultValue={[results[0] ? (results[0].accession ? results[0].accession : results[0].canonicalName) : ""]}
+      chevron={ChevronCircleAccordion()}
+      multiple>
+      {results.map(record => (
+        <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
+      ))}
+    </Accordion>
   )
 }
 
 
 interface SearchProperties {
   onSearch: (searchTerms: string, dataType: string) => void,
-}
-
-function SearchDataTypeItem({ label }: { label: string }) {
-  return (
-    <Center m={10}>
-      <Text>{label}</Text>
-    </Center>
-  )
+  data: QueryResults | undefined,
+  loading: boolean
 }
 
 function Search(props: SearchProperties) {
-  const segmented = useSearchTypeStyles();
   const searchParams = useSearchParams();
 
   const [value, setValue] = useState(searchParams.get('q') || "")
@@ -496,7 +489,7 @@ function Search(props: SearchProperties) {
 
   return (
     <>
-      <Paper bg="midnight.6" pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-40px' pt = '60px' pb='60px' mb='20px'>
+      <Paper bg="midnight.6" pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt='-40px' pt='60px' pb='60px' mb='20px'>
         <Box>
           <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
             <Grid align="center" m={10}>
@@ -511,7 +504,6 @@ function Search(props: SearchProperties) {
                   icon={<IconSearch size={28} />}
                 />
               </Grid.Col>
-
               <Grid.Col span="content">
                 <Button size="xl" className="primary_button" type="submit">Search</Button>
               </Grid.Col>
@@ -519,11 +511,16 @@ function Search(props: SearchProperties) {
           </form>
         </Box>
       </Paper>
-    
       <Box>
-        <Group position="right" >
-          <NativeSelect
-            style={{ width: "200px", paddingBottom: "40px", paddingRight: "16px" }}
+        <Group position="apart" >
+          <Text size="lg" ml={20} mb={30}>
+            {!props.loading && props.data
+              ? (<><strong>{props.data?.search.fullText.total} </strong> search results found for <strong>{value} </strong></>)
+              : null
+            }
+          </Text>
+          <NativeSelect ml={20} mb={30} mr={20}
+            style={{ width: "200px" }}
             label="Filter by"
             value={dataType}
             onChange={(event) => onFilter(event.currentTarget.value)}
@@ -537,7 +534,7 @@ function Search(props: SearchProperties) {
           />
         </Group>
       </Box>
-    </>    
+    </>
   )
 }
 
@@ -588,8 +585,7 @@ export default function SearchPage() {
   return (
     <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
       <Box>
-        <Search onSearch={onSearch} />
-
+        <Search onSearch={onSearch} data={data} loading={loading} />
         <Paper radius="xl" p="xl" sx={{ border: "1px solid #dbdbdb" }} pos="relative">
           <LoadingOverlay
             overlayColor={theme.colors.midnight[0]}
@@ -598,15 +594,7 @@ export default function SearchPage() {
             visible={loading}
             radius="xl"
           />
-          <Text size="lg" ml={20} mb={30}>
-            {!loading && data
-              ? (<><strong>{data?.search.fullText.total} </strong> search results found for <strong>{query} </strong></>)
-              : null
-            }
-          </Text>
           <SearchResults results={data?.search.fullText.records || []} />
-
-          
           {
             totalPages === 1 ? null : //Show pagination only if there is more than 1 page
               <Paper bg="white" p={20} m={40} radius="lg">
@@ -665,7 +653,7 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
       },
     },
     attribute: {
-      background:theme.colors.attribute[0],
+      background: theme.colors.attribute[0],
       '&:hover, &:focus': {
         background: theme.colors.attribute[2]
       }
@@ -679,6 +667,6 @@ const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
       '&:hover, &:focus': {
         textDecoration: 'underline'
       }
-    }        
+    }
   }
 });
