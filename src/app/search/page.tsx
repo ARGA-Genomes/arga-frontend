@@ -244,7 +244,7 @@ function TaxonSummary({ summary }: { summary: DataSummary }) {
       {summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} url={null} /> : null}
       {summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} url={null} /> : null}
       {summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} url={null} /> : null}
-      {summary.barcodes ? <Summary label="Genetic loci*" value={summary.barcodes} url={null} /> : null}
+      {summary.barcodes ? <Summary label="Genetic markers" value={summary.barcodes} url={null} /> : null}
     </>
   )
 }
@@ -532,7 +532,7 @@ function Search(props: SearchProperties) {
               { value: 'all', label: 'All' },
               { value: 'taxonomy', label: 'Taxonomy' },
               { value: 'genomes', label: 'Genome assemblies' },
-              { value: 'loci', label: 'Genetic loci*' }
+              { value: 'loci', label: 'Genetic markers' }
             ]}
           />
         </Group>
