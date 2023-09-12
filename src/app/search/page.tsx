@@ -7,7 +7,7 @@ import {
   Paper,
   Box,
   Grid,
-  SegmentedControl,
+  Image,
   createStyles,
   Button,
   LoadingOverlay,
@@ -194,7 +194,8 @@ function TaxonItem({ item }: { item: Record }) {
       <Accordion.Control>
         <Group position="apart">
           <Stack spacing={0}>
-            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } >
+            <Image src={"search-icons/data_type_higher_taxon_reports.svg"} fit="contain" width={200} pos="absolute" mt={-41} ml={-40} alt="" />
+            <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{paddingTop: "20px"}}>
               <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
             </Link>
             { item.subspecies?.map(subspecies => (
@@ -293,7 +294,8 @@ function GenomeItem({ item } : { item: Record }) {
     <Accordion.Item p={10} value={item.accession? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } >
+        <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="absolute" mt={70} ml={-40} alt="" />
+          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{paddingTop: "20px"}} >
             <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
@@ -347,7 +349,8 @@ function LocusItem({ item } : { item: Record }) {
     <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control>
         <Group position="apart">
-          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } >
+        <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="absolute" mt={70} ml={-40} alt="" />
+          <Link href={{pathname: `/species/${itemLinkName}/summary`, query: {previousUrl : searchParams.toString()}} } style={{paddingTop: "20px"}}>
             <Text size="lg" className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
           </Link>
           <Group>
