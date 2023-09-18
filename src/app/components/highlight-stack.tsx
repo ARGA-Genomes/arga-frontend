@@ -48,6 +48,30 @@ export function Attribute({ label, value, href }: AttributeProps) {
   )
 }
 
+const BADGE_COLOURS: Record<string, string> = {
+  "representative genome": "yellow",
+  "Full": "moss",
+  "Partial": "bushfire.3",
+  "Chromosome": "moss.3",
+  "Contig": "bushfire.3",
+}
+
+export function AttributeValue({ label, value }: AttributeProps) {
+  value ||= "No data";
+  const color = BADGE_COLOURS[value] || "#d6e4ed";
+
+  return (
+    <Stack spacing={5}>
+      <Text weight={300} size="sm">{label}</Text>
+      <Center>
+        <Paper py={5} px={15} bg={color} radius="xl">
+          <Text weight={600} size="sm">{value}</Text>
+        </Paper>
+      </Center>
+    </Stack>
+  )
+}
+
 
 interface AttributeIconProps {
   label: string,

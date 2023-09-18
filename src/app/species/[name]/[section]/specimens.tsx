@@ -18,20 +18,21 @@ const PointMap = dynamic(() => import('../../../components/point-map'), {
 const GET_SPECIMENS = gql`
 query SpeciesSpecimens($canonicalName: String) {
   species(canonicalName: $canonicalName) {
-    specimens {
-      id
-      typeStatus
-      institutionName
-      institutionCode
-      collectionCode
-      catalogNumber
-      recordedBy
-      organismId
-      locality
-      latitude
-      longitude
-      details
-      remarks
+    specimens(page: 1) {
+      records {
+        id
+        accession
+        typeStatus
+        institutionName
+        institutionCode
+        collectionCode
+        recordedBy
+        organismId
+        locality
+        latitude
+        longitude
+        remarks
+      }
     }
   }
 }`;
@@ -91,7 +92,7 @@ query SpecimenDetails($specimenId: String) {
 }`;
 
 type Species = {
-  specimens: Specimen[],
+  specimens: { records: Specimen[] },
 }
 
 type QueryResults = {
@@ -129,7 +130,7 @@ function SpecimenDetails({ record }: { record: Specimen }) {
   return (
     <Grid>
       <Grid.Col span={3}>
-        <SpecimenField label="Catalog number" value={record.catalogNumber} icon={<IconClipboardList size={16} />} />
+        <SpecimenField label="Accession" value={record.accession} icon={<IconClipboardList size={16} />} />
       </Grid.Col>
       <Grid.Col span={3}>
         <SpecimenField label="Institution code" value={record.institutionCode} icon={<IconClipboardList size={16} />} />
@@ -186,7 +187,7 @@ function SpecimenRecord(props: SpecimenRecordProps) {
       <td>{props.record.institutionName}</td>
       <td>{props.record.institutionCode}</td>
       <td>{props.record.collectionCode}</td>
-      <td>{props.record.catalogNumber}</td>
+      <td>{props.record.accession}</td>
       <td>
         <Link href={`/specimens/${props.record.id}`}>
           <Button size="xs" variant="light" rightIcon={<ArrowUpRight size={16} />}>All details</Button>
@@ -227,7 +228,7 @@ function SpecimenTable({ records }: { records: Specimen[] }) {
           <td>Institution Name</td>
           <td>Institution Code</td>
           <td>Collection Code</td>
-          <td>Catalog Number</td>
+          <td>Accession</td>
           <td></td>
         </tr>
       </thead>
@@ -268,7 +269,7 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
     },
   });
 
-  const records = data?.species.specimens;
+  const records = data?.species.specimens.records;
   const holotypeId = records?.find(record => record.typeStatus == "HOLOTYPE")?.id;
 
   const holotype = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {

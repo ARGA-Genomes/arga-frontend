@@ -66,7 +66,6 @@ const GET_SUMMARY = gql`
       specimens {
         id
         typeStatus
-        catalogNumber
         latitude
         longitude
         institutionName

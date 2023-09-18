@@ -1,13 +1,15 @@
 'use client';
 
+import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Collapse, Drawer, Grid, Group, LoadingOverlay, Overlay, Paper, Stack, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
-import {WholeGenome, Coordinates, GenomicData, CommonGenome} from "@/app/type";
+import { Accordion, Badge, Box, Button, Center, Collapse, Drawer, Grid, Group, LoadingOverlay, Paper, SimpleGrid, Stack, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
+import { GenomicData, CommonGenome} from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useListState } from "@mantine/hooks";
-import { Link as IconLink, Pencil as IconPencil, License as IconLicense, ArrowUpRight, ArrowsMaximize, ArrowsMinimize } from 'tabler-icons-react';
+import { useHover, useListState } from "@mantine/hooks";
+import { Link as IconLink, Pencil as IconPencil, License as IconLicense, ArrowUpRight, ArrowsMaximize, ArrowsMinimize, ExternalLink, Microscope, ChevronDown, Eye } from 'tabler-icons-react';
 import { useState } from "react";
+import { Attribute, AttributeValue } from "@/app/components/highlight-stack";
 
 
 const REFSEQ_MAP_HEIGHT = 400;
@@ -23,48 +25,54 @@ const GET_WHOLE_GENOMES = gql`
 query SpeciesWholeGenomes($canonicalName: String) {
   species(canonicalName: $canonicalName) {
     wholeGenomes {
-      type
-      dataResource
-      recordedBy
-      license
-      provenance
-      eventDate
-      occurrenceYear
-      otherCatalogNumbers
+      sequenceId
+      dnaExtractId
+      datasetName
       accession
-      accessionUri
-      refseqCategory
-      coordinates {
-        latitude
-        longitude
-      }
-      ncbiNuccore
-      ncbiBioproject
-      ncbiBiosample
-      mixs0000005
-      mixs0000029
-      mixs0000026
-      pairedAsmComp
-      rawRecordedBy
-      ncbiReleaseType
-    }
-    data {
-      type
-      dataResource
-      recordedBy
-      license
-      provenance
-      eventDate
-      accession
-      accessionUri
-      refseqCategory
-      coordinates {
-        latitude
-        longitude
-      }
+      materialSampleId
+      name
+      quality
+      releaseType
+      representation
+      versionStatus
+      estimatedSize
+      excludedFromRefseq
+      assemblyType
+      genomeSize
+      dataType
+      sequencedBy
+      assembledBy
+      annotatedBy
+      depositedBy
     }
   }
 }`;
+
+type WholeGenome = {
+  id: string,
+  dnaExtractId: string,
+  accession: string,
+  datasetName: string,
+  materialSampleId?: string,
+  name?: string,
+  quality?: string,
+  releaseType?: string,
+  representation?: string,
+  versionStatus?: string,
+  estimatedSize?: number,
+  excludedFromRefseq?: string,
+  assemblyType?: string,
+  genomeSize?: number,
+  dataType?: string,
+  sequencedBy?: string,
+  assembledBy?: string,
+  annotatedBy?: string,
+  depositedBy?: string,
+  coordinates: {
+    latitude: number,
+    longitude: number,
+  },
+}
 
 type Species = {
   wholeGenomes: WholeGenome[],
@@ -99,7 +107,7 @@ function ReferenceSequence({ refseq }: { refseq: WholeGenome | undefined }) {
 
 
 interface AllSequencesProps {
-  records: GenomicData[],
+  records: WholeGenome[],
   onExpandToggle: () => void,
 }
 
@@ -108,7 +116,7 @@ function AllSequences({ records, onExpandToggle }: AllSequencesProps) {
     <Grid mah={GENOME_MAP_HEIGHT} pos="relative" m={0}>
       <Grid.Col span={9} p={20}>
         <Title order={3}>All Sequences</Title>
-        { records ? <GenomeTable records={records}/> : null }
+        { records ? <GenomeList records={records}/> : null }
       </Grid.Col>
       <Grid.Col span={3} h={GENOME_MAP_HEIGHT} w={200} pos="relative" m={0} p={0}>
         <GenomeMap records={records} onExpandToggle={onExpandToggle} />
@@ -148,7 +156,7 @@ function GenomeDetails({ record, columns }: { record: WholeGenome, columns: numb
       <Grid.Col span={cols}>
         <GenomeField label="Accession" value={record.accession} icon={<IconLink size={16} />} />
       </Grid.Col>
-      <Grid.Col span={cols}>
+          {/* <Grid.Col span={cols}>
         <GenomeField label="Data resource" value={record.dataResource} icon={<IconLink size={16} />} />
       </Grid.Col>
 
@@ -202,15 +210,15 @@ function GenomeDetails({ record, columns }: { record: WholeGenome, columns: numb
       </Grid.Col>
       <Grid.Col span={cols}>
         <GenomeField label="Event" value={record.eventDate} icon={<IconLicense size={16} />} />
-      </Grid.Col>
+      </Grid.Col> */}
     </Grid>
   )
 }
 
 interface GenomeRecordProps {
-  record: CommonGenome,
+  record: WholeGenome,
   selected: boolean,
-  onSelected: (record: CommonGenome) => void;
+  onSelected: (record: WholeGenome) => void;
 }
 
 function GenomeRecord(props: GenomeRecordProps) {
@@ -221,9 +229,9 @@ function GenomeRecord(props: GenomeRecordProps) {
       onClick={() => props.onSelected(props.record)}
     >
       <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
-      <td>{props.record.type}</td>
-      <td>{props.record.refseqCategory}</td>
-      <td>{props.record.dataResource}</td>
+      <td>{props.record.name}</td>
+      <td>{props.record.representation}</td>
+      <td>{props.record.datasetName}</td>
       <td>
         <Link href={`/assemblies/${props.record.accession}`}>
           <Button size="xs" variant="light" rightIcon={<ArrowUpRight size={16} />}>All details</Button>
@@ -243,7 +251,7 @@ function GenomeRecord(props: GenomeRecordProps) {
   )
 }
 
-function GenomeTable({ records }: { records: CommonGenome[] }) {
+function GenomeTable({ records }: { records: WholeGenome[] }) {
   const [selected, handler] = useListState<WholeGenome>([]);
 
   function toggle(record: WholeGenome) {
@@ -260,9 +268,9 @@ function GenomeTable({ records }: { records: CommonGenome[] }) {
       <thead>
         <tr>
           <td style={{ paddingLeft: 25 }}>Accession</td>
-          <td>Type</td>
-          <td>Category</td>
-          <td>Data Resource</td>
+          <td>Name</td>
+          <td>Representation</td>
+          <td>Data Source</td>
           <td></td>
         </tr>
       </thead>
@@ -272,7 +280,7 @@ function GenomeTable({ records }: { records: CommonGenome[] }) {
             record={record}
             selected={selected.indexOf(record) >= 0}
             onSelected={toggle}
-            key={record.accessionUri}
+            key={record.accession}
           />)
         })}
       </tbody>
@@ -281,8 +289,142 @@ function GenomeTable({ records }: { records: CommonGenome[] }) {
 }
 
 
+function GenomeList({ records }: { records: WholeGenome[] }) {
+  return (
+    <Accordion>
+      { records.map(record => (
+        <Accordion.Item value={record.accession}>
+          <Accordion.Control>{record.accession} - {record.name}</Accordion.Control>
+          <Accordion.Panel><GenomeSummary record={record} /></Accordion.Panel>
+        </Accordion.Item>
+      ))}
+    </Accordion>
+  )
+}
+
+
+function GenomeSummary({ record }: { record: WholeGenome }) {
+  return (
+    <SimpleGrid cols={5}>
+      <AttributeValue label="Accession" value={record.accession} />
+      <AttributeValue label="Dataset" value={record.datasetName} />
+      <AttributeValue label="Material sample" value={record.materialSampleId} />
+      <AttributeValue label="Name" value={record.name} />
+      <AttributeValue label="Quality" value={record.quality} />
+      <AttributeValue label="Release type" value={record.releaseType} />
+      <AttributeValue label="Representation" value={record.representation} />
+      <AttributeValue label="Version" value={record.versionStatus} />
+      <AttributeValue label="Estimated size" value={record.estimatedSize} />
+      <AttributeValue label="Assembly type" value={record.assemblyType} />
+      <AttributeValue label="Data type" value={record.dataType} />
+      <AttributeValue label="Sequenced by" value={record.sequencedBy} />
+      <AttributeValue label="Assembled by" value={record.assembledBy} />
+      <AttributeValue label="Annotated by" value={record.annotatedBy} />
+      <AttributeValue label="Deposited by" value={record.depositedBy} />
+    </SimpleGrid>
+  )
+}
+
+const BADGE_COLOURS: Record<string, string> = {
+  "representative genome": "yellow",
+  "Full": "moss",
+  "Partial": "bushfire.3",
+  "Chromosome": "moss",
+  "Contig": "bushfire.3",
+}
+
+function RecordBadge({ value }: { value: string }) {
+  return (
+    <Badge color={BADGE_COLOURS[value] || "blue"}>{value}</Badge>
+  )
+}
+
+
+function RecordBadges({ record }: { record: WholeGenome }) {
+  return (
+    <Group>
+      { record.dataType && <RecordBadge value={record.dataType} /> }
+      { record.representation && <RecordBadge value={record.representation} /> }
+      { record.quality && <RecordBadge value={record.quality} /> }
+    </Group>
+  )
+}
+
+
+function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
+  return (
+    <Group spacing={20}>
+      <Text weight={300} size="sm">{label}</Text>
+      <Text weight={600}>{value}</Text>
+    </Group>
+  )
+}
+
+
+function RecordItemHeader({ record }: { record: WholeGenome }) {
+  return (
+      <Grid p={20}>
+        <Grid.Col span={8}>
+          <Stack spacing={5}>
+            <SimpleGrid cols={2}>
+            <LabeledValue label="Accession" value={record.accession} />
+            <LabeledValue label="Release date" value="No data"/>
+            </SimpleGrid>
+            <Text size="xs" weight={600}>{record.datasetName}</Text>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <AttributeValue label="Genome size" value={Humanize.fileSize(record.genomeSize || 0)}/>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <AttributeValue label="Assmebly level" value={record.quality}/>
+        </Grid.Col>
+      </Grid>
+  )
+}
+
+function RecordItem({ record }: { record: WholeGenome }) {
+  const { hovered, ref } = useHover();
+
+  return (
+    <Paper
+      radius={16}
+      mb={15}
+      ref={ref}
+      bg={ hovered ? "#F5F5F5" : "white" }
+      withBorder
+    >
+      <Grid gutter={0}>
+        <Grid.Col span="auto">
+          <RecordItemHeader record={record} />
+          <Paper bg="#F5F5F5" sx={{ borderRadius: "0 0 0 16px" }}>
+            <Center><ChevronDown /></Center>
+          </Paper>
+      </Grid.Col>
+      <Grid.Col span="content">
+        <Button color="midnight" h="100%" w={100} sx={{ borderRadius: "0 16px 16px 0" }}>
+          <Stack>
+            <Eye size="lg" />
+            view
+          </Stack>
+        </Button>
+      </Grid.Col>
+    </Grid>
+    </Paper>
+  )
+}
+
+function RecordList({ records }: { records: WholeGenome[] }) {
+  return (
+    <>
+      { records.map(record => <RecordItem record={record} />) }
+    </>
+  )
+}
+
+
 interface GenomeMapProperties {
-  records?: CommonGenome[],
+  records?: WholeGenome[],
   onExpandToggle: () => void,
 }
 
@@ -323,9 +465,8 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
   }
 
   const records = data ? data.species.wholeGenomes : [];
-  const otherRecords = data ? data.species.data.filter(record => record.dataResource.includes("BPA")) : [];
-  const refseq = records?.find(record => record.refseqCategory == "representative genome");
-  const allRecords = [...records, ...otherRecords];
+    /* const otherRecords = data ? data.species.data.filter(record => record.dataResource.includes("BPA")) : [];
+  * const refseq = records?.find(record => record.refseqCategory == "representative genome"); */
 
   return (
     <Box pos="relative">
@@ -337,9 +478,20 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
         radius={20}
       />
 
-      <Stack spacing={30}>
-      <ReferenceSequence refseq={refseq} />
-      <AllSequences records={allRecords} onExpandToggle={() => setMapExpand(true)} />
+      <Stack spacing={5} p={20}>
+        <Title order={3}>All genomes</Title>
+        <Grid>
+          <Grid.Col span={8}>
+            <RecordList records={records} />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Box w={600} h={600} pos="absolute">
+            <MapViewer records={records} onExpandToggle={() => {}} />
+            </Box>
+          </Grid.Col>
+        </Grid>
+              {/* <ReferenceSequence refseq={refseq} /> */}
+              {/* <AllSequences records={records} onExpandToggle={() => setMapExpand(true)} /> */}
       </Stack>
 
       <Drawer

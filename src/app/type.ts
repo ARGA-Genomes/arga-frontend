@@ -159,6 +159,7 @@ type Species = {
 
 type Specimen = {
     id: string,
+    accession: string,
     typeStatus: string,
     institutionName?: string,
     institutionCode?: string,
