@@ -1,5 +1,7 @@
 import { HeaderAndFooterProps } from "./type";
 
+export const MAX_WIDTH = {xs: "100%", sm: "100%", md: "100%", lg: "95%", xl: "95%" };
+
 export const headerLinks: HeaderAndFooterProps = {
     links: [
         { link: "/", label: "APP HOME" },

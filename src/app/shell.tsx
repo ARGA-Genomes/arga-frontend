@@ -3,15 +3,13 @@
 import { AppShell, Box, Container, Flex, Header, Image } from '@mantine/core';
 import { TopNav } from './top-nav';
 import { Footer } from './footer'
-import { footerLinks, headerLinks } from './constants';
+import { footerLinks, headerLinks, MAX_WIDTH } from './constants';
 
 // The shell is the visual layout of the site that wraps all content
 // with the top navigation bar and the footer. It also defines the
 // page dimension constraints to make responsive layouts easier in
 // each page.
 export function Shell({ children }: { children: React.ReactNode }) {
-
-  const MAX_WIDTH = {xs: "100%", sm: "100%", md: "100%", lg: "95%", xl: "95%" };
 
   return (
     <AppShell
@@ -34,9 +32,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </Box>
       }
     >
-      <Container py={36} px={32} maw={MAX_WIDTH}>
+      <Box my={36}>
         {children}
-      </Container>
+      </Box>
     </AppShell>
   );
 }

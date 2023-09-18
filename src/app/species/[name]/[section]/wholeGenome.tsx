@@ -2,7 +2,7 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Accordion, Badge, Box, Button, Center, Collapse, Drawer, Grid, Group, LoadingOverlay, Paper, SimpleGrid, Stack, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
+import { Accordion, Badge, Box, Button, Center, Collapse, Container, Drawer, Grid, Group, LoadingOverlay, Paper, SimpleGrid, Stack, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
 import { GenomicData, CommonGenome} from "@/app/type";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -10,6 +10,8 @@ import { useHover, useListState } from "@mantine/hooks";
 import { Link as IconLink, Pencil as IconPencil, License as IconLicense, ArrowUpRight, ArrowsMaximize, ArrowsMinimize, ExternalLink, Microscope, ChevronDown, Eye } from 'tabler-icons-react';
 import { useState } from "react";
 import { Attribute, AttributeValue } from "@/app/components/highlight-stack";
+import { LoadOverlay } from "@/app/components/load-overlay";
+import { MAX_WIDTH } from "@/app/constants";
 
 
 const REFSEQ_MAP_HEIGHT = 400;
@@ -397,16 +399,16 @@ function RecordItem({ record }: { record: WholeGenome }) {
       <Grid gutter={0}>
         <Grid.Col span="auto">
           <RecordItemHeader record={record} />
-      </Grid.Col>
-      <Grid.Col span="content">
-        <Button color="midnight" h="100%" w={100} sx={{ borderRadius: "0 16px 16px 0" }}>
-          <Stack>
-            <Eye size="lg" />
-            view
-          </Stack>
-        </Button>
-      </Grid.Col>
-    </Grid>
+        </Grid.Col>
+        <Grid.Col span="content">
+          <Button color="midnight" h="100%" w={100} sx={{ borderRadius: "0 16px 16px 0" }}>
+            <Stack>
+              <Eye size="lg" />
+              view
+            </Stack>
+          </Button>
+        </Grid.Col>
+      </Grid>
     </Paper>
   )
 }
@@ -429,7 +431,7 @@ function GenomeMap({ records, onExpandToggle }: GenomeMapProperties) {
   let positions = records?.map(record => record.coordinates).filter(record => record);
 
   return (
-    <PointMap coordinates={positions} borderRadius="0 0 16px 0">
+    <PointMap coordinates={positions} borderRadius="16px 16px 16px 16px">
       <Button sx={{ zIndex: 1000, right: 20, top: 20, position: "absolute"}} rightIcon={<ArrowsMaximize />} onClick={() => onExpandToggle()}>Expand</Button>
     </PointMap>
   )
@@ -440,7 +442,7 @@ function MapViewer({ records, onExpandToggle }: GenomeMapProperties) {
   let positions = records?.map(record => record.coordinates).filter(record => record);
 
   return (
-    <PointMap coordinates={positions} borderRadius="0 16px 16px 0">
+    <PointMap coordinates={positions} borderRadius="16px 16px 16px 16px">
       <Button sx={{ zIndex: 1000, right: 20, top: 20, position: "absolute" }} rightIcon={<ArrowsMinimize />} onClick={() => onExpandToggle()}>Close</Button>
     </PointMap>
   )
@@ -466,16 +468,10 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
   * const refseq = records?.find(record => record.refseqCategory == "representative genome"); */
 
   return (
-    <Box pos="relative">
-      <LoadingOverlay
-        overlayColor={theme.colors.midnight[0]}
-        transitionDuration={500}
-        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-        visible={loading}
-        radius={20}
-      />
+    <Container maw={MAX_WIDTH} py={20}>
+      <LoadOverlay visible={loading} />
 
-      <Stack spacing={5} p={20}>
+      <Stack spacing={5}>
         <Title order={3}>All genomes</Title>
         <Grid>
           <Grid.Col span={8}>
@@ -503,6 +499,6 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
       >
         <MapViewer records={records} onExpandToggle={() => setMapExpand(false)}/>
       </Drawer>
-    </Box>
+    </Container>
   );
 }

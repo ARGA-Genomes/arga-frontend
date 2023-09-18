@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Paper, Tabs, Text, Tooltip } from "@mantine/core";
+import { Box, Container, Paper, Tabs, Text, Tooltip } from "@mantine/core";
 import { Barcode } from "./barcode";
 import { Resources } from "./resources";
 import { Specimens } from "./specimens";
@@ -8,6 +8,7 @@ import { Summary } from "./summary";
 import { TraceTable } from "./traces";
 import { WholeGenome } from "./wholeGenome";
 import { useRouter } from "next/navigation";
+import { MAX_WIDTH } from "@/app/constants";
 
 function DataTabs({ name, section }: { name: string; section: string }) {
   const router = useRouter();
@@ -58,33 +59,33 @@ function DataTabs({ name, section }: { name: string; section: string }) {
         },
       })}
     >
-      <Tabs.List>
-        <Tooltip label="Summary">
+      <Container maw={MAX_WIDTH}>
+        <Tabs.List>
           <Tabs.Tab value="summary">Summary</Tabs.Tab>
-        </Tooltip>
-        <Tabs.Tab value="whole_genome">Whole Genomes</Tabs.Tab>
-        <Tabs.Tab value="traces">Traces</Tabs.Tab>
-        <Tabs.Tab value="barcode">Genetic Loci*</Tabs.Tab>
-        <Tabs.Tab value="other_genomic">Other Genetic Data</Tabs.Tab>
-        <Tabs.Tab value="specimen">Specimen</Tabs.Tab>
-      </Tabs.List>
+          <Tabs.Tab value="whole_genome">Whole Genomes</Tabs.Tab>
+          <Tabs.Tab value="traces">Traces</Tabs.Tab>
+          <Tabs.Tab value="barcode">Genetic Loci*</Tabs.Tab>
+          <Tabs.Tab value="other_genomic">Other Genetic Data</Tabs.Tab>
+          <Tabs.Tab value="specimen">Specimen</Tabs.Tab>
+        </Tabs.List>
+      </Container>
 
-      <Tabs.Panel value="summary" bg="white" style={{ borderRadius: 20, borderTopLeftRadius: 0 }}>
+      <Tabs.Panel value="summary" bg="white">
         <Summary canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="whole_genome" bg="white" style={{ borderRadius: 20 }}>
+      <Tabs.Panel value="whole_genome" bg="white">
         <WholeGenome canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="traces" bg="white" style={{ borderRadius: 20 }}>
+      <Tabs.Panel value="traces" bg="white">
         <TraceTable canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="barcode" bg="white" style={{ borderRadius: 20 }}>
+      <Tabs.Panel value="barcode" bg="white">
         <Barcode canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="specimen" bg="white" style={{ borderRadius: 20 }}>
+      <Tabs.Panel value="specimen" bg="white">
         <Specimens canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="other_genomic" bg="white" style={{ borderRadius: 20 }}>
+      <Tabs.Panel value="other_genomic" bg="white">
         <Resources canonicalName={canonicalName} />
       </Tabs.Panel>
     </Tabs>

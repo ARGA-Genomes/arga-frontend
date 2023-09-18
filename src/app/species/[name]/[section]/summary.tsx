@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  Container,
   createStyles,
   Grid,
   Group,
@@ -22,6 +23,8 @@ import { Attribute, HighlightStack } from "@/app/components/highlight-stack";
 import { ExternalLink } from "tabler-icons-react";
 import { useEffect, useState } from "react";
 import { SurveyModal } from "@/app/components/survey-modal";
+import { LoadOverlay } from "@/app/components/load-overlay";
+import { MAX_WIDTH } from "@/app/constants";
 
 
 const GET_SUMMARY = gql`
@@ -381,14 +384,9 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
   }
 
   return (
-    <Stack p={30} spacing={20}>
+    <Container maw={MAX_WIDTH} py={20}>
       <SurveyModal />
-      <LoadingOverlay
-        overlayColor="black"
-        transitionDuration={500}
-        loaderProps={{ variant: "bars", size: "xl", color: "moss.5" }}
-        visible={loading}
-      />
+      <LoadOverlay visible={loading} />
 
       <Grid>
         <Grid.Col span="content">
@@ -411,7 +409,7 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
           </Stack>
         </Grid.Col>
       </Grid>
-    </Stack>
+    </Container>
   );
 }
 
