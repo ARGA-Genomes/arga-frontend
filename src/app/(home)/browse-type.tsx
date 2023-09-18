@@ -2,12 +2,11 @@
 
 import { gql, useQuery } from "@apollo/client";
 
-import { Grid } from "@mantine/core";
 import { BrowseCard } from "../components/browse-card";
 import {Carousel} from "@mantine/carousel";
 
 type Overview = {
-  genomes: number;
+  wholeGenomes: number;
   organelles: number;
   barcodes: number;
 };
@@ -15,7 +14,7 @@ type Overview = {
 const GET_OVERVIEW = gql`
   query {
     overview {
-      genomes
+      wholeGenomes
       barcodes
     }
   }
@@ -52,7 +51,7 @@ export default function BrowseType() {
       >
       <Carousel.Slide>
         <BrowseCard
-          total={data?.overview.genomes}
+          total={data?.overview.wholeGenomes}
           category="Whole genomes"
           image="card-icons/data_type_whole_genome.svg"
           link="/browse/genomes"

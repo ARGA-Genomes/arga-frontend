@@ -450,7 +450,6 @@ function MapViewer({ records, onExpandToggle }: GenomeMapProperties) {
 
 
 export function WholeGenome({ canonicalName }: { canonicalName: string }) {
-  const theme = useMantineTheme();
   const [mapExpand, setMapExpand] = useState(false);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_WHOLE_GENOMES, {

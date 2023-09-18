@@ -3,7 +3,7 @@
 import { gql, useQuery } from "@apollo/client";
 import {Box, Button, Collapse, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, useMantineTheme} from "@mantine/core";
 
-import { CommonGenome, Coordinates, Marker } from "@/app/type";
+import { Coordinates } from "@/app/type";
 import dynamic from "next/dynamic";
 import React from "react";
 import { useListState } from "@mantine/hooks";
@@ -15,27 +15,28 @@ const GET_SPECIES = gql`
 query SpeciesBarcodes($canonicalName: String) {
   species(canonicalName: $canonicalName) {
     markers {
-      id
+      sequenceId
+      datasetName
       accession
-      basepairs
-      fastaUrl
-      sourceUrl
-      gbAcs
-      markerCode
       materialSampleId
-      nucleotide
-      recordedBy
-      shape
-      type
-      version
+      sequencedBy
+      targetGene
     }
   }
 }`;
 
+type Marker = {
+  sequenceId: string,
+  datasetName: string,
+  accession: string,
+  materialSampleId?: string,
+  sequencedBy?: string,
+  targetGene: string,
+}
+
 type QueryResults = {
   species: {
     markers: Marker[],
-    data: CommonGenome[]
   },
 };
 
@@ -81,50 +82,6 @@ function RecordField(props: RecordFieldProps) {
 }
 
 
-function MarkerDetails({ record }: { record: Marker }) {
-  return (
-    <Grid>
-      <Grid.Col span={3}>
-        <RecordField label="GB Acs" value={record.gbAcs} icon={<IconLink />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <RecordField label="Marker code" value={record.markerCode} icon={<IconLink />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <RecordField label="Material sample ID" value={record.materialSampleId} icon={<IconLink />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <RecordField label="Recorded by" value={record.recordedBy} icon={<IconLink />} />
-      </Grid.Col>
-
-      { record.nucleotide &&
-        <><div style={{display:"-webkit-flex"}}>
-          <Grid.Col span={6}>
-            <Group position="left">
-              <ThemeIcon variant='light' size={28} radius='xl'>
-                <IconLicense size={16}/>
-              </ThemeIcon>
-              <Text color='dimmed' size='xs'>Coloured Barcode</Text>
-              {/* <Barcode nucleotides={record.nucleotide} /> */}
-            </Group>
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Group position="left">
-              <ThemeIcon variant='light' size={28} radius='xl'>
-                <IconLicense size={16}/>
-              </ThemeIcon>
-              <Text color='dimmed' size='xs'>Nucleotides</Text>
-              <textarea cols={100} rows={10} readOnly={true} value={record.nucleotide} />
-            </Group>
-          </Grid.Col>
-        </div>
-        </>
-      }
-    </Grid>
-  )
-}
-
-
 interface MarkerRecordProps {
   record: Marker,
   selected: boolean,
@@ -138,23 +95,13 @@ function MarkerRecord(props: MarkerRecordProps) {
         style={{ cursor: 'pointer' }}
         onClick={() => props.onSelected(props.record)}>
         <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
-        <td>{props.record.version}</td>
-        <td>{props.record.type || "Not Supplied"}</td>
-        <td>{props.record.shape}</td>
-        <td>{props.record.basepairs}</td>
+        <td>{props.record.datasetName}</td>
+        <td>{props.record.sequencedBy || "Not Supplied"}</td>
+        <td>{props.record.targetGene}</td>
         <td align="right">
           <Link href={`/markers/${props.record.accession}`}>
             <Button mr={20} size="xs" variant="light" rightIcon={<ArrowUpRight size={16} />}>All details</Button>
           </Link>
-        </td>
-      </tr>
-      <tr>
-        <td colSpan={8} style={{ padding: 0, border: 'none' }}>
-          <Collapse in={props.selected}>
-            <Box p={20} bg="gray.1">
-              <MarkerDetails record={props.record} />
-            </Box>
-          </Collapse>
         </td>
       </tr>
     </>
@@ -179,10 +126,9 @@ function MarkerTable({ records }: { records: Marker[] }) {
       <thead>
       <tr>
         <td style={{ paddingLeft: 25 }}>Accession</td>
-        <td>Version</td>
-        <td>Type</td>
-        <td>Shape</td>
-        <td>Base pairs</td>
+        <td>Dataset</td>
+        <td>Sequenced by</td>
+        <td>Target gene</td>
         <td></td>
       </tr>
       </thead>
