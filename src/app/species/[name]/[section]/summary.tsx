@@ -14,7 +14,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { Photo, Taxonomy, Regions, StatsSpecies, Species, Specimen } from "@/app/type";
+import { Photo, Taxonomy, Regions, StatsSpecies, IndigenousEcologicalKnowledge, TraceFile } from "@/app/type";
 import Link from "next/link";
 
 import { ArgaMap, BioRegionLayers, SpecimensLayer } from "@/app/components/mapping";
@@ -63,12 +63,16 @@ const GET_SUMMARY = gql`
           name
         }
       }
-      specimens {
-        id
-        typeStatus
-        latitude
-        longitude
-        institutionName
+      specimens(page: 1) {
+        total
+        records {
+          id
+          accession
+          typeStatus
+          latitude
+          longitude
+          institutionName
+        }
       }
       indigenousEcologicalKnowledge {
         id
@@ -78,13 +82,31 @@ const GET_SUMMARY = gql`
   }
 `;
 
+type Specimen = {
+  id: string,
+  accession: string,
+  typeStatus?: string,
+  latitude?: number,
+  longitude?: number,
+  institutionName?: string,
+};
+
+type Species = {
+    taxonomy: Taxonomy,
+    photos: Photo[],
+    regions: Regions,
+    traceFiles: TraceFile[],
+    specimens: { total: number, records: Specimen[] },
+    indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[],
+};
+
 type StatsResults = {
-  species: StatsSpecies;
+  species: StatsSpecies,
 };
 
 type QueryResults = {
-  stats: StatsResults;
-  species: Species;
+  stats: StatsResults,
+  species: Species,
 };
 
 
@@ -378,12 +400,12 @@ export function Summary({ canonicalName }: { canonicalName: string }) {
         </Grid.Col>
         <Grid.Col span="auto">
           <Stack spacing={30}>
-          {data?.stats ? <DataSummary canonicalName={canonicalName} stats={data.stats.species} specimens={data.species.specimens} /> : null}
+          {data?.stats ? <DataSummary canonicalName={canonicalName} stats={data.stats.species} specimens={data.species.specimens.records} /> : null}
           {data && (
             <Distribution
               taxonomy={data.species.taxonomy}
               regions={data.species.regions}
-              specimens={data.species.specimens}
+              specimens={data.species.specimens.records}
             />
           )}
           </Stack>
