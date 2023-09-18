@@ -397,9 +397,6 @@ function RecordItem({ record }: { record: WholeGenome }) {
       <Grid gutter={0}>
         <Grid.Col span="auto">
           <RecordItemHeader record={record} />
-          <Paper bg="#F5F5F5" sx={{ borderRadius: "0 0 0 16px" }}>
-            <Center><ChevronDown /></Center>
-          </Paper>
       </Grid.Col>
       <Grid.Col span="content">
         <Button color="midnight" h="100%" w={100} sx={{ borderRadius: "0 16px 16px 0" }}>
