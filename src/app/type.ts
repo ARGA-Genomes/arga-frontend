@@ -258,6 +258,7 @@ type Marker = {
 
 type SpecimenDetails = {
   id: string,
+  accession: string,
   typeStatus: string,
   institutionName?: string,
   institutionCode?: string,

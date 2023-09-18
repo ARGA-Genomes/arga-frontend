@@ -293,7 +293,7 @@ function GenomeList({ records }: { records: WholeGenome[] }) {
   return (
     <Accordion>
       { records.map(record => (
-        <Accordion.Item value={record.accession}>
+        <Accordion.Item value={record.accession} key={record.id}>
           <Accordion.Control>{record.accession} - {record.name}</Accordion.Control>
           <Accordion.Panel><GenomeSummary record={record} /></Accordion.Panel>
         </Accordion.Item>
@@ -417,7 +417,7 @@ function RecordItem({ record }: { record: WholeGenome }) {
 function RecordList({ records }: { records: WholeGenome[] }) {
   return (
     <>
-      { records.map(record => <RecordItem record={record} />) }
+      { records.map(record => <RecordItem record={record} key={record.id} />) }
     </>
   )
 }
