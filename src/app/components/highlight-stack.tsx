@@ -72,6 +72,23 @@ export function AttributeValue({ label, value }: AttributeProps) {
   )
 }
 
+export function AttributeLink({ label, value, href }: AttributeProps) {
+  value ||= "No data";
+
+  return (
+    <Stack spacing={5}>
+      <Text weight={300} size="sm">{label}</Text>
+      <Center>
+        <Paper py={5} px={15} bg="#d6e4ed" radius="xl">
+          <Link href={href || "#"}>
+            <Text weight={600} size="sm">{value}</Text>
+          </Link>
+        </Paper>
+      </Center>
+    </Stack>
+  )
+}
+
 
 interface AttributeIconProps {
   label: string,

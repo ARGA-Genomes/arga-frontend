@@ -1,10 +1,10 @@
 "use client";
 
-import { Box, Container, Paper, Tabs, Text, Tooltip } from "@mantine/core";
+import { Box, Container, Tabs } from "@mantine/core";
+import { Taxonomy } from "./taxonomy";
 import { Markers } from "./barcode";
 import { Resources } from "./resources";
 import { Specimens } from "./specimens";
-import { Summary } from "./summary";
 import { TraceTable } from "./traces";
 import { WholeGenome } from "./wholeGenome";
 import { useRouter } from "next/navigation";
@@ -23,7 +23,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
       variant="outline"
       radius={10}
       mt={40}
-      defaultValue="summary"
+      defaultValue="taxonomy"
       value={section}
       onTabChange={changeTab}
       styles={(theme) => ({
@@ -61,7 +61,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
     >
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
-          <Tabs.Tab value="summary">Summary</Tabs.Tab>
+          <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
           <Tabs.Tab value="whole_genome">Whole Genomes</Tabs.Tab>
           <Tabs.Tab value="traces">Traces</Tabs.Tab>
           <Tabs.Tab value="barcode">Genetic Loci*</Tabs.Tab>
@@ -70,8 +70,8 @@ function DataTabs({ name, section }: { name: string; section: string }) {
         </Tabs.List>
       </Container>
 
-      <Tabs.Panel value="summary" bg="white">
-        <Summary canonicalName={canonicalName} />
+      <Tabs.Panel value="taxonomy" bg="white">
+        <Taxonomy canonicalName={canonicalName} />
       </Tabs.Panel>
       <Tabs.Panel value="whole_genome" bg="white">
         <WholeGenome canonicalName={canonicalName} />
