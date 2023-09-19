@@ -8,14 +8,14 @@ import {Carousel} from "@mantine/carousel";
 type Overview = {
   wholeGenomes: number;
   organelles: number;
-  barcodes: number;
+  markers: number;
 };
 
 const GET_OVERVIEW = gql`
   query {
     overview {
       wholeGenomes
-      barcodes
+      markers
     }
   }
 `;
@@ -67,7 +67,7 @@ export default function BrowseType() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={data?.overview.barcodes}
+          total={data?.overview.markers}
           category="Markers"
           image="card-icons/data_type_marker.svg"
           link="/browse/barcodes"
