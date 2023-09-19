@@ -1,14 +1,10 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import {Box, Button, Collapse, Container, Grid, Group, LoadingOverlay, Paper, SimpleGrid, Stack, Table, Text, ThemeIcon, Title, useMantineTheme} from "@mantine/core";
+import {Box, Container, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { ArgaMap } from "@/app/components/mapping";
 
-import { Coordinates } from "@/app/type";
-import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import { useListState } from "@mantine/hooks";
-import Link from "next/link";
-import {ArrowUpRight, License as IconLicense, Link as IconLink, Pencil as IconPencil} from "tabler-icons-react";
 import { LoadOverlay } from "@/app/components/load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
 import { AttributeValue } from "@/app/components/highlight-stack";
@@ -54,110 +50,17 @@ type QueryResults = {
 };
 
 
-const PointMap = dynamic(() => import('../../../components/point-map'), {
-  ssr: false,
-  loading: () => <Text>Loading map...</Text>,
-})
-
-
-function BarcodeDataSection({ data }: { data : QueryResults }) {
-  let coordinates = [] as Coordinates[];
-    /* const coordinates = data.markers.map(record => record.coordinates); */
-
+function MarkerMap({ records }: { records : Marker[] | undefined }) {
   return (
-    <Box pos="relative" h={300}>
-      <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" />
+    <Box pos="relative" h={560} sx={theme => ({
+      overflow: "hidden",
+      borderRadius: theme.radius.lg,
+    })}>
+      <ArgaMap />
     </Box>
   )
 }
 
-
-interface RecordFieldProps {
-  label: string,
-  value?: string | string[] | Object,
-  icon: React.ReactNode,
-}
-
-function RecordField(props: RecordFieldProps) {
-  return (
-    <Group position="left">
-      <ThemeIcon variant='light' size={28} radius='xl'>
-        { props.icon }
-      </ThemeIcon>
-      <Box>
-        <Text color='dimmed' size='xs'>{props.label}</Text>
-        <Text size='sm' weight='bold' c={props.value ? "black" : "dimmed"}>
-          { props.value?.toString() || "Not Supplied"}
-        </Text>
-      </Box>
-    </Group>
-  )
-}
-
-
-interface MarkerRecordProps {
-  record: Marker,
-  selected: boolean,
-  onSelected: (record: Marker) => void;
-}
-
-function MarkerRecord(props: MarkerRecordProps) {
-  return (
-    <>
-      <tr
-        style={{ cursor: 'pointer' }}
-        onClick={() => props.onSelected(props.record)}>
-        <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
-        <td>{props.record.datasetName}</td>
-        <td>{props.record.sequencedBy || "Not Supplied"}</td>
-        <td>{props.record.targetGene}</td>
-        <td align="right">
-          <Link href={`/markers/${props.record.accession}`}>
-            <Button mr={20} size="xs" variant="light" rightIcon={<ArrowUpRight size={16} />}>All details</Button>
-          </Link>
-        </td>
-      </tr>
-    </>
-  )
-}
-
-
-function MarkerTable({ records }: { records: Marker[] }) {
-  const [selected, handler] = useListState<Marker>([]);
-
-  function toggle(record: Marker) {
-    let idx = selected.indexOf(record);
-    if (idx >= 0) {
-      handler.remove(idx);
-    } else {
-      handler.append(record);
-    }
-  }
-
-  return (
-    <Table highlightOnHover>
-      <thead>
-      <tr>
-        <td style={{ paddingLeft: 25 }}>Accession</td>
-        <td>Dataset</td>
-        <td>Sequenced by</td>
-        <td>Target gene</td>
-        <td></td>
-      </tr>
-      </thead>
-      <tbody>
-        { records?.map((record, idx) => {
-           return <MarkerRecord
-            record={record}
-            selected={selected.indexOf(record) >= 0}
-            onSelected={toggle}
-            key={idx}
-          />
-      })}
-      </tbody>
-    </Table>
-  )
-}
 
 function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
   return (
@@ -241,6 +144,7 @@ export function Markers({ canonicalName }: { canonicalName: string }) {
             />
           </Grid.Col>
           <Grid.Col span={4}>
+            <MarkerMap records={data?.species.markers.records} />
           </Grid.Col>
         </Grid>
       </Paper>
