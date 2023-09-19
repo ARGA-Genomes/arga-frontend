@@ -149,7 +149,7 @@ function ExternalLinks(props: ExternalLinksProps) {
 
   return (
     <Paper radius={16} p="md" withBorder>
-      <Text size="xl" weight={600} mb="sm">External links</Text>
+      <Text fw={700} mb={10} size="lg">External links</Text>
       <Group mt="md" spacing="xs">
         <Button
           component="a"
@@ -227,7 +227,7 @@ const useTableStyles = createStyles((theme, _params, _getRef) => {
         textAlign: "right",
         whiteSpace: "nowrap",
         width: 1,
-        paddingRight: 20,
+        paddingRight: theme.spacing.lg,
       },
     },
   }
@@ -288,7 +288,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   return (
     <Paper radius={16} p="md" withBorder>
-      <Text fw={700} mb={10} size="lg">Higher Classification</Text>
+      <Text fw={700} mb={10} size="lg">Higher classification</Text>
 
       <Group>
         <AttributeLink label="Kingdom" value={taxonomy.kingdom} href={`/kingdom/${taxonomy.kingdom}`} />

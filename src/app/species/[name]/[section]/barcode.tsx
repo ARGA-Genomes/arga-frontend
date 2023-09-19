@@ -108,7 +108,6 @@ function RecordList({ records }: { records: Marker[] }) {
 }
 
 
-
 export function Markers({ canonicalName }: { canonicalName: string }) {
   const [page, setPage] = useState(1);
 

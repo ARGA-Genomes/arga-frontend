@@ -108,7 +108,7 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
           <AttributeValue label="Genome size" value={Humanize.fileSize(record.genomeSize || 0)}/>
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Assmebly level" value={record.quality}/>
+          <AttributeValue label="Assembly level" value={record.quality}/>
         </Grid.Col>
       </Grid>
   )
