@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Container, Paper, Tabs, Text, Tooltip } from "@mantine/core";
-import { Barcode } from "./barcode";
+import { Markers } from "./barcode";
 import { Resources } from "./resources";
 import { Specimens } from "./specimens";
 import { Summary } from "./summary";
@@ -80,7 +80,7 @@ function DataTabs({ name, section }: { name: string; section: string }) {
         <TraceTable canonicalName={canonicalName} />
       </Tabs.Panel>
       <Tabs.Panel value="barcode" bg="white">
-        <Barcode canonicalName={canonicalName} />
+        <Markers canonicalName={canonicalName} />
       </Tabs.Panel>
       <Tabs.Panel value="specimen" bg="white">
         <Specimens canonicalName={canonicalName} />

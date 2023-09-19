@@ -8,6 +8,11 @@ import { useListState } from "@mantine/hooks";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { ClipboardList as IconClipboardList, Pencil as IconPencil, BuildingBank as IconBuildingBank, Cell as IconCell, Map2 as IconMap, ArrowUpRight} from 'tabler-icons-react';
+import { useState } from "react";
+import { PaginationBar } from "@/app/components/pagination";
+
+
+const PAGE_SIZE = 5;
 
 const PointMap = dynamic(() => import('../../../components/point-map'), {
   ssr: false,
@@ -16,9 +21,10 @@ const PointMap = dynamic(() => import('../../../components/point-map'), {
 
 
 const GET_SPECIMENS = gql`
-query SpeciesSpecimens($canonicalName: String) {
+query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
   species(canonicalName: $canonicalName) {
-    specimens(page: 1) {
+    specimens(page: $page, pageSize: $pageSize) {
+      total
       records {
         id
         accession
@@ -92,7 +98,10 @@ query SpecimenDetails($specimenId: String) {
 }`;
 
 type Species = {
-  specimens: { records: Specimen[] },
+  specimens: {
+    total: number,
+    records: Specimen[]
+  },
 }
 
 type QueryResults = {
@@ -262,10 +271,13 @@ function SpecimenMap({ specimens }: { specimens: Specimen[] }) {
 
 export function Specimens({ canonicalName }: { canonicalName: string }) {
   const theme = useMantineTheme();
+  const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIMENS, {
     variables: {
       canonicalName,
+      page,
+      pageSize: PAGE_SIZE,
     },
   });
 
@@ -301,6 +313,13 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
       <Paper radius="lg" mt={0} pb={20}>
         <SpecimenMap specimens={records || []} />
         { records ? <SpecimenTable records={records} /> : null }
+
+        <PaginationBar
+          total={data?.species.specimens.total}
+          page={page}
+          pageSize={PAGE_SIZE}
+          onChange={setPage}
+        />
       </Paper>
     </Box>
   );

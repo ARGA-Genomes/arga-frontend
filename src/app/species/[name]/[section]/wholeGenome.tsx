@@ -12,8 +12,10 @@ import { useState } from "react";
 import { Attribute, AttributeValue } from "@/app/components/highlight-stack";
 import { LoadOverlay } from "@/app/components/load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
+import { PaginationBar } from "@/app/components/pagination";
 
 
+const PAGE_SIZE = 5;
 const REFSEQ_MAP_HEIGHT = 400;
 const GENOME_MAP_HEIGHT = 500;
 
@@ -24,28 +26,31 @@ const FORMATTED_TYPE: Record<string, string> = {
 }
 
 const GET_WHOLE_GENOMES = gql`
-query SpeciesWholeGenomes($canonicalName: String) {
+query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int) {
   species(canonicalName: $canonicalName) {
-    wholeGenomes {
-      sequenceId
-      dnaExtractId
-      datasetName
-      accession
-      materialSampleId
-      name
-      quality
-      releaseType
-      representation
-      versionStatus
-      estimatedSize
-      excludedFromRefseq
-      assemblyType
-      genomeSize
-      dataType
-      sequencedBy
-      assembledBy
-      annotatedBy
-      depositedBy
+    wholeGenomes(page: $page, pageSize: $pageSize) {
+      total
+      records {
+        sequenceId
+        dnaExtractId
+        datasetName
+        accession
+        materialSampleId
+        name
+        quality
+        releaseType
+        representation
+        versionStatus
+        estimatedSize
+        excludedFromRefseq
+        assemblyType
+        genomeSize
+        dataType
+        sequencedBy
+        assembledBy
+        annotatedBy
+        depositedBy
+      }
     }
   }
 }`;
@@ -77,7 +82,10 @@ type WholeGenome = {
 }
 
 type Species = {
-  wholeGenomes: WholeGenome[],
+  wholeGenomes: {
+    total: number,
+    records: WholeGenome[],
+  },
   data: GenomicData[]
 }
 
@@ -451,10 +459,13 @@ function MapViewer({ records, onExpandToggle }: GenomeMapProperties) {
 
 export function WholeGenome({ canonicalName }: { canonicalName: string }) {
   const [mapExpand, setMapExpand] = useState(false);
+  const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_WHOLE_GENOMES, {
     variables: {
       canonicalName,
+      page,
+      pageSize: PAGE_SIZE,
     },
   });
 
@@ -462,19 +473,27 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
     return (<Text>Error : {error.message}</Text>);
   }
 
-  const records = data ? data.species.wholeGenomes : [];
+  const records = data ? data.species.wholeGenomes.records : [];
     /* const otherRecords = data ? data.species.data.filter(record => record.dataResource.includes("BPA")) : [];
   * const refseq = records?.find(record => record.refseqCategory == "representative genome"); */
 
   return (
     <Container maw={MAX_WIDTH} py={20}>
-      <LoadOverlay visible={loading} />
-
       <Stack spacing={5}>
         <Title order={3}>All genomes</Title>
         <Grid>
           <Grid.Col span={8}>
-            <RecordList records={records} />
+            <Box pos="relative">
+              <LoadOverlay visible={loading} />
+              <RecordList records={records} />
+            </Box>
+
+            <PaginationBar
+              total={data?.species.wholeGenomes.total}
+              page={page}
+              pageSize={PAGE_SIZE}
+              onChange={setPage}
+            />
           </Grid.Col>
           <Grid.Col span={4}>
             <Box w={600} h={600} pos="absolute">
