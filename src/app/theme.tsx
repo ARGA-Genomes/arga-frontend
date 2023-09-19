@@ -8,6 +8,7 @@ import localFont from '@next/font/local'
 // Serve the fonts ourselves in case blockers reject requests to google font
 const workSans = localFont({ src: '../../public/fonts/WorkSans-VariableFont_wght.ttf' })
 const gothamBook = localFont({ src: '../../public/fonts/gotham/GothamBook.ttf' })
+const gothamBold = localFont({ src: '../../public/fonts/gotham/GothamBold.ttf' })
 
 // All global styles should be defined here as a theme override for mantine.
 // This is used as a root theme provider element in the layout and applies
@@ -29,10 +30,11 @@ export const argaBrand: MantineThemeOverride = {
   fontFamilyMonospace: 'Monaco, Courier, monospace',
 
   headings: {
-    fontFamily: gothamBook.style.fontFamily,
+    fontFamily: gothamBold.style.fontFamily,
     sizes: {
-      h1: { fontSize: 38, fontWeight: "bold" },
+      h1: { fontSize: 38 },
       h2: { fontSize: 30 },
+      h3: { fontSize: 18 },
     },
   },
 

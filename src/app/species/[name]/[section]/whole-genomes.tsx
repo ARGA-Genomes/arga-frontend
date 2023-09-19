@@ -2,9 +2,9 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Container, Drawer, Grid, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Box, Container, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from "@mantine/core";
 import { useState } from "react";
-import { AttributeValue } from "@/app/components/highlight-stack";
+import { AttributePill, AttributeValue } from "@/app/components/highlight-stack";
 import { LoadOverlay } from "@/app/components/load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/app/components/pagination";
@@ -14,6 +14,34 @@ import { RecordItem } from "@/app/components/record-list";
 
 const PAGE_SIZE = 5;
 
+const GET_REFERENCE_GENOME = gql`
+query SpeciesReferenceGenome($canonicalName: String) {
+  species(canonicalName: $canonicalName) {
+    referenceGenome {
+      sequenceId
+      dnaExtractId
+      datasetName
+      accession
+      materialSampleId
+      name
+      quality
+      releaseType
+      representation
+      versionStatus
+      estimatedSize
+      excludedFromRefseq
+      assemblyType
+      genomeSize
+      dataType
+      sequencedBy
+      assembledBy
+      annotatedBy
+      depositedBy
+    }
+  }
+}`;
+
+
 const GET_WHOLE_GENOMES = gql`
 query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int) {
   species(canonicalName: $canonicalName) {
@@ -21,24 +49,10 @@ query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int) {
       total
       records {
         sequenceId
-        dnaExtractId
         datasetName
         accession
-        materialSampleId
-        name
         quality
-        releaseType
-        representation
-        versionStatus
-        estimatedSize
-        excludedFromRefseq
-        assemblyType
         genomeSize
-        dataType
-        sequencedBy
-        assembledBy
-        annotatedBy
-        depositedBy
       }
     }
   }
@@ -80,6 +94,12 @@ type Species = {
 type QueryResults = {
   species: Species,
 };
+
+type RefseqResults = {
+  species: {
+    referenceGenome?: WholeGenome,
+  }
+}
 
 
 function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
@@ -138,6 +158,51 @@ function WholeGenomeMap({ records }: { records : WholeGenome[] | undefined }) {
 }
 
 
+function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
+  const { loading, error, data } = useQuery<RefseqResults>(GET_REFERENCE_GENOME, {
+    variables: { canonicalName },
+  });
+
+  if (error) {
+    return (<Text>Error : {error.message}</Text>);
+  }
+
+  return (
+    <Paper p="lg" radius="lg" pos="relative" withBorder>
+      <LoadOverlay visible={loading} />
+      <Title order={3} mb={10}>Representative genome</Title>
+
+      <Grid>
+        <Grid.Col span={2}>
+          <Table>
+            <tr>
+              <td><Text c="dimmed" size="sm">Representation</Text></td>
+              <td><AttributePill value={data?.species.referenceGenome?.representation} /></td>
+            </tr>
+            <tr>
+              <td><Text c="dimmed" size="sm">Release date</Text></td>
+              <td><Text size="sm" weight={700}>No data</Text></td>
+            </tr>
+            <tr>
+              <td><Text c="dimmed" size="sm">Assembly type</Text></td>
+              <td><AttributePill value={data?.species.referenceGenome?.assemblyType} /></td>
+            </tr>
+            <tr>
+              <td><Text c="dimmed" size="sm">Accession</Text></td>
+              <td><Text size="sm" weight={700}>{data?.species.referenceGenome?.accession}</Text></td>
+            </tr>
+            <tr>
+              <td><Text c="dimmed" size="sm">Data source</Text></td>
+              <td><Text size="sm" weight={700}>{data?.species.referenceGenome?.datasetName}</Text></td>
+            </tr>
+          </Table>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  )
+}
+
+
 export function WholeGenome({ canonicalName }: { canonicalName: string }) {
   const [mapExpand, setMapExpand] = useState(false);
   const [page, setPage] = useState(1);
@@ -156,8 +221,11 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
 
   return (
     <Container maw={MAX_WIDTH} py={20}>
-      <Stack spacing={5}>
-        <Title order={3}>All genomes</Title>
+      <Stack spacing={20}>
+        <ReferenceGenome canonicalName={canonicalName} />
+
+      <Paper p="lg" radius="lg" withBorder>
+        <Title order={3} mb={10}>All genomes</Title>
         <Grid>
           <Grid.Col span={8}>
             <Box pos="relative">
@@ -176,6 +244,7 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
             <WholeGenomeMap records={data?.species.wholeGenomes.records} />
           </Grid.Col>
         </Grid>
+      </Paper>
       </Stack>
 
       <Drawer

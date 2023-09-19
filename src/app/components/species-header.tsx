@@ -1,11 +1,12 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Container, Grid, Group, Paper, Stack, Text } from "@mantine/core";
+import { Container, Grid, Group, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
 import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "../constants";
+import { CircleCheck } from "tabler-icons-react";
 
 
 const GET_SPECIES = gql`
@@ -48,18 +49,28 @@ interface HeaderProps {
 }
 
 function Header({ taxonomy, conservation, traits }: HeaderProps) {
+  const theme = useMantineTheme();
+
   return (
     <Grid>
       <Grid.Col span="auto">
-        <Group>
+        <Group spacing={40}>
           <Text c="dimmed" weight={400}>Species</Text>
-          <Text size={22} weight={600} italic>{taxonomy.canonicalName}</Text>
+          <Text size={38} weight={700} italic>{taxonomy.canonicalName}</Text>
         </Group>
       </Grid.Col>
       <Grid.Col span="content">
-        <Stack h="100%" justify="center">
-          <IconBar taxonomy={taxonomy} conservation={conservation} traits={traits} />
-        </Stack>
+        <IconBar taxonomy={taxonomy} conservation={conservation} traits={traits} />
+      </Grid.Col>
+      <Grid.Col span="content" ml={80}>
+        <Group h="100%" pl={30} sx={{
+          borderLeftWidth: 5,
+          borderLeftStyle: "solid",
+          borderLeftColor: theme.colors.bushfire[4]
+        }}>
+          <Text weight={700} c="dimmed">Reference Genome</Text>
+          <CircleCheck size={35} color={theme.colors.moss[5]} />
+        </Group>
       </Grid.Col>
     </Grid>
   )
@@ -82,7 +93,7 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
   const traits = data?.species.indigenousEcologicalKnowledge;
 
   return (
-    <Paper py={20}>
+    <Paper py={20} pos="relative">
       <LoadOverlay visible={loading} />
       <Container maw={MAX_WIDTH}>
       { taxonomy ? <Header taxonomy={taxonomy} conservation={conservation} traits={traits} /> : null }

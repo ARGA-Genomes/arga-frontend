@@ -51,24 +51,33 @@ export function Attribute({ label, value, href }: AttributeProps) {
 const BADGE_COLOURS: Record<string, string> = {
   "yes": "moss.3",
   "no": "bushfire.3",
-  "representative genome": "yellow",
+  "representative genome": "wheat.2",
   "Full": "moss.3",
   "Partial": "bushfire.3",
   "Chromosome": "moss.3",
   "Contig": "bushfire.3",
+  "haploid": "wheat.2",
 }
 
-export function AttributeValue({ label, value }: AttributeProps) {
+export function AttributePill({ value }: { value: string | number | undefined }) {
   value ||= "No data";
   const color = BADGE_COLOURS[value] || "#d6e4ed";
 
   return (
+    <Paper py={5} px={15} bg={color} radius="xl">
+      <Center>
+        <Text weight={600} size="sm">{value}</Text>
+      </Center>
+    </Paper>
+  )
+}
+
+export function AttributeValue({ label, value }: AttributeProps) {
+  return (
     <Stack spacing={5}>
       <Text weight={300} size="sm">{label}</Text>
       <Center>
-        <Paper py={5} px={15} bg={color} radius="xl">
-          <Text weight={600} size="sm">{value}</Text>
-        </Paper>
+        <AttributePill value={value} />
       </Center>
     </Stack>
   )
