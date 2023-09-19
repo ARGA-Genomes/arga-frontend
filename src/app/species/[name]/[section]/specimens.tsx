@@ -1,24 +1,19 @@
 'use client';
 
 import SpecimenEvents from "@/app/specimens/[uuid]/specimen-details";
-import { Coordinates, Specimen, SpecimenDetails } from "@/app/type";
+import { Coordinates, SpecimenDetails } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Collapse, Grid, Group, LoadingOverlay, Paper, Table, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
-import { useListState } from "@mantine/hooks";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import { ClipboardList as IconClipboardList, Pencil as IconPencil, BuildingBank as IconBuildingBank, Cell as IconCell, Map2 as IconMap, ArrowUpRight} from 'tabler-icons-react';
+import { Box, Container, Grid, Group, Paper, Stack, Text, Title} from "@mantine/core";
 import { useState } from "react";
 import { PaginationBar } from "@/app/components/pagination";
+import { MAX_WIDTH } from "@/app/constants";
+import { LoadOverlay } from "@/app/components/load-overlay";
+import { RecordItem } from "@/app/components/record-list";
+import { AttributeValue } from "@/app/components/highlight-stack";
+import { ArgaMap } from "@/app/components/mapping";
 
 
 const PAGE_SIZE = 5;
-
-const PointMap = dynamic(() => import('../../../components/point-map'), {
-  ssr: false,
-  loading: () => <Text>Loading map...</Text>,
-})
-
 
 const GET_SPECIMENS = gql`
 query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
@@ -28,16 +23,13 @@ query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
       records {
         id
         accession
+        datasetName
         typeStatus
-        institutionName
-        institutionCode
-        collectionCode
-        recordedBy
-        organismId
         locality
-        latitude
-        longitude
-        remarks
+        country
+        sequences
+        wholeGenomes
+        markers
       }
     }
   }
@@ -97,6 +89,19 @@ query SpecimenDetails($specimenId: String) {
   }
 }`;
 
+
+type Specimen = {
+  id: string,
+  accession: string,
+  datasetName: string,
+  typeStatus: string,
+  locality: string,
+  country: string,
+  sequences: number,
+  wholeGenomes: number,
+  markers: number,
+}
+
 type Species = {
   specimens: {
     total: number,
@@ -113,164 +118,62 @@ type SpecimenQueryResults = {
 }
 
 
-interface SpecimenFieldProps {
-  label: string,
-  value?: string | number,
-  icon: React.ReactNode,
-}
-
-function SpecimenField(props: SpecimenFieldProps) {
+function SpecimenMap({ records }: { records: Specimen[] | undefined }) {
   return (
-    <Group position="left">
-      <ThemeIcon variant='light' size={28} radius='xl'>
-        { props.icon}
-      </ThemeIcon>
-      <Box>
-        <Text color='dimmed' size='xs'>{props.label}</Text>
-        <Text size='sm' weight='bold' c={props.value ? "black" : "dimmed"}>
-          {props.value || "Not Supplied"}
-        </Text>
-      </Box>
-    </Group>
-  )
-}
-
-function SpecimenDetails({ record }: { record: Specimen }) {
-  return (
-    <Grid>
-      <Grid.Col span={3}>
-        <SpecimenField label="Accession" value={record.accession} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Institution code" value={record.institutionCode} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Collection code" value={record.collectionCode} icon={<IconClipboardList size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Institution name" value={record.institutionName} icon={<IconBuildingBank size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <SpecimenField label="Organism" value={record.organismId} icon={<IconCell size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Recorded by" value={record.recordedBy} icon={<IconPencil size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Latitude" value={record.latitude} icon={<IconMap size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Longitude" value={record.longitude} icon={<IconMap size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <SpecimenField label="Locality" value={record.locality} icon={<IconMap size={16} />} />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <SpecimenField label="Details" value={record.details} icon={<IconPencil size={16} />} />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <SpecimenField label="Remarks" value={record.remarks} icon={<IconPencil size={16} />} />
-      </Grid.Col>
-    </Grid>
-  )
-}
-
-
-interface SpecimenRecordProps {
-  record: Specimen,
-  selected: boolean,
-  onSelected: (record: Specimen) => void;
-}
-
-function SpecimenRecord(props: SpecimenRecordProps) {
-  return (
-    <>
-    <tr
-      style={{ cursor: 'pointer' }}
-      onClick={() => props.onSelected(props.record)}
-    >
-      <td style={{ paddingLeft: 25 }}>{props.record.typeStatus}</td>
-      <td>{props.record.institutionName}</td>
-      <td>{props.record.institutionCode}</td>
-      <td>{props.record.collectionCode}</td>
-      <td>{props.record.accession}</td>
-      <td>
-        <Link href={`/specimens/${props.record.id}`}>
-          <Button size="xs" variant="light" rightIcon={<ArrowUpRight size={16} />}>All details</Button>
-        </Link>
-      </td>
-    </tr>
-    <tr>
-      <td colSpan={8} style={{ padding: 0, border: 'none' }}>
-        <Collapse in={props.selected}>
-          <Box p={20} bg="gray.1">
-            <SpecimenDetails record={props.record} />
-          </Box>
-        </Collapse>
-      </td>
-    </tr>
-    </>
-  )
-}
-
-
-function SpecimenTable({ records }: { records: Specimen[] }) {
-  const [selected, handler] = useListState<Specimen>([]);
-
-  function toggle(record: Specimen) {
-    let idx = selected.indexOf(record);
-    if (idx >= 0) {
-      handler.remove(idx);
-    } else {
-      handler.append(record);
-    }
-  }
-
-  return (
-    <Table highlightOnHover>
-      <thead>
-        <tr>
-          <td style={{ paddingLeft: 25 }}>Type Status</td>
-          <td>Institution Name</td>
-          <td>Institution Code</td>
-          <td>Collection Code</td>
-          <td>Accession</td>
-          <td></td>
-        </tr>
-      </thead>
-      <tbody>
-        { records.map(record => {
-          return (<SpecimenRecord
-            record={record}
-            selected={selected.indexOf(record) >= 0}
-            onSelected={toggle}
-            key={record.id}
-          />)
-        })}
-      </tbody>
-    </Table>
-  )
-}
-
-
-function SpecimenMap({ specimens }: { specimens: Specimen[] }) {
-  let coordinates = specimens
-    .filter(s => s.latitude && s.longitude)
-    .map(s => s as Coordinates)
-
-  return (
-    <Box pos="relative" h={300}>
-      <PointMap coordinates={coordinates} borderRadius="16px 16px 0 0" />
+    <Box pos="relative" h={560} sx={theme => ({
+      overflow: "hidden",
+      borderRadius: theme.radius.lg,
+    })}>
+      <ArgaMap />
     </Box>
   )
 }
 
 
+function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
+  return (
+    <Group spacing={20}>
+      <Text weight={300} size="sm">{label}</Text>
+      <Text weight={600}>{value}</Text>
+    </Group>
+  )
+}
+
+function RecordItemContent({ record }: { record: Specimen }) {
+  return (
+      <Grid p={20}>
+        <Grid.Col span={4}>
+          <Stack spacing={5}>
+            <LabeledValue label="Registration number" value={record.accession} />
+            <Text size="xs" weight={600}>{record.datasetName}</Text>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <AttributeValue label="Collection location" value={record.locality} />
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <AttributeValue label="Type status" value={record.typeStatus} />
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <AttributeValue label="Genomic data" value={record.sequences > 0 ? "yes" : "no"}/>
+        </Grid.Col>
+      </Grid>
+  )
+}
+
+function RecordList({ records }: { records: Specimen[] }) {
+  return (
+    <>
+      { records.map(record => (
+        <RecordItem key={record.id}>
+          <RecordItemContent record={record} />
+        </RecordItem>)) }
+    </>
+  )
+}
+
+
 export function Specimens({ canonicalName }: { canonicalName: string }) {
-  const theme = useMantineTheme();
   const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIMENS, {
@@ -295,32 +198,35 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
   }
 
   return (
-    <Box pos="relative">
-      <LoadingOverlay
-        overlayColor={theme.colors.midnight[0]}
-        transitionDuration={500}
-        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-        visible={loading}
-        radius="xl"
-      />
-
+    <Container maw={MAX_WIDTH} py={20}>
       { holotype.data ? (<>
         <Paper radius="lg">
           <SpecimenEvents specimen={holotype.data.specimen} />
         </Paper>
       </>) : null }
 
-      <Paper radius="lg" mt={0} pb={20}>
-        <SpecimenMap specimens={records || []} />
-        { records ? <SpecimenTable records={records} /> : null }
+      <Paper radius="lg" p={20} withBorder>
+        <Title order={3}>All specimens</Title>
 
-        <PaginationBar
-          total={data?.species.specimens.total}
-          page={page}
-          pageSize={PAGE_SIZE}
-          onChange={setPage}
-        />
+        <Grid py={20}>
+          <Grid.Col span={8}>
+            <Box pos="relative">
+              <LoadOverlay visible={loading} />
+              { data?.species.specimens ? <RecordList records={data.species.specimens.records} /> : null }
+            </Box>
+
+            <PaginationBar
+              total={data?.species.specimens.total}
+              page={page}
+              pageSize={PAGE_SIZE}
+              onChange={setPage}
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <SpecimenMap records={data?.species.specimens.records} />
+          </Grid.Col>
+        </Grid>
       </Paper>
-    </Box>
+    </Container>
   );
 }

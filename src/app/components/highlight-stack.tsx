@@ -49,8 +49,10 @@ export function Attribute({ label, value, href }: AttributeProps) {
 }
 
 const BADGE_COLOURS: Record<string, string> = {
+  "yes": "moss.3",
+  "no": "bushfire.3",
   "representative genome": "yellow",
-  "Full": "moss",
+  "Full": "moss.3",
   "Partial": "bushfire.3",
   "Chromosome": "moss.3",
   "Contig": "bushfire.3",
