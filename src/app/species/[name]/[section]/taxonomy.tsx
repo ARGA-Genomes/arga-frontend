@@ -325,11 +325,11 @@ export function Taxonomy({ canonicalName }: { canonicalName: string }) {
   return (
     <Container maw={MAX_WIDTH} py={20}>
       <SurveyModal />
-      <LoadOverlay visible={loading} />
 
       <Grid>
         <Grid.Col span={8}>
-          <Stack spacing={20}>
+          <Stack spacing={20} pos="relative">
+            <LoadOverlay visible={loading} />
             {data && <Details taxonomy={data.species.taxonomy} /> }
             {data && <Classification taxonomy={data.species.taxonomy} /> }
             <ExternalLinks canonicalName={canonicalName} species={data?.species} />

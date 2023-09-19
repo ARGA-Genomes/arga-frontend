@@ -2,11 +2,11 @@
 
 import { Box, Container, Tabs } from "@mantine/core";
 import { Taxonomy } from "./taxonomy";
-import { Markers } from "./barcode";
+import { Markers } from "./markers";
 import { Resources } from "./resources";
 import { Specimens } from "./specimens";
 import { TraceTable } from "./traces";
-import { WholeGenome } from "./wholeGenome";
+import { WholeGenome } from "./whole-genomes";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 
@@ -62,9 +62,8 @@ function DataTabs({ name, section }: { name: string; section: string }) {
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
           <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
-          <Tabs.Tab value="whole_genome">Whole Genomes</Tabs.Tab>
-          <Tabs.Tab value="traces">Traces</Tabs.Tab>
-          <Tabs.Tab value="barcode">Genetic Loci*</Tabs.Tab>
+          <Tabs.Tab value="whole_genomes">Whole Genomes</Tabs.Tab>
+          <Tabs.Tab value="markers">Markers</Tabs.Tab>
           <Tabs.Tab value="other_genomic">Other Genetic Data</Tabs.Tab>
           <Tabs.Tab value="specimen">Specimen</Tabs.Tab>
         </Tabs.List>
@@ -73,13 +72,10 @@ function DataTabs({ name, section }: { name: string; section: string }) {
       <Tabs.Panel value="taxonomy" bg="white">
         <Taxonomy canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="whole_genome" bg="white">
+      <Tabs.Panel value="whole_genomes" bg="white">
         <WholeGenome canonicalName={canonicalName} />
       </Tabs.Panel>
-      <Tabs.Panel value="traces" bg="white">
-        <TraceTable canonicalName={canonicalName} />
-      </Tabs.Panel>
-      <Tabs.Panel value="barcode" bg="white">
+      <Tabs.Panel value="markers" bg="white">
         <Markers canonicalName={canonicalName} />
       </Tabs.Panel>
       <Tabs.Panel value="specimen" bg="white">
