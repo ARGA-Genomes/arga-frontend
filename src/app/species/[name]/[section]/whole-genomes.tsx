@@ -197,7 +197,46 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
             </tr>
           </Table>
         </Grid.Col>
+        <Grid.Col span={10}>
+          <AssemblyStats genome={data?.species.referenceGenome} />
+        </Grid.Col>
       </Grid>
+    </Paper>
+  )
+}
+
+function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
+  return (
+    <Paper p="lg" radius="lg" pos="relative" withBorder>
+      <LoadOverlay visible={false} />
+      <Title order={5} mb={10}>Assembly statistics</Title>
+
+      <SimpleGrid cols={5} spacing={50}>
+        <Stack>
+          <AttributeValue label="Genome size" value={Humanize.fileSize(genome?.genomeSize || 0)} />
+          <AttributeValue label="Ungapped length" value={Humanize.fileSize(0)} />
+          <AttributeValue label="BUSCO score" value={undefined} />
+        </Stack>
+        <Stack>
+          <AttributeValue label="Number of chromosones" value={undefined} />
+          <AttributeValue label="Number of organelles" value={undefined} />
+        </Stack>
+        <Stack>
+          <AttributeValue label="Number of scaffolds" value={undefined} />
+          <AttributeValue label="Scaffold N50" value={Humanize.fileSize(0)} />
+          <AttributeValue label="Scaffold L50" value={undefined} />
+        </Stack>
+        <Stack>
+          <AttributeValue label="Number of contigs" value={undefined} />
+          <AttributeValue label="Contig N50" value={Humanize.fileSize(0)} />
+          <AttributeValue label="Contig L50" value={undefined} />
+        </Stack>
+        <Stack>
+          <AttributeValue label="GC percentage" value={undefined} />
+          <AttributeValue label="Genome coverage" value={undefined} />
+          <AttributeValue label="Assembly level" value={genome?.quality} />
+        </Stack>
+      </SimpleGrid>
     </Paper>
   )
 }

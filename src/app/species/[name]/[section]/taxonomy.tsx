@@ -271,7 +271,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
             <tr>
               <td><Text weight={300} size="sm">Common names</Text></td>
               <td>
-                <Spoiler maxHeight={120} showLabel="Show more" hideLabel="Hide">
+                <Spoiler maxHeight={24} showLabel="Show more" hideLabel="Hide">
                   <Text weight={600} size="sm">{taxonomy.vernacularNames?.map(r => r.name).join(', ')}</Text>
                 </Spoiler>
               </td>
