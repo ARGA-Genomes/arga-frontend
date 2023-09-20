@@ -5,7 +5,7 @@ import { Eye } from "tabler-icons-react";
 
 
 interface RecordItemProps {
-  href: string,
+  href?: string,
   children: React.ReactNode,
 }
 
