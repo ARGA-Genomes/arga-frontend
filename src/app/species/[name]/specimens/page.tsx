@@ -173,7 +173,8 @@ function RecordList({ records }: { records: Specimen[] }) {
 }
 
 
-export function Specimens({ canonicalName }: { canonicalName: string }) {
+export default function Specimens({ params }: { params: { name: string } }) {
+  const canonicalName = params.name.replaceAll("_", " ");
   const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIMENS, {
@@ -198,7 +199,7 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
   }
 
   return (
-    <Container maw={MAX_WIDTH} py={20}>
+    <>
       { holotype.data ? (<>
         <Paper radius="lg">
           <SpecimenEvents specimen={holotype.data.specimen} />
@@ -227,6 +228,6 @@ export function Specimens({ canonicalName }: { canonicalName: string }) {
           </Grid.Col>
         </Grid>
       </Paper>
-    </Container>
+    </>
   );
 }

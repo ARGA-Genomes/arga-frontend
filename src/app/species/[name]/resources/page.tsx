@@ -35,7 +35,9 @@ type QueryResults = {
 };
 
 
-export function Resources({ canonicalName }: { canonicalName: string }) {
+export default function Resources({ params }: { params: { name: string } }) {
+  const canonicalName = params.name.replaceAll("_", " ");
+
   const { loading, error, data } = useQuery<QueryResults>(GET_RESOURCES, {
     variables: {
       canonicalName,

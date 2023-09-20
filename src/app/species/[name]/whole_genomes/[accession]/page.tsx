@@ -16,7 +16,9 @@ import {
 } from "@mantine/core";
 import { LoadPanel } from "@/app/components/load-overlay";
 import { AttributePill, AttributeValue, DataField } from "@/app/components/highlight-stack";
-import { CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink } from "tabler-icons-react";
+import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink } from "tabler-icons-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -353,6 +355,8 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
 }
 
 export default function AssemblyPage({ params }: { params: { accession: string } }) {
+  let basePath = usePathname()?.replace(params.accession, '');
+
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
       accession: params.accession,
@@ -365,6 +369,13 @@ export default function AssemblyPage({ params }: { params: { accession: string }
 
   return (
     <Stack spacing={20}>
+      <Link href={basePath || ''}>
+        <Group spacing={5}>
+          <ArrowNarrowLeft />
+          <Text fz={18}>Back to whole genomes</Text>
+        </Group>
+      </Link>
+
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
           <Title order={3} mb={10}>{`Full data view: ${data?.sequence.accession}`}</Title>

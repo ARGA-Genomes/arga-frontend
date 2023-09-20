@@ -5,7 +5,7 @@ import { Taxonomy } from "./taxonomy";
 import { Markers } from "./markers";
 import { Resources } from "./resources";
 import { Specimens } from "./specimens";
-import { WholeGenome } from "./whole-genomes";
+import { WholeGenome } from "../whole_genomes/page";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 

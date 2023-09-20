@@ -2,7 +2,6 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {
-  Box,
   Button,
   Container,
   createStyles,
@@ -313,7 +312,9 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
 }
 
 
-export function Taxonomy({ canonicalName }: { canonicalName: string }) {
+export default function TaxonomyPage({ params }: { params: { name: string } }) {
+  const canonicalName = params.name.replaceAll("_", " ");
+
   const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
     variables: { canonicalName },
   });
@@ -323,7 +324,7 @@ export function Taxonomy({ canonicalName }: { canonicalName: string }) {
   }
 
   return (
-    <Container maw={MAX_WIDTH} py={20}>
+    <>
       <SurveyModal />
 
       <Grid>
@@ -339,6 +340,6 @@ export function Taxonomy({ canonicalName }: { canonicalName: string }) {
           <SpeciesPhoto photo={data?.species.photos[0]} />
         </Grid.Col>
       </Grid>
-    </Container>
+    </>
   );
 }

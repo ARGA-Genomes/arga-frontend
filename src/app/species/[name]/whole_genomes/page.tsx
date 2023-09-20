@@ -10,6 +10,7 @@ import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/app/components/pagination";
 import { ArgaMap } from "@/app/components/mapping";
 import { RecordItem } from "@/app/components/record-list";
+import { usePathname } from "next/navigation";
 
 
 const PAGE_SIZE = 5;
@@ -135,10 +136,12 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
 }
 
 function RecordList({ records }: { records: WholeGenome[] }) {
+  const path = usePathname();
+
   return (
     <>
       { records.map(record => (
-        <RecordItem key={record.id} href={`/assemblies/${record.accession}`}>
+        <RecordItem key={record.id} href={`${path}/${record.accession}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>
@@ -242,7 +245,9 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
 }
 
 
-export function WholeGenome({ canonicalName }: { canonicalName: string }) {
+export default function WholeGenome({ params }: { params: { name: string } }) {
+  const canonicalName = params.name.replaceAll("_", " ");
+
   const [mapExpand, setMapExpand] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -259,31 +264,31 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
   }
 
   return (
-    <Container maw={MAX_WIDTH} py={20}>
+    <>
       <Stack spacing={20}>
         <ReferenceGenome canonicalName={canonicalName} />
 
-      <Paper p="lg" radius="lg" withBorder>
-        <Title order={3} mb={10}>All genomes</Title>
-        <Grid>
-          <Grid.Col span={8}>
-            <Box pos="relative">
-              <LoadOverlay visible={loading} />
-              { data?.species.wholeGenomes ? <RecordList records={data?.species.wholeGenomes.records} /> : null }
-            </Box>
+        <Paper p="lg" radius="lg" withBorder>
+          <Title order={3} mb={10}>All genomes</Title>
+          <Grid>
+            <Grid.Col span={8}>
+              <Box pos="relative">
+                <LoadOverlay visible={loading} />
+                { data?.species.wholeGenomes ? <RecordList records={data?.species.wholeGenomes.records} /> : null }
+              </Box>
 
-            <PaginationBar
-              total={data?.species.wholeGenomes.total}
-              page={page}
-              pageSize={PAGE_SIZE}
-              onChange={setPage}
-            />
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <WholeGenomeMap records={data?.species.wholeGenomes.records} />
-          </Grid.Col>
-        </Grid>
-      </Paper>
+              <PaginationBar
+                total={data?.species.wholeGenomes.total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onChange={setPage}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <WholeGenomeMap records={data?.species.wholeGenomes.records} />
+            </Grid.Col>
+          </Grid>
+        </Paper>
       </Stack>
 
       <Drawer
@@ -298,6 +303,6 @@ export function WholeGenome({ canonicalName }: { canonicalName: string }) {
       >
         <WholeGenomeMap records={data?.species.wholeGenomes.records} />
       </Drawer>
-    </Container>
+    </>
   );
 }

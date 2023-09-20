@@ -108,7 +108,8 @@ function RecordList({ records }: { records: Marker[] }) {
 }
 
 
-export function Markers({ canonicalName }: { canonicalName: string }) {
+export default function Markers({ params }: { params: { name: string } }) {
+  const canonicalName = params.name.replaceAll("_", " ");
   const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
@@ -124,7 +125,6 @@ export function Markers({ canonicalName }: { canonicalName: string }) {
   }
 
   return (
-    <Container maw={MAX_WIDTH} py={20}>
       <Paper radius="lg" p={20} withBorder>
         <Title order={3}>Genetic markers and single loci</Title>
 
@@ -147,6 +147,5 @@ export function Markers({ canonicalName }: { canonicalName: string }) {
           </Grid.Col>
         </Grid>
       </Paper>
-    </Container>
   );
 }
