@@ -32,7 +32,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </Box>
       }
     >
-      <Box my={36}>
+      <Box mt={36}>
         {children}
       </Box>
     </AppShell>

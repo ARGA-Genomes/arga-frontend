@@ -51,12 +51,13 @@ export function Attribute({ label, value, href }: AttributeProps) {
 const BADGE_COLOURS: Record<string, string> = {
   "yes": "moss.3",
   "no": "bushfire.3",
-  "representative genome": "wheat.2",
+  "representative genome": "moss.3",
   "Full": "moss.3",
   "Partial": "bushfire.3",
   "Chromosome": "moss.3",
   "Contig": "bushfire.3",
   "haploid": "wheat.2",
+  "Major": "moss.3",
 }
 
 export function AttributePill({ value }: { value: string | number | undefined }) {
@@ -66,7 +67,7 @@ export function AttributePill({ value }: { value: string | number | undefined })
   return (
     <Paper py={5} px={15} bg={color} radius="xl">
       <Center>
-        <Text weight={600} size="sm">{value}</Text>
+        <Text weight={600} size="sm" sx={{ whiteSpace: "nowrap" }}>{value}</Text>
       </Center>
     </Paper>
   )
@@ -76,9 +77,7 @@ export function AttributeValue({ label, value }: AttributeProps) {
   return (
     <Stack spacing={5}>
       <Text weight={300} size="sm">{label}</Text>
-      <Center>
-        <AttributePill value={value} />
-      </Center>
+      <AttributePill value={value} />
     </Stack>
   )
 }
@@ -98,6 +97,12 @@ export function AttributeLink({ label, value, href }: AttributeProps) {
       </Center>
     </Stack>
   )
+}
+
+export function DataField({ value }: { value: string | number | undefined }) {
+  return value
+    ? <Text size="sm" weight={700}>{value}</Text>
+    : <Text size="sm" weight={700} c="dimmed">No data</Text>
 }
 
 

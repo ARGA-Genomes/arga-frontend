@@ -138,7 +138,7 @@ function RecordList({ records }: { records: WholeGenome[] }) {
   return (
     <>
       { records.map(record => (
-        <RecordItem key={record.id}>
+        <RecordItem key={record.id} href={`/assemblies/${record.accession}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>

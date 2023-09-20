@@ -26,7 +26,7 @@ export function Footer({ links }: HeaderAndFooterProps) {
   }
 
   return (
-    <Flex py={50} align="center" style={{borderTop: "solid white 3px"}} >
+    <Flex py={50} align="center">
       <Grid style={{width: "100%"}}>
         <MediaQuery largerThan="md" styles={{borderRight: "solid white 6px"}}>
           <Grid.Col xs={12} sm={12} md={2} lg={2} xl={2}>
