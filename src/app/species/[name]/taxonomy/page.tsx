@@ -242,6 +242,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 
       <SimpleGrid cols={2}>
         <Table className={classes.table}>
+          <tbody>
           <tr>
             <td><Text weight={300} size="sm">Scientific name</Text></td>
             <td>
@@ -263,10 +264,12 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
               ))}
             </td>
           </tr>
+          </tbody>
         </Table>
 
         <Stack>
           <Table className={classes.table}>
+            <tbody>
             <tr>
               <td><Text weight={300} size="sm">Common names</Text></td>
               <td>
@@ -275,6 +278,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
                 </Spoiler>
               </td>
             </tr>
+            </tbody>
           </Table>
           <AttributeLink label="Subspecies" value="" href="#" />
         </Stack>

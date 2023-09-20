@@ -101,8 +101,8 @@ export function AttributeLink({ label, value, href }: AttributeProps) {
 
 export function DataField({ value }: { value: string | number | undefined }) {
   return value
-    ? <Text size="sm" weight={700}>{value}</Text>
-    : <Text size="sm" weight={700} c="dimmed">No data</Text>
+    ? <Text size="sm" weight={700} pl={15}>{value}</Text>
+    : <Text size="sm" weight={700} pl={15} c="dimmed">No data</Text>
 }
 
 

@@ -198,6 +198,7 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
     <Grid>
       <Grid.Col span={8}>
         <Table className={classes.table} w={1}>
+          <tbody>
           <tr>
             <td>Genome status</td>
             <td><AttributePill value={sequence?.events.dataDepositions[0].dataType} /></td>
@@ -230,6 +231,7 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
             <td>Publication</td>
             <td><DataField value={sequence?.events.dataDepositions[0].title} /></td>
           </tr>
+          </tbody>
         </Table>
       </Grid.Col>
       <Grid.Col span={4}>
@@ -238,7 +240,7 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
             <Title order={5}>Original data</Title>
             <Button color="midnight" radius="md" leftIcon={<IconDownload />}>get data</Button>
             <Button color="midnight" radius="md" leftIcon={<IconLink />}>go to source</Button>
-            <Button color="midnight" radius="md" leftIcon={<CloudUpload />} disabled>send to galaxy</Button>
+            <Button color="midnight" radius="md" leftIcon={<CloudUpload />} disabled>send to Galaxy</Button>
           </Stack>
         </Paper>
       </Grid.Col>
@@ -313,6 +315,7 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
 
   return (
     <Table className={classes.table}>
+      <tbody>
       <tr>
         <td>Accession</td>
         <td><DataField value={sequence?.accession} /></td>
@@ -333,6 +336,7 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
         <td>Deposited by</td>
         <td><DataField value={sequence?.events.dataDepositions[0].submittedBy} /></td>
       </tr>
+      </tbody>
     </Table>
   )
 }

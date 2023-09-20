@@ -180,10 +180,11 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
       <LoadOverlay visible={loading} />
       <Title order={3} mb={10}>Representative genome</Title>
 
-      <Grid>
-        <Grid.Col span={2}>
+      <Grid gutter={50}>
+        <Grid.Col span={3}>
           <Stack spacing={20}>
           <Table className={classes.table}>
+            <tbody>
             <tr>
               <td>Representation</td>
               <td><AttributePill value={data?.species.referenceGenome?.representation} /></td>
@@ -204,6 +205,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
               <td>Data source</td>
               <td><DataField value={data?.species.referenceGenome?.datasetName} /></td>
             </tr>
+            </tbody>
           </Table>
 
           { data &&
@@ -215,7 +217,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
           }
           </Stack>
         </Grid.Col>
-        <Grid.Col span={10}>
+        <Grid.Col span={9}>
           <AssemblyStats genome={data?.species.referenceGenome} />
         </Grid.Col>
       </Grid>

@@ -1,15 +1,15 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import {Box, Container, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import {Box, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { ArgaMap } from "@/app/components/mapping";
 
 import React, { useState } from "react";
 import { LoadOverlay } from "@/app/components/load-overlay";
-import { MAX_WIDTH } from "@/app/constants";
 import { AttributeValue } from "@/app/components/highlight-stack";
 import { RecordItem } from "@/app/components/record-list";
 import { PaginationBar } from "@/app/components/pagination";
+import { usePathname } from "next/navigation";
 
 
 const PAGE_SIZE = 5;
@@ -97,10 +97,12 @@ function RecordItemContent({ record }: { record: Marker }) {
 }
 
 function RecordList({ records }: { records: Marker[] }) {
+  const path = usePathname();
+
   return (
     <>
       { records.map(record => (
-        <RecordItem key={record.sequenceId}>
+        <RecordItem key={record.sequenceId} href={`${path}/${record.accession}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>
@@ -125,27 +127,27 @@ export default function Markers({ params }: { params: { name: string } }) {
   }
 
   return (
-      <Paper radius="lg" p={20} withBorder>
-        <Title order={3}>Genetic markers and single loci</Title>
+    <Paper radius="lg" p={20} withBorder>
+      <Title order={3}>Genetic markers and single loci</Title>
 
-        <Grid py={20}>
-          <Grid.Col span={8}>
-            <Box pos="relative">
-              <LoadOverlay visible={loading} />
-              { data?.species.markers ? <RecordList records={data.species.markers.records} /> : null }
-            </Box>
+      <Grid py={20}>
+        <Grid.Col span={8}>
+          <Box pos="relative">
+            <LoadOverlay visible={loading} />
+            { data?.species.markers ? <RecordList records={data.species.markers.records} /> : null }
+          </Box>
 
-            <PaginationBar
-              total={data?.species.markers.total}
-              page={page}
-              pageSize={PAGE_SIZE}
-              onChange={setPage}
-            />
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <MarkerMap records={data?.species.markers.records} />
-          </Grid.Col>
-        </Grid>
-      </Paper>
+          <PaginationBar
+            total={data?.species.markers.total}
+            page={page}
+            pageSize={PAGE_SIZE}
+            onChange={setPage}
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <MarkerMap records={data?.species.markers.records} />
+        </Grid.Col>
+      </Grid>
+    </Paper>
   );
 }
