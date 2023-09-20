@@ -84,6 +84,43 @@ const GET_SPECIMEN = gql`
         }
       }
     }
+
+    subsample(accession: $accession) {
+      id
+      accession
+      materialSampleId
+      institutionName
+      institutionCode
+      typeStatus
+
+      events {
+        subsamples {
+          id
+          preparationType
+        }
+      }
+    }
+
+    dnaExtract(accession: $accession) {
+      id
+      accession
+
+      events {
+        dnaExtracts {
+          id
+          extractedBy
+          extractionMethod
+          measurementMethod
+          preparationType
+          preservationType
+          concentration
+          concentrationMethod
+          quality
+          absorbance260230
+          absorbance260280
+        }
+      }
+    }
   }
 `;
 
@@ -120,6 +157,25 @@ type AccessionEvent = {
   typeStatus?: string,
 }
 
+type SubsampleEvent = {
+  id: string,
+  preparationType?: string,
+}
+
+type DnaExtractionEvent = {
+  id: string,
+  extractedBy?: string,
+  extractionMethod?: string,
+  measurementMethod?: string,
+  preparationType?: string,
+  preservationType?: string,
+  concentration?: number,
+  concentrationMethod?: string,
+  quality?: string,
+  absorbance260230?: number,
+  absorbance260280?: number,
+}
+
 type SpecimenDetails = {
   id: string,
   accession: string,
@@ -153,8 +209,32 @@ type SpecimenDetails = {
   },
 };
 
+type SubsampleDetails = {
+  id: string,
+  accession: string,
+  materialSampleId?: string,
+  institutionName?: string,
+  institutionCode?: string,
+  typeStatus?: string,
+
+  events: {
+    subsamples: SubsampleEvent[],
+  },
+};
+
+type DnaExtractDetails = {
+  id: string,
+  accession: string,
+  events: {
+    dnaExtracts: DnaExtractionEvent[],
+  },
+};
+
+
 type SpecimenQueryResults = {
   specimen: SpecimenDetails;
+  subsample: SubsampleDetails;
+  dnaExtract: DnaExtractDetails;
 };
 
 
@@ -340,6 +420,104 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
 }
 
 
+function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) {
+  const { classes } = useTableStyles();
+
+  return (
+    <SimpleGrid cols={3}>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Sample number</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Subsample available</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Data source</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Subsampled by</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Remarks</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Subsampling date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr></tr>
+          <tr></tr>
+        </tbody>
+      </Table>
+    </SimpleGrid>
+  )
+}
+
+
+function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined }) {
+  const { classes } = useTableStyles();
+
+  return (
+    <SimpleGrid cols={3}>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Extraction number</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Extract available</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Data source</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Extracted by</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Protocol</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>DNA extraction date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr></tr>
+          <tr></tr>
+        </tbody>
+      </Table>
+    </SimpleGrid>
+  )
+}
+
+
 function EventTimeline({ specimen }: { specimen: SpecimenDetails | undefined }) {
   return (
     <Timeline color="midnight" active={8} bulletSize={45} lineWidth={4}>
@@ -446,6 +624,14 @@ export default function SpecimenPage({ params }: { params: { accession: string }
               <Paper px={20} pt={30} pb={15}>
                 <Title order={5}>Accession event</Title>
                 <Accessions specimen={data?.specimen} />
+              </Paper>
+              <Paper px={20} pt={30} pb={15}>
+                <Title order={5}>Subsample event</Title>
+                <Subsamples subsample={data?.subsample} />
+              </Paper>
+              <Paper px={20} pt={30} pb={15}>
+                <Title order={5}>DNA extraction event</Title>
+                <DnaExtracts dnaExtract={data?.dnaExtract} />
               </Paper>
             </Stack>
           </Grid.Col>
