@@ -99,10 +99,16 @@ export function AttributeLink({ label, value, href }: AttributeProps) {
   )
 }
 
-export function DataField({ value }: { value: string | number | undefined }) {
+
+interface DataFieldProps {
+  value?: string | number,
+  fz?: string | number,
+}
+
+export function DataField({ value, fz }: DataFieldProps) {
   return value
-    ? <Text size="sm" weight={700} pl={15}>{value}</Text>
-    : <Text size="sm" weight={700} pl={15} c="dimmed">No data</Text>
+    ? <Text fz={fz || 'sm'} weight={700} pl={15}>{value}</Text>
+    : <Text fz={fz || 'sm'} weight={700} pl={15} c="dimmed">No data</Text>
 }
 
 

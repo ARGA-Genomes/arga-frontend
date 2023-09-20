@@ -11,6 +11,7 @@ import { LoadOverlay } from "@/app/components/load-overlay";
 import { RecordItem } from "@/app/components/record-list";
 import { AttributeValue } from "@/app/components/highlight-stack";
 import { ArgaMap } from "@/app/components/mapping";
+import { usePathname } from "next/navigation";
 
 
 const PAGE_SIZE = 5;
@@ -162,10 +163,12 @@ function RecordItemContent({ record }: { record: Specimen }) {
 }
 
 function RecordList({ records }: { records: Specimen[] }) {
+  const path = usePathname();
+
   return (
     <>
       { records.map(record => (
-        <RecordItem key={record.id}>
+        <RecordItem key={record.id} href={`${path}/${record.accession}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>

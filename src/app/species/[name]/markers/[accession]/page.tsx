@@ -1,29 +1,25 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import {
   Button,
-  createStyles,
   Grid,
   Group,
   Paper,
-  SimpleGrid,
   Stack,
   Table,
   Text,
-  Textarea,
   Title,
 } from "@mantine/core";
 import { LoadPanel } from "@/app/components/load-overlay";
-import { AttributePill, AttributeValue, DataField } from "@/app/components/highlight-stack";
+import { AttributePill, DataField } from "@/app/components/highlight-stack";
 import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CopyableData, useTableStyles } from "@/app/components/data-fields";
 
 const GET_ASSEMBLY = gql`
-  query AssemblyFullData($accession: String) {
+  query MarkerFullData($accession: String) {
     sequence(accession: $accession) {
       id
       dnaExtractId
