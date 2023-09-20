@@ -2,15 +2,17 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Container, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from "@mantine/core";
+import { Box, Button, Center, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from "@mantine/core";
 import { useState } from "react";
-import { AttributePill, AttributeValue } from "@/app/components/highlight-stack";
+import { AttributePill, AttributeValue, DataField } from "@/app/components/highlight-stack";
 import { LoadOverlay } from "@/app/components/load-overlay";
-import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/app/components/pagination";
 import { ArgaMap } from "@/app/components/mapping";
 import { RecordItem } from "@/app/components/record-list";
 import { usePathname } from "next/navigation";
+import { Eye } from "tabler-icons-react";
+import { useTableStyles } from "@/app/components/data-fields";
+import Link from "next/link";
 
 
 const PAGE_SIZE = 5;
@@ -162,6 +164,9 @@ function WholeGenomeMap({ records }: { records : WholeGenome[] | undefined }) {
 
 
 function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
+  const path = usePathname();
+  const { classes } = useTableStyles();
+
   const { loading, error, data } = useQuery<RefseqResults>(GET_REFERENCE_GENOME, {
     variables: { canonicalName },
   });
@@ -177,28 +182,38 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
 
       <Grid>
         <Grid.Col span={2}>
-          <Table>
+          <Stack spacing={20}>
+          <Table className={classes.table}>
             <tr>
-              <td><Text c="dimmed" size="sm">Representation</Text></td>
+              <td>Representation</td>
               <td><AttributePill value={data?.species.referenceGenome?.representation} /></td>
             </tr>
             <tr>
-              <td><Text c="dimmed" size="sm">Release date</Text></td>
-              <td><Text size="sm" weight={700}>No data</Text></td>
+              <td>Release date</td>
+              <td><DataField value={undefined} /></td>
             </tr>
             <tr>
-              <td><Text c="dimmed" size="sm">Assembly type</Text></td>
+              <td>Assembly type</td>
               <td><AttributePill value={data?.species.referenceGenome?.assemblyType} /></td>
             </tr>
             <tr>
-              <td><Text c="dimmed" size="sm">Accession</Text></td>
-              <td><Text size="sm" weight={700}>{data?.species.referenceGenome?.accession}</Text></td>
+              <td>Accession</td>
+              <td><DataField value={data?.species.referenceGenome?.accession} /></td>
             </tr>
             <tr>
-              <td><Text c="dimmed" size="sm">Data source</Text></td>
-              <td><Text size="sm" weight={700}>{data?.species.referenceGenome?.datasetName}</Text></td>
+              <td>Data source</td>
+              <td><DataField value={data?.species.referenceGenome?.datasetName} /></td>
             </tr>
           </Table>
+
+          { data &&
+            <Link href={`${path}/${data?.species.referenceGenome?.accession}`}>
+              <Center>
+                <Button color="midnight" radius="md" leftIcon={<Eye />}>view</Button>
+              </Center>
+            </Link>
+          }
+          </Stack>
         </Grid.Col>
         <Grid.Col span={10}>
           <AssemblyStats genome={data?.species.referenceGenome} />

@@ -19,6 +19,7 @@ import { AttributePill, AttributeValue, DataField } from "@/app/components/highl
 import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTableStyles } from "@/app/components/data-fields";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -190,26 +191,8 @@ type SequenceQueryResults = {
 };
 
 
-const useTableStyles = createStyles((theme, _params, _getRef) => {
-  return {
-    table: {
-      td: {
-        height: 45,
-      },
-      "td:first-child": {
-        textAlign: "left",
-        whiteSpace: "nowrap",
-        width: 1,
-        paddingRight: theme.spacing.xl,
-        fontSize: theme.fontSizes.sm,
-        fontWeight: 300,
-      },
-    },
-  }
-});
-
 function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
-  let { classes } = useTableStyles();
+  const { classes } = useTableStyles();
 
   return (
     <Grid>
