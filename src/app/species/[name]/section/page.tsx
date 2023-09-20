@@ -1,11 +1,6 @@
 "use client";
 
 import { Box, Container, Tabs } from "@mantine/core";
-import { Taxonomy } from "./taxonomy";
-import { Markers } from "./markers";
-import { Resources } from "./resources";
-import { Specimens } from "./specimens";
-import { WholeGenome } from "../whole_genomes/page";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 
@@ -68,21 +63,6 @@ function DataTabs({ name, section }: { name: string; section: string }) {
         </Tabs.List>
       </Container>
 
-      <Tabs.Panel value="taxonomy" bg="white">
-        <Taxonomy canonicalName={canonicalName} />
-      </Tabs.Panel>
-      <Tabs.Panel value="whole_genomes" bg="white">
-        <WholeGenome canonicalName={canonicalName} />
-      </Tabs.Panel>
-      <Tabs.Panel value="markers" bg="white">
-        <Markers canonicalName={canonicalName} />
-      </Tabs.Panel>
-      <Tabs.Panel value="specimen" bg="white">
-        <Specimens canonicalName={canonicalName} />
-      </Tabs.Panel>
-      <Tabs.Panel value="other_genomic" bg="white">
-        <Resources canonicalName={canonicalName} />
-      </Tabs.Panel>
     </Tabs>
   );
 }
