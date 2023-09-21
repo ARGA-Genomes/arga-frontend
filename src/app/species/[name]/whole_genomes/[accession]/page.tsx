@@ -3,7 +3,9 @@
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import {
+  Box,
   Button,
+  Flex,
   Grid,
   Group,
   Paper,
@@ -15,15 +17,16 @@ import {
 } from "@mantine/core";
 import { LoadPanel } from "@/app/components/load-overlay";
 import { AttributePill, AttributeValue, DataField } from "@/app/components/highlight-stack";
-import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink } from "tabler-icons-react";
+import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTableStyles } from "@/app/components/data-fields";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/app/queries/sequence";
+import { ArgaMap } from "@/app/components/mapping";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
-    sequence(accession: $accession) {
+    sequence(by: { accession: $accession }) {
       id
       ...SequenceDetails
 
@@ -37,6 +40,13 @@ const GET_ASSEMBLY = gql`
         annotations { ...AnnotationEventDetails }
         dataDepositions { ...DataDepositionEventDetails }
       }
+    }
+
+    specimen(by: { sequenceAccession: $accession }) {
+      accession
+      collectionCode
+      latitude
+      longitude
     }
   }
 `;
@@ -52,8 +62,16 @@ type SequenceDetails = Sequence & {
   },
 }
 
+type SpecimenDetails = {
+  accession: string,
+  collectionCode?: string,
+  latitude?: number,
+  longitude?: number,
+}
+
 type SequenceQueryResults = {
   sequence: SequenceDetails,
+  specimen: SpecimenDetails,
 };
 
 
@@ -207,6 +225,55 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
   )
 }
 
+function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
+  const { classes } = useTableStyles();
+  const basePath = usePathname()?.split('/').slice(1, 3).join('/');
+  const path = `${basePath}/specimens/${specimen?.accession}`;
+
+  return (
+    <Grid>
+      <Grid.Col span={7}>
+        <Stack>
+          <Title order={5}>Specimen information</Title>
+          <Table className={classes.table}>
+            <tbody>
+              <tr>
+                <td>Sample ID</td>
+                <td><DataField value={specimen?.accession} /></td>
+              </tr>
+              <tr>
+                <td>Sequenced by</td>
+                <td><DataField value={specimen?.collectionCode} /></td>
+              </tr>
+            </tbody>
+          </Table>
+
+          <Flex justify="flex-end">
+            <Link href={path}>
+              <Button radius="md" color="midnight" leftIcon={<Microscope />}>go to specimen</Button>
+            </Link>
+          </Flex>
+        </Stack>
+      </Grid.Col>
+      <Grid.Col span={5}>
+        <SpecimenMap specimen={specimen} />
+      </Grid.Col>
+    </Grid>
+  )
+}
+
+function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
+  return (
+    <Box pos="relative" h={180} sx={theme => ({
+      overflow: "hidden",
+      borderRadius: theme.radius.lg,
+    })}>
+      <ArgaMap />
+    </Box>
+  )
+}
+
+
 export default function AssemblyPage({ params }: { params: { accession: string } }) {
   let basePath = usePathname()?.replace(params.accession, '');
 
@@ -260,7 +327,7 @@ export default function AssemblyPage({ params }: { params: { accession: string }
               </Grid.Col>
               <Grid.Col span={6}>
                 <LoadPanel visible={loading}>
-                  <Title order={5} mb={10}>Specimen information</Title>
+                  <SpecimenPreview specimen={data?.specimen} />
                 </LoadPanel>
               </Grid.Col>
             </Grid>

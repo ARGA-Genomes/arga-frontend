@@ -27,7 +27,7 @@ import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, Sequenci
 
 const GET_SPECIMEN = gql`
   query SpecimenFullData($accession: String) {
-    specimen(accession: $accession) {
+    specimen(by: { accession: $accession }) {
       ...SpecimenDetails
       events {
         collections { ...CollectionEventDetails }
@@ -35,21 +35,21 @@ const GET_SPECIMEN = gql`
       }
     }
 
-    subsample(accession: $accession) {
+    subsample(by: { specimenAccession: $accession }) {
       ...SubsampleDetails
       events {
         subsamples { ...SubsampleEventDetails }
       }
     }
 
-    dnaExtract(accession: $accession) {
+    dnaExtract(by: { specimenAccession: $accession }) {
       ...DnaExtractDetails
       events {
         dnaExtracts { ...DnaExtractionEventDetails }
       }
     }
 
-    sequence(accession: $accession) {
+    sequence(by: { specimenAccession: $accession }) {
       ...SequenceDetails
       events {
         sequencing { ...SequencingEventDetails }

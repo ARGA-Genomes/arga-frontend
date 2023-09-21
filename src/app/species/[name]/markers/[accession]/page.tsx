@@ -2,7 +2,9 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {
+  Box,
   Button,
+  Flex,
   Grid,
   Group,
   Paper,
@@ -13,135 +15,41 @@ import {
 } from "@mantine/core";
 import { LoadPanel } from "@/app/components/load-overlay";
 import { AttributePill, DataField } from "@/app/components/highlight-stack";
-import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink } from "tabler-icons-react";
+import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CopyableData, useTableStyles } from "@/app/components/data-fields";
+import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/app/queries/sequence";
+import { ArgaMap } from "@/app/components/mapping";
 
 const GET_ASSEMBLY = gql`
   query MarkerFullData($accession: String) {
-    sequence(accession: $accession) {
+    sequence(by: { accession: $accession }) {
       id
-      dnaExtractId
-      accession
-      genbankAccession
-      datasetName
+      ...SequenceDetails
 
       events {
-        sequencing {
-          materialSampleId
-          sequencedBy
-          targetGene
-          ampliconSize
-          estimatedSize
-          concentration
-          baitSetName
-          baitSetReference
-          dnaSequence
-        }
+        sequencing { ...SequencingEventDetails }
         sequencingRuns {
           id
-          traceName
-          traceId
-          traceLink
-          targetGene
-          sequencingDate
-          sequencingEventId
-          sequencingMethod
-          sequencingCenter
-          sequencingCenterCode
-          sequencePrimerForwardName
-          sequencePrimerReverseName
-          pcrPrimerNameForward
-          pcrPrimerNameReverse
-          direction
-          analysisSoftware
-          analysisDescription
-          libraryProtocol
+          ...SequencingRunEventDetails
         }
-        dataDepositions {
-          dataType
-          institutionName
-          collectionName
-          collectionCode
-          materialSampleId
-          submittedBy
-          asmNotLiveDate
-          excludedFromRefseq
-          lastUpdated
-
-          title
-          url
-          fundingAttribution
-          reference
-          accessRights
-          rightsHolder
-          sourceUri
-        }
+        assemblies { ...AssemblyEventDetails }
+        annotations { ...AnnotationEventDetails }
+        dataDepositions { ...DataDepositionEventDetails }
       }
+    }
+
+    specimen(by: { sequenceAccession: $accession }) {
+      accession
+      collectionCode
+      latitude
+      longitude
     }
   }
 `;
 
-type SequencingEvent = {
-  materialSampleId?: string,
-  sequencedBy?: string,
-  targetGene?: string,
-  ampliconSize?: string,
-  estimatedSize?: string,
-  concentration?: string,
-  baitSetName?: string,
-  baitSetReference?: string,
-  sourceMolecule?: string,
-  dnaSequence?: string,
-  translation?: string,
-}
-
-type SequencingRunEvent = {
-  id: string,
-  traceName?: string,
-  traceId?: string,
-  traceLink?: string,
-  targetGene?: string,
-  sequencingDate?: string,
-  sequencingEventId?: string,
-  sequencingMethod?: string,
-  sequencingCenter?: string,
-  sequencingCenterCode?: string,
-  sequencePrimerForwardName?: string,
-  sequencingPrimerReverseName?: string,
-  direction?: string,
-  analysisSoftware?: string,
-  analysisDescription?: string,
-  libraryProtocol?: string,
-}
-
-type DataDepositionEvent = {
-  dataType?: string,
-  institutionName?: string,
-  collectionName?: string,
-  collectionCode?: string,
-  materialSampleId?: string,
-  submittedBy?: string,
-  asmNotLiveDate?: string,
-  excludedFromRefseq?: string,
-  lastUpdated?: string,
-  title?: string,
-  url?: string,
-  fundingAttribution?: string,
-  reference?: string,
-  accessRights?: string,
-  rightsHolder?: string,
-  sourceUri?: string,
-}
-
-type SequenceDetails = {
-  id: string,
-  dnaExtractId: string,
-  accession: string,
-  genbankAccession?: string,
-  datasetName: string,
-
+type SequenceDetails = Sequence & {
   events: {
     sequencing: SequencingEvent[],
     sequencingRuns: SequencingRunEvent[],
@@ -149,8 +57,16 @@ type SequenceDetails = {
   },
 };
 
+type SpecimenDetails = {
+  accession: string,
+  collectionCode?: string,
+  latitude?: number,
+  longitude?: number,
+}
+
 type SequenceQueryResults = {
-  sequence: SequenceDetails;
+  sequence: SequenceDetails,
+  specimen: SpecimenDetails,
 };
 
 
@@ -174,7 +90,7 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
           </tr>
           <tr>
             <td>Source molecule</td>
-            <td><AttributePill value={sequencing?.sourceMolecule} /></td>
+            <td><AttributePill value={undefined} /></td>
           </tr>
           <tr>
             <td>Sequencing method</td>
@@ -216,12 +132,7 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
           </tr>
           <tr>
             <td>Translation</td>
-            <td>
-              { sequencing?.translation
-                ?<CopyableData value={sequencing.translation} />
-                : <DataField value={undefined} />
-              }
-            </td>
+            <td><DataField value={undefined} /></td>
           </tr>
           </tbody>
         </Table>
@@ -315,6 +226,54 @@ function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefi
   )
 }
 
+function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
+  const { classes } = useTableStyles();
+  const basePath = usePathname()?.split('/').slice(1, 3).join('/');
+  const path = `${basePath}/specimens/${specimen?.accession}`;
+
+  return (
+    <Grid>
+      <Grid.Col span={7}>
+        <Stack>
+          <Title order={5}>Specimen information</Title>
+          <Table className={classes.table}>
+            <tbody>
+              <tr>
+                <td>Sample ID</td>
+                <td><DataField value={specimen?.accession} /></td>
+              </tr>
+              <tr>
+                <td>Sequenced by</td>
+                <td><DataField value={specimen?.collectionCode} /></td>
+              </tr>
+            </tbody>
+          </Table>
+
+          <Flex justify="flex-end">
+            <Link href={path}>
+              <Button radius="md" color="midnight" leftIcon={<Microscope />}>go to specimen</Button>
+            </Link>
+          </Flex>
+        </Stack>
+      </Grid.Col>
+      <Grid.Col span={5}>
+        <SpecimenMap specimen={specimen} />
+      </Grid.Col>
+    </Grid>
+  )
+}
+
+function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
+  return (
+    <Box pos="relative" h={180} sx={theme => ({
+      overflow: "hidden",
+      borderRadius: theme.radius.lg,
+    })}>
+      <ArgaMap />
+    </Box>
+  )
+}
+
 
 export default function MarkerPage({ params }: { params: { accession: string } }) {
   let basePath = usePathname()?.replace(params.accession, '');
@@ -375,7 +334,7 @@ export default function MarkerPage({ params }: { params: { accession: string } }
           </Grid.Col>
           <Grid.Col span={5}>
             <LoadPanel visible={loading}>
-              <Title order={5} mb={10}>Specimen information</Title>
+              <SpecimenPreview specimen={data?.specimen} />
             </LoadPanel>
           </Grid.Col>
           <Grid.Col span={3}>
