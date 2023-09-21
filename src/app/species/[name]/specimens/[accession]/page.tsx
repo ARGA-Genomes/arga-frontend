@@ -13,228 +13,90 @@ import {
   Timeline,
   Title,
 } from "@mantine/core";
-import { DataField } from "@/app/components/highlight-stack";
+import { AttributePill, DataField } from "@/app/components/highlight-stack";
 import { ArrowNarrowLeft, CircleCaretUp} from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTableStyles } from "@/app/components/data-fields";
 import { ArgaMap } from "@/app/components/mapping";
+import { AccessionEvent, CollectionEvent, Specimen } from "@/app/queries/specimen";
+import { Subsample, SubsampleEvent } from "@/app/queries/subsample";
+import { DnaExtract, DnaExtractionEvent } from "@/app/queries/dna-extract";
+import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/app/queries/sequence";
 
 
 const GET_SPECIMEN = gql`
   query SpecimenFullData($accession: String) {
     specimen(accession: $accession) {
-      id
-      accession
-      organismId
-      materialSampleId
-      collectionCode
-      institutionName
-      institutionCode
-      recordedBy
-      identifiedBy
-      typeStatus
-      latitude
-      longitude
-      locationSource
-      locality
-      country
-      countryCode
-      county
-      municipality
-      stateProvince
-      depth
-      elevation
-      depthAccuracy
-      elevationAccuracy
-      remarks
-      identificationRemarks
-
+      ...SpecimenDetails
       events {
-        collections {
-          id
-          behavior
-          catalogNumber
-          degreeOfEstablishment
-          envBroadScale
-          establishmentMeans
-          individualCount
-          isolate
-          lifeStage
-          occurrenceStatus
-          organismQuantity
-          organismQuantityType
-          otherCatalogNumbers
-          pathway
-          preparation
-          recordNumber
-          refBiomaterial
-          reproductiveCondition
-          sex
-          sourceMatId
-          specificHost
-          strain
-        }
-        accessions {
-          id
-          institutionName
-          institutionCode
-          materialSampleId
-          typeStatus
-        }
+        collections { ...CollectionEventDetails }
+        accessions { ...AccessionEventDetails }
       }
     }
 
     subsample(accession: $accession) {
-      id
-      accession
-      materialSampleId
-      institutionName
-      institutionCode
-      typeStatus
-
+      ...SubsampleDetails
       events {
-        subsamples {
-          id
-          preparationType
-        }
+        subsamples { ...SubsampleEventDetails }
       }
     }
 
     dnaExtract(accession: $accession) {
-      id
-      accession
-
+      ...DnaExtractDetails
       events {
-        dnaExtracts {
-          id
-          extractedBy
-          extractionMethod
-          measurementMethod
-          preparationType
-          preservationType
-          concentration
-          concentrationMethod
-          quality
-          absorbance260230
-          absorbance260280
-        }
+        dnaExtracts { ...DnaExtractionEventDetails }
       }
     }
+
+    sequence(accession: $accession) {
+      ...SequenceDetails
+      events {
+        sequencing { ...SequencingEventDetails }
+        sequencingRuns { ...SequencingRunEventDetails }
+        assemblies { ...AssemblyEventDetails }
+        annotations { ...AnnotationEventDetails }
+        dataDepositions { ...DataDepositionEventDetails }
+      }
+    }
+
   }
 `;
 
-type CollectionEvent = {
-  id: string,
-  behavior?: string,
-  catalogNumber?: string,
-  degreeOfEstablishment?: string,
-  envBroadScale?: string,
-  establishmentMeans?: string,
-  individualCount?: string,
-  isolate?: string,
-  lifeStage?: string,
-  occurrenceStatus?: string,
-  organismQuantity?: string,
-  organismQuantityType?: string,
-  otherCatalogNumbers?: string,
-  pathway?: string,
-  preparation?: string,
-  recordNumber?: string,
-  refBiomaterial?: string,
-  reproductiveCondition?: string,
-  sex?: string,
-  sourceMatId?: string,
-  specificHost?: string,
-  strain?: string,
-}
-
-type AccessionEvent = {
-  id: string,
-  institutionName?: string,
-  institutionCode?: string,
-  materialSampleId?: string,
-  typeStatus?: string,
-}
-
-type SubsampleEvent = {
-  id: string,
-  preparationType?: string,
-}
-
-type DnaExtractionEvent = {
-  id: string,
-  extractedBy?: string,
-  extractionMethod?: string,
-  measurementMethod?: string,
-  preparationType?: string,
-  preservationType?: string,
-  concentration?: number,
-  concentrationMethod?: string,
-  quality?: string,
-  absorbance260230?: number,
-  absorbance260280?: number,
-}
-
-type SpecimenDetails = {
-  id: string,
-  accession: string,
-  organismId?: string,
-  materialSampleId?: string,
-  collectionCode?: string,
-  institutionName?: string,
-  institutionCode?: string,
-  recordedBy?: string,
-  identifiedBy?: string,
-  typeStatus?: string,
-  latitude?: string,
-  longitude?: string,
-  locationSource?: string,
-  locality?: string,
-  country?: string,
-  countryCode?: string,
-  county?: string,
-  municipality?: string,
-  stateProvince?: string,
-  depth?: string,
-  elevation?: string,
-  depthAccuracy?: string,
-  elevationAccuracy?: string,
-  remarks?: string,
-  identificationRemarks?: string,
-
+type SpecimenDetails = Specimen & {
   events: {
     collections: CollectionEvent[],
     accessions: AccessionEvent[],
   },
 };
 
-type SubsampleDetails = {
-  id: string,
-  accession: string,
-  materialSampleId?: string,
-  institutionName?: string,
-  institutionCode?: string,
-  typeStatus?: string,
-
+type SubsampleDetails = Subsample & {
   events: {
     subsamples: SubsampleEvent[],
   },
 };
 
-type DnaExtractDetails = {
-  id: string,
-  accession: string,
+type DnaExtractDetails = DnaExtract & {
   events: {
     dnaExtracts: DnaExtractionEvent[],
   },
 };
 
+type SequenceDetails = Sequence & {
+  events: {
+    sequencing: SequencingEvent[],
+    sequencingRuns: { id: string } & SequencingRunEvent[],
+    assemblies: AssemblyEvent[],
+    annotations: AnnotationEvent[],
+    dataDepositions: DataDepositionEvent[],
+  },
+}
 
 type SpecimenQueryResults = {
   specimen: SpecimenDetails;
   subsample: SubsampleDetails;
   dnaExtract: DnaExtractDetails;
+  sequence: SequenceDetails;
 };
 
 
@@ -380,7 +242,7 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
           </tr>
           <tr>
             <td>Type status</td>
-            <td><DataField value={accession?.typeStatus}/></td>
+            <td><AttributePill value={accession?.typeStatus}/></td>
           </tr>
           <tr>
             <td>Organism name</td>
@@ -429,11 +291,11 @@ function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) 
         <tbody>
           <tr>
             <td>Sample number</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={subsample?.materialSampleId}/></td>
           </tr>
           <tr>
             <td>Subsample available</td>
-            <td><DataField value={undefined}/></td>
+            <td><AttributePill value={undefined}/></td>
           </tr>
           <tr>
             <td>Data source</td>
@@ -445,7 +307,7 @@ function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) 
         <tbody>
           <tr>
             <td>Subsampled by</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={subsample?.institutionName}/></td>
           </tr>
           <tr>
             <td>Remarks</td>
@@ -471,6 +333,7 @@ function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) 
 
 function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined }) {
   const { classes } = useTableStyles();
+  const extraction = dnaExtract?.events.dnaExtracts[0];
 
   return (
     <SimpleGrid cols={3}>
@@ -478,11 +341,11 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
         <tbody>
           <tr>
             <td>Extraction number</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={dnaExtract?.accession}/></td>
           </tr>
           <tr>
             <td>Extract available</td>
-            <td><DataField value={undefined}/></td>
+            <td><AttributePill value={undefined}/></td>
           </tr>
           <tr>
             <td>Data source</td>
@@ -494,11 +357,11 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
         <tbody>
           <tr>
             <td>Extracted by</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={extraction?.extractedBy}/></td>
           </tr>
           <tr>
             <td>Protocol</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={extraction?.extractionMethod}/></td>
           </tr>
           <tr></tr>
         </tbody>
@@ -511,6 +374,258 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
           </tr>
           <tr></tr>
           <tr></tr>
+        </tbody>
+      </Table>
+    </SimpleGrid>
+  )
+}
+
+
+function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
+  const { classes } = useTableStyles();
+  const sequencing = sequence?.events.sequencing[0];
+  const sequencingRun = sequence?.events.sequencingRuns[0];
+
+  return (
+    <SimpleGrid cols={3}>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Amplification number</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Target region</td>
+            <td><DataField value={sequencing?.targetGene}/></td>
+          </tr>
+          <tr>
+            <td>Sequence numbers</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Sequencing protocol</td>
+            <td><DataField value={sequencingRun?.libraryProtocol}/></td>
+          </tr>
+          <tr>
+            <td>Data source</td>
+            <td><DataField value={sequence?.datasetName}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Amplified by</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Primer forward</td>
+            <td><DataField value={sequencingRun?.sequencePrimerForwardName}/></td>
+          </tr>
+          <tr>
+            <td>Sequenced by</td>
+            <td><DataField value={sequencing?.sequencedBy}/></td>
+          </tr>
+          <tr>
+            <td>Visualised by</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Amplification date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Primer reverse</td>
+            <td><DataField value={sequencingRun?.sequencingPrimerReverseName}/></td>
+          </tr>
+          <tr>
+            <td>Sequencing date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Visualisation date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </Table>
+    </SimpleGrid>
+  )
+}
+
+function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
+  const { classes } = useTableStyles();
+  const assembly = sequence?.events.assemblies[0];
+
+  return (
+    <SimpleGrid cols={3}>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Assembly number</td>
+            <td><DataField value={assembly?.name}/></td>
+          </tr>
+          <tr>
+            <td>Assembly level</td>
+            <td><AttributePill value={assembly?.quality}/></td>
+          </tr>
+          <tr>
+            <td>Data source</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Assembled by</td>
+            <td><DataField value={assembly?.submittedBy}/></td>
+          </tr>
+          <tr>
+            <td>Institution</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Number of scaffolds</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Assembly date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Assembly method</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>CG content</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+    </SimpleGrid>
+  )
+}
+
+function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
+  const { classes } = useTableStyles();
+  const annotation = sequence?.events.annotations[0];
+
+  return (
+    <SimpleGrid cols={3}>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Annotation number</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Genome size</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Data source</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Annotated by</td>
+            <td><DataField value={annotation?.annotatedBy}/></td>
+          </tr>
+          <tr>
+            <td>Institution</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Coverage</td>
+            <td><DataField value={annotation?.coverage}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Annotated date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Annotation method</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>BUSCO score</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+    </SimpleGrid>
+  )
+}
+
+function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
+  const { classes } = useTableStyles();
+  const deposition = sequence?.events.dataDepositions[0];
+
+  return (
+    <SimpleGrid cols={3}>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Accession number</td>
+            <td><DataField value={sequence?.accession}/></td>
+          </tr>
+          <tr>
+            <td>Sample number</td>
+            <td><DataField value={deposition?.materialSampleId}/></td>
+          </tr>
+          <tr>
+            <td>Data source</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Deposited by</td>
+            <td><DataField value={deposition?.submittedBy}/></td>
+          </tr>
+          <tr>
+            <td>Institution</td>
+            <td><DataField value={deposition?.institutionName}/></td>
+          </tr>
+          <tr>
+            <td>Release type</td>
+            <td><AttributePill value={undefined}/></td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Deposition date</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Organism name</td>
+            <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Representation</td>
+            <td><AttributePill value={undefined}/></td>
+          </tr>
         </tbody>
       </Table>
     </SimpleGrid>
@@ -632,6 +747,22 @@ export default function SpecimenPage({ params }: { params: { accession: string }
               <Paper px={20} pt={30} pb={15}>
                 <Title order={5}>DNA extraction event</Title>
                 <DnaExtracts dnaExtract={data?.dnaExtract} />
+              </Paper>
+              <Paper px={20} pt={30} pb={15}>
+                <Title order={5}>Amplificaton and sequencing event</Title>
+                <Sequencing sequence={data?.sequence} />
+              </Paper>
+              <Paper px={20} pt={30} pb={15}>
+                <Title order={5}>Sequence assembly event</Title>
+                <Assemblies sequence={data?.sequence} />
+              </Paper>
+              <Paper px={20} pt={30} pb={15}>
+                <Title order={5}>Sequence annotation event</Title>
+                <Annotations sequence={data?.sequence} />
+              </Paper>
+              <Paper px={20} pt={30} pb={15}>
+                <Title order={5}>Data deposition event</Title>
+                <Depositions sequence={data?.sequence} />
               </Paper>
             </Stack>
           </Grid.Col>

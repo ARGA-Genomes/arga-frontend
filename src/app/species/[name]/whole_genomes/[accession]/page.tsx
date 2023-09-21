@@ -4,7 +4,6 @@ import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import {
   Button,
-  createStyles,
   Grid,
   Group,
   Paper,
@@ -20,174 +19,41 @@ import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDow
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTableStyles } from "@/app/components/data-fields";
+import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/app/queries/sequence";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
     sequence(accession: $accession) {
       id
-      dnaExtractId
-      accession
-      genbankAccession
-      datasetName
+      ...SequenceDetails
 
       events {
-        sequencing {
-          materialSampleId
-          sequencedBy
-          targetGene
-          ampliconSize
-          estimatedSize
-          concentration
-          baitSetName
-          baitSetReference
-          dnaSequence
-        }
+        sequencing { ...SequencingEventDetails }
         sequencingRuns {
           id
-          traceName
-          traceId
-          traceLink
-          targetGene
-          sequencingDate
-          sequencingEventId
-          sequencingMethod
-          sequencingCenter
-          sequencingCenterCode
-          sequencePrimerForwardName
-          sequencePrimerReverseName
-          pcrPrimerNameForward
-          pcrPrimerNameReverse
-          direction
-          analysisSoftware
-          analysisDescription
-          libraryProtocol
+          ...SequencingRunEventDetails
         }
-        assemblies {
-          name
-          quality
-          assemblyType
-          genomeSize
-          submittedBy
-          versionStatus
-        }
-        annotations {
-          representation
-          releaseType
-          replicons
-          coverage
-          standardOperatingProcedures
-          annotatedBy
-        }
-        dataDepositions {
-          dataType
-          institutionName
-          collectionName
-          collectionCode
-          materialSampleId
-          submittedBy
-          asmNotLiveDate
-          excludedFromRefseq
-          lastUpdated
-
-          title
-          url
-          fundingAttribution
-          reference
-          accessRights
-          rightsHolder
-          sourceUri
-        }
+        assemblies { ...AssemblyEventDetails }
+        annotations { ...AnnotationEventDetails }
+        dataDepositions { ...DataDepositionEventDetails }
       }
     }
   }
 `;
 
-type SequencingEvent = {
-  materialSampleId: string,
-  sequencedBy: string,
-  targetGene: string,
-  ampliconSize: string,
-  estimatedSize: string,
-  concentration: string,
-  baitSetName: string,
-  baitSetReference: string,
-  dnaSequence: string,
-}
-
-type SequencingRunEvent = {
+type SequenceDetails = Sequence & {
   id: string,
-  traceName: string,
-  traceId: string,
-  traceLink: string,
-  targetGene: string,
-  sequencingDate: string,
-  sequencingEventId: string,
-  sequencingMethod: string,
-  sequencingCenter: string,
-  sequencingCenterCode: string,
-  sequencePrimerForwardName: string,
-  sequencingPrimerReverseName: string,
-  direction: string,
-  analysisSoftware: string,
-  analysisDescription: string,
-  libraryProtocol: string,
-}
-
-type AssemblyEvent = {
-  name: string,
-  quality: string,
-  assemblyType: string,
-  genomeSize: number,
-  submittedBy: string,
-  versionStatus: string,
-}
-
-type AnnotationEvent = {
-  representation: string,
-  releaseType: string,
-  replicons: string,
-  coverage: string,
-  standardOperatingProcedures: string,
-  annotatedBy: string,
-}
-
-type DataDepositionEvent = {
-  dataType: string,
-  institutionName: string,
-  collectionName: string,
-  collectionCode: string,
-  materialSampleId: string,
-  submittedBy: string,
-  asmNotLiveDate: string,
-  excludedFromRefseq: string,
-  lastUpdated: string,
-  title: string,
-  url: string,
-  fundingAttribution: string,
-  reference: string,
-  accessRights: string,
-  rightsHolder: string,
-  sourceUri: string,
-}
-
-type SequenceDetails = {
-  id: string,
-  dnaExtractId: string,
-  accession: string,
-  genbankAccession: string,
-  datasetName: string,
-
   events: {
     sequencing: SequencingEvent[],
-    sequencingRuns: SequencingRunEvent[],
+    sequencingRuns: { id: string } & SequencingRunEvent[],
     assemblies: AssemblyEvent[],
     annotations: AnnotationEvent[],
     dataDepositions: DataDepositionEvent[],
   },
-};
+}
 
 type SequenceQueryResults = {
-  sequence: SequenceDetails;
+  sequence: SequenceDetails,
 };
 
 
