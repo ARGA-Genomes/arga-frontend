@@ -23,8 +23,8 @@ import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } fr
 import { ArgaMap } from "@/app/components/mapping";
 
 const GET_ASSEMBLY = gql`
-  query MarkerFullData($accession: String) {
-    sequence(by: { accession: $accession }) {
+  query MarkerFullData($recordId: String) {
+    sequence(by: { recordId: $recordId }) {
       id
       ...SequenceDetails
 
@@ -40,8 +40,8 @@ const GET_ASSEMBLY = gql`
       }
     }
 
-    specimen(by: { sequenceAccession: $accession }) {
-      accession
+    specimen(by: { sequenceRecordId: $recordId }) {
+      recordId
       collectionCode
       latitude
       longitude
@@ -58,7 +58,7 @@ type SequenceDetails = Sequence & {
 };
 
 type SpecimenDetails = {
-  accession: string,
+  recordId: string,
   collectionCode?: string,
   latitude?: number,
   longitude?: number,
@@ -183,7 +183,7 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
       <tbody>
       <tr>
         <td>Accession</td>
-        <td><DataField value={sequence?.accession} /></td>
+        <td><DataField value={sequence?.recordId} /></td>
       </tr>
       <tr>
         <td>Sequence author</td>
@@ -229,7 +229,7 @@ function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefi
 function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
   const { classes } = useTableStyles();
   const basePath = usePathname()?.split('/').slice(1, 3).join('/');
-  const path = `${basePath}/specimens/${specimen?.accession}`;
+  const path = `${basePath}/specimens/${specimen?.recordId}`;
 
   return (
     <Grid>
@@ -240,7 +240,7 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
             <tbody>
               <tr>
                 <td>Sample ID</td>
-                <td><DataField value={specimen?.accession} /></td>
+                <td><DataField value={specimen?.recordId} /></td>
               </tr>
               <tr>
                 <td>Sequenced by</td>
@@ -280,7 +280,7 @@ export default function MarkerPage({ params }: { params: { accession: string } }
 
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
-      accession: params.accession,
+      recordId: params.accession,
     },
   });
 
@@ -299,7 +299,7 @@ export default function MarkerPage({ params }: { params: { accession: string } }
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${data?.sequence.accession}`}</Title>
+          <Title order={3} mb={10}>{`Full data view: ${data?.sequence.recordId}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
           <Text fz="sm" c="dimmed" weight={700}>{data?.sequence.datasetName}</Text>
         </Group>

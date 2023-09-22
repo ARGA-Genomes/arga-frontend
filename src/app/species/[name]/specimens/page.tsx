@@ -1,12 +1,11 @@
 'use client';
 
 import SpecimenEvents from "@/app/specimens/[uuid]/specimen-details";
-import { Coordinates, SpecimenDetails } from "@/app/type";
+import { SpecimenDetails } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Container, Grid, Group, Paper, Stack, Text, Title} from "@mantine/core";
+import { Box, Grid, Group, Paper, Stack, Text, Title} from "@mantine/core";
 import { useState } from "react";
 import { PaginationBar } from "@/app/components/pagination";
-import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/app/components/load-overlay";
 import { RecordItem } from "@/app/components/record-list";
 import { AttributeValue } from "@/app/components/highlight-stack";
@@ -23,7 +22,7 @@ query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
       total
       records {
         id
-        accession
+        recordId
         datasetName
         typeStatus
         locality
@@ -93,11 +92,11 @@ query SpecimenDetails($specimenId: String) {
 
 type Specimen = {
   id: string,
-  accession: string,
+  recordId: string,
   datasetName: string,
-  typeStatus: string,
-  locality: string,
-  country: string,
+  typeStatus?: string,
+  locality?: string,
+  country?: string,
   sequences: number,
   wholeGenomes: number,
   markers: number,
@@ -145,7 +144,7 @@ function RecordItemContent({ record }: { record: Specimen }) {
       <Grid p={20}>
         <Grid.Col span={4}>
           <Stack spacing={5}>
-            <LabeledValue label="Registration number" value={record.accession} />
+            <LabeledValue label="Registration number" value={record.recordId} />
             <Text size="xs" weight={600}>{record.datasetName}</Text>
           </Stack>
         </Grid.Col>
@@ -168,7 +167,7 @@ function RecordList({ records }: { records: Specimen[] }) {
   return (
     <>
       { records.map(record => (
-        <RecordItem key={record.id} href={`${path}/${record.accession}`}>
+        <RecordItem key={record.id} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>

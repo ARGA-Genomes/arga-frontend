@@ -25,8 +25,8 @@ import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, Sequenci
 import { ArgaMap } from "@/app/components/mapping";
 
 const GET_ASSEMBLY = gql`
-  query AssemblyFullData($accession: String) {
-    sequence(by: { accession: $accession }) {
+  query AssemblyFullData($recordId: String) {
+    sequence(by: { recordId: $recordId }) {
       id
       ...SequenceDetails
 
@@ -42,7 +42,7 @@ const GET_ASSEMBLY = gql`
       }
     }
 
-    specimen(by: { sequenceAccession: $accession }) {
+    specimen(by: { sequenceRecordId: $recordId }) {
       accession
       collectionCode
       latitude
@@ -202,23 +202,23 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
       <tbody>
       <tr>
         <td>Accession</td>
-        <td><DataField value={sequence?.accession} /></td>
+        <td><DataField value={sequence?.events.dataDepositions[0]?.accession} /></td>
       </tr>
       <tr>
         <td>Sequenced by</td>
-        <td><DataField value={sequence?.events.sequencing[0].sequencedBy} /></td>
+        <td><DataField value={sequence?.events.sequencing[0]?.sequencedBy} /></td>
       </tr>
       <tr>
         <td>Assembled by</td>
-        <td><DataField value={sequence?.events.assemblies[0].submittedBy} /></td>
+        <td><DataField value={sequence?.events.assemblies[0]?.assembledBy} /></td>
       </tr>
       <tr>
         <td>Annotated by</td>
-        <td><DataField value={sequence?.events.annotations[0].annotatedBy} /></td>
+        <td><DataField value={sequence?.events.annotations[0]?.annotatedBy} /></td>
       </tr>
       <tr>
         <td>Deposited by</td>
-        <td><DataField value={sequence?.events.dataDepositions[0].submittedBy} /></td>
+        <td><DataField value={sequence?.events.dataDepositions[0]?.submittedBy} /></td>
       </tr>
       </tbody>
     </Table>
@@ -279,7 +279,7 @@ export default function AssemblyPage({ params }: { params: { accession: string }
 
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
-      accession: params.accession,
+      recordId: params.accession,
     },
   });
 
@@ -298,7 +298,7 @@ export default function AssemblyPage({ params }: { params: { accession: string }
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${data?.sequence.accession}`}</Title>
+          <Title order={3} mb={10}>{`Full data view: ${data?.sequence.recordId}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
           <Text fz="sm" c="dimmed" weight={700}>{data?.sequence.datasetName}</Text>
         </Group>

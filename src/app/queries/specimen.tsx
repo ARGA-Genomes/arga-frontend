@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const SPECIMEN = gql`
   fragment SpecimenDetails on Specimen {
-    accession
+    recordId
     organismId
     materialSampleId
     collectionCode
@@ -10,6 +10,7 @@ export const SPECIMEN = gql`
     institutionCode
     recordedBy
     identifiedBy
+    identifiedDate
     typeStatus
     latitude
     longitude
@@ -24,13 +25,14 @@ export const SPECIMEN = gql`
     elevation
     depthAccuracy
     elevationAccuracy
+    details
     remarks
     identificationRemarks
   }
 `;
 
 export type Specimen = {
-  accession: string,
+  recordId: string,
   organismId?: string,
   materialSampleId?: string,
   collectionCode?: string,
@@ -38,6 +40,7 @@ export type Specimen = {
   institutionCode?: string,
   recordedBy?: string,
   identifiedBy?: string,
+  identifiedDate?: string,
   typeStatus?: string,
   latitude?: string,
   longitude?: string,
@@ -52,16 +55,23 @@ export type Specimen = {
   elevation?: string,
   depthAccuracy?: string,
   elevationAccuracy?: string,
+  details?: string,
   remarks?: string,
   identificationRemarks?: string,
 };
 
 export const COLLECTION_EVENT = gql`
   fragment CollectionEventDetails on CollectionEvent {
+    eventDate
+    eventTime
+    collectedBy
     behavior
     catalogNumber
     degreeOfEstablishment
     envBroadScale
+    envLocalScale
+    envMedium
+    habitat
     establishmentMeans
     individualCount
     isolate
@@ -76,17 +86,27 @@ export const COLLECTION_EVENT = gql`
     refBiomaterial
     reproductiveCondition
     sex
+    genotypicSex
+    phenotypicSex
     sourceMatId
     specificHost
     strain
+    fieldNotes
+    remarks
   }
 `;
 
 export type CollectionEvent = {
+  eventDate?: string,
+  eventTime?: string,
+  collectedBy?: string,
   behavior?: string,
   catalogNumber?: string,
   degreeOfEstablishment?: string,
   envBroadScale?: string,
+  envLocalScale?: string,
+  envMedium?: string,
+  habitat?: string,
   establishmentMeans?: string,
   individualCount?: string,
   isolate?: string,
@@ -101,13 +121,21 @@ export type CollectionEvent = {
   refBiomaterial?: string,
   reproductiveCondition?: string,
   sex?: string,
+  genotypicSex?: string,
+  phenotypicSex?: string,
   sourceMatId?: string,
   specificHost?: string,
   strain?: string,
+  fieldNotes?: string,
+  remarks?: string,
 }
 
 export const ACCESSION_EVENT = gql`
   fragment AccessionEventDetails on AccessionEvent {
+    eventDate
+    eventTime
+    accession
+    accessionedBy
     institutionName
     institutionCode
     materialSampleId
@@ -116,6 +144,10 @@ export const ACCESSION_EVENT = gql`
 `;
 
 export type AccessionEvent = {
+  eventDate?: string,
+  eventTime?: string,
+  accession?: string,
+  accessionedBy?: string,
   institutionName?: string,
   institutionCode?: string,
   materialSampleId?: string,

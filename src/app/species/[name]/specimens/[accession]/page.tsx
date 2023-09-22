@@ -26,8 +26,8 @@ import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, Sequenci
 
 
 const GET_SPECIMEN = gql`
-  query SpecimenFullData($accession: String) {
-    specimen(by: { accession: $accession }) {
+  query SpecimenFullData($recordId: String) {
+    specimen(by: { recordId: $recordId }) {
       ...SpecimenDetails
       events {
         collections { ...CollectionEventDetails }
@@ -35,21 +35,21 @@ const GET_SPECIMEN = gql`
       }
     }
 
-    subsample(by: { specimenAccession: $accession }) {
+    subsample(by: { specimenRecordId: $recordId }) {
       ...SubsampleDetails
       events {
         subsamples { ...SubsampleEventDetails }
       }
     }
 
-    dnaExtract(by: { specimenAccession: $accession }) {
+    dnaExtract(by: { specimenRecordId: $recordId }) {
       ...DnaExtractDetails
       events {
         dnaExtracts { ...DnaExtractionEventDetails }
       }
     }
 
-    sequence(by: { specimenAccession: $accession }) {
+    sequence(by: { specimenRecordId: $recordId }) {
       ...SequenceDetails
       events {
         sequencing { ...SequencingEventDetails }
@@ -234,7 +234,7 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
         <tbody>
           <tr>
             <td>Registration number</td>
-            <td><DataField value={accession?.materialSampleId}/></td>
+            <td><DataField value={accession?.accession}/></td>
           </tr>
           <tr>
             <td>Institution</td>
@@ -341,7 +341,7 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
         <tbody>
           <tr>
             <td>Extraction number</td>
-            <td><DataField value={dnaExtract?.accession}/></td>
+            <td><DataField value={dnaExtract?.recordId}/></td>
           </tr>
           <tr>
             <td>Extract available</td>
@@ -484,7 +484,7 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
         <tbody>
           <tr>
             <td>Assembled by</td>
-            <td><DataField value={assembly?.submittedBy}/></td>
+            <td><DataField value={assembly?.assembledBy}/></td>
           </tr>
           <tr>
             <td>Institution</td>
@@ -584,7 +584,7 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
         <tbody>
           <tr>
             <td>Accession number</td>
-            <td><DataField value={sequence?.accession}/></td>
+            <td><DataField value={deposition?.accession}/></td>
           </tr>
           <tr>
             <td>Sample number</td>
@@ -700,7 +700,7 @@ export default function SpecimenPage({ params }: { params: { accession: string }
 
   const { loading, error, data } = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {
     variables: {
-      accession: params.accession,
+      recordId: params.accession,
     },
   });
 
@@ -719,7 +719,7 @@ export default function SpecimenPage({ params }: { params: { accession: string }
 
       <Paper p={20} radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Complete specimen view: ${data?.specimen.accession}`}</Title>
+          <Title order={3} mb={10}>{`Complete specimen view: ${data?.specimen.recordId}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
         </Group>
 

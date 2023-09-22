@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const SUBSAMPLE = gql`
   fragment SubsampleDetails on Subsample {
-    accession
+    recordId
     materialSampleId
     institutionName
     institutionCode
@@ -11,7 +11,7 @@ export const SUBSAMPLE = gql`
 `;
 
 export type Subsample = {
-  accession: string,
+  recordId: string,
   materialSampleId?: string,
   institutionName?: string,
   institutionCode?: string,

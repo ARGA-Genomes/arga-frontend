@@ -2,12 +2,12 @@ import { gql } from "@apollo/client";
 
 export const DNA_EXTRACT = gql`
   fragment DnaExtractDetails on DnaExtract {
-    accession
+    recordId
   }
 `;
 
 export type DnaExtract = {
-  accession: string,
+  recordId: string,
 };
 
 export const DNA_EXTRACTION_EVENT = gql`

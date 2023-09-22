@@ -22,6 +22,7 @@ query SpeciesBarcodes($canonicalName: String, $page: Int, $pageSize: Int) {
       records {
         sequenceId
         datasetName
+        recordId
         accession
         materialSampleId
         sequencedBy
@@ -34,7 +35,8 @@ query SpeciesBarcodes($canonicalName: String, $page: Int, $pageSize: Int) {
 type Marker = {
   sequenceId: string,
   datasetName: string,
-  accession: string,
+  recordId: string,
+  accession?: string,
   materialSampleId?: string,
   sequencedBy?: string,
   targetGene: string,
@@ -102,7 +104,7 @@ function RecordList({ records }: { records: Marker[] }) {
   return (
     <>
       { records.map(record => (
-        <RecordItem key={record.sequenceId} href={`${path}/${record.accession}`}>
+        <RecordItem key={record.sequenceId} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>

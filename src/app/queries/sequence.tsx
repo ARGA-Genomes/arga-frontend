@@ -2,21 +2,21 @@ import { gql } from "@apollo/client";
 
 export const SEQUENCE = gql`
   fragment SequenceDetails on Sequence {
-    accession
+    recordId
     datasetName
-    genbankAccession
   }
 `;
 
 export type Sequence = {
   id: string,
-  accession: string,
+  recordId: string,
   datasetName: string,
-  genbankAccession?: string,
 };
 
 export const SEQUENCING_EVENT = gql`
   fragment SequencingEventDetails on SequencingEvent {
+    eventDate
+    eventTime
     materialSampleId
     sequencedBy
     targetGene
@@ -30,6 +30,8 @@ export const SEQUENCING_EVENT = gql`
 `;
 
 export type SequencingEvent = {
+  eventDate?: string,
+  eventTime?: string,
   materialSampleId?: string,
   sequencedBy?: string,
   targetGene?: string,
@@ -83,26 +85,32 @@ export type SequencingRunEvent = {
 
 export const ASSEMBLY_EVENT = gql`
   fragment AssemblyEventDetails on AssemblyEvent {
+    eventDate
+    eventTime
     name
     quality
     assemblyType
     genomeSize
-    submittedBy
+    assembledBy
     versionStatus
   }
 `;
 
 export type AssemblyEvent = {
+  eventDate?: string,
+  eventTime?: string,
   name?: string,
   quality?: string,
   assemblyType?: string,
   genomeSize?: number,
-  submittedBy?: string,
+  assembledBy?: string,
   versionStatus?: string,
 }
 
 export const ANNOTATIONS_EVENT = gql`
   fragment AnnotationEventDetails on AnnotationEvent {
+    eventDate
+    eventTime
     representation
     releaseType
     replicons
@@ -113,6 +121,8 @@ export const ANNOTATIONS_EVENT = gql`
 `;
 
 export type AnnotationEvent = {
+  eventDate?: string,
+  eventTime?: string,
   representation?: string,
   releaseType?: string,
   replicons?: string,
@@ -123,6 +133,9 @@ export type AnnotationEvent = {
 
 export const DATA_DEPOSITION_EVENT = gql`
   fragment DataDepositionEventDetails on DataDepositionEvent {
+    eventDate
+    eventTime
+    accession
     dataType
     institutionName
     collectionName
@@ -144,6 +157,9 @@ export const DATA_DEPOSITION_EVENT = gql`
 `;
 
 export type DataDepositionEvent = {
+  eventDate?: string,
+  eventTime?: string,
+  accession?: string,
   dataType?: string,
   institutionName?: string,
   collectionName?: string,
