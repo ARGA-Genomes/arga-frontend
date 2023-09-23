@@ -43,10 +43,13 @@ const GET_ASSEMBLY = gql`
     }
 
     specimen(by: { sequenceRecordId: $recordId }) {
-      accession
+      recordId
       collectionCode
       latitude
       longitude
+      events {
+        accessions { id }
+      }
     }
   }
 `;
@@ -63,10 +66,13 @@ type SequenceDetails = Sequence & {
 }
 
 type SpecimenDetails = {
-  accession: string,
+  recordId: string,
   collectionCode?: string,
   latitude?: number,
   longitude?: number,
+  events: {
+    accessions: { id: string }[],
+  }
 }
 
 type SequenceQueryResults = {
@@ -85,27 +91,27 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
           <tbody>
           <tr>
             <td>Genome status</td>
-            <td><AttributePill value={sequence?.events.dataDepositions[0].dataType} /></td>
+            <td><AttributePill value={sequence?.events.dataDepositions[0]?.dataType} /></td>
           </tr>
           <tr>
             <td>Representation</td>
-            <td><AttributePill value={sequence?.events.annotations[0].representation} /></td>
+            <td><AttributePill value={sequence?.events.annotations[0]?.representation} /></td>
           </tr>
           <tr>
             <td>Assembly type</td>
-            <td><AttributePill value={sequence?.events.assemblies[0].assemblyType} /></td>
+            <td><AttributePill value={sequence?.events.assemblies[0]?.assemblyType} /></td>
           </tr>
           <tr>
             <td>Release date</td>
-            <td><DataField value={undefined} /></td>
+            <td><DataField value={sequence?.events.dataDepositions[0]?.eventDate} /></td>
           </tr>
           <tr>
             <td>Release type</td>
-            <td><AttributePill value={sequence?.events.annotations[0].releaseType} /></td>
+            <td><AttributePill value={sequence?.events.annotations[0]?.releaseType} /></td>
           </tr>
           <tr>
             <td>Version status</td>
-            <td><DataField value={sequence?.events.assemblies[0].versionStatus} /></td>
+            <td><DataField value={sequence?.events.assemblies[0]?.versionStatus} /></td>
           </tr>
           <tr>
             <td>Sequencing method</td>
@@ -176,7 +182,7 @@ function DataAvailabilityItem({ value, children }: { value: boolean|undefined, c
   )
 }
 
-function DataAvailability({ sequence }: { sequence: SequenceDetails | undefined }) {
+function DataAvailability({ sequence, specimen }: { sequence: SequenceDetails | undefined, specimen: SpecimenDetails | undefined }) {
   const sequencing = sequence?.events.sequencing[0];
   const assembly = sequence?.events.assemblies[0];
   const deposition = sequence?.events.dataDepositions[0];
@@ -187,9 +193,9 @@ function DataAvailability({ sequence }: { sequence: SequenceDetails | undefined 
       <DataAvailabilityItem value={!!assembly}>Assembly data available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!deposition?.sourceUri}>Assembly source files available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!deposition?.url}>Genome publication available</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Specimen collection data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Specimen voucher accessioned</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Specimen location available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.events.accessions.length}>Specimen voucher accessioned</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.latitude}>Specimen location available</DataAvailabilityItem>
     </Stack>
   )
 }
@@ -228,7 +234,7 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
 function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
   const { classes } = useTableStyles();
   const basePath = usePathname()?.split('/').slice(1, 3).join('/');
-  const path = `${basePath}/specimens/${specimen?.accession}`;
+  const path = `${basePath}/specimens/${specimen?.recordId}`;
 
   return (
     <Grid>
@@ -239,7 +245,7 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
             <tbody>
               <tr>
                 <td>Sample ID</td>
-                <td><DataField value={specimen?.accession} /></td>
+                <td><DataField value={specimen?.recordId} /></td>
               </tr>
               <tr>
                 <td>Sequenced by</td>
@@ -315,7 +321,7 @@ export default function AssemblyPage({ params }: { params: { accession: string }
               <Grid.Col span={4}>
                 <LoadPanel visible={loading} h={450}>
                   <Title order={5} mb={10}>Data availability</Title>
-                  <DataAvailability sequence={data?.sequence} />
+                  <DataAvailability sequence={data?.sequence} specimen={data?.specimen} />
                 </LoadPanel>
               </Grid.Col>
 

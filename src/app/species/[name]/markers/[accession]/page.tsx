@@ -45,6 +45,9 @@ const GET_ASSEMBLY = gql`
       collectionCode
       latitude
       longitude
+      events {
+        accessions { id }
+      }
     }
   }
 `;
@@ -62,6 +65,9 @@ type SpecimenDetails = {
   collectionCode?: string,
   latitude?: number,
   longitude?: number,
+  events: {
+    accessions: { id: string }[],
+  }
 }
 
 type SequenceQueryResults = {
@@ -98,7 +104,7 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
           </tr>
           <tr>
             <td>Release date</td>
-            <td><DataField value={undefined} /></td>
+            <td><DataField value={deposition?.eventDate} /></td>
           </tr>
           </tbody>
         </Table>
@@ -157,7 +163,7 @@ function DataAvailabilityItem({ value, children }: { value: boolean|undefined, c
   )
 }
 
-function DataAvailability({ sequence }: { sequence: SequenceDetails | undefined }) {
+function DataAvailability({ sequence, specimen }: { sequence: SequenceDetails | undefined, specimen: SpecimenDetails | undefined }) {
   const sequencing = sequence?.events.sequencing[0];
   const sequencingRun = sequence?.events.sequencingRuns[0];
   const deposition = sequence?.events.dataDepositions[0];
@@ -168,9 +174,9 @@ function DataAvailability({ sequence }: { sequence: SequenceDetails | undefined 
       <DataAvailabilityItem value={false}>Contig data available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!sequencingRun?.traceLink}>Trace files available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!deposition?.url}>Marker publication available</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Specimen collection data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Specimen voucher accessioned</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Specimen location available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.events.accessions.length}>Specimen voucher accessioned</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.latitude}>Specimen location available</DataAvailabilityItem>
     </Stack>
   )
 }
@@ -314,7 +320,7 @@ export default function MarkerPage({ params }: { params: { accession: string } }
               <Grid.Col span={3}>
                 <LoadPanel visible={loading} h={450}>
                   <Title order={5} mb={10}>Data availability</Title>
-                  <DataAvailability sequence={data?.sequence} />
+                  <DataAvailability sequence={data?.sequence} specimen={data?.specimen} />
                 </LoadPanel>
               </Grid.Col>
 

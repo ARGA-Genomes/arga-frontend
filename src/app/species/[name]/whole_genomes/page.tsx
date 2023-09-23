@@ -24,11 +24,13 @@ query SpeciesReferenceGenome($canonicalName: String) {
       sequenceId
       dnaExtractId
       datasetName
+      recordId
       accession
       materialSampleId
       name
       quality
       releaseType
+      releaseDate
       representation
       versionStatus
       estimatedSize
@@ -53,9 +55,11 @@ query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int) {
       records {
         sequenceId
         datasetName
+        recordId
         accession
         quality
         genomeSize
+        releaseDate
       }
     }
   }
@@ -64,12 +68,14 @@ query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int) {
 type WholeGenome = {
   id: string,
   dnaExtractId: string,
-  accession: string,
   datasetName: string,
+  recordId: string,
+  accession?: string,
   materialSampleId?: string,
   name?: string,
   quality?: string,
   releaseType?: string,
+  releaseDate?: string,
   representation?: string,
   versionStatus?: string,
   estimatedSize?: number,
@@ -121,8 +127,8 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
         <Grid.Col span={8}>
           <Stack spacing={5}>
             <SimpleGrid cols={2}>
-            <LabeledValue label="Accession" value={record.accession} />
-            <LabeledValue label="Release date" value="No data"/>
+            <LabeledValue label="Accession" value={record.recordId} />
+            <LabeledValue label="Release date" value={record.releaseDate}/>
             </SimpleGrid>
             <Text size="xs" weight={600}>{record.datasetName}</Text>
           </Stack>
@@ -143,7 +149,7 @@ function RecordList({ records }: { records: WholeGenome[] }) {
   return (
     <>
       { records.map(record => (
-        <RecordItem key={record.id} href={`${path}/${record.accession}`}>
+        <RecordItem key={record.id} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>
@@ -191,7 +197,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
             </tr>
             <tr>
               <td>Release date</td>
-              <td><DataField value={undefined} /></td>
+              <td><DataField value={data?.species.referenceGenome?.releaseDate} /></td>
             </tr>
             <tr>
               <td>Assembly type</td>
@@ -209,7 +215,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
           </Table>
 
           { data &&
-            <Link href={`${path}/${data?.species.referenceGenome?.accession}`}>
+            <Link href={`${path}/${data?.species.referenceGenome?.recordId}`}>
               <Center>
                 <Button color="midnight" radius="md" leftIcon={<Eye />}>view</Button>
               </Center>
