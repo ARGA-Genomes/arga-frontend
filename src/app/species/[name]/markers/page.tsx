@@ -27,6 +27,7 @@ query SpeciesBarcodes($canonicalName: String, $page: Int, $pageSize: Int) {
         materialSampleId
         sequencedBy
         targetGene
+        releaseDate
       }
     }
   }
@@ -40,6 +41,7 @@ type Marker = {
   materialSampleId?: string,
   sequencedBy?: string,
   targetGene: string,
+  releaseDate?: string,
 }
 
 type QueryResults = {
@@ -79,8 +81,8 @@ function RecordItemContent({ record }: { record: Marker }) {
         <Grid.Col span={6}>
           <Stack spacing={5}>
             <SimpleGrid cols={2}>
-            <LabeledValue label="Accession" value={record.accession} />
-            <LabeledValue label="Release date" value="No data"/>
+            <LabeledValue label="Accession" value={record.recordId} />
+            <LabeledValue label="Release date" value={record.releaseDate}/>
             </SimpleGrid>
             <Text size="xs" weight={600}>{record.datasetName}</Text>
           </Stack>
