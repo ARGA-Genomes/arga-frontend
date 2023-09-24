@@ -2,7 +2,6 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {
-    Avatar,
   Box,
   Grid,
   Group,
@@ -16,7 +15,7 @@ import {
   Image,
 } from "@mantine/core";
 import { AttributePill, DataField } from "@/app/components/highlight-stack";
-import { ArrowNarrowLeft, CircleCaretUp} from "tabler-icons-react";
+import { ArrowNarrowLeft } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTableStyles } from "@/app/components/data-fields";
@@ -126,7 +125,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
           <tbody>
             <tr>
               <td>Field identifier</td>
-              <td><DataField value={undefined}/></td>
+              <td><DataField value={collection?.fieldNumber}/></td>
             </tr>
             <tr>
               <td>Organism name</td>
@@ -171,11 +170,23 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
               <tbody>
                 <tr>
                   <td>Habitat</td>
-                  <td><DataField value={collection?.envBroadScale} /></td>
+                  <td><DataField value={collection?.habitat} /></td>
                 </tr>
                 <tr>
                   <td>Elevation</td>
                   <td><DataField value={specimen?.elevation}/></td>
+                </tr>
+                <tr>
+                  <td>Environment (broad)</td>
+                  <td><DataField value={collection?.envBroadScale}/></td>
+                </tr>
+                <tr>
+                  <td>Environment medium</td>
+                  <td><DataField value={collection?.envMedium}/></td>
+                </tr>
+                <tr>
+                  <td>Preparation</td>
+                  <td><DataField value={collection?.preparation}/></td>
                 </tr>
               </tbody>
             </Table>
@@ -190,6 +201,18 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
                 <tr>
                   <td>Depth (m)</td>
                   <td><DataField value={specimen?.depth}/></td>
+                </tr>
+                <tr>
+                  <td>Environment (local)</td>
+                  <td><DataField value={collection?.envBroadScale}/></td>
+                </tr>
+                <tr>
+                  <td>Life stage</td>
+                  <td><DataField value={collection?.lifeStage}/></td>
+                </tr>
+                <tr>
+                  <td>Sex</td>
+                  <td><DataField value={collection?.sex}/></td>
                 </tr>
               </tbody>
             </Table>
@@ -213,6 +236,14 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
             <tr>
               <td>Publication</td>
               <td><DataField value={undefined}/></td>
+            </tr>
+            <tr>
+              <td>Field notes</td>
+              <td><DataField value={collection?.fieldNotes}/></td>
+            </tr>
+            <tr>
+              <td>Remarks</td>
+              <td><DataField value={collection?.remarks}/></td>
             </tr>
           </tbody>
         </Table>
@@ -239,8 +270,8 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
             <td><DataField value={accession?.accession}/></td>
           </tr>
           <tr>
-            <td>Institution</td>
-            <td><DataField value={accession?.institutionName}/></td>
+            <td>Collection</td>
+            <td><DataField value={specimen?.collectionCode}/></td>
           </tr>
           <tr>
             <td>Type status</td>
@@ -263,8 +294,8 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
       <Table className={classes.table}>
         <tbody>
           <tr>
-            <td>Collection</td>
-            <td><DataField value={specimen?.collectionCode}/></td>
+            <td>Institution</td>
+            <td><DataField value={accession?.institutionName}/></td>
           </tr>
           <tr>
             <td>Identified by</td>
@@ -273,6 +304,25 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
           <tr>
             <td>Fixation method</td>
             <td><DataField value={undefined}/></td>
+          </tr>
+          <tr></tr>
+          <tr></tr>
+          <tr></tr>
+        </tbody>
+      </Table>
+      <Table className={classes.table}>
+        <tbody>
+          <tr>
+            <td>Institution code</td>
+            <td><DataField value={specimen?.institutionCode}/></td>
+          </tr>
+          <tr>
+            <td>Identified date</td>
+            <td><DataField value={specimen?.identifiedDate}/></td>
+          </tr>
+          <tr>
+            <td>Identification remarks</td>
+            <td><DataField value={specimen?.identificationRemarks}/></td>
           </tr>
           <tr></tr>
           <tr></tr>
@@ -315,16 +365,22 @@ function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) 
             <td>Remarks</td>
             <td><DataField value={undefined}/></td>
           </tr>
-          <tr></tr>
+          <tr>
+            <td>Preparation type</td>
+            <td><DataField value={subsample?.events.subsamples[0].preparationType}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
         <tbody>
           <tr>
             <td>Subsampling date</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={subsample?.events.subsamples[0].eventDate}/></td>
           </tr>
-          <tr></tr>
+          <tr>
+            <td>Type status</td>
+            <td><DataField value={subsample?.typeStatus}/></td>
+          </tr>
           <tr></tr>
         </tbody>
       </Table>
@@ -353,6 +409,14 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
             <td>Data source</td>
             <td><DataField value={undefined}/></td>
           </tr>
+          <tr>
+            <td>Quality</td>
+            <td><DataField value={extraction?.quality}/></td>
+          </tr>
+          <tr>
+            <td>Absorbance 260/230</td>
+            <td><DataField value={extraction?.absorbance260230}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
@@ -365,16 +429,38 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
             <td>Protocol</td>
             <td><DataField value={extraction?.extractionMethod}/></td>
           </tr>
-          <tr></tr>
+          <tr>
+            <td>Measurement method</td>
+            <td><DataField value={extraction?.measurementMethod}/></td>
+          </tr>
+          <tr>
+            <td>Concentration method</td>
+            <td><DataField value={extraction?.concentrationMethod}/></td>
+          </tr>
+          <tr>
+            <td>Absorbance 260/280</td>
+            <td><DataField value={extraction?.absorbance260280}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
         <tbody>
           <tr>
             <td>DNA extraction date</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={extraction?.eventDate}/></td>
           </tr>
-          <tr></tr>
+          <tr>
+            <td>Preparation</td>
+            <td><DataField value={extraction?.preparationType}/></td>
+          </tr>
+          <tr>
+            <td>Preservation</td>
+            <td><DataField value={extraction?.preservationType}/></td>
+          </tr>
+          <tr>
+            <td>Concentration</td>
+            <td><DataField value={extraction?.concentration}/></td>
+          </tr>
           <tr></tr>
         </tbody>
       </Table>
@@ -412,6 +498,10 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
             <td>Data source</td>
             <td><DataField value={sequence?.datasetName}/></td>
           </tr>
+          <tr>
+            <td>Concentration</td>
+            <td><DataField value={sequencing?.concentration}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
@@ -432,7 +522,14 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
             <td>Visualised by</td>
             <td><DataField value={undefined}/></td>
           </tr>
-          <tr></tr>
+          <tr>
+            <td>Amplicon size</td>
+            <td><DataField value={sequencing?.ampliconSize}/></td>
+          </tr>
+          <tr>
+            <td>Bait set name</td>
+            <td><DataField value={sequencing?.baitSetName}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
@@ -447,13 +544,20 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
           <tr>
             <td>Sequencing date</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={sequencing?.eventDate}/></td>
           </tr>
           <tr>
             <td>Visualisation date</td>
             <td><DataField value={undefined}/></td>
           </tr>
-          <tr></tr>
+          <tr>
+            <td>Estimated size</td>
+            <td><DataField value={sequencing?.estimatedSize}/></td>
+          </tr>
+          <tr>
+            <td>Bait set reference</td>
+            <td><DataField value={sequencing?.baitSetReference}/></td>
+          </tr>
         </tbody>
       </Table>
     </SimpleGrid>
@@ -480,6 +584,10 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
             <td>Data source</td>
             <td><DataField value={undefined}/></td>
           </tr>
+          <tr>
+            <td>Genome size</td>
+            <td><DataField value={assembly?.genomeSize}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
@@ -496,13 +604,17 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
             <td>Number of scaffolds</td>
             <td><DataField value={undefined}/></td>
           </tr>
+          <tr>
+            <td>Version</td>
+            <td><DataField value={assembly?.versionStatus}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
         <tbody>
           <tr>
             <td>Assembly date</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={assembly?.eventDate}/></td>
           </tr>
           <tr>
             <td>Assembly method</td>
@@ -511,6 +623,10 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
           <tr>
             <td>CG content</td>
             <td><DataField value={undefined}/></td>
+          </tr>
+          <tr>
+            <td>Name</td>
+            <td><DataField value={assembly?.name}/></td>
           </tr>
         </tbody>
       </Table>
@@ -531,8 +647,8 @@ function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
             <td><DataField value={undefined}/></td>
           </tr>
           <tr>
-            <td>Genome size</td>
-            <td><DataField value={undefined}/></td>
+            <td>Representation</td>
+            <td><DataField value={annotation?.representation}/></td>
           </tr>
           <tr>
             <td>Data source</td>
@@ -560,7 +676,7 @@ function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
         <tbody>
           <tr>
             <td>Annotated date</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={annotation?.eventDate}/></td>
           </tr>
           <tr>
             <td>Annotation method</td>
@@ -596,6 +712,14 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
             <td>Data source</td>
             <td><DataField value={undefined}/></td>
           </tr>
+          <tr>
+            <td>Data type</td>
+            <td><DataField value={deposition?.dataType}/></td>
+          </tr>
+          <tr>
+            <td>Reference</td>
+            <td><DataField value={deposition?.reference}/></td>
+          </tr>
         </tbody>
       </Table>
       <Table className={classes.table}>
@@ -609,8 +733,16 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
             <td><DataField value={deposition?.institutionName}/></td>
           </tr>
           <tr>
-            <td>Release type</td>
-            <td><AttributePill value={undefined}/></td>
+            <td>Collection</td>
+            <td><DataField value={deposition?.collectionName}/></td>
+          </tr>
+          <tr>
+            <td>Rights holder</td>
+            <td><DataField value={deposition?.rightsHolder}/></td>
+          </tr>
+          <tr>
+            <td>Title</td>
+            <td><DataField value={deposition?.title}/></td>
           </tr>
         </tbody>
       </Table>
@@ -618,15 +750,19 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
         <tbody>
           <tr>
             <td>Deposition date</td>
-            <td><DataField value={undefined}/></td>
+            <td><DataField value={deposition?.eventDate}/></td>
           </tr>
           <tr>
-            <td>Organism name</td>
-            <td><DataField value={undefined}/></td>
+            <td>Last updated</td>
+            <td><DataField value={deposition?.lastUpdated}/></td>
           </tr>
           <tr>
-            <td>Representation</td>
-            <td><AttributePill value={undefined}/></td>
+            <td>Access rights</td>
+            <td><DataField value={deposition?.accessRights}/></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><DataField value={undefined}/></td>
           </tr>
         </tbody>
       </Table>

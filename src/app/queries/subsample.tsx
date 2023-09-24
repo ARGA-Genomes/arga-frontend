@@ -12,8 +12,6 @@ export const SUBSAMPLE = gql`
 
 export type Subsample = {
   recordId: string,
-  eventDate?: string,
-  eventTime?: string,
   materialSampleId?: string,
   institutionName?: string,
   institutionCode?: string,

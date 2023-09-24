@@ -91,6 +91,7 @@ export const COLLECTION_EVENT = gql`
     sourceMatId
     specificHost
     strain
+    fieldNumber
     fieldNotes
     remarks
   }
@@ -126,6 +127,7 @@ export type CollectionEvent = {
   sourceMatId?: string,
   specificHost?: string,
   strain?: string,
+  fieldNumber?: string,
   fieldNotes?: string,
   remarks?: string,
 }
