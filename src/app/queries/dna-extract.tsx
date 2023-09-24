@@ -12,6 +12,8 @@ export type DnaExtract = {
 
 export const DNA_EXTRACTION_EVENT = gql`
   fragment DnaExtractionEventDetails on DnaExtractionEvent {
+    eventDate
+    eventTime
     extractedBy
     extractionMethod
     measurementMethod
@@ -26,6 +28,8 @@ export const DNA_EXTRACTION_EVENT = gql`
 `;
 
 export type DnaExtractionEvent = {
+  eventDate?: string,
+  eventTime?: string,
   extractedBy?: string,
   extractionMethod?: string,
   measurementMethod?: string,

@@ -12,6 +12,8 @@ export const SUBSAMPLE = gql`
 
 export type Subsample = {
   recordId: string,
+  eventDate?: string,
+  eventTime?: string,
   materialSampleId?: string,
   institutionName?: string,
   institutionCode?: string,
@@ -20,10 +22,16 @@ export type Subsample = {
 
 export const SUBSAMPLE_EVENT = gql`
   fragment SubsampleEventDetails on SubsampleEvent {
+    eventDate
+    eventTime
+    subsampledBy
     preparationType
   }
 `;
 
 export type SubsampleEvent = {
+  eventDate?: string,
+  eventTime?: string,
+  subsampledBy?: string,
   preparationType?: string,
 }

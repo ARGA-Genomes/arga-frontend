@@ -2,6 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {
+    Avatar,
   Box,
   Grid,
   Group,
@@ -12,6 +13,7 @@ import {
   Text,
   Timeline,
   Title,
+  Image,
 } from "@mantine/core";
 import { AttributePill, DataField } from "@/app/components/highlight-stack";
 import { ArrowNarrowLeft, CircleCaretUp} from "tabler-icons-react";
@@ -633,58 +635,74 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
 }
 
 
-function EventTimeline({ specimen }: { specimen: SpecimenDetails | undefined }) {
+interface EventTimelineProps {
+  specimen?: SpecimenDetails,
+  subsample?: SubsampleDetails,
+  dnaExtract?: DnaExtractDetails,
+  sequence?: SequenceDetails,
+}
+
+function EventTimeline(props: EventTimelineProps) {
+  const collection = props.specimen?.events.collections[0];
+  const accession = props.specimen?.events.accessions[0];
+  const subsample = props.subsample?.events.subsamples[0];
+  const extraction = props.dnaExtract?.events.dnaExtracts[0];
+  const sequence = props.sequence?.events.sequencing[0];
+  const assembly = props.sequence?.events.assemblies[0];
+  const annotation = props.sequence?.events.annotations[0];
+  const deposition = props.sequence?.events.dataDepositions[0];
+
   return (
     <Timeline color="midnight" active={8} bulletSize={45} lineWidth={4}>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Collection</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/collection.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Collection</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={collection?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Accession</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/accession.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Accession</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={accession?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Subsampling</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/subsampling.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Subsampling</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={subsample?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>DNA extraction</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/extraction.svg'/>} title={<Text fz="sm" ml={20} weight={700}>DNA extraction</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={extraction?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Amplification and sequencing</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/sequencing.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Amplification and sequencing</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={sequence?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Sequence assembly</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/assembly.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Sequence assembly</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={assembly?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Sequence annotation</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/annotation.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Sequence annotation</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={annotation?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Data deposition</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/deposition.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Data deposition</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
-          <DataField value={undefined} fz="xs"/>
+          <DataField value={deposition?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<CircleCaretUp size={50} />} title={<Text fz="sm" ml={20} weight={700}>Data reuse</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/data-reuse.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Data reuse</Text>}>
         <Group>
           <Text ml={30} fz="xs" weight={300}>Event date</Text>
           <DataField value={undefined} fz="xs"/>
@@ -726,7 +744,12 @@ export default function SpecimenPage({ params }: { params: { accession: string }
         <Grid gutter={0}>
           <Grid.Col span={3}>
             <Paper p={15} bg="#d6e4ed" h="100%" sx={{ borderRadius: "10px 0 10px 10px" }}>
-              <EventTimeline specimen={data?.specimen} />
+              <EventTimeline
+                specimen={data?.specimen}
+                subsample={data?.subsample}
+                dnaExtract={data?.dnaExtract}
+                sequence={data?.sequence}
+              />
             </Paper>
           </Grid.Col>
 
