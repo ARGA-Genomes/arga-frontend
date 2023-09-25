@@ -56,7 +56,7 @@ export default function BrowseTaxon() {
           total={data?.overview.animals}
           category="Animals"
           image="card-icons/taxon_Animals(Animalia).svg"
-          link="/browse/animals"
+          link="/kingdom/Animalia"
         />
       </Carousel.Slide>  
       <Carousel.Slide>
@@ -64,7 +64,7 @@ export default function BrowseTaxon() {
           total={data?.overview.plants}
           category="Plants"
           image="card-icons/taxon_Floweringplants(Plantae).svg"
-          link="/browse/plants"
+          link="/kingdom/Plantae"
         />
       </Carousel.Slide> 
       <Carousel.Slide>
@@ -72,7 +72,7 @@ export default function BrowseTaxon() {
           total={data?.overview.fungi}
           category="Fungi"
           image="card-icons/taxon_Fungi(Fungi).svg"
-          link="/browse/fungi"
+          link="/kingdom/Fungi"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -80,7 +80,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Cnidaria"
           image="card-icons/taxon_Anemones_coralsandjellyfishes(Cnidaria).svg"
-          link=""
+          link="/phylum/Cnidaria"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -88,7 +88,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Bacteria"
           image="card-icons/taxon_Bacteria.svg"
-          link=""
+          link="kingdom/Bacteria"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -96,7 +96,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Birds"
           image="card-icons/taxon_Birds(Aves).svg"
-          link=""
+          link="/class/Aves"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -104,7 +104,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Phaeophyceae"
           image="card-icons/taxon_Brownalgae(Phaeophyceae).svg"
-          link=""
+          link="/phylum/Phaeophyceae"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -120,7 +120,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Cyanobacteria"
           image="card-icons/taxon_Cyanobacteria.svg"
-          link=""
+          link="/phylum/Cyanobacteria"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -128,7 +128,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Echinodermata"
           image="card-icons/taxon_Echinoderms(Echinodermata).svg"
-          link=""
+          link="/phylum/Echinodermata"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -136,7 +136,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Actinopterygii"
           image="card-icons/taxon_Finfishes(Actinopterygii).svg"
-          link=""
+          link="/class/Actinopterygii"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -144,7 +144,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Anura"
           image="card-icons/taxon_Frogsandtoads(Anura).svg"
-          link=""
+          link="/order/Anura"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -152,7 +152,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Chlorophyta"
           image="card-icons/taxon_Greenalgae(Chlorophyta).svg"
-          link=""
+          link="/phylum/Chlorophyta"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -160,7 +160,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Insecta"
           image="card-icons/taxon_Insects(Insecta).svg"
-          link=""
+          link="/class/Insecta"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -168,7 +168,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Mammalia"
           image="card-icons/taxon_Mammals(Mammalia).svg"
-          link=""
+          link="/class/Mammalia"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -176,7 +176,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Mollusca"
           image="card-icons/taxon_Molluscs(Mollusca).svg"
-          link=""
+          link="/phylum/Mollusca"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -184,7 +184,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Protista"
           image="card-icons/taxon_Protists(Protista).svg"
-          link=""
+          link="/kingdom/Protista"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -192,7 +192,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Rhodophyta"
           image="card-icons/taxon_Redalgae(Rhodophyta).svg"
-          link=""
+          link="/phylum/Rhodophyta"
         />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -208,7 +208,7 @@ export default function BrowseTaxon() {
           total={0}
           category="Porifera"
           image="card-icons/taxon_Sponges(Porifera).svg"
-          link=""
+          link="/phylum/Porifera"
         />
         </Carousel.Slide>
     </Carousel>
