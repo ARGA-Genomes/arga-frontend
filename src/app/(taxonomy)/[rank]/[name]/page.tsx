@@ -386,7 +386,7 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
         <Grid.Col span="auto">
           <Group>
             <Text fz="sm" weight={300}>Filters</Text>
-            { flattenFilters(filters).map(filter => <FilterBadge filter={filter} />) }
+            { flattenFilters(filters).map(filter => <FilterBadge filter={filter} key={filter.value} />) }
           </Group>
         </Grid.Col>
 
