@@ -188,7 +188,7 @@ function SpeciesCard({ species }: { species: Species }) {
 
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
-      <Link href={`/species/${itemLinkName}/summary`}>
+      <Link href={`/species/${itemLinkName}/taxonomy`}>
         <Title order={4}>{species.taxonomy.canonicalName}</Title>
       </Link>
 
@@ -199,7 +199,7 @@ function SpeciesCard({ species }: { species: Species }) {
       </Box>
 
       <Card.Section>
-        <Link href={`/species/${itemLinkName}/summary`}>
+        <Link href={`/species/${itemLinkName}/taxonomy`}>
           {species.photo ? (
             <Image
               src={small(species.photo)}
