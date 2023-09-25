@@ -7,7 +7,7 @@ import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps } from "@mantine/core";
 
 
-const MARGIN = { top: 30, right: 30, bottom: 30, left: 30 };
+const MARGIN = { top: 10, right: 10, bottom: 10, left: 10 };
 
 
 interface Rect {
@@ -57,7 +57,7 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>)
         y={rect.y + (rect.height / 2)}
         textAnchor="start"
         alignmentBaseline="central"
-        fontSize={16}
+        fontSize={12}
       >
         {data.name}
       </text>
@@ -66,7 +66,7 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>)
         y={rect.y + (rect.height / 2)}
         textAnchor="end"
         alignmentBaseline="central"
-        fontSize={16}
+        fontSize={12}
         opacity={rect.width > 100 ? 1 : 0}
       >
         {data.value}
@@ -168,7 +168,7 @@ export function BarChart({ data, spacing, ...rest }: BarChartProps & BoxProps) {
               height: yScale.bandwidth(),
             }}
             data={datum}
-            rx={10}
+            rx={5}
             opacity={0.8}
             fill={color(idx.toString()) as string}
             highlight={highlighted === undefined || highlighted.name == datum.name}

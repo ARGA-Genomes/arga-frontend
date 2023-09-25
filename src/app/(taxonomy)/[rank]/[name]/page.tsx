@@ -1,5 +1,6 @@
 "use client";
 
+import * as Humanize from 'humanize-plus';
 import { gql, useQuery } from "@apollo/client";
 import {
   Paper,
@@ -28,7 +29,7 @@ import { Filter, intoFilterItem } from "@/app/components/filtering/common";
 import ClassificationHeader from "@/app/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/app/components/pagination";
-import { AttributeLink, DataField } from "@/app/components/highlight-stack";
+import { AttributeLink, AttributeValue, DataField } from "@/app/components/highlight-stack";
 import { useTableStyles } from "@/app/components/data-fields";
 import { useDisclosure } from "@mantine/hooks";
 import { HigherClassificationFilters } from "@/app/components/filtering/higher-classification";
@@ -38,6 +39,9 @@ import { IbraFilters } from "@/app/components/filtering/ibra";
 import { ImcraFilters } from "@/app/components/filtering/imcra";
 import { StateFilters } from "@/app/components/filtering/state";
 import { DrainageBasinFilters } from "@/app/components/filtering/drainage-basin";
+import { TachoChart } from "@/app/components/graphing/tacho";
+import { PieChart } from "@/app/components/graphing/pie";
+import { BarChart } from "@/app/components/graphing/bar";
 
 
 const PAGE_SIZE = 10;
@@ -83,7 +87,7 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
 
 
 const GET_TAXON = gql`
-query TaxaSpecies($rank: TaxonRank, $canonicalName: String) {
+query TaxonSpecies($rank: TaxonRank, $canonicalName: String) {
   taxon(rank: $rank, canonicalName: $canonicalName) {
     scientificName
     canonicalName
@@ -96,8 +100,46 @@ query TaxaSpecies($rank: TaxonRank, $canonicalName: String) {
     family
     genus
     vernacularGroup
+
+    summary {
+      children
+      species
+    }
+
+    dataSummary {
+      name
+      genomes
+      other
+    }
+
+    speciesSummary {
+      name
+      genomes
+      other
+    }
   }
 }`;
+
+const GET_STATS = gql`
+query TaxonStats($canonicalName: String) {
+  stats {
+    order(order: $canonicalName) {
+      totalFamilies
+      familiesWithData
+      breakdown {
+        name
+        total
+      }
+    }
+  }
+}
+`;
+
+type DataBreakdown = {
+  name?: string,
+  genomes: number,
+  other: number,
+}
 
 type Taxonomy = {
   scientificName: string,
@@ -111,6 +153,12 @@ type Taxonomy = {
   family?: string,
   genus?: string,
   vernacularGroup?: string,
+  dataSummary: DataBreakdown[]
+  speciesSummary: DataBreakdown[]
+  summary: {
+    children: number,
+    species: number,
+  }
 };
 
 type DataSummary = {
@@ -145,6 +193,19 @@ type Taxa = {
 type QueryResults = {
   taxa: Taxa,
 };
+
+type StatsResults = {
+  stats: {
+    order: {
+      totalFamilies: number,
+      familiesWithData: number,
+      breakdown: {
+        name: string,
+        total: number,
+      }
+    }
+  }
+}
 
 type TaxonResults = {
   taxon: Taxonomy,
@@ -426,6 +487,125 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
 }
 
 
+function childTaxa(rank: string) {
+  if (rank === 'KINGDOM') return 'phyla';
+  else if (rank === 'PHYLUM') return 'classes';
+  else if (rank === 'CLASS') return 'orders';
+  else if (rank === 'ORDER') return 'families';
+  else if (rank === 'FAMILY') return 'genera';
+  return ''
+}
+
+
+function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefined }) {
+  const { classes } = useTableStyles();
+  const childTaxon = childTaxa(rank);
+
+  const thresholds = [
+    { name: "low", color: "#f47625", start: 0, end: 50 },
+    { name: "decent", color: "#febb1e", start: 50, end: 75 },
+    { name: "great", color: "#97bc5d", start: 75, end: 100 },
+  ]
+
+  const rankGenomes = taxon?.dataSummary.filter(i => i.genomes > 0).map(summary => {
+    return { name: summary.name || '', value: summary.genomes }
+  })
+
+  const rankOther = taxon?.dataSummary.filter(i => i.other > 0).map(summary => {
+    return { name: summary.name || '', value: summary.genomes }
+  })
+
+  const speciesGenomes = taxon?.speciesSummary.filter(i => i.genomes > 0).map(summary => {
+    return { name: summary.name || '', value: summary.genomes }
+  }).sort((a, b) => b.value - a.value)
+
+  const speciesOther = taxon?.speciesSummary.filter(i => i.other > 0).map(summary => {
+    return { name: summary.name || '', value: summary.other }
+  }).sort((a, b) => b.value - a.value)
+
+  const genomePercentile = taxon && speciesGenomes && (speciesGenomes?.length / taxon?.summary.species) * 100;
+  const otherPercentile = taxon && speciesOther && (speciesOther?.length / taxon?.summary.species) * 100;
+
+  return (
+    <Grid>
+      <Grid.Col span="auto">
+        <Title order={5}>Data summary</Title>
+        <Grid>
+          <Grid.Col span={4}>
+            <Stack>
+              <Text fz="sm" weight={300}>Percentage of species with genomes</Text>
+              { taxon && <TachoChart h={250} thresholds={thresholds} value={Math.round(genomePercentile || 0)} /> }
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Stack>
+              <Text fz="sm" weight={300}>{Humanize.capitalize(childTaxon)} with genomes</Text>
+              { rankGenomes && <PieChart h={200} data={rankGenomes} /> }
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Stack>
+              <Text fz="sm" weight={300}>Species with genomes</Text>
+              { speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 6)} spacing={0.1} /> }
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Stack>
+              <Text fz="sm" weight={300}>Percentage of species with any genetic data</Text>
+              { taxon && <TachoChart h={250} thresholds={thresholds} value={Math.round(otherPercentile || 0)} /> }
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={8}>
+            <Stack>
+              <Text fz="sm" weight={300}>Species with any genetic data</Text>
+              {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} /> }
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Grid.Col>
+
+      <Grid.Col span="content">
+        <Paper p="xl" radius="lg" withBorder>
+          <Title order={5}>Taxonomic breakdown</Title>
+          <Table className={classes.simpleTable}>
+            <tbody>
+              <tr>
+                <td>Number of {childTaxon}</td>
+                <td><DataField value={taxon?.summary.children} /></td>
+              </tr>
+              <tr>
+                <td>Number of species/OTUs</td>
+                <td><DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} /></td>
+              </tr>
+              <tr>
+                <td>{Humanize.capitalize(childTaxon)} with genomes</td>
+                <td><DataField value={rankGenomes?.length} /></td>
+              </tr>
+              <tr>
+                <td>Species with genomes</td>
+                <td><DataField value={speciesGenomes?.length} /></td>
+              </tr>
+              <tr>
+                <td>{Humanize.capitalize(childTaxon)} with data</td>
+                <td><DataField value={rankOther?.length} /></td>
+              </tr>
+              <tr>
+                <td>Species with data</td>
+                <td><DataField value={speciesOther?.length} /></td>
+              </tr>
+            </tbody>
+          </Table>
+          <Stack mx={10} mt={5}>
+            <AttributeValue label="Species with most genomes" value={speciesGenomes && speciesGenomes[0]?.name} />
+            <AttributeValue label="Species with most data" value={speciesOther && speciesOther[0]?.name} />
+          </Stack>
+        </Paper>
+      </Grid.Col>
+    </Grid>
+  )
+}
+
+
 export default function ClassificationPage({ params }: { params: { rank: string, name: string } }) {
   const rank = params.rank.toUpperCase();
 
@@ -458,6 +638,10 @@ export default function ClassificationPage({ params }: { params: { rank: string,
                 </LoadPanel>
               </Grid.Col>
             </Grid>
+
+            <Paper p="xl" radius="lg" pos="relative" withBorder>
+              <DataSummary rank={rank} taxon={taxonResults.data?.taxon} />
+            </Paper>
 
             <Paper p="xl" radius="lg" pos="relative" withBorder>
               <Species rank={rank} canonicalName={params.name} />

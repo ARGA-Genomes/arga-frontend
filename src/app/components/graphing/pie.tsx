@@ -7,8 +7,8 @@ import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps } from "@mantine/core";
 
 
-const MARGIN_X = 150;
-const MARGIN_Y = 50;
+const MARGIN_X = 10;
+const MARGIN_Y = 10;
 const INFLEXION_PADDING = 20;
 
 
