@@ -17,6 +17,21 @@ export const useTableStyles = createStyles((theme, _params, _getRef) => {
         minWidth: 180,
       },
     },
+
+    simpleTable: {
+      "tbody tr td": {
+        borderTop: 'none',
+      },
+      "td:first-child": {
+        textAlign: "left",
+        whiteSpace: "nowrap",
+        width: 1,
+        paddingRight: theme.spacing.xl,
+        fontSize: theme.fontSizes.sm,
+        fontWeight: 300,
+        minWidth: 180,
+      },
+    },
   }
 });
 

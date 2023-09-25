@@ -104,14 +104,14 @@ export default function SpeciesLayout({ params, children }: SpeciesLayoutProps) 
           </Link>
         </Container>
 
-      <SpeciesHeader canonicalName={canonicalName} />
+        <SpeciesHeader canonicalName={canonicalName} />
 
-      <DataTabs name={params.name}>
-        <Container maw={MAX_WIDTH}>
-          {children}
-        </Container>
-      </DataTabs>
-    </Stack>
+        <DataTabs name={params.name}>
+          <Container maw={MAX_WIDTH}>
+            {children}
+          </Container>
+        </DataTabs>
+      </Stack>
     </MantineProvider>
   );
 }
