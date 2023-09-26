@@ -59,66 +59,10 @@ export default function BrowseType() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0} // TODO: total={data?.overview.organelles}
-          category="Mitogenomes"
-          image="card-icons/data_type_mitogenome.svg"
-          link="/browse/organelles"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
           total={data?.overview.markers}
           category="Markers"
           image="card-icons/data_type_marker.svg"
-          link="/browse/barcodes"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={0}
-          category="Higher Taxon"
-          image="card-icons/data_type_higher_taxon_report.svg"
-          link=""
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={0}
-          category="Microsatellite"
-          image="card-icons/data_type_microsatellite.svg"
-          link=""
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={0}
-          category="Plastome"
-          image="card-icons/data_type_plastome.svg"
-          link=""
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={0}
-          category="Protein"
-          image="card-icons/data_type_protein.svg"
-          link=""
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={0}
-          category="SNPs and ddRADs"
-          image="card-icons/data_type_SNPs_and_ddRADs.svg"
-          link=""
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={0}
-          category="Species Report"
-          image="card-icons/data_type_species_and_subspecies_report.svg"
-          link=""
+          link="/browse/markers"
         />
       </Carousel.Slide>
       <Carousel.Slide>
@@ -126,7 +70,7 @@ export default function BrowseType() {
           total={0}
           category="Specimen"
           image="card-icons/data_type_specimen.svg"
-          link=""
+          link="/browse/specimens"
         />
       </Carousel.Slide>
     </Carousel>
