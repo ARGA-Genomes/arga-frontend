@@ -1,7 +1,8 @@
 'use client';
 
+import { MAX_WIDTH } from "@/app/constants";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Card, createStyles, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image, Grid, Pagination, MantineProvider } from "@mantine/core";
+import { Box, Card, createStyles, LoadingOverlay, Paper, SegmentedControl, SimpleGrid, Text, Title, Image, Grid, Pagination, MantineProvider, Stack, Container, Group } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -38,18 +39,6 @@ query lists($name: String, $pagination: Pagination, $filters: [FilterItem]) {
     }
   }
 }`;
-
-type Pagination = {
-  page: number,
-  pageSize: number,
-}
-
-type FilterItem = {
-  filter: string,
-  action: string,
-  value: string,
-}
-
 
 type Taxonomy = {
   scientificName: string,
@@ -156,135 +145,33 @@ function BrowseResults({ list }: { list: Species[]}) {
   )
 }
 
-const VERTEBRATE_FILTERS = [
-  { filter: 'KINGDOM', action: 'INCLUDE', value: 'Animalia' },
-  { filter: 'PHYLUM', action: 'INCLUDE', value: 'Chordata' },
-];
-
-const INVERTEBRATE_FILTERS = [
-  { filter: 'KINGDOM', action: 'INCLUDE', value: 'Animalia' },
-  { filter: 'PHYLUM', action: 'EXCLUDE', value: 'Chordata' },
-];
-
-const PAGE_SIZE = 20;
 
 export default function BrowseList({ params }: { params: { name: string } }) {
-  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
-
-  const segmented = useSearchTypeStyles();
-  const [taxaType, setTaxaType] = useState('vertebrates');
-  const [filters, setFilters] = useState<FilterItem[]>(VERTEBRATE_FILTERS);
-  const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE });
-  const [totalPages, setTotalPages] = useState(1)
-
   const { loading, error, data } = useQuery<QueryResults>(GET_TAXA, {
     variables: {
       name: params.name.replaceAll("_", " "),
-      pagination,
-      filters,
     },
   });
 
-  useEffect(() => {
-    setFilters(taxaType == 'vertebrates' ? VERTEBRATE_FILTERS : INVERTEBRATE_FILTERS)
-    setPagination({ page: 1, pageSize: PAGE_SIZE })
-    setTotalPages(1)
-  }, [taxaType, setFilters, setPagination, setTotalPages])
-
-  useEffect(() => {
-    setTotalPages(data ? Math.ceil(data.lists.stats.totalRecords / PAGE_SIZE) : 1)
-  }, [data, setTotalPages])
-
 
   return (
-    <Box>
-      <Paper bg="midnight.6" p={10} radius="lg" ref={targetRef}>
-        <MantineProvider theme={{ colorScheme: 'dark' }}>
-        <SegmentedControl
-          size="md"
-          m={10}
-          value={taxaType}
-          onChange={setTaxaType}
-          classNames={segmented.classes}
-          data={[
-            { value: 'vertebrates', label: 'Vertebrates' },
-            { value: 'invertebrates', label: 'Invertebrates' },
-          ]}
-        />
-        </MantineProvider>
+    <Stack>
+      <Paper py={20} pos="relative">
+        <Container maw={MAX_WIDTH}>
+          <Group spacing={40}>
+            <Text c="dimmed" weight={400}>Dataset</Text>
+            <Text size={38} weight={700}>{params.name.replaceAll('_', ' ')}</Text>
+          </Group>
+        </Container>
       </Paper>
 
-      <Box mt={40}>
-        <LoadingOverlay
-          overlayColor="black"
-          transitionDuration={500}
-          loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-          visible={loading}
-        />
-        { !loading && data ? <BrowseResults list={data.lists.species} /> : null }
-      </Box>
-
-      {
-        totalPages == 1 ? null : //Show pagination only if there is more than 1 page
-          <Paper bg="midnight.6" p={20} m={40} radius="lg">
-            <Pagination
-              position="center"
-              color={"attribute.2"}
-              radius="xl"
-              withEdges
-              total={totalPages}
-              page={pagination.page}
-              onChange={(page) => {
-                setPagination({ page, pageSize: PAGE_SIZE })
-                scrollIntoView({ alignment: 'center' })
-              }}
-            />
-          </Paper>
-      }
-    </Box>
+      <Paper py={30}>
+        <Container maw={MAX_WIDTH}>
+          <Stack>
+          </Stack>
+        </Container>
+      </Paper>
+    </Stack>
   );
 }
 
-
-// Custom segmented control style for the search block
-const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
-  return {
-    root: {
-      color: "white",
-      backgroundColor: theme.colors.midnight[6],
-      paddingLeft: 0,
-      paddingRight: 0,
-      borderWidth: 0,
-      borderRadius: 0,
-    },
-    label: {
-      fontSize: "20px",
-      fontWeight: 400,
-      color: theme.colors.gray[3],
-
-      '&:hover': {
-        color: "white",
-      },
-      '&[data-active]': {
-        '&, &:hover': {
-          color: "white",
-        },
-      },
-    },
-    control: {
-      borderWidth: 0,
-      borderRadius: 0,
-    },
-    active: {
-      color: "white",
-      backgroundColor: theme.colors.midnight[5],
-      left: 5,
-      bottom: 0,
-      borderRadius: 5,
-      borderBottomColor: theme.colors.bushfire[4],
-      borderBottomWidth: "6px",
-      borderBottomStyle: "solid",
-      boxShadow: "none",
-    },
-  }
-});

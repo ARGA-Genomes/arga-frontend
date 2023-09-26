@@ -2,15 +2,15 @@
 
 import { SpeciesCard } from "@/app/components/species-card";
 import { PieChart } from "@/app/components/graphing/pie";
-import { argaBrandLight } from "@/app/theme";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Paper, SimpleGrid, Text, MantineProvider, Title, Group, useMantineTheme, LoadingOverlay } from "@mantine/core";
+import { Box, Paper, SimpleGrid, Text, Title, Group, useMantineTheme, LoadingOverlay, Stack, Container } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { useState } from "react";
 import { BarChart } from "@/app/components/graphing/bar";
 import { TachoChart } from "@/app/components/graphing/tacho";
 import { PaginationBar } from "@/app/components/pagination";
 import Link from "next/link";
+import { MAX_WIDTH } from "@/app/constants";
 
 
 const PAGE_SIZE = 16;
@@ -238,23 +238,32 @@ export default function BrowseDataset({ params }: { params: { name: string } }) 
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
   return (
-    <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
+    <Stack>
+      <Paper py={20} pos="relative">
+        <Container maw={MAX_WIDTH}>
+          <Title order={2}>{dataset}</Title>
+          <DatasetDetails dataset={dataset} />
+        </Container>
+      </Paper>
+
       <Box>
-        <Title order={2}>{dataset}</Title>
-        <DatasetDetails dataset={dataset} />
       </Box>
 
-      <Box mt={30}>
-        <Title order={3} mb={10}>Data summary</Title>
-        <Paper radius="lg">
-          <DataSummary dataset={dataset} />
-        </Paper>
-      </Box>
+      <Paper py={30}>
+        <Container maw={MAX_WIDTH}>
+          <Stack>
+            <Paper p="xl" radius="lg" withBorder>
+              <Title order={3} mb={10}>Data summary</Title>
+              <DataSummary dataset={dataset} />
+            </Paper>
 
-      <Box mt={30}>
-        <Title order={3} mb={10}>Browse species</Title>
-        <Species dataset={dataset}/>
-      </Box>
-    </MantineProvider>
+            <Paper p="xl" radius="lg" withBorder>
+              <Title order={3} mb={10}>Browse species</Title>
+              <Species dataset={dataset} />
+            </Paper>
+          </Stack>
+        </Container>
+      </Paper>
+    </Stack>
   );
 }
