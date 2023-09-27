@@ -75,7 +75,7 @@ export function HigherClassificationFilters({ filters, onChange }: HigherClassif
           </Grid.Col>
         </Grid>
       ))}
-      <Button leftIcon={<Plus />} onClick={addFilter}>Add filter</Button>
+      <Button color="midnight" leftIcon={<Plus />} onClick={addFilter}>Add filter</Button>
     </Stack>
   )
 }

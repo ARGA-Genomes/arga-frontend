@@ -19,6 +19,8 @@ import {
   Drawer,
   Button,
   Badge,
+  Accordion,
+  Avatar,
 } from "@mantine/core";
 
 import Link from "next/link";
@@ -339,31 +341,87 @@ function Filters({ filters, options, onChange }: FiltersProps) {
   }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, onChange]);
 
   return (
-    <Stack p={20}>
-      <Title order={5}>Higher classification</Title>
-      <HigherClassificationFilters
-        filters={classifications}
-        onChange={setClassifications}
-      />
+    <Accordion defaultValue="classification" variant='separated'>
+      <Accordion.Item value="classification">
+        <Accordion.Control>
+          <FilterGroup
+            label="Higher classification filters"
+            description="Limit data based on taxonomy"
+            image="/card-icons/data_type_higher_taxon_report.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+        </Accordion.Panel>
+      </Accordion.Item>
 
-      <Title order={5}>Vernacular group</Title>
-      <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
+      <Accordion.Item value="vernacular">
+        <Accordion.Control>
+          <FilterGroup
+            label="Vernacular group"
+            description="Birds, Flowering plants, Bacteria, etc."
+            image="/card-icons/data_type_species_and_subspecies_report.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
+        </Accordion.Panel>
+      </Accordion.Item>
 
-      <Title order={5}>Ecology</Title>
-      <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
+      <Accordion.Item value="regions">
+        <Accordion.Control>
+          <FilterGroup
+            label="Regions"
+            description="Ecological and administrative boundaries"
+            image="/card-icons/list_group_terrestrial.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <Stack>
+          <Box>
+            <Text weight={300} fz="sm">Ecology</Text>
+            <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
+          </Box>
+          <Box>
+            <Text weight={300} fz="sm">Ibra Region</Text>
+            <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
+          </Box>
+          <Box>
+            <Text weight={300} fz="sm">Imcra Region</Text>
+            <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
+          </Box>
+          <Box>
+            <Text weight={300} fz="sm">State</Text>
+            <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
+          </Box>
+          <Box>
+            <Text weight={300} fz="sm">Drainage Basin</Text>
+            <DrainageBasinFilters value={drainageBasin?.value} options={options?.drainageBasin || []} onChange={setDrainageBasin} />
+          </Box>
+          </Stack>
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+  )
+}
 
-      <Title order={5}>Ibra Region</Title>
-      <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
+interface FilterGroupProps {
+  label: string,
+  description: string,
+  image: string,
+}
 
-      <Title order={5}>Imcra Region</Title>
-      <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
-
-      <Title order={5}>State</Title>
-      <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
-
-      <Title order={5}>Drainage Basin</Title>
-      <DrainageBasinFilters value={drainageBasin?.value} options={options?.drainageBasin || []} onChange={setDrainageBasin} />
-    </Stack>
+function FilterGroup({ label, description, image }: FilterGroupProps) {
+  return (
+    <Group noWrap>
+      <Avatar src={image} size="lg" />
+      <div>
+        <Text>{label}</Text>
+        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
+          {description}
+        </Text>
+      </div>
+    </Group>
   )
 }
 
