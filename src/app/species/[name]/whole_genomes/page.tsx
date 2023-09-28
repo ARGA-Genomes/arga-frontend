@@ -297,14 +297,13 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
               <Box pos="relative">
                 <LoadOverlay visible={loading} />
                 { data?.species.wholeGenomes ? <RecordList records={data?.species.wholeGenomes.records} /> : null }
+                <PaginationBar
+                  total={data?.species.wholeGenomes.total}
+                  page={page}
+                  pageSize={PAGE_SIZE}
+                  onChange={setPage}
+                />
               </Box>
-
-              <PaginationBar
-                total={data?.species.wholeGenomes.total}
-                page={page}
-                pageSize={PAGE_SIZE}
-                onChange={setPage}
-              />
             </Grid.Col>
             <Grid.Col span={4}>
               <WholeGenomeMap records={data?.species.wholeGenomes.records} />

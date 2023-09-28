@@ -1,4 +1,4 @@
-import { Button, Grid, Paper, Stack } from "@mantine/core";
+import { Box, Button, Grid, Group, Paper, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import Link from "next/link";
 import { Eye } from "tabler-icons-react";
@@ -20,15 +20,15 @@ export function RecordItem({ href, children }: RecordItemProps) {
       bg={ hovered ? "#F5F5F5" : "white" }
       withBorder
     >
-      <Grid gutter={0}>
-        <Grid.Col span="auto">
+      <Grid columns={24}>
+        <Grid.Col span={21}>
           {children}
         </Grid.Col>
-        <Grid.Col span="content">
+        <Grid.Col span={3}>
           <Link href={href || "#"}>
-            <Button color="midnight" h="100%" w={100} style={{ borderRadius: "0 16px 16px 0" }}>
+            <Button color="midnight" h="100%" w="100%" style={{ borderRadius: "0 16px 16px 0" }}>
             <Stack>
-              <Eye size="lg" />
+              <Eye size="30px" />
               view
             </Stack>
           </Button>
