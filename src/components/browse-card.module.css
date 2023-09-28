@@ -1,0 +1,14 @@
+.skeleton {
+    ::before {
+        background: #486471;
+    }
+    ::after {
+        background: #6797b4;
+    }
+}
+
+.card {
+    &:hover {
+        background-color: red;
+    }
+}

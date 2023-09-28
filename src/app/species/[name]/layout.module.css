@@ -1,0 +1,27 @@
+.tab {
+  position: relative;
+  border-radius: rem(10) rem(10) 0 0;
+  margin-left: rem(2);
+  margin-right: rem(2);
+  padding: rem(15) rem(25) rem(25) rem(25);
+  font-size: rem(18);
+  color: #3C6377;
+
+  &:first-of-type {
+      margin-left: 0;
+  }
+
+  &:last-of-type {
+      margin-right: 0;
+  }
+
+
+  @mixin hover {
+    background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+  }
+
+  &[data-active] {
+    background-color: var(--mantine-color-white);
+    color: black;
+  }
+}

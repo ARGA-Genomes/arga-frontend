@@ -2,8 +2,9 @@
 
 import { gql, useQuery } from "@apollo/client";
 
-import { BrowseCard } from "../components/browse-card";
+import { BrowseCard } from "@/components/browse-card";
 import {Carousel} from "@mantine/carousel";
+import { Group } from "@mantine/core";
 
 type Overview = {
   wholeGenomes: number;
@@ -27,33 +28,30 @@ type OverviewResults = {
 export default function BrowseType() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
   if (error) return <p>Error : {error.message}</p>;
+    /*
+    *       styles={{
+    *         control: {
+    *           '&[data-inactive]': {
+    *             opacity: 0,
+    *             cursor: 'default',
+    *           },
+    *         },
+    *       }} */
 
   return (
-    <Carousel sx={{maxWidth:'100%'}}
-      // mx="auto" //use this if you'd like to center the carousel
-      height={340} 
+    <Carousel
+      height={340}
+      slideSize={{ base: 230, md: '50%' }}
+      slideGap={{ base: "md", sm: 0 }}
       slidesToScroll='auto'
-      slideSize="200px"
-      slideGap="xs"
       align="start"
-      breakpoints={[
-        { maxWidth: 'md', slideSize: '50%' },
-        { maxWidth: 'sm', slideSize: '100%', slideGap: 0 },
-      ]}
-      styles={{
-        control: {
-          '&[data-inactive]': {
-            opacity: 0,
-            cursor: 'default',
-          },
-        },
-      }}
-      >
+    >
+      <Group>
       <Carousel.Slide>
         <BrowseCard
           total={data?.overview.wholeGenomes}
           category="Whole genomes"
-          image="card-icons/data_type_whole_genome.svg"
+          image="/card-icons/type/whole_genomes.svg"
           link="/browse/genomes"
         />
       </Carousel.Slide>
@@ -61,7 +59,7 @@ export default function BrowseType() {
         <BrowseCard
           total={data?.overview.markers}
           category="Markers"
-          image="card-icons/data_type_marker.svg"
+          image="/card-icons/type/markers.svg"
           link="/browse/markers"
         />
       </Carousel.Slide>
@@ -69,10 +67,11 @@ export default function BrowseType() {
         <BrowseCard
           total={0}
           category="Specimen"
-          image="card-icons/data_type_specimen.svg"
+          image="/card-icons/type/specimens.svg"
           link="/browse/specimens"
         />
       </Carousel.Slide>
+      </Group>
     </Carousel>
   );
 }

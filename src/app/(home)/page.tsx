@@ -7,8 +7,8 @@ import {
   Title,
   Box,
   Stack,
-  Button,
   TextInput,
+  Container,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import BrowseGrouping from "./browse-grouping";
@@ -19,17 +19,15 @@ import VisitorGraph from "./visitor_graph";
 import { Search as IconSearch } from "tabler-icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
-import {createStyles} from '@mantine/core';
+import { MAX_WIDTH } from "../constants";
 
-const useStyles = createStyles((theme, _params, _getRef) => ({
-}));
 
 function Highlights() {
   return (
     <Box>
       <Grid gutter={30}>
-        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-          <Stack spacing={30}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
+          <Stack gap={30}>
             <Paper p={30} radius="xl" bg="midnight.6">
               <MostViewedCard />
             </Paper>
@@ -39,7 +37,7 @@ function Highlights() {
             </Paper>
           </Stack>
         </Grid.Col>
-        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
           <VisitorGraph />
         </Grid.Col>
       </Grid>
@@ -50,16 +48,16 @@ function Highlights() {
 function ConferenceInfo() {
   return (
     <Paper mt={30} p={30} radius="lg" bg="midnight.5">
-      <Title order={2} color="wheat.3">
+      <Title order={2} c="wheat.3">
         Up and coming conference
       </Title>
       <Grid>
         <Grid.Col>
           <Stack mt={40} mb={30}>
-            <Title order={1} color="white">
+            <Title order={1} c="white">
               See you at the 2023 eResearch Brisbane
             </Title>
-            <Text color="white">
+            <Text c="white">
               Building name. Street address and our booth number. See you there.
             </Text>
           </Stack>
@@ -87,12 +85,12 @@ function Search() {
       }}
     >
       <Grid align="center">
-        <Grid.Col xs={12} sm={12} md={10} lg={10} xl={8} span="auto">
+        <Grid.Col span={{ base: 12, md: 10, lg: 10, xl: 8 }}>
           <TextInput
             placeholder="e.g. sequence accession, taxon identifier, genus name"
             value={value}
             onChange={(val) => setValue(val.target.value)}
-            iconWidth={60}
+            leftSectionWidth={60}
             size="xl"
             radius="lg"
             styles={{
@@ -104,13 +102,8 @@ function Search() {
                 color: "#707070",
               },
             }}
-            icon={<IconSearch size={28} color="black" />}
+            leftSection={<IconSearch size={28} color="black" />}
           />
-        </Grid.Col>
-        <Grid.Col span="content">
-          {/* <Button size="xl" type="submit" className="primary_button">
-             Search
-          </Button> */}
         </Grid.Col>
       </Grid>
     </form>
@@ -119,56 +112,48 @@ function Search() {
 }
 
 export default function HomePage() {
-  const {  theme } = useStyles();
-
   return (
-    <Box>
-      <Paper bg="midnight.6" h={'auto'} pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt = '-40px'>
-        <Box  py={80} sx={{ textAlign: 'justify'}}>
-        <Grid gutter={30}>
-          <Grid.Col xs={1} sm={1} md={1} lg={1} xl={1}>
-          </Grid.Col>  
-          <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-          
-            <h2 style={{ color: theme.colors.wheat[4], marginTop: '0px', marginBottom: '0px', fontWeight: '550' }}>
-              deepen discovery - trawl traits - curate collections
-            </h2>
-            <p style={{ color: "white" }}>For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
-              Genome Atlas (ARGA) locates and aggregates genomic data, including <b> reference genome assemblies &#x2022;
-                genome annotations &#x2022; population and variant sets &#x2022; DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022;
-                raw genomics data
-              </b>
-            </p>
+    <Paper bg="midnight.7">
+      <Paper bg="midnight.6" py={80} px={150}>
+        <Grid>
+          <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
+            <Stack>
+              <Title order={3} c="wheat.4">
+                deepen discovery - trawl traits - curate collections
+              </Title>
+              <Text c="white">
+                For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
+                Genome Atlas (ARGA) locates and aggregates genomic data, including
+                <b>
+                  reference genome assemblies &#x2022; genome annotations &#x2022; population and variant sets &#x2022;
+                  DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022; raw genomics data
+                </b>
+            </Text>
+            </Stack>
           </Grid.Col>
         </Grid>
-        </Box>
       </Paper>
 
-        <Box px={50} py={20}>
-          <h2 style={{ color: theme.colors.moss[3], fontSize: '24px', fontWeight: '550'}}>Search for data</h2>
+      <Container maw={MAX_WIDTH} py={50}>
+      <Stack gap={80}>
+        <Stack gap={40}>
+          <Title order={3} c="moss.3" fz={24} fw={550}>Search for data</Title>
           <Search />
-        </Box>
-
-        <Box px={50} py={20}>
-          <h2 style={{ color: theme.colors.moss[3], fontWeight: '550' }}>
-            Browse by data type
-          </h2>
+        </Stack>
+        <Stack gap={40}>
+          <Title order={3} c="moss.3" fw={550}>Browse by data type</Title>
           <BrowseType />
-        </Box>
-
-        <Box px={50} py={20}>
-          <h2 style={{ color: theme.colors.moss[3], fontWeight: '550' }}>
-            Browse by taxonomic group
-          </h2>
+        </Stack>
+        <Stack gap={40}>
+          <Title order={3} c="moss.3" fw={550}>Browse by taxonomic group</Title>
           <BrowseTaxon />
-        </Box>
-
-        <Box px={50} py={30}>
-          <h2 style={{ color: theme.colors.moss[3], fontWeight: '550'  }}>
-            Browse by functional or ecological group
-          </h2>
+        </Stack>
+        <Stack gap={40}>
+          <Title order={3} c="moss.3" fw={550}>Browse by functional or ecological group</Title>
           <BrowseGrouping />
-        </Box>
-    </Box>
+        </Stack>
+      </Stack>
+      </Container>
+    </Paper>
   );
 }

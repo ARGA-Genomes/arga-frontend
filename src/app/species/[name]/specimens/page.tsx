@@ -1,15 +1,14 @@
 'use client';
 
-import SpecimenEvents from "@/app/specimens/[uuid]/specimen-details";
 import { SpecimenDetails } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, Group, Paper, Stack, Text, Title} from "@mantine/core";
 import { useState } from "react";
-import { PaginationBar } from "@/app/components/pagination";
-import { LoadOverlay } from "@/app/components/load-overlay";
-import { RecordItem } from "@/app/components/record-list";
-import { AttributeValue } from "@/app/components/highlight-stack";
-import { ArgaMap } from "@/app/components/mapping";
+import { PaginationBar } from "@/components/pagination";
+import { LoadOverlay } from "@/components/load-overlay";
+import { RecordItem } from "@/components/record-list";
+import { AttributeValue } from "@/components/highlight-stack";
+import { ArgaMap } from "@/components/mapping";
 import { usePathname } from "next/navigation";
 
 
@@ -120,10 +119,7 @@ type SpecimenQueryResults = {
 
 function SpecimenMap({ records }: { records: Specimen[] | undefined }) {
   return (
-    <Box pos="relative" h={560} sx={theme => ({
-      overflow: "hidden",
-      borderRadius: theme.radius.lg,
-    })}>
+    <Box pos="relative" h={560}>
       <ArgaMap />
     </Box>
   )
@@ -132,9 +128,9 @@ function SpecimenMap({ records }: { records: Specimen[] | undefined }) {
 
 function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
   return (
-    <Group spacing={20}>
-      <Text weight={300} size="sm">{label}</Text>
-      <Text weight={600}>{value}</Text>
+    <Group gap={20}>
+      <Text fw={300} size="sm">{label}</Text>
+      <Text fw={600}>{value}</Text>
     </Group>
   )
 }
@@ -143,9 +139,9 @@ function RecordItemContent({ record }: { record: Specimen }) {
   return (
       <Grid p={20}>
         <Grid.Col span={4}>
-          <Stack spacing={5}>
+          <Stack gap={5}>
             <LabeledValue label="Registration number" value={record.recordId} />
-            <Text size="xs" weight={600}>{record.datasetName}</Text>
+            <Text size="xs" fw={600}>{record.datasetName}</Text>
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
@@ -202,12 +198,6 @@ export default function Specimens({ params }: { params: { name: string } }) {
 
   return (
     <>
-      { holotype.data ? (<>
-        <Paper radius="lg">
-          <SpecimenEvents specimen={holotype.data.specimen} />
-        </Paper>
-      </>) : null }
-
       <Paper radius="lg" p={20} withBorder>
         <Title order={3}>All specimens</Title>
 

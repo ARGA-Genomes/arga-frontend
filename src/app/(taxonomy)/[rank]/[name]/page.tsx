@@ -24,26 +24,26 @@ import {
 } from "@mantine/core";
 
 import Link from "next/link";
-import { CircleCheck, CircleX, X as IconX, Filter as IconFilter, SortAscending } from "tabler-icons-react";
+import { CircleCheck, CircleX, Filter as IconFilter, SortAscending } from "tabler-icons-react";
 import { useEffect, useState } from "react";
-import { LoadOverlay, LoadPanel } from "@/app/components/load-overlay";
-import { Filter, intoFilterItem } from "@/app/components/filtering/common";
-import ClassificationHeader from "@/app/components/classification-header";
+import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
+import { Filter, intoFilterItem } from "@/components/filtering/common";
+import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
-import { PaginationBar } from "@/app/components/pagination";
-import { AttributeLink, AttributeValue, DataField } from "@/app/components/highlight-stack";
-import { useTableStyles } from "@/app/components/data-fields";
+import { PaginationBar } from "@/components/pagination";
+import { AttributeLink, AttributeValue, DataField } from "@/components/highlight-stack";
 import { useDisclosure } from "@mantine/hooks";
-import { HigherClassificationFilters } from "@/app/components/filtering/higher-classification";
-import { VernacularGroupFilters } from "@/app/components/filtering/vernacular-group";
-import { EcologyFilters } from "@/app/components/filtering/ecology";
-import { IbraFilters } from "@/app/components/filtering/ibra";
-import { ImcraFilters } from "@/app/components/filtering/imcra";
-import { StateFilters } from "@/app/components/filtering/state";
-import { DrainageBasinFilters } from "@/app/components/filtering/drainage-basin";
-import { TachoChart } from "@/app/components/graphing/tacho";
-import { PieChart } from "@/app/components/graphing/pie";
-import { BarChart } from "@/app/components/graphing/bar";
+import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
+import { VernacularGroupFilters } from "@/components/filtering/vernacular-group";
+import { EcologyFilters } from "@/components/filtering/ecology";
+import { IbraFilters } from "@/components/filtering/ibra";
+import { ImcraFilters } from "@/components/filtering/imcra";
+import { StateFilters } from "@/components/filtering/state";
+import { DrainageBasinFilters } from "@/components/filtering/drainage-basin";
+import { TachoChart } from "@/components/graphing/tacho";
+import { PieChart } from "@/components/graphing/pie";
+import { BarChart } from "@/components/graphing/bar";
+import { BushfireRecoveryFilters } from '@/components/filtering/bushfire-recovery';
 
 
 const PAGE_SIZE = 10;
@@ -57,6 +57,7 @@ type Filters = {
   imcra?: Filter,
   state?: Filter,
   drainageBasin?: Filter,
+  bushfireVulnerable?: Filter,
 }
 
 
@@ -216,12 +217,11 @@ type TaxonResults = {
 
 function DataItem({ name, count }: { name: string; count: number }) {
   const hasData = count > 0;
-  const dimmed = "rgba(134, 142, 150, .5)";
 
   return (
     <Group>
       {hasData ? <CircleCheck color="green" /> : <CircleX color="red" />}
-      <Text weight={300} fz="xs">{ name }</Text>
+      <Text fw={300} fz="xs">{ name }</Text>
     </Group>
   );
 }
@@ -245,7 +245,6 @@ function SpeciesCard({ species }: { species: Species }) {
             />
           ) : (
             <Image
-              withPlaceholder
               height={260}
               alt={species.taxonomy.canonicalName}
             />
@@ -253,9 +252,9 @@ function SpeciesCard({ species }: { species: Species }) {
         </Link>
       </Card.Section>
 
-      <Stack spacing={5}>
+      <Stack gap={5}>
         <Link href={`/species/${itemLinkName}/taxonomy`}>
-          <Text fz="sm" weight={700} italic>{species.taxonomy.canonicalName}</Text>
+          <Text fz="sm" fw={700} fs="italic">{species.taxonomy.canonicalName}</Text>
         </Link>
         <SimpleGrid cols={2}>
           <DataItem name="Genome" count={species.dataSummary.wholeGenomes} />
@@ -277,10 +276,11 @@ const speciesTotalRecords = (species: Species) => {
 
 
 function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
-  const { classes } = useTableStyles();
+    /* const { classes } = useTableStyles(); */
+    {/* <Table className={classes.simpleTable}> */ }
 
   return (
-    <Table className={classes.simpleTable}>
+    <Table>
       <tbody>
       <tr>
         <td>Scientific name</td>
@@ -327,6 +327,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
   const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra)
   const [state, setState] = useState<Filter | undefined>(filters.state)
   const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin)
+  const [bushfireVulnerable, setBushfireVulnerable] = useState<Filter | undefined>(filters.bushfireVulnerable)
 
   useEffect(() => {
     onChange({
@@ -379,25 +380,40 @@ function Filters({ filters, options, onChange }: FiltersProps) {
         <Accordion.Panel>
           <Stack>
           <Box>
-            <Text weight={300} fz="sm">Ecology</Text>
+            <Text fw={300} fz="sm">Ecology</Text>
             <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
           </Box>
           <Box>
-            <Text weight={300} fz="sm">Ibra Region</Text>
+            <Text fw={300} fz="sm">Ibra Region</Text>
             <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
           </Box>
           <Box>
-            <Text weight={300} fz="sm">Imcra Region</Text>
+            <Text fw={300} fz="sm">Imcra Region</Text>
             <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
           </Box>
           <Box>
-            <Text weight={300} fz="sm">State</Text>
+            <Text fw={300} fz="sm">State</Text>
             <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
           </Box>
           <Box>
-            <Text weight={300} fz="sm">Drainage Basin</Text>
+            <Text fw={300} fz="sm">Drainage Basin</Text>
             <DrainageBasinFilters value={drainageBasin?.value} options={options?.drainageBasin || []} onChange={setDrainageBasin} />
           </Box>
+          </Stack>
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item value="bushfire">
+        <Accordion.Control>
+          <FilterGroup
+            label="Bushfire traits"
+            description="Bushfire vulnerability and recovery"
+            image="/card-icons/list_group_Firevulnerable.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <Stack>
+            <BushfireRecoveryFilters value={bushfireVulnerable?.value} onChange={setBushfireVulnerable} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
@@ -413,7 +429,7 @@ interface FilterGroupProps {
 
 function FilterGroup({ label, description, image }: FilterGroupProps) {
   return (
-    <Group noWrap>
+    <Group wrap="nowrap">
       <Avatar src={image} size="lg" />
       <div>
         <Text>{label}</Text>
@@ -473,8 +489,15 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
 
   return (
     <Stack>
-      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
-        <Box mt={200}>
+      <Drawer
+        opened={opened}
+        onClose={close}
+        withCloseButton={false}
+        position="right"
+        size="xl"
+        transitionProps={{ duration: 250, transition: 'pop-top-right' }}
+      >
+        <Box pt={200}>
           <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
         </Box>
       </Drawer>
@@ -488,13 +511,13 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
 
         <Grid.Col span="auto">
           <Group>
-            <Text fz="sm" weight={300}>Filters</Text>
+            <Text fz="sm" fw={300}>Filters</Text>
             { flattenFilters(filters).map(filter => <FilterBadge filter={filter} key={filter.value} />) }
           </Group>
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Group noWrap>
+          <Group wrap="nowrap">
             <SortAscending />
             <Text>Sort by</Text>
             <SegmentedControl radius="xl" data={[
@@ -506,7 +529,7 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button leftIcon={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
         </Grid.Col>
       </Grid>
 
@@ -540,7 +563,7 @@ function childTaxa(rank: string) {
 
 
 function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefined }) {
-  const { classes } = useTableStyles();
+    /* const { classes } = useTableStyles(); */
   const childTaxon = childTaxa(rank);
 
   const thresholds = [
@@ -575,31 +598,31 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
         <Grid>
           <Grid.Col span={4}>
             <Stack>
-              <Text fz="sm" weight={300}>Percentage of species with genomes</Text>
+              <Text fz="sm" fw={300}>Percentage of species with genomes</Text>
               { taxon && <TachoChart h={250} thresholds={thresholds} value={Math.round(genomePercentile || 0)} /> }
             </Stack>
           </Grid.Col>
           <Grid.Col span={4}>
             <Stack>
-              <Text fz="sm" weight={300}>{Humanize.capitalize(childTaxon)} with genomes</Text>
+              <Text fz="sm" fw={300}>{Humanize.capitalize(childTaxon)} with genomes</Text>
               { rankGenomes && <PieChart h={200} data={rankGenomes} /> }
             </Stack>
           </Grid.Col>
           <Grid.Col span={4}>
             <Stack>
-              <Text fz="sm" weight={300}>Species with genomes</Text>
+              <Text fz="sm" fw={300}>Species with genomes</Text>
               { speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 6)} spacing={0.1} /> }
             </Stack>
           </Grid.Col>
           <Grid.Col span={4}>
             <Stack>
-              <Text fz="sm" weight={300}>Percentage of species with any genetic data</Text>
+              <Text fz="sm" fw={300}>Percentage of species with any genetic data</Text>
               { taxon && <TachoChart h={250} thresholds={thresholds} value={Math.round(otherPercentile || 0)} /> }
             </Stack>
           </Grid.Col>
           <Grid.Col span={8}>
             <Stack>
-              <Text fz="sm" weight={300}>Species with any genetic data</Text>
+              <Text fz="sm" fw={300}>Species with any genetic data</Text>
               {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} /> }
             </Stack>
           </Grid.Col>
@@ -609,7 +632,7 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
       <Grid.Col span="content">
         <Paper p="xl" radius="lg" withBorder>
           <Title order={5}>Taxonomic breakdown</Title>
-          <Table className={classes.simpleTable}>
+          <Table>
             <tbody>
               <tr>
                 <td>Number of {childTaxon}</td>
@@ -659,7 +682,7 @@ export default function ClassificationPage({ params }: { params: { rank: string,
   });
 
   return (
-    <Stack>
+    <Stack mt={40}>
           {/* {taxonomy && <Header kingdom={taxonomy.kingdom || params.name} />} */}
       <ClassificationHeader rank={rank} classification={params.name} />
 

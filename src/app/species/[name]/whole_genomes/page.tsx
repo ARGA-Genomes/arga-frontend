@@ -4,14 +4,13 @@ import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Center, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from "@mantine/core";
 import { useState } from "react";
-import { AttributePill, AttributeValue, DataField } from "@/app/components/highlight-stack";
-import { LoadOverlay } from "@/app/components/load-overlay";
-import { PaginationBar } from "@/app/components/pagination";
-import { ArgaMap } from "@/app/components/mapping";
-import { RecordItem } from "@/app/components/record-list";
+import { AttributePill, AttributeValue, DataField } from "@/components/highlight-stack";
+import { LoadOverlay } from "@/components/load-overlay";
+import { PaginationBar } from "@/components/pagination";
+import { ArgaMap } from "@/components/mapping";
+import { RecordItem } from "@/components/record-list";
 import { usePathname } from "next/navigation";
 import { Eye } from "tabler-icons-react";
-import { useTableStyles } from "@/app/components/data-fields";
 import Link from "next/link";
 
 
@@ -113,9 +112,9 @@ type RefseqResults = {
 
 function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
   return (
-    <Group spacing={20}>
-      <Text weight={300} size="sm">{label}</Text>
-      <Text weight={600}>{value}</Text>
+    <Group gap={20}>
+      <Text fw={300} size="sm">{label}</Text>
+      <Text fw={600}>{value}</Text>
     </Group>
   )
 }
@@ -125,12 +124,12 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
   return (
       <Grid p={20}>
         <Grid.Col span={8}>
-          <Stack spacing={5}>
+          <Stack gap={5}>
             <SimpleGrid cols={2}>
             <LabeledValue label="Accession" value={record.recordId} />
             <LabeledValue label="Release date" value={record.releaseDate}/>
             </SimpleGrid>
-            <Text size="xs" weight={600}>{record.datasetName}</Text>
+            <Text size="xs" fw={600}>{record.datasetName}</Text>
           </Stack>
         </Grid.Col>
         <Grid.Col span={2}>
@@ -148,8 +147,8 @@ function RecordList({ records }: { records: WholeGenome[] }) {
 
   return (
     <>
-      { records.map(record => (
-        <RecordItem key={record.id} href={`${path}/${record.recordId}`}>
+      { records.map((record, idx) => (
+        <RecordItem key={idx} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </>
@@ -158,11 +157,12 @@ function RecordList({ records }: { records: WholeGenome[] }) {
 
 
 function WholeGenomeMap({ records }: { records : WholeGenome[] | undefined }) {
+    /* sx={theme => ({
+    *       overflow: "hidden",
+    *       borderRadius: theme.radius.lg,
+    *     })} */
   return (
-    <Box pos="relative" h={560} sx={theme => ({
-      overflow: "hidden",
-      borderRadius: theme.radius.lg,
-    })}>
+    <Box pos="relative" h={560}>
       <ArgaMap />
     </Box>
   )
@@ -171,7 +171,6 @@ function WholeGenomeMap({ records }: { records : WholeGenome[] | undefined }) {
 
 function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
   const path = usePathname();
-  const { classes } = useTableStyles();
 
   const { loading, error, data } = useQuery<RefseqResults>(GET_REFERENCE_GENOME, {
     variables: { canonicalName },
@@ -188,8 +187,8 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
 
       <Grid gutter={50}>
         <Grid.Col span={3}>
-          <Stack spacing={20}>
-          <Table className={classes.table}>
+          <Stack gap={20}>
+          <Table>
             <tbody>
             <tr>
               <td>Representation</td>
@@ -217,7 +216,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
           { data &&
             <Link href={`${path}/${data?.species.referenceGenome?.recordId}`}>
               <Center>
-                <Button color="midnight" radius="md" leftIcon={<Eye />}>view</Button>
+                <Button color="midnight" radius="md" leftSection={<Eye />}>view</Button>
               </Center>
             </Link>
           }
@@ -288,7 +287,7 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
 
   return (
     <>
-      <Stack spacing={20}>
+      <Stack gap={20}>
         <ReferenceGenome canonicalName={canonicalName} />
 
         <Paper p="lg" radius="lg" withBorder>
@@ -317,8 +316,7 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
       <Drawer
         opened={mapExpand}
         onClose={() => setMapExpand(false)}
-        overlayOpacity={0.55}
-        overlayBlur={3}
+        opacity={0.55}
         zIndex={2000}
         position="right"
         size="75%"

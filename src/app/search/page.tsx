@@ -8,12 +8,9 @@ import {
   Box,
   Grid,
   Image,
-  createStyles,
-  Button,
   LoadingOverlay,
   Group,
   TextInput,
-  MantineProvider,
   Accordion,
   Divider,
   Stack,
@@ -27,8 +24,9 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
-import { argaBrandLight } from '../theme';
 import ChevronCircleAccordion from 'public/search-icons/chevron-circle-accordion';
+import { MAX_WIDTH } from '../constants';
+import { HighlightStack } from '@/components/highlight-stack';
 
 type Classification = {
   kingdom?: string,
@@ -150,11 +148,10 @@ type Pagination = {
 
 
 function Summary({ label, value, url = null }: { label: string, value: number | string | React.ReactNode, url: { pathname: string; query: { previousUrl: string; } } | null }) {
-  const { classes } = useSearchTypeStyles();
   if (url !== null) {
     return (
       <>
-        <Text size="lg">{label} <Link href={url}><strong className={classes.accession}>{value}</strong></Link></Text>
+        <Text size="lg">{label} <Link href={url}><strong>{value}</strong></Link></Text>
         <Divider size="sm" orientation="vertical" />
       </>
     )
@@ -169,15 +166,16 @@ function Summary({ label, value, url = null }: { label: string, value: number | 
 
 function Attribute({ label, value }: { label: string, value: string | undefined }) {
   value ||= "Not specified";
-  const { classes } = useSearchTypeStyles();
   const link = "/" + label.toLowerCase() + "/" + value
 
   return (
-    <Stack spacing={0}>
+    <Stack gap={0}>
       <Text size="sm">{label}</Text>
       <Link href={link}>
-        <Paper py={5} px={15} radius="md" sx={{ maxWidth: '300px' }} className={classes.attribute}>
-          <Text size="lg" color="midnight.5">{label == "Genus" ? <i>{value}</i> : value}</Text>
+        <Paper py={5} px={15} radius="md">
+          <Text size="lg" c="midnight.5" style={{ whiteSpace: "nowrap" }}>
+            {label == "Genus" ? <i>{value}</i> : value}
+          </Text>
         </Paper>
       </Link>
     </Stack>
@@ -186,14 +184,13 @@ function Attribute({ label, value }: { label: string, value: string | undefined 
 
 function TaxonItem({ item }: { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
-  const { classes } = useSearchTypeStyles();
   const searchParams = useSearchParams();
 
   return (
-    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} style={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control ml={-20} mt={-20}>
-        <Group position="apart" >
-          <Stack spacing={0}>
+        <Group justify="apart" >
+          <Stack gap={0}>
             <Container style={{
               position: "relative",
               top: "0px",
@@ -207,7 +204,7 @@ function TaxonItem({ item }: { item: Record }) {
               <Image src={"search-icons/data_type_species_and_subspecies_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/taxonomy`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
-              <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+              <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
             </Link>
             {item.subspecies?.map(subspecies => (
               <Text size="sm" ml={5} key={subspecies} className='subspeciesAccordion'>
@@ -251,7 +248,6 @@ function TaxonSummary({ summary }: { summary: DataSummary }) {
 
 function TaxonDetails({ item }: { item: Record }) {
   const theme = useMantineTheme();
-  const { classes } = useSearchTypeStyles();
 
   const attributes = <>
     <Attribute label="Kingdom" value={item.classification?.kingdom} />
@@ -264,47 +260,32 @@ function TaxonDetails({ item }: { item: Record }) {
 
   return (
     <Box>
-      <Stack spacing={0} mt={10} mb={30}>
+      <Stack gap={0} mt={10} mb={30}>
         <Text size="sm">Common names</Text>
         {item.commonNames && item.commonNames.length > 0
-          ? <Text size="lg" weight={550}>{item.commonNames?.join(", ")}</Text>
-          : <Text size="lg" weight={550} c="dimmed">None</Text>
+          ? <Text size="lg" fw={550}>{item.commonNames?.join(", ")}</Text>
+          : <Text size="lg" fw={550} c="dimmed">None</Text>
         }
       </Stack>
 
-      <Stack pl={16} sx={{
-        borderLeftWidth: 5,
-        borderLeftStyle: "solid",
-        borderLeftColor: theme.colors.bushfire[4],
-      }}
-        className={classes.horizontalGrouping}>
-        <Text size="lg" weight={550}>Scientific classification</Text>
-        <Flex gap="lg" >
+      <HighlightStack>
+        <Text size="lg" fw={550}>Scientific classification</Text>
+        <Group gap="lg" >
           {attributes}
-        </Flex>
-      </Stack>
-      <Stack pl={16} sx={{
-        borderLeftWidth: 5,
-        borderLeftStyle: "solid",
-        borderLeftColor: theme.colors.bushfire[4],
-      }}
-        className={classes.verticalGrouping}>
-        <Text size="lg" weight={550}>Scientific classification</Text>
-        {attributes}
-      </Stack>
+        </Group>
+      </HighlightStack>
     </Box>
   )
 }
 
 
 function GenomeItem({ item }: { item: Record }) {
-  const { classes } = useSearchTypeStyles();
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   const searchParams = useSearchParams();
   return (
-    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} style={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control ml={-20} mt={-20}>
-        <Group position="apart">
+        <Group justify="apart">
           <Stack>
             <Container style={{
               position: "relative",
@@ -319,7 +300,7 @@ function GenomeItem({ item }: { item: Record }) {
               <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/taxonomy`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }} >
-              <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+              <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
             </Link>
           </Stack>
           <Group pt={20}>
@@ -349,12 +330,12 @@ function GenomeDetails({ item }: { item: Record }) {
 
   return (
     <Box>
-      <Stack pl={16} sx={{
+      <Stack pl={16} style={{
         borderLeftWidth: 5,
         borderLeftStyle: "solid",
         borderLeftColor: theme.colors.bushfire[4],
       }}>
-        <Text size="lg" weight={550}>Attributes</Text>
+        <Text size="lg" fw={550}>Attributes</Text>
         <Flex gap="lg">
           <Attribute label="Data source" value={item.dataSource} />
           <Attribute label="Level" value={item.level} />
@@ -366,13 +347,12 @@ function GenomeDetails({ item }: { item: Record }) {
 }
 
 function LocusItem({ item }: { item: Record }) {
-  const { classes } = useSearchTypeStyles();
   const searchParams = useSearchParams();
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   return (
-    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} sx={{ border: "1px solid #b5b5b5" }}>
+    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} style={{ border: "1px solid #b5b5b5" }}>
       <Accordion.Control ml={-20} mt={-20}>
-        <Group position="apart" >
+        <Group justify="apart" >
           <Stack>
             <Container style={{
               position: "relative",
@@ -387,7 +367,7 @@ function LocusItem({ item }: { item: Record }) {
               <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}/taxonomy`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
-              <Text size="lg" fw={550} className={classes.canonicalName}><i>{item.canonicalName}</i></Text>
+              <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
             </Link>
           </Stack>
           <Group pt={20}>
@@ -417,12 +397,12 @@ function LocusDetails({ item }: { item: Record }) {
 
   return (
     <Box>
-      <Stack pl={16} sx={{
+      <Stack pl={16} style={{
         borderLeftWidth: 5,
         borderLeftStyle: "solid",
         borderLeftColor: theme.colors.bushfire[4],
       }}>
-        <Text size="lg" weight={550}>Attributes</Text>
+        <Text size="lg" fw={550}>Attributes</Text>
         <Flex gap="lg">
           <Attribute label="Data source" value={item.dataSource} />
           <Attribute label="Voucher status" value={item.voucherStatus} />
@@ -489,7 +469,7 @@ function Search(props: SearchProperties) {
 
   return (
     <>
-      <Paper bg="midnight.6" pl='10000px' ml='-10000px' pr='10000px' mr='-10000px' mt='-40px' pt='60px' pb='60px' mb='20px'>
+      <Paper bg="midnight.6" p={40} radius={0}>
         <Box>
           <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
             <Grid align="center" m={10}>
@@ -500,10 +480,10 @@ function Search(props: SearchProperties) {
                   placeholder="e.g. sequence accession, taxon identifier, genus name"
                   value={value}
                   onChange={val => setValue(val.target.value)}
-                  iconWidth={60}
+                  leftSectionWidth={60}
                   size="xl"
                   radius={16}
-                  icon={<IconSearch size={28} />}
+                  leftSection={<IconSearch size={28} />}
                 />
               </Grid.Col>
              {/* Hiding the search button, uncomment line below if needed */}
@@ -515,7 +495,7 @@ function Search(props: SearchProperties) {
         </Box>
       </Paper>
       <Box>
-        <Group position="apart" >
+        <Group justify="apart" >
           <Text size="lg" ml={20} mb={30}>
             {!props.loading && props.data
               ? (<><strong>{props.data?.search.fullText.total} </strong> search results found for <strong>{value} </strong></>)
@@ -586,17 +566,14 @@ export default function SearchPage() {
   }
 
   return (
-    <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
-      <Box>
+      <>
         <Search onSearch={onSearch} data={data} loading={loading} />
-        <Paper radius="xl" p="xl" sx={{ border: "1px solid #dbdbdb" }} pos="relative">
+        <Paper radius={0} p="xl" pos="relative">
           <LoadingOverlay
-            overlayColor={theme.colors.midnight[0]}
-            transitionDuration={500}
             loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
             visible={loading}
-            radius="xl"
           />
+          <Container maw={MAX_WIDTH}>
           <SearchResults results={data?.search.fullText.records || []} />
           {
             totalPages === 1 ? null : //Show pagination only if there is more than 1 page
@@ -605,71 +582,16 @@ export default function SearchPage() {
                   color={"attribute.2"}
                   size="lg"
                   radius="xl"
-                  position="center"
-                  spacing="md"
+                  gap="md"
                   total={totalPages}
-                  page={pagination.page}
                   onChange={page => {
                     setPagination({ page, pageSize: PAGE_SIZE })
                   }}
                 />
               </Paper>
           }
+          </Container>
         </Paper>
-      </Box>
-    </MantineProvider>
+      </>
   );
 }
-
-
-// Custom segmented control style for the search block
-const useSearchTypeStyles = createStyles((theme, _params, _getRef) => {
-  return {
-    root: {
-      backgroundColor: "#f0f0f0",
-      paddingLeft: 0,
-      paddingRight: 0,
-      borderWidth: 0,
-      borderRadius: 0,
-    },
-    label: {
-      fontWeight: 400,
-      color: theme.colors.midnight[5],
-    },
-    control: {
-      borderWidth: 0,
-    },
-    active: {
-      backgroundColor: theme.colors.wheat[0],
-      borderWidth: 0,
-      borderRadius: 10,
-      boxShadow: "none",
-    },
-    horizontalGrouping: {
-      [theme.fn.smallerThan('lg')]: {
-        display: 'none',
-      },
-    },
-    verticalGrouping: {
-      [theme.fn.largerThan('lg')]: {
-        display: 'none',
-      },
-    },
-    attribute: {
-      background: theme.colors.attribute[0],
-      '&:hover, &:focus': {
-        background: theme.colors.attribute[2]
-      }
-    },
-    canonicalName: {
-      '&:hover, &:focus': {
-        textDecoration: 'underline'
-      }
-    },
-    accession: {
-      '&:hover, &:focus': {
-        textDecoration: 'underline'
-      }
-    }
-  }
-});

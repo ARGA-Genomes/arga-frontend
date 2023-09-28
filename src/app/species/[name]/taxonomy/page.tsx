@@ -3,8 +3,6 @@
 import { gql, useQuery } from "@apollo/client";
 import {
   Button,
-  Container,
-  createStyles,
   Grid,
   Group,
   Image,
@@ -18,12 +16,11 @@ import {
 import { Photo, Taxonomy, IndigenousEcologicalKnowledge } from "@/app/type";
 import Link from "next/link";
 
-import { AttributeLink, HighlightStack } from "@/app/components/highlight-stack";
+import { AttributeLink, HighlightStack } from "@/components/highlight-stack";
 import { ExternalLink } from "tabler-icons-react";
 import { useEffect, useState } from "react";
-import { SurveyModal } from "@/app/components/survey-modal";
-import { LoadOverlay } from "@/app/components/load-overlay";
-import { MAX_WIDTH } from "@/app/constants";
+import { SurveyModal } from "@/components/survey-modal";
+import { LoadOverlay } from "@/components/load-overlay";
 
 
 const GET_SUMMARY = gql`
@@ -78,22 +75,15 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
   }
 
   return (
-    <Paper radius={100} sx={{ border: "1px solid #c1c1c1" }}>
+    <Paper radius={100}>
       <Image
         height={500}
         radius={100}
         src={photo ? small(photo.url) : ""}
         alt=""
-        styles={{
-          image: {
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-          },
-        }}
-        withPlaceholder
       />
       {photo && (
-        <Group px="md" py="xs" position="apart">
+        <Group px="md" py="xs" align="apart">
           <Text fz="sm" c="dimmed">
             &copy; {photo?.rightsHolder}
           </Text>
@@ -149,23 +139,20 @@ function ExternalLinks(props: ExternalLinksProps) {
   return (
     <Paper radius={16} p="md" withBorder>
       <Text fw={700} mb={10} size="lg">External links</Text>
-      <Group mt="md" spacing="xs">
+      <Group mt="md" gap="xs">
         <Button
           component="a"
           radius="md"
           color="gray"
           variant="light"
           size="xs"
-          leftIcon={<ExternalLink size="1rem" color="black" />}
+          leftSection={<ExternalLink size="1rem" color="black" />}
           loading={!matchedTaxon}
           disabled={Array.isArray(matchedTaxon) && matchedTaxon.length === 0}
           href={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`}
           target="_blank"
-          sx={(theme) => ({
-            border: `1px solid ${theme.colors["gray"][6]}`,
-          })}
         >
-          <Text color="black">View on&nbsp;<b>ALA</b></Text>
+          <Text>View on&nbsp;<b>ALA</b></Text>
         </Button>
 
         {props.species?.indigenousEcologicalKnowledge?.map(iek => (
@@ -176,14 +163,11 @@ function ExternalLinks(props: ExternalLinksProps) {
             color="gray"
             variant="light"
             size="xs"
-            leftIcon={<ExternalLink size="1rem" color="black" />}
+            leftSection={<ExternalLink size="1rem" color="black" />}
             href={iek.sourceUrl}
             target="_blank"
-            sx={(theme) => ({
-              border: `1px solid ${theme.colors["gray"][6]}`,
-            })}
           >
-            <Text color="black">View on&nbsp;<b>Profiles</b></Text>
+            <Text >View on&nbsp;<b>Profiles</b></Text>
           </Button>
         ))}
 
@@ -192,10 +176,7 @@ function ExternalLinks(props: ExternalLinksProps) {
             radius="md"
             color="midnight"
             size="xs"
-            leftIcon={<ExternalLink size="1rem" />}
-            sx={(theme) => ({
-              border: `1px solid ${theme.colors["shellfish"][6]}`,
-            })}
+            leftSection={<ExternalLink size="1rem" />}
           >
             View on&nbsp;<b>FrogID</b>
           </Button>
@@ -205,10 +186,7 @@ function ExternalLinks(props: ExternalLinksProps) {
             radius="md"
             color="midnight"
             size="xs"
-            leftIcon={<ExternalLink size="1rem" />}
-            sx={(theme) => ({
-              border: `1px solid ${theme.colors["shellfish"][6]}`,
-            })}
+            leftSection={<ExternalLink size="1rem" />}
           >
             View on&nbsp;<b>AFD</b>
           </Button>
@@ -219,48 +197,32 @@ function ExternalLinks(props: ExternalLinksProps) {
 }
 
 
-const useTableStyles = createStyles((theme, _params, _getRef) => {
-  return {
-    table: {
-      "td:first-child": {
-        textAlign: "right",
-        whiteSpace: "nowrap",
-        width: 1,
-        paddingRight: theme.spacing.lg,
-      },
-    },
-  }
-});
-
-
 function Details({ taxonomy }: { taxonomy: Taxonomy }) {
-  let { classes } = useTableStyles();
-
   return (
     <Paper radius={16} p="md" withBorder>
       <Text fw={700} mb={10} size="lg">Taxonomy</Text>
 
       <SimpleGrid cols={2}>
-        <Table className={classes.table}>
+        <Table>
           <tbody>
           <tr>
-            <td><Text weight={300} size="sm">Scientific name</Text></td>
+            <td><Text fw={300} size="sm">Scientific name</Text></td>
             <td>
               <Group>
-                <Text weight={600} size="sm" italic>{taxonomy.canonicalName}</Text>
-                <Text weight={600} size="sm">{taxonomy.authority}</Text>
+                <Text fw={600} size="sm" fs="italic">{taxonomy.canonicalName}</Text>
+                <Text fw={600} size="sm">{taxonomy.authority}</Text>
               </Group>
             </td>
           </tr>
           <tr>
-            <td><Text weight={300} size="sm">Status</Text></td>
-            <td><Text weight={600} size="sm">{taxonomy.status.toLowerCase()}</Text></td>
+            <td><Text fw={300} size="sm">Status</Text></td>
+            <td><Text fw={600} size="sm">{taxonomy.status.toLowerCase()}</Text></td>
           </tr>
           <tr>
-            <td><Text weight={300} size="sm">Synonyms</Text></td>
+            <td><Text fw={300} size="sm">Synonyms</Text></td>
             <td>
               { taxonomy.synonyms.map(synonym => (
-                <Text weight={600} size="sm" key={synonym.scientificName}>{synonym.scientificName}</Text>
+                <Text fw={600} size="sm" key={synonym.scientificName}>{synonym.scientificName}</Text>
               ))}
             </td>
           </tr>
@@ -268,13 +230,13 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
         </Table>
 
         <Stack>
-          <Table className={classes.table}>
+          <Table>
             <tbody>
             <tr>
-              <td><Text weight={300} size="sm">Common names</Text></td>
+              <td><Text fw={300} size="sm">Common names</Text></td>
               <td>
                 <Spoiler maxHeight={24} showLabel="Show more" hideLabel="Hide">
-                  <Text weight={600} size="sm">{taxonomy.vernacularNames?.map(r => r.name).join(', ')}</Text>
+                  <Text fw={600} size="sm">{taxonomy.vernacularNames?.map(r => r.name).join(', ')}</Text>
                 </Spoiler>
               </td>
             </tr>
@@ -302,8 +264,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
         <AttributeLink label="Genus" value={taxonomy.genus} href={`/genus/${taxonomy.genus}`} />
       </Group>
 
-      <HighlightStack spacing={0}>
-
+      <HighlightStack gap={0}>
         { taxonomy.synonyms.length > 0 && <>
           <Text fw={700} mb={10} mt={20}>Synonyms</Text>
           { taxonomy.synonyms.map(synonym => (
@@ -333,7 +294,7 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
 
       <Grid>
         <Grid.Col span={8}>
-          <Stack spacing={20} pos="relative">
+          <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
             {data && <Details taxonomy={data.species.taxonomy} /> }
             {data && <Classification taxonomy={data.species.taxonomy} /> }

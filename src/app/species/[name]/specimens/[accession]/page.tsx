@@ -14,16 +14,15 @@ import {
   Title,
   Image,
 } from "@mantine/core";
-import { AttributePill, DataField } from "@/app/components/highlight-stack";
+import { AttributePill, DataField } from "@/components/highlight-stack";
 import { ArrowNarrowLeft } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTableStyles } from "@/app/components/data-fields";
-import { ArgaMap } from "@/app/components/mapping";
-import { AccessionEvent, CollectionEvent, Specimen } from "@/app/queries/specimen";
-import { Subsample, SubsampleEvent } from "@/app/queries/subsample";
-import { DnaExtract, DnaExtractionEvent } from "@/app/queries/dna-extract";
-import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/app/queries/sequence";
+import { ArgaMap } from "@/components/mapping";
+import { AccessionEvent, CollectionEvent, Specimen } from "@/queries/specimen";
+import { Subsample, SubsampleEvent } from "@/queries/subsample";
+import { DnaExtract, DnaExtractionEvent } from "@/queries/dna-extract";
+import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 
 
 const GET_SPECIMEN = gql`
@@ -103,7 +102,7 @@ type SpecimenQueryResults = {
 
 function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
   return (
-    <Box pos="relative" h={300} sx={theme => ({
+    <Box pos="relative" h={300} style={theme => ({
       overflow: "hidden",
       borderRadius: theme.radius.lg,
     })}>
@@ -114,14 +113,13 @@ function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
 
 
 function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  const { classes } = useTableStyles();
   const collection = specimen?.events.collections[0];
   const coordinates = specimen?.latitude && `${specimen.latitude}, ${specimen.longitude}`;
 
   return (
     <Grid>
       <Grid.Col span={4}>
-        <Table className={classes.table}>
+        <Table>
           <tbody>
             <tr>
               <td>Field identifier</td>
@@ -135,7 +133,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
         </Table>
       </Grid.Col>
       <Grid.Col span={4}>
-        <Table className={classes.table}>
+        <Table>
           <tbody>
             <tr>
               <td>Collected by</td>
@@ -149,7 +147,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
         </Table>
       </Grid.Col>
       <Grid.Col span={4}>
-        <Table className={classes.table}>
+        <Table>
           <tbody>
             <tr>
               <td>Collection location</td>
@@ -166,7 +164,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
       <Grid.Col span={8}>
         <Grid>
           <Grid.Col span={6}>
-            <Table className={classes.table}>
+            <Table>
               <tbody>
                 <tr>
                   <td>Habitat</td>
@@ -192,7 +190,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
             </Table>
           </Grid.Col>
           <Grid.Col span={6}>
-            <Table className={classes.table}>
+            <Table>
               <tbody>
                 <tr>
                   <td>Sampling protocol</td>
@@ -219,7 +217,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
           </Grid.Col>
         </Grid>
 
-        <Table className={classes.table}>
+        <Table>
           <tbody>
             <tr>
               <td>Fixation method</td>
@@ -258,12 +256,11 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
 
 
 function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  const { classes } = useTableStyles();
   const accession = specimen?.events.accessions[0];
 
   return (
     <SimpleGrid cols={3}>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Registration number</td>
@@ -291,7 +288,7 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Institution</td>
@@ -310,7 +307,7 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
           <tr></tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Institution code</td>
@@ -335,11 +332,9 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
 
 
 function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) {
-  const { classes } = useTableStyles();
-
   return (
     <SimpleGrid cols={3}>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Sample number</td>
@@ -355,7 +350,7 @@ function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) 
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Subsampled by</td>
@@ -371,7 +366,7 @@ function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) 
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Subsampling date</td>
@@ -390,12 +385,11 @@ function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) 
 
 
 function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined }) {
-  const { classes } = useTableStyles();
   const extraction = dnaExtract?.events.dnaExtracts[0];
 
   return (
     <SimpleGrid cols={3}>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Extraction number</td>
@@ -419,7 +413,7 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Extracted by</td>
@@ -443,7 +437,7 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>DNA extraction date</td>
@@ -470,13 +464,12 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
 
 
 function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
   const sequencing = sequence?.events.sequencing[0];
   const sequencingRun = sequence?.events.sequencingRuns[0];
 
   return (
     <SimpleGrid cols={3}>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Amplification number</td>
@@ -504,7 +497,7 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Amplified by</td>
@@ -532,7 +525,7 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Amplification date</td>
@@ -565,12 +558,11 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
 }
 
 function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
   const assembly = sequence?.events.assemblies[0];
 
   return (
     <SimpleGrid cols={3}>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Assembly number</td>
@@ -590,7 +582,7 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Assembled by</td>
@@ -610,7 +602,7 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Assembly date</td>
@@ -635,12 +627,11 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
 }
 
 function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
   const annotation = sequence?.events.annotations[0];
 
   return (
     <SimpleGrid cols={3}>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Annotation number</td>
@@ -656,7 +647,7 @@ function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Annotated by</td>
@@ -672,7 +663,7 @@ function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Annotated date</td>
@@ -693,12 +684,11 @@ function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
 }
 
 function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
   const deposition = sequence?.events.dataDepositions[0];
 
   return (
     <SimpleGrid cols={3}>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Accession number</td>
@@ -722,7 +712,7 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Deposited by</td>
@@ -746,7 +736,7 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
           </tr>
         </tbody>
       </Table>
-      <Table className={classes.table}>
+      <Table>
         <tbody>
           <tr>
             <td>Deposition date</td>
@@ -790,57 +780,57 @@ function EventTimeline(props: EventTimelineProps) {
 
   return (
     <Timeline color="midnight" active={8} bulletSize={45} lineWidth={4}>
-      <Timeline.Item bullet={<Image src='/timeline-icons/collection.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Collection</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/collection.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Collection</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={collection?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/accession.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Accession</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/accession.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Accession</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={accession?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/subsampling.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Subsampling</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/subsampling.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Subsampling</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={subsample?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/extraction.svg'/>} title={<Text fz="sm" ml={20} weight={700}>DNA extraction</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/extraction.svg'/>} title={<Text fz="sm" ml={20} fw={700}>DNA extraction</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={extraction?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/sequencing.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Amplification and sequencing</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/sequencing.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Amplification and sequencing</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={sequence?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/assembly.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Sequence assembly</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/assembly.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Sequence assembly</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={assembly?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/annotation.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Sequence annotation</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/annotation.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Sequence annotation</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={annotation?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/deposition.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Data deposition</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/deposition.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Data deposition</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={deposition?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/data-reuse.svg'/>} title={<Text fz="sm" ml={20} weight={700}>Data reuse</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/data-reuse.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Data reuse</Text>}>
         <Group>
-          <Text ml={30} fz="xs" weight={300}>Event date</Text>
+          <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={undefined} fz="xs"/>
         </Group>
       </Timeline.Item>
@@ -863,9 +853,9 @@ export default function SpecimenPage({ params }: { params: { accession: string }
   }
 
   return (
-    <Stack spacing={20}>
+    <Stack gap={20}>
       <Link href={basePath || ''}>
-        <Group spacing={5}>
+        <Group gap={5}>
           <ArrowNarrowLeft />
           <Text fz={18}>Back to specimens</Text>
         </Group>
@@ -879,7 +869,7 @@ export default function SpecimenPage({ params }: { params: { accession: string }
 
         <Grid gutter={0}>
           <Grid.Col span={3}>
-            <Paper p={15} bg="#d6e4ed" h="100%" sx={{ borderRadius: "10px 0 10px 10px" }}>
+            <Paper p={15} bg="#d6e4ed" h="100%" style={{ borderRadius: "10px 0 10px 10px" }}>
               <EventTimeline
                 specimen={data?.specimen}
                 subsample={data?.subsample}
@@ -891,7 +881,7 @@ export default function SpecimenPage({ params }: { params: { accession: string }
 
           <Grid.Col span={9}>
             <Stack>
-              <Paper px={20} pt={30} pb={15} bg="#eaf1f5" sx={{ borderRadius: "0 10px 10px 0" }}>
+              <Paper px={20} pt={30} pb={15} bg="#eaf1f5" style={{ borderRadius: "0 10px 10px 0" }}>
                 <Title order={5}>Collection event</Title>
                 <Collections specimen={data?.specimen} />
               </Paper>

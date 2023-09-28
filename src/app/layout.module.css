@@ -1,0 +1,7 @@
+.header {
+    background-color: light-dark(var(--mantine-color-midnight-8), var(--mantine-color-midnight-8));
+}
+
+.footer {
+    background-color: light-dark(var(--mantine-color-midnight-8), var(--mantine-color-midnight-8));
+}

@@ -5,10 +5,7 @@ import { TopNav } from './top-nav';
 import { Footer } from './footer'
 import { footerLinks, headerLinks, MAX_WIDTH } from './constants';
 
-// The shell is the visual layout of the site that wraps all content
-// with the top navigation bar and the footer. It also defines the
-// page dimension constraints to make responsive layouts easier in
-// each page.
+
 export function Shell({ children }: { children: React.ReactNode }) {
 
   return (

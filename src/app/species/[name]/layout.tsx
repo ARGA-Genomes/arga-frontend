@@ -1,8 +1,9 @@
 "use client";
 
-import { Container, Group, MantineProvider, Paper, Stack, Tabs, Text } from "@mantine/core";
-import { argaBrandLight } from '@/app/theme';
-import SpeciesHeader from "@/app/components/species-header";
+import classes from "./layout.module.css";
+
+import { Container, Group, Paper, Stack, Tabs, Text } from "@mantine/core";
+import SpeciesHeader from "@/components/species-header";
 import Link from "next/link";
 import { ArrowNarrowLeft } from "tabler-icons-react";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -25,44 +26,13 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
 
   return (
     <Tabs
-      variant="outline"
+      variant="unstyled"
+      classNames={classes}
       radius={10}
       mt={40}
       defaultValue="taxonomy"
       value={tab}
-      onTabChange={changeTab}
-      styles={(theme) => ({
-        tab: {
-          ...theme.fn.focusStyles(),
-          color: theme.colors["link"][0],
-          padding: 25,
-          paddingTop: 15,
-          cursor: "pointer",
-          fontSize: 18,
-          display: "flex",
-          alignItems: "center",
-          ":hover": {
-            backgroundColor: theme.white,
-            borderColor: theme.white,
-          },
-
-          "&[data-active]": {
-            backgroundColor: theme.white,
-            borderColor: theme.white,
-            color: theme.black,
-            ":hover": {
-              borderColor: theme.white,
-            },
-          },
-
-          ":not(:first-of-type)": {
-            marginLeft: 4,
-          },
-        },
-        tabsList: {
-          border: "none",
-        },
-      })}
+      onChange={changeTab}
     >
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
@@ -93,11 +63,10 @@ export default function SpeciesLayout({ params, children }: SpeciesLayoutProps) 
   const [previousUrl] = useState('/search?' + searchParams.get('previousUrl') || "")
 
   return (
-    <MantineProvider inherit withGlobalStyles withNormalizeCSS theme={argaBrandLight}>
-      <Stack spacing={0}>
+      <Stack gap={0}>
         <Container mb={20} w="100%" maw={MAX_WIDTH}>
           <Link href={previousUrl}>
-            <Group spacing={5}>
+            <Group gap={5}>
               <ArrowNarrowLeft />
               <Text fz={18}>Back to search results</Text>
             </Group>
@@ -112,6 +81,5 @@ export default function SpeciesLayout({ params, children }: SpeciesLayoutProps) 
           </Container>
         </DataTabs>
       </Stack>
-    </MantineProvider>
   );
 }

@@ -2,13 +2,13 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {Box, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { ArgaMap } from "@/app/components/mapping";
+import { ArgaMap } from "@/components/mapping";
 
 import React, { useState } from "react";
-import { LoadOverlay } from "@/app/components/load-overlay";
-import { AttributeValue } from "@/app/components/highlight-stack";
-import { RecordItem } from "@/app/components/record-list";
-import { PaginationBar } from "@/app/components/pagination";
+import { LoadOverlay } from "@/components/load-overlay";
+import { AttributeValue } from "@/components/highlight-stack";
+import { RecordItem } from "@/components/record-list";
+import { PaginationBar } from "@/components/pagination";
 import { usePathname } from "next/navigation";
 
 
@@ -56,10 +56,7 @@ type QueryResults = {
 
 function MarkerMap({ records }: { records : Marker[] | undefined }) {
   return (
-    <Box pos="relative" h={560} sx={theme => ({
-      overflow: "hidden",
-      borderRadius: theme.radius.lg,
-    })}>
+    <Box pos="relative" h={560}>
       <ArgaMap />
     </Box>
   )
@@ -68,9 +65,9 @@ function MarkerMap({ records }: { records : Marker[] | undefined }) {
 
 function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
   return (
-    <Group spacing={20}>
-      <Text weight={300} size="sm">{label}</Text>
-      <Text weight={600}>{value}</Text>
+    <Group gap={20}>
+      <Text fw={300} size="sm">{label}</Text>
+      <Text fw={600}>{value}</Text>
     </Group>
   )
 }
@@ -79,12 +76,12 @@ function RecordItemContent({ record }: { record: Marker }) {
   return (
       <Grid p={20}>
         <Grid.Col span={6}>
-          <Stack spacing={5}>
+          <Stack gap={5}>
             <SimpleGrid cols={2}>
             <LabeledValue label="Accession" value={record.recordId} />
             <LabeledValue label="Release date" value={record.releaseDate}/>
             </SimpleGrid>
-            <Text size="xs" weight={600}>{record.datasetName}</Text>
+            <Text size="xs" fw={600}>{record.datasetName}</Text>
           </Stack>
         </Grid.Col>
         <Grid.Col span={2}>

@@ -2,9 +2,9 @@
 
 import { gql, useQuery } from "@apollo/client";
 
-import { Grid } from "@mantine/core";
-import { BrowseCard } from "../components/browse-card";
-import {Carousel} from "@mantine/carousel";
+import { BrowseCard } from "@/components/browse-card";
+import { Carousel } from "@mantine/carousel";
+import { Group } from "@mantine/core";
 
 type Overview = {
   animals: number;
@@ -26,36 +26,33 @@ type OverviewResults = {
   overview: Overview;
 };
 
+/* styles={{
+*   control: {
+*     '&[data-inactive]': {
+*       opacity: 0,
+*       cursor: 'default',
+*     },
+*   },
+* }} */
+
 export default function BrowseTaxon() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
   if (error) return <p>Error : {error.message}</p>;
 
   return (
-    <Carousel sx={{ width: '100%'}} 
-      mx="auto" 
-      height={340} 
+    <Carousel
+      height={340}
+      slideSize={{ base: 230, md: '50%' }}
+      slideGap={{ base: "md", sm: 0 }}
       slidesToScroll='auto'
-      slideSize="200px"
-      slideGap="md"
       align="start"
-      breakpoints={[
-        { maxWidth: 'md', slideSize: '50%' },
-        { maxWidth: 'sm', slideSize: '100%', slideGap: 0},
-      ]}
-      styles={{
-        control: {
-          '&[data-inactive]': {
-            opacity: 0,
-            cursor: 'default',
-          },
-        },
-      }}
-      >
+    >
+      <Group>
       <Carousel.Slide>
         <BrowseCard
           total={data?.overview.animals}
           category="Animals"
-          image="card-icons/taxon_Animals(Animalia).svg"
+          image="/card-icons/taxon/animals.svg"
           link="/kingdom/Animalia"
         />
       </Carousel.Slide>  
@@ -63,7 +60,7 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={data?.overview.plants}
           category="Plants"
-          image="card-icons/taxon_Floweringplants(Plantae).svg"
+          image="/card-icons/taxon/plants.svg"
           link="/kingdom/Plantae"
         />
       </Carousel.Slide> 
@@ -71,7 +68,7 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={data?.overview.fungi}
           category="Fungi"
-          image="card-icons/taxon_Fungi(Fungi).svg"
+          image="/card-icons/taxon/fungi.svg"
           link="/kingdom/Fungi"
         />
         </Carousel.Slide>
@@ -79,7 +76,7 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={0}
           category="Bacteria"
-          image="card-icons/taxon_Bacteria.svg"
+          image="/card-icons/taxon/bacteria.svg"
           link="kingdom/Bacteria"
         />
         </Carousel.Slide>
@@ -87,10 +84,11 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={0}
           category="Protista"
-          image="card-icons/taxon_Protists(Protista).svg"
+          image="/card-icons/taxon/protista.svg"
           link="/kingdom/Protista"
         />
         </Carousel.Slide>
+      </Group>
     </Carousel>
   );
 }

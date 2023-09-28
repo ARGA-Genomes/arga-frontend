@@ -1,0 +1,28 @@
+.navlink {
+    color: white;
+    border-bottom: rem(5) solid var(--mantine-color-midnight-8);
+
+    @media (max-width: $mantine-breakpoint-md) {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: var(--mantine-color-midnight-8);
+        border-bottom: rem(5) solid white;
+        color: var(--mantine-color-bushfire-4);
+
+        @media (max-width: $mantine-breakpoint-md) {
+            border-bottom: none;
+        }
+    }
+
+    &[data-active] {
+        background: var(--mantine-color-midnight-8);
+        border-bottom: rem(5) solid white;
+        color: var(--mantine-color-wheat-4);
+
+        @media (max-width: $mantine-breakpoint-md) {
+            border-bottom: none;
+        }
+    }
+}

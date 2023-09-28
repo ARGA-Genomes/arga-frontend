@@ -1,0 +1,13 @@
+body {
+    background-color: light-dark(#f0f0f0, var(--mantine-color-midnight-6));
+    a {
+        outline: none;
+        text-decoration: none;
+        color: #3C6377;
+    };
+}
+
+
+.footer {
+    background-color: light-dark(var(--mantine-color-midnight-6), var(--mantine-color-midnight-6));
+}
