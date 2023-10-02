@@ -18,21 +18,27 @@ const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
   },
   extinct: {
     label: "Extinct Species",
+    image: "/species-icons/epbc_extinct.svg",
   },
   "extinct in the wild": {
     label: "Extinct in the Wild",
+    image: "/species-icons/epbc_extinct_in_the_wild.svg",
   },
   "critically endangered": {
     label: "Critically Endangered",
+    image: "/species-icons/epbc_critically_endangered.svg",
   },
   endangered: {
     label: "Endangered Species",
+    image: "/species-icons/epbc_endangered.svg",
   },
   vulnerable: {
     label: "Vulnerable Species",
+    image: "/species-icons/epbc_vulnerable.svg",
   },
   "vulnerable (wildfire)": {
     label: "Vulnerable to Wildfire",
+    image: "/species-icons/fire_vulnerable.svg",
   },
   threatened: {
     label: "Threatened Species",
@@ -45,13 +51,12 @@ const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
   },
   "least concern": {
     label: "Least concern",
+    image: "/species-icons/epbc_least_concern.svg",
   },
   unlisted: {
     label: "Unlisted",
+    image: "/species-icons/epbc_unlisted.svg",
   },
-  no_status: {
-    image: "threatened.svg",
-  }
 };
 
 const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
