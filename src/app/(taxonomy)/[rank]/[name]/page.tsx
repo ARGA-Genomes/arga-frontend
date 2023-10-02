@@ -56,7 +56,7 @@ type Filters = {
   imcra?: Filter,
   state?: Filter,
   drainageBasin?: Filter,
-  bushfireVulnerable?: Filter,
+  bushfireRecovery: Filter[],
 }
 
 
@@ -235,7 +235,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
   const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra)
   const [state, setState] = useState<Filter | undefined>(filters.state)
   const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin)
-  const [bushfireVulnerable, setBushfireVulnerable] = useState<Filter | undefined>(filters.bushfireVulnerable)
+  const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(filters.bushfireRecovery)
 
   useEffect(() => {
     onChange({
@@ -246,8 +246,9 @@ function Filters({ filters, options, onChange }: FiltersProps) {
       imcra,
       state,
       drainageBasin,
+      bushfireRecovery,
     })
-  }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, onChange]);
+  }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, bushfireRecovery, onChange]);
 
   return (
     <Accordion defaultValue="classification" variant='separated'>
@@ -321,7 +322,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
         </Accordion.Control>
         <Accordion.Panel>
           <Stack>
-            <BushfireRecoveryFilters value={bushfireVulnerable?.value} onChange={setBushfireVulnerable} />
+            <BushfireRecoveryFilters filters={bushfireRecovery} onChange={setBushfireRecovery} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
@@ -365,6 +366,7 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
 
   const [filters, setFilters] = useState<Filters>({
     classifications: [{ filter: rank, action: "INCLUDE", value: canonicalName, editable: false }],
+    bushfireRecovery: [],
   });
 
   const flattenFilters = (filters: Filters) => {
@@ -376,6 +378,7 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
       filters.imcra,
       filters.state,
       filters.drainageBasin,
+      ...filters.bushfireRecovery,
     ];
 
     return items.filter((item): item is Filter => !!item);
@@ -485,7 +488,7 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
   })
 
   const rankOther = taxon?.dataSummary.filter(i => i.other > 0).map(summary => {
-    return { name: summary.name || '', value: summary.genomes }
+    return { name: summary.name || '', value: summary.other }
   })
 
   const speciesGenomes = taxon?.speciesSummary.filter(i => i.genomes > 0).map(summary => {
@@ -566,12 +569,12 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
             <Attribute
               label="Species with most genomes"
               value={speciesGenomes && speciesGenomes[0]?.name}
-              href={`/species/${speciesGenomes && speciesGenomes[0].name?.replaceAll(' ', '_')}/taxonomy`}
+              href={`/species/${speciesGenomes && speciesGenomes[0]?.name?.replaceAll(' ', '_')}/taxonomy`}
             />
             <Attribute
               label="Species with most data"
               value={speciesOther && speciesOther[0]?.name}
-              href={`/species/${speciesOther && speciesOther[0].name.replaceAll(' ', '_')}/taxonomy`}
+              href={`/species/${speciesOther && speciesOther[0]?.name.replaceAll(' ', '_')}/taxonomy`}
             />
           </Stack>
         </Paper>
@@ -593,7 +596,6 @@ export default function ClassificationPage({ params }: { params: { rank: string,
 
   return (
     <Stack mt={40}>
-          {/* {taxonomy && <Header kingdom={taxonomy.kingdom || params.name} />} */}
       <ClassificationHeader rank={rank} classification={params.name} />
 
       <Paper py={30}>
