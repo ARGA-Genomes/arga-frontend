@@ -5,7 +5,6 @@ import {
   Grid,
   Text,
   Title,
-  Box,
   Stack,
   TextInput,
   Container,
@@ -13,37 +12,11 @@ import {
 import { useRouter } from "next/navigation";
 import BrowseGrouping from "./browse-grouping";
 import BrowseTaxon from "./browse-taxon";
-import MostDownloadedCard from "./most-downloaded";
-import MostViewedCard from "./most-viewed";
-import VisitorGraph from "./visitor_graph";
 import { Search as IconSearch } from "tabler-icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
 import { MAX_WIDTH } from "../constants";
 
-
-function Highlights() {
-  return (
-    <Box>
-      <Grid gutter={30}>
-        <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
-          <Stack gap={30}>
-            <Paper p={30} radius="xl" bg="midnight.6">
-              <MostViewedCard />
-            </Paper>
-
-            <Paper p={30} radius="lg" bg="midnight.6">
-              <MostDownloadedCard />
-            </Paper>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
-          <VisitorGraph />
-        </Grid.Col>
-      </Grid>
-    </Box>
-  );
-}
 
 function ConferenceInfo() {
   return (

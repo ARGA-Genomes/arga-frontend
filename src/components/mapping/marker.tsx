@@ -5,7 +5,6 @@ import "leaflet/dist/leaflet.css";
 import { Box } from "@mantine/core";
 import { Marker, Popup } from "react-leaflet";
 import { Icon, LatLngExpression } from "leaflet";
-import { Coordinates } from "../../type";
 
 
 const CUSTOM_ICON = new Icon({

@@ -1,7 +1,8 @@
 "use client";
 
+import { LoadOverlay } from "@/components/load-overlay";
 import { gql, useQuery } from "@apollo/client";
-import { Box, LoadingOverlay, Title, Text, useMantineTheme } from "@mantine/core";
+import { Box, Title, Text } from "@mantine/core";
 import Link from "next/link";
 
 
@@ -81,18 +82,11 @@ function SourceRow({ source }: { source: Source }) {
 }
 
 export default function DatasetsPage() {
-  const theme = useMantineTheme();
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
 
   return (
     <>
-      <LoadingOverlay
-        overlayColor={theme.colors.midnight[0]}
-        transitionDuration={500}
-        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-        visible={loading}
-        radius="xl"
-      />
+      <LoadOverlay visible={loading} />
       { data?.sources.map(source => <SourceRow source={source} key={source.name} />) }
     </>
   );

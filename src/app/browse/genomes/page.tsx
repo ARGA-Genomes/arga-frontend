@@ -1,9 +1,10 @@
 'use client';
 
-import { PaginationBar } from "@/app/components/pagination";
-import { SpeciesCard } from "@/app/components/species-card";
+import { LoadOverlay } from "@/components/load-overlay";
+import { PaginationBar } from "@/components/pagination";
+import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
-import { Box, LoadingOverlay, SimpleGrid, Title, useMantineTheme } from "@mantine/core";
+import { Box, SimpleGrid, Title } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { useState } from "react";
 
@@ -70,7 +71,6 @@ function BrowseResults({ list }: { list: Species[]}) {
 
 
 export default function GenomesList() {
-  const theme = useMantineTheme();
   const [page, setPage] = useState(1);
   const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
 
@@ -81,13 +81,7 @@ export default function GenomesList() {
   return (
     <Box>
       <Box mt={20}>
-        <LoadingOverlay
-          overlayColor={theme.colors.midnight[0]}
-          transitionDuration={500}
-          loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-          visible={loading}
-          radius="xl"
-        />
+        <LoadOverlay visible={loading} />
 
         <Title order={2} mb={20}>Genomes</Title>
 

@@ -2,7 +2,6 @@
 
 import { Text } from "@mantine/core";
 import { PopupMarker } from ".";
-import { Coordinates} from "../../type";
 
 
 interface SpecimenLocation {

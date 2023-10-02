@@ -1,9 +1,10 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, LoadingOverlay, Paper, Text } from '@mantine/core';
+import { Box, Paper, Text } from '@mantine/core';
 import { CommonGenome } from "@/app/type";
 import GenomeTable from "../commonGenomeRecordTable";
+import { LoadOverlay } from "@/components/load-overlay";
 
 
 const GET_RESOURCES = gql`
@@ -50,14 +51,9 @@ export default function Resources({ params }: { params: { name: string } }) {
 
   return (
     <Box pos="relative">
-      <LoadingOverlay
-        overlayColor="black"
-        transitionDuration={500}
-        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-        visible={loading}
-      />
+      <LoadOverlay visible={loading} />
 
-      <Text style={{padding: 25}} color="white">All Genome Sequence Records</Text>
+      <Text style={{padding: 25}} c="white">All Genome Sequence Records</Text>
       <Paper radius="lg" py={25}>
         { data ? <GenomeTable records={data.species.data} /> : null }
       </Paper>

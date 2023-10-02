@@ -473,9 +473,7 @@ function Search(props: SearchProperties) {
         <Box>
           <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
             <Grid align="center" m={10}>
-            <Grid.Col xs={0} sm={0} md={0} lg={1} xl={1}>
-            </Grid.Col>
-              <Grid.Col xs={12} sm={12} md={12} lg={10} xl={10}>
+              <Grid.Col span={12}>
                 <TextInput
                   placeholder="e.g. sequence accession, taxon identifier, genus name"
                   value={value}
@@ -523,7 +521,6 @@ function Search(props: SearchProperties) {
 
 
 export default function SearchPage() {
-  const theme = useMantineTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || "")

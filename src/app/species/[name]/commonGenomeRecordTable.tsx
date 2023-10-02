@@ -109,13 +109,13 @@ const fields: GenomeFieldProps[] = [
 
 function GenomeField(props: GenomeFieldProps) {
   return (
-    <Group position="left">
+    <Group justify="left">
       <ThemeIcon variant='light' size={28} radius='xl'>
         { props.icon }
       </ThemeIcon>
       <Box>
-        <Text color='dimmed' size='xs'>{props.label}</Text>
-        <Text size='sm' weight='bold' c={props.value ? "black" : "dimmed"}>
+        <Text c='dimmed' size='xs'>{props.label}</Text>
+        <Text size='sm' fw='bold' c={props.value ? "black" : "dimmed"}>
           { props.value?.toString() || "Not Supplied"}
         </Text>
       </Box>
@@ -160,20 +160,20 @@ function GenomeDetails({ record }: { record: CommonGenome }) {
       { record.associatedSequences?.nucleotides &&
         <><div style={{display:"-webkit-flex"}}>
           <Grid.Col span={6}>
-            <Group position="left">
+            <Group justify="left">
               <ThemeIcon variant='light' size={28} radius='xl'>
                 <IconLicense size={16}/>
               </ThemeIcon>
-              <Text color='dimmed' size='xs'>Coloured Barcode</Text>
+              <Text c='dimmed' size='xs'>Coloured Barcode</Text>
               <Barcode nucleotides={record.associatedSequences.nucleotides}/>
             </Group>
           </Grid.Col>
           <Grid.Col span={6}>
-            <Group position="left">
+            <Group justify="left">
               <ThemeIcon variant='light' size={28} radius='xl'>
                 <IconLicense size={16}/>
               </ThemeIcon>
-              <Text color='dimmed' size='xs'>Nucleotides</Text>
+              <Text c='dimmed' size='xs'>Nucleotides</Text>
               <textarea cols={100} rows={10} readOnly={true} value={record.associatedSequences.nucleotides} />
             </Group>
           </Grid.Col>
@@ -235,7 +235,7 @@ function GenomeRecord(props: GenomeRecordProps) {
         { props.record.accessionUri &&
           <td>
             <Link href={props.record.accessionUri} target="_blank">
-              <Button size="xs" variant="light" rightIcon={<ArrowUpRight size={16}/>}>All details</Button>
+              <Button size="xs" variant="light" rightSection={<ArrowUpRight size={16}/>}>All details</Button>
             </Link>
           </td>
         }
