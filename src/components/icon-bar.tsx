@@ -6,11 +6,8 @@ import { CircleCheck, CircleX } from "tabler-icons-react";
 import { AttributeIcon } from "./highlight-stack";
 
 interface IconData {
-  color: string;
   label?: string;
   image?: string;
-  text?: string;
-  text_color?: string;
   link?: string;
 }
 
@@ -18,218 +15,166 @@ const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
   native: {
     image: "native.svg",
     label: "Native Species",
-    color: "wheat.4",
   },
   extinct: {
-    text: "EX",
     label: "Extinct Species",
-    color: "black",
-    text_color: "red",
   },
   "extinct in the wild": {
-    text: "EW",
     label: "Extinct in the Wild",
-    color: "black",
   },
   "critically endangered": {
-    text: "CR",
     label: "Critically Endangered",
-    color: "red",
   },
   endangered: {
-    text: "EN",
     label: "Endangered Species",
-    color: "bushfire.4",
-    text_color: "bushfire.0",
   },
   vulnerable: {
-    text: "VU",
     label: "Vulnerable Species",
-    color: "wheat.5",
   },
   "vulnerable (wildfire)": {
-    text: "VU",
     label: "Vulnerable to Wildfire",
-    color: "bushfire.5",
   },
   threatened: {
-    text: "VU",
     label: "Threatened Species",
-    color: "wheat.5",
   },
   rare: {
-    text: "RA",
     label: "Rare Species",
-    color: "shellfish.6",
-    text_color: "moss.1",
   },
   "near threatened": {
-    text: "NT",
     label: "Near Threatened Species",
-    color: "shellfish.6",
-    text_color: "moss.1",
   },
   "least concern": {
-    text: "LC",
     label: "Least concern",
-    color: "shellfish.6",
   },
   unlisted: {
-    text: "UL",
     label: "Unlisted",
-    color: "shellfish.6",
   },
   no_status: {
     image: "threatened.svg",
-    color: "gray",
   }
 };
 
 const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   BACTERIA: {
-    image: "bacteria.svg",
+    image: "/species-icons/bacteria.svg",
     label: "Bacteria",
-    color: "shellfish.5",
     link: "/kingdom/Bacteria",
   },
   PROTISTS_AND_OTHER_UNICELLULAR_ORGANISMS: {
-    image: "protists.svg",
+    image: "/species-icons/protists.svg",
     label: "Protists and other unicellular organisms",
-    color: "wheat.2",
     link: "/kingdom/Protozoa",
   },
   FUNGI: {
-    image: "fungi.svg",
+    image: "/species-icons/fungi.svg",
     label: "Mushrooms and other fungi",
-    color: "bushfire.5",
     link: "/kingdom/Fungi",
   },
   MOLLUSCS: {
-    image: "molluscs.svg",
+    image: "/species-icons/molluscs.svg",
     label: "Molluscs",
-    color: "bushfire.4",
     link: "/phylum/Mollusca",
   },
   CRUSTACEANS: {
-    image: "crustaceans.svg",
+    image: "/species-icons/crustaceans.svg",
     label: "Marine crustaceans",
-    color: "red",
   },
   INSECTS: {
-    image: "insects_light.svg",
+    image: "/species-icons/insects.svg",
     label: "Insects",
-    color: "black",
     link: "/class/Insecta",
   },
   FROGS_AND_OTHER_AMPHIBIANS: {
-    image: "frogs_light.svg",
+    image: "/species-icons/frogs.svg",
     label: "Frogs and other amphibians",
-    color: "moss.5",
     link: "/class/Amphibia",
   },
   BIRDS: {
-    image: "birds_light.svg",
+    image: "/species-icons/birds.svg",
     label: "Birds",
-    color: "moss.7",
     link: "/class/Aves",
   },
   MAMMALS: {
-    image: "mammals.svg",
+    image: "/species-icons/mammals.svg",
     label: "Mammals",
-    color: "moss.3",
     link: "/class/Mammalia",
   },
   SEAWEEDS: {
-    image: "seaweed_light.svg",
+    image: "/species-icons/seaweed.svg",
     label: "Seaweeds",
-    color: "shellfish",
     link: "/kingdom/Chromista",
   },
   HIGHER_PLANTS: {
-    image: "plants_light.svg",
+    image: "/species-icons/plants.svg",
     label: "Higher plants",
-    color: "midnight",
     link: "/kingdom/Plantae",
   },
 
   FLOWERING_PLANTS: {
-      image: "plants_light.svg",
-      label: "Flowering plants",
-      color: "midnight",
-      link: "/kingdom/Plantae",
+    image: "/species-icons/plants.svg",
+    label: "Flowering plants",
+    link: "/kingdom/Plantae",
   },
   ANIMALS: {
-      image: "",
-      label: "Animals",
-      color: "midnight",
-      link: "/kingdom/Animalia",
+    image: "/species-icons/animals.svg",
+    label: "Animals",
+    link: "/kingdom/Animalia",
   },
   BROWN_ALGAE: {
-      image: "",
-      label: "Brown algae",
-      color: "midnight",
-      link: "/phylum/Phaeophycea",
+    image: "/species-icons/brown_algae",
+    label: "Brown algae",
+    link: "/phylum/Phaeophycea",
   },
   RED_ALGAE: {
-      image: "",
-      label: "Red algae",
-      color: "midnight",
-      link: "/phylum/Rhodophyta",
+    image: "/species-icons/red_algae",
+    label: "Red algae",
+    link: "/phylum/Rhodophyta",
   },
   GREEN_ALGAE: {
-      image: "",
-      label: "Green algae",
-      color: "midnight",
-      link: "/phylum/Chlorophyta",
+    image: "/species-icons/green_algae",
+    label: "Green algae",
+    link: "/phylum/Chlorophyta",
   },
   ECHINODERMS: {
-      image: "",
-      label: "Echinoderms",
-      color: "midnight",
-      link: "/phylum/Echinodermata",
+    image: "/species-icons/echinoderms.svg",
+    label: "Echinoderms",
+    link: "/phylum/Echinodermata",
   },
   FIN_FISHES: {
-      image: "",
-      label: "Fin fishes",
-      color: "midnight",
-      link: "/class/Actinopterygii",
+    image: "/species-icons/finfishes.svg",
+    label: "Fin fishes",
+    link: "/class/Actinopterygii",
   },
   CORALS_AND_JELLYFISHES: {
-      image: "",
-      label: "Corals and jellyfishes",
-      color: "midnight",
-      link: "/phylum/Cnidaria",
+    image: "/species-icons/cnidaria.svg",
+    label: "Corals and jellyfishes",
+    link: "/phylum/Cnidaria",
   },
   CYANOBACTERIA: {
-      image: "",
-      label: "Cyanobacteria",
-      color: "midnight",
-      link: "/phylum/Cyanobacteria",
+    image: "/species-icons/cyanobacteria.svg",
+    label: "Cyanobacteria",
+    link: "/phylum/Cyanobacteria",
   },
   SHARKS_AND_RAYS: {
-      image: "",
-      label: "Sharks and rays",
-      color: "midnight",
+    image: "/species-icons/sharks.svg",
+    label: "Sharks and rays",
   },
 };
 
 const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
   "Indigenous Ecological Knowledge: Kamilaroi People": {
     label: "Indigenous Ecological Knowledge: Kamilaroi People",
-    image: "iek_kamilaroi.svg",
-    color: "#f47c2e",
+    image: "/species-icons/iek_kamilaroi.svg",
     link: "/browse/datasets/Indigenous Ecological Knowledge: Kamilaroi People",
   },
   "Indigenous Ecological Knowledge: South East Arnhem Land": {
     label: "Indigenous Ecological Knowledge: South East Arnhem Land",
-    image: "iek_south_east_arnhem_land.svg",
-    color: "#a2c36e",
+    image: "/species-icons/iek_south_east_arnhem_land.svg",
     link: "/browse/datasets/Indigenous Ecological Knowledge: South East Arnhem Land",
   },
   "Indigenous Ecological Knowledge: Noongar Boodjar People": {
     label: "Indigenous Ecological Knowledge: Noongar Boodjar People",
-    image: "iek_noongar_boodjar.svg",
-    color: "#fec743",
+    image: "/species-icons/iek_noongar_boodjar.svg",
     link: "/browse/datasets/Indigenous Ecological Knowledge: Noongar Boodjar People",
   },
 }
@@ -240,16 +185,12 @@ function ConservationIcon({ status, source }: { status: string, source: string |
 
   return (
     <Tooltip label={tooltip}>
-      <ThemeIcon radius="xl" size={60} color={icon.color} p={10}>
-        {icon.text &&
-         <Text fw={700} fz={30} c={icon.text_color || "white"}>
-           {icon.text}
-         </Text>
-        }
+      <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
         {icon.image &&
          <Image
-           src={`/species-icons/${icon?.image}`}
+           src={icon?.image}
            alt={icon.label || status}
+           w={60}
          />
         }
       </ThemeIcon>
@@ -263,10 +204,11 @@ function VernacularGroupIcon({ group }: { group: string }) {
 
   const component = (
     <Tooltip label={icon.label}>
-      <ThemeIcon radius="xl" size={60} color={icon.color} p={10}>
+      <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
         <Image
-          src={`/species-icons/${icon.image}`}
+          src={icon.image}
           alt={`Icon of ${icon.label}`}
+          w={60}
         />
       </ThemeIcon>
     </Tooltip>
@@ -292,7 +234,7 @@ function IndigenousLanguageGroupIcon({ group, trait }: IndigenousLanguageGroupIc
   const component = (
     <Popover position="bottom" withArrow shadow="md" opened={opened}>
       <Popover.Target>
-        <Image height={60} src={`/species-icons/${icon?.image}`} alt="" onMouseEnter={open} onMouseLeave={close} />
+        <Image w={60} src={`/species-icons/${icon?.image}`} alt="" onMouseEnter={open} onMouseLeave={close} />
       </Popover.Target>
       <Popover.Dropdown>
         <Stack>
