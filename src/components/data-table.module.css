@@ -1,0 +1,33 @@
+.data-table {
+    height: 1px;
+
+    tbody tr {
+        height: 45;
+
+        td {
+            &:first-child {
+                text-align: left;
+                white-space: nowrap;
+                width: 1px;
+                padding-right: var(--mantine-spacing-xl);
+                font-size: var(--mantine-font-size-sm);
+                font-weight: 300;
+            }
+        }
+    }
+}
+
+.simple-text-table {
+    tbody tr td {
+        border-top: none;
+
+        &:first-child {
+            text-align: left;
+            white-space: nowrap;
+            width: 1;
+            padding-right: var(--mantine-spacing-xl);
+            font-size: var(--mantine-font-size-sm);
+            font-weight: 300;
+        }
+    }
+}

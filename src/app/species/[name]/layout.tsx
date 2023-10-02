@@ -63,7 +63,7 @@ export default function SpeciesLayout({ params, children }: SpeciesLayoutProps) 
   const [previousUrl] = useState('/search?' + searchParams.get('previousUrl') || "")
 
   return (
-      <Stack gap={0}>
+      <Stack gap={0} mt="xl">
         <Container mb={20} w="100%" maw={MAX_WIDTH}>
           <Link href={previousUrl}>
             <Group gap={5}>

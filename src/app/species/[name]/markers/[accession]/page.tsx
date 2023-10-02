@@ -4,23 +4,24 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  Center,
   Flex,
   Grid,
   Group,
   Paper,
   Stack,
-  Table,
   Text,
   Title,
 } from "@mantine/core";
-import { LoadPanel } from "@/app/components/load-overlay";
-import { AttributePill, DataField } from "@/app/components/highlight-stack";
+import { LoadPanel } from "@/components/load-overlay";
+import { AttributePill, DataField } from "@/components/highlight-stack";
 import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { CopyableData, useTableStyles } from "@/app/components/data-fields";
-import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/app/queries/sequence";
-import { ArgaMap } from "@/app/components/mapping";
+import { CopyableData } from "@/components/data-fields";
+import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
+import { ArgaMap } from "@/components/mapping";
+import { DataTable, DataTableRow } from "@/components/data-table";
+
 
 const GET_ASSEMBLY = gql`
   query MarkerFullData($recordId: String) {
@@ -77,71 +78,63 @@ type SequenceQueryResults = {
 
 
 function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
   return (
     <Grid>
       <Grid.Col span={8}>
-        <Table className={classes.table} w={1}>
-          <tbody>
-          <tr>
-            <td>Gene name</td>
-            <td><AttributePill value={sequencing?.targetGene} /></td>
-          </tr>
-          <tr>
-            <td>Sequence length</td>
-            <td><AttributePill value={sequencing?.ampliconSize} /></td>
-          </tr>
-          <tr>
-            <td>Source molecule</td>
-            <td><AttributePill value={undefined} /></td>
-          </tr>
-          <tr>
-            <td>Sequencing method</td>
-            <td><DataField value={undefined} /></td>
-          </tr>
-          <tr>
-            <td>Release date</td>
-            <td><DataField value={deposition?.eventDate} /></td>
-          </tr>
-          </tbody>
-        </Table>
+        <DataTable>
+          <DataTableRow label="Gene name">
+            <Flex>
+              <AttributePill value={sequencing?.targetGene} />
+            </Flex>
+          </DataTableRow>
+          <DataTableRow label="Sequence length">
+            <Flex>
+              <AttributePill value={sequencing?.estimatedSize} />
+            </Flex>
+          </DataTableRow>
+          <DataTableRow label="Source molecule">
+            <Flex>
+              <AttributePill value={undefined} />
+            </Flex>
+          </DataTableRow>
+          <DataTableRow label="Sequencing method">
+            <Flex>
+              <AttributePill value={undefined} />
+            </Flex>
+          </DataTableRow>
+          <DataTableRow label="Release date">
+            <Flex>
+              <AttributePill value={deposition?.eventDate} />
+            </Flex>
+          </DataTableRow>
+        </DataTable>
       </Grid.Col>
+
       <Grid.Col span={4}>
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button color="midnight" radius="md" leftIcon={<IconDownload />}>get FASTA</Button>
-            <Button color="midnight" radius="md" leftIcon={<IconLink />}>go to source</Button>
-            <Button color="midnight" radius="md" leftIcon={<CloudUpload />} disabled>send to Galaxy</Button>
+            <Button color="midnight" radius="md" leftSection={<IconDownload />}>get FASTA</Button>
+            <Button color="midnight" radius="md" leftSection={<IconLink />}>go to source</Button>
+            <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
           </Stack>
         </Paper>
       </Grid.Col>
 
       <Grid.Col span={12}>
-        <Table className={classes.table}>
-          <tbody>
-          <tr>
-            <td>Publication</td>
-            <td><DataField value={deposition?.reference} /></td>
-          </tr>
-          <tr>
-            <td>Sequence</td>
-            <td>
-              { sequencing?.dnaSequence
-                ?<CopyableData value={sequencing.dnaSequence} />
-                : <DataField value={undefined} />
-              }
-            </td>
-          </tr>
-          <tr>
-            <td>Translation</td>
-            <td><DataField value={undefined} /></td>
-          </tr>
-          </tbody>
-        </Table>
+        <DataTable>
+          <DataTableRow label="Publication"><DataField value={deposition?.reference} /></DataTableRow>
+          <DataTableRow label="Sequence">
+            { sequencing?.dnaSequence
+              ?<CopyableData value={sequencing.dnaSequence} />
+              : <DataField value={undefined} />
+            }
+          </DataTableRow>
+          <DataTableRow label="Translation"><DataField value={undefined} /></DataTableRow>
+        </DataTable>
       </Grid.Col>
     </Grid>
   )
@@ -156,9 +149,9 @@ function TraceData({ sequence }: { sequence: SequenceDetails | undefined }) {
 
 function DataAvailabilityItem({ value, children }: { value: boolean|undefined, children: React.ReactNode }) {
   return (
-    <Group noWrap>
+    <Group wrap="nowrap">
       { value ? <CircleCheck color="green" /> : <CircleX color="red" /> }
-      <Text fz="sm" weight={300}>{children}</Text>
+      <Text fz="sm" fw={300}>{children}</Text>
     </Group>
   )
 }
@@ -182,84 +175,48 @@ function DataAvailability({ sequence, specimen }: { sequence: SequenceDetails | 
 }
 
 function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
+  const sequencing = sequence?.events.sequencing[0];
+  const deposition = sequence?.events.dataDepositions[0];
 
   return (
-    <Table className={classes.table}>
-      <tbody>
-      <tr>
-        <td>Accession</td>
-        <td><DataField value={sequence?.recordId} /></td>
-      </tr>
-      <tr>
-        <td>Sequence author</td>
-        <td><DataField value={sequence?.events.sequencing[0]?.sequencedBy} /></td>
-      </tr>
-      <tr>
-        <td>Institution</td>
-        <td><DataField value={sequence?.events.dataDepositions[0]?.institutionName} /></td>
-      </tr>
-      <tr>
-        <td>Deposited by</td>
-        <td><DataField value={sequence?.events.dataDepositions[0]?.submittedBy} /></td>
-      </tr>
-      </tbody>
-    </Table>
+    <DataTable>
+      <DataTableRow label="Accession"><DataField value={sequence?.recordId} /></DataTableRow>
+      <DataTableRow label="Sequence author"><DataField value={sequencing?.sequencedBy} /></DataTableRow>
+      <DataTableRow label="Institution"><DataField value={deposition?.institutionName} /></DataTableRow>
+      <DataTableRow label="Deposited by"><DataField value={deposition?.submittedBy} /></DataTableRow>
+    </DataTable>
   )
 }
 
 function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
   const sequencingRun = sequence?.events.sequencingRuns[0];
 
   return (
-    <Table className={classes.table}>
-      <tbody>
-      <tr>
-        <td>Primer forward</td>
-        <td><DataField value={sequencingRun?.sequencePrimerForwardName} /></td>
-      </tr>
-      <tr>
-        <td>Primer reverse</td>
-        <td><DataField value={sequencingRun?.sequencingPrimerReverseName} /></td>
-      </tr>
-      <tr>
-        <td>Data source</td>
-        <td><DataField value={sequence?.datasetName} /></td>
-      </tr>
-      </tbody>
-    </Table>
+    <DataTable>
+      <DataTableRow label="Primer forward"><DataField value={sequencingRun?.sequencePrimerForwardName} /></DataTableRow>
+      <DataTableRow label="Primer reverse"><DataField value={sequencingRun?.sequencingPrimerReverseName} /></DataTableRow>
+      <DataTableRow label="Data source"><DataField value={sequence?.datasetName} /></DataTableRow>
+    </DataTable>
   )
 }
 
 function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  const { classes } = useTableStyles();
-  const basePath = usePathname()?.split('/').slice(1, 3).join('/');
-  const path = `${basePath}/specimens/${specimen?.recordId}`;
-
   return (
     <Grid>
       <Grid.Col span={7}>
         <Stack>
           <Title order={5}>Specimen information</Title>
-          <Table className={classes.table}>
-            <tbody>
-              <tr>
-                <td>Sample ID</td>
-                <td><DataField value={specimen?.recordId} /></td>
-              </tr>
-              <tr>
-                <td>Sequenced by</td>
-                <td><DataField value={specimen?.collectionCode} /></td>
-              </tr>
-            </tbody>
-          </Table>
 
-          <Flex justify="flex-end">
-            <Link href={path}>
-              <Button radius="md" color="midnight" leftIcon={<Microscope />}>go to specimen</Button>
+          <DataTable>
+            <DataTableRow label="Sample ID"><DataField value={specimen?.recordId} /></DataTableRow>
+            <DataTableRow label="Sequenced by"><DataField value={specimen?.collectionCode} /></DataTableRow>
+          </DataTable>
+
+          <Center>
+            <Link href={`../specimens/${specimen?.recordId}`}>
+              <Button radius="md" color="midnight" leftSection={<Microscope />}>go to specimen</Button>
             </Link>
-          </Flex>
+          </Center>
         </Stack>
       </Grid.Col>
       <Grid.Col span={5}>
@@ -271,10 +228,7 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
 
 function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
   return (
-    <Box pos="relative" h={180} sx={theme => ({
-      overflow: "hidden",
-      borderRadius: theme.radius.lg,
-    })}>
+    <Box pos="relative" h={180}>
       <ArgaMap />
     </Box>
   )
@@ -282,8 +236,6 @@ function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
 
 
 export default function MarkerPage({ params }: { params: { accession: string } }) {
-  let basePath = usePathname()?.replace(params.accession, '');
-
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
       recordId: params.accession,
@@ -295,9 +247,9 @@ export default function MarkerPage({ params }: { params: { accession: string } }
   }
 
   return (
-    <Stack spacing={20}>
-      <Link href={basePath || ''}>
-        <Group spacing={5}>
+    <Stack gap={20}>
+      <Link href="./">
+        <Group gap={5}>
           <ArrowNarrowLeft />
           <Text fz={18}>Back to markers</Text>
         </Group>
@@ -307,22 +259,22 @@ export default function MarkerPage({ params }: { params: { accession: string } }
         <Group align="inherit">
           <Title order={3} mb={10}>{`Full data view: ${data?.sequence.recordId}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
-          <Text fz="sm" c="dimmed" weight={700}>{data?.sequence.datasetName}</Text>
+          <Text fz="sm" c="dimmed" fw={700}>{data?.sequence.datasetName}</Text>
         </Group>
 
         <Grid>
-              <Grid.Col span={6}>
-                <LoadPanel visible={loading} h={450}>
-                  <Title order={5}>Molecule data</Title>
-                  <MoleculeDetails sequence={data?.sequence} />
-                </LoadPanel>
-              </Grid.Col>
-              <Grid.Col span={3}>
-                <LoadPanel visible={loading} h={450}>
-                  <Title order={5} mb={10}>Data availability</Title>
-                  <DataAvailability sequence={data?.sequence} specimen={data?.specimen} />
-                </LoadPanel>
-              </Grid.Col>
+          <Grid.Col span={6}>
+            <LoadPanel visible={loading} h={450}>
+              <Title order={5}>Molecule data</Title>
+              <MoleculeDetails sequence={data?.sequence} />
+            </LoadPanel>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <LoadPanel visible={loading} h={450}>
+              <Title order={5} mb={10}>Data availability</Title>
+              <DataAvailability sequence={data?.sequence} specimen={data?.specimen} />
+            </LoadPanel>
+          </Grid.Col>
 
           <Grid.Col span={3}>
             <LoadPanel visible={loading}>

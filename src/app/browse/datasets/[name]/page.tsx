@@ -1,19 +1,19 @@
 'use client';
 
-import { SpeciesCard } from "@/app/components/species-card";
-import { PieChart } from "@/app/components/graphing/pie";
+import { SpeciesCard } from "@/components/species-card";
+import { PieChart } from "@/components/graphing/pie";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Paper, SimpleGrid, Text, Title, Group, useMantineTheme, LoadingOverlay, Stack, Container } from "@mantine/core";
-import { useScrollIntoView } from "@mantine/hooks";
+import { Box, Paper, SimpleGrid, Text, Title, Group, Stack, Container } from "@mantine/core";
 import { useState } from "react";
-import { BarChart } from "@/app/components/graphing/bar";
-import { TachoChart } from "@/app/components/graphing/tacho";
-import { PaginationBar } from "@/app/components/pagination";
+import { BarChart } from "@/components/graphing/bar";
+import { TachoChart } from "@/components/graphing/tacho";
+import { PaginationBar } from "@/components/pagination";
 import Link from "next/link";
 import { MAX_WIDTH } from "@/app/constants";
+import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
 
 
-const PAGE_SIZE = 16;
+const PAGE_SIZE = 10;
 
 const GET_DATASET = gql`
 query DatasetDetails($name: String) {
@@ -123,50 +123,33 @@ type StatsQueryResults = {
 
 
 function Species({ dataset }: { dataset: string }) {
-  const theme = useMantineTheme();
   const [page, setPage] = useState(1);
-  const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
 
   const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
     variables: { name: dataset, page },
   });
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
-  if (!data) {
-    return <Text>No data</Text>;
-  }
-
-  const records = Array.from(data.dataset.species.records);
+  const records = Array.from(data?.dataset.species.records || []);
 
   return (
-    <Box>
-      <LoadingOverlay
-        overlayColor={theme.colors.midnight[0]}
-        transitionDuration={500}
-        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-        visible={loading}
-        radius="xl"
-      />
+    <>
+      <LoadOverlay visible={loading} />
 
       { error ? <Title order={4}>{error.message}</Title> : null }
 
-      { !loading && data &&
-        <SimpleGrid cols={4}>
-          {records.map((record) => (
-            <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
-          ))}
-        </SimpleGrid>
-      }
+      <SimpleGrid cols={5}>
+        {records.map((record) => (
+          <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
+        ))}
+      </SimpleGrid>
 
       <PaginationBar
         total={data?.dataset.species.total}
         page={page}
         pageSize={PAGE_SIZE}
-        onChange={page => { setPage(page); scrollIntoView() }}
+        onChange={setPage}
       />
-    </Box>
+    </>
   );
 }
 
@@ -207,29 +190,23 @@ function DataSummary({ dataset }: { dataset: string }) {
 
 
 function DatasetDetails({ dataset }: { dataset: string }) {
-  const theme = useMantineTheme();
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DATASET, {
     variables: { name: dataset }
   });
 
   return (
-    <Box>
-      <LoadingOverlay
-        overlayColor={theme.colors.midnight[0]}
-        transitionDuration={500}
-        loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-        visible={loading}
-        radius="xl"
-      />
+    <>
+      <LoadOverlay visible={loading} />
+
       { error ? <Text>{error.message}</Text> : null }
-      {data?.dataset.url &&
-       <Text weight={700} c="dimmed" size="sm">
-         Source: <Link href={data?.dataset.url} target="_blank">ALA Profiles</Link>
-       </Text>
+      { data?.dataset.url &&
+        <Text fw={700} c="dimmed" size="sm">
+          Source: <Link href={data?.dataset.url} target="_blank">ALA Profiles</Link>
+        </Text>
       }
       <Text c="dimmed" size="xs">{data?.dataset.citation}</Text>
       <Text c="dimmed" size="xs">&copy; {data?.dataset.rightsHolder}</Text>
-    </Box>
+    </>
   )
 }
 
@@ -238,16 +215,13 @@ export default function BrowseDataset({ params }: { params: { name: string } }) 
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
   return (
-    <Stack>
+    <Stack mt="xl">
       <Paper py={20} pos="relative">
         <Container maw={MAX_WIDTH}>
           <Title order={2}>{dataset}</Title>
           <DatasetDetails dataset={dataset} />
         </Container>
       </Paper>
-
-      <Box>
-      </Box>
 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>

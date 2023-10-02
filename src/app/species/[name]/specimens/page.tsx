@@ -7,7 +7,7 @@ import { useState } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { LoadOverlay } from "@/components/load-overlay";
 import { RecordItem } from "@/components/record-list";
-import { AttributeValue } from "@/components/highlight-stack";
+import { Attribute } from "@/components/highlight-stack";
 import { ArgaMap } from "@/components/mapping";
 import { usePathname } from "next/navigation";
 
@@ -145,13 +145,13 @@ function RecordItemContent({ record }: { record: Specimen }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
-          <AttributeValue label="Collection location" value={record.locality} />
+          <Attribute label="Collection location" value={record.locality} />
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Type status" value={record.typeStatus} />
+          <Attribute label="Type status" value={record.typeStatus} />
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Genomic data" value={record.sequences > 0 ? "yes" : "no"}/>
+          <Attribute label="Genomic data" value={record.sequences > 0 ? "yes" : "no"}/>
         </Grid.Col>
       </Grid>
   )

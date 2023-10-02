@@ -1,5 +1,7 @@
 "use client";
 
+import classes from "@/components/data-table.module.css";
+
 import { gql, useQuery } from "@apollo/client";
 import {
   Box,
@@ -23,6 +25,7 @@ import { AccessionEvent, CollectionEvent, Specimen } from "@/queries/specimen";
 import { Subsample, SubsampleEvent } from "@/queries/subsample";
 import { DnaExtract, DnaExtractionEvent } from "@/queries/dna-extract";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
+import { DataTable, DataTableRow } from "@/components/data-table";
 
 
 const GET_SPECIMEN = gql`
@@ -119,135 +122,42 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
   return (
     <Grid>
       <Grid.Col span={4}>
-        <Table>
-          <tbody>
-            <tr>
-              <td>Field identifier</td>
-              <td><DataField value={collection?.fieldNumber}/></td>
-            </tr>
-            <tr>
-              <td>Organism name</td>
-              <td><DataField value={specimen?.organismId}/></td>
-            </tr>
-          </tbody>
-        </Table>
-      </Grid.Col>
-      <Grid.Col span={4}>
-        <Table>
-          <tbody>
-            <tr>
-              <td>Collected by</td>
-              <td><DataField value={specimen?.recordedBy}/></td>
-            </tr>
-            <tr>
-              <td>Identified by</td>
-              <td><DataField value={specimen?.identifiedBy}/></td>
-            </tr>
-          </tbody>
-        </Table>
-      </Grid.Col>
-      <Grid.Col span={4}>
-        <Table>
-          <tbody>
-            <tr>
-              <td>Collection location</td>
-              <td><DataField value={specimen?.locality} /></td>
-            </tr>
-            <tr>
-              <td>Coordinates</td>
-              <td><DataField value={coordinates}/></td>
-            </tr>
-          </tbody>
-        </Table>
-      </Grid.Col>
+        <DataTable>
+          <DataTableRow label="Field identifier"><DataField value={collection?.fieldNumber} /></DataTableRow>
+          <DataTableRow label="Organism name"><DataField value={specimen?.organismId} /></DataTableRow>
+          <DataTableRow label="Habitat"><DataField value={collection?.habitat} /></DataTableRow>
+          <DataTableRow label="Elevation"><DataField value={specimen?.elevation} /></DataTableRow>
+          <DataTableRow label="Environment (broad)"><DataField value={collection?.envBroadScale} /></DataTableRow>
+          <DataTableRow label="Environment medium"><DataField value={collection?.envMedium} /></DataTableRow>
+          <DataTableRow label="Preparation"><DataField value={collection?.preparation} /></DataTableRow>
 
-      <Grid.Col span={8}>
-        <Grid>
-          <Grid.Col span={6}>
-            <Table>
-              <tbody>
-                <tr>
-                  <td>Habitat</td>
-                  <td><DataField value={collection?.habitat} /></td>
-                </tr>
-                <tr>
-                  <td>Elevation</td>
-                  <td><DataField value={specimen?.elevation}/></td>
-                </tr>
-                <tr>
-                  <td>Environment (broad)</td>
-                  <td><DataField value={collection?.envBroadScale}/></td>
-                </tr>
-                <tr>
-                  <td>Environment medium</td>
-                  <td><DataField value={collection?.envMedium}/></td>
-                </tr>
-                <tr>
-                  <td>Preparation</td>
-                  <td><DataField value={collection?.preparation}/></td>
-                </tr>
-              </tbody>
-            </Table>
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Table>
-              <tbody>
-                <tr>
-                  <td>Sampling protocol</td>
-                  <td><DataField value={undefined} /></td>
-                </tr>
-                <tr>
-                  <td>Depth (m)</td>
-                  <td><DataField value={specimen?.depth}/></td>
-                </tr>
-                <tr>
-                  <td>Environment (local)</td>
-                  <td><DataField value={collection?.envBroadScale}/></td>
-                </tr>
-                <tr>
-                  <td>Life stage</td>
-                  <td><DataField value={collection?.lifeStage}/></td>
-                </tr>
-                <tr>
-                  <td>Sex</td>
-                  <td><DataField value={collection?.sex}/></td>
-                </tr>
-              </tbody>
-            </Table>
-          </Grid.Col>
-        </Grid>
-
-        <Table>
-          <tbody>
-            <tr>
-              <td>Fixation method</td>
-              <td><DataField value={collection?.preparation} /></td>
-            </tr>
-            <tr>
-              <td>Other data</td>
-              <td><DataField value={specimen?.remarks}/></td>
-            </tr>
-            <tr>
-              <td>Source</td>
-              <td><DataField value={specimen?.institutionName}/></td>
-            </tr>
-            <tr>
-              <td>Publication</td>
-              <td><DataField value={undefined}/></td>
-            </tr>
-            <tr>
-              <td>Field notes</td>
-              <td><DataField value={collection?.fieldNotes}/></td>
-            </tr>
-            <tr>
-              <td>Remarks</td>
-              <td><DataField value={collection?.remarks}/></td>
-            </tr>
-          </tbody>
-        </Table>
+          <DataTableRow label="Fixation method"><DataField value={undefined} /></DataTableRow>
+          <DataTableRow label="Other data"><DataField value={specimen?.remarks} /></DataTableRow>
+          <DataTableRow label="Source"><DataField value={specimen?.institutionName} /></DataTableRow>
+          <DataTableRow label="Publication"><DataField value={undefined} /></DataTableRow>
+          <DataTableRow label="Field notes"><DataField value={collection?.fieldNotes} /></DataTableRow>
+          <DataTableRow label="Remarks"><DataField value={collection?.remarks} /></DataTableRow>
+        </DataTable>
       </Grid.Col>
 
       <Grid.Col span={4}>
+        <DataTable>
+          <DataTableRow label="Collected by"><DataField value={specimen?.recordedBy} /></DataTableRow>
+          <DataTableRow label="Identified by"><DataField value={specimen?.identifiedBy} /></DataTableRow>
+          <DataTableRow label="Sampling protocol"><DataField value={undefined} /></DataTableRow>
+          <DataTableRow label="Depth (m)"><DataField value={specimen?.depth} /></DataTableRow>
+          <DataTableRow label="Environment (local)"><DataField value={collection?.envLocalScale} /></DataTableRow>
+          <DataTableRow label="Life stage"><DataField value={collection?.lifeStage} /></DataTableRow>
+          <DataTableRow label="Sex"><DataField value={collection?.sex} /></DataTableRow>
+        </DataTable>
+      </Grid.Col>
+
+      <Grid.Col span={4}>
+        <DataTable>
+          <DataTableRow label="Collection location"><DataField value={specimen?.locality} /></DataTableRow>
+          <DataTableRow label="Coordinates"><DataField value={coordinates} /></DataTableRow>
+        </DataTable>
+
         <SpecimenMap specimen={specimen}/>
       </Grid.Col>
     </Grid>
@@ -260,125 +170,52 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
 
   return (
     <SimpleGrid cols={3}>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Registration number</td>
-            <td><DataField value={accession?.accession}/></td>
-          </tr>
-          <tr>
-            <td>Collection</td>
-            <td><DataField value={specimen?.collectionCode}/></td>
-          </tr>
-          <tr>
-            <td>Type status</td>
-            <td><AttributePill value={accession?.typeStatus}/></td>
-          </tr>
-          <tr>
-            <td>Organism name</td>
-            <td><DataField value={specimen?.organismId}/></td>
-          </tr>
-          <tr>
-            <td>Disposition</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Data source</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Institution</td>
-            <td><DataField value={accession?.institutionName}/></td>
-          </tr>
-          <tr>
-            <td>Identified by</td>
-            <td><DataField value={specimen?.identifiedBy}/></td>
-          </tr>
-          <tr>
-            <td>Fixation method</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr></tr>
-          <tr></tr>
-          <tr></tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Institution code</td>
-            <td><DataField value={specimen?.institutionCode}/></td>
-          </tr>
-          <tr>
-            <td>Identified date</td>
-            <td><DataField value={specimen?.identifiedDate}/></td>
-          </tr>
-          <tr>
-            <td>Identification remarks</td>
-            <td><DataField value={specimen?.identificationRemarks}/></td>
-          </tr>
-          <tr></tr>
-          <tr></tr>
-          <tr></tr>
-        </tbody>
-      </Table>
+      <DataTable>
+        <DataTableRow label="Registration number"><DataField value={accession?.accession} /></DataTableRow>
+        <DataTableRow label="Collection"><DataField value={specimen?.collectionCode} /></DataTableRow>
+        <DataTableRow label="Type status"><AttributePill value={accession?.typeStatus} /></DataTableRow>
+        <DataTableRow label="Organism name"><DataField value={specimen?.organismId} /></DataTableRow>
+        <DataTableRow label="Disposition"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Data source"><DataField value={undefined} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Institution"><DataField value={accession?.institutionName} /></DataTableRow>
+        <DataTableRow label="Identified by"><DataField value={specimen?.identifiedBy} /></DataTableRow>
+        <DataTableRow label="Fixation method"><DataField value={undefined} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Institution code"><DataField value={accession?.institutionCode} /></DataTableRow>
+        <DataTableRow label="Identified date"><DataField value={specimen?.identifiedDate} /></DataTableRow>
+        <DataTableRow label="Identification remarks"><DataField value={specimen?.identificationRemarks} /></DataTableRow>
+      </DataTable>
     </SimpleGrid>
   )
 }
 
 
 function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) {
+  const event = subsample?.events.subsamples[0];
+
   return (
     <SimpleGrid cols={3}>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Sample number</td>
-            <td><DataField value={subsample?.materialSampleId}/></td>
-          </tr>
-          <tr>
-            <td>Subsample available</td>
-            <td><AttributePill value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Data source</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Subsampled by</td>
-            <td><DataField value={subsample?.institutionName}/></td>
-          </tr>
-          <tr>
-            <td>Remarks</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Preparation type</td>
-            <td><DataField value={subsample?.events.subsamples[0].preparationType}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Subsampling date</td>
-            <td><DataField value={subsample?.events.subsamples[0].eventDate}/></td>
-          </tr>
-          <tr>
-            <td>Type status</td>
-            <td><DataField value={subsample?.typeStatus}/></td>
-          </tr>
-          <tr></tr>
-        </tbody>
-      </Table>
+      <DataTable>
+        <DataTableRow label="Sample number"><DataField value={subsample?.materialSampleId} /></DataTableRow>
+        <DataTableRow label="Subsample available"><AttributePill value={undefined} /></DataTableRow>
+        <DataTableRow label="Data source"><DataField value={undefined} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Subsampled by"><DataField value={event?.subsampledBy} /></DataTableRow>
+        <DataTableRow label="Remarks"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Preparation type"><DataField value={event?.preparationType} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Subsampling date"><DataField value={event?.eventDate} /></DataTableRow>
+        <DataTableRow label="Type status"><DataField value={subsample?.typeStatus} /></DataTableRow>
+      </DataTable>
     </SimpleGrid>
   )
 }
@@ -389,75 +226,28 @@ function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined
 
   return (
     <SimpleGrid cols={3}>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Extraction number</td>
-            <td><DataField value={dnaExtract?.recordId}/></td>
-          </tr>
-          <tr>
-            <td>Extract available</td>
-            <td><AttributePill value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Data source</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Quality</td>
-            <td><DataField value={extraction?.quality}/></td>
-          </tr>
-          <tr>
-            <td>Absorbance 260/230</td>
-            <td><DataField value={extraction?.absorbance260230}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Extracted by</td>
-            <td><DataField value={extraction?.extractedBy}/></td>
-          </tr>
-          <tr>
-            <td>Protocol</td>
-            <td><DataField value={extraction?.extractionMethod}/></td>
-          </tr>
-          <tr>
-            <td>Measurement method</td>
-            <td><DataField value={extraction?.measurementMethod}/></td>
-          </tr>
-          <tr>
-            <td>Concentration method</td>
-            <td><DataField value={extraction?.concentrationMethod}/></td>
-          </tr>
-          <tr>
-            <td>Absorbance 260/280</td>
-            <td><DataField value={extraction?.absorbance260280}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>DNA extraction date</td>
-            <td><DataField value={extraction?.eventDate}/></td>
-          </tr>
-          <tr>
-            <td>Preparation</td>
-            <td><DataField value={extraction?.preparationType}/></td>
-          </tr>
-          <tr>
-            <td>Preservation</td>
-            <td><DataField value={extraction?.preservationType}/></td>
-          </tr>
-          <tr>
-            <td>Concentration</td>
-            <td><DataField value={extraction?.concentration}/></td>
-          </tr>
-          <tr></tr>
-        </tbody>
-      </Table>
+      <DataTable>
+        <DataTableRow label="Extraction number"><DataField value={dnaExtract?.recordId} /></DataTableRow>
+        <DataTableRow label="Extract available"><AttributePill value={undefined} /></DataTableRow>
+        <DataTableRow label="Data source"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Quality"><DataField value={extraction?.quality} /></DataTableRow>
+        <DataTableRow label="Absorbance 260/230"><DataField value={extraction?.absorbance260230} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Extracted by"><DataField value={extraction?.extractedBy} /></DataTableRow>
+        <DataTableRow label="Protocol"><DataField value={extraction?.extractionMethod} /></DataTableRow>
+        <DataTableRow label="Measurement method"><DataField value={extraction?.measurementMethod} /></DataTableRow>
+        <DataTableRow label="Concentration method"><DataField value={extraction?.concentrationMethod} /></DataTableRow>
+        <DataTableRow label="Absorbance 260/280"><DataField value={extraction?.absorbance260280} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="DNA Extraction date"><DataField value={extraction?.eventDate} /></DataTableRow>
+        <DataTableRow label="Preparation"><DataField value={extraction?.preparationType} /></DataTableRow>
+        <DataTableRow label="Preservation"><DataField value={extraction?.preservationType} /></DataTableRow>
+        <DataTableRow label="Concentration"><DataField value={extraction?.concentration} /></DataTableRow>
+      </DataTable>
     </SimpleGrid>
   )
 }
@@ -469,90 +259,32 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
 
   return (
     <SimpleGrid cols={3}>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Amplification number</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Target region</td>
-            <td><DataField value={sequencing?.targetGene}/></td>
-          </tr>
-          <tr>
-            <td>Sequence numbers</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Sequencing protocol</td>
-            <td><DataField value={sequencingRun?.libraryProtocol}/></td>
-          </tr>
-          <tr>
-            <td>Data source</td>
-            <td><DataField value={sequence?.datasetName}/></td>
-          </tr>
-          <tr>
-            <td>Concentration</td>
-            <td><DataField value={sequencing?.concentration}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Amplified by</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Primer forward</td>
-            <td><DataField value={sequencingRun?.sequencePrimerForwardName}/></td>
-          </tr>
-          <tr>
-            <td>Sequenced by</td>
-            <td><DataField value={sequencing?.sequencedBy}/></td>
-          </tr>
-          <tr>
-            <td>Visualised by</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Amplicon size</td>
-            <td><DataField value={sequencing?.ampliconSize}/></td>
-          </tr>
-          <tr>
-            <td>Bait set name</td>
-            <td><DataField value={sequencing?.baitSetName}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Amplification date</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Primer reverse</td>
-            <td><DataField value={sequencingRun?.sequencingPrimerReverseName}/></td>
-          </tr>
-          <tr>
-            <td>Sequencing date</td>
-            <td><DataField value={sequencing?.eventDate}/></td>
-          </tr>
-          <tr>
-            <td>Visualisation date</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Estimated size</td>
-            <td><DataField value={sequencing?.estimatedSize}/></td>
-          </tr>
-          <tr>
-            <td>Bait set reference</td>
-            <td><DataField value={sequencing?.baitSetReference}/></td>
-          </tr>
-        </tbody>
-      </Table>
+      <DataTable>
+        <DataTableRow label="Amplification number"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Target region"><DataField value={sequencing?.targetGene} /></DataTableRow>
+        <DataTableRow label="Sequence numbers"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Sequencing protocol"><DataField value={sequencingRun?.libraryProtocol} /></DataTableRow>
+        <DataTableRow label="Data source"><DataField value={sequence?.datasetName} /></DataTableRow>
+        <DataTableRow label="Concentration"><DataField value={sequencing?.concentration} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Amplified by"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Primer forward"><DataField value={sequencingRun?.sequencePrimerForwardName} /></DataTableRow>
+        <DataTableRow label="Sequenced by"><DataField value={sequencing?.sequencedBy} /></DataTableRow>
+        <DataTableRow label="Visualised by"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Amplicon size"><DataField value={sequencing?.ampliconSize} /></DataTableRow>
+        <DataTableRow label="Bait set name"><DataField value={sequencing?.baitSetName} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Amplification date"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Primer reverse"><DataField value={sequencingRun?.sequencingPrimerReverseName} /></DataTableRow>
+        <DataTableRow label="Sequencing date"><DataField value={sequencing?.eventDate} /></DataTableRow>
+        <DataTableRow label="Visualisation date"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Estimated size"><DataField value={sequencing?.estimatedSize} /></DataTableRow>
+        <DataTableRow label="Bait set reference"><DataField value={sequencing?.baitSetReference} /></DataTableRow>
+      </DataTable>
     </SimpleGrid>
   )
 }
@@ -562,66 +294,26 @@ function Assemblies({ sequence }: { sequence: SequenceDetails | undefined }) {
 
   return (
     <SimpleGrid cols={3}>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Assembly number</td>
-            <td><DataField value={assembly?.name}/></td>
-          </tr>
-          <tr>
-            <td>Assembly level</td>
-            <td><AttributePill value={assembly?.quality}/></td>
-          </tr>
-          <tr>
-            <td>Data source</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Genome size</td>
-            <td><DataField value={assembly?.genomeSize}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Assembled by</td>
-            <td><DataField value={assembly?.assembledBy}/></td>
-          </tr>
-          <tr>
-            <td>Institution</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Number of scaffolds</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Version</td>
-            <td><DataField value={assembly?.versionStatus}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Assembly date</td>
-            <td><DataField value={assembly?.eventDate}/></td>
-          </tr>
-          <tr>
-            <td>Assembly method</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>CG content</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Name</td>
-            <td><DataField value={assembly?.name}/></td>
-          </tr>
-        </tbody>
-      </Table>
+      <DataTable>
+        <DataTableRow label="Assembly number"><DataField value={assembly?.name} /></DataTableRow>
+        <DataTableRow label="Assembly level"><AttributePill value={assembly?.quality} /></DataTableRow>
+        <DataTableRow label="Data source"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Genome size"><DataField value={assembly?.genomeSize} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Assembled by"><DataField value={assembly?.assembledBy} /></DataTableRow>
+        <DataTableRow label="Institution"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Number of scaffolds"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Version"><DataField value={assembly?.versionStatus} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Assembly date"><DataField value={assembly?.eventDate} /></DataTableRow>
+        <DataTableRow label="Assembly method"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="CG content"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Name"><DataField value={assembly?.name} /></DataTableRow>
+      </DataTable>
     </SimpleGrid>
   )
 }
@@ -631,54 +323,23 @@ function Annotations({ sequence }: { sequence: SequenceDetails | undefined }) {
 
   return (
     <SimpleGrid cols={3}>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Annotation number</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Representation</td>
-            <td><DataField value={annotation?.representation}/></td>
-          </tr>
-          <tr>
-            <td>Data source</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Annotated by</td>
-            <td><DataField value={annotation?.annotatedBy}/></td>
-          </tr>
-          <tr>
-            <td>Institution</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Coverage</td>
-            <td><DataField value={annotation?.coverage}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Annotated date</td>
-            <td><DataField value={annotation?.eventDate}/></td>
-          </tr>
-          <tr>
-            <td>Annotation method</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>BUSCO score</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-        </tbody>
-      </Table>
+      <DataTable>
+        <DataTableRow label="Annotation number"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Representation"><DataField value={annotation?.representation} /></DataTableRow>
+        <DataTableRow label="Data source"><DataField value={undefined} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Annotated by"><DataField value={annotation?.annotatedBy} /></DataTableRow>
+        <DataTableRow label="Institution"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Coverage"><DataField value={annotation?.coverage} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Annotated date"><DataField value={annotation?.eventDate} /></DataTableRow>
+        <DataTableRow label="Annotation method"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="BUSCO score"><DataField value={undefined} /></DataTableRow>
+      </DataTable>
     </SimpleGrid>
   )
 }
@@ -688,74 +349,27 @@ function Depositions({ sequence }: { sequence: SequenceDetails | undefined }) {
 
   return (
     <SimpleGrid cols={3}>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Accession number</td>
-            <td><DataField value={deposition?.accession}/></td>
-          </tr>
-          <tr>
-            <td>Sample number</td>
-            <td><DataField value={deposition?.materialSampleId}/></td>
-          </tr>
-          <tr>
-            <td>Data source</td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-          <tr>
-            <td>Data type</td>
-            <td><DataField value={deposition?.dataType}/></td>
-          </tr>
-          <tr>
-            <td>Reference</td>
-            <td><DataField value={deposition?.reference}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Deposited by</td>
-            <td><DataField value={deposition?.submittedBy}/></td>
-          </tr>
-          <tr>
-            <td>Institution</td>
-            <td><DataField value={deposition?.institutionName}/></td>
-          </tr>
-          <tr>
-            <td>Collection</td>
-            <td><DataField value={deposition?.collectionName}/></td>
-          </tr>
-          <tr>
-            <td>Rights holder</td>
-            <td><DataField value={deposition?.rightsHolder}/></td>
-          </tr>
-          <tr>
-            <td>Title</td>
-            <td><DataField value={deposition?.title}/></td>
-          </tr>
-        </tbody>
-      </Table>
-      <Table>
-        <tbody>
-          <tr>
-            <td>Deposition date</td>
-            <td><DataField value={deposition?.eventDate}/></td>
-          </tr>
-          <tr>
-            <td>Last updated</td>
-            <td><DataField value={deposition?.lastUpdated}/></td>
-          </tr>
-          <tr>
-            <td>Access rights</td>
-            <td><DataField value={deposition?.accessRights}/></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td><DataField value={undefined}/></td>
-          </tr>
-        </tbody>
-      </Table>
+      <DataTable>
+        <DataTableRow label="Accession number"><DataField value={deposition?.accession} /></DataTableRow>
+        <DataTableRow label="Sample number"><DataField value={deposition?.materialSampleId} /></DataTableRow>
+        <DataTableRow label="Data source"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Data type"><DataField value={deposition?.dataType} /></DataTableRow>
+        <DataTableRow label="Reference"><DataField value={deposition?.reference} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Deposited by"><DataField value={deposition?.submittedBy} /></DataTableRow>
+        <DataTableRow label="Institution"><DataField value={deposition?.institutionName} /></DataTableRow>
+        <DataTableRow label="Collection"><DataField value={deposition?.collectionName} /></DataTableRow>
+        <DataTableRow label="Rights holder"><DataField value={deposition?.rightsHolder} /></DataTableRow>
+        <DataTableRow label="Title"><DataField value={deposition?.title} /></DataTableRow>
+      </DataTable>
+
+      <DataTable>
+        <DataTableRow label="Deposition date"><DataField value={deposition?.eventDate} /></DataTableRow>
+        <DataTableRow label="Last updated"><DataField value={deposition?.lastUpdated} /></DataTableRow>
+        <DataTableRow label="Access rights"><DataField value={deposition?.accessRights} /></DataTableRow>
+      </DataTable>
     </SimpleGrid>
   )
 }
@@ -780,55 +394,55 @@ function EventTimeline(props: EventTimelineProps) {
 
   return (
     <Timeline color="midnight" active={8} bulletSize={45} lineWidth={4}>
-      <Timeline.Item bullet={<Image src='/timeline-icons/collection.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Collection</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/collection.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Collection</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={collection?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/accession.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Accession</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/accession.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Accession</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={accession?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/subsampling.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Subsampling</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/subsampling.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Subsampling</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={subsample?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/extraction.svg'/>} title={<Text fz="sm" ml={20} fw={700}>DNA extraction</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/extraction.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>DNA extraction</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={extraction?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/sequencing.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Amplification and sequencing</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/sequencing.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Amplification and sequencing</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={sequence?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/assembly.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Sequence assembly</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/assembly.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Sequence assembly</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={assembly?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/annotation.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Sequence annotation</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/annotation.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Sequence annotation</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={annotation?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/deposition.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Data deposition</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/deposition.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Data deposition</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={deposition?.eventDate} fz="xs"/>
         </Group>
       </Timeline.Item>
-      <Timeline.Item bullet={<Image src='/timeline-icons/data-reuse.svg'/>} title={<Text fz="sm" ml={20} fw={700}>Data reuse</Text>}>
+      <Timeline.Item bullet={<Image src='/timeline-icons/data-reuse.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Data reuse</Text>}>
         <Group>
           <Text ml={30} fz="xs" fw={300}>Event date</Text>
           <DataField value={undefined} fz="xs"/>
@@ -836,6 +450,11 @@ function EventTimeline(props: EventTimelineProps) {
       </Timeline.Item>
     </Timeline>
   )
+}
+
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return <Box px={20} pt={30} pb={15}>{children}</Box>
 }
 
 
@@ -867,9 +486,9 @@ export default function SpecimenPage({ params }: { params: { accession: string }
           <Text fz="sm" c="dimmed">Source</Text>
         </Group>
 
-        <Grid gutter={0}>
-          <Grid.Col span={3}>
-            <Paper p={15} bg="#d6e4ed" h="100%" style={{ borderRadius: "10px 0 10px 10px" }}>
+        <Grid columns={24} gutter={0}>
+          <Grid.Col span={5}>
+            <Paper p={15} bg="#d6e4ed" h="100%" style={{ borderRadius: "10px 0 10px 10px", border: "none" }}>
               <EventTimeline
                 specimen={data?.specimen}
                 subsample={data?.subsample}
@@ -879,40 +498,42 @@ export default function SpecimenPage({ params }: { params: { accession: string }
             </Paper>
           </Grid.Col>
 
-          <Grid.Col span={9}>
+          <Grid.Col span={19}>
             <Stack>
-              <Paper px={20} pt={30} pb={15} bg="#eaf1f5" style={{ borderRadius: "0 10px 10px 0" }}>
-                <Title order={5}>Collection event</Title>
-                <Collections specimen={data?.specimen} />
+              <Paper bg="#eaf1f5" withBorder={false} style={{ borderRadius: "0 10px 10px 0", border: "none" }}>
+                <Panel>
+                  <Title order={5}>Collection event</Title>
+                  <Collections specimen={data?.specimen} />
+                </Panel>
               </Paper>
-              <Paper px={20} pt={30} pb={15}>
+              <Panel>
                 <Title order={5}>Accession event</Title>
                 <Accessions specimen={data?.specimen} />
-              </Paper>
-              <Paper px={20} pt={30} pb={15}>
+              </Panel>
+              <Panel>
                 <Title order={5}>Subsample event</Title>
                 <Subsamples subsample={data?.subsample} />
-              </Paper>
-              <Paper px={20} pt={30} pb={15}>
+              </Panel>
+              <Panel>
                 <Title order={5}>DNA extraction event</Title>
                 <DnaExtracts dnaExtract={data?.dnaExtract} />
-              </Paper>
-              <Paper px={20} pt={30} pb={15}>
+              </Panel>
+              <Panel>
                 <Title order={5}>Amplificaton and sequencing event</Title>
                 <Sequencing sequence={data?.sequence} />
-              </Paper>
-              <Paper px={20} pt={30} pb={15}>
+              </Panel>
+              <Panel>
                 <Title order={5}>Sequence assembly event</Title>
                 <Assemblies sequence={data?.sequence} />
-              </Paper>
-              <Paper px={20} pt={30} pb={15}>
+              </Panel>
+              <Panel>
                 <Title order={5}>Sequence annotation event</Title>
                 <Annotations sequence={data?.sequence} />
-              </Paper>
-              <Paper px={20} pt={30} pb={15}>
+              </Panel>
+              <Panel>
                 <Title order={5}>Data deposition event</Title>
                 <Depositions sequence={data?.sequence} />
-              </Paper>
+              </Panel>
             </Stack>
           </Grid.Col>
         </Grid>

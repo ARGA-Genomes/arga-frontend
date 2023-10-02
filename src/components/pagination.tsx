@@ -1,4 +1,4 @@
-import { Center, Pagination, Paper } from "@mantine/core";
+import { Box, Center, Pagination } from "@mantine/core";
 
 
 interface PaginationBarProps {
@@ -14,7 +14,7 @@ export function PaginationBar({ total, page, pageSize, onChange }: PaginationBar
   if (totalPages <= 1) return null;
 
   return (
-    <Paper bg="white" p={20} my={40} radius="lg">
+    <Box p={20} my={40}>
       <Center>
       <Pagination
         color="attribute.2"
@@ -26,6 +26,6 @@ export function PaginationBar({ total, page, pageSize, onChange }: PaginationBar
         onChange={onChange}
       />
       </Center>
-    </Paper>
+    </Box>
   )
 }

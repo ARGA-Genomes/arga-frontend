@@ -17,27 +17,6 @@ export function HighlightStack({ children, ...rest }: HighlightStackProps | Stac
 }
 
 
-interface AttributeProps {
-  label: string,
-  value?: string | number,
-  href?: string,
-}
-
-export function Attribute({ label, value, href }: AttributeProps) {
-  value ||= "No data";
-
-  return (
-    <Stack gap={0}>
-      <Text size="sm">{label}</Text>
-        <Paper py={5} px={15} bg="#f5f5f5" radius="md">
-          <Link href={href || "#"}>
-            <Text size="lg">{value}</Text>
-          </Link>
-        </Paper>
-    </Stack>
-  )
-}
-
 const BADGE_COLOURS: Record<string, string> = {
   "yes": "moss.3",
   "no": "bushfire.3",
@@ -55,7 +34,7 @@ export function AttributePill({ value }: { value: string | number | undefined })
   const color = BADGE_COLOURS[value] || "#d6e4ed";
 
   return (
-    <Paper py={5} px={15} bg={color} radius="xl">
+    <Paper py={5} px={15} bg={color} radius="xl" style={{ border: "none" }}>
       <Center>
         <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>{value}</Text>
       </Center>
@@ -63,28 +42,20 @@ export function AttributePill({ value }: { value: string | number | undefined })
   )
 }
 
-export function AttributeValue({ label, value }: AttributeProps) {
-  return (
-    <Stack gap={5}>
-      <Text fw={300} size="sm">{label}</Text>
-      <AttributePill value={value} />
-    </Stack>
-  )
+interface AttributeProps {
+  label: string,
+  value?: string | number,
+  href?: string,
 }
 
-export function AttributeLink({ label, value, href }: AttributeProps) {
-  value ||= "No data";
-
+export function Attribute({ label, value, href }: AttributeProps) {
   return (
     <Stack gap={5}>
       <Text fw={300} size="sm">{label}</Text>
-      <Center>
-        <Paper py={5} px={15} bg="#d6e4ed" radius="xl">
-          <Link href={href || "#"}>
-            <Text fw={600} size="sm">{value}</Text>
-          </Link>
-        </Paper>
-      </Center>
+      { href
+        ? <Link href={href}><AttributePill value={value} /></Link>
+        : <AttributePill value={value} />
+      }
     </Stack>
   )
 }

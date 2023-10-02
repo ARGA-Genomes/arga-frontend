@@ -26,14 +26,6 @@ type OverviewResults = {
   overview: Overview;
 };
 
-/* styles={{
-*   control: {
-*     '&[data-inactive]': {
-*       opacity: 0,
-*       cursor: 'default',
-*     },
-*   },
-* }} */
 
 export default function BrowseTaxon() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
@@ -46,6 +38,7 @@ export default function BrowseTaxon() {
       slideGap={{ base: "md", sm: 0 }}
       slidesToScroll='auto'
       align="start"
+      withControls={false}
     >
       <Group>
       <Carousel.Slide>

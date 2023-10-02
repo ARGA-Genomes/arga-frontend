@@ -31,7 +31,7 @@ import { Filter, intoFilterItem } from "@/components/filtering/common";
 import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/components/pagination";
-import { AttributeLink, AttributeValue, DataField } from "@/components/highlight-stack";
+import { Attribute, DataField } from "@/components/highlight-stack";
 import { useDisclosure } from "@mantine/hooks";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { VernacularGroupFilters } from "@/components/filtering/vernacular-group";
@@ -44,6 +44,7 @@ import { TachoChart } from "@/components/graphing/tacho";
 import { PieChart } from "@/components/graphing/pie";
 import { BarChart } from "@/components/graphing/bar";
 import { BushfireRecoveryFilters } from '@/components/filtering/bushfire-recovery';
+import { DataTable, DataTableRow } from '@/components/data-table';
 
 
 const PAGE_SIZE = 10;
@@ -123,21 +124,6 @@ query TaxonSpecies($rank: TaxonRank, $canonicalName: String) {
   }
 }`;
 
-const GET_STATS = gql`
-query TaxonStats($canonicalName: String) {
-  stats {
-    order(order: $canonicalName) {
-      totalFamilies
-      familiesWithData
-      breakdown {
-        name
-        total
-      }
-    }
-  }
-}
-`;
-
 type DataBreakdown = {
   name?: string,
   genomes: number,
@@ -197,19 +183,6 @@ type QueryResults = {
   taxa: Taxa,
 };
 
-type StatsResults = {
-  stats: {
-    order: {
-      totalFamilies: number,
-      familiesWithData: number,
-      breakdown: {
-        name: string,
-        total: number,
-      }
-    }
-  }
-}
-
 type TaxonResults = {
   taxon: Taxonomy,
 }
@@ -265,20 +238,8 @@ function SpeciesCard({ species }: { species: Species }) {
   );
 }
 
-const speciesTotalRecords = (species: Species) => {
-  return (
-    species.dataSummary.wholeGenomes +
-    species.dataSummary.organelles +
-    species.dataSummary.barcodes +
-    species.dataSummary.other
-  );
-};
-
 
 function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
-    /* const { classes } = useTableStyles(); */
-    {/* <Table className={classes.simpleTable}> */ }
-
   return (
     <Table>
       <tbody>
@@ -302,12 +263,12 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
 function HigherClassification({ taxon }: { taxon: Taxonomy | undefined }) {
   return (
     <Group>
-      { taxon?.kingdom && <AttributeLink label="Kingdom" value={taxon?.kingdom} href={`/kingdom/${taxon?.kingdom}`} /> }
-      { taxon?.phylum && <AttributeLink label="Phylum" value={taxon?.phylum} href={`/phylum/${taxon?.phylum}`} />  }
-      { taxon?.class && <AttributeLink label="Class" value={taxon?.class} href={`/class/${taxon?.class}`} /> }
-      { taxon?.order && <AttributeLink label="Order" value={taxon?.order} href={`/order/${taxon?.order}`} /> }
-      { taxon?.family && <AttributeLink label="Family" value={taxon?.family} href={`/family/${taxon?.family}`} /> }
-      { taxon?.genus && <AttributeLink label="Genus" value={taxon?.genus} href={`/genus/${taxon?.genus}`} /> }
+      { taxon?.kingdom && <Attribute label="Kingdom" value={taxon?.kingdom} href={`/kingdom/${taxon?.kingdom}`} /> }
+      { taxon?.phylum && <Attribute label="Phylum" value={taxon?.phylum} href={`/phylum/${taxon?.phylum}`} />  }
+      { taxon?.class && <Attribute label="Class" value={taxon?.class} href={`/class/${taxon?.class}`} /> }
+      { taxon?.order && <Attribute label="Order" value={taxon?.order} href={`/order/${taxon?.order}`} /> }
+      { taxon?.family && <Attribute label="Family" value={taxon?.family} href={`/family/${taxon?.family}`} /> }
+      { taxon?.genus && <Attribute label="Genus" value={taxon?.genus} href={`/genus/${taxon?.genus}`} /> }
     </Group>
   )
 }
@@ -348,7 +309,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Higher classification filters"
             description="Limit data based on taxonomy"
-            image="/card-icons/data_type_higher_taxon_report.svg"
+            image="/card-icons/type/higher_taxon_report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -361,7 +322,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Vernacular group"
             description="Birds, Flowering plants, Bacteria, etc."
-            image="/card-icons/data_type_species_and_subspecies_report.svg"
+            image="/card-icons/type/species_report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -374,7 +335,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Regions"
             description="Ecological and administrative boundaries"
-            image="/card-icons/list_group_terrestrial.svg"
+            image="/card-icons/dataset/terrestrial.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -408,7 +369,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Bushfire traits"
             description="Bushfire vulnerability and recovery"
-            image="/card-icons/list_group_Firevulnerable.svg"
+            image="/card-icons/dataset/fire_vulnerable.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -632,37 +593,39 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
       <Grid.Col span="content">
         <Paper p="xl" radius="lg" withBorder>
           <Title order={5}>Taxonomic breakdown</Title>
-          <Table>
-            <tbody>
-              <tr>
-                <td>Number of {childTaxon}</td>
-                <td><DataField value={taxon?.summary.children} /></td>
-              </tr>
-              <tr>
-                <td>Number of species/OTUs</td>
-                <td><DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} /></td>
-              </tr>
-              <tr>
-                <td>{Humanize.capitalize(childTaxon)} with genomes</td>
-                <td><DataField value={rankGenomes?.length} /></td>
-              </tr>
-              <tr>
-                <td>Species with genomes</td>
-                <td><DataField value={speciesGenomes?.length} /></td>
-              </tr>
-              <tr>
-                <td>{Humanize.capitalize(childTaxon)} with data</td>
-                <td><DataField value={rankOther?.length} /></td>
-              </tr>
-              <tr>
-                <td>Species with data</td>
-                <td><DataField value={speciesOther?.length} /></td>
-              </tr>
-            </tbody>
-          </Table>
+
+          <DataTable my={8}>
+            <DataTableRow label={`Number of ${childTaxon}`}>
+              <DataField value={taxon?.summary.children}></DataField>
+            </DataTableRow>
+            <DataTableRow label="Number of species/OTUs">
+              <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
+            </DataTableRow>
+            <DataTableRow label={`${Humanize.capitalize(childTaxon)} with genomes`}>
+              <DataField value={rankGenomes?.length} />
+            </DataTableRow>
+            <DataTableRow label="Species with genomes">
+              <DataField value={speciesGenomes?.length} />
+            </DataTableRow>
+            <DataTableRow label={`${Humanize.capitalize(childTaxon)} with data`}>
+              <DataField value={rankOther?.length} />
+            </DataTableRow>
+            <DataTableRow label="Species with data">
+              <DataField value={speciesOther?.length} />
+            </DataTableRow>
+          </DataTable>
+
           <Stack mx={10} mt={5}>
-            <AttributeValue label="Species with most genomes" value={speciesGenomes && speciesGenomes[0]?.name} />
-            <AttributeValue label="Species with most data" value={speciesOther && speciesOther[0]?.name} />
+            <Attribute
+              label="Species with most genomes"
+              value={speciesGenomes && speciesGenomes[0]?.name}
+              href={`/species/${speciesGenomes && speciesGenomes[0].name?.replaceAll(' ', '_')}/taxonomy`}
+            />
+            <Attribute
+              label="Species with most data"
+              value={speciesOther && speciesOther[0]?.name}
+              href={`/species/${speciesOther && speciesOther[0].name.replaceAll(' ', '_')}/taxonomy`}
+            />
           </Stack>
         </Paper>
       </Grid.Col>

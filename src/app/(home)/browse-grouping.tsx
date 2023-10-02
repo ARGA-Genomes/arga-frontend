@@ -38,6 +38,7 @@ export default function BrowseGrouping() {
       slideGap={{ base: "md", sm: 0 }}
       slidesToScroll='auto'
       align="start"
+      withControls={false}
     >
       <Group>
       <Carousel.Slide>

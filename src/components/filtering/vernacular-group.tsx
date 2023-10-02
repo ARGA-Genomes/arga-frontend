@@ -126,7 +126,7 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ label, image, ...others }: ItemProps, ref) => (
     <div ref={ref} {...others}>
-      <Group noWrap>
+      <Group wrap="nowrap">
         <Avatar src={image} />
         <div>
           <Text size="sm">{label}</Text>
@@ -162,7 +162,6 @@ export function VernacularGroupFilters({ value, onChange }: VernacularGroupFilte
   return (
     <Stack>
       <Select
-        itemComponent={SelectItem}
         data={data}
         value={value ? constantCase(value) : null}
         clearable

@@ -28,15 +28,6 @@ type OverviewResults = {
 export default function BrowseType() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
   if (error) return <p>Error : {error.message}</p>;
-    /*
-    *       styles={{
-    *         control: {
-    *           '&[data-inactive]': {
-    *             opacity: 0,
-    *             cursor: 'default',
-    *           },
-    *         },
-    *       }} */
 
   return (
     <Carousel
@@ -45,6 +36,7 @@ export default function BrowseType() {
       slideGap={{ base: "md", sm: 0 }}
       slidesToScroll='auto'
       align="start"
+      withControls={false}
     >
       <Group>
       <Carousel.Slide>

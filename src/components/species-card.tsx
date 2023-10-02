@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Box, Card, Text, Title, Image, Grid } from "@mantine/core";
+import { Box, Card, Text, Title, Image, Grid, Group, Stack, SimpleGrid } from "@mantine/core";
 import { CircleCheck, CircleX } from "tabler-icons-react";
 
 
@@ -25,23 +25,15 @@ export interface Species {
 }
 
 
-function DataItem({ name, count }: { name: string, count: number | undefined }) {
-  const hasData = count && count > 0;
-  const dimmed = 'rgba(134, 142, 150, .5)';
-  const extraDimmed = 'rgba(134, 142, 150, .3)';
+
+function DataItem({ name, count }: { name: string; count: number }) {
+  const hasData = count > 0;
 
   return (
-    <Grid>
-      <Grid.Col span="content" pb={0} pr={0} mr={0}>
-        { hasData ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} /> }
-      </Grid.Col>
-      <Grid.Col span="auto">
-        <Text c={hasData ? "black" : dimmed} fw={hasData ? 500 : 400 }>{name}</Text>
-      </Grid.Col>
-      <Grid.Col span="content">
-        <Text c={hasData ? "black" : dimmed} fw={hasData ? 500 : 400 }>{count || 0} records</Text>
-      </Grid.Col>
-    </Grid>
+    <Group>
+      {hasData ? <CircleCheck color="green" /> : <CircleX color="red" />}
+      <Text fw={300} fz="xs">{ name }</Text>
+    </Group>
   )
 }
 
@@ -49,31 +41,38 @@ function DataItem({ name, count }: { name: string, count: number | undefined }) 
 export function SpeciesCard({ species }: { species: Species }) {
   const itemLinkName = species.taxonomy.canonicalName?.replaceAll(" ", "_");
 
-  function small(photo: Photo) {
+  function small(photo: { url: string }) {
     return photo.url.replaceAll("original", "small");
   }
 
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
-      <Link href={`/species/${itemLinkName}/taxonomy`}>
-        <Title order={4}>{ species.taxonomy.canonicalName }</Title>
-      </Link>
-
-      <Box py={20}>
-        <DataItem name="Whole genome" count={species.dataSummary?.wholeGenomes} />
-        <DataItem name="Organelles" count={species.dataSummary?.organelles} />
-        <DataItem name="Barcode" count={species.dataSummary?.barcodes} />
-        <DataItem name="Other" count={species.dataSummary?.other} />
-      </Box>
-
       <Card.Section>
         <Link href={`/species/${itemLinkName}/taxonomy`}>
-          { species.photo
-            ? <Image src={small(species.photo)} height={160} alt={species.taxonomy.canonicalName} />
-            : <Image withPlaceholder height={160} alt={species.taxonomy.canonicalName} />
-          }
+          {species.photo ? (
+            <Image
+              src={small(species.photo)}
+              height={260}
+              alt={species.taxonomy.canonicalName}
+            />
+          ) : (
+            <Image
+              height={260}
+              alt={species.taxonomy.canonicalName}
+            />
+          )}
         </Link>
       </Card.Section>
+
+      <Stack gap={5}>
+        <Link href={`/species/${itemLinkName}/taxonomy`}>
+          <Text fz="sm" fw={700} fs="italic">{species.taxonomy.canonicalName}</Text>
+        </Link>
+        <SimpleGrid cols={2}>
+          <DataItem name="Genome" count={species.dataSummary.wholeGenomes} />
+          <DataItem name="Genetic marker" count={species.dataSummary.barcodes} />
+        </SimpleGrid>
+      </Stack>
     </Card>
   )
 }

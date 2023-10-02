@@ -2,7 +2,7 @@ import { Button, Stack, Grid, Select, Flex } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import { useEffect } from "react";
 import { Minus, Plus } from "tabler-icons-react";
-import { CommonFiltersProps, DebouncedInputFilter, Filter } from "./common";
+import { DebouncedInputFilter, Filter } from "./common";
 
 
 const CLASSIFICATIONS = [
@@ -75,7 +75,7 @@ export function HigherClassificationFilters({ filters, onChange }: HigherClassif
           </Grid.Col>
         </Grid>
       ))}
-      <Button color="midnight" leftIcon={<Plus />} onClick={addFilter}>Add filter</Button>
+      <Button color="midnight" leftSection={<Plus />} onClick={addFilter}>Add filter</Button>
     </Stack>
   )
 }

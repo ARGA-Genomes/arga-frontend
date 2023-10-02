@@ -4,7 +4,7 @@ import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Center, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from "@mantine/core";
 import { useState } from "react";
-import { AttributePill, AttributeValue, DataField } from "@/components/highlight-stack";
+import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
 import { PaginationBar } from "@/components/pagination";
 import { ArgaMap } from "@/components/mapping";
@@ -133,10 +133,10 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Genome size" value={Humanize.fileSize(record.genomeSize || 0)}/>
+          <Attribute label="Genome size" value={Humanize.fileSize(record.genomeSize || 0)}/>
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Assembly level" value={record.quality}/>
+          <Attribute label="Assembly level" value={record.quality}/>
         </Grid.Col>
       </Grid>
   )
@@ -238,28 +238,28 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
 
       <SimpleGrid cols={5} spacing={50}>
         <Stack>
-          <AttributeValue label="Genome size" value={Humanize.fileSize(genome?.genomeSize || 0)} />
-          <AttributeValue label="Ungapped length" value={Humanize.fileSize(0)} />
-          <AttributeValue label="BUSCO score" value={undefined} />
+          <Attribute label="Genome size" value={Humanize.fileSize(genome?.genomeSize || 0)} />
+          <Attribute label="Ungapped length" value={Humanize.fileSize(0)} />
+          <Attribute label="BUSCO score" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="Number of chromosones" value={undefined} />
-          <AttributeValue label="Number of organelles" value={undefined} />
+          <Attribute label="Number of chromosones" value={undefined} />
+          <Attribute label="Number of organelles" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="Number of scaffolds" value={undefined} />
-          <AttributeValue label="Scaffold N50" value={Humanize.fileSize(0)} />
-          <AttributeValue label="Scaffold L50" value={undefined} />
+          <Attribute label="Number of scaffolds" value={undefined} />
+          <Attribute label="Scaffold N50" value={Humanize.fileSize(0)} />
+          <Attribute label="Scaffold L50" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="Number of contigs" value={undefined} />
-          <AttributeValue label="Contig N50" value={Humanize.fileSize(0)} />
-          <AttributeValue label="Contig L50" value={undefined} />
+          <Attribute label="Number of contigs" value={undefined} />
+          <Attribute label="Contig N50" value={Humanize.fileSize(0)} />
+          <Attribute label="Contig L50" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="GC percentage" value={undefined} />
-          <AttributeValue label="Genome coverage" value={undefined} />
-          <AttributeValue label="Assembly level" value={genome?.quality} />
+          <Attribute label="GC percentage" value={undefined} />
+          <Attribute label="Genome coverage" value={undefined} />
+          <Attribute label="Assembly level" value={genome?.quality} />
         </Stack>
       </SimpleGrid>
     </Paper>

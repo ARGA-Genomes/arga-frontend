@@ -43,11 +43,12 @@ export function CopyableData({ value }: { value: string }) {
       type="always"
       w={500}
       p={5}
-      sx={{
+      ml={12}
+      style={{
         border: "1px solid #cfcfcf",
         borderRadius: 10,
       }}>
-      <Text>{value}</Text>
+      <Text fw={300} fz="xs">{value}</Text>
     </ScrollArea>
   )
 }

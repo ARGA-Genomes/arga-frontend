@@ -5,24 +5,22 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
-  Flex,
+  Center,
   Grid,
   Group,
   Paper,
   SimpleGrid,
   Stack,
-  Table,
   Text,
   Title,
 } from "@mantine/core";
-import { LoadPanel } from "@/app/components/load-overlay";
-import { AttributePill, AttributeValue, DataField } from "@/app/components/highlight-stack";
+import { LoadPanel } from "@/components/load-overlay";
+import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useTableStyles } from "@/app/components/data-fields";
-import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/app/queries/sequence";
-import { ArgaMap } from "@/app/components/mapping";
+import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
+import { ArgaMap } from "@/components/mapping";
+import { DataTable, DataTableRow } from "@/components/data-table";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($recordId: String) {
@@ -82,57 +80,38 @@ type SequenceQueryResults = {
 
 
 function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
+  const assembly = sequence?.events.assemblies[0];
+  const annotation = sequence?.events.annotations[0];
+  const deposition = sequence?.events.dataDepositions[0];
 
   return (
     <Grid>
       <Grid.Col span={8}>
-        <Table className={classes.table} w={1}>
-          <tbody>
-          <tr>
-            <td>Genome status</td>
-            <td><AttributePill value={sequence?.events.dataDepositions[0]?.dataType} /></td>
-          </tr>
-          <tr>
-            <td>Representation</td>
-            <td><AttributePill value={sequence?.events.annotations[0]?.representation} /></td>
-          </tr>
-          <tr>
-            <td>Assembly type</td>
-            <td><AttributePill value={sequence?.events.assemblies[0]?.assemblyType} /></td>
-          </tr>
-          <tr>
-            <td>Release date</td>
-            <td><DataField value={sequence?.events.dataDepositions[0]?.eventDate} /></td>
-          </tr>
-          <tr>
-            <td>Release type</td>
-            <td><AttributePill value={sequence?.events.annotations[0]?.releaseType} /></td>
-          </tr>
-          <tr>
-            <td>Version status</td>
-            <td><DataField value={sequence?.events.assemblies[0]?.versionStatus} /></td>
-          </tr>
-          <tr>
-            <td>Sequencing method</td>
-            <td><DataField value={undefined} /></td>
-          </tr>
-          <tr>
-            <td>Publication</td>
-            <td><DataField value={sequence?.events.dataDepositions[0].title} /></td>
-          </tr>
-          </tbody>
-        </Table>
+        <DataTable w={1}>
+          <DataTableRow label="Genome status"><AttributePill value={deposition?.dataType} /></DataTableRow>
+          <DataTableRow label="Representation"><AttributePill value={annotation?.representation} /></DataTableRow>
+          <DataTableRow label="Assembly type"><AttributePill value={assembly?.assemblyType} /></DataTableRow>
+          <DataTableRow label="Release date"><DataField value={deposition?.eventDate} /></DataTableRow>
+          <DataTableRow label="Release type"><AttributePill value={annotation?.releaseType} /></DataTableRow>
+          <DataTableRow label="Version status"><DataField value={assembly?.versionStatus} /></DataTableRow>
+          <DataTableRow label="Sequencing method"><DataField value={undefined} /></DataTableRow>
+          <DataTableRow label="Publication"><DataField value={deposition?.title} /></DataTableRow>
+        </DataTable>
       </Grid.Col>
       <Grid.Col span={4}>
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button color="midnight" radius="md" leftIcon={<IconDownload />}>get data</Button>
-            <Button color="midnight" radius="md" leftIcon={<IconLink />}>go to source</Button>
-            <Button color="midnight" radius="md" leftIcon={<CloudUpload />} disabled>send to Galaxy</Button>
+            <Button color="midnight" radius="md" leftSection={<IconDownload />}>get data</Button>
+            <Button color="midnight" radius="md" leftSection={<IconLink />}>go to source</Button>
+            <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
           </Stack>
         </Paper>
+      </Grid.Col>
+      <Grid.Col span={12}>
+        <DataTable>
+          <DataTableRow label="Publication"><DataField value={deposition?.title} /></DataTableRow>
+        </DataTable>
       </Grid.Col>
     </Grid>
   )
@@ -144,30 +123,30 @@ function AssemblyStats({ sequence }: { sequence: SequenceDetails | undefined }) 
   return (
       <SimpleGrid cols={2} spacing={50}>
         <Stack>
-          <AttributeValue label="Genome size" value={Humanize.fileSize(assembly?.genomeSize || 0)} />
-          <AttributeValue label="Ungapped length" value={Humanize.fileSize(0)} />
+          <Attribute label="Genome size" value={Humanize.compactInteger(assembly?.genomeSize || 0, 3)} />
+          <Attribute label="Ungapped length" value={Humanize.compactInteger(0)} />
         </Stack>
         <Stack>
-          <AttributeValue label="Number of chromosones" value={undefined} />
-          <AttributeValue label="Number of organelles" value={undefined} />
+          <Attribute label="Number of chromosones" value={undefined} />
+          <Attribute label="Number of organelles" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="Assembly level" value={assembly?.quality} />
-          <AttributeValue label="BUSCO score" value={undefined} />
+          <Attribute label="Assembly level" value={assembly?.quality} />
+          <Attribute label="BUSCO score" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="Genome coverage" value={undefined} />
-          <AttributeValue label="GC percentage" value={undefined} />
+          <Attribute label="Genome coverage" value={undefined} />
+          <Attribute label="GC percentage" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="Number of scaffolds" value={undefined} />
-          <AttributeValue label="Scaffold N50" value={Humanize.fileSize(0)} />
-          <AttributeValue label="Scaffold L50" value={undefined} />
+          <Attribute label="Number of scaffolds" value={undefined} />
+          <Attribute label="Scaffold N50" value={undefined} />
+          <Attribute label="Scaffold L50" value={undefined} />
         </Stack>
         <Stack>
-          <AttributeValue label="Number of contigs" value={undefined} />
-          <AttributeValue label="Contig N50" value={Humanize.fileSize(0)} />
-          <AttributeValue label="Contig L50" value={undefined} />
+          <Attribute label="Number of contigs" value={undefined} />
+          <Attribute label="Contig N50" value={undefined} />
+          <Attribute label="Contig L50" value={undefined} />
         </Stack>
       </SimpleGrid>
   )
@@ -175,9 +154,9 @@ function AssemblyStats({ sequence }: { sequence: SequenceDetails | undefined }) 
 
 function DataAvailabilityItem({ value, children }: { value: boolean|undefined, children: React.ReactNode }) {
   return (
-    <Group noWrap>
+    <Group wrap="nowrap">
       { value ? <CircleCheck color="green" /> : <CircleX color="red" /> }
-      <Text fz="sm" weight={300}>{children}</Text>
+      <Text fz="sm" fw={300}>{children}</Text>
     </Group>
   )
 }
@@ -201,64 +180,39 @@ function DataAvailability({ sequence, specimen }: { sequence: SequenceDetails | 
 }
 
 function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined }) {
-  const { classes } = useTableStyles();
+  const sequencing = sequence?.events.sequencing[0];
+  const assembly = sequence?.events.assemblies[0];
+  const annotation = sequence?.events.annotations[0];
+  const deposition = sequence?.events.dataDepositions[0];
 
   return (
-    <Table className={classes.table}>
-      <tbody>
-      <tr>
-        <td>Accession</td>
-        <td><DataField value={sequence?.events.dataDepositions[0]?.accession} /></td>
-      </tr>
-      <tr>
-        <td>Sequenced by</td>
-        <td><DataField value={sequence?.events.sequencing[0]?.sequencedBy} /></td>
-      </tr>
-      <tr>
-        <td>Assembled by</td>
-        <td><DataField value={sequence?.events.assemblies[0]?.assembledBy} /></td>
-      </tr>
-      <tr>
-        <td>Annotated by</td>
-        <td><DataField value={sequence?.events.annotations[0]?.annotatedBy} /></td>
-      </tr>
-      <tr>
-        <td>Deposited by</td>
-        <td><DataField value={sequence?.events.dataDepositions[0]?.submittedBy} /></td>
-      </tr>
-      </tbody>
-    </Table>
+    <DataTable>
+      <DataTableRow label="Accession"><DataField value={deposition?.accession} /></DataTableRow>
+      <DataTableRow label="Sequenced by"><DataField value={sequencing?.sequencedBy} /></DataTableRow>
+      <DataTableRow label="Assembled by"><DataField value={assembly?.assembledBy} /></DataTableRow>
+      <DataTableRow label="Annotated by"><DataField value={annotation?.annotatedBy} /></DataTableRow>
+      <DataTableRow label="Deposited by"><DataField value={deposition?.submittedBy} /></DataTableRow>
+    </DataTable>
   )
 }
 
 function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  const { classes } = useTableStyles();
-  const basePath = usePathname()?.split('/').slice(1, 3).join('/');
-  const path = `${basePath}/specimens/${specimen?.recordId}`;
-
   return (
     <Grid>
       <Grid.Col span={7}>
         <Stack>
           <Title order={5}>Specimen information</Title>
-          <Table className={classes.table}>
-            <tbody>
-              <tr>
-                <td>Sample ID</td>
-                <td><DataField value={specimen?.recordId} /></td>
-              </tr>
-              <tr>
-                <td>Sequenced by</td>
-                <td><DataField value={specimen?.collectionCode} /></td>
-              </tr>
-            </tbody>
-          </Table>
 
-          <Flex justify="flex-end">
-            <Link href={path}>
-              <Button radius="md" color="midnight" leftIcon={<Microscope />}>go to specimen</Button>
+          <DataTable>
+            <DataTableRow label="Sample ID"><DataField value={specimen?.recordId} /></DataTableRow>
+            <DataTableRow label="Sequenced by"><DataField value={specimen?.collectionCode} /></DataTableRow>
+          </DataTable>
+
+          <Center>
+            <Link href={`../specimens/${specimen?.recordId}`}>
+              <Button radius="md" color="midnight" leftSection={<Microscope />}>go to specimen</Button>
             </Link>
-          </Flex>
+          </Center>
         </Stack>
       </Grid.Col>
       <Grid.Col span={5}>
@@ -270,10 +224,7 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
 
 function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
   return (
-    <Box pos="relative" h={180} sx={theme => ({
-      overflow: "hidden",
-      borderRadius: theme.radius.lg,
-    })}>
+    <Box pos="relative" h={180}>
       <ArgaMap />
     </Box>
   )
@@ -281,8 +232,6 @@ function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
 
 
 export default function AssemblyPage({ params }: { params: { accession: string } }) {
-  let basePath = usePathname()?.replace(params.accession, '');
-
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
       recordId: params.accession,
@@ -294,9 +243,9 @@ export default function AssemblyPage({ params }: { params: { accession: string }
   }
 
   return (
-    <Stack spacing={20}>
-      <Link href={basePath || ''}>
-        <Group spacing={5}>
+    <Stack gap={20}>
+      <Link href="./">
+        <Group gap={5}>
           <ArrowNarrowLeft />
           <Text fz={18}>Back to whole genomes</Text>
         </Group>
@@ -306,7 +255,7 @@ export default function AssemblyPage({ params }: { params: { accession: string }
         <Group align="inherit">
           <Title order={3} mb={10}>{`Full data view: ${data?.sequence.recordId}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
-          <Text fz="sm" c="dimmed" weight={700}>{data?.sequence.datasetName}</Text>
+          <Text fz="sm" c="dimmed" fw={700}>{data?.sequence.datasetName}</Text>
         </Group>
 
         <Grid>

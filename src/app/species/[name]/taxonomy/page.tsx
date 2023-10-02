@@ -8,19 +8,18 @@ import {
   Image,
   Paper,
   SimpleGrid,
-  Spoiler,
   Stack,
-  Table,
   Text,
 } from "@mantine/core";
 import { Photo, Taxonomy, IndigenousEcologicalKnowledge } from "@/app/type";
 import Link from "next/link";
 
-import { AttributeLink, HighlightStack } from "@/components/highlight-stack";
+import { Attribute, HighlightStack } from "@/components/highlight-stack";
 import { ExternalLink } from "tabler-icons-react";
 import { useEffect, useState } from "react";
 import { SurveyModal } from "@/components/survey-modal";
 import { LoadOverlay } from "@/components/load-overlay";
+import { DataTable, DataTableRow } from "@/components/data-table";
 
 
 const GET_SUMMARY = gql`
@@ -203,47 +202,33 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
       <Text fw={700} mb={10} size="lg">Taxonomy</Text>
 
       <SimpleGrid cols={2}>
-        <Table>
-          <tbody>
-          <tr>
-            <td><Text fw={300} size="sm">Scientific name</Text></td>
-            <td>
-              <Group>
-                <Text fw={600} size="sm" fs="italic">{taxonomy.canonicalName}</Text>
-                <Text fw={600} size="sm">{taxonomy.authority}</Text>
-              </Group>
-            </td>
-          </tr>
-          <tr>
-            <td><Text fw={300} size="sm">Status</Text></td>
-            <td><Text fw={600} size="sm">{taxonomy.status.toLowerCase()}</Text></td>
-          </tr>
-          <tr>
-            <td><Text fw={300} size="sm">Synonyms</Text></td>
-            <td>
+        <DataTable>
+          <DataTableRow label="Scientific name">
+            <Group gap={10}>
+              <Text fw={600} fz="sm" fs="italic">{taxonomy.canonicalName}</Text>
+              <Text fw={600} fz="sm">{taxonomy.authority}</Text>
+            </Group>
+          </DataTableRow>
+          <DataTableRow label="Status">
+            <Text fw={600} fz="sm">{taxonomy.status.toLowerCase()}</Text>
+          </DataTableRow>
+          <DataTableRow label="Synonyms">
+            <Stack>
               { taxonomy.synonyms.map(synonym => (
-                <Text fw={600} size="sm" key={synonym.scientificName}>{synonym.scientificName}</Text>
+                <Text fw={600} fz="sm" key={synonym.scientificName}>{synonym.scientificName}</Text>
               ))}
-            </td>
-          </tr>
-          </tbody>
-        </Table>
+            </Stack>
+          </DataTableRow>
+        </DataTable>
 
-        <Stack>
-          <Table>
-            <tbody>
-            <tr>
-              <td><Text fw={300} size="sm">Common names</Text></td>
-              <td>
-                <Spoiler maxHeight={24} showLabel="Show more" hideLabel="Hide">
-                  <Text fw={600} size="sm">{taxonomy.vernacularNames?.map(r => r.name).join(', ')}</Text>
-                </Spoiler>
-              </td>
-            </tr>
-            </tbody>
-          </Table>
-          <AttributeLink label="Subspecies" value="" href="#" />
-        </Stack>
+        <DataTable>
+          <DataTableRow label="Common names">
+            <Text fw={600} fz="sm" truncate="end" w="400">
+              {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
+            </Text>
+          </DataTableRow>
+          <DataTableRow label="Subspecies"></DataTableRow>
+        </DataTable>
       </SimpleGrid>
     </Paper>
   );
@@ -256,12 +241,12 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
       <Text fw={700} mb={10} size="lg">Higher classification</Text>
 
       <Group>
-        <AttributeLink label="Kingdom" value={taxonomy.kingdom} href={`/kingdom/${taxonomy.kingdom}`} />
-        <AttributeLink label="Phylum" value={taxonomy.phylum} href={`/phylum/${taxonomy.phylum}`} />
-        <AttributeLink label="Class" value={taxonomy.class} href={`/class/${taxonomy.class}`} />
-        <AttributeLink label="Order" value={taxonomy.order} href={`/order/${taxonomy.order}`} />
-        <AttributeLink label="Family" value={taxonomy.family} href={`/family/${taxonomy.family}`} />
-        <AttributeLink label="Genus" value={taxonomy.genus} href={`/genus/${taxonomy.genus}`} />
+        <Attribute label="Kingdom" value={taxonomy.kingdom} href={`/kingdom/${taxonomy.kingdom}`} />
+        <Attribute label="Phylum" value={taxonomy.phylum} href={`/phylum/${taxonomy.phylum}`} />
+        <Attribute label="Class" value={taxonomy.class} href={`/class/${taxonomy.class}`} />
+        <Attribute label="Order" value={taxonomy.order} href={`/order/${taxonomy.order}`} />
+        <Attribute label="Family" value={taxonomy.family} href={`/family/${taxonomy.family}`} />
+        <Attribute label="Genus" value={taxonomy.genus} href={`/genus/${taxonomy.genus}`} />
       </Group>
 
       <HighlightStack gap={0}>

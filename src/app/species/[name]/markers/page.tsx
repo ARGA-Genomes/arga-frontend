@@ -6,7 +6,7 @@ import { ArgaMap } from "@/components/mapping";
 
 import React, { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
-import { AttributeValue } from "@/components/highlight-stack";
+import { Attribute } from "@/components/highlight-stack";
 import { RecordItem } from "@/components/record-list";
 import { PaginationBar } from "@/components/pagination";
 import { usePathname } from "next/navigation";
@@ -85,13 +85,13 @@ function RecordItemContent({ record }: { record: Marker }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Gene name" value={record.targetGene} />
+          <Attribute label="Gene name" value={record.targetGene} />
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Sequence length" value="No data" />
+          <Attribute label="Sequence length" value="No data" />
         </Grid.Col>
         <Grid.Col span={2}>
-          <AttributeValue label="Source molecule" value="No data"/>
+          <Attribute label="Source molecule" value="No data"/>
         </Grid.Col>
       </Grid>
   )
