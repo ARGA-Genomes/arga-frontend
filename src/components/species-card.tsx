@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Box, Card, Text, Title, Image, Grid, Group, Stack, SimpleGrid } from "@mantine/core";
 import { CircleCheck, CircleX } from "tabler-icons-react";
+import { SpeciesImage } from "./species-photo";
 
 
 export interface Taxonomy {
@@ -26,18 +27,6 @@ export interface Species {
 }
 
 
-function placeholder(kingdom: string | undefined) {
-  switch(kingdom) {
-      case 'Animalia':
-      return '/placeholder-animalia.jpg';
-      case 'Plantae':
-      return '/placeholder-plantae.jpg';
-      default:
-      return '/placeholder-generic.jpg';
-  }
-}
-
-
 function DataItem({ name, count }: { name: string; count: number }) {
   const hasData = count > 0;
 
@@ -53,27 +42,15 @@ function DataItem({ name, count }: { name: string; count: number }) {
 export function SpeciesCard({ species }: { species: Species }) {
   const itemLinkName = species.taxonomy.canonicalName?.replaceAll(" ", "_");
 
-  function small(photo: { url: string }) {
-    return photo.url.replaceAll("original", "small");
-  }
-
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
       <Card.Section>
         <Link href={`/species/${itemLinkName}/taxonomy`}>
-          {species.photo ? (
-            <Image
-              src={small(species.photo)}
-              height={260}
-              alt={species.taxonomy.canonicalName}
-            />
-          ) : (
-            <Image
-              height={260}
-              alt={species.taxonomy.canonicalName}
-              src={placeholder(species.taxonomy.kingdom)}
-            />
-          )}
+          <SpeciesImage
+            photo={species.photo}
+            taxonomy={species.taxonomy}
+            h={260}
+          />
         </Link>
       </Card.Section>
 

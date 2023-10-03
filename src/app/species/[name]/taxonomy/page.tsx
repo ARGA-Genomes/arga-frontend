@@ -5,14 +5,12 @@ import {
   Button,
   Grid,
   Group,
-  Image,
   Paper,
   SimpleGrid,
   Stack,
   Text,
 } from "@mantine/core";
 import { Photo, Taxonomy, IndigenousEcologicalKnowledge } from "@/app/type";
-import Link from "next/link";
 
 import { Attribute, HighlightStack } from "@/components/highlight-stack";
 import { ExternalLink } from "tabler-icons-react";
@@ -20,6 +18,8 @@ import { useEffect, useState } from "react";
 import { SurveyModal } from "@/components/survey-modal";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
+import { SpeciesImage } from "@/components/species-photo";
+import Link from "next/link";
 
 
 const GET_SUMMARY = gql`
@@ -66,48 +66,6 @@ type Species = {
 type QueryResults = {
   species: Species,
 };
-
-
-
-function placeholder(kingdom: string | undefined) {
-  switch(kingdom) {
-      case 'Animalia':
-      return '/placeholder-animalia.jpg';
-      case 'Plantae':
-      return '/placeholder-plantae.jpg';
-      default:
-      return '/placeholder-generic.jpg';
-  }
-}
-
-function SpeciesPhoto({ photo, kingdom }: { photo?: Photo, kingdom?: string }) {
-  function small(url: string) {
-    return url.replace("original", "medium");
-  }
-
-  return (
-    <Paper radius={100}>
-      <Image
-        height={500}
-        radius={100}
-        src={photo ? small(photo.url) : placeholder(kingdom)}
-        alt=""
-      />
-      {photo && (
-        <Group px="md" py="xs" align="apart">
-          <Text fz="sm" c="dimmed">
-            &copy; {photo?.rightsHolder}
-          </Text>
-          <Text fz="sm" c="dimmed">
-            <Link href={photo?.referenceUrl || "#"} target="_blank">
-              {photo?.publisher}
-            </Link>
-          </Text>
-        </Group>
-      )}
-    </Paper>
-  );
-}
 
 
 interface TaxonMatch {
@@ -273,6 +231,26 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   );
 }
 
+function SpeciesPhoto({ photo, taxonomy }: { photo?: Photo, taxonomy?: Taxonomy }) {
+  return (
+    <Paper radius={100}>
+      <SpeciesImage h={500} photo={photo} taxonomy={taxonomy} />
+      {photo && (
+        <Group px="md" py="xs" align="apart">
+          <Text fz="sm" c="dimmed">
+            &copy; {photo?.rightsHolder}
+          </Text>
+          <Text fz="sm" c="dimmed">
+            <Link href={photo?.referenceUrl || "#"} target="_blank">
+              {photo?.publisher}
+            </Link>
+          </Text>
+        </Group>
+      )}
+    </Paper>
+  );
+}
+
 
 export default function TaxonomyPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
@@ -299,7 +277,7 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
-          <SpeciesPhoto photo={data?.species.photos[0]} kingdom={data?.species.taxonomy.kingdom} />
+          <SpeciesPhoto photo={data?.species.photos[0]} taxonomy={data?.species.taxonomy} />
         </Grid.Col>
       </Grid>
     </>
