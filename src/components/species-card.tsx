@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Box, Card, Text, Title, Image, Grid, Group, Stack, SimpleGrid } from "@mantine/core";
+import { Card, Text, Group, Stack, SimpleGrid } from "@mantine/core";
 import { CircleCheck, CircleX } from "tabler-icons-react";
-import { SpeciesImage } from "./species-photo";
+import { SpeciesImage } from "./species-image";
 
 
 export interface Taxonomy {

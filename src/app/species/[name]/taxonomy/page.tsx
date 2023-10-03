@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { SurveyModal } from "@/components/survey-modal";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
-import { SpeciesImage } from "@/components/species-photo";
+import { SpeciesImage } from "@/components/species-image";
 import Link from "next/link";
 
 

@@ -10,5 +10,6 @@ import dynamic from "next/dynamic";
 export const ArgaMap = dynamic(() => import("./map"), { ssr: false });
 export const PopupMarker = dynamic(() => import("./marker").then(mod => mod.PopupMarker), { ssr: false });
 export const BioRegionLayers = dynamic(() => import("./bio-regions").then(mod => mod.BioRegionLayers), { ssr: false });
+export const AnalysisMap = dynamic(() => import("./analysis-map"), { ssr: false });
 
 export { SpecimensLayer } from "./specimens";

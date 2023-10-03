@@ -30,12 +30,13 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
       classNames={classes}
       radius={10}
       mt={40}
-      defaultValue="taxonomy"
+      defaultValue="distribution"
       value={tab}
       onChange={changeTab}
     >
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
+          <Tabs.Tab value="distribution">Data Distribution</Tabs.Tab>
           <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
           <Tabs.Tab value="whole_genomes">Whole Genomes</Tabs.Tab>
           <Tabs.Tab value="markers">Markers</Tabs.Tab>

@@ -239,7 +239,7 @@ function IndigenousLanguageGroupIcon({ group, trait }: IndigenousLanguageGroupIc
   const component = (
     <Popover position="bottom" withArrow shadow="md" opened={opened}>
       <Popover.Target>
-        <Image w={60} src={`/species-icons/${icon?.image}`} alt="" onMouseEnter={open} onMouseLeave={close} />
+        <Image w={60} src={icon?.image} alt="" onMouseEnter={open} onMouseLeave={close} />
       </Popover.Target>
       <Popover.Dropdown>
         <Stack>
