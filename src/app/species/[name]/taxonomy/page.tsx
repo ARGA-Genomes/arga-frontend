@@ -68,7 +68,19 @@ type QueryResults = {
 };
 
 
-function SpeciesPhoto({ photo }: { photo?: Photo }) {
+
+function placeholder(kingdom: string | undefined) {
+  switch(kingdom) {
+      case 'Animalia':
+      return '/placeholder-animalia.jpg';
+      case 'Plantae':
+      return '/placeholder-plantae.jpg';
+      default:
+      return '/placeholder-generic.jpg';
+  }
+}
+
+function SpeciesPhoto({ photo, kingdom }: { photo?: Photo, kingdom?: string }) {
   function small(url: string) {
     return url.replace("original", "medium");
   }
@@ -78,7 +90,7 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
       <Image
         height={500}
         radius={100}
-        src={photo ? small(photo.url) : ""}
+        src={photo ? small(photo.url) : placeholder(kingdom)}
         alt=""
       />
       {photo && (
@@ -287,7 +299,7 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
-          <SpeciesPhoto photo={data?.species.photos[0]} />
+          <SpeciesPhoto photo={data?.species.photos[0]} kingdom={data?.species.taxonomy.kingdom} />
         </Grid.Col>
       </Grid>
     </>

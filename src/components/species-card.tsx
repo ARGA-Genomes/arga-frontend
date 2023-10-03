@@ -5,6 +5,7 @@ import { CircleCheck, CircleX } from "tabler-icons-react";
 
 export interface Taxonomy {
   canonicalName: string,
+  kingdom?: string,
 };
 
 export interface Photo {
@@ -24,6 +25,17 @@ export interface Species {
   dataSummary: DataSummary,
 }
 
+
+function placeholder(kingdom: string | undefined) {
+  switch(kingdom) {
+      case 'Animalia':
+      return '/placeholder-animalia.jpg';
+      case 'Plantae':
+      return '/placeholder-plantae.jpg';
+      default:
+      return '/placeholder-generic.jpg';
+  }
+}
 
 
 function DataItem({ name, count }: { name: string; count: number }) {
@@ -59,6 +71,7 @@ export function SpeciesCard({ species }: { species: Species }) {
             <Image
               height={260}
               alt={species.taxonomy.canonicalName}
+              src={placeholder(species.taxonomy.kingdom)}
             />
           )}
         </Link>

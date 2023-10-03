@@ -66,7 +66,10 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
     species(page: $page, perPage: $perPage) {
       total,
       records {
-        taxonomy { canonicalName }
+        taxonomy {
+          canonicalName
+          kingdom
+        }
         photo { url }
         dataSummary {
           wholeGenomes
@@ -156,7 +159,10 @@ type DataSummary = {
 }
 
 type Species = {
-  taxonomy: { canonicalName: string },
+  taxonomy: {
+    canonicalName: string,
+    kingdom?: string,
+  },
   photo: { url: string },
   dataSummary: DataSummary,
 }
