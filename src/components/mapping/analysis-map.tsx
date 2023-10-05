@@ -144,15 +144,15 @@ function bioRegionLayers(regions: BioRegions) {
 
 function specimenPlotLayer(markers: Marker[]) {
   const colors = {
-    holotype: [0, 128, 255, 140] as [number, number, number, number],
-    unknown: [255, 0, 128, 140],
+    holotype: [0, 128, 255, 204] as [number, number, number, number],
+    unknown: [255, 0, 128, 204],
   }
 
   return new ScatterplotLayer({
     id: 'scatter-plot',
     data: markers,
     radiusScale: 20,
-    radiusMinPixels: 10,
+    radiusMinPixels: 5,
     getPosition: (d: Marker) => [d.longitude, d.latitude],
     getFillColor: (d: Marker) => colors.holotype,
     getRadius: 1,
