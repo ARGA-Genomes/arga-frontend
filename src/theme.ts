@@ -10,11 +10,63 @@ const workSans = localFont({ src: '../public/fonts/WorkSans-VariableFont_wght.tt
 export const theme = createTheme({
   colors: {
     midnight: ['#e7f4ff', '#c8dce9', '#a8c5d6', '#87aec5', '#6797b4', '#486471', '#2d4d5c', '#193d4d', '#15313f', '#001017'],
-    shellfish: ['#e1f9f7', '#c6e6e3', '#a8d3cf', '#89c0bc', '#6aafa9', '#509590', '#3d7470', '#295450', '#133331', '#001411'],
-    moss: ['#f0fae4', '#daeac4', '#c4daa3', '#aecb80', '#97bc5d', '#7da243', '#627e33', '#455a23', '#283612', '#0b1300'],
-    bushfire: ['#ffeedd', '#ffd0b1', '#fbb284', '#f79554', '#f47625', '#da5d0b', '#af7a58', '#7a3303', '#4b1d00', '#1f0700'],
-    wheat: ['#f3e6c4', '#ffe8af', '#fed97f', '#fcc743', '#febb1e', '#e4a107', '#b27e01', '#7f5a00', '#4d3600', '#1c1200'],
     attribute: ["#f5f5f5", "#e5e5e5", "#d5d5d5", "#c5c5c5", "#b5b5b5", "#a5a5a5", "#959595", "#858585", "#757575", "#656565"],
+
+    // https://mantine.dev/colors-generator/?color=F47C2E
+    bushfire: [
+      "#fff1e2",
+      "#ffe2cd",
+      "#fcc39f",
+      "#f8a36b",
+      "#f58740",
+      "#f37524",
+      "#f46d13",
+      "#d95b06",
+      "#c14f01",
+      "#a94200"
+    ],
+
+    // https://mantine.dev/colors-generator/?color=FEC743
+    wheat: [
+      "#fff9e0",
+      "#fff1ca",
+      "#ffe299",
+      "#fed163",
+      "#fec337",
+      "#febb19",
+      "#feb603",
+      "#e3a000",
+      "#c98e00",
+      "#ae7900"
+    ],
+
+    // https://mantine.dev/colors-generator/?color=A2C36E
+    moss: [
+      "#f3fbe8",
+      "#e8f2d8",
+      "#d1e2b7",
+      "#b9d291",
+      "#a4c471",
+      "#96bb5c",
+      "#8fb750",
+      "#7ba13f",
+      "#6c8f36",
+      "#5b7c29"
+    ],
+
+    // https://mantine.dev/colors-generator/?color=58A39D
+    shellfish: [
+      "#e7fbf8",
+      "#dbefee",
+      "#bcdcda",
+      "#9bc9c5",
+      "#7eb8b4",
+      "#6baea8",
+      "#5fa9a3",
+      "#4e938e",
+      "#40847f",
+      "#2b736d"
+    ],
   },
 
   fontFamily: workSans.style.fontFamily,

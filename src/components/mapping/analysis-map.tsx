@@ -1,8 +1,8 @@
 "use client";
 
 import Map from 'react-map-gl/maplibre';
-import DeckGL, { BitmapLayer, GeoJsonLayer, PathLayer, TileLayer } from 'deck.gl/typed';
-import { useEffect, useState } from 'react';
+import DeckGL, { BitmapLayer, GeoJsonLayer, TileLayer } from 'deck.gl/typed';
+import { useState } from 'react';
 import { GeoJSON } from 'geojson';
 import { gql, useQuery } from '@apollo/client';
 
