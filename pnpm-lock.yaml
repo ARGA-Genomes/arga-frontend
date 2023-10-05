@@ -12,6 +12,7 @@ specifiers:
   '@mantine/next': ^6.0.21
   '@react-spring/web': ^9.7.3
   '@types/d3': ^7.4.1
+  '@types/geojson': ^7946.0.11
   '@types/humanize-plus': ^1.8.0
   '@types/leaflet': ^1.9.6
   '@types/luxon': ^3.3.2
@@ -55,6 +56,7 @@ dependencies:
   '@mantine/next': 6.0.21_tlmv24r25ag7veq3xcgxqx3nqq
   '@react-spring/web': 9.7.3_biqbaboplfbrettd7655fr4n2y
   '@types/d3': 7.4.1
+  '@types/geojson': 7946.0.11
   '@types/humanize-plus': 1.8.0
   '@types/leaflet': 1.9.6
   '@types/luxon': 3.3.2
