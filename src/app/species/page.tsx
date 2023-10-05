@@ -1,8 +1,7 @@
 'use client';
 
+import { RedirectType, redirect } from "next/navigation";
+
 export default function SpeciesHomePage() {
-  return (
-    <>
-    </>
-  )
+  redirect('./distribution', RedirectType.replace);
 }

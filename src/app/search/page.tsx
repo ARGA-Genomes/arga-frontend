@@ -203,12 +203,12 @@ function TaxonItem({ item }: { item: Record }) {
             }}>
               <Image src={"search-icons/data_type_species_and_subspecies_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
-            <Link href={{ pathname: `/species/${itemLinkName}/taxonomy`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
+            <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
               <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
             </Link>
             {item.subspecies?.map(subspecies => (
               <Text size="sm" ml={5} key={subspecies} className='subspeciesAccordion'>
-                <Link href={`/species/${itemLinkName}/taxonomy`}>
+                <Link href={`/species/${itemLinkName}`}>
                   {subspecies}
                 </Link>
               </Text>
@@ -299,7 +299,7 @@ function GenomeItem({ item }: { item: Record }) {
             }}>
               <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
-            <Link href={{ pathname: `/species/${itemLinkName}/taxonomy`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }} >
+            <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }} >
               <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
             </Link>
           </Stack>
@@ -366,7 +366,7 @@ function LocusItem({ item }: { item: Record }) {
             }}>
               <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
             </Container>
-            <Link href={{ pathname: `/species/${itemLinkName}/taxonomy`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
+            <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
               <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
             </Link>
           </Stack>

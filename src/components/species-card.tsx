@@ -45,7 +45,7 @@ export function SpeciesCard({ species }: { species: Species }) {
   return (
     <Card shadow="sm" p={20} radius="lg" withBorder>
       <Card.Section>
-        <Link href={`/species/${itemLinkName}/taxonomy`}>
+        <Link href={`/species/${itemLinkName}`}>
           <SpeciesImage
             photo={species.photo}
             taxonomy={species.taxonomy}
@@ -55,7 +55,7 @@ export function SpeciesCard({ species }: { species: Species }) {
       </Card.Section>
 
       <Stack gap={5}>
-        <Link href={`/species/${itemLinkName}/taxonomy`}>
+        <Link href={`/species/${itemLinkName}`}>
           <Text fz="sm" fw={700} fs="italic">{species.taxonomy.canonicalName}</Text>
         </Link>
         <SimpleGrid cols={2}>

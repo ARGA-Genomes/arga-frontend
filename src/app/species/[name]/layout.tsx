@@ -6,7 +6,7 @@ import { Container, Group, Paper, Stack, Tabs, Text } from "@mantine/core";
 import SpeciesHeader from "@/components/species-header";
 import Link from "next/link";
 import { ArrowNarrowLeft } from "tabler-icons-react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { RedirectType, redirect, usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
@@ -23,6 +23,9 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
   // based on the current url the active tab should always be
   // the fourth component in the path name
   const tab = path?.split('/')[3];
+
+  if (!tab)
+    redirect(`/species/${name}/distribution`, RedirectType.replace);
 
   return (
     <Tabs
