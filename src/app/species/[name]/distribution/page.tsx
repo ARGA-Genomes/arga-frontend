@@ -13,6 +13,7 @@ import {
 import { ArrowsMinimize } from "tabler-icons-react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
+import { Marker } from "@/components/mapping/analysis-map";
 
 
 const GET_DISTRIBUTION = gql`
@@ -21,6 +22,14 @@ const GET_DISTRIBUTION = gql`
       regions {
         ibra { name }
         imcra { name }
+      }
+      specimens(page: 1, pageSize: 1000) {
+        total
+        records {
+          id
+          latitude
+          longitude
+        }
       }
     }
   }
@@ -31,26 +40,40 @@ type Regions = {
   imcra: { name: string }[],
 }
 
+type Specimen = {
+  id: string,
+  latitude?: number,
+  longitude?: number,
+}
+
 type QueryResults = {
   species: {
     regions: Regions,
+    specimens: {
+      total: number,
+      records: Specimen[],
+    }
   }
 }
 
 
 interface DistributionAnalysisProps {
   regions?: Regions,
+  specimens?: Specimen[],
   onExpandToggle: () => void,
 }
 
-function DistributionAnalysis({ regions, onExpandToggle }: DistributionAnalysisProps) {
+function DistributionAnalysis({ regions, specimens, onExpandToggle }: DistributionAnalysisProps) {
   const flattened = {
     ibra: regions?.ibra.map(r => r.name) || [],
     imcra: regions?.imcra.map(r => r.name) || [],
   };
 
+  // filter out null island as well as specimens without coords
+  const markers = specimens?.filter(s => s.latitude) as Marker[];
+
   return (
-    <AnalysisMap regions={flattened}>
+    <AnalysisMap regions={flattened} markers={markers}>
       <Button onClick={() => onExpandToggle()} rightSection={<ArrowsMinimize />} style={{ zIndex: 1000, right: 20, top: 20, position: "absolute" }}>
         Close
       </Button>
@@ -78,7 +101,11 @@ export default function DistributionPage({ params }: { params: { name: string } 
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
             <Box h={800} pos="relative">
-              <DistributionAnalysis regions={data?.species.regions} onExpandToggle={() => {}} />
+              <DistributionAnalysis
+                regions={data?.species.regions}
+                specimens={data?.species.specimens.records}
+                onExpandToggle={() => {}}
+              />
             </Box>
           </Stack>
         </Grid.Col>

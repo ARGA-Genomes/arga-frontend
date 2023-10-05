@@ -1,7 +1,9 @@
 "use client";
 
+import 'maplibre-gl/dist/maplibre-gl.css';
+
 import Map from 'react-map-gl/maplibre';
-import DeckGL, { BitmapLayer, GeoJsonLayer, TileLayer } from 'deck.gl/typed';
+import DeckGL, { BitmapLayer, GeoJsonLayer, MapView, ScatterplotLayer, TileLayer } from 'deck.gl/typed';
 import { useState } from 'react';
 import { GeoJSON } from 'geojson';
 import { gql, useQuery } from '@apollo/client';
@@ -34,13 +36,20 @@ interface Regions {
   imcra: string[],
 }
 
+export interface Marker {
+  id: string,
+  latitude: number,
+  longitude: number,
+}
+
 
 interface AnalysisMapProps {
   regions?: Regions,
+  markers?: Marker[],
   children?: React.ReactNode,
 }
 
-export default function AnalysisMap({ regions, children }: AnalysisMapProps) {
+export default function AnalysisMap({ regions, markers, children }: AnalysisMapProps) {
   const [tolerance, setTolerance] = useState(0.01);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
@@ -55,21 +64,24 @@ export default function AnalysisMap({ regions, children }: AnalysisMapProps) {
     imcra: data && JSON.parse(data.maps.imcraProvincial) as GeoJSON,
   }
 
+  const view = new MapView({ repeat: true });
+
   return (
     <DeckGL
+      views={view}
       initialViewState={{
         latitude: DEFAULT_POSITION[0],
         longitude: DEFAULT_POSITION[1],
-        zoom: 4,
-      }}
+        zoom: 3.7,
+        }}
       layers={[
-        tileLayer(),
         bioRegionLayers(bioRegions),
+        specimenPlotLayer(markers || []),
       ]}
       controller={true}
       style={{ width: '100%', height: '100%' }}
     >
-      <Map />
+      <Map reuseMaps mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json' />
       {children}
     </DeckGL>
   )
@@ -127,4 +139,25 @@ function bioRegionLayers(regions: BioRegions) {
   });
 
   return [ibra, imcra];
+}
+
+
+function specimenPlotLayer(markers: Marker[]) {
+  const colors = {
+    holotype: [0, 128, 255, 140] as [number, number, number, number],
+    unknown: [255, 0, 128, 140],
+  }
+
+  return new ScatterplotLayer({
+    id: 'scatter-plot',
+    data: markers,
+    radiusScale: 20,
+    radiusMinPixels: 10,
+    getPosition: (d: Marker) => [d.longitude, d.latitude],
+    getFillColor: (d: Marker) => colors.holotype,
+    getRadius: 1,
+    updateTriggers: {
+      getFillColor: [colors.holotype, colors.unknown]
+    }
+  })
 }
