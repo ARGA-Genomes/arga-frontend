@@ -8,8 +8,9 @@ import { PaginationBar } from "@/components/pagination";
 import { LoadOverlay } from "@/components/load-overlay";
 import { RecordItem } from "@/components/record-list";
 import { Attribute } from "@/components/highlight-stack";
-import { ArgaMap } from "@/components/mapping";
+import { AnalysisMap, ArgaMap } from "@/components/mapping";
 import { usePathname } from "next/navigation";
+import { Marker } from "@/components/mapping/analysis-map";
 
 
 const PAGE_SIZE = 5;
@@ -29,6 +30,8 @@ query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
         sequences
         wholeGenomes
         markers
+        latitude
+        longitude
       }
     }
   }
@@ -99,6 +102,8 @@ type Specimen = {
   sequences: number,
   wholeGenomes: number,
   markers: number,
+  latitude?: number,
+  longitude?: number,
 }
 
 type Species = {
@@ -117,10 +122,28 @@ type SpecimenQueryResults = {
 }
 
 
+function toMarker (color: [number, number, number, number], records?: Specimen[]) {
+  if (!records) return [];
+  return records.map(r => {
+    return {
+      recordId: r.recordId || "unknown",
+      latitude: r.latitude,
+      longitude: r.longitude,
+      color: color,
+    }
+  })
+}
+
 function SpecimenMap({ records }: { records: Specimen[] | undefined }) {
+  const markers = toMarker([103, 151, 180, 220], records).filter(s => s.latitude) as Marker[];
+
   return (
-    <Box pos="relative" h={560}>
-      <ArgaMap />
+    <Box pos="relative" h="100%">
+      <AnalysisMap
+        markers={markers}
+        style={{ borderRadius: 'var(--mantine-radius-lg)', overflow: 'hidden' }}
+      >
+      </AnalysisMap>
     </Box>
   )
 }
@@ -161,12 +184,12 @@ function RecordList({ records }: { records: Specimen[] }) {
   const path = usePathname();
 
   return (
-    <>
+    <Stack>
       { records.map(record => (
         <RecordItem key={record.id} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
-    </>
+    </Stack>
   )
 }
 
@@ -207,16 +230,18 @@ export default function Specimens({ params }: { params: { name: string } }) {
               <LoadOverlay visible={loading} />
               { data?.species.specimens ? <RecordList records={data.species.specimens.records} /> : null }
             </Box>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <SpecimenMap records={data?.species.specimens.records} />
+          </Grid.Col>
 
+          <Grid.Col span={8}>
             <PaginationBar
               total={data?.species.specimens.total}
               page={page}
               pageSize={PAGE_SIZE}
               onChange={setPage}
             />
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <SpecimenMap records={data?.species.specimens.records} />
           </Grid.Col>
         </Grid>
       </Paper>

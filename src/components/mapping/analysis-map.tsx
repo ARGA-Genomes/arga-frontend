@@ -76,11 +76,11 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
 
   const view = new MapView({ repeat: true });
 
-  const getTooltip = ({ object }: { object: any }) => {
+  const getTooltip = ({ object }: { object?: any }): string => {
     return object?.properties?.name || object?.recordId;
   }
 
-  const onHover = ({ object }: { object: any }) => {
+  const onHover = ({ object }: { object?: any }) => {
     if (object?.properties) {
       setSelectedRegion(object?.properties?.name);
     }

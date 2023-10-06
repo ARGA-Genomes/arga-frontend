@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import {Box, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { ArgaMap } from "@/components/mapping";
+import { AnalysisMap, ArgaMap } from "@/components/mapping";
 
 import React, { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -10,6 +10,7 @@ import { Attribute } from "@/components/highlight-stack";
 import { RecordItem } from "@/components/record-list";
 import { PaginationBar } from "@/components/pagination";
 import { usePathname } from "next/navigation";
+import { Marker } from "@/components/mapping/analysis-map";
 
 
 const PAGE_SIZE = 5;
@@ -28,12 +29,14 @@ query SpeciesBarcodes($canonicalName: String, $page: Int, $pageSize: Int) {
         sequencedBy
         targetGene
         releaseDate
+        latitude
+        longitude
       }
     }
   }
 }`;
 
-type Marker = {
+type Loci = {
   sequenceId: string,
   datasetName: string,
   recordId: string,
@@ -42,22 +45,42 @@ type Marker = {
   sequencedBy?: string,
   targetGene: string,
   releaseDate?: string,
+  latitude?: number,
+  longitude?: number,
 }
 
 type QueryResults = {
   species: {
     markers: {
       total: number,
-      records: Marker[],
+      records: Loci[],
     }
   },
 };
 
 
-function MarkerMap({ records }: { records : Marker[] | undefined }) {
+function toMarker (color: [number, number, number, number], records?: Loci[]) {
+  if (!records) return [];
+  return records.map(r => {
+    return {
+      recordId: r.recordId || "unknown",
+      latitude: r.latitude,
+      longitude: r.longitude,
+      color: color,
+    }
+  })
+}
+
+function MarkerMap({ records }: { records : Loci[] | undefined }) {
+  const markers = toMarker([123, 161, 63, 220], records).filter(s => s.latitude) as Marker[];
+
   return (
-    <Box pos="relative" h={560}>
-      <ArgaMap />
+    <Box pos="relative" h="100%">
+      <AnalysisMap
+        markers={markers}
+        style={{ borderRadius: 'var(--mantine-radius-lg)', overflow: 'hidden' }}
+      >
+      </AnalysisMap>
     </Box>
   )
 }
@@ -72,7 +95,7 @@ function LabeledValue({ label, value }: { label: string, value: string|undefined
   )
 }
 
-function RecordItemContent({ record }: { record: Marker }) {
+function RecordItemContent({ record }: { record: Loci }) {
   return (
       <Grid p={20}>
         <Grid.Col span={6}>
@@ -97,16 +120,16 @@ function RecordItemContent({ record }: { record: Marker }) {
   )
 }
 
-function RecordList({ records }: { records: Marker[] }) {
+function RecordList({ records }: { records: Loci[] }) {
   const path = usePathname();
 
   return (
-    <>
+    <Stack>
       { records.map(record => (
         <RecordItem key={record.sequenceId} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
-    </>
+    </Stack>
   )
 }
 
@@ -137,16 +160,18 @@ export default function Markers({ params }: { params: { name: string } }) {
             <LoadOverlay visible={loading} />
             { data?.species.markers ? <RecordList records={data.species.markers.records} /> : null }
           </Box>
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <MarkerMap records={data?.species.markers.records} />
+        </Grid.Col>
 
+        <Grid.Col span={8}>
           <PaginationBar
             total={data?.species.markers.total}
             page={page}
             pageSize={PAGE_SIZE}
             onChange={setPage}
           />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <MarkerMap records={data?.species.markers.records} />
         </Grid.Col>
       </Grid>
     </Paper>

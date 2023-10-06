@@ -7,11 +7,12 @@ import { useState } from "react";
 import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
 import { PaginationBar } from "@/components/pagination";
-import { ArgaMap } from "@/components/mapping";
+import { AnalysisMap, ArgaMap } from "@/components/mapping";
 import { RecordItem } from "@/components/record-list";
 import { usePathname } from "next/navigation";
 import { Eye } from "tabler-icons-react";
 import Link from "next/link";
+import { Marker } from "@/components/mapping/analysis-map";
 
 
 const PAGE_SIZE = 5;
@@ -59,6 +60,8 @@ query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int) {
         quality
         genomeSize
         releaseDate
+        latitude
+        longitude
       }
     }
   }
@@ -86,10 +89,8 @@ type WholeGenome = {
   assembledBy?: string,
   annotatedBy?: string,
   depositedBy?: string,
-  coordinates: {
-    latitude: number,
-    longitude: number,
-  },
+  latitude?: number,
+  longitude?: number,
 }
 
 type Species = {
@@ -146,24 +147,38 @@ function RecordList({ records }: { records: WholeGenome[] }) {
   const path = usePathname();
 
   return (
-    <>
+    <Stack>
       { records.map((record, idx) => (
         <RecordItem key={idx} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
-    </>
+    </Stack>
   )
 }
 
 
+function toMarker (color: [number, number, number, number], records?: WholeGenome[]) {
+  if (!records) return [];
+  return records.map(r => {
+    return {
+      recordId: r.recordId || "unknown",
+      latitude: r.latitude,
+      longitude: r.longitude,
+      color: color,
+    }
+  })
+}
+
 function WholeGenomeMap({ records }: { records : WholeGenome[] | undefined }) {
-    /* sx={theme => ({
-    *       overflow: "hidden",
-    *       borderRadius: theme.radius.lg,
-    *     })} */
+  const markers = toMarker([243, 117, 36, 220], records).filter(s => s.latitude) as Marker[];
+
   return (
-    <Box pos="relative" h={560}>
-      <ArgaMap />
+    <Box pos="relative" h="100%">
+      <AnalysisMap
+        markers={markers}
+        style={{ borderRadius: 'var(--mantine-radius-lg)', overflow: 'hidden' }}
+      >
+      </AnalysisMap>
     </Box>
   )
 }
@@ -178,6 +193,10 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
 
   if (error) {
     return (<Text>Error : {error.message}</Text>);
+  }
+
+  if (!data?.species.referenceGenome) {
+    return null;
   }
 
   return (
@@ -297,16 +316,18 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
               <Box pos="relative">
                 <LoadOverlay visible={loading} />
                 { data?.species.wholeGenomes ? <RecordList records={data?.species.wholeGenomes.records} /> : null }
-                <PaginationBar
-                  total={data?.species.wholeGenomes.total}
-                  page={page}
-                  pageSize={PAGE_SIZE}
-                  onChange={setPage}
-                />
               </Box>
             </Grid.Col>
             <Grid.Col span={4}>
               <WholeGenomeMap records={data?.species.wholeGenomes.records} />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <PaginationBar
+                total={data?.species.wholeGenomes.total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onChange={setPage}
+              />
             </Grid.Col>
           </Grid>
         </Paper>

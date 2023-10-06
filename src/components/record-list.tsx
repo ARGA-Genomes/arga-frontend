@@ -15,7 +15,6 @@ export function RecordItem({ href, children }: RecordItemProps) {
   return (
     <Paper
       radius={16}
-      mb={15}
       ref={ref}
       bg={ hovered ? "#F5F5F5" : "white" }
       withBorder
