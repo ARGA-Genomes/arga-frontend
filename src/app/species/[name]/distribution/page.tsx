@@ -18,8 +18,6 @@ import { ArrowBarRight } from "tabler-icons-react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
-import { useListState } from "@mantine/hooks";
-import { WholeGenome } from "@/app/type";
 import { useEffect, useState } from "react";
 
 
@@ -157,11 +155,12 @@ enum Layer {
 }
 
 interface SummaryProps {
+  regions?: Regions,
   filters: Filters,
   onFilter: (layer: Layer, enabled: boolean) => void;
 }
 
-function Summary({ filters, onFilter }: SummaryProps ) {
+function Summary({ regions, filters, onFilter }: SummaryProps ) {
   return (
     <Stack>
       <Group justify="end">
@@ -174,16 +173,18 @@ function Summary({ filters, onFilter }: SummaryProps ) {
         </Button>
       </Group>
 
-      <Stack p={10}>
+      <Stack p={10} gap="md">
         <Title order={3} fw={650}>Indexed data</Title>
-        <Stack gap={5}>
+        <Stack gap={5} mb={30}>
           <MapFilterOption onChange={e => onFilter(Layer.WholeGenome, e.currentTarget.checked)} size="md" color="bushfire" label="Whole genomes" count={filters.wholeGenomes.count} total={filters.wholeGenomes.total} />
           <MapFilterOption onChange={e => onFilter(Layer.Loci, e.currentTarget.checked)} size="md" color="moss.7" label="Loci" count={filters.loci.count} total={filters.loci.total} />
           <MapFilterOption onChange={e => onFilter(Layer.OtherData, e.currentTarget.checked)} size="md" color="moss.3" label="Other data" count={filters.other.count} total={filters.other.total} />
           <MapFilterOption onChange={e => onFilter(Layer.Specimens, e.currentTarget.checked)} size="md" color="midnight.4" label="Specimens" count={filters.specimens.count} total={filters.specimens.total} />
         </Stack>
 
-        <Title order={3}>Distribution</Title>
+        <Title order={3} fw={650}>Distribution</Title>
+        <Text>{regions?.ibra.map(r => r.name).join(", ")}</Text>
+        <Text>{regions?.imcra.map(r => r.name).join(", ")}</Text>
       </Stack>
     </Stack>
   )
@@ -257,25 +258,25 @@ export default function DistributionPage({ params }: { params: { name: string } 
   return (
     <Paper p="lg" radius="lg" withBorder>
       <Stack gap="lg">
-      <Title order={4}>Indexed data distribution</Title>
-      <Paper radius="lg" withBorder>
-      <Grid>
-        <Grid.Col span={9}>
-          <Stack gap={20} pos="relative">
-            <LoadOverlay visible={loading} />
-            <Box h={800} pos="relative">
-              <DistributionAnalysis
-                regions={data?.species.regions}
-                markers={allSpecimens}
-              />
-            </Box>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          { filters && <Summary filters={filters} onFilter={onFilter} />}
-        </Grid.Col>
-      </Grid>
-      </Paper>
+        <Title order={4}>Indexed data distribution</Title>
+        <Paper radius="lg" withBorder>
+          <Grid>
+            <Grid.Col span={9}>
+              <Stack gap={20} pos="relative">
+                <LoadOverlay visible={loading} />
+                <Box h={800} pos="relative">
+                  <DistributionAnalysis
+                    regions={data?.species.regions}
+                    markers={allSpecimens}
+                  />
+                </Box>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={3}>
+              { filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
+            </Grid.Col>
+          </Grid>
+        </Paper>
       </Stack>
     </Paper>
   );

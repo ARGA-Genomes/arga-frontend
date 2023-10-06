@@ -123,8 +123,8 @@ function bioRegionLayers(regions: BioRegions) {
   const ibra = new GeoJsonLayer({
     id: "ibra-layer",
     data: regions.ibra || [],
-    getFillColor: [244, 124, 46, 70],
-    getLineColor: [244, 124, 46, 200],
+    getFillColor: [254, 195, 55, 70],
+    getLineColor: [254, 195, 55, 200],
     pickable: true,
     filled: true,
     pointType: 'circle',
@@ -134,8 +134,8 @@ function bioRegionLayers(regions: BioRegions) {
   const imcra = new GeoJsonLayer({
     id: "imcra-layer",
     data: regions.imcra || [],
-    getFillColor: [244, 124, 46, 70],
-    getLineColor: [244, 124, 46, 200],
+    getFillColor: [254, 195, 55, 70],
+    getLineColor: [254, 195, 55, 200],
     pickable: true,
     filled: true,
     pointType: 'circle',
