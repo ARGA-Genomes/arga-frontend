@@ -190,16 +190,37 @@ function Summary({ filters, onFilter }: SummaryProps ) {
 }
 
 
+function toMarker (color: [number, number, number, number], records?: Specimen[]) {
+  if (!records) return [];
+  return records.map(r => {
+    return {
+      latitude: r.latitude,
+      longitude: r.longitude,
+      color: color,
+    }
+  })
+}
+
 export default function DistributionPage({ params }: { params: { name: string } }) {
+  const [layers, setLayers] = useState({ wholeGenome: true, loci: true, other: true, specimens: true });
+  const [allSpecimens, setAllSpecimens] = useState<Marker[]>([]);
+
   const canonicalName = params.name.replaceAll("_", " ");
 
   const { loading, error, data } = useQuery<QueryResults>(GET_DISTRIBUTION, {
     variables: { canonicalName },
   });
 
-  if (error) {
-    return <Text>Error : {error.message}</Text>;
-  }
+
+  useEffect(() => {
+    const combined = [
+      ...toMarker([243, 117, 36, 220], layers.wholeGenome ? data?.species.wholeGenomes.records : undefined),
+      ...toMarker([123, 161, 63, 220], layers.loci ? data?.species.markers.records : undefined),
+      ...toMarker([103, 151, 180, 220], layers.specimens ? data?.species.specimens.records : undefined),
+    ];
+    // filter out null island as well as specimens without coords
+    setAllSpecimens(combined.filter(s => s.latitude) as Marker[]);
+  }, [data, layers, setAllSpecimens]);
 
   let filters = null;
   if (data) {
@@ -220,20 +241,6 @@ export default function DistributionPage({ params }: { params: { name: string } 
     }
   }
 
-  const toMarker = (color: [number, number, number, number], records?: Specimen[]) => {
-    if (!records) return [];
-    return records.map(r => {
-      return {
-        latitude: r.latitude,
-        longitude: r.longitude,
-        color: color,
-      }
-    })
-  }
-
-
-  const [layers, setLayers] = useState({ wholeGenome: true, loci: true, other: true, specimens: true });
-
   const onFilter = (layer: Layer, enabled: boolean) => {
     setLayers({
       wholeGenome: layer === Layer.WholeGenome ? enabled : layers.wholeGenome,
@@ -243,19 +250,9 @@ export default function DistributionPage({ params }: { params: { name: string } 
     })
   }
 
-
-  const [allSpecimens, setAllSpecimens] = useState<Marker[]>([]);
-
-  useEffect(() => {
-    const combined = [
-      ...toMarker([243, 117, 36, 220], layers.wholeGenome ? data?.species.wholeGenomes.records : undefined),
-      ...toMarker([123, 161, 63, 220], layers.loci ? data?.species.markers.records : undefined),
-      ...toMarker([103, 151, 180, 220], layers.specimens ? data?.species.specimens.records : undefined),
-    ];
-    // filter out null island as well as specimens without coords
-    setAllSpecimens(combined.filter(s => s.latitude) as Marker[]);
-  }, [data, layers, setAllSpecimens]);
-
+  if (error) {
+    return <Text>Error : {error.message}</Text>;
+  }
 
   return (
     <Paper p="lg" radius="lg" withBorder>
