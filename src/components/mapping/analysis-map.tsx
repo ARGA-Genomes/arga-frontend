@@ -37,9 +37,9 @@ interface Regions {
 }
 
 export interface Marker {
-  id: string,
   latitude: number,
   longitude: number,
+  color: [number, number, number, number],
 }
 
 
@@ -47,9 +47,10 @@ interface AnalysisMapProps {
   regions?: Regions,
   markers?: Marker[],
   children?: React.ReactNode,
+  style?: Partial<CSSStyleDeclaration>,
 }
 
-export default function AnalysisMap({ regions, markers, children }: AnalysisMapProps) {
+export default function AnalysisMap({ regions, markers, children, style }: AnalysisMapProps) {
   const [tolerance, setTolerance] = useState(0.01);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
@@ -79,9 +80,12 @@ export default function AnalysisMap({ regions, markers, children }: AnalysisMapP
         specimenPlotLayer(markers || []),
       ]}
       controller={true}
-      style={{ width: '100%', height: '100%' }}
+      style={style}
     >
-      <Map reuseMaps mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json' />
+      <Map
+        reuseMaps
+        mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+      />
       {children}
     </DeckGL>
   )
@@ -143,21 +147,13 @@ function bioRegionLayers(regions: BioRegions) {
 
 
 function specimenPlotLayer(markers: Marker[]) {
-  const colors = {
-    holotype: [0, 128, 255, 204] as [number, number, number, number],
-    unknown: [255, 0, 128, 204],
-  }
-
   return new ScatterplotLayer({
     id: 'scatter-plot',
     data: markers,
     radiusScale: 20,
     radiusMinPixels: 5,
     getPosition: (d: Marker) => [d.longitude, d.latitude],
-    getFillColor: (d: Marker) => colors.holotype,
+    getFillColor: (d: Marker) => d.color,
     getRadius: 1,
-    updateTriggers: {
-      getFillColor: [colors.holotype, colors.unknown]
-    }
   })
 }
