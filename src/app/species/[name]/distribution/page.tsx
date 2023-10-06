@@ -32,6 +32,7 @@ const GET_DISTRIBUTION = gql`
         total
         records {
           id
+          recordId
           latitude
           longitude
         }
@@ -63,6 +64,7 @@ type Regions = {
 
 type Specimen = {
   id: string,
+  recordId?: string,
   latitude?: number,
   longitude?: number,
 }
@@ -195,6 +197,7 @@ function toMarker (color: [number, number, number, number], records?: Specimen[]
   if (!records) return [];
   return records.map(r => {
     return {
+      recordId: r.recordId || "unknown",
       latitude: r.latitude,
       longitude: r.longitude,
       color: color,
