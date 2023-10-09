@@ -412,7 +412,6 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
         withCloseButton={false}
         position="right"
         size="xl"
-        transitionProps={{ duration: 250, transition: 'pop-top-right' }}
       >
         <Box pt={200}>
           <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />

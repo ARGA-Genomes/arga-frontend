@@ -13,6 +13,9 @@ import { usePathname } from "next/navigation";
 import { Eye } from "tabler-icons-react";
 import Link from "next/link";
 import { Marker } from "@/components/mapping/analysis-map";
+import { FilterBar } from "@/components/filtering/filter-bar";
+import { SequenceFilters } from "@/components/filtering/sequence-filters";
+import { Filter, intoFilterItem } from "@/components/filtering/common";
 
 
 const PAGE_SIZE = 5;
@@ -48,9 +51,9 @@ query SpeciesReferenceGenome($canonicalName: String) {
 
 
 const GET_WHOLE_GENOMES = gql`
-query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int) {
+query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
   species(canonicalName: $canonicalName) {
-    wholeGenomes(page: $page, pageSize: $pageSize) {
+    wholeGenomes(page: $page, pageSize: $pageSize, filters: $filters) {
       total
       records {
         sequenceId
@@ -289,6 +292,7 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
 export default function WholeGenome({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
 
+  const [filters, setFilters] = useState<Filter[]>([]);
   const [mapExpand, setMapExpand] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -297,6 +301,7 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
       canonicalName,
       page,
       pageSize: PAGE_SIZE,
+      filters: filters.map(intoFilterItem).filter(item => item),
     },
   });
 
@@ -310,7 +315,14 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
         <ReferenceGenome canonicalName={canonicalName} />
 
         <Paper p="lg" radius="lg" withBorder>
-          <Title order={3} mb={10}>All genomes</Title>
+          <Stack>
+          <FilterBar title="All genomes" filters={[]}>
+            <SequenceFilters
+              filters={{ assembly: [] }}
+              onChange={setFilters}
+            />
+          </FilterBar>
+
           <Grid>
             <Grid.Col span={8}>
               <Box pos="relative">
@@ -330,6 +342,7 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
               />
             </Grid.Col>
           </Grid>
+          </Stack>
         </Paper>
       </Stack>
 
