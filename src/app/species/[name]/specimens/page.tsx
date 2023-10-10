@@ -24,6 +24,8 @@ query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
         id
         recordId
         datasetName
+        accession,
+        institutionCode,
         typeStatus
         locality
         country
@@ -96,6 +98,8 @@ type Specimen = {
   id: string,
   recordId: string,
   datasetName: string,
+  accession?: string,
+  institutionCode?: string,
   typeStatus?: string,
   locality?: string,
   country?: string,
@@ -159,11 +163,13 @@ function LabeledValue({ label, value }: { label: string, value: string|undefined
 }
 
 function RecordItemContent({ record }: { record: Specimen }) {
+  const registration = record.accession ? `${record.institutionCode || ''} ${record.accession}` : record.recordId;
+
   return (
       <Grid p={20}>
         <Grid.Col span={4}>
           <Stack gap={5}>
-            <LabeledValue label="Registration number" value={record.recordId} />
+            <LabeledValue label="Registration number" value={registration} />
             <Text size="xs" fw={600}>{record.datasetName}</Text>
           </Stack>
         </Grid.Col>
