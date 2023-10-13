@@ -505,7 +505,7 @@ function EventCarousel({ children }: { children: React.ReactNode }) {
           onClick={() => embla?.scrollPrev()}
           leftSection={<ChevronLeft/>}
         >
-          <Text c="black" fw={600} fz="sm">Event {slide <= 1 ? 1 : slide}</Text>
+          Event {slide <= 1 ? 1 : slide}
         </Button>
         <Group>
           { React.Children.map(children, (_child, idx) =>
