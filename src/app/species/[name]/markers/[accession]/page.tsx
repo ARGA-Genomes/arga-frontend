@@ -72,7 +72,7 @@ type SpecimenDetails = {
 }
 
 type SequenceQueryResults = {
-  sequence: SequenceDetails,
+  sequence: SequenceDetails[],
   specimen: SpecimenDetails,
 };
 
@@ -246,6 +246,8 @@ export default function MarkerPage({ params }: { params: { accession: string } }
     return <Text>Error : {error.message}</Text>;
   }
 
+  const sequence = data?.sequence[0];
+
   return (
     <Stack gap={20}>
       <Link href="./">
@@ -257,29 +259,29 @@ export default function MarkerPage({ params }: { params: { accession: string } }
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${data?.sequence.recordId}`}</Title>
+          <Title order={3} mb={10}>{`Full data view: ${sequence?.recordId}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
-          <Text fz="sm" c="dimmed" fw={700}>{data?.sequence.datasetName}</Text>
+          <Text fz="sm" c="dimmed" fw={700}>{sequence?.datasetName}</Text>
         </Group>
 
         <Grid>
           <Grid.Col span={6}>
             <LoadPanel visible={loading} h={450}>
               <Title order={5}>Molecule data</Title>
-              <MoleculeDetails sequence={data?.sequence} />
+              <MoleculeDetails sequence={sequence} />
             </LoadPanel>
           </Grid.Col>
           <Grid.Col span={3}>
             <LoadPanel visible={loading} h={450}>
               <Title order={5} mb={10}>Data availability</Title>
-              <DataAvailability sequence={data?.sequence} specimen={data?.specimen} />
+              <DataAvailability sequence={sequence} specimen={data?.specimen} />
             </LoadPanel>
           </Grid.Col>
 
           <Grid.Col span={3}>
             <LoadPanel visible={loading}>
               <Title order={5} mb={10}>Trace data</Title>
-              <TraceData sequence={data?.sequence} />
+              <TraceData sequence={sequence} />
             </LoadPanel>
           </Grid.Col>
 
@@ -287,7 +289,7 @@ export default function MarkerPage({ params }: { params: { accession: string } }
           <Grid.Col span={4}>
             <LoadPanel visible={loading}>
               <Title order={5} mb={10}>Data provenance</Title>
-              <DataProvenance sequence={data?.sequence} />
+              <DataProvenance sequence={sequence} />
             </LoadPanel>
           </Grid.Col>
           <Grid.Col span={5}>
@@ -298,7 +300,7 @@ export default function MarkerPage({ params }: { params: { accession: string } }
           <Grid.Col span={3}>
             <LoadPanel visible={loading}>
               <Title order={5} mb={10}>Amplification methods</Title>
-              <AmplificationMethods sequence={data?.sequence} />
+              <AmplificationMethods sequence={sequence} />
             </LoadPanel>
           </Grid.Col>
         </Grid>
