@@ -418,8 +418,8 @@ function EventTimeline(props: EventTimelineProps) {
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/sequencing.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Amplification and sequencing</Text>}>
         <Stack gap={0}>
-          { sequencing?.map(event =>
-            <Group>
+          { sequencing?.map((event, idx) =>
+            <Group key={idx}>
               <Text ml={30} fz="xs" fw={300}>Event date</Text>
               <DataField value={event?.eventDate} fz="xs"/>
             </Group>
@@ -428,8 +428,8 @@ function EventTimeline(props: EventTimelineProps) {
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/assembly.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Sequence assembly</Text>}>
         <Stack gap={0}>
-          { assemblies?.map(event =>
-            <Group>
+          { assemblies?.map((event, idx) =>
+            <Group key={idx}>
               <Text ml={30} fz="xs" fw={300}>Event date</Text>
               <DataField value={event?.eventDate} fz="xs"/>
             </Group>
@@ -438,8 +438,8 @@ function EventTimeline(props: EventTimelineProps) {
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/annotation.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Sequence annotation</Text>}>
         <Stack gap={0}>
-          { annotations?.map(event =>
-            <Group>
+          { annotations?.map((event, idx) =>
+            <Group key={idx}>
               <Text ml={30} fz="xs" fw={300}>Event date</Text>
               <DataField value={event?.eventDate} fz="xs"/>
             </Group>
@@ -448,8 +448,8 @@ function EventTimeline(props: EventTimelineProps) {
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/deposition.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Data deposition</Text>}>
         <Stack gap={0}>
-          { depositions?.map(event =>
-            <Group>
+          { depositions?.map((event, idx) =>
+            <Group key={idx}>
               <Text ml={30} fz="xs" fw={300}>Event date</Text>
               <DataField value={event?.eventDate} fz="xs"/>
             </Group>
@@ -534,19 +534,19 @@ export default function SpecimenPage({ params }: { params: { accession: string }
               </Panel>
               <Panel>
                 <Title order={5}>Amplificaton and sequencing event</Title>
-                { data?.sequence.map(sequence => <Sequencing sequence={sequence} />) }
+                { data?.sequence.map(sequence => <Sequencing sequence={sequence} key={sequence.id} />) }
               </Panel>
               <Panel>
                 <Title order={5}>Sequence assembly event</Title>
-                { data?.sequence.map(sequence => <Assemblies sequence={sequence} />) }
+                { data?.sequence.map(sequence => <Assemblies sequence={sequence} key={sequence.id} />) }
               </Panel>
               <Panel>
                 <Title order={5}>Sequence annotation event</Title>
-                { data?.sequence.map(sequence => <Annotations sequence={sequence} />) }
+                { data?.sequence.map(sequence => <Annotations sequence={sequence} key={sequence.id} />) }
               </Panel>
               <Panel>
                 <Title order={5}>Data deposition event</Title>
-                { data?.sequence.map(sequence => <Depositions sequence={sequence} />) }
+                { data?.sequence.map(sequence => <Depositions sequence={sequence} key={sequence.id} />) }
               </Panel>
             </Stack>
           </Grid.Col>
