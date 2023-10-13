@@ -1,5 +1,8 @@
 "use client";
 
+import '@mantine/carousel/styles.css';
+import classes from './event-block.module.css';
+
 import { gql, useQuery } from "@apollo/client";
 import {
   Box,
@@ -12,9 +15,10 @@ import {
   Timeline,
   Title,
   Image,
+  Button,
 } from "@mantine/core";
 import { AttributePill, DataField } from "@/components/highlight-stack";
-import { ArrowNarrowLeft } from "tabler-icons-react";
+import { ArrowNarrowLeft, ChevronLeft, ChevronRight } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArgaMap } from "@/components/mapping";
@@ -23,6 +27,8 @@ import { Subsample, SubsampleEvent } from "@/queries/subsample";
 import { DnaExtract, DnaExtractionEvent } from "@/queries/dna-extract";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 import { DataTable, DataTableRow } from "@/components/data-table";
+import { Carousel, Embla } from "@mantine/carousel";
+import React, { useState } from 'react';
 
 
 const GET_SPECIMEN = gql`
@@ -468,7 +474,54 @@ function EventTimeline(props: EventTimelineProps) {
 
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <Box px={20} pt={30} pb={15}>{children}</Box>
+  return <Box px={20} pt={30} pb={15} style={{ borderTop: "1px solid #d6e4ed" }}>{children}</Box>
+}
+
+
+function EventCarousel({ children }: { children: React.ReactNode }) {
+  const [slide, setSlide] = useState(0);
+  const [embla, setEmbla] = useState<Embla | null>(null);
+  const total = React.Children.count(children);
+
+  return (
+    <Stack>
+      <Carousel
+        withControls={false}
+        align="start"
+        draggable={false}
+        slideSize="100%"
+        classNames={classes}
+        getEmblaApi={setEmbla}
+        onSlideChange={setSlide}
+      >
+        { React.Children.map(children, (child: React.ReactNode) => <Carousel.Slide>{child}</Carousel.Slide>) }
+      </Carousel>
+
+      <Group gap="xs" justify="space-between">
+        <Button
+          variant="light"
+          disabled={slide == 0}
+          onClick={() => embla?.scrollPrev()}
+          leftSection={<ChevronLeft/>}
+        >
+          <Text c="black" fw={600} fz="sm">Event {slide <= 1 ? 1 : slide}</Text>
+        </Button>
+        <Group>
+          { React.Children.map(children, (_child, idx) =>
+            <div className={classes.indicator} data-active={idx === slide}></div>
+          )}
+        </Group>
+        <Button
+          variant="light"
+          disabled={slide == total - 1}
+          onClick={() => embla?.scrollNext()}
+          rightSection={<ChevronRight/>}
+        >
+          Event {slide >= total-1 ? total : slide + 2}
+        </Button>
+      </Group>
+    </Stack>
+  )
 }
 
 
@@ -500,9 +553,9 @@ export default function SpecimenPage({ params }: { params: { accession: string }
           <Text fz="sm" c="dimmed">Source</Text>
         </Group>
 
-        <Grid columns={24} gutter={0}>
+        <Grid columns={24} gutter={0} style={{ border: "1px solid #d6e4ed", borderRadius: "var(--mantine-radius-lg)" }}>
           <Grid.Col span={5}>
-            <Paper p={15} bg="#d6e4ed" h="100%" style={{ borderRadius: "10px 0 10px 10px", border: "none" }}>
+            <Paper p={15} bg="#d6e4ed" h="100%" style={{ borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)", border: "none" }}>
               <EventTimeline
                 specimen={data?.specimen}
                 subsample={data?.subsample}
@@ -513,12 +566,12 @@ export default function SpecimenPage({ params }: { params: { accession: string }
           </Grid.Col>
 
           <Grid.Col span={19}>
-            <Stack>
-              <Paper bg="#eaf1f5" withBorder={false} style={{ borderRadius: "0 10px 10px 0", border: "none" }}>
-                <Panel>
+            <Stack gap={0}>
+              <Paper bg="#eaf1f5" withBorder={false} style={{ borderRadius: "0 var(--mantine-radius-lg) 0 0", border: "none" }}>
+                <Box px={20} pt={30} pb={15}>
                   <Title order={5}>Collection event</Title>
                   <Collections specimen={data?.specimen} />
-                </Panel>
+                </Box>
               </Paper>
               <Panel>
                 <Title order={5}>Accession event</Title>
@@ -534,19 +587,27 @@ export default function SpecimenPage({ params }: { params: { accession: string }
               </Panel>
               <Panel>
                 <Title order={5}>Amplificaton and sequencing event</Title>
-                { data?.sequence.map(sequence => <Sequencing sequence={sequence} key={sequence.id} />) }
+                <EventCarousel>
+                  { data?.sequence.map(sequence => <Sequencing sequence={sequence} key={sequence.id} />) }
+                </EventCarousel>
               </Panel>
               <Panel>
                 <Title order={5}>Sequence assembly event</Title>
-                { data?.sequence.map(sequence => <Assemblies sequence={sequence} key={sequence.id} />) }
+                <EventCarousel>
+                  { data?.sequence.map(sequence => <Assemblies sequence={sequence} key={sequence.id} />) }
+                </EventCarousel>
               </Panel>
               <Panel>
                 <Title order={5}>Sequence annotation event</Title>
-                { data?.sequence.map(sequence => <Annotations sequence={sequence} key={sequence.id} />) }
+                <EventCarousel>
+                  { data?.sequence.map(sequence => <Annotations sequence={sequence} key={sequence.id} />) }
+                </EventCarousel>
               </Panel>
               <Panel>
                 <Title order={5}>Data deposition event</Title>
-                { data?.sequence.map(sequence => <Depositions sequence={sequence} key={sequence.id} />) }
+                <EventCarousel>
+                  { data?.sequence.map(sequence => <Depositions sequence={sequence} key={sequence.id} />) }
+                </EventCarousel>
               </Panel>
             </Stack>
           </Grid.Col>

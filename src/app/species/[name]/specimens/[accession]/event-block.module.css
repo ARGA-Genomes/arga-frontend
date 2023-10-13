@@ -1,0 +1,14 @@
+.indicator {
+  background-color: var(--mantine-color-midnight-5);
+  width: rem(10px);
+  height: rem(6px);
+  transition: width 250ms ease;
+  border-radius: rem(20px);
+  border: 0px;
+  opacity: 30%;
+
+  &[data-active=true] {
+    width: rem(30px);
+    opacity: 50%;
+  }
+}
