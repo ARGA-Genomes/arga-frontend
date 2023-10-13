@@ -493,8 +493,9 @@ function EventCarousel({ children }: { children: React.ReactNode }) {
         classNames={classes}
         getEmblaApi={setEmbla}
         onSlideChange={setSlide}
+        speed={30}
       >
-        { React.Children.map(children, (child: React.ReactNode) => <Carousel.Slide>{child}</Carousel.Slide>) }
+        { React.Children.map(children, (child: React.ReactNode, idx) => <Carousel.Slide key={idx}>{child}</Carousel.Slide>) }
       </Carousel>
 
       <Group gap="xs" justify="space-between">
@@ -508,7 +509,7 @@ function EventCarousel({ children }: { children: React.ReactNode }) {
         </Button>
         <Group>
           { React.Children.map(children, (_child, idx) =>
-            <div className={classes.indicator} data-active={idx === slide}></div>
+            <div key={idx} className={classes.indicator} data-active={idx === slide}></div>
           )}
         </Group>
         <Button
