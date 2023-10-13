@@ -1,7 +1,5 @@
 "use client";
 
-import classes from "@/components/data-table.module.css";
-
 import { gql, useQuery } from "@apollo/client";
 import {
   Box,
@@ -10,7 +8,6 @@ import {
   Paper,
   SimpleGrid,
   Stack,
-  Table,
   Text,
   Timeline,
   Title,
@@ -99,7 +96,7 @@ type SpecimenQueryResults = {
   specimen: SpecimenDetails;
   subsample: SubsampleDetails;
   dnaExtract: DnaExtractDetails;
-  sequence: SequenceDetails;
+  sequence: SequenceDetails[];
 };
 
 
@@ -260,7 +257,7 @@ function Sequencing({ sequence }: { sequence: SequenceDetails | undefined }) {
   return (
     <SimpleGrid cols={3}>
       <DataTable>
-        <DataTableRow label="Amplification number"><DataField value={undefined} /></DataTableRow>
+        <DataTableRow label="Amplification number"><DataField value={sequence?.recordId} /></DataTableRow>
         <DataTableRow label="Target region"><DataField value={sequencing?.targetGene} /></DataTableRow>
         <DataTableRow label="Sequence numbers"><DataField value={undefined} /></DataTableRow>
         <DataTableRow label="Sequencing protocol"><DataField value={sequencingRun?.libraryProtocol} /></DataTableRow>
@@ -379,7 +376,7 @@ interface EventTimelineProps {
   specimen?: SpecimenDetails,
   subsample?: SubsampleDetails,
   dnaExtract?: DnaExtractDetails,
-  sequence?: SequenceDetails,
+  sequences?: SequenceDetails[],
 }
 
 function EventTimeline(props: EventTimelineProps) {
@@ -387,10 +384,11 @@ function EventTimeline(props: EventTimelineProps) {
   const accession = props.specimen?.events.accessions[0];
   const subsample = props.subsample?.events.subsamples[0];
   const extraction = props.dnaExtract?.events.dnaExtracts[0];
-  const sequence = props.sequence?.events.sequencing[0];
-  const assembly = props.sequence?.events.assemblies[0];
-  const annotation = props.sequence?.events.annotations[0];
-  const deposition = props.sequence?.events.dataDepositions[0];
+
+  const sequencing = props.sequences?.map(seq => seq.events.sequencing).flat();
+  const assemblies = props.sequences?.map(seq => seq.events.assemblies).flat();
+  const annotations = props.sequences?.map(seq => seq.events.annotations).flat();
+  const depositions = props.sequences?.map(seq => seq.events.dataDepositions).flat();
 
   return (
     <Timeline color="midnight" active={8} bulletSize={45} lineWidth={4}>
@@ -419,28 +417,44 @@ function EventTimeline(props: EventTimelineProps) {
         </Group>
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/sequencing.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Amplification and sequencing</Text>}>
-        <Group>
-          <Text ml={30} fz="xs" fw={300}>Event date</Text>
-          <DataField value={sequence?.eventDate} fz="xs"/>
-        </Group>
+        <Stack gap={0}>
+          { sequencing?.map(event =>
+            <Group>
+              <Text ml={30} fz="xs" fw={300}>Event date</Text>
+              <DataField value={event?.eventDate} fz="xs"/>
+            </Group>
+          )}
+        </Stack>
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/assembly.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Sequence assembly</Text>}>
-        <Group>
-          <Text ml={30} fz="xs" fw={300}>Event date</Text>
-          <DataField value={assembly?.eventDate} fz="xs"/>
-        </Group>
+        <Stack gap={0}>
+          { assemblies?.map(event =>
+            <Group>
+              <Text ml={30} fz="xs" fw={300}>Event date</Text>
+              <DataField value={event?.eventDate} fz="xs"/>
+            </Group>
+          )}
+        </Stack>
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/annotation.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Sequence annotation</Text>}>
-        <Group>
-          <Text ml={30} fz="xs" fw={300}>Event date</Text>
-          <DataField value={annotation?.eventDate} fz="xs"/>
-        </Group>
+        <Stack gap={0}>
+          { annotations?.map(event =>
+            <Group>
+              <Text ml={30} fz="xs" fw={300}>Event date</Text>
+              <DataField value={event?.eventDate} fz="xs"/>
+            </Group>
+          )}
+        </Stack>
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/deposition.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Data deposition</Text>}>
-        <Group>
-          <Text ml={30} fz="xs" fw={300}>Event date</Text>
-          <DataField value={deposition?.eventDate} fz="xs"/>
-        </Group>
+        <Stack gap={0}>
+          { depositions?.map(event =>
+            <Group>
+              <Text ml={30} fz="xs" fw={300}>Event date</Text>
+              <DataField value={event?.eventDate} fz="xs"/>
+            </Group>
+          )}
+        </Stack>
       </Timeline.Item>
       <Timeline.Item bullet={<Image src='/timeline-icons/data-reuse.svg' w={50}/>} title={<Text fz="sm" ml={20} fw={700}>Data reuse</Text>}>
         <Group>
@@ -463,7 +477,7 @@ export default function SpecimenPage({ params }: { params: { accession: string }
 
   const { loading, error, data } = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {
     variables: {
-      recordId: params.accession,
+      recordId: decodeURIComponent(params.accession),
     },
   });
 
@@ -493,7 +507,7 @@ export default function SpecimenPage({ params }: { params: { accession: string }
                 specimen={data?.specimen}
                 subsample={data?.subsample}
                 dnaExtract={data?.dnaExtract}
-                sequence={data?.sequence}
+                sequences={data?.sequence}
               />
             </Paper>
           </Grid.Col>
@@ -520,19 +534,19 @@ export default function SpecimenPage({ params }: { params: { accession: string }
               </Panel>
               <Panel>
                 <Title order={5}>Amplificaton and sequencing event</Title>
-                <Sequencing sequence={data?.sequence} />
+                { data?.sequence.map(sequence => <Sequencing sequence={sequence} />) }
               </Panel>
               <Panel>
                 <Title order={5}>Sequence assembly event</Title>
-                <Assemblies sequence={data?.sequence} />
+                { data?.sequence.map(sequence => <Assemblies sequence={sequence} />) }
               </Panel>
               <Panel>
                 <Title order={5}>Sequence annotation event</Title>
-                <Annotations sequence={data?.sequence} />
+                { data?.sequence.map(sequence => <Annotations sequence={sequence} />) }
               </Panel>
               <Panel>
                 <Title order={5}>Data deposition event</Title>
-                <Depositions sequence={data?.sequence} />
+                { data?.sequence.map(sequence => <Depositions sequence={sequence} />) }
               </Panel>
             </Stack>
           </Grid.Col>
