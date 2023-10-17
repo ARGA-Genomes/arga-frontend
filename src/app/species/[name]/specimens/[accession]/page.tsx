@@ -587,7 +587,7 @@ export default function SpecimenPage({ params }: { params: { accession: string }
                 <DnaExtracts dnaExtract={data?.dnaExtract} />
               </Panel>
               <Panel>
-                <Title order={5}>Amplificaton and sequencing event</Title>
+                <Title order={5}>Amplification and sequencing event</Title>
                 <EventCarousel>
                   { data?.sequence.map(sequence => <Sequencing sequence={sequence} key={sequence.id} />) }
                 </EventCarousel>

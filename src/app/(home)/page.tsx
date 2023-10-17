@@ -96,7 +96,7 @@ export default function HomePage() {
               </Title>
               <Text c="white">
                 For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
-                Genome Atlas (ARGA) locates and aggregates genomic data, including
+                Genome Atlas (ARGA) locates and aggregates genomic data, including &nbsp;
                 <b>
                   reference genome assemblies &#x2022; genome annotations &#x2022; population and variant sets &#x2022;
                   DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022; raw genomics data
