@@ -193,7 +193,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 
         <DataTable>
           <DataTableRow label="Common names">
-            <Text fw={600} fz="sm" truncate="end" w="400">
+            <Text fw={600} fz="sm" truncate="end" w={{xs: 100, sm: 200, md: 200, lg: 400, xl: 500}}>
               {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
             </Text>
           </DataTableRow>

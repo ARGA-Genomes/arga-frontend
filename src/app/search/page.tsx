@@ -201,7 +201,7 @@ function TaxonItem({ item }: { item: Record }) {
               marginLeft: 0,
               marginRight: 0
             }}>
-              <Image src={"search-icons/data_type_species_and_subspecies_reports.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+              <Image src={"search-icons/data_type_species_and_subspecies_reports.svg"} fit="contain" width={200} pos="relative" top={-12} left={-31} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
               <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
@@ -297,7 +297,7 @@ function GenomeItem({ item }: { item: Record }) {
               marginLeft: 0,
               marginRight: 0
             }}>
-              <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+              <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="relative" top={-12} left={-31} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }} >
               <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
@@ -364,7 +364,7 @@ function LocusItem({ item }: { item: Record }) {
               marginLeft: 0,
               marginRight: 0
             }}>
-              <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-20} left={-36} alt="" />
+              <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-12} left={-31} alt="" />
             </Container>
             <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
               <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>

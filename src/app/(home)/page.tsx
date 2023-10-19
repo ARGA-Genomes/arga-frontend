@@ -96,7 +96,7 @@ export default function HomePage() {
               </Title>
               <Text c="white">
                 For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
-                Genome Atlas (ARGA) locates and aggregates genomic data, including
+                Genome Atlas (ARGA) locates and aggregates genomic data, including &nbsp; <br></br>
                 <b>
                   reference genome assemblies &#x2022; genome annotations &#x2022; population and variant sets &#x2022;
                   DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022; raw genomics data
@@ -108,24 +108,24 @@ export default function HomePage() {
       </Paper>
 
       <Container maw={MAX_WIDTH} py={50}>
-      <Stack gap={80}>
-        <Stack gap={40}>
-          <Title order={3} c="moss.3" fz={24} fw={550}>Search for data</Title>
-          <Search />
+        <Stack gap={80}>
+          <Stack gap={40}>
+            <Title order={3} c="moss.3" fz={24} fw={550}>Search for data</Title>
+            <Search />
+          </Stack>
+          <Stack gap={40}>
+            <Title order={3} c="moss.3" fw={550}>Browse by data type</Title>
+            <BrowseType />
+          </Stack>
+          <Stack gap={40}>
+            <Title order={3} c="moss.3" fw={550}>Browse by taxonomic group</Title>
+            <BrowseTaxon />
+          </Stack>
+          <Stack gap={40}>
+            <Title order={3} c="moss.3" fw={550}>Browse by functional or ecological group</Title>
+            <BrowseGrouping />
+          </Stack>
         </Stack>
-        <Stack gap={40}>
-          <Title order={3} c="moss.3" fw={550}>Browse by data type</Title>
-          <BrowseType />
-        </Stack>
-        <Stack gap={40}>
-          <Title order={3} c="moss.3" fw={550}>Browse by taxonomic group</Title>
-          <BrowseTaxon />
-        </Stack>
-        <Stack gap={40}>
-          <Title order={3} c="moss.3" fw={550}>Browse by functional or ecological group</Title>
-          <BrowseGrouping />
-        </Stack>
-      </Stack>
       </Container>
     </Paper>
   );

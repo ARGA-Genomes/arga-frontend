@@ -7,7 +7,7 @@ import classes from './layout.module.css';
 import { ApolloProvider } from '@apollo/client';
 import createClient from '../queries/client';
 
-import { AppShell, Container, Flex, Image, MantineProvider, Paper } from '@mantine/core';
+import { AppShell, Container, Image, MantineProvider, Paper } from '@mantine/core';
 
 import { theme } from '../theme';
 import { TopNav } from './top-nav';
@@ -54,9 +54,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Container maw={MAX_WIDTH}>
           <Footer />
         </Container>
-        <Flex align="flex-end" justify="flex-end">
-          <Image src="/dna_footer.jpg" width={'100%'} height={160} />
-        </Flex>
+          <Image src="/dna_footer.jpg" h={160} />
       </Paper>
     </AppShell>
   )

@@ -63,7 +63,7 @@ function BrowseResults({ list }: { list: Species[]}) {
   if (list.length === 0) return <Title>No data found</Title>
 
   return (
-    <SimpleGrid cols={4}>
+    <SimpleGrid cols={{ base: 1, xs: 1, sm: 2, lg: 3, md: 2, xl: 4 }} spacing="xl">
       { list.map(item => (<SpeciesCard species={item} key={item.taxonomy.canonicalName} />)) }
     </SimpleGrid>
   )
@@ -80,7 +80,7 @@ export default function GenomesList() {
 
   return (
     <Box>
-      <Box mt={20}>
+      <Box m={20} p="xl" pos="relative">
         <LoadOverlay visible={loading} />
 
         <Title order={2} mb={20}>Genomes</Title>

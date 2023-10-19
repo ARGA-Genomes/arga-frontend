@@ -25,3 +25,13 @@
     color: black;
   }
 }
+
+.tabStyles button {
+  &[data-active]{
+    background-color: var(--mantine-color-wheat-4);
+    color: black;
+} 
+  background-color: var(--mantine-color-white);
+  margin-right: 20px;
+  margin-bottom: 5px;
+}

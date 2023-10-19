@@ -43,7 +43,7 @@ export function SpeciesCard({ species }: { species: Species }) {
   const itemLinkName = species.taxonomy.canonicalName?.replaceAll(" ", "_");
 
   return (
-    <Card shadow="sm" p={20} radius="lg" withBorder>
+    <Card shadow="sm" p={20} radius="lg" withBorder miw={313}>
       <Card.Section>
         <Link href={`/species/${itemLinkName}`}>
           <SpeciesImage

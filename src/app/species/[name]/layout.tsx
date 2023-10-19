@@ -29,10 +29,10 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
 
   return (
     <Tabs
-      variant="unstyled"
-      classNames={classes}
+      variant="pills"
+      className={classes.tabStyles}
       radius={10}
-      mt={40}
+      mt={10}
       defaultValue="distribution"
       value={tab}
       onChange={changeTab}
@@ -48,7 +48,7 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
         </Tabs.List>
       </Container>
 
-      <Paper pos="relative" py={30}>
+      <Paper pos="relative" py={30} mt= {10}>
         {children}
       </Paper>
     </Tabs>
