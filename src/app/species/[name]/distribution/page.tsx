@@ -14,7 +14,6 @@ import {
   SwitchProps,
 } from "@mantine/core";
 
-import { ArrowBarRight } from "tabler-icons-react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
@@ -164,31 +163,20 @@ interface SummaryProps {
 }
 
 function Summary({ regions, filters, onFilter }: SummaryProps ) {
+
   return (
-    <Stack>
-      <Group justify="end">
-        <Button
-          variant="subtle"
-          leftSection={<ArrowBarRight/>}
-          style={{ borderRadius: "0 var(--mantine-radius-lg) 0 0"}}
-        >
-          Hide
-        </Button>
-      </Group>
-
-      <Stack p={10} gap="md">
-        <Title order={3} fw={650}>Indexed data</Title>
-        <Stack gap={5} mb={30}>
-          <MapFilterOption onChange={e => onFilter(Layer.WholeGenome, e.currentTarget.checked)} size="md" color="bushfire" label="Whole genomes" count={filters.wholeGenomes.count} total={filters.wholeGenomes.total} />
-          <MapFilterOption onChange={e => onFilter(Layer.Loci, e.currentTarget.checked)} size="md" color="moss.7" label="Loci" count={filters.loci.count} total={filters.loci.total} />
-          <MapFilterOption onChange={e => onFilter(Layer.OtherData, e.currentTarget.checked)} size="md" color="moss.3" label="Other data" count={filters.other.count} total={filters.other.total} />
-          <MapFilterOption onChange={e => onFilter(Layer.Specimens, e.currentTarget.checked)} size="md" color="midnight.4" label="Specimens" count={filters.specimens.count} total={filters.specimens.total} />
-        </Stack>
-
-        <Title order={3} fw={650}>Distribution</Title>
-        <Text>{regions?.ibra.map(r => r.name).join(", ")}</Text>
-        <Text>{regions?.imcra.map(r => r.name).join(", ")}</Text>
+    <Stack p={10} gap="md">
+      <Title order={3} fw={650}>Indexed data</Title>
+      <Stack gap={5} mb={30}>
+        <MapFilterOption onChange={e => onFilter(Layer.WholeGenome, e.currentTarget.checked)} size="md" color="bushfire" label="Whole genomes" count={filters.wholeGenomes.count} total={filters.wholeGenomes.total} />
+        <MapFilterOption onChange={e => onFilter(Layer.Loci, e.currentTarget.checked)} size="md" color="moss.7" label="Loci" count={filters.loci.count} total={filters.loci.total} />
+        <MapFilterOption onChange={e => onFilter(Layer.OtherData, e.currentTarget.checked)} size="md" color="moss.3" label="Other data" count={filters.other.count} total={filters.other.total} />
+        <MapFilterOption onChange={e => onFilter(Layer.Specimens, e.currentTarget.checked)} size="md" color="midnight.4" label="Specimens" count={filters.specimens.count} total={filters.specimens.total} />
       </Stack>
+
+      <Title order={3} fw={650}>Distribution</Title>
+      <Text>{regions?.ibra.map(r => r.name).join(", ")}</Text>
+      <Text>{regions?.imcra.map(r => r.name).join(", ")}</Text>
     </Stack>
   )
 }
