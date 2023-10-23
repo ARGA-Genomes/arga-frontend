@@ -38,7 +38,6 @@ function Placeholder({ taxonomy, ...imageProps }: PlaceholderImageProps) {
       <Image
         src={placeholder(taxonomy?.kingdom)}
         alt={taxonomy?.canonicalName}
-        w="auto"
         fit="contain"
         {...imageProps}
       />
