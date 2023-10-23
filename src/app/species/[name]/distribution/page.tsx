@@ -67,6 +67,7 @@ type Specimen = {
   recordId?: string,
   latitude?: number,
   longitude?: number,
+  color?: string
 }
 
 type QueryResults = {
@@ -261,7 +262,6 @@ export default function DistributionPage({ params }: { params: { name: string } 
   return (
     <Paper p="lg" radius="lg" withBorder>
       <Stack gap="lg">
-        <Title order={4}>Indexed data distribution</Title>
         <Paper radius="lg" withBorder>
           <Grid>
             <Grid.Col span={9}>

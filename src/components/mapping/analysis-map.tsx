@@ -77,7 +77,16 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
   const view = new MapView({ repeat: true });
 
   const getTooltip = ({ object }: { object?: any }): string => {
-    return object?.properties?.name || object?.recordId;
+    return (
+      object && {
+        html: `${object?.properties?.name || object?.recordId}`,
+        style: {
+          backgroundColor: `rgba(${object?.color || [0,0,0,256]})`,
+          color: 'white',
+          borderRadius: '5px'
+        }
+      }
+    );
   }
 
   const onHover = ({ object }: { object?: any }) => {
