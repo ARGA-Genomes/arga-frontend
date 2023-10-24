@@ -2,7 +2,7 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import Map from 'react-map-gl/maplibre';
+import Map, { Popup } from 'react-map-gl/maplibre';
 import DeckGL, { BitmapLayer, GeoJsonLayer, MapView, ScatterplotLayer, TileLayer } from 'deck.gl/typed';
 import { useState } from 'react';
 import { GeoJSON } from 'geojson';
@@ -55,6 +55,9 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
   const [tolerance, setTolerance] = useState(0.01);
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined)
   const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined)
+  const [clickedLatitude, setClickedLatitude] = useState<string | undefined>(undefined)
+  const [clickedLongitude, setClickedLongitude] = useState<string | undefined>(undefined)
+
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
     variables: {
@@ -102,6 +105,17 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
     }
   }
 
+  const onClick = ({ object }: { object?: any }) => {
+    if (object) {
+      setClickedLatitude(object?.latitude);
+      setClickedLongitude(object?.longitude);
+    }
+    else {
+      setClickedLatitude(undefined);
+      setClickedLongitude(undefined);
+    }
+  }
+
   return (
     <DeckGL
       views={view}
@@ -116,9 +130,20 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
       ]}
       getTooltip={getTooltip}
       onHover={onHover}
+      onClick={onClick}
       controller={true}
       style={style}
     >
+      {
+        clickedLatitude && clickedLongitude && (
+          <Popup longitude={+clickedLongitude} latitude={+clickedLatitude}>
+        <div>
+          Test popup, needs to be a link to the marker or region here
+        </div>
+          
+        </Popup>
+        )
+      }
       <Map
         reuseMaps
         mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
