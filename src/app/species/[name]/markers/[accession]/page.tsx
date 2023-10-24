@@ -239,7 +239,7 @@ function TraceDataList({ sequence }: { sequence: SequenceDetails | undefined }) 
   return (
     <Stack>
       { sequence?.events.sequencingRuns.map((run, idx) => (
-        <TraceData key={idx} trace={run.trace} />
+        run.trace && <TraceData key={idx} trace={run.trace} />
       ))}
     </Stack>
   )

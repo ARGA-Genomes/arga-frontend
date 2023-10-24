@@ -8,11 +8,10 @@ import { Trace } from "@/queries/sequence";
 
 
 interface TraceDataProps {
-  trace?: Trace,
+  trace: Trace,
 }
 
 export function TraceData(props: TraceDataProps) {
-  if (!props.trace) return null;
   const url = `https://app.arga.org.au/traces/${props.trace.accession}/${props.trace.traceId}/${props.trace.traceName}`;
   const { loading, trace } = useTraceLoader(url);
 

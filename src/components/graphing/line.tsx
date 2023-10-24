@@ -35,8 +35,7 @@ function Line(props: LineProps & SVGProps<SVGRectElement>)
     <animated.g style={anim}>
       <path
         stroke="red"
-              strokeWidth={2}
-        d={data}
+        strokeWidth={2}
       />
     </animated.g>
   )
