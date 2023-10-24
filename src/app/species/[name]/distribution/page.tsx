@@ -25,8 +25,14 @@ const GET_DISTRIBUTION = gql`
   query SpeciesDistribution($canonicalName: String) {
     species(canonicalName: $canonicalName) {
       regions {
-        ibra { name }
-        imcra { name }
+        ibra {
+          names
+          dataset { name }
+        }
+        imcra {
+          names
+          dataset { name }
+        }
       }
       specimens(page: 1, pageSize: 1000) {
         total
@@ -57,9 +63,14 @@ const GET_DISTRIBUTION = gql`
   }
 `;
 
+type RegionDistribution = {
+  names: string[],
+  dataset: { name: string }
+}
+
 type Regions = {
-  ibra: { name: string }[],
-  imcra: { name: string }[],
+  ibra: RegionDistribution[],
+  imcra: RegionDistribution[],
 }
 
 type Specimen = {
@@ -96,8 +107,8 @@ interface DistributionAnalysisProps {
 
 function DistributionAnalysis({ regions, markers }: DistributionAnalysisProps) {
   const flattened = {
-    ibra: regions?.ibra.map(r => r.name) || [],
-    imcra: regions?.imcra.map(r => r.name) || [],
+    ibra: regions?.ibra.map(r => r.names).flat() || [],
+    imcra: regions?.imcra.map(r => r.names).flat() || [],
   };
 
   return (
@@ -186,8 +197,8 @@ function Summary({ regions, filters, onFilter }: SummaryProps ) {
         </Stack>
 
         <Title order={3} fw={650}>Distribution</Title>
-        <Text>{regions?.ibra.map(r => r.name).join(", ")}</Text>
-        <Text>{regions?.imcra.map(r => r.name).join(", ")}</Text>
+        <Text>{regions?.ibra.map(r => r.names).flat().join(", ")}</Text>
+        <Text>{regions?.imcra.map(r => r.names).flat().join(", ")}</Text>
       </Stack>
     </Stack>
   )
