@@ -21,6 +21,7 @@ import { CopyableData } from "@/components/data-fields";
 import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 import { ArgaMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
+import { TraceData } from "@/components/traces/trace-data";
 
 
 const GET_ASSEMBLY = gql`
@@ -34,6 +35,12 @@ const GET_ASSEMBLY = gql`
         sequencingRuns {
           id
           ...SequencingRunEventDetails
+          trace {
+            accession
+            traceName
+            traceId
+            traceLink
+          }
         }
         assemblies { ...AssemblyEventDetails }
         annotations { ...AnnotationEventDetails }
@@ -140,13 +147,6 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
   )
 }
 
-function TraceData({ sequence }: { sequence: SequenceDetails | undefined }) {
-  return (
-    <>
-    </>
-  )
-}
-
 function DataAvailabilityItem({ value, children }: { value: boolean|undefined, children: React.ReactNode }) {
   return (
     <Group wrap="nowrap">
@@ -165,7 +165,7 @@ function DataAvailability({ sequence, specimen }: { sequence: SequenceDetails | 
     <Stack>
       <DataAvailabilityItem value={!!sequencing?.dnaSequence}>Marker data available</DataAvailabilityItem>
       <DataAvailabilityItem value={false}>Contig data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!sequencingRun?.traceLink}>Trace files available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencingRun?.trace?.traceLink}>Trace files available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!deposition?.url}>Marker publication available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!specimen?.events.accessions.length}>Specimen voucher accessioned</DataAvailabilityItem>
@@ -235,6 +235,17 @@ function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
 }
 
 
+function TraceDataList({ sequence }: { sequence: SequenceDetails | undefined }) {
+  return (
+    <Stack>
+      { sequence?.events.sequencingRuns.map((run, idx) => (
+        <TraceData key={idx} trace={run.trace} />
+      ))}
+    </Stack>
+  )
+}
+
+
 export default function MarkerPage({ params }: { params: { accession: string } }) {
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
@@ -281,7 +292,7 @@ export default function MarkerPage({ params }: { params: { accession: string } }
           <Grid.Col span={3}>
             <LoadPanel visible={loading}>
               <Title order={5} mb={10}>Trace data</Title>
-              <TraceData sequence={sequence} />
+              <TraceDataList sequence={sequence} />
             </LoadPanel>
           </Grid.Col>
 

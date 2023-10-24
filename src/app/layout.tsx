@@ -13,6 +13,7 @@ import { theme } from '../theme';
 import { TopNav } from './top-nav';
 import { MAX_WIDTH } from './constants';
 import { Footer } from './footer';
+import { TraceLoaderProvider } from '@/components/traces/context';
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -25,9 +26,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ApolloProvider client={client}>
           <MantineProvider theme={theme}>
+            <TraceLoaderProvider>
             <Shell>
               {children}
             </Shell>
+            </TraceLoaderProvider>
           </MantineProvider>
         </ApolloProvider>
       </body>

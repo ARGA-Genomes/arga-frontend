@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@apollo/client': ^3.8.4
+  '@arga/trace-file-parser-wasm': ^0.1.0
   '@emotion/react': ^11.11.1
   '@emotion/server': ^11.11.0
   '@mantine/carousel': ^7.0.2
@@ -46,6 +47,7 @@ specifiers:
 
 dependencies:
   '@apollo/client': 3.8.4_abfikfp5vfqhqbpqnw7vzn5gua
+  '@arga/trace-file-parser-wasm': 0.1.0
   '@emotion/react': 11.11.1_cvi3schkfut2wuqsdvxrzfxug4
   '@emotion/server': 11.11.0
   '@mantine/carousel': 7.0.2_fu7436tiby6ucbd3erfrwfmaku
@@ -131,6 +133,10 @@ packages:
       ts-invariant: 0.10.3
       tslib: 2.6.2
       zen-observable-ts: 1.2.5
+    dev: false
+
+  /@arga/trace-file-parser-wasm/0.1.0:
+    resolution: {integrity: sha512-CGs3vC0UYo4a5shvV6xWUo620ibd9TEACLwSAnwB8AyxotPQxL7sB0pItyWmyUM3zGPE2Ue9GXxAQSU4f+hA9A==}
     dev: false
 
   /@babel/code-frame/7.22.13:

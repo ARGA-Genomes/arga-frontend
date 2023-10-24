@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.8.4",
+    "@arga/trace-file-parser-wasm": "^0.1.0",
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@mantine/carousel": "^7.0.2",
