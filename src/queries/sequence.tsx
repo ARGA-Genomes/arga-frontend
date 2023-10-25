@@ -45,9 +45,6 @@ export type SequencingEvent = {
 
 export const SEQUENCING_RUN_EVENT = gql`
   fragment SequencingRunEventDetails on SequencingRunEvent {
-    traceName
-    traceId
-    traceLink
     targetGene
     sequencingDate
     sequencingEventId
@@ -65,10 +62,14 @@ export const SEQUENCING_RUN_EVENT = gql`
   }
 `;
 
-export type SequencingRunEvent = {
+export type Trace = {
+  accession: string,
   traceName?: string,
   traceId?: string,
   traceLink?: string,
+}
+
+export type SequencingRunEvent = {
   targetGene?: string,
   sequencingDate?: string,
   sequencingEventId?: string,
@@ -81,6 +82,7 @@ export type SequencingRunEvent = {
   analysisSoftware?: string,
   analysisDescription?: string,
   libraryProtocol?: string,
+  trace?: Trace,
 }
 
 export const ASSEMBLY_EVENT = gql`

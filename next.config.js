@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   experimental: {
-//     appDir: true,
-//   },
-// }
+const nextConfig = {
+  webpack(config) {
+    // Since Webpack 5 doesn't enable WebAssembly by default, we should do it manually
+    config.experiments = { ...config.experiments, asyncWebAssembly: true, topLevelAwait: true }
+    return config
+  },
+}
 
-// module.exports = nextConfig
+module.exports = nextConfig
