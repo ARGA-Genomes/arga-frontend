@@ -1,12 +1,13 @@
 'use client'
 
 import { useContext, useEffect, useState } from "react";
-import init, { parse_remote, Trace } from "@arga/trace-file-parser-wasm";
+import init, { parse_remote, Trace, Error } from "@arga/trace-file-parser-wasm";
 import React from "react";
 
 
 export function useTraceLoader(url: string) {
   const [trace, setTrace] = useState<Trace|null>(null);
+  const [error, setError] = useState<Error|null>(null);
   const [loading, setLoading] = useState(true);
 
   const { initialized, cache, addToCache } = useTraceParser();
@@ -16,20 +17,23 @@ export function useTraceLoader(url: string) {
 
     const trace = cache.get(url);
     if (trace) {
-      setLoading(false);
       setTrace(trace);
     }
     else {
       parse_remote(url).then(trace => {
         addToCache(url, trace);
-        setLoading(false);
         setTrace(trace);
+      }).catch(err => {
+        setError(err);
       });
     }
+
+    setLoading(false);
   }, [initialized, setLoading]);
 
   return {
     loading,
+    error,
     trace,
   }
 }
