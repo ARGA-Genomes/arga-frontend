@@ -2,12 +2,12 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import Map, { Popup } from 'react-map-gl/maplibre';
+import { Popup, Map } from 'react-map-gl/maplibre';
 import DeckGL, { BitmapLayer, GeoJsonLayer, MapView, ScatterplotLayer, TileLayer } from 'deck.gl/typed';
 import { useState } from 'react';
 import { GeoJSON } from 'geojson';
 import { gql, useQuery } from '@apollo/client';
-
+import Link from 'next/link';
 
 // center on Australia by default
 const DEFAULT_POSITION = [-28.30638, 134.3838];
@@ -47,16 +47,20 @@ export interface Marker {
 interface AnalysisMapProps {
   regions?: Regions,
   markers?: Marker[],
+  speciesName: string
   children?: React.ReactNode,
   style?: Partial<CSSStyleDeclaration>,
 }
 
-export default function AnalysisMap({ regions, markers, children, style }: AnalysisMapProps) {
+export default function AnalysisMap({ regions, markers, speciesName, children, style }: AnalysisMapProps) {
   const [tolerance, setTolerance] = useState(0.01);
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined)
   const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined)
+  const [clickedMarker, setClickedMarker] = useState<string | undefined>(undefined)
+
   const [clickedLatitude, setClickedLatitude] = useState<string | undefined>(undefined)
   const [clickedLongitude, setClickedLongitude] = useState<string | undefined>(undefined)
+
 
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
@@ -84,7 +88,7 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
       object && {
         html: `${object?.properties?.name || object?.recordId}`,
         style: {
-          backgroundColor: `rgba(${object?.color || [0,0,0,256]})`,
+          backgroundColor: `rgba(${object?.color || [0, 0, 0, 256]})`,
           color: 'white',
           borderRadius: '5px'
         }
@@ -105,15 +109,29 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
     }
   }
 
-  const onClick = ({ object }: { object?: any }) => {
+  const onClick = ({ object }: { object?: any }): object => {
     if (object) {
       setClickedLatitude(object?.latitude);
       setClickedLongitude(object?.longitude);
+
+      if (object?.recordId) {
+        setClickedMarker(object?.recordId);
+      }
     }
     else {
       setClickedLatitude(undefined);
       setClickedLongitude(undefined);
     }
+    return (
+      object && {
+        html: `${object?.properties?.name || object?.recordId}`,
+        style: {
+          backgroundColor: `rgba(${object?.color || [0, 0, 0, 256]})`,
+          color: 'white',
+          borderRadius: '5px'
+        }
+      }
+    );
   }
 
   return (
@@ -123,7 +141,7 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
         latitude: DEFAULT_POSITION[0],
         longitude: DEFAULT_POSITION[1],
         zoom: 3.7,
-        }}
+      }}
       layers={[
         bioRegionLayers(bioRegions),
         specimenPlotLayer(specimens),
@@ -132,23 +150,31 @@ export default function AnalysisMap({ regions, markers, children, style }: Analy
       onHover={onHover}
       onClick={onClick}
       controller={true}
-      style={style}
     >
-      {
-        clickedLatitude && clickedLongitude && (
-          <Popup longitude={+clickedLongitude} latitude={+clickedLatitude}>
-        <div>
-          Test popup, needs to be a link to the marker or region here
-        </div>
-          
-        </Popup>
-        )
-      }
       <Map
+        key="map"
         reuseMaps
         mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
-      />
-      {children}
+        id="ausmap"
+        initialViewState={{
+          latitude: DEFAULT_POSITION[0],
+          longitude: DEFAULT_POSITION[1],
+          zoom: 3.7,
+        }}
+      >
+        {clickedLatitude && clickedLongitude && (
+          <Popup
+            longitude={+clickedLongitude}
+            latitude={+clickedLatitude}
+            anchor="top"
+            closeButton={false}
+          >
+            <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
+            </Link>
+          </Popup>
+        )}
+        {children}
+      </Map>
     </DeckGL>
   )
 }

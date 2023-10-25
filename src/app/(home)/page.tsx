@@ -58,7 +58,11 @@ function Search() {
       }}
     >
       <Grid align="center">
-        <Grid.Col span={{ base: 12, md: 10, lg: 10, xl: 8 }}>
+        <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
+        <Text c="white">
+              Search by species, higher classification, data type or ecological and phenotypic traits. Get started by entering any word in the search bar below, or scroll down to browse pre-filtered grouping.
+            </Text>
+            <br/>
           <TextInput
             placeholder="e.g. sequence accession, taxon identifier, genus name"
             value={value}
@@ -87,7 +91,7 @@ function Search() {
 export default function HomePage() {
   return (
     <Paper bg="midnight.7">
-      <Paper bg="midnight.6" py={80} px={150}>
+      <Paper bg="midnight.6" py={80} px={150} style={{textAlign: 'justify'}}>
         <Grid>
           <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
             <Stack>
@@ -96,7 +100,7 @@ export default function HomePage() {
               </Title>
               <Text c="white">
                 For plants, animals, microbes and other species endemic or relevant to Australia, the Australian Reference
-                Genome Atlas (ARGA) locates and aggregates genomic data, including &nbsp; <br></br>
+                Genome Atlas (ARGA) locates and aggregates genomic data, including: &nbsp; <br></br>
                 <b>
                   reference genome assemblies &#x2022; genome annotations &#x2022; population and variant sets &#x2022;
                   DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022; raw genomics data
@@ -110,19 +114,20 @@ export default function HomePage() {
       <Container maw={MAX_WIDTH} py={50}>
         <Stack gap={80}>
           <Stack gap={40}>
-            <Title order={3} c="moss.3" fz={24} fw={550}>Search for data</Title>
+            <Title order={3} c="moss.3" fz={30} fw={600}>Search for data</Title>
+            
             <Search />
           </Stack>
           <Stack gap={40}>
-            <Title order={3} c="moss.3" fw={550}>Browse by data type</Title>
+            <Title order={3} c="moss.3" fz={30} fw={600}>Browse by data type</Title>
             <BrowseType />
           </Stack>
           <Stack gap={40}>
-            <Title order={3} c="moss.3" fw={550}>Browse by taxonomic group</Title>
+            <Title order={3} c="moss.3" fz={30} fw={600}>Browse by taxonomic group</Title>
             <BrowseTaxon />
           </Stack>
           <Stack gap={40}>
-            <Title order={3} c="moss.3" fw={550}>Browse by functional or ecological group</Title>
+            <Title order={3} c="moss.3" fz={30} fw={600}>Browse by functional or ecological group</Title>
             <BrowseGrouping />
           </Stack>
         </Stack>

@@ -18,6 +18,7 @@ import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 
 const GET_DISTRIBUTION = gql`
@@ -102,9 +103,10 @@ type QueryResults = {
 interface DistributionAnalysisProps {
   regions?: Regions,
   markers?: Marker[],
+  speciesName: string
 }
 
-function DistributionAnalysis({ regions, markers }: DistributionAnalysisProps) {
+function DistributionAnalysis({ regions, markers, speciesName }: DistributionAnalysisProps) {
   const flattened = {
     ibra: regions?.ibra.map(r => r.names).flat() || [],
     imcra: regions?.imcra.map(r => r.names).flat() || [],
@@ -115,6 +117,7 @@ function DistributionAnalysis({ regions, markers }: DistributionAnalysisProps) {
       regions={flattened}
       markers={markers}
       style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', overflow: 'hidden' }}
+      speciesName= {speciesName}
     >
     </AnalysisMap>
   )
@@ -270,12 +273,14 @@ export default function DistributionPage({ params }: { params: { name: string } 
                   <DistributionAnalysis
                     regions={data?.species.regions}
                     markers={allSpecimens}
+                    speciesName={params.name}
                   />
                 </Box>
               </Stack>
             </Grid.Col>
             <Grid.Col span={3}>
               { filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
+              <b>Source:</b> <Link href="https://biodiversity.org.au/afd/home">Australian Faunal Directory</Link>
             </Grid.Col>
           </Grid>
         </Paper>
