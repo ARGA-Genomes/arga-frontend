@@ -221,9 +221,9 @@ export default function DistributionPage({ params }: { params: { name: string } 
 
   useEffect(() => {
     const combined = [
-      ...toMarker([243, 117, 36, 220], layers.wholeGenome ? data?.species.wholeGenomes.records : undefined),
-      ...toMarker([123, 161, 63, 220], layers.loci ? data?.species.markers.records : undefined),
       ...toMarker([103, 151, 180, 220], layers.specimens ? data?.species.specimens.records : undefined),
+      ...toMarker([123, 161, 63, 220], layers.loci ? data?.species.markers.records : undefined),
+      ...toMarker([243, 117, 36, 220], layers.wholeGenome ? data?.species.wholeGenomes.records : undefined),
     ];
     // filter out null island as well as specimens without coords
     setAllSpecimens(combined.filter(s => s.latitude) as Marker[]);
