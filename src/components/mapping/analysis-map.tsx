@@ -47,7 +47,7 @@ export interface Marker {
 interface AnalysisMapProps {
   regions?: Regions,
   markers?: Marker[],
-  speciesName: string
+  speciesName?: string,
   children?: React.ReactNode,
   style?: Partial<CSSStyleDeclaration>,
 }
