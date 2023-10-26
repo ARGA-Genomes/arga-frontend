@@ -110,10 +110,10 @@ type SpecimenQueryResults = {
 function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
   let position: [number, number] | undefined = (specimen && specimen.latitude && specimen.longitude) ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
 
-  let marker = specimen?.latitude && {
+  let marker = position && {
     recordId: specimen?.recordId,
-    latitude: specimen.latitude,
-    longitude: specimen.longitude,
+    latitude: position[0],
+    longitude: position[1],
     color: [103, 151, 180, 220],
   } as Marker
 
