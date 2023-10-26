@@ -8,24 +8,22 @@ import {
   Box,
   Grid,
   Image,
-  LoadingOverlay,
   Group,
   TextInput,
-  Accordion,
   Divider,
   Stack,
-  useMantineTheme,
-  Flex,
-  NativeSelect,
-  Pagination,
-  Container
+  Container,
+  Button
 } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { CircleCheck, CircleX, Search as IconSearch } from "tabler-icons-react";
-import ChevronCircleAccordion from 'public/search-icons/chevron-circle-accordion';
+import { useState } from 'react';
+import { Eye, Search as IconSearch } from "tabler-icons-react";
 import { MAX_WIDTH } from '../constants';
+import { LoadPanel } from '@/components/load-overlay';
+import { FilterBar } from '@/components/filtering/filter-bar';
+import { PaginationBar } from '@/components/pagination';
+import { Attribute, AttributePill, DataField } from '@/components/data-fields';
 import { HighlightStack } from '@/components/highlight-stack';
 
 type Classification = {
@@ -53,7 +51,7 @@ type Record = {
   synonyms?: string[],
   commonNames?: string[],
   classification?: Classification,
-  dataSummary?: DataSummary,
+  dataSummary: DataSummary,
 
   accession?: string,
   genomeRep?: string,
@@ -81,7 +79,7 @@ type QueryResults = {
   search: SearchResults,
 };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const SEARCH_FULLTEXT = gql`
 query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination,) {
@@ -141,11 +139,6 @@ query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination
   }
 }`
 
-type Pagination = {
-  page: number,
-  pageSize: number,
-}
-
 
 function Summary({ label, value, url = null }: { label: string, value: number | string | React.ReactNode, url: { pathname: string; query: { previousUrl: string; } } | null }) {
   if (url !== null) {
@@ -164,253 +157,209 @@ function Summary({ label, value, url = null }: { label: string, value: number | 
   )
 }
 
-function Attribute({ label, value }: { label: string, value: string | undefined }) {
-  value ||= "Not specified";
-  const link = "/" + label.toLowerCase() + "/" + value
-
-  return (
-    <Stack gap={0}>
-      <Text size="sm">{label}</Text>
-      <Link href={link}>
-        <Paper py={5} px={15} radius="md">
-          <Text size="lg" c="midnight.5" style={{ whiteSpace: "nowrap" }}>
-            {label == "Genus" ? <i>{value}</i> : value}
-          </Text>
-        </Paper>
-      </Link>
-    </Stack>
-  )
-}
-
 function TaxonItem({ item }: { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
-  const searchParams = useSearchParams();
 
   return (
-    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} style={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control ml={-20} mt={-20}>
-        <Group justify="apart" >
-          <Stack gap={0}>
-            <Container style={{
-              position: "relative",
-              top: "0px",
-              left: "0px",
-              overflow: "hidden",
-              width: "200px",
-              height: "35px",
-              marginLeft: 0,
-              marginRight: 0
-            }}>
-              <Image src={"search-icons/data_type_species_and_subspecies_reports.svg"} fit="contain" width={200} pos="relative" top={-12} left={-31} alt="" />
-            </Container>
-            <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "0px" }}>
-              <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
-            </Link>
-            {item.subspecies?.map(subspecies => (
-              <Text size="sm" ml={5} key={subspecies} className='subspeciesAccordion'>
-                <Link href={`/species/${itemLinkName}`}>
-                  {subspecies}
-                </Link>
+    <Paper radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
+      <Grid gutter="xl">
+        <Grid.Col span="content">
+          <Paper bg="moss.4" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
+            <Group gap="xs" wrap="nowrap">
+              <Image src={"card-icons/type/species_report.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Species Report</Text>
+            </Group>
+          </Paper>
+        </Grid.Col>
+
+        <Grid.Col span={2} my="auto">
+          <Attribute label="Accepted species name">
+            <Stack gap={0} justify='center'>
+              <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
+              <Text ml="sm" fz="sm" c="dimmed">
+                {item.synonyms ? `syn. ${item.synonyms[0]}` : null}
               </Text>
-            ))}
-            {
-              <Text size="sm" ml={5} className="synonymClosed">
-                {item.synonyms ? item.synonyms[0] : null}
-              </Text>}
-            {item.synonyms?.map(synonym => (
-              <Text size="sm" ml={5} key={synonym} className="synonymOpened">
-                {synonym}
-              </Text>
-            ))}
-          </Stack>
-          <Group pt={20}>
-            {item.dataSummary ? <TaxonSummary summary={item.dataSummary} /> : null}
-          </Group>
-        </Group>
-      </Accordion.Control>
-      <Accordion.Panel>
-        <TaxonDetails item={item} />
-      </Accordion.Panel>
-    </Accordion.Item>
+            </Stack>
+          </Attribute>
+        </Grid.Col>
+
+        <Grid.Col span="auto" my="auto">
+          <TaxonDetails item={item} />
+        </Grid.Col>
+
+        <Grid.Col span="content" my="auto">
+          <HighlightStack>
+            <TaxonSummary data={item.dataSummary} />
+          </HighlightStack>
+        </Grid.Col>
+
+        <Grid.Col span="content">
+          <Link href={`/species/${itemLinkName}`}>
+            <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
+              <Stack gap={3} align='center'>
+                <Eye />
+                <Text fw={600}>view</Text>
+              </Stack>
+            </Button>
+          </Link>
+        </Grid.Col>
+      </Grid>
+    </Paper>
   )
 }
 
-function TaxonSummary({ summary }: { summary: DataSummary }) {
+function TaxonSummary({ data }: { data: DataSummary }) {
+  const genomes = data.partialGenomes + data.referenceGenomes + data.wholeGenomes;
+
   return (
-    <>
-      {summary.wholeGenomes ? <Summary label="Whole genomes" value={summary.wholeGenomes} url={null} /> : null}
-      {summary.referenceGenomes ? <Summary label="Reference genomes" value={summary.referenceGenomes} url={null} /> : null}
-      {summary.partialGenomes ? <Summary label="Partial genomes" value={summary.partialGenomes} url={null} /> : null}
-      {summary.barcodes ? <Summary label="Genetic markers" value={summary.barcodes} url={null} /> : null}
-    </>
+    <Group>
+      <AttributePill label="Genomes" color={genomes ? "moss.3" : "bushfire.2"} value={genomes} />
+      <AttributePill label="Genetic Loci" color={data.barcodes ? "moss.3" : "bushfire.2"} value={data.barcodes} />
+    </Group>
   )
 }
 
 function TaxonDetails({ item }: { item: Record }) {
-  const theme = useMantineTheme();
-
-  const attributes = <>
-    <Attribute label="Kingdom" value={item.classification?.kingdom} />
-    <Attribute label="Phylum" value={item.classification?.phylum} />
-    <Attribute label="Class" value={item.classification?.class} />
-    <Attribute label="Order" value={item.classification?.order} />
-    <Attribute label="Family" value={item.classification?.family} />
-    <Attribute label="Genus" value={item.classification?.genus} />
-  </>
+  const taxon = item.classification;
+  if (!taxon) return null;
 
   return (
-    <Box>
-      <Stack gap={0} mt={10} mb={30}>
-        <Text size="sm">Common names</Text>
-        {item.commonNames && item.commonNames.length > 0
-          ? <Text size="lg" fw={550}>{item.commonNames?.join(", ")}</Text>
-          : <Text size="lg" fw={550} c="dimmed">None</Text>
-        }
-      </Stack>
-
-      <HighlightStack>
-        <Text size="lg" fw={550}>Scientific classification</Text>
-        <Group gap="lg" >
-          {attributes}
-        </Group>
-      </HighlightStack>
-    </Box>
+    <Group gap="lg">
+      <AttributePill label="Kingdom" value={taxon.kingdom} href={`/kingdom/${taxon.kingdom}`} />
+      <AttributePill label="Phylum" value={taxon.phylum} href={`/phylum/${taxon.phylum}`} />
+      <AttributePill label="Class" value={taxon.class} href={`/class/${taxon.class}`} />
+      <AttributePill label="Order" value={taxon.order} href={`/order/${taxon.order}`} />
+      <AttributePill label="Family" value={taxon.family} href={`/family/${taxon.family}`} />
+      <AttributePill label="Genus" value={taxon.genus} href={`/genus/${taxon.genus}`} italic />
+    </Group>
   )
 }
 
 
 function GenomeItem({ item }: { item: Record }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
-  const searchParams = useSearchParams();
+
   return (
-    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} style={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control ml={-20} mt={-20}>
-        <Group justify="apart">
-          <Stack>
-            <Container style={{
-              position: "relative",
-              top: "0px",
-              left: "0px",
-              overflow: "hidden",
-              width: "200px",
-              height: "35px",
-              marginLeft: 0,
-              marginRight: 0
-            }}>
-              <Image src={"search-icons/data_type_Whole_genome.svg"} fit="contain" width={200} pos="relative" top={-12} left={-31} alt="" />
-            </Container>
-            <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }} >
-              <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
-            </Link>
-          </Stack>
-          <Group pt={20}>
-            <GenomeSummary item={item} />
-          </Group>
-        </Group>
-      </Accordion.Control>
-      <Accordion.Panel>
-        <GenomeDetails item={item} />
-      </Accordion.Panel>
-    </Accordion.Item>
+    <Paper radius="lg" withBorder style={{ border: 'solid 1px #f47c2e' }}>
+      <Grid gutter="xl">
+        <Grid.Col span="content">
+          <Paper bg="#f47c2e" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
+            <Group gap="xs" wrap="nowrap">
+              <Image src={"card-icons/type/whole_genomes.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Whole Genome</Text>
+            </Group>
+          </Paper>
+        </Grid.Col>
+
+        <Grid.Col span={2} my="auto">
+          <Attribute label="Accepted species name">
+            <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
+          </Attribute>
+        </Grid.Col>
+
+        <Grid.Col span="auto" my="auto">
+          <GenomeDetails item={item} />
+        </Grid.Col>
+
+        <Grid.Col span="content" my="auto">
+          <GenomeSummary item={item} />
+        </Grid.Col>
+
+        <Grid.Col span="content">
+          <Link href={`/species/${itemLinkName}/whole_genomes/${item.accession}`}>
+            <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
+              <Stack gap={3} align='center'>
+                <Eye />
+                <Text fw={600}>view</Text>
+              </Stack>
+            </Button>
+          </Link>
+        </Grid.Col>
+      </Grid>
+    </Paper>
   )
 }
 
 function GenomeSummary({ item }: { item: Record }) {
-  const searchParams = useSearchParams();
   return (
-    <>
-      <Summary label="Accession no." value={`${item.accession} (${item.genomeRep})`} url={{ pathname: `/assemblies/${item.accession}`, query: { previousUrl: searchParams.toString() } }} />
-      <Summary label="Reference genome" value={item.referenceGenome ? <CircleCheck size={20} color="green" /> : <CircleX size={20} color="red" />} url={null} />
-    </>
+    <Group gap="lg">
+      <Attribute label="Data source"><DataField value={item.dataSource}/></Attribute>
+      <Attribute label="Release date"><DataField value={item.releaseDate}/></Attribute>
+    </Group>
   )
 }
 
 function GenomeDetails({ item }: { item: Record }) {
-  const theme = useMantineTheme();
-
   return (
-    <Box>
-      <Stack pl={16} style={{
-        borderLeftWidth: 5,
-        borderLeftStyle: "solid",
-        borderLeftColor: theme.colors.bushfire[4],
-      }}>
-        <Text size="lg" fw={550}>Attributes</Text>
-        <Flex gap="lg">
-          <Attribute label="Data source" value={item.dataSource} />
-          <Attribute label="Level" value={item.level} />
-          <Attribute label="Released date" value={item.releaseDate} />
-        </Flex>
-      </Stack>
-    </Box>
+    <Group gap="xl">
+      <Attribute label="Accession"><DataField value={item.accession}/></Attribute>
+      <AttributePill label="Representation" value={item.dataSource} />
+      <AttributePill label="Assembly type" value={item.level} />
+      <AttributePill label="Assembly level" value={item.level} />
+    </Group>
   )
 }
 
 function LocusItem({ item }: { item: Record }) {
-  const searchParams = useSearchParams();
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   return (
-    <Accordion.Item p={10} value={item.accession ? item.accession : item.canonicalName} style={{ border: "1px solid #b5b5b5" }}>
-      <Accordion.Control ml={-20} mt={-20}>
-        <Group justify="apart" >
-          <Stack>
-            <Container style={{
-              position: "relative",
-              top: "0px",
-              left: "0px",
-              overflow: "hidden",
-              width: "200px",
-              height: "35px",
-              marginLeft: 0,
-              marginRight: 0
-            }}>
-              <Image src={"search-icons/data_type_marker.svg"} fit="contain" width={200} pos="relative" top={-12} left={-31} alt="" />
-            </Container>
-            <Link href={{ pathname: `/species/${itemLinkName}`, query: { previousUrl: searchParams.toString() } }} style={{ marginTop: "-15px" }}>
-              <Text size="lg" fw={550} fs="italic">{item.canonicalName}</Text>
-            </Link>
-          </Stack>
-          <Group pt={20}>
-            <LocusSummary item={item} />
-          </Group>
-        </Group>
-      </Accordion.Control>
-      <Accordion.Panel>
-        <LocusDetails item={item} />
-      </Accordion.Panel>
-    </Accordion.Item>
+    <Paper radius="lg" withBorder style={{ border: 'solid 1px #58a39d' }}>
+      <Grid gutter="xl">
+        <Grid.Col span="content">
+          <Paper bg="#58a39d" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
+            <Group gap="xs" wrap="nowrap">
+              <Image src={"card-icons/type/markers.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Locus</Text>
+            </Group>
+          </Paper>
+        </Grid.Col>
+
+        <Grid.Col span={2} my="auto">
+          <Attribute label="Accepted species name">
+            <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
+          </Attribute>
+        </Grid.Col>
+
+        <Grid.Col span="auto" my="auto">
+          <LocusDetails item={item} />
+        </Grid.Col>
+
+        <Grid.Col span="content" my="auto">
+          <LocusSummary item={item} />
+        </Grid.Col>
+
+        <Grid.Col span="content">
+          <Link href={`/species/${itemLinkName}/markers/${item.accession}`}>
+            <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
+              <Stack gap={3} align='center'>
+                <Eye />
+                <Text fw={600}>view</Text>
+              </Stack>
+            </Button>
+          </Link>
+        </Grid.Col>
+      </Grid>
+    </Paper>
   )
 }
 
 function LocusSummary({ item }: { item: Record }) {
-  const searchParams = useSearchParams();
   return (
-    <>
-      <Summary label="Accession no." value={item.accession} url={{ pathname: `/markers/${item.accession}`, query: { previousUrl: searchParams.toString() } }} />
-      <Summary label="Source molecule" value={item.locusType} url={null} />
-    </>
+    <Group gap="lg">
+      <Attribute label="Data source"><DataField value={item.dataSource}/></Attribute>
+      <Attribute label="Release date"><DataField value={item.releaseDate}/></Attribute>
+    </Group>
   )
 }
 
 function LocusDetails({ item }: { item: Record }) {
-  const theme = useMantineTheme();
-
   return (
-    <Box>
-      <Stack pl={16} style={{
-        borderLeftWidth: 5,
-        borderLeftStyle: "solid",
-        borderLeftColor: theme.colors.bushfire[4],
-      }}>
-        <Text size="lg" fw={550}>Attributes</Text>
-        <Flex gap="lg">
-          <Attribute label="Data source" value={item.dataSource} />
-          <Attribute label="Voucher status" value={item.voucherStatus} />
-          <Attribute label="Occurrence date" value={item.eventDate} />
-          <Attribute label="Occurrence location" value={item.eventLocation} />
-        </Flex>
-      </Stack>
-    </Box>
+    <Group gap="lg">
+      <AttributePill label="Accession" value={item.accession} />
+      <AttributePill label="Gene name" value={item.locusType} />
+      <AttributePill label="Sequence length" />
+      <AttributePill label="Source molecule" />
+    </Group>
   )
 }
 
@@ -430,16 +379,11 @@ function SearchItem({ item }: { item: Record }) {
 
 function SearchResults({ results }: { results: Record[] }) {
   return (
-    <Accordion variant="separated"
-      radius="lg"
-      // Uncomment line below if tyou want the first search result always expanded
-      // defaultValue={[results[0] ? (results[0].accession ? results[0].accession : results[0].canonicalName) : ""]}
-      chevron={ChevronCircleAccordion()}
-      multiple>
+    <Stack gap="xs">
       {results.map(record => (
         <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
       ))}
-    </Accordion>
+    </Stack>
   )
 }
 
@@ -468,54 +412,25 @@ function Search(props: SearchProperties) {
   }
 
   return (
-    <>
-      <Paper bg="midnight.6" p={40} radius={0}>
-        <Box>
-          <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
-            <Grid align="center" m={10}>
-              <Grid.Col span={12}>
-                <TextInput
-                  placeholder="e.g. sequence accession, taxon identifier, genus name"
-                  value={value}
-                  onChange={val => setValue(val.target.value)}
-                  leftSectionWidth={60}
-                  size="xl"
-                  radius={16}
-                  leftSection={<IconSearch size={28} />}
-                />
-              </Grid.Col>
-             {/* Hiding the search button, uncomment line below if needed */}
-              {/* <Grid.Col xs={12} sm={12} md={2} lg={2} xl={2}> */}
-                {/* <Button h="65px" w="100%" className="primary_button" type="submit">Search</Button> */}
-              {/* </Grid.Col> */}
-            </Grid>
-          </form>
-        </Box>
-      </Paper>
+    <Paper bg="midnight.1" p={10} radius={0}>
       <Box>
-        <Group justify="apart" >
-          <Text size="lg" ml={20} mb={30}>
-            {!props.loading && props.data
-              ? (<><strong>{props.data?.search.fullText.total} </strong> search results found for <strong>{value} </strong></>)
-              : null
-            }
-          </Text>
-          <NativeSelect ml={20} mb={30} mr={20}
-            style={{ width: "200px" }}
-            label="Filter by"
-            value={dataType}
-            onChange={(event) => onFilter(event.currentTarget.value)}
-            size="sm"
-            data={[
-              { value: 'all', label: 'All' },
-              { value: 'taxonomy', label: 'Taxonomy' },
-              { value: 'genomes', label: 'Genome assemblies' },
-              { value: 'loci', label: 'Genetic markers' }
-            ]}
-          />
-        </Group>
+        <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
+          <Grid align="center" m={10}>
+            <Grid.Col span={7}>
+              <TextInput
+                placeholder="e.g. sequence accession, taxon identifier, genus name"
+                value={value}
+                onChange={val => setValue(val.target.value)}
+                leftSectionWidth={60}
+                size="xl"
+                radius={16}
+                leftSection={<IconSearch size={28} />}
+              />
+            </Grid.Col>
+          </Grid>
+        </form>
       </Box>
-    </>
+    </Paper>
   )
 }
 
@@ -525,25 +440,15 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || "")
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
-  const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE });
-  const [totalPages, setTotalPages] = useState(1)
+  const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
       query,
       dataType: dataType,
-      pagination
+      pagination: { page, pageSize: PAGE_SIZE }
     }
   });
-
-  useEffect(() => {
-    setPagination({ page: 1, pageSize: PAGE_SIZE })
-    setTotalPages(1)
-  }, [setPagination, setTotalPages])
-
-  useEffect(() => {
-    setTotalPages(data ? Math.ceil(data.search.fullText.total / PAGE_SIZE) : 1)
-  }, [data, setTotalPages])
 
   function onSearch(searchTerms: string, dataType: string) {
     setQuery(searchTerms)
@@ -551,44 +456,41 @@ export default function SearchPage() {
     router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=${dataType}`)
   }
 
-  if (loading) {
-    return <div>Loading</div>;  // Change this to a proper loading output
-  }
   if (error) {
-    return (
-      <div>
-        {error.message}
-      </div>
-    );
+    return <Text c="red">{error.message}</Text>
   }
 
   return (
-      <>
-        <Search onSearch={onSearch} data={data} loading={loading} />
-        <Paper radius={0} p="xl" pos="relative">
-          <LoadingOverlay
-            loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
-            visible={loading}
-          />
-          <Container maw={MAX_WIDTH}>
-          <SearchResults results={data?.search.fullText.records || []} />
-          {
-            totalPages === 1 ? null : //Show pagination only if there is more than 1 page
-              <Paper bg="white" p={20} m={40} radius="lg">
-                <Pagination
-                  color={"attribute.2"}
-                  size="lg"
-                  radius="xl"
-                  gap="md"
-                  total={totalPages}
-                  onChange={page => {
-                    setPagination({ page, pageSize: PAGE_SIZE })
-                  }}
-                />
-              </Paper>
-          }
-          </Container>
-        </Paper>
-      </>
+    <>
+      <Search onSearch={onSearch} data={data} loading={loading} />
+
+      <Paper radius={0} py="xl">
+        <Container maw={MAX_WIDTH}>
+          <LoadPanel visible={loading}>
+            <Stack>
+              <FilterBar
+                filters={[]}
+                title={
+                  <Group justify="left" gap={5}>
+                    <Text fz="lg" fw={700}>{data?.search.fullText.total}</Text>
+                    <Text fz="lg">search results found for</Text>
+                    <Text fz="lg" fw={600}>{query}</Text>
+                  </Group>
+                }
+              >
+              </FilterBar>
+
+              <SearchResults results={data?.search.fullText.records || []} />
+              <PaginationBar
+                total={data?.search.fullText.total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onChange={setPage}
+              />
+            </Stack>
+          </LoadPanel>
+        </Container>
+      </Paper>
+    </>
   );
 }

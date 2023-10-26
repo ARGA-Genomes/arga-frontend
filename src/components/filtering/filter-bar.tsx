@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 
 
 interface FilterBarProps {
-  title?: string,
+  title?: string | React.ReactNode,
   filters: Filter[],
   children?: React.ReactNode,
 }
@@ -29,7 +29,10 @@ export function FilterBar(props: FilterBarProps) {
 
     <Grid gutter={50} align="baseline">
       <Grid.Col span="content">
-        <Title order={5}>{props.title}</Title>
+        { typeof props.title === 'string'
+          ? <Title order={5}>{props.title}</Title>
+          : props.title
+        }
       </Grid.Col>
 
       <Grid.Col span="auto">
