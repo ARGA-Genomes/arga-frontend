@@ -50,9 +50,11 @@ interface AnalysisMapProps {
   speciesName?: string,
   children?: React.ReactNode,
   style?: Partial<CSSStyleDeclaration>,
+  initialPosition?: [number, number],
+  initialZoom?: number,
 }
 
-export default function AnalysisMap({ regions, markers, speciesName, children, style }: AnalysisMapProps) {
+export default function AnalysisMap({ regions, markers, speciesName, children, style, initialPosition, initialZoom }: AnalysisMapProps) {
   const [tolerance, setTolerance] = useState(0.01);
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined)
   const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined)
@@ -138,9 +140,9 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
     <DeckGL
       views={view}
       initialViewState={{
-        latitude: DEFAULT_POSITION[0],
-        longitude: DEFAULT_POSITION[1],
-        zoom: 3.7,
+        latitude: initialPosition ? initialPosition[0] : DEFAULT_POSITION[0],
+        longitude: initialPosition ? initialPosition[1] : DEFAULT_POSITION[1],
+        zoom: initialZoom || 3.7,
       }}
       layers={[
         bioRegionLayers(bioRegions),
@@ -156,11 +158,6 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
         reuseMaps
         mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
         id="ausmap"
-        initialViewState={{
-          latitude: DEFAULT_POSITION[0],
-          longitude: DEFAULT_POSITION[1],
-          zoom: 3.7,
-        }}
       >
         {clickedLatitude && clickedLongitude && (
           <Popup
