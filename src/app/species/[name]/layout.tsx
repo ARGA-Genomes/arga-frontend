@@ -40,11 +40,11 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
           <Tabs.Tab value="distribution">Data Distribution</Tabs.Tab>
-          <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
           <Tabs.Tab value="whole_genomes">Whole Genomes</Tabs.Tab>
-          <Tabs.Tab value="markers">Markers</Tabs.Tab>
+          <Tabs.Tab value="markers">Genetic Loci</Tabs.Tab>
           <Tabs.Tab value="resources">Other Genetic Data</Tabs.Tab>
-          <Tabs.Tab value="specimens">Specimen</Tabs.Tab>
+          <Tabs.Tab value="specimens">Specimens</Tabs.Tab>
+          <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
         </Tabs.List>
       </Container>
 

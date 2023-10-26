@@ -280,7 +280,7 @@ export default function DistributionPage({ params }: { params: { name: string } 
             </Grid.Col>
             <Grid.Col span={3}>
               { filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
-              <b>Source:</b> <Link href="https://biodiversity.org.au/afd/home">Australian Faunal Directory</Link>
+              <b>Source:</b> <Link href={`https://biodiversity.org.au/afd/taxa/${params.name}`}>Australian Faunal Directory</Link>
             </Grid.Col>
           </Grid>
         </Paper>
