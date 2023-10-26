@@ -17,7 +17,7 @@ import {
 } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Eye, Search as IconSearch } from "tabler-icons-react";
 import { MAX_WIDTH } from '../constants';
 import { LoadPanel } from '@/components/load-overlay';
@@ -432,13 +432,13 @@ export default function SearchPage() {
 
   const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
-      query,
-      dataType: dataType,
-      pagination: { page, pageSize: PAGE_SIZE }
+      query: searchParams.get('q'),
+      dataType: searchParams.get('type'),
+      pagination: { page: Number(searchParams.get('page')), pageSize: PAGE_SIZE }
     }
   });
 
-  const updateParams = () => {
+  useEffect(() => {
     let params = new URLSearchParams(searchParams)
     params.set('q', query);
     params.set('dataType', dataType);
@@ -447,18 +447,12 @@ export default function SearchPage() {
     const url = pathname + '?' + params.toString();
     setPreviousPage({ name: 'search results', url });
     router.push(url)
-  }
+  }, [query, dataType, page, setPreviousPage])
 
   function onSearch(searchTerms: string, dataType: string) {
     setQuery(searchTerms)
     setDataType(dataType)
     setPage(1)
-    updateParams()
-  }
-
-  function onPageChanged(value: number) {
-    setPage(value)
-    updateParams()
   }
 
   if (error) {
@@ -490,7 +484,7 @@ export default function SearchPage() {
                 total={data?.search.fullText.total}
                 page={page}
                 pageSize={PAGE_SIZE}
-                onChange={onPageChanged}
+                onChange={setPage}
               />
             </Stack>
           </LoadPanel>
