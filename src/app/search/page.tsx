@@ -16,8 +16,8 @@ import {
   Button
 } from "@mantine/core";
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useCallback, useState } from 'react';
 import { Eye, Search as IconSearch } from "tabler-icons-react";
 import { MAX_WIDTH } from '../constants';
 import { LoadPanel } from '@/components/load-overlay';
@@ -25,6 +25,8 @@ import { FilterBar } from '@/components/filtering/filter-bar';
 import { PaginationBar } from '@/components/pagination';
 import { Attribute, AttributePill, DataField } from '@/components/data-fields';
 import { HighlightStack } from '@/components/highlight-stack';
+import { useSessionStorage } from '@mantine/hooks';
+import { Page, usePreviousPage } from '@/components/navigation-history';
 
 type Classification = {
   kingdom?: string,
@@ -42,7 +44,7 @@ type DataSummary = {
   barcodes: number,
 }
 
-type Record = {
+type Item = {
   type: string,
   score: number,
   status: string,
@@ -67,7 +69,7 @@ type Record = {
 };
 
 type FullTextResults = {
-  records: Record[],
+  records: Item[],
   total: number
 }
 
@@ -140,24 +142,7 @@ query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination
 }`
 
 
-function Summary({ label, value, url = null }: { label: string, value: number | string | React.ReactNode, url: { pathname: string; query: { previousUrl: string; } } | null }) {
-  if (url !== null) {
-    return (
-      <>
-        <Text size="lg">{label} <Link href={url}><strong>{value}</strong></Link></Text>
-        <Divider size="sm" orientation="vertical" />
-      </>
-    )
-  }
-  return (
-    <>
-      <Text size="lg">{label} <strong>{value}</strong></Text>
-      <Divider size="sm" orientation="vertical" />
-    </>
-  )
-}
-
-function TaxonItem({ item }: { item: Record }) {
+function TaxonItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
 
   return (
@@ -219,7 +204,7 @@ function TaxonSummary({ data }: { data: DataSummary }) {
   )
 }
 
-function TaxonDetails({ item }: { item: Record }) {
+function TaxonDetails({ item }: { item: Item }) {
   const taxon = item.classification;
   if (!taxon) return null;
 
@@ -236,7 +221,7 @@ function TaxonDetails({ item }: { item: Record }) {
 }
 
 
-function GenomeItem({ item }: { item: Record }) {
+function GenomeItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
 
   return (
@@ -280,7 +265,7 @@ function GenomeItem({ item }: { item: Record }) {
   )
 }
 
-function GenomeSummary({ item }: { item: Record }) {
+function GenomeSummary({ item }: { item: Item }) {
   return (
     <Group gap="lg">
       <Attribute label="Data source"><DataField value={item.dataSource}/></Attribute>
@@ -289,7 +274,7 @@ function GenomeSummary({ item }: { item: Record }) {
   )
 }
 
-function GenomeDetails({ item }: { item: Record }) {
+function GenomeDetails({ item }: { item: Item }) {
   return (
     <Group gap="xl">
       <Attribute label="Accession"><DataField value={item.accession}/></Attribute>
@@ -300,7 +285,7 @@ function GenomeDetails({ item }: { item: Record }) {
   )
 }
 
-function LocusItem({ item }: { item: Record }) {
+function LocusItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   return (
     <Paper radius="lg" withBorder style={{ border: 'solid 1px #58a39d' }}>
@@ -343,7 +328,7 @@ function LocusItem({ item }: { item: Record }) {
   )
 }
 
-function LocusSummary({ item }: { item: Record }) {
+function LocusSummary({ item }: { item: Item }) {
   return (
     <Group gap="lg">
       <Attribute label="Data source"><DataField value={item.dataSource}/></Attribute>
@@ -352,7 +337,7 @@ function LocusSummary({ item }: { item: Record }) {
   )
 }
 
-function LocusDetails({ item }: { item: Record }) {
+function LocusDetails({ item }: { item: Item }) {
   return (
     <Group gap="lg">
       <AttributePill label="Accession" value={item.accession} />
@@ -364,7 +349,7 @@ function LocusDetails({ item }: { item: Record }) {
 }
 
 
-function SearchItem({ item }: { item: Record }) {
+function SearchItem({ item }: { item: Item }) {
   switch (item.type) {
     case 'TAXON':
       return (<TaxonItem item={item} />)
@@ -377,7 +362,7 @@ function SearchItem({ item }: { item: Record }) {
   }
 }
 
-function SearchResults({ results }: { results: Record[] }) {
+function SearchResults({ results }: { results: Item[] }) {
   return (
     <Stack gap="xs">
       {results.map(record => (
@@ -437,10 +422,13 @@ function Search(props: SearchProperties) {
 
 export default function SearchPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const [query, setQuery] = useState(searchParams.get('q') || "")
   const [dataType, setDataType] = useState(searchParams.get('type') || "all")
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [_, setPreviousPage] = usePreviousPage();
 
   const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
@@ -450,10 +438,27 @@ export default function SearchPage() {
     }
   });
 
+  const updateParams = () => {
+    let params = new URLSearchParams(searchParams)
+    params.set('q', query);
+    params.set('dataType', dataType);
+    params.set('page', page.toString());
+
+    const url = pathname + '?' + params.toString();
+    setPreviousPage({ name: 'search results', url });
+    router.push(url)
+  }
+
   function onSearch(searchTerms: string, dataType: string) {
     setQuery(searchTerms)
     setDataType(dataType)
-    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=${dataType}`)
+    setPage(1)
+    updateParams()
+  }
+
+  function onPageChanged(value: number) {
+    setPage(value)
+    updateParams()
   }
 
   if (error) {
@@ -485,7 +490,7 @@ export default function SearchPage() {
                 total={data?.search.fullText.total}
                 page={page}
                 pageSize={PAGE_SIZE}
-                onChange={setPage}
+                onChange={onPageChanged}
               />
             </Stack>
           </LoadPanel>

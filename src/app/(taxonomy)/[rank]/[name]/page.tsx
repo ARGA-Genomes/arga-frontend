@@ -43,6 +43,8 @@ import { BarChart } from "@/components/graphing/bar";
 import { BushfireRecoveryFilters } from '@/components/filtering/bushfire-recovery';
 import { DataTable, DataTableRow } from '@/components/data-table';
 import { SpeciesCard } from '@/components/species-card';
+import { usePreviousPage } from '@/components/navigation-history';
+import { usePathname } from 'next/navigation';
 
 
 const PAGE_SIZE = 10;
@@ -592,12 +594,19 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
 export default function ClassificationPage({ params }: { params: { rank: string, name: string } }) {
   const rank = params.rank.toUpperCase();
 
+  const pathname = usePathname();
+  const [_, setPreviousPage] = usePreviousPage();
+
   const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
     variables: {
       rank,
       canonicalName: params.name
     },
   });
+
+  useEffect(() => {
+    setPreviousPage({ name: `browsing ${params.name}`, url: pathname })
+  }, [setPreviousPage])
 
   return (
     <Stack mt={40}>

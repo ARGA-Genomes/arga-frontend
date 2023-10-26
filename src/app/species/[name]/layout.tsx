@@ -2,14 +2,12 @@
 
 import classes from "./layout.module.css";
 
-import { Container, Group, Paper, Stack, Tabs, Text } from "@mantine/core";
+import { Container, Paper, Stack, Tabs, Text } from "@mantine/core";
 import SpeciesHeader from "@/components/species-header";
-import Link from "next/link";
-import { ArrowNarrowLeft } from "tabler-icons-react";
 import { RedirectType, redirect, usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
+import { PreviousPage } from "@/components/navigation-history";
 
 
 function DataTabs({ name, children }: { name: string, children: React.ReactNode }) {
@@ -63,18 +61,11 @@ interface SpeciesLayoutProps {
 
 export default function SpeciesLayout({ params, children }: SpeciesLayoutProps) {
   const canonicalName = params.name.replaceAll("_", " ");
-  const searchParams = useSearchParams()
-  const [previousUrl] = useState('/search?' + searchParams.get('previousUrl') || "")
 
   return (
       <Stack gap={0} mt="xl">
         <Container mb={20} w="100%" maw={MAX_WIDTH}>
-          <Link href={previousUrl}>
-            <Group gap={5}>
-              <ArrowNarrowLeft />
-              <Text fz={18}>Back to search results</Text>
-            </Group>
-          </Link>
+          <PreviousPage />
         </Container>
 
         <SpeciesHeader canonicalName={canonicalName} />
