@@ -22,6 +22,7 @@ import Link from "next/link";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 import { ArgaMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
+import { useLocalStorage } from "@mantine/hooks";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -97,6 +98,13 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
   const annotation = sequence?.events.annotations[0];
   const deposition = sequence?.events.dataDepositions[0];
 
+  const [saved, setSaved] = useLocalStorage<string[]>({ key: 'save-list', defaultValue: [] });
+
+  const saveToList = () => {
+    if (deposition?.sourceUri)
+      setSaved([...saved || [], deposition.sourceUri])
+  }
+
   return (
     <Grid>
       <Grid.Col span={8}>
@@ -115,6 +123,7 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
+            <Button color="midnight" radius="md" leftSection={<CircleCheck />} onClick={saveToList}>add to list</Button>
             <LinkButton color="midnight" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>get data</LinkButton>
             <LinkButton color="midnight" radius="md" leftSection={<IconLink />} href={deposition?.url}>go to source</LinkButton>
             <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
