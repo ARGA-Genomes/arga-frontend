@@ -24,8 +24,8 @@ import { ArgaMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
 
 const GET_ASSEMBLY = gql`
-  query AssemblyFullData($recordId: String) {
-    sequence(by: { recordId: $recordId }) {
+  query AssemblyFullData($accession: String) {
+    sequence(by: { accession: $accession }) {
       id
       ...SequenceDetails
 
@@ -41,7 +41,7 @@ const GET_ASSEMBLY = gql`
       }
     }
 
-    specimen(by: { sequenceRecordId: $recordId }) {
+    specimen(by: { sequenceAccession: $accession }) {
       recordId
       collectionCode
       latitude
@@ -242,7 +242,7 @@ function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
 export default function AssemblyPage({ params }: { params: { accession: string } }) {
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
-      recordId: params.accession,
+      accession: params.accession,
     },
   });
 
@@ -251,6 +251,8 @@ export default function AssemblyPage({ params }: { params: { accession: string }
   }
 
   const sequence = data?.sequence[0];
+  const deposition = sequence?.events.dataDepositions[0];
+  const accession = deposition?.accession || sequence?.recordId;
 
   return (
     <Stack gap={20}>
@@ -263,7 +265,7 @@ export default function AssemblyPage({ params }: { params: { accession: string }
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${sequence?.recordId}`}</Title>
+          <Title order={3} mb={10}>{`Full data view: ${accession}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
           <Text fz="sm" c="dimmed" fw={700}>{sequence?.datasetName}</Text>
         </Group>

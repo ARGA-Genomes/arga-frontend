@@ -4,10 +4,9 @@ import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Center, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from "@mantine/core";
 import { useState } from "react";
-import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
 import { PaginationBar } from "@/components/pagination";
-import { AnalysisMap, ArgaMap } from "@/components/mapping";
+import { AnalysisMap } from "@/components/mapping";
 import { RecordItem } from "@/components/record-list";
 import { usePathname } from "next/navigation";
 import { Eye } from "tabler-icons-react";
@@ -16,6 +15,8 @@ import { Marker } from "@/components/mapping/analysis-map";
 import { FilterBar } from "@/components/filtering/filter-bar";
 import { SequenceFilters } from "@/components/filtering/sequence-filters";
 import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { AttributePill, AttributePillValue, DataField } from "@/components/data-fields";
+import { DataTable, DataTableRow } from "@/components/data-table";
 
 
 const PAGE_SIZE = 5;
@@ -127,20 +128,23 @@ function LabeledValue({ label, value }: { label: string, value: string|undefined
 function RecordItemContent({ record }: { record: WholeGenome }) {
   return (
       <Grid p={20}>
-        <Grid.Col span={8}>
+        <Grid.Col span={4}>
           <Stack gap={5}>
-            <SimpleGrid cols={2}>
-            <LabeledValue label="Accession" value={record.recordId} />
-            <LabeledValue label="Release date" value={record.releaseDate}/>
-            </SimpleGrid>
+            <LabeledValue label="Accession" value={record.accession} />
             <Text size="xs" fw={600}>{record.datasetName}</Text>
           </Stack>
         </Grid.Col>
         <Grid.Col span={2}>
-          <Attribute label="Genome size" value={Humanize.fileSize(record.genomeSize || 0)}/>
+          <AttributePill label="Release date" value={record.releaseDate}/>
         </Grid.Col>
         <Grid.Col span={2}>
-          <Attribute label="Assembly level" value={record.quality}/>
+          <AttributePill label="Genome size" value={Humanize.fileSize(record.genomeSize || 0)}/>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <AttributePill label="Representation" value={record.representation}/>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <AttributePill label="Assembly level" value={record.quality}/>
         </Grid.Col>
       </Grid>
   )
@@ -152,7 +156,7 @@ function RecordList({ records }: { records: WholeGenome[] }) {
   return (
     <Stack>
       { records.map((record, idx) => (
-        <RecordItem key={idx} href={`${path}/${record.recordId}`}>
+        <RecordItem key={idx} href={`${path}/${record.accession}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </Stack>
@@ -210,33 +214,26 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
       <Grid gutter={50}>
         <Grid.Col span={3}>
           <Stack gap={20}>
-          <Table>
-            <tbody>
-            <tr>
-              <td>Representation</td>
-              <td><AttributePill value={data?.species.referenceGenome?.representation} /></td>
-            </tr>
-            <tr>
-              <td>Release date</td>
-              <td><DataField value={data?.species.referenceGenome?.releaseDate} /></td>
-            </tr>
-            <tr>
-              <td>Assembly type</td>
-              <td><AttributePill value={data?.species.referenceGenome?.assemblyType} /></td>
-            </tr>
-            <tr>
-              <td>Accession</td>
-              <td><DataField value={data?.species.referenceGenome?.accession} /></td>
-            </tr>
-            <tr>
-              <td>Data source</td>
-              <td><DataField value={data?.species.referenceGenome?.datasetName} /></td>
-            </tr>
-            </tbody>
-          </Table>
+          <DataTable>
+            <DataTableRow label="Representation">
+              <AttributePillValue value={data?.species.referenceGenome?.representation} />
+            </DataTableRow>
+            <DataTableRow label="Release date">
+              <DataField value={data?.species.referenceGenome?.releaseDate} />
+            </DataTableRow>
+            <DataTableRow label="Assembly type">
+              <AttributePillValue value={data?.species.referenceGenome?.assemblyType} />
+            </DataTableRow>
+            <DataTableRow label="Accession">
+              <DataField value={data?.species.referenceGenome?.accession} />
+            </DataTableRow>
+            <DataTableRow label="Data source">
+              <DataField value={data?.species.referenceGenome?.datasetName} />
+            </DataTableRow>
+          </DataTable>
 
           { data &&
-            <Link href={`${path}/${data?.species.referenceGenome?.recordId}`}>
+            <Link href={`${path}/${data?.species.referenceGenome?.accession}`}>
               <Center>
                 <Button color="midnight" radius="md" leftSection={<Eye />}>view</Button>
               </Center>
@@ -260,28 +257,28 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
 
       <SimpleGrid cols={5} spacing={50}>
         <Stack>
-          <Attribute label="Genome size" value={Humanize.fileSize(genome?.genomeSize || 0)} />
-          <Attribute label="Ungapped length" value={Humanize.fileSize(0)} />
-          <Attribute label="BUSCO score" value={undefined} />
+          <AttributePill label="Genome size" value={Humanize.fileSize(genome?.genomeSize || 0)} />
+          <AttributePill label="Ungapped length" value={Humanize.fileSize(0)} />
+          <AttributePill label="BUSCO score" value={undefined} />
         </Stack>
         <Stack>
-          <Attribute label="Number of chromosones" value={undefined} />
-          <Attribute label="Number of organelles" value={undefined} />
+          <AttributePill label="Number of chromosones" value={undefined} />
+          <AttributePill label="Number of organelles" value={undefined} />
         </Stack>
         <Stack>
-          <Attribute label="Number of scaffolds" value={undefined} />
-          <Attribute label="Scaffold N50" value={Humanize.fileSize(0)} />
-          <Attribute label="Scaffold L50" value={undefined} />
+          <AttributePill label="Number of scaffolds" value={undefined} />
+          <AttributePill label="Scaffold N50" value={Humanize.fileSize(0)} />
+          <AttributePill label="Scaffold L50" value={undefined} />
         </Stack>
         <Stack>
-          <Attribute label="Number of contigs" value={undefined} />
-          <Attribute label="Contig N50" value={Humanize.fileSize(0)} />
-          <Attribute label="Contig L50" value={undefined} />
+          <AttributePill label="Number of contigs" value={undefined} />
+          <AttributePill label="Contig N50" value={Humanize.fileSize(0)} />
+          <AttributePill label="Contig L50" value={undefined} />
         </Stack>
         <Stack>
-          <Attribute label="GC percentage" value={undefined} />
-          <Attribute label="Genome coverage" value={undefined} />
-          <Attribute label="Assembly level" value={genome?.quality} />
+          <AttributePill label="GC percentage" value={undefined} />
+          <AttributePill label="Genome coverage" value={undefined} />
+          <AttributePill label="Assembly level" value={genome?.quality} />
         </Stack>
       </SimpleGrid>
     </Paper>
@@ -330,7 +327,7 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
                 { data?.species.wholeGenomes ? <RecordList records={data?.species.wholeGenomes.records} /> : null }
               </Box>
             </Grid.Col>
-            <Grid.Col span={4}>
+            <Grid.Col span={4}  mih={568}>
               <WholeGenomeMap records={data?.species.wholeGenomes.records} />
             </Grid.Col>
             <Grid.Col span={8}>
