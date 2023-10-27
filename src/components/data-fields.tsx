@@ -1,4 +1,5 @@
-import { Center, MantineColor, Paper, ScrollArea, Stack, Text } from "@mantine/core";
+import { Center, MantineColor, Paper, Popover, ScrollArea, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 
 
@@ -58,22 +59,32 @@ interface AttributePillValueProps {
 }
 
 export function AttributePillValue({ value, italic, color }: AttributePillValueProps) {
+  const [opened, { close, open }] = useDisclosure(false);
+
   value ||= "No data";
   const bg = color || BADGE_COLOURS[value] || "#d6e4ed";
 
   return (
-    <Paper py={5} px={15} bg={bg} radius="xl" style={{ border: "none" }}>
-      <Center>
-        <Text
-          fw={600}
-          size="sm"
-          fs={ italic ? "italic" : undefined }
-          style={{ whiteSpace: "nowrap" }}
-        >
-          {value}
-        </Text>
-      </Center>
-    </Paper>
+    <Popover position="bottom" withArrow shadow="md" opened={opened} radius="md">
+      <Popover.Target>
+        <Paper py={5} px={15} bg={bg} radius="xl" style={{ border: "none" }} onMouseEnter={open} onMouseLeave={close}>
+          <Center>
+            <Text
+              fw={600}
+              size="sm"
+              fs={ italic ? "italic" : undefined }
+              style={{ whiteSpace: "nowrap" }}
+              truncate
+            >
+              {value}
+            </Text>
+          </Center>
+        </Paper>
+      </Popover.Target>
+      <Popover.Dropdown bg={bg}>
+        <Text size="xs">{value}</Text>
+      </Popover.Dropdown>
+    </Popover>
   )
 }
 
