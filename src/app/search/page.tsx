@@ -89,9 +89,9 @@ type QueryResults = {
 const PAGE_SIZE = 10;
 
 const SEARCH_FULLTEXT = gql`
-query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination,) {
+query FullTextSearch ($query: String, $page: Int, $perPage: Int, $dataType: String) {
   search {
-    fullText (query: $query, dataType: $dataType, pagination: $pagination,) {
+    fullText (query: $query, page: $page, perPage: $perPage, dataType: $dataType) {
       total
       records {
         ... on TaxonItem {
@@ -525,7 +525,8 @@ export default function SearchPage() {
     variables: {
       query: searchParams.get('q'),
       dataType: searchParams.get('type'),
-      pagination: { page: Number(searchParams.get('page')), pageSize: PAGE_SIZE }
+      page: Number(searchParams.get('page')),
+      perPage: PAGE_SIZE,
     }
   });
 

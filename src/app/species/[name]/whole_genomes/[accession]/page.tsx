@@ -5,6 +5,7 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  ButtonProps,
   Center,
   Grid,
   Group,
@@ -17,7 +18,7 @@ import {
 import { LoadPanel } from "@/components/load-overlay";
 import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 import { ArgaMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
@@ -79,6 +80,18 @@ type SequenceQueryResults = {
 };
 
 
+interface LinkButtonProps extends ButtonProps {
+  href?: string,
+  children?: React.ReactNode,
+}
+
+function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
+  return href
+    ? <Button {...buttonProps}>{children}</Button>
+    : <Button {...buttonProps} disabled>{children}</Button>
+}
+
+
 function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
   const assembly = sequence?.events.assemblies[0];
   const annotation = sequence?.events.annotations[0];
@@ -102,16 +115,11 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button color="midnight" radius="md" leftSection={<IconDownload />}>get data</Button>
-            <Button color="midnight" radius="md" leftSection={<IconLink />}>go to source</Button>
+            <LinkButton color="midnight" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>get data</LinkButton>
+            <LinkButton color="midnight" radius="md" leftSection={<IconLink />} href={deposition?.url}>go to source</LinkButton>
             <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
           </Stack>
         </Paper>
-      </Grid.Col>
-      <Grid.Col span={12}>
-        <DataTable>
-          <DataTableRow label="Publication"><DataField value={deposition?.title} /></DataTableRow>
-        </DataTable>
       </Grid.Col>
     </Grid>
   )
