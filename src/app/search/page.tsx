@@ -403,7 +403,7 @@ function SpecimenItem({ item }: { item: Item }) {
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Link href={`/species/${itemLinkName}/markers/${item.accession}`}>
+          <Link href={`/species/${itemLinkName}/specimens/${item.accession}`}>
             <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
               <Stack gap={3} align='center'>
                 <Eye />
