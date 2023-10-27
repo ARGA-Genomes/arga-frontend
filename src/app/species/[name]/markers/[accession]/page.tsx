@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  ButtonProps,
   Center,
   Flex,
   Grid,
@@ -84,6 +85,18 @@ type SequenceQueryResults = {
 };
 
 
+interface LinkButtonProps extends ButtonProps {
+  href?: string,
+  children?: React.ReactNode,
+}
+
+function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
+  return href
+       ? <Button component="a" href={href} target="_blank" {...buttonProps}>{children}</Button>
+       : <Button {...buttonProps} disabled>{children}</Button>
+}
+
+
 function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
@@ -124,8 +137,8 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button color="midnight" radius="md" leftSection={<IconDownload />}>get FASTA</Button>
-            <Button color="midnight" radius="md" leftSection={<IconLink />}>go to source</Button>
+            <LinkButton color="midnight" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>get FASTA</LinkButton>
+            <LinkButton color="midnight" radius="md" leftSection={<IconLink />} href={deposition?.url}>go to source</LinkButton>
             <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
           </Stack>
         </Paper>

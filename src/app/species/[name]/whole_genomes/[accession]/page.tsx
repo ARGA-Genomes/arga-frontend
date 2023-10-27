@@ -18,7 +18,7 @@ import {
 import { LoadPanel } from "@/components/load-overlay";
 import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
-import Link, { LinkProps } from "next/link";
+import Link from "next/link";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 import { ArgaMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
@@ -87,8 +87,8 @@ interface LinkButtonProps extends ButtonProps {
 
 function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
   return href
-    ? <Button {...buttonProps}>{children}</Button>
-    : <Button {...buttonProps} disabled>{children}</Button>
+       ? <Button component="a" href={href} target="_blank" {...buttonProps}>{children}</Button>
+       : <Button {...buttonProps} disabled>{children}</Button>
 }
 
 
