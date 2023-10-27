@@ -26,6 +26,7 @@ import { PaginationBar } from '@/components/pagination';
 import { Attribute, AttributePill, DataField } from '@/components/data-fields';
 import { HighlightStack } from '@/components/highlight-stack';
 import { usePreviousPage } from '@/components/navigation-history';
+import { useHover } from '@mantine/hooks';
 
 type Classification = {
   kingdom?: string,
@@ -162,9 +163,10 @@ query FullTextSearch ($query: String, $dataType: String, $pagination: Pagination
 
 function TaxonItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const { hovered, ref } = useHover();
 
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
+    <Paper radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }} ref={ref} bg={hovered ? "#96bb5c22" : undefined}>
       <Grid gutter="xl">
         <Grid.Col span="content">
           <Paper bg="moss.4" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
@@ -241,9 +243,10 @@ function TaxonDetails({ item }: { item: Item }) {
 
 function GenomeItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const { hovered, ref } = useHover();
 
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px #f47c2e' }}>
+    <Paper radius="lg" withBorder style={{ border: 'solid 1px #f47c2e' }} ref={ref} bg={hovered ? "#f47c2e22" : undefined}>
       <Grid gutter="xl">
         <Grid.Col span="content">
           <Paper bg="#f47c2e" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
@@ -305,8 +308,10 @@ function GenomeDetails({ item }: { item: Item }) {
 
 function LocusItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const { hovered, ref } = useHover();
+
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px #58a39d' }}>
+    <Paper radius="lg" withBorder style={{ border: 'solid 1px #58a39d' }} ref={ref} bg={hovered ? "#58a39d22" : undefined}>
       <Grid gutter="xl">
         <Grid.Col span="content">
           <Paper bg="#58a39d" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
@@ -369,8 +374,10 @@ function LocusDetails({ item }: { item: Item }) {
 
 function SpecimenItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const { hovered, ref } = useHover();
+
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px #f47c2e' }}>
+    <Paper radius="lg" withBorder style={{ border: 'solid 1px #f47c2e' }} ref={ref} bg={hovered ? "#f47c2e22" : undefined}>
       <Grid gutter="xl">
         <Grid.Col span="content">
           <Paper bg="#f47c2e" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
