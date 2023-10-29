@@ -50,7 +50,7 @@ export function TopNav() {
     <Stack>
 
     <Modal opened={savedOpened} onClose={savedHandler.close} title="Saved list" size="auto" centered>
-      { saved?.map((item, idx) => <Link href={item}><Text key={idx}>{item}</Text></Link>) }
+      { saved?.map((item, idx) => <Link href={item} key={idx}><Text>{item}</Text></Link>) }
     </Modal>
 
     <Group justify="space-between" align="end" px={30}>
