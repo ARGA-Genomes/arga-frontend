@@ -180,7 +180,8 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
         <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
         </Link>
       </Modal> */}
-      {isOpen && <Paper h={50} w={300} radius={5} p={10} style={{zIndex:200, display: isOpen? 'table': 'hidden', position: 'fixed', left: popupPosition.x, top: popupPosition.y, alignContent: 'center'}} onClick={closePopup}>
+      {isOpen && <Paper h={50} w={300} radius={5} p={10} 
+      style={{zIndex:200, display: isOpen? 'table': 'hidden', position: 'fixed', left: popupPosition.x, top: popupPosition.y, alignContent: 'center'}} onClick={closePopup}>
         View specimen details: &nbsp;
         <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
         </Link>

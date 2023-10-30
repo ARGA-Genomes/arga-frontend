@@ -173,7 +173,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
     <Paper radius={16} p="md" withBorder>
       <Group mb={10}>
       <Text fw={700}  size="lg">Taxonomy</Text>      
-      <Text>Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
+      <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
       </Group>
 
       <SimpleGrid cols={2}>
@@ -198,8 +198,8 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 
         <DataTable>
           <DataTableRow label="Common names">
-            <Group>
-            <Text fw={600} fz="sm" truncate="end" w={{xs: 50, sm: 50, md: 50, lg: 300, xl: 500}}>
+            <Group display="block" w={{xs: 50, sm: 100, md: 150, lg: 200, xl: 270}}>
+            <Text fw={600} fz="sm" truncate="end" >
               {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
             </Text>
             <button onClick={() => setIsOpen(true)}>Show All</button>
@@ -223,7 +223,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
     <Paper radius={16} p="md" withBorder>
       <Group>
         <Text fw={700} size="lg">Higher classification</Text>
-        <Text>Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
+        <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
       </Group>
       <Group>
         <Attribute label="Kingdom" value={taxonomy.kingdom} href={`/kingdom/${taxonomy.kingdom}`} />
