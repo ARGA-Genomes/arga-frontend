@@ -5,6 +5,7 @@ import {
   Button,
   Grid,
   Group,
+  Modal,
   Paper,
   SimpleGrid,
   Stack,
@@ -167,9 +168,13 @@ function ExternalLinks(props: ExternalLinksProps) {
 
 
 function Details({ taxonomy }: { taxonomy: Taxonomy }) {
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <Paper radius={16} p="md" withBorder>
-      <Text fw={700} mb={10} size="lg">Taxonomy</Text>
+      <Group mb={10}>
+      <Text fw={700}  size="lg">Taxonomy</Text>      
+      <Text>Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
+      </Group>
 
       <SimpleGrid cols={2}>
         <DataTable>
@@ -193,9 +198,17 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 
         <DataTable>
           <DataTableRow label="Common names">
-            <Text fw={600} fz="sm" truncate="end" w={{xs: 100, sm: 200, md: 200, lg: 400, xl: 500}}>
+            <Group>
+            <Text fw={600} fz="sm" truncate="end" w={{xs: 50, sm: 50, md: 50, lg: 300, xl: 500}}>
               {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
             </Text>
+            <button onClick={() => setIsOpen(true)}>Show All</button>
+            </Group>
+            <Modal opened={isOpen} onClose={() => setIsOpen(false)} className="commonNamesModal" centered>
+            <Text fw={600} fz="sm">
+              {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
+            </Text>
+            </Modal>
           </DataTableRow>
           <DataTableRow label="Subspecies"></DataTableRow>
         </DataTable>
@@ -208,8 +221,10 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   return (
     <Paper radius={16} p="md" withBorder>
-      <Text fw={700} mb={10} size="lg">Higher classification</Text>
-
+      <Group>
+        <Text fw={700} size="lg">Higher classification</Text>
+        <Text>Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
+      </Group>
       <Group>
         <Attribute label="Kingdom" value={taxonomy.kingdom} href={`/kingdom/${taxonomy.kingdom}`} />
         <Attribute label="Phylum" value={taxonomy.phylum} href={`/phylum/${taxonomy.phylum}`} />

@@ -2,12 +2,13 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import { Popup, Map } from 'react-map-gl/maplibre';
+import { Map } from 'react-map-gl/maplibre';
 import DeckGL, { BitmapLayer, GeoJsonLayer, MapView, ScatterplotLayer, TileLayer } from 'deck.gl/typed';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GeoJSON } from 'geojson';
 import { gql, useQuery } from '@apollo/client';
 import Link from 'next/link';
+import { Modal, Paper } from '@mantine/core';
 
 // center on Australia by default
 const DEFAULT_POSITION = [-28.30638, 134.3838];
@@ -57,10 +58,8 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined)
   const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined)
   const [clickedMarker, setClickedMarker] = useState<string | undefined>(undefined)
-
-  const [clickedLatitude, setClickedLatitude] = useState<string | undefined>(undefined)
-  const [clickedLongitude, setClickedLongitude] = useState<string | undefined>(undefined)
-
+  const [isOpen, setIsOpen] = useState(false)
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
@@ -83,6 +82,19 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
 
   const view = new MapView({ repeat: true });
 
+  const useMousePosition = () => {
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    useEffect(() => {
+      const setFromEvent = (e: { clientX: any; clientY: any; }) => setPosition({ x: e.clientX, y: e.clientY });
+      window.addEventListener("mousemove", setFromEvent);
+
+      return () => {
+        window.removeEventListener("mousemove", setFromEvent);
+      };
+    }, []);
+    return position;
+  };
+
   const getTooltip = ({ object }: { object?: any }): string => {
     return (
       object && {
@@ -95,6 +107,7 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
       }
     );
   }
+  const position = useMousePosition()
 
   const onHover = ({ object }: { object?: any }) => {
     if (object?.properties) {
@@ -109,73 +122,69 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
     }
   }
 
-  const onClick = ({ object }: { object?: any }): object => {
-    if (object) {
-      setClickedLatitude(object?.latitude);
-      setClickedLongitude(object?.longitude);
-
-      if (object?.recordId) {
-        setClickedMarker(object?.recordId);
-      }
+  const onClick = ({ object }: { object?: any }) => {
+    if (object && object.recordId) {
+      setClickedMarker(object?.recordId);
+      setIsOpen(true);
+      setPopupPosition(position)
+    }else {
+    setIsOpen(false);
     }
-    else {
-      setClickedLatitude(undefined);
-      setClickedLongitude(undefined);
-    }
-    return (
-      object && {
-        html: `${object?.properties?.name || object?.recordId}`,
-        style: {
-          backgroundColor: `rgba(${object?.color || [0, 0, 0, 256]})`,
-          color: 'white',
-          borderRadius: '5px'
-        }
-      }
-    );
   }
 
+  const closePopup =() => {
+    setIsOpen(false);
+  }
+
+
+
+
   return (
-    <DeckGL
-      views={view}
-      initialViewState={{
-        latitude: DEFAULT_POSITION[0],
-        longitude: DEFAULT_POSITION[1],
-        zoom: 3.7,
-      }}
-      layers={[
-        bioRegionLayers(bioRegions),
-        specimenPlotLayer(specimens),
-      ]}
-      getTooltip={getTooltip}
-      onHover={onHover}
-      onClick={onClick}
-      controller={true}
-    >
-      <Map
-        key="map"
-        reuseMaps
-        mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
-        id="ausmap"
+    <>
+      <DeckGL
+        views={view}
         initialViewState={{
           latitude: DEFAULT_POSITION[0],
           longitude: DEFAULT_POSITION[1],
           zoom: 3.7,
         }}
+        layers={[
+          bioRegionLayers(bioRegions),
+          specimenPlotLayer(specimens),
+        ]}
+        getTooltip={getTooltip}
+        onHover={onHover}
+        onClick={onClick}
+        onViewStateChange={closePopup}
+        controller={true}
       >
-        {clickedLatitude && clickedLongitude && (
-          <Popup
-            longitude={+clickedLongitude}
-            latitude={+clickedLatitude}
-            anchor="top"
-            closeButton={false}
-          >
-            <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
-            </Link>
-          </Popup>
-        )}
-        {children}
-      </Map>
-    </DeckGL>
+        <Map
+          key="map"
+          reuseMaps
+          mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+          id="ausmap"
+          initialViewState={{
+            latitude: DEFAULT_POSITION[0],
+            longitude: DEFAULT_POSITION[1],
+            zoom: 3.7,
+          }}
+        >
+          {children}
+        </Map>
+      </DeckGL>
+      {/* Use either the modal or the paper div for popup */}
+      {/* <Modal opened={isOpen} onClose={() => setIsOpen(false)} centered>
+        View specimen details: &nbsp;
+        <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
+        </Link>
+      </Modal> */}
+      {isOpen && <Paper h={50} w={300} radius={5} p={10} style={{zIndex:200, display: isOpen? 'table': 'hidden', position: 'fixed', left: popupPosition.x, top: popupPosition.y, alignContent: 'center'}} onClick={closePopup}>
+        View specimen details: &nbsp;
+        <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
+        </Link>
+      </Paper>}
+    </>
+
   )
 }
 

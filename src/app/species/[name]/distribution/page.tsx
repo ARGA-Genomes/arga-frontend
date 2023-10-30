@@ -281,6 +281,10 @@ export default function DistributionPage({ params }: { params: { name: string } 
             <Grid.Col span={3}>
               { filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
               <b>Source:</b> <Link href={`https://biodiversity.org.au/afd/taxa/${params.name}`}>Australian Faunal Directory</Link>
+              <br/>
+              <Text c={"midnight.4"}>
+              <b>Note:</b> location data may be generalised for sensitive species. Location data should be verified from individual data point custodians. Please refer to the specimen page for full details of metadata provenance for specific collection locations.
+              </Text>
             </Grid.Col>
           </Grid>
         </Paper>
