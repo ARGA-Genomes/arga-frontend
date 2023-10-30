@@ -1,100 +1,282 @@
 'use client';
 
+import { MAX_WIDTH } from "@/app/constants";
+import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { DataTypeFilters } from "@/components/filtering/data-type";
+import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { LoadOverlay } from "@/components/load-overlay";
+import { usePreviousPage } from "@/components/navigation-history";
 import { PaginationBar } from "@/components/pagination";
 import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
-import { Box, SimpleGrid, Title } from "@mantine/core";
-import { useScrollIntoView } from "@mantine/hooks";
-import { useState } from "react";
+import { Accordion, Avatar, Badge, Box, Button, Container, Drawer, Grid, Group, Paper, SegmentedControl, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useEffect, useState } from "react";
+import { Filter as IconFilter, SortAscending } from "tabler-icons-react";
 
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 10;
+
+
+type Filters = {
+  classifications: Filter[],
+  dataTypes: Filter[],
+}
+
 
 const GET_SPECIES = gql`
-query SpeciesWithAssemblies($page: Int, $perPage: Int) {
-  assemblies {
+query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
+  taxa(filters: $filters) {
     species(page: $page, perPage: $perPage) {
-      total
+      total,
       records {
         taxonomy {
           canonicalName
+          kingdom
         }
-        photo {
-          url
-        }
+        photo { url }
         dataSummary {
-          barcodes
+          genomes
+          loci
+          specimens
           other
-          partialGenomes
-          wholeGenomes
         }
       }
+    }
+    filterOptions {
+      ecology
+      ibra
+      imcra
+      state
+      drainageBasin
     }
   }
 }`;
 
+
 type DataSummary = {
-  wholeGenomes: number,
-  organelles: number,
-  barcodes: number,
+  genomes: number,
+  loci: number,
+  specimens: number,
   other: number,
 }
 
 type Species = {
-  taxonomy: { canonicalName: string },
+  taxonomy: {
+    canonicalName: string,
+    kingdom?: string,
+  },
   photo: { url: string },
   dataSummary: DataSummary,
 }
 
-type Assemblies = {
+type FilterOptions = {
+  ecology: string[],
+  ibra: string[],
+  imcra: string[],
+  state: string[],
+  drainageBasin: string[],
+}
+
+type Taxa = {
   species: {
     records: Species[],
     total: number,
   },
+  filterOptions: FilterOptions,
 };
 
 type QueryResults = {
-  assemblies: Assemblies,
+  taxa: Taxa,
 };
 
 
-function BrowseResults({ list }: { list: Species[]}) {
-  if (list.length === 0) return <Title>No data found</Title>
+interface FiltersProps {
+  filters: Filters,
+  options?: FilterOptions,
+  onChange: (filters: Filters) => void,
+}
+
+function Filters({ filters, options, onChange }: FiltersProps) {
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
+
+  useEffect(() => {
+    onChange({
+      classifications,
+      dataTypes,
+    })
+  }, [classifications, onChange]);
 
   return (
-    <SimpleGrid cols={{ base: 1, xs: 1, sm: 2, lg: 3, md: 2, xl: 4 }} spacing="xl">
-      { list.map(item => (<SpeciesCard species={item} key={item.taxonomy.canonicalName} />)) }
-    </SimpleGrid>
+    <Accordion defaultValue="hasData" variant='separated'>
+      <Accordion.Item value="hasData">
+        <Accordion.Control>
+          <FilterGroup
+            label="Data types"
+            description="Only show species that have specific types of data"
+            image="/card-icons/type/whole_genomes.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <DataTypeFilters filters={dataTypes} onChange={setDataTypes} />
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item value="classification">
+        <Accordion.Control>
+          <FilterGroup
+            label="Higher classification filters"
+            description="Limit data based on taxonomy"
+            image="/card-icons/type/higher_taxon_report.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
   )
 }
 
 
-export default function GenomesList() {
-  const [page, setPage] = useState(1);
-  const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({ offset: 60, duration: 500 });
+interface FilterGroupProps {
+  label: string,
+  description: string,
+  image: string,
+}
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
-    variables: { page, perPage: PAGE_SIZE }
+function FilterGroup({ label, description, image }: FilterGroupProps) {
+  return (
+    <Group wrap="nowrap">
+      <Avatar src={image} size="lg" />
+      <div>
+        <Text>{label}</Text>
+        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
+          {description}
+        </Text>
+      </div>
+    </Group>
+  )
+}
+
+
+function FilterBadge({ filter }: { filter: Filter }) {
+  return (
+    <Badge variant="outline">
+      {filter.value}
+    </Badge>
+  )
+}
+
+
+export function Species() {
+  const [page, setPage] = useState(1);
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const [filters, setFilters] = useState<Filters>({
+    classifications: [],
+    dataTypes: [{ filter: "HAS_DATA", action: "INCLUDE", value: "Genome", editable: false }],
   });
 
+  const flattenFilters = (filters: Filters) => {
+    const items = [
+      ...filters.classifications,
+      ...filters.dataTypes,
+    ];
+
+    return items.filter((item): item is Filter => !!item);
+  }
+
+  const { loading, error, data, previousData } = useQuery<QueryResults>(GET_SPECIES, {
+    variables: {
+      page,
+      perPage: PAGE_SIZE,
+      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item)
+    }
+  });
+
+  const records = data?.taxa.species.records || previousData?.taxa.species.records;
+
   return (
-    <Box>
-      <Box m={20} p="xl" pos="relative">
-        <LoadOverlay visible={loading} />
+    <Stack>
+      <Drawer
+        opened={opened}
+        onClose={close}
+        withCloseButton={false}
+        position="right"
+        size="xl"
+      >
+        <Box pt={200}>
+          <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
+        </Box>
+      </Drawer>
 
-        <Title order={2} mb={20}>Genomes</Title>
+      <LoadOverlay visible={loading} />
+      <Grid gutter={50} align="baseline">
+        <Grid.Col span="content">
+          <Title order={5}>Browse species</Title>
+        </Grid.Col>
 
-        { error ? <Title order={4}>{error.message}</Title> : null }
-        { !loading && data ? <BrowseResults list={data.assemblies.species.records} /> : null }
+        <Grid.Col span="auto">
+          <Group>
+            <Text fz="sm" fw={300}>Filters</Text>
+            { flattenFilters(filters).map(filter => <FilterBadge filter={filter} key={filter.value} />) }
+          </Group>
+        </Grid.Col>
 
-        <PaginationBar
-          total={data?.assemblies.species.total}
-          page={page}
-          pageSize={PAGE_SIZE}
-          onChange={page => { setPage(page); scrollIntoView() }}
-        />
-      </Box>
-    </Box>
+        <Grid.Col span="content">
+          <Group wrap="nowrap">
+            <SortAscending />
+            <Text>Sort by</Text>
+            <SegmentedControl radius="xl" data={[
+              { value: 'alpha', label: 'A-Z' },
+              { value: 'date', label: 'Date' },
+              { value: 'records', label: 'Records' },
+            ]}/>
+          </Group>
+        </Grid.Col>
+
+        <Grid.Col span="content">
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
+        </Grid.Col>
+      </Grid>
+
+      <SimpleGrid cols={5} pt={40}>
+        {records?.map(record => (
+          <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
+        ))}
+      </SimpleGrid>
+
+      <PaginationBar
+        total={data?.taxa.species.total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        onChange={setPage}
+      />
+    </Stack>
+  );
+}
+
+
+export default function GenomeListPage() {
+  const [_, setPreviousPage] = usePreviousPage();
+
+  useEffect(() => {
+    setPreviousPage({ name: `browsing genomes`, url: '/browse/genomes' })
+  }, [setPreviousPage])
+
+  return (
+    <Stack mt={40}>
+      <Paper py={30}>
+        <Container maw={MAX_WIDTH}>
+          <Stack>
+            <Paper p="xl" radius="lg" pos="relative" withBorder>
+              <Species />
+            </Paper>
+          </Stack>
+        </Container>
+      </Paper>
+    </Stack>
   );
 }
