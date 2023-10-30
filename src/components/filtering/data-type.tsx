@@ -46,43 +46,52 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
       removeFilter(ev.currentTarget.value);
   }
 
+  const isDisabled = (dataType: FilterKind) => {
+    const filter = findFilter(dataType);
+    return filter && !filter.editable;
+  }
+
   return (
     <Stack>
     <Switch
       label={<Text fz="sm">Genomes</Text>}
-      onLabel="ON"
-      offLabel="OFF"
+      onLabel="SHOW"
+      offLabel="HIDE"
       size="lg"
       value={FilterKind.Genomes}
       checked={!!findFilter(FilterKind.Genomes)}
       onChange={filterChanged}
+      disabled={isDisabled(FilterKind.Genomes)}
     />
     <Switch
       label={<Text fz="sm">Loci</Text>}
-      onLabel="ON"
-      offLabel="OFF"
+      onLabel="SHOW"
+      offLabel="HIDE"
       size="lg"
       value={FilterKind.Loci}
       checked={!!findFilter(FilterKind.Loci)}
       onChange={filterChanged}
+      disabled={isDisabled(FilterKind.Loci)}
     />
     <Switch
       label={<Text fz="sm">Specimens</Text>}
-      onLabel="ON"
-      offLabel="OFF"
+      onLabel="SHOW"
+      offLabel="HIDE"
       size="lg"
       value={FilterKind.Specimens}
       checked={!!findFilter(FilterKind.Specimens)}
       onChange={filterChanged}
+      disabled={isDisabled(FilterKind.Specimens)}
     />
     <Switch
       label={<Text fz="sm">Other</Text>}
-      onLabel="ON"
-      offLabel="OFF"
+      onLabel="SHOW"
+      offLabel="HIDE"
       size="lg"
       value={FilterKind.Other}
       checked={!!findFilter(FilterKind.Other)}
       onChange={filterChanged}
+      disabled={isDisabled(FilterKind.Other)}
     />
     </Stack>
   )

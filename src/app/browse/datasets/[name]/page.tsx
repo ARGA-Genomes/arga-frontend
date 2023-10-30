@@ -52,9 +52,9 @@ query DatasetSpecies($name: String, $page: Int) {
           url
         }
         dataSummary {
-          wholeGenomes
-          organelles
-          barcodes
+          genomes
+          loci
+          specimens
           other
         }
       }
@@ -67,9 +67,9 @@ type Photo = {
 }
 
 type DataSummary = {
-  wholeGenomes: number,
-  organelles: number,
-  barcodes: number,
+  genomes: number,
+  loci: number,
+  specimens: number,
   other: number,
 }
 

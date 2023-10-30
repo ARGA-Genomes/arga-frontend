@@ -106,7 +106,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
       classifications,
       dataTypes,
     })
-  }, [classifications, onChange]);
+  }, [classifications, dataTypes, onChange]);
 
   return (
     <Accordion defaultValue="hasData" variant='separated'>
@@ -170,7 +170,7 @@ function FilterBadge({ filter }: { filter: Filter }) {
 }
 
 
-export function Species() {
+function Species() {
   const [page, setPage] = useState(1);
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -213,6 +213,8 @@ export function Species() {
       </Drawer>
 
       <LoadOverlay visible={loading} />
+      { error && <Text>{error.message}</Text> }
+
       <Grid gutter={50} align="baseline">
         <Grid.Col span="content">
           <Title order={5}>Browse species</Title>
