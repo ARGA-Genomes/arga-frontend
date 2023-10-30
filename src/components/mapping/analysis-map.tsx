@@ -148,7 +148,7 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
         initialViewState={{
           latitude: DEFAULT_POSITION[0],
           longitude: DEFAULT_POSITION[1],
-          zoom: 3.7,
+          zoom: initialZoom || 3.7,
         }}
         layers={[
           bioRegionLayers(bioRegions),
