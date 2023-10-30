@@ -51,9 +51,11 @@ interface AnalysisMapProps {
   speciesName?: string,
   children?: React.ReactNode,
   style?: Partial<CSSStyleDeclaration>,
+  initialPosition?: [number, number],
+  initialZoom?: number,
 }
 
-export default function AnalysisMap({ regions, markers, speciesName, children, style }: AnalysisMapProps) {
+export default function AnalysisMap({ regions, markers, speciesName, children, style, initialPosition, initialZoom }: AnalysisMapProps) {
   const [tolerance, setTolerance] = useState(0.01);
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined)
   const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined)

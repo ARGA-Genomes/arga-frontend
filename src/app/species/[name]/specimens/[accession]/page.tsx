@@ -21,7 +21,8 @@ import { AttributePill, DataField } from "@/components/highlight-stack";
 import { ArrowNarrowLeft, ChevronLeft, ChevronRight } from "tabler-icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArgaMap } from "@/components/mapping";
+import { AnalysisMap } from "@/components/mapping";
+import { Marker } from "@/components/mapping/analysis-map";
 import { AccessionEvent, CollectionEvent, Specimen } from "@/queries/specimen";
 import { Subsample, SubsampleEvent } from "@/queries/subsample";
 import { DnaExtract, DnaExtractionEvent } from "@/queries/dna-extract";
@@ -107,12 +108,24 @@ type SpecimenQueryResults = {
 
 
 function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
+  let position: [number, number] | undefined = (specimen && specimen.latitude && specimen.longitude) ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
+
+  let marker = position && {
+    recordId: specimen?.recordId,
+    latitude: position[0],
+    longitude: position[1],
+    color: [103, 151, 180, 220],
+  } as Marker
+
   return (
-    <Box pos="relative" h={300} style={theme => ({
-      overflow: "hidden",
-      borderRadius: theme.radius.lg,
-    })}>
-      <ArgaMap />
+    <Box pos="relative" h={300}>
+      <AnalysisMap
+        markers={marker ? [marker] : []}
+        style={{ borderRadius: 'var(--mantine-radius-lg)', overflow: 'hidden' }}
+        initialPosition={position}
+        initialZoom={position ? 7.0 : 2.4}
+      >
+      </AnalysisMap>
     </Box>
   )
 }

@@ -5,6 +5,7 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  ButtonProps,
   Center,
   Grid,
   Group,
@@ -21,10 +22,11 @@ import Link from "next/link";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 import { ArgaMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
+import { useLocalStorage } from "@mantine/hooks";
 
 const GET_ASSEMBLY = gql`
-  query AssemblyFullData($recordId: String) {
-    sequence(by: { recordId: $recordId }) {
+  query AssemblyFullData($accession: String) {
+    sequence(by: { accession: $accession }) {
       id
       ...SequenceDetails
 
@@ -40,7 +42,7 @@ const GET_ASSEMBLY = gql`
       }
     }
 
-    specimen(by: { sequenceRecordId: $recordId }) {
+    specimen(by: { sequenceAccession: $accession }) {
       recordId
       collectionCode
       latitude
@@ -79,10 +81,29 @@ type SequenceQueryResults = {
 };
 
 
+interface LinkButtonProps extends ButtonProps {
+  href?: string,
+  children?: React.ReactNode,
+}
+
+function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
+  return href
+       ? <Button component="a" href={href} target="_blank" {...buttonProps}>{children}</Button>
+       : <Button {...buttonProps} disabled>{children}</Button>
+}
+
+
 function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
   const assembly = sequence?.events.assemblies[0];
   const annotation = sequence?.events.annotations[0];
   const deposition = sequence?.events.dataDepositions[0];
+
+  const [saved, setSaved] = useLocalStorage<string[]>({ key: 'save-list', defaultValue: [] });
+
+  const saveToList = () => {
+    if (deposition?.sourceUri)
+      setSaved([...saved || [], deposition.sourceUri])
+  }
 
   return (
     <Grid>
@@ -102,16 +123,12 @@ function GenomeDetails({ sequence }: { sequence: SequenceDetails | undefined }) 
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button color="midnight" radius="md" leftSection={<IconDownload />}>get data</Button>
-            <Button color="midnight" radius="md" leftSection={<IconLink />}>go to source</Button>
+            <Button color="midnight" radius="md" leftSection={<CircleCheck />} onClick={saveToList}>add to list</Button>
+            <LinkButton color="midnight" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>get data</LinkButton>
+            <LinkButton color="midnight" radius="md" leftSection={<IconLink />} href={deposition?.url}>go to source</LinkButton>
             <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
           </Stack>
         </Paper>
-      </Grid.Col>
-      <Grid.Col span={12}>
-        <DataTable>
-          <DataTableRow label="Publication"><DataField value={deposition?.title} /></DataTableRow>
-        </DataTable>
       </Grid.Col>
     </Grid>
   )
@@ -234,7 +251,7 @@ function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
 export default function AssemblyPage({ params }: { params: { accession: string } }) {
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
-      recordId: params.accession,
+      accession: params.accession,
     },
   });
 
@@ -243,6 +260,8 @@ export default function AssemblyPage({ params }: { params: { accession: string }
   }
 
   const sequence = data?.sequence[0];
+  const deposition = sequence?.events.dataDepositions[0];
+  const accession = deposition?.accession || sequence?.recordId;
 
   return (
     <Stack gap={20}>
@@ -255,7 +274,7 @@ export default function AssemblyPage({ params }: { params: { accession: string }
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${sequence?.recordId}`}</Title>
+          <Title order={3} mb={10}>{`Full data view: ${accession}`}</Title>
           <Text fz="sm" c="dimmed">Source</Text>
           <Text fz="sm" c="dimmed" fw={700}>{sequence?.datasetName}</Text>
         </Group>
