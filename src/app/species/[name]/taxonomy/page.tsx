@@ -165,6 +165,12 @@ function ExternalLinks(props: ExternalLinksProps) {
     </Paper>
   );
 }
+function showSource(kingdom:  String | undefined ) {
+  if  (kingdom && (kingdom.toLowerCase() ==="animalia" || kingdom.toLowerCase() ==="protista")) {
+    return true;
+  }
+  return false;
+}
 
 
 function Details({ taxonomy }: { taxonomy: Taxonomy }) {
@@ -173,7 +179,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
     <Paper radius={16} p="md" withBorder>
       <Group mb={10}>
       <Text fw={700}  size="lg">Taxonomy</Text>      
-      <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
+      {showSource(taxonomy.kingdom) && <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>}
       </Group>
 
       <SimpleGrid cols={2}>
@@ -223,7 +229,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
     <Paper radius={16} p="md" withBorder>
       <Group>
         <Text fw={700} size="lg">Higher classification</Text>
-        <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>
+        {showSource(taxonomy.kingdom) && <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>}
       </Group>
       <Group>
         <Attribute label="Kingdom" value={taxonomy.kingdom} href={`/kingdom/${taxonomy.kingdom}`} />
