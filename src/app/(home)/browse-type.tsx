@@ -8,7 +8,7 @@ import { Group } from "@mantine/core";
 
 type Overview = {
   wholeGenomes: number;
-  markers: number;
+  loci: number;
   specimens: number;
 };
 
@@ -16,7 +16,8 @@ const GET_OVERVIEW = gql`
   query {
     overview {
       wholeGenomes
-      markers
+      loci
+      specimens
     }
   }
 `;
@@ -49,7 +50,7 @@ export default function BrowseType() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={data?.overview.markers}
+          total={data?.overview.loci}
           category="Genetic loci"
           image="/card-icons/type/markers.svg"
           link="/browse/loci"
@@ -57,7 +58,7 @@ export default function BrowseType() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data?.overview.specimens}
           category="Specimens"
           image="/card-icons/type/specimens.svg"
           link="/browse/specimens"
