@@ -251,7 +251,7 @@ function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
 export default function AssemblyPage({ params }: { params: { accession: string } }) {
   const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
     variables: {
-      accession: params.accession,
+      accession: decodeURIComponent(params.accession),
     },
   });
 

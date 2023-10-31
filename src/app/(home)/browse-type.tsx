@@ -8,8 +8,8 @@ import { Group } from "@mantine/core";
 
 type Overview = {
   wholeGenomes: number;
-  organelles: number;
   markers: number;
+  specimens: number;
 };
 
 const GET_OVERVIEW = gql`
@@ -50,15 +50,15 @@ export default function BrowseType() {
       <Carousel.Slide>
         <BrowseCard
           total={data?.overview.markers}
-          category="Markers"
+          category="Genetic loci"
           image="/card-icons/type/markers.svg"
-          link="/browse/markers"
+          link="/browse/loci"
         />
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
           total={0}
-          category="Specimen"
+          category="Specimens"
           image="/card-icons/type/specimens.svg"
           link="/browse/specimens"
         />

@@ -74,10 +74,9 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
         }
         photo { url }
         dataSummary {
-          wholeGenomes
-          partialGenomes
-          organelles
-          barcodes
+          genomes
+          loci
+          specimens
           other
         }
       }
@@ -154,9 +153,9 @@ type Taxonomy = {
 };
 
 type DataSummary = {
-  wholeGenomes: number,
-  organelles: number,
-  barcodes: number,
+  genomes: number,
+  loci: number,
+  specimens: number,
   other: number,
 }
 

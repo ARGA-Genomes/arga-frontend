@@ -156,7 +156,7 @@ function RecordList({ records }: { records: WholeGenome[] }) {
   return (
     <Stack>
       { records.map((record, idx) => (
-        <RecordItem key={idx} href={`${path}/${record.accession}`}>
+        <RecordItem key={idx} href={`${path}/${encodeURIComponent(record.accession || '')}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </Stack>

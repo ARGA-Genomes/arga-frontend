@@ -177,7 +177,7 @@ function Species() {
 
   const [filters, setFilters] = useState<Filters>({
     classifications: [],
-    dataTypes: [{ filter: "HAS_DATA", action: "INCLUDE", value: "Genome", editable: false }],
+    dataTypes: [{ filter: "HAS_DATA", action: "INCLUDE", value: "Locus", editable: false }],
   });
 
   const flattenFilters = (filters: Filters) => {
@@ -264,16 +264,16 @@ function Species() {
 }
 
 
-export default function GenomeListPage() {
+export default function LocusListPage() {
   const [_, setPreviousPage] = usePreviousPage();
 
   useEffect(() => {
-    setPreviousPage({ name: `browsing genomes`, url: '/browse/genomes' })
+    setPreviousPage({ name: `browsing genetic loci`, url: '/browse/loci' })
   }, [setPreviousPage])
 
   return (
     <Stack mt={40}>
-      <DataTypeHeader dataType="Whole genomes" />
+      <DataTypeHeader dataType="Genetic loci" />
 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>

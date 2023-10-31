@@ -14,9 +14,9 @@ export interface Photo {
 }
 
 export interface DataSummary {
-  wholeGenomes: number,
-  organelles: number,
-  barcodes: number,
+  genomes: number,
+  loci: number,
+  specimens: number,
   other: number,
 }
 
@@ -60,8 +60,8 @@ export function SpeciesCard({ species }: { species: Species }) {
           <Text fz="sm" fw={700} fs="italic">{species.taxonomy.canonicalName}</Text>
         </Link>
         <SimpleGrid cols={2}>
-          <DataItem name="Genome" count={species.dataSummary.wholeGenomes} />
-          <DataItem name="Genetic marker" count={species.dataSummary.barcodes} />
+          <DataItem name="Genome" count={species.dataSummary.genomes} />
+          <DataItem name="Genetic loci" count={species.dataSummary.loci} />
         </SimpleGrid>
       </Stack>
     </Card>
