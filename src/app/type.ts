@@ -334,3 +334,10 @@ export type {
 export interface HeaderAndFooterProps {
     links: { link: string; label: string }[];
   }
+
+  export enum Layer {
+    WholeGenome,
+    Loci,
+    Specimens,
+    OtherData,
+  }

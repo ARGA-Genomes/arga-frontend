@@ -20,6 +20,7 @@ import { Marker } from "@/components/mapping/analysis-map";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Taxonomy } from "@/components/species-card";
+import { Layer } from "@/app/type";
 
 const GET_DISTRIBUTION = gql`
   query SpeciesDistribution($canonicalName: String) {
@@ -35,21 +36,7 @@ const GET_DISTRIBUTION = gql`
         }
       }
       taxonomy {
-        canonicalName
-        authority
-        status
         kingdom
-        phylum
-        class
-        order
-        family
-        genus
-        synonyms {
-          scientificName
-        }
-        vernacularNames {
-          name
-        }
       }
       specimens(page: 1, pageSize: 1000) {
         total
@@ -95,7 +82,8 @@ type Specimen = {
   recordId?: string,
   latitude?: number,
   longitude?: number,
-  color?: string
+  color?: string,
+  type: Layer
 }
 
 type QueryResults = {
@@ -187,13 +175,6 @@ type Filters = {
   other: { total: number, count: number },
 }
 
-enum Layer {
-  WholeGenome,
-  Loci,
-  Specimens,
-  OtherData,
-}
-
 interface SummaryProps {
   regions?: Regions,
   filters: Filters,
@@ -220,7 +201,7 @@ function Summary({ regions, filters, onFilter }: SummaryProps ) {
 }
 
 
-function toMarker (color: [number, number, number, number], records?: Specimen[]) {
+function toMarker (color: [number, number, number, number], type: Layer, records?: Specimen[]) {
   if (!records) return [];
   return records.map(r => {
     return {
@@ -228,6 +209,7 @@ function toMarker (color: [number, number, number, number], records?: Specimen[]
       latitude: r.latitude,
       longitude: r.longitude,
       color: color,
+      type: type
     }
   })
 }
@@ -244,9 +226,9 @@ export default function DistributionPage({ params }: { params: { name: string } 
 
   useEffect(() => {
     const combined = [
-      ...toMarker([103, 151, 180, 220], layers.specimens ? data?.species.specimens.records : undefined),
-      ...toMarker([123, 161, 63, 220], layers.loci ? data?.species.markers.records : undefined),
-      ...toMarker([243, 117, 36, 220], layers.wholeGenome ? data?.species.wholeGenomes.records : undefined),
+      ...toMarker([103, 151, 180, 220], Layer.Specimens, layers.specimens ? data?.species.specimens.records : undefined),
+      ...toMarker([123, 161, 63, 220], Layer.Loci, layers.loci ? data?.species.markers.records : undefined),
+      ...toMarker([243, 117, 36, 220], Layer.WholeGenome, layers.wholeGenome ? data?.species.wholeGenomes.records : undefined),
     ];
     // filter out null island as well as specimens without coords
     setAllSpecimens(combined.filter(s => s.latitude) as Marker[]);

@@ -9,6 +9,7 @@ import { GeoJSON } from 'geojson';
 import { gql, useQuery } from '@apollo/client';
 import Link from 'next/link';
 import { Modal, Paper } from '@mantine/core';
+import { Layer } from '@/app/type';
 
 // center on Australia by default
 const DEFAULT_POSITION = [-28.30638, 134.3838];
@@ -42,6 +43,7 @@ export interface Marker {
   latitude: number,
   longitude: number,
   color: [number, number, number, number],
+  type: Layer
 }
 
 
@@ -55,13 +57,14 @@ interface AnalysisMapProps {
   initialZoom?: number,
 }
 
-export default function AnalysisMap({ regions, markers, speciesName, children, style, initialPosition, initialZoom }: AnalysisMapProps) {
+export default function AnalysisMap(this: any, { regions, markers, speciesName, children, style, initialPosition, initialZoom }: AnalysisMapProps) {
   const [tolerance, setTolerance] = useState(0.01);
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined)
   const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined)
   const [clickedMarker, setClickedMarker] = useState<string | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false)
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [popupLink, setPopupLink] = useState(``)
 
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
@@ -129,6 +132,7 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
       setClickedMarker(object?.recordId);
       setIsOpen(true);
       setPopupPosition(position)
+      getPopUpLink(object.type, speciesName, object?.recordId)
     }else {
     setIsOpen(false);
     }
@@ -138,7 +142,16 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
     setIsOpen(false);
   }
 
-
+  const getPopUpLink = (type: Layer, speciesName: string | undefined, clickedMarker: string | undefined) => {
+    if (type === Layer.Specimens) {
+      setPopupLink( `/species/${speciesName}/specimens/${clickedMarker}`)
+    } else if (type ===Layer.Loci) {
+      setPopupLink( `/species/${speciesName}/markers/${clickedMarker}`)
+    } else if(type === Layer.WholeGenome) {
+      setPopupLink( `/species/${speciesName}/whole_genomes/${clickedMarker}`)
+    }
+    else {setPopupLink(``)}
+  }
 
 
   return (
@@ -183,7 +196,7 @@ export default function AnalysisMap({ regions, markers, speciesName, children, s
       {isOpen && <Paper h={50} w={300} radius={5} p={10} 
       style={{zIndex:200, display: isOpen? 'table': 'hidden', position: 'fixed', left: popupPosition.x, top: popupPosition.y, alignContent: 'center'}} onClick={closePopup}>
         View specimen details: &nbsp;
-        <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
+        <Link href={popupLink}>{clickedMarker}
         </Link>
       </Paper>}
     </>
