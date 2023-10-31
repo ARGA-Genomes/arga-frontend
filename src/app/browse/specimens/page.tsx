@@ -177,7 +177,7 @@ function Species() {
 
   const [filters, setFilters] = useState<Filters>({
     classifications: [],
-    dataTypes: [{ filter: "HAS_DATA", action: "INCLUDE", value: "Genome", editable: false }],
+    dataTypes: [{ filter: "HAS_DATA", action: "INCLUDE", value: "Specimen", editable: false }],
   });
 
   const flattenFilters = (filters: Filters) => {
@@ -264,16 +264,16 @@ function Species() {
 }
 
 
-export default function GenomeListPage() {
+export default function SpecimenListPage() {
   const [_, setPreviousPage] = usePreviousPage();
 
   useEffect(() => {
-    setPreviousPage({ name: `browsing genomes`, url: '/browse/genomes' })
+    setPreviousPage({ name: `browsing specimens`, url: '/browse/specimens' })
   }, [setPreviousPage])
 
   return (
     <Stack mt={40}>
-      <DataTypeHeader dataType="Whole genomes" />
+      <DataTypeHeader dataType="Specimens" />
 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
