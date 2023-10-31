@@ -19,7 +19,8 @@ import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
+import { showSource } from "../taxonomy/page";
+import { Taxonomy } from "@/components/species-card";
 
 const GET_DISTRIBUTION = gql`
   query SpeciesDistribution($canonicalName: String) {
@@ -32,6 +33,23 @@ const GET_DISTRIBUTION = gql`
         imcra {
           names
           dataset { name }
+        }
+      }
+      taxonomy {
+        canonicalName
+        authority
+        status
+        kingdom
+        phylum
+        class
+        order
+        family
+        genus
+        synonyms {
+          scientificName
+        }
+        vernacularNames {
+          name
         }
       }
       specimens(page: 1, pageSize: 1000) {
@@ -96,6 +114,7 @@ type QueryResults = {
       total: number,
       records: Specimen[],
     },
+    taxonomy: Taxonomy,
   }
 }
 
@@ -218,7 +237,6 @@ export default function DistributionPage({ params }: { params: { name: string } 
     variables: { canonicalName },
   });
 
-
   useEffect(() => {
     const combined = [
       ...toMarker([103, 151, 180, 220], layers.specimens ? data?.species.specimens.records : undefined),
@@ -280,7 +298,7 @@ export default function DistributionPage({ params }: { params: { name: string } 
             </Grid.Col>
             <Grid.Col span={3}>
               { filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
-              <Text  c="attribute.5"><b>Source:</b> <Link href={`https://biodiversity.org.au/afd/taxa/${params.name}`}>Australian Faunal Directory</Link></Text>
+              {showSource(data?.species.taxonomy.kingdom) && <Text  c="attribute.5"><b>Source:</b> <Link href={`https://biodiversity.org.au/afd/taxa/${params.name}`}>Australian Faunal Directory</Link></Text>}
               <br/>
               <Text c={"attribute.5"}>
               <b>Note:</b> location data may be generalised for sensitive species. Location data should be verified from individual data point custodians. Please refer to the specimen page for full details of metadata provenance for specific collection locations.

@@ -165,7 +165,7 @@ function ExternalLinks(props: ExternalLinksProps) {
     </Paper>
   );
 }
-function showSource(kingdom:  String | undefined ) {
+export function showSource(kingdom:  String | undefined ) {
   if  (kingdom && (kingdom.toLowerCase() ==="animalia" || kingdom.toLowerCase() ==="protista")) {
     return true;
   }
@@ -208,7 +208,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
             <Text fw={600} fz="sm" truncate="end" >
               {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
             </Text>
-            <button onClick={() => setIsOpen(true)}>Show All</button>
+            <Button onClick={() => setIsOpen(true)} bg="none" c="midnight.4" pl={-5} className="textButton">Show All</Button>
             </Group>
             <Modal opened={isOpen} onClose={() => setIsOpen(false)} className="commonNamesModal" centered>
             <Text fw={600} fz="sm">
