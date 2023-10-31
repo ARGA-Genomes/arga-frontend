@@ -165,7 +165,7 @@ function ExternalLinks(props: ExternalLinksProps) {
     </Paper>
   );
 }
-export function showSource(kingdom:  String | undefined ) {
+ function showSource(kingdom:  String | undefined ) {
   if  (kingdom && (kingdom.toLowerCase() ==="animalia" || kingdom.toLowerCase() ==="protista")) {
     return true;
   }

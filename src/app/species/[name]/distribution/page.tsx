@@ -19,7 +19,6 @@ import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { showSource } from "../taxonomy/page";
 import { Taxonomy } from "@/components/species-card";
 
 const GET_DISTRIBUTION = gql`
@@ -147,6 +146,12 @@ interface MapFilterOptionProps extends SwitchProps {
   label: string,
   count: number,
   total: number,
+}
+function showSource(kingdom:  String | undefined ) {
+  if  (kingdom && (kingdom.toLowerCase() ==="animalia" || kingdom.toLowerCase() ==="protista")) {
+    return true;
+  }
+  return false;
 }
 
 function MapFilterOption({ label, count, total, ...switchProps }: MapFilterOptionProps) {
