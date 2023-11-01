@@ -115,7 +115,7 @@ export default function ShowStats({ rank, name }: { rank: string, name: String }
 
     return (
         <Paper radius="20px" mr={50} style={{ position: "absolute", top: 200, right: 0, width: "650px" }}>
-            <Title order={5} style={{ textAlign: "center" }}>Data summary</Title>
+            <Title order={5} style={{ textAlign: "center", marginTop: "10px" }}>Data summary</Title>
             <Grid p={20}>
                 <Grid columns={12}>
                     <Grid.Col span={6}>
