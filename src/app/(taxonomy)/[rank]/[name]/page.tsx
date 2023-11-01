@@ -602,7 +602,6 @@ export default function ClassificationPage({ params }: { params: { rank: string,
       canonicalName: params.name
     },
   });
-
   useEffect(() => {
     setPreviousPage({ name: `browsing ${params.name}`, url: pathname })
   }, [setPreviousPage])

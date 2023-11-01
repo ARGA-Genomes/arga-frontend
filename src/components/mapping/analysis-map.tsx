@@ -195,7 +195,7 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
       </Modal> */}
       {isOpen && <Paper h={50} w={300} radius={5} p={10} 
       style={{zIndex:200, display: isOpen? 'table': 'hidden', position: 'fixed', left: popupPosition.x, top: popupPosition.y, alignContent: 'center'}} onClick={closePopup}>
-        View specimen details: &nbsp;
+        View details: &nbsp;
         <Link href={popupLink}>{clickedMarker}
         </Link>
       </Paper>}

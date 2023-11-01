@@ -16,6 +16,7 @@ import { Search as IconSearch } from "tabler-icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
 import { MAX_WIDTH } from "../constants";
+import ShowStats from "./stats";
 
 
 function ConferenceInfo() {
@@ -60,7 +61,7 @@ function Search() {
       <Grid align="center">
         <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
           <TextInput
-            placeholder="e.g. sequence accession, taxon identifier, genus name"
+            placeholder="e.g. sequence accession, species name"
             value={value}
             onChange={(val) => setValue(val.target.value)}
             leftSectionWidth={60}
@@ -103,18 +104,20 @@ export default function HomePage() {
                 </b>
             </Text>
             <Text c="white">
-                  Search by species, higher classification, data type or ecological and phenotypic traits. Get started by entering any word in the search bar below, or scroll down to browse pre-filtered grouping.
+                  Search by species, higher classification, data type or ecological and phenotypic traits. Get started by entering any word in the search bar below, or scroll down to browse pre-filtered groupings.
               </Text>
             </Stack>
           </Grid.Col>
         </Grid>
       </Paper>
+      <Paper>
+        <ShowStats rank="DOMAIN" name="Eukaryota"/>
+      </Paper>
 
-      <Container maw={MAX_WIDTH} py={50}>
+      <Container maw={MAX_WIDTH} py={200}>
         <Stack gap={80}>
           <Stack gap={40}>
-            <Title order={3} c="moss.5" fz={30} fw={600}>Search for data</Title>
-            
+            <Title order={3} c="moss.5" fz={30} fw={600}>Search for data</Title>   
             <Search />
           </Stack>
           <Stack gap={40}>

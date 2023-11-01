@@ -5,6 +5,7 @@ import { useSpring, animated } from '@react-spring/web'
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps } from "@mantine/core";
+import { BoxPadding } from "tabler-icons-react";
 
 
 const MARGIN = { top: 10, right: 10, bottom: 10, left: 10 };
@@ -144,7 +145,8 @@ export function BarChart({ data, spacing, ...rest }: BarChartProps & BoxProps) {
         <g
           width={boundsWidth}
           height={boundsHeight}
-          transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
+          // Commented the line below becausde the axis data at the bottom was getting cut off, feel free to uncomment it if not required
+          // transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
         >
         { grid.map((value, idx) => (
             <GridLine

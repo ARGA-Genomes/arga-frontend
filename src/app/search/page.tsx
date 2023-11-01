@@ -494,7 +494,7 @@ function Search(props: SearchProperties) {
           <Grid align="center" m={10}>
             <Grid.Col span={7}>
               <TextInput
-                placeholder="e.g. sequence accession, taxon identifier, genus name"
+                placeholder="e.g. sequence accession, species name"
                 value={value}
                 onChange={val => setValue(val.target.value)}
                 leftSectionWidth={60}
