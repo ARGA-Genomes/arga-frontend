@@ -3,21 +3,22 @@
 import { SpeciesCard } from "@/components/species-card";
 import { PieChart } from "@/components/graphing/pie";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Paper, SimpleGrid, Text, Title, Group, Stack, Container } from "@mantine/core";
-import { useState } from "react";
+import { Box, Paper, SimpleGrid, Text, Title, Group, Stack, Container, Grid } from "@mantine/core";
+import { useEffect, useState } from "react";
 import { BarChart } from "@/components/graphing/bar";
 import { TachoChart } from "@/components/graphing/tacho";
 import { PaginationBar } from "@/components/pagination";
 import Link from "next/link";
 import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
+import { usePreviousPage } from "@/components/navigation-history";
 
 
 const PAGE_SIZE = 10;
 
 const GET_DATASET = gql`
 query DatasetDetails($name: String) {
-  dataset(name: $name) {
+  dataset(by: { name: $name }) {
     citation
     license
     rightsHolder
@@ -41,7 +42,7 @@ type DetailsQueryResults = {
 
 const GET_SPECIES = gql`
 query DatasetSpecies($name: String, $page: Int) {
-  dataset(name: $name) {
+  dataset(by: { name: $name }) {
     species(page: $page) {
       total
       records {
@@ -195,7 +196,7 @@ function DatasetDetails({ dataset }: { dataset: string }) {
   });
 
   return (
-    <>
+    <Stack gap={0}>
       <LoadOverlay visible={loading} />
 
       { error ? <Text>{error.message}</Text> : null }
@@ -206,7 +207,7 @@ function DatasetDetails({ dataset }: { dataset: string }) {
       }
       <Text c="dimmed" size="xs">{data?.dataset.citation}</Text>
       <Text c="dimmed" size="xs">&copy; {data?.dataset.rightsHolder}</Text>
-    </>
+    </Stack>
   )
 }
 
@@ -214,12 +215,23 @@ function DatasetDetails({ dataset }: { dataset: string }) {
 export default function BrowseDataset({ params }: { params: { name: string } }) {
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
+  const [_, setPreviousPage] = usePreviousPage();
+
+  useEffect(() => {
+    setPreviousPage({ name: `browsing ${dataset}`, url: '/browse/datasets/${params.name}' })
+  }, [setPreviousPage])
+
   return (
     <Stack mt="xl">
-      <Paper py={20} pos="relative">
+      <Paper py={30}>
         <Container maw={MAX_WIDTH}>
-          <Title order={2}>{dataset}</Title>
-          <DatasetDetails dataset={dataset} />
+          <Group gap={40}>
+            <Text c="dimmed" fw={400}>DATASET</Text>
+            <Stack gap={0}>
+              <Text fz={38} fw={700}>{dataset}</Text>
+              <DatasetDetails dataset={dataset} />
+            </Stack>
+          </Group>
         </Container>
       </Paper>
 
@@ -227,12 +239,7 @@ export default function BrowseDataset({ params }: { params: { name: string } }) 
         <Container maw={MAX_WIDTH}>
           <Stack>
             <Paper p="xl" radius="lg" withBorder>
-              <Title order={3} mb={10}>Data summary</Title>
-              <DataSummary dataset={dataset} />
-            </Paper>
-
-            <Paper p="xl" radius="lg" withBorder>
-              <Title order={3} mb={10}>Browse species</Title>
+              <Title order={5}>Browse species</Title>
               <Species dataset={dataset} />
             </Paper>
           </Stack>
