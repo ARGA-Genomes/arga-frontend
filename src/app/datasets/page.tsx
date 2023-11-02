@@ -2,7 +2,8 @@
 
 import { LoadOverlay } from "@/components/load-overlay";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Title, Text } from "@mantine/core";
+import { Box, Grid, Title, Paper, Button } from "@mantine/core";
+import { Attribute } from "@/components/highlight-stack";
 import Link from "next/link";
 
 
@@ -56,28 +57,54 @@ type QueryResults = {
   sources: Source[],
 };
 
-
-function DatasetRow({ dataset }: { dataset: Dataset }) {
+function RecordItemContent({ dataset }: { dataset: Dataset }) {
   return (
-    <Box py={10} px={20}>
-      <Title order={4}><Link target="_blank" href={dataset.url || ""}>{dataset.name}</Link></Title>
-      <Text>{dataset.description}</Text>
-      <Text c="dimmed">{dataset.citation}</Text>
-      <Text c="dimmed">&copy; {dataset.rightsHolder}</Text>
-      <Text c="dimmed">Last updated: {dataset.updatedAt}</Text>
-    </Box>
+    <Paper radius="lg" m="xs" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
+      <Grid p={10} columns={24}>
+        <Grid.Col span={7}>
+          <Attribute label="Collection name" value={dataset.name} />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Attribute label="Number of records" value="No data" />
+        </Grid.Col>
+        <Grid.Col span={5}>
+          <Attribute label="Percentage with genomic data" value="No data"/>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Attribute label="Last updated" value={dataset.updatedAt}/>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <Button m={15} component={Link} href={dataset.url || ""} rel="noopener noreferrer" target="_blank"></Button>
+        </Grid.Col>
+      </Grid>
+    </Paper>
   )
 }
 
-
 function SourceRow({ source }: { source: Source }) {
   return (
-    <Box py={20}>
-      <Title>{source.name}</Title>
-      <Text c="dimmed">{source.author}</Text>
-      <Text c="dimmed">&copy; {source.rightsHolder}</Text>
-      { source.datasets.map(dataset => <DatasetRow dataset={dataset} key={dataset.name} />) }
-    </Box>
+    <Paper p="l" radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
+      <Grid p={10} columns={24}>
+        <Grid.Col span={5}>
+          <Attribute label="Institution name" value={source.name}/>
+        </Grid.Col>
+        <Grid.Col span={7}>
+          <Attribute label="Access rights" value={source.accessRights}/>
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <Attribute label="Number of records" value="No data"/>
+        </Grid.Col>
+        <Grid.Col span={5}>
+          <Attribute label="Percentage with genomic data" value="No data"/>
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Attribute label="Last updated" value="No data"/>
+        </Grid.Col>
+      </Grid>
+      <Box ml={60}>
+        { source.datasets.map(dataset => <RecordItemContent dataset={dataset} key={dataset.name} />) }
+      </Box>
+    </Paper>
   )
 }
 
@@ -86,8 +113,13 @@ export default function DatasetsPage() {
 
   return (
     <>
-      <LoadOverlay visible={loading} />
-      { data?.sources.map(source => <SourceRow source={source} key={source.name} />) }
+      <Box p={20}>
+        <Title>Institutions</Title>
+        <Paper p="xs" radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
+          <LoadOverlay visible={loading} />
+          { data?.sources.map(source => <SourceRow source={source} key={source.name} />) }
+        </Paper>
+      </Box>
     </>
   );
 }
