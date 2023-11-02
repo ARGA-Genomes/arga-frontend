@@ -286,8 +286,6 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
 
   return (
     <>
-      <SurveyModal />
-
       <Grid>
         <Grid.Col span={8}>
           <Stack gap={20} pos="relative">

@@ -23,14 +23,14 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
   const tab = path?.split('/')[3];
 
   if (!tab)
-    redirect(`/species/${name}/distribution`, RedirectType.replace);
+    redirect(`/species/${name}/whole_genomes`, RedirectType.replace);
 
   return (
     <Tabs
       variant="unstyled"
       radius={10}
       mt={40}
-      defaultValue="distribution"
+      defaultValue="whole_genomes"
       classNames={classes}
       value={tab}
       onChange={changeTab}

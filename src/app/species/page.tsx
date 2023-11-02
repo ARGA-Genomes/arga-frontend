@@ -3,5 +3,5 @@
 import { RedirectType, redirect } from "next/navigation";
 
 export default function SpeciesHomePage() {
-  redirect('./distribution', RedirectType.replace);
+  redirect('./whole_genomes', RedirectType.replace);
 }
