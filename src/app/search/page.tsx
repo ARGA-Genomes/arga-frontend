@@ -38,6 +38,7 @@ type Classification = {
 }
 
 type DataSummary = {
+  assemblies: number,
   referenceGenomes: number,
   wholeGenomes: number,
   partialGenomes: number,
@@ -111,6 +112,7 @@ query FullTextSearch ($query: String, $page: Int, $perPage: Int, $dataType: Stri
             genus
           }
           dataSummary {
+            assemblies
             referenceGenomes
             wholeGenomes
             partialGenomes
@@ -182,7 +184,7 @@ function TaxonItem({ item }: { item: Item }) {
             <Stack gap={0} justify='center'>
               <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
               <Text ml="sm" fz="sm" c="dimmed">
-                {item.synonyms ? `syn. ${item.synonyms[0]}` : null}
+                {item.synonyms && item.synonyms[0] ? `syn. ${item.synonyms[0]}` : null}
               </Text>
             </Stack>
           </Attribute>
@@ -214,11 +216,9 @@ function TaxonItem({ item }: { item: Item }) {
 }
 
 function TaxonSummary({ data }: { data: DataSummary }) {
-  const genomes = data.partialGenomes + data.referenceGenomes + data.wholeGenomes;
-
   return (
     <SimpleGrid cols={2}>
-      <AttributePill label="Genomes" color={genomes ? "moss.3" : "bushfire.2"} value={genomes} />
+      <AttributePill label="Genomes" color={data.assemblies ? "moss.3" : "bushfire.2"} value={data.assemblies} />
       <AttributePill label="Genetic Loci" color={data.barcodes ? "moss.3" : "bushfire.2"} value={data.barcodes} />
     </SimpleGrid>
   )
