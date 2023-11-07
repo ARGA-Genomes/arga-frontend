@@ -57,31 +57,53 @@ type QueryResults = {
   sources: Source[],
 };
 
+function RecordItemContent({ dataset }: { dataset: Dataset }) {
+  return (
+    <Paper radius="lg" m="xs" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
+      <Grid p={10} columns={24}>
+        <Grid.Col span={7}>
+          <Attribute label="Collection name" value={dataset.name} />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Attribute label="Number of records" value="No data" />
+        </Grid.Col>
+        <Grid.Col span={5}>
+          <Attribute label="Percentage with genomic data" value="No data"/>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Attribute label="Last updated" value={dataset.updatedAt}/>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <Button m={15} component={Link} href={dataset.url || ""} rel="noopener noreferrer" target="_blank"></Button>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  )
+}
+
 function SourceRow({ source }: { source: Source }) {
   return (
     <Paper p="l" radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
-      <Grid p={10} columns={22}>
-        <Grid.Col span={3}>
-          <Attribute label="Data source name" value={source.name}/>
+      <Grid p={10} columns={24}>
+        <Grid.Col span={5}>
+          <Attribute label="Institution name" value={source.name}/>
         </Grid.Col>
-        <Grid.Col span={19}>
-          <Attribute label="Rights holder" value={source.rightsHolder}/>
-        </Grid.Col>
-        <Grid.Col span={12}>
+        <Grid.Col span={7}>
           <Attribute label="Access rights" value={source.accessRights}/>
         </Grid.Col>
         <Grid.Col span={3}>
           <Attribute label="Number of records" value="No data"/>
         </Grid.Col>
-        <Grid.Col span={3}>
-          <Attribute label="Last updated" value="No data"/>
+        <Grid.Col span={5}>
+          <Attribute label="Percentage with genomic data" value="No data"/>
         </Grid.Col>
         <Grid.Col span={4}>
-          <Box m="md">
-            <Button w={170}></Button>
-          </Box>
+          <Attribute label="Last updated" value="No data"/>
         </Grid.Col>
       </Grid>
+      <Box ml={60}>
+        { source.datasets.map(dataset => <RecordItemContent dataset={dataset} key={dataset.name} />) }
+      </Box>
     </Paper>
   )
 }
@@ -92,7 +114,7 @@ export default function DatasetsPage() {
   return (
     <>
       <Box p={20}>
-        <Title>Data sources indexed in ARGA</Title>
+        <Title>Institutions</Title>
         <Paper p="xs" radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
           <LoadOverlay visible={loading} />
           { data?.sources.map(source => <SourceRow source={source} key={source.name} />) }
