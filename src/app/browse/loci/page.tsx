@@ -268,12 +268,12 @@ export default function LocusListPage() {
   const [_, setPreviousPage] = usePreviousPage();
 
   useEffect(() => {
-    setPreviousPage({ name: `browsing genetic loci`, url: '/browse/loci' })
+    setPreviousPage({ name: `browsing single loci`, url: '/browse/loci' })
   }, [setPreviousPage])
 
   return (
     <Stack mt={40}>
-      <DataTypeHeader dataType="Genetic loci" />
+      <DataTypeHeader dataType="Single loci" />
 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>

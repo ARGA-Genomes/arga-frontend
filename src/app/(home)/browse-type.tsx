@@ -51,7 +51,7 @@ export default function BrowseType() {
       <Carousel.Slide>
         <BrowseCard
           total={data?.overview.loci}
-          category="Genetic loci"
+          category="Single loci"
           image="/card-icons/type/markers.svg"
           link="/browse/loci"
         />
