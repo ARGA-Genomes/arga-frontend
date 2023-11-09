@@ -252,7 +252,7 @@ function GenomeItem({ item }: { item: Item }) {
           <Paper bg="#f47c2e" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
             <Group gap="xs" wrap="nowrap">
               <Image src={"card-icons/type/whole_genomes.svg"} fit="contain" h={80} w="auto" alt="" />
-              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Whole Genome</Text>
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Genome Assembly</Text>
             </Group>
           </Paper>
         </Grid.Col>

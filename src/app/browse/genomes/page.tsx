@@ -273,7 +273,7 @@ export default function GenomeListPage() {
 
   return (
     <Stack mt={40}>
-      <DataTypeHeader dataType="Whole genomes" />
+      <DataTypeHeader dataType="Genomes assemblies" />
 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>

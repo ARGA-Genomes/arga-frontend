@@ -43,7 +43,7 @@ export default function BrowseType() {
       <Carousel.Slide>
         <BrowseCard
           total={data?.overview.wholeGenomes}
-          category="Whole genomes"
+          category="Genome assemblies"
           image="/card-icons/type/whole_genomes.svg"
           link="/browse/genomes"
         />
