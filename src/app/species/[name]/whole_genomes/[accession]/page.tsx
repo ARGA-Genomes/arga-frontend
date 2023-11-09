@@ -144,7 +144,7 @@ function AssemblyStats({ sequence }: { sequence: SequenceDetails | undefined }) 
           <Attribute label="Ungapped length" value={Humanize.compactInteger(0)} />
         </Stack>
         <Stack>
-          <Attribute label="Number of chromosones" value={undefined} />
+          <Attribute label="Number of chromosomes" value={undefined} />
           <Attribute label="Number of organelles" value={undefined} />
         </Stack>
         <Stack>
