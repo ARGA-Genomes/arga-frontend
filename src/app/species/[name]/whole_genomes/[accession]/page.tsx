@@ -10,8 +10,8 @@ import {
   Grid,
   Group,
   Paper,
-  SimpleGrid,
   Stack,
+  Table,
   Text,
   Title,
 } from "@mantine/core";
@@ -138,34 +138,36 @@ function AssemblyStats({ sequence }: { sequence: SequenceDetails | undefined }) 
   const assembly = sequence?.events.assemblies[0];
 
   return (
-      <SimpleGrid cols={2} spacing={50}>
-        <Stack>
-          <Attribute label="Genome size" value={Humanize.compactInteger(assembly?.genomeSize || 0, 3)} />
-          <Attribute label="Ungapped length" value={Humanize.compactInteger(0)} />
-        </Stack>
-        <Stack>
-          <Attribute label="Number of chromosomes" value={undefined} />
-          <Attribute label="Number of organelles" value={undefined} />
-        </Stack>
-        <Stack>
-          <Attribute label="Assembly level" value={assembly?.quality} />
-          <Attribute label="BUSCO score" value={undefined} />
-        </Stack>
-        <Stack>
-          <Attribute label="Genome coverage" value={undefined} />
-          <Attribute label="GC percentage" value={undefined} />
-        </Stack>
-        <Stack>
-          <Attribute label="Number of scaffolds" value={undefined} />
-          <Attribute label="Scaffold N50" value={undefined} />
-          <Attribute label="Scaffold L50" value={undefined} />
-        </Stack>
-        <Stack>
-          <Attribute label="Number of contigs" value={undefined} />
-          <Attribute label="Contig N50" value={undefined} />
-          <Attribute label="Contig L50" value={undefined} />
-        </Stack>
-      </SimpleGrid>
+    <Table withRowBorders={false}>
+      <Table.Tr>
+        <Table.Td valign="bottom"><Attribute label="Genome size" value={Humanize.compactInteger(assembly?.genomeSize || 0, 3)} /></Table.Td>
+        <Table.Td valign="bottom"><Attribute label="Number of chromosomes" value={undefined} /></Table.Td>
+      </Table.Tr>
+      <Table.Tr>
+        <Table.Td valign="bottom"><Attribute label="Ungapped length" value={Humanize.compactInteger(0)} /></Table.Td>
+        <Table.Td valign="bottom"><Attribute label="Number of organelles" value={undefined} /></Table.Td>
+      </Table.Tr>
+      <Table.Tr>
+        <Table.Td valign="bottom"><Attribute label="Assembly level" value={assembly?.quality} /></Table.Td>
+        <Table.Td valign="bottom"><Attribute label="Genome coverage" value={undefined} /></Table.Td>
+      </Table.Tr>
+      <Table.Tr>
+        <Table.Td valign="bottom"><Attribute label="BUSCO score" value={undefined} /></Table.Td>
+        <Table.Td valign="bottom"><Attribute label="GC percentage" value={undefined} /></Table.Td>
+      </Table.Tr>
+      <Table.Tr>
+        <Table.Td valign="bottom"><Attribute label="Number of scaffolds" value={undefined} /></Table.Td>
+        <Table.Td valign="bottom"><Attribute label="Number of contigs" value={undefined} /></Table.Td>
+      </Table.Tr>
+      <Table.Tr>
+        <Table.Td valign="bottom"><Attribute label="Scaffold N50" value={undefined} /></Table.Td>
+        <Table.Td valign="bottom"><Attribute label="Contig N50" value={undefined} /></Table.Td>
+      </Table.Tr>
+      <Table.Tr>
+        <Table.Td valign="bottom"><Attribute label="Scaffold L50" value={undefined} /></Table.Td>
+        <Table.Td valign="bottom"><Attribute label="Contig L50" value={undefined} /></Table.Td>
+      </Table.Tr>
+    </Table>
   )
 }
 
