@@ -96,16 +96,18 @@ const GET_TAXON = gql`
 query TaxonSpecies($rank: TaxonRank, $canonicalName: String) {
   taxon(rank: $rank, canonicalName: $canonicalName) {
     scientificName
+    scientificNameAuthorship
     canonicalName
-    authority
     status
-    kingdom
-    phylum
-    class
-    order
-    family
-    genus
-    vernacularGroup
+    nomenclaturalCode
+    citation
+
+    hierarchy {
+      scientificName
+      canonicalName
+      rank
+      depth
+    }
 
     summary {
       children
@@ -132,18 +134,21 @@ type DataBreakdown = {
   other: number,
 }
 
-type Taxonomy = {
+type ClassificationNode = {
   scientificName: string,
   canonicalName: string,
-  authority?: string,
-  status?: string,
-  kingdom?: string,
-  phylum?: string,
-  class?: string,
-  order?: string,
-  family?: string,
-  genus?: string,
-  vernacularGroup?: string,
+  rank: string,
+  depth: number,
+}
+
+type Taxonomy = {
+  scientificName: string,
+  scientificNameAuthorship: string,
+  canonicalName: string,
+  status: string,
+  nomenclaturalCode: string,
+  citation: string,
+  hierarchy: ClassificationNode[],
   dataSummary: DataBreakdown[]
   speciesSummary: DataBreakdown[]
   summary: {
@@ -199,15 +204,15 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
       <tbody>
       <tr>
         <td>Scientific name</td>
-        <td><DataField value={undefined}/></td>
+        <td><DataField value={taxon?.scientificName}/></td>
       </tr>
       <tr>
         <td>Status</td>
-        <td><DataField value={undefined}/></td>
+        <td><DataField value={taxon?.status.toLocaleLowerCase()}/></td>
       </tr>
       <tr>
         <td>Source</td>
-        <td><DataField value={undefined}/></td>
+        <td><DataField value={taxon?.citation}/></td>
       </tr>
       </tbody>
     </Table>
@@ -215,14 +220,17 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
 }
 
 function HigherClassification({ taxon }: { taxon: Taxonomy | undefined }) {
+  const hierarchy = taxon?.hierarchy.toSorted((a, b) => b.depth - a.depth);
+
   return (
     <Group>
-      { taxon?.kingdom && <Attribute label="Kingdom" value={taxon?.kingdom} href={`/kingdom/${taxon?.kingdom}`} /> }
-      { taxon?.phylum && <Attribute label="Phylum" value={taxon?.phylum} href={`/phylum/${taxon?.phylum}`} />  }
-      { taxon?.class && <Attribute label="Class" value={taxon?.class} href={`/class/${taxon?.class}`} /> }
-      { taxon?.order && <Attribute label="Order" value={taxon?.order} href={`/order/${taxon?.order}`} /> }
-      { taxon?.family && <Attribute label="Family" value={taxon?.family} href={`/family/${taxon?.family}`} /> }
-      { taxon?.genus && <Attribute label="Genus" value={taxon?.genus} href={`/genus/${taxon?.genus}`} /> }
+      { hierarchy?.map(node => (
+        <Attribute
+          label={Humanize.capitalize(node.rank.toLowerCase())}
+          value={node.canonicalName}
+          href={`/${node.rank.toLowerCase() }/${node.canonicalName}`}
+        />
+      )) }
     </Group>
   )
 }

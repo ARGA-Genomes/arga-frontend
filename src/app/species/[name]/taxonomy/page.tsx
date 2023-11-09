@@ -1,5 +1,6 @@
 "use client";
 
+import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import {
   Button,
@@ -13,14 +14,37 @@ import {
 } from "@mantine/core";
 import { Photo, Taxonomy, IndigenousEcologicalKnowledge } from "@/app/type";
 
-import { Attribute, HighlightStack } from "@/components/highlight-stack";
+import { Attribute } from "@/components/highlight-stack";
 import { ExternalLink } from "tabler-icons-react";
 import { useEffect, useState } from "react";
-import { SurveyModal } from "@/components/survey-modal";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { SpeciesImage } from "@/components/species-image";
 import Link from "next/link";
+
+
+const GET_TAXON = gql`
+query TaxonSpecies($canonicalName: String) {
+  taxon(rank: GENUS, canonicalName: $canonicalName) {
+    hierarchy {
+      canonicalName
+      rank
+      depth
+    }
+  }
+}`;
+
+type ClassificationNode = {
+  canonicalName: string,
+  rank: string,
+  depth: number,
+}
+
+type TaxonQuery = {
+  taxon: {
+    hierarchy: ClassificationNode[],
+  },
+};
 
 
 const GET_SUMMARY = gql`
@@ -225,29 +249,31 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 
 
 function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
+  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+    variables: { canonicalName: taxonomy.genus },
+  });
+
+  const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
+
   return (
     <Paper radius={16} p="md" withBorder>
+      <LoadOverlay visible={loading} />
+
       <Group>
         <Text fw={700} size="lg">Higher classification</Text>
         {showSource(taxonomy.kingdom) && <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>}
       </Group>
-      <Group>
-        <Attribute label="Kingdom" value={taxonomy.kingdom} href={`/kingdom/${taxonomy.kingdom}`} />
-        <Attribute label="Phylum" value={taxonomy.phylum} href={`/phylum/${taxonomy.phylum}`} />
-        <Attribute label="Class" value={taxonomy.class} href={`/class/${taxonomy.class}`} />
-        <Attribute label="Order" value={taxonomy.order} href={`/order/${taxonomy.order}`} />
-        <Attribute label="Family" value={taxonomy.family} href={`/family/${taxonomy.family}`} />
-        <Attribute label="Genus" value={taxonomy.genus} href={`/genus/${taxonomy.genus}`} />
-      </Group>
 
-      <HighlightStack gap={0}>
-        { taxonomy.synonyms.length > 0 && <>
-          <Text fw={700} mb={10} mt={20}>Synonyms</Text>
-          { taxonomy.synonyms.map(synonym => (
-            <Text key={synonym.scientificName}>{synonym.scientificName}</Text>
-          ))}
-        </>}
-      </HighlightStack>
+      <Group>
+        { error && <Text>{error.message}</Text> }
+        { hierarchy?.map(node => (
+          <Attribute
+            label={Humanize.capitalize(node.rank.toLowerCase())}
+            value={node.canonicalName}
+            href={`/${node.rank.toLowerCase() }/${node.canonicalName}`}
+          />
+        )) }
+      </Group>
     </Paper>
   );
 }
