@@ -266,8 +266,9 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
 
       <Group>
         { error && <Text>{error.message}</Text> }
-        { hierarchy?.map(node => (
+        { hierarchy?.map((node, idx) => (
           <Attribute
+            key={idx}
             label={Humanize.capitalize(node.rank.toLowerCase())}
             value={node.canonicalName}
             href={`/${node.rank.toLowerCase() }/${node.canonicalName}`}
