@@ -19,39 +19,16 @@ import { MAX_WIDTH } from "../constants";
 import ShowStats from "./stats";
 
 
-function ConferenceInfo() {
-  return (
-    <Paper mt={30} p={30} radius="lg" bg="midnight.5">
-      <Title order={2} c="wheat.3">
-        Up and coming conference
-      </Title>
-      <Grid>
-        <Grid.Col>
-          <Stack mt={40} mb={30}>
-            <Title order={1} c="white">
-              See you at the 2023 eResearch Brisbane
-            </Title>
-            <Text c="white">
-              Building name. Street address and our booth number. See you there.
-            </Text>
-          </Stack>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  );
-}
-
 function Search() {
   const router = useRouter();
 
   const [value, setValue] = useState("");
 
   function onSearch(searchTerms: string) {
-    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=species`);
+    router.push(`/search?q=${encodeURIComponent(searchTerms)}&type=all`);
   }
 
   return (
-    // <Paper p={20} radius="xl">
     <form
       onSubmit={(ev) => {
         ev.preventDefault();
@@ -81,7 +58,6 @@ function Search() {
         </Grid.Col>
       </Grid>
     </form>
-    // </Paper>
   );
 }
 
