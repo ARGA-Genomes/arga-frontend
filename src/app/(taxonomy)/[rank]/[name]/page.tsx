@@ -117,21 +117,27 @@ query TaxonSpecies($rank: TaxonRank, $canonicalName: String) {
     dataSummary {
       name
       genomes
-      other
+      totalGenomic
     }
 
     speciesSummary {
       name
       genomes
-      other
+      totalGenomic
+    }
+
+    speciesGenomeSummary {
+      name
+      genomes
+      totalGenomic
     }
   }
 }`;
 
 type DataBreakdown = {
-  name?: string,
+  name: string,
   genomes: number,
-  other: number,
+  totalGenomic: number,
 }
 
 type ClassificationNode = {
@@ -151,6 +157,7 @@ type Taxonomy = {
   hierarchy: ClassificationNode[],
   dataSummary: DataBreakdown[]
   speciesSummary: DataBreakdown[]
+  speciesGenomeSummary: DataBreakdown[]
   summary: {
     children: number,
     species: number,
@@ -502,16 +509,16 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
     return { name: summary.name || '', value: summary.genomes }
   })
 
-  const rankOther = taxon?.dataSummary.filter(i => i.other > 0).map(summary => {
-    return { name: summary.name || '', value: summary.other }
+  const rankOther = taxon?.dataSummary.filter(i => i.totalGenomic > 0).map(summary => {
+    return { name: summary.name || '', value: summary.totalGenomic }
   })
 
-  const speciesGenomes = taxon?.speciesSummary.filter(i => i.genomes > 0).map(summary => {
+  const speciesGenomes = taxon?.speciesGenomeSummary.filter(i => i.genomes > 0).map(summary => {
     return { name: summary.name || '', value: summary.genomes }
   }).sort((a, b) => b.value - a.value)
 
-  const speciesOther = taxon?.speciesSummary.filter(i => i.other > 0).map(summary => {
-    return { name: summary.name || '', value: summary.other }
+  const speciesOther = taxon?.speciesSummary.filter(i => i.totalGenomic > 0).map(summary => {
+    return { name: summary.name || '', value: summary.totalGenomic }
   }).sort((a, b) => b.value - a.value)
 
   const genomePercentile = taxon && speciesGenomes && (speciesGenomes?.length / taxon?.summary.species) * 100;
