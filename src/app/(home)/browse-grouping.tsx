@@ -46,7 +46,7 @@ export default function BrowseGrouping() {
           total={0}
           category="Agriculture"
           image="/card-icons/dataset/agriculture.svg"
-          link="/browse/list/Conservation_NT"
+          link="#"
         />
       </Carousel.Slide>
       <Carousel.Slide>
@@ -54,7 +54,7 @@ export default function BrowseGrouping() {
           total={0}
           category="Aquaculture"
           image="/card-icons/dataset/aquaculture.svg"
-          link="/browse/list/Conservation_NT"
+          link="#"
         />
       </Carousel.Slide>
       <Carousel.Slide>
@@ -62,7 +62,7 @@ export default function BrowseGrouping() {
           total={0}
           category="Terrestrial"
           image="/card-icons/dataset/terrestrial.svg"
-          link="/browse/list/Conservation_NT"
+          link="#"
         />
       </Carousel.Slide>
       <Carousel.Slide>
@@ -70,7 +70,7 @@ export default function BrowseGrouping() {
           total={0}
           category="Marine"
           image="/card-icons/dataset/marine.svg"
-          link="/browse/list/Conservation_NT"
+          link="#"
         />
       </Carousel.Slide>
       <Carousel.Slide>
@@ -78,7 +78,7 @@ export default function BrowseGrouping() {
           total={0}
           category="Threatened"
           image="/card-icons/dataset/threatened_top_110_species.svg"
-          link="/browse/list/Conservation_NT"
+          link="/browse/sources/ARGA_Threatened_Species"
         />
       </Carousel.Slide>
       <Carousel.Slide>
@@ -86,7 +86,7 @@ export default function BrowseGrouping() {
           total={data?.overview.allSpecies}
           category="All species"
           image="/card-icons/view_all.svg"
-          link="/browse/list/Conservation_NT"
+          link="/domain/Eukaryota"
         />
       </Carousel.Slide>
       </Group>
