@@ -10,8 +10,8 @@ import { BarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
 
 const GET_TAXON = gql`
-query TaxonSpecies($rank: TaxonRank, $canonicalName: String) {
-  taxon(rank: $rank, canonicalName: $canonicalName) {
+query HomeStats {
+  taxon(rank: DOMAIN, canonicalName: "Eukaryota") {
     summary {
       children
       species
@@ -58,13 +58,8 @@ type TaxonResults = {
 }
 
 
-export default function ShowStats({ rank, name }: { rank: string, name: String }) {
-    const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
-        variables: {
-            rank,
-            canonicalName: name
-        },
-    });
+export default function ShowStats() {
+    const taxonResults = useQuery<TaxonResults>(GET_TAXON);
     const taxon = taxonResults.data?.taxon
 
     const thresholds = [
@@ -81,7 +76,7 @@ export default function ShowStats({ rank, name }: { rank: string, name: String }
         return { name: summary.name || '', value: summary.totalGenomic }
     })
 
-    const speciesGenomes = taxon?.speciesSummary.filter(i => i.genomes > 0).map(summary => {
+    const speciesGenomes = taxon?.speciesGenomeSummary.filter(i => i.genomes > 0).map(summary => {
         return { name: summary.name || '', value: summary.genomes }
     }).sort((a, b) => b.value - a.value)
 

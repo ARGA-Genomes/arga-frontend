@@ -63,7 +63,7 @@ function Search() {
 
 export default function HomePage() {
   return (
-    <Paper bg="midnight.7">
+    <Paper bg="midnight.7" radius={0}>
       <Paper bg="midnight.6" py={80} px={150} style={{textAlign: 'justify'}}>
         <Grid>
           <Grid.Col span={{ base: 12, md: 6, lg: 6, xl: 6 }}>
@@ -87,16 +87,16 @@ export default function HomePage() {
         </Grid>
       </Paper>
       <Paper>
-        <ShowStats rank="DOMAIN" name="Eukaryota"/>
+        <ShowStats />
       </Paper>
 
-      <Container maw={MAX_WIDTH} py={200}>
+      <Container maw={MAX_WIDTH} py={100}>
         <Stack gap={80}>
           <Stack gap={40}>
             <Title order={3} c="moss.5" fz={30} fw={600}>Search for data</Title>   
             <Search />
           </Stack>
-          <Stack gap={40}>
+          <Stack gap={40} pt={40}>
             <Title order={3} c="moss.5" fz={30} fw={600}>Browse by data type</Title>
             <BrowseType />
           </Stack>
