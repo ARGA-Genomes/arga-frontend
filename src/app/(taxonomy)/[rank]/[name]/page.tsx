@@ -45,6 +45,7 @@ import { DataTable, DataTableRow } from '@/components/data-table';
 import { SpeciesCard } from '@/components/species-card';
 import { usePreviousPage } from '@/components/navigation-history';
 import { usePathname } from 'next/navigation';
+import { DataTypeFilters } from '@/components/filtering/data-type';
 
 
 const PAGE_SIZE = 10;
@@ -59,6 +60,7 @@ type Filters = {
   state?: Filter,
   drainageBasin?: Filter,
   bushfireRecovery: Filter[],
+  dataTypes: Filter[],
 }
 
 
@@ -259,6 +261,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
   const [state, setState] = useState<Filter | undefined>(filters.state)
   const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin)
   const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(filters.bushfireRecovery)
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
 
   useEffect(() => {
     onChange({
@@ -270,8 +273,9 @@ function Filters({ filters, options, onChange }: FiltersProps) {
       state,
       drainageBasin,
       bushfireRecovery,
+      dataTypes,
     })
-  }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, bushfireRecovery, onChange]);
+  }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, bushfireRecovery, dataTypes, onChange]);
 
   return (
     <Accordion defaultValue="classification" variant='separated'>
@@ -285,6 +289,19 @@ function Filters({ filters, options, onChange }: FiltersProps) {
         </Accordion.Control>
         <Accordion.Panel>
           <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item value="hasData">
+        <Accordion.Control>
+          <FilterGroup
+            label="Data types"
+            description="Only show species that have specific types of data"
+            image="/card-icons/type/whole_genomes.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <DataTypeFilters filters={dataTypes} onChange={setDataTypes} />
         </Accordion.Panel>
       </Accordion.Item>
 
@@ -390,6 +407,7 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
   const [filters, setFilters] = useState<Filters>({
     classifications: [{ filter: rank, action: "INCLUDE", value: canonicalName, editable: false }],
     bushfireRecovery: [],
+    dataTypes: [],
   });
 
   const flattenFilters = (filters: Filters) => {
@@ -402,6 +420,7 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
       filters.state,
       filters.drainageBasin,
       ...filters.bushfireRecovery,
+      ...filters.dataTypes,
     ];
 
     return items.filter((item): item is Filter => !!item);
