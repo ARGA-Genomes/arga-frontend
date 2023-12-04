@@ -45,7 +45,7 @@ import { DataTable, DataTableRow } from '@/components/data-table';
 import { SpeciesCard } from '@/components/species-card';
 import { usePreviousPage } from '@/components/navigation-history';
 import { usePathname } from 'next/navigation';
-import { DataTypeFilters } from '@/components/filtering/data-type';
+import { HasDataFilters } from '@/components/filtering/has-data';
 
 
 const PAGE_SIZE = 10;
@@ -301,7 +301,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <DataTypeFilters filters={dataTypes} onChange={setDataTypes} />
+          <HasDataFilters filters={dataTypes} onChange={setDataTypes} />
         </Accordion.Panel>
       </Accordion.Item>
 

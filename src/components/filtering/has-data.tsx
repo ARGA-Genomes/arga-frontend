@@ -5,19 +5,19 @@ import { ChangeEvent, useEffect } from "react";
 
 
 enum FilterKind {
-  Taxon = 'Taxon',
-  Genome = 'Genome',
-  Locus = 'Locus',
-  Specimen = 'Specimen',
+  Genomes = 'Genome',
+  Loci = 'Locus',
+  Specimens = 'Specimen',
+  Other = 'Other',
 }
 
 
-interface DataTypeFiltersProps {
+interface HasDataFiltersProps {
   filters: Filter[],
   onChange: (items: Filter[]) => void,
 }
 
-export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
+export function HasDataFilters({ filters, onChange }: HasDataFiltersProps) {
   const [items, handlers] = useListState<Filter>(filters);
   useEffect(() => onChange(items), [items, onChange]);
 
@@ -27,7 +27,7 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
 
   const addFilter = (value: string) => {
     handlers.append({
-      filter: "DATA_TYPE",
+      filter: "HAS_DATA",
       action: "INCLUDE",
       value,
       editable: true,
@@ -54,44 +54,44 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
   return (
     <Stack>
     <Switch
-      label={<Text fz="sm">Species reports</Text>}
-      onLabel="SHOW"
-      offLabel="HIDE"
-      size="lg"
-      value={FilterKind.Taxon}
-      checked={!!findFilter(FilterKind.Taxon)}
-      onChange={filterChanged}
-      disabled={isDisabled(FilterKind.Taxon)}
-    />
-    <Switch
       label={<Text fz="sm">Genomes</Text>}
       onLabel="SHOW"
       offLabel="HIDE"
       size="lg"
-      value={FilterKind.Genome}
-      checked={!!findFilter(FilterKind.Genome)}
+      value={FilterKind.Genomes}
+      checked={!!findFilter(FilterKind.Genomes)}
       onChange={filterChanged}
-      disabled={isDisabled(FilterKind.Genome)}
+      disabled={isDisabled(FilterKind.Genomes)}
     />
     <Switch
       label={<Text fz="sm">Loci</Text>}
       onLabel="SHOW"
       offLabel="HIDE"
       size="lg"
-      value={FilterKind.Locus}
-      checked={!!findFilter(FilterKind.Locus)}
+      value={FilterKind.Loci}
+      checked={!!findFilter(FilterKind.Loci)}
       onChange={filterChanged}
-      disabled={isDisabled(FilterKind.Locus)}
+      disabled={isDisabled(FilterKind.Loci)}
     />
     <Switch
       label={<Text fz="sm">Specimens</Text>}
       onLabel="SHOW"
       offLabel="HIDE"
       size="lg"
-      value={FilterKind.Specimen}
-      checked={!!findFilter(FilterKind.Specimen)}
+      value={FilterKind.Specimens}
+      checked={!!findFilter(FilterKind.Specimens)}
       onChange={filterChanged}
-      disabled={isDisabled(FilterKind.Specimen)}
+      disabled={isDisabled(FilterKind.Specimens)}
+    />
+    <Switch
+      label={<Text fz="sm">Other</Text>}
+      onLabel="SHOW"
+      offLabel="HIDE"
+      size="lg"
+      value={FilterKind.Other}
+      checked={!!findFilter(FilterKind.Other)}
+      onChange={filterChanged}
+      disabled={isDisabled(FilterKind.Other)}
     />
     </Stack>
   )

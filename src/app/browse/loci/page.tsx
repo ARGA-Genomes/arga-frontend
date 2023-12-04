@@ -3,7 +3,7 @@
 import { MAX_WIDTH } from "@/app/constants";
 import DataTypeHeader from "@/components/data-type-header";
 import { Filter, intoFilterItem } from "@/components/filtering/common";
-import { DataTypeFilters } from "@/components/filtering/data-type";
+import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
@@ -120,7 +120,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <DataTypeFilters filters={dataTypes} onChange={setDataTypes} />
+          <HasDataFilters filters={dataTypes} onChange={setDataTypes} />
         </Accordion.Panel>
       </Accordion.Item>
 

@@ -13,12 +13,15 @@ import {
   Stack,
   Container,
   Button,
-  SimpleGrid
+  SimpleGrid,
+  Accordion,
+  Avatar,
+  Alert
 } from "@mantine/core";
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Eye, Search as IconSearch } from "tabler-icons-react";
+import { ExclamationMark, Eye, Search as IconSearch } from "tabler-icons-react";
 import { MAX_WIDTH } from '../constants';
 import { LoadPanel } from '@/components/load-overlay';
 import { FilterBar } from '@/components/filtering/filter-bar';
@@ -27,6 +30,15 @@ import { Attribute, AttributePill, DataField } from '@/components/data-fields';
 import { HighlightStack } from '@/components/highlight-stack';
 import { usePreviousPage } from '@/components/navigation-history';
 import { useHover } from '@mantine/hooks';
+import { Filter, intoFilterItem } from '@/components/filtering/common';
+import { HigherClassificationFilters } from '@/components/filtering/higher-classification';
+import { DataTypeFilters } from '@/components/filtering/data-type';
+
+
+type Filters = {
+  classifications: Filter[],
+  dataTypes: Filter[],
+}
 
 type Classification = {
   kingdom?: string,
@@ -90,9 +102,9 @@ type QueryResults = {
 const PAGE_SIZE = 10;
 
 const SEARCH_FULLTEXT = gql`
-query FullTextSearch ($query: String, $page: Int, $perPage: Int, $dataType: String) {
-  search {
-    fullText (query: $query, page: $page, perPage: $perPage, dataType: $dataType) {
+query FullTextSearch ($query: String, $page: Int, $perPage: Int, $filters: [FilterItem]) {
+  search(filters: $filters) {
+    fullText (query: $query, page: $page, perPage: $perPage) {
       total
       records {
         ... on TaxonItem {
@@ -511,44 +523,133 @@ function Search(props: SearchProperties) {
 }
 
 
+interface FilterGroupProps {
+  label: string,
+  description: string,
+  image: string,
+}
+
+function FilterGroup({ label, description, image }: FilterGroupProps) {
+  return (
+    <Group wrap="nowrap">
+      <Avatar src={image} size="lg" />
+      <div>
+        <Text>{label}</Text>
+        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
+          {description}
+        </Text>
+      </div>
+    </Group>
+  )
+}
+
+
+interface FiltersProps {
+  filters: Filters,
+  onChange: (filters: Filters) => void,
+}
+
+function Filters({ filters, onChange }: FiltersProps) {
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
+
+  useEffect(() => {
+    onChange({
+      classifications,
+      dataTypes,
+    })
+  }, [classifications, dataTypes, onChange]);
+
+  return (
+    <Accordion defaultValue="dataType" variant='separated'>
+      <Accordion.Item value="dataType">
+        <Accordion.Control>
+          <FilterGroup
+            label="Data types"
+            description="Only show records of the specific types enabled"
+            image="/card-icons/type/whole_genomes.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <DataTypeFilters filters={dataTypes} onChange={setDataTypes} />
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item value="classification">
+        <Accordion.Control>
+          <FilterGroup
+            label="Higher classification filters"
+            description="Limit data based on taxonomy"
+            image="/card-icons/type/higher_taxon_report.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+  )
+}
+
+
 export default function SearchPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [query, setQuery] = useState(searchParams.get('q') || "")
-  const [dataType, setDataType] = useState(searchParams.get('type') || "all")
+  const [dataTypes, setDataTypes] = useState(searchParams.getAll('type'))
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const [_, setPreviousPage] = usePreviousPage();
 
-  const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
-    variables: {
-      query: searchParams.get('q'),
-      dataType: searchParams.get('type'),
-      page: Number(searchParams.get('page')),
-      perPage: PAGE_SIZE,
-    }
+  const [filters, setFilters] = useState<Filters>({
+    classifications: [],
+    dataTypes: dataTypes.map(value => ({ filter: "DATA_TYPE", action: "INCLUDE", value, editable: true })),
   });
 
-  useEffect(() => {
+
+  useEffect(refreshUrl, [query, dataTypes, page, setPreviousPage])
+
+  function refreshUrl() {
     let params = new URLSearchParams(searchParams)
     params.set('q', query);
-    params.set('type', dataType);
     params.set('page', page.toString());
+
+    params.delete('type');
+    dataTypes.forEach(dataType => params.append('type', dataType));
 
     const url = pathname + '?' + params.toString();
     setPreviousPage({ name: 'search results', url });
     router.push(url)
-  }, [query, dataType, page, setPreviousPage])
+  }
+
+  function flattenFilters(filters: Filters) {
+    const items = [
+      ...filters.classifications,
+      ...filters.dataTypes,
+    ];
+
+    return items.filter((item): item is Filter => !!item);
+  }
+
+  const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
+    variables: {
+      query,
+      page,
+      perPage: PAGE_SIZE,
+      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item),
+    }
+  });
 
   function onSearch(searchTerms: string, dataType: string) {
     setQuery(searchTerms)
-    setDataType(dataType)
+      /* setDataTypes(dataType) */
     setPage(1)
   }
 
-  if (error) {
-    return <Text c="red">{error.message}</Text>
+  function onFilter(all: Filters) {
+    setDataTypes(all.dataTypes.map(dataType => dataType.value))
+    setFilters(all);
   }
 
   return (
@@ -560,7 +661,7 @@ export default function SearchPage() {
           <LoadPanel visible={loading}>
             <Stack>
               <FilterBar
-                filters={[]}
+                filters={flattenFilters(filters)}
                 title={
                   <Group justify="left" gap={5}>
                     <Text fz="lg" fw={700}>{data?.search.fullText.total}</Text>
@@ -569,8 +670,10 @@ export default function SearchPage() {
                   </Group>
                 }
               >
+                <Filters filters={filters} onChange={onFilter} />
               </FilterBar>
 
+              { error && <Alert radius="lg" variant="light" color="red" title="Unexpected failure" icon={<ExclamationMark />}><Text c="red">{error.message}</Text></Alert> }
               <SearchResults results={data?.search.fullText.records || []} />
               <PaginationBar
                 total={data?.search.fullText.total}
