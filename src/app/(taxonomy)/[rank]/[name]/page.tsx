@@ -113,7 +113,11 @@ query TaxonSpecies($rank: TaxonRank, $canonicalName: String) {
 
     summary {
       children
+      childrenData
+      childrenGenomes
       species
+      speciesData
+      speciesGenomes
     }
 
     dataSummary {
@@ -162,7 +166,11 @@ type Taxonomy = {
   speciesGenomeSummary: DataBreakdown[]
   summary: {
     children: number,
+    childrenData: number,
+    childrenGenomes: number
     species: number,
+    speciesData: number,
+    speciesGenomes: number,
   }
 };
 
@@ -595,10 +603,6 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
     }
   })
 
-  const rankOther = taxon?.dataSummary.filter(i => i.totalGenomic > 0).map(summary => {
-    return { name: summary.name || '', value: summary.totalGenomic }
-  })
-
   const speciesGenomes = taxon?.speciesGenomeSummary.filter(i => i.genomes > 0).map(summary => {
     return { name: summary.name || '', value: summary.genomes }
   }).sort((a, b) => b.value - a.value)
@@ -607,8 +611,8 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
     return { name: summary.name || '', value: summary.totalGenomic }
   }).sort((a, b) => b.value - a.value)
 
-  const genomePercentile = taxon && speciesGenomes && (speciesGenomes?.length / taxon?.summary.species) * 100;
-  const otherPercentile = taxon && speciesOther && (speciesOther?.length / taxon?.summary.species) * 100;
+  const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
+  const otherPercentile = taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
 
   return (
     <Grid>
@@ -660,16 +664,16 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
               <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
             </DataTableRow>
             <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
-              <DataField value={rankGenomes?.length} />
+              <DataField value={Humanize.formatNumber(taxon?.summary.childrenGenomes || 0)} />
             </DataTableRow>
             <DataTableRow label="Species with genomes">
-              <DataField value={speciesGenomes?.length} />
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
             </DataTableRow>
             <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
-              <DataField value={rankOther?.length} />
+              <DataField value={Humanize.formatNumber(taxon?.summary.childrenData || 0)} />
             </DataTableRow>
             <DataTableRow label="Species with data">
-              <DataField value={speciesOther?.length} />
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
             </DataTableRow>
           </DataTable>
 
