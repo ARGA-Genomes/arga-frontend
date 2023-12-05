@@ -504,19 +504,82 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
 }
 
 
+const CLASSIFICATIONS_CHILD_MAP: Record<string, string> = {
+    DOMAIN: 'kingdom',
+    SUPERKINGDOM: 'kingdom',
+    KINGDOM: 'phylum',
+    SUBKINGDOM: 'phylum',
+    PHYLUM: 'class',
+    SUBPHYLUM: 'class',
+    SUPERCLASS: 'class',
+    CLASS: 'order',
+    SUBCLASS: 'order',
+    INFRACLASS: 'order',
+    SUPERORDER: 'order',
+    ORDER: 'family',
+    SUBORDER: 'family',
+    INFRAORDER: 'family',
+    SUPERFAMILY: 'family',
+    FAMILY: 'genus',
+    SUBFAMILY: 'genus',
+    SUPERTRIBE: 'genus',
+    TRIBE: 'genus',
+    SUBTRIBE: 'genus',
+    GENUS: 'species',
+    SUBGENUS: 'species',
+    SPECIES: 'subspecies',
+    SUBSPECIES: 'subspecies',
+
+    UNRANKED: 'unranked',
+    HIGHERTAXON: 'higher taxon',
+
+    AGGREGATEGENERA: 'aggregate genera',
+    AGGREGATESPECIES: 'aggregate species',
+    INCERTAESEDIS: 'incertae sedis',
+
+    REGNUM: 'division',
+    DIVISION: 'classis',
+    SUBDIVISION: 'classis',
+    CLASSIS: 'ordo',
+    SUBCLASSIS: 'ordo',
+    SUPERORDO: 'ordo',
+    ORDO: 'familia',
+    SUBORDO: 'familia',
+    COHORT: 'familia',
+    FAMILIA: 'genus',
+    SUBFAMILIA: 'genus',
+    SECTION: 'species',
+    SECTIO: 'species',
+    SERIES: 'species',
+    VARIETAS: 'subvarietas',
+    SUBVARIETAS: 'subvarietas',
+    FORMA: 'forma',
+
+    NOTHOVARIETAS: 'nothovarietas',
+    INFRASPECIES: 'infraspecies',
+    REGIO: 'regio',
+    SPECIALFORM: 'special form',
+}
+
 function childTaxa(rank: string) {
-  if (rank === 'KINGDOM') return 'phyla';
-  else if (rank === 'PHYLUM') return 'classes';
-  else if (rank === 'CLASS') return 'orders';
-  else if (rank === 'ORDER') return 'families';
-  else if (rank === 'FAMILY') return 'genera';
-  return ''
+  return ;
+}
+
+function pluralTaxon(rank: string) {
+  if (rank === 'division') return 'divisions'
+  else if (rank === 'kingdom') return 'kingdoms'
+  else if (rank === 'phylum') return 'phyla'
+  else if (rank === 'class') return 'classes'
+  else if (rank === 'order') return 'orders'
+  else if (rank === 'family') return 'families'
+  else if (rank === 'genus') return 'genera'
+  else return rank
 }
 
 
 function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefined }) {
-    /* const { classes } = useTableStyles(); */
-  const childTaxon = childTaxa(rank);
+  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || '';
+  const childTaxonLabel = pluralTaxon(childTaxon);
 
   const thresholds = [
     { name: "low", color: "#f47625", start: 0, end: 50 },
@@ -525,7 +588,11 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
   ]
 
   const rankGenomes = taxon?.dataSummary.filter(i => i.genomes > 0).map(summary => {
-    return { name: summary.name || '', value: summary.genomes }
+    return {
+      name: summary.name || '',
+      value: summary.genomes,
+      href: `/${childTaxon}/${summary.name}`,
+    }
   })
 
   const rankOther = taxon?.dataSummary.filter(i => i.totalGenomic > 0).map(summary => {
@@ -556,7 +623,7 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
           </Grid.Col>
           <Grid.Col span={4}>
             <Stack>
-              <Text fz="sm" fw={300}>{Humanize.capitalize(childTaxon)} with genomes</Text>
+              <Text fz="sm" fw={300}>{Humanize.capitalize(childTaxonLabel)} with genomes</Text>
               { rankGenomes && <PieChart h={200} data={rankGenomes} /> }
             </Stack>
           </Grid.Col>
@@ -586,19 +653,19 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
           <Title order={5}>Taxonomic breakdown</Title>
 
           <DataTable my={8}>
-            <DataTableRow label={`Number of ${childTaxon}`}>
+            <DataTableRow label={`Number of ${childTaxonLabel}`}>
               <DataField value={taxon?.summary.children}></DataField>
             </DataTableRow>
             <DataTableRow label="Number of species/OTUs">
               <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
             </DataTableRow>
-            <DataTableRow label={`${Humanize.capitalize(childTaxon)} with genomes`}>
+            <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
               <DataField value={rankGenomes?.length} />
             </DataTableRow>
             <DataTableRow label="Species with genomes">
               <DataField value={speciesGenomes?.length} />
             </DataTableRow>
-            <DataTableRow label={`${Humanize.capitalize(childTaxon)} with data`}>
+            <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
               <DataField value={rankOther?.length} />
             </DataTableRow>
             <DataTableRow label="Species with data">

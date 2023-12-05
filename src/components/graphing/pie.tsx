@@ -4,7 +4,8 @@ import * as d3 from "d3";
 import { useSpring, animated } from '@react-spring/web'
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
-import { Box, BoxProps } from "@mantine/core";
+import { Box, BoxProps, Tooltip } from "@mantine/core";
+import Link from "next/link";
 
 
 const MARGIN_X = 10;
@@ -43,7 +44,7 @@ function Arc(props: ArcProps & SVGProps<SVGPathElement>) {
   const arcGenerator = d3.arc();
   const slicePath = arcGenerator(props) || undefined;
 
-  return (
+  const arc = (
     <animated.g style={anim}>
       <path
         d={slicePath}
@@ -52,6 +53,14 @@ function Arc(props: ArcProps & SVGProps<SVGPathElement>) {
         {...rest}
       />
     </animated.g>
+  )
+
+  const label = data.percentage ? `${data.name} - ${data.percentage}` : data.name;
+
+  return (
+    <Tooltip.Floating label={label}>
+      { data.href ? <Link href={data.href}>{arc}</Link> : arc }
+    </Tooltip.Floating>
   )
 };
 
@@ -136,6 +145,8 @@ function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
 interface PieDatum {
   name: string,
   value: number,
+  percentage?: number,
+  href?: string,
 }
 
 interface PieChartProps {
