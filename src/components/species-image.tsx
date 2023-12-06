@@ -38,6 +38,7 @@ function Placeholder({ taxonomy, ...imageProps }: PlaceholderImageProps) {
       <Image
         src="/no-image.png"
         alt={taxonomy?.canonicalName}
+        w="auto"
         {...imageProps}
       />
     </Center>
