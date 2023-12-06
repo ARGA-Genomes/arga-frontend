@@ -50,7 +50,6 @@ export function SpeciesCard({ species }: { species: Species }) {
             photo={species.photo}
             taxonomy={species.taxonomy}
             h={260}
-            w="auto"
           />
         </Link>
       </Card.Section>

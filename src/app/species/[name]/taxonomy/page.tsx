@@ -282,7 +282,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
 function SpeciesPhoto({ photo, taxonomy }: { photo?: Photo, taxonomy?: Taxonomy }) {
   return (
     <Paper radius={100}>
-      <SpeciesImage h={500} w="auto" photo={photo} taxonomy={taxonomy} radius="lg" />
+      <SpeciesImage h={500} photo={photo} taxonomy={taxonomy} radius="lg" />
       {photo && (
         <Group px="md" py="xs" align="apart">
           <Text fz="sm" c="dimmed">
