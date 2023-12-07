@@ -80,7 +80,7 @@ export function TachoChart({ thresholds, value, ...rest }: TachoChartProps & Box
             key={idx}
             startAngle={threshold.start}
             endAngle={threshold.end}
-            innerRadius={70}
+            innerRadius={80}
             outerRadius={radius}
             fill={threshold.color}
             opacity={0.3}
@@ -89,14 +89,13 @@ export function TachoChart({ thresholds, value, ...rest }: TachoChartProps & Box
         <Arc
           startAngle={0}
           endAngle={value}
-          innerRadius={70}
+          innerRadius={80}
           outerRadius={radius}
           fill={valueColor}
         />
         <text
           fontSize={40}
           textAnchor="middle"
-          alignmentBaseline="central"
         >
           {value}%
         </text>

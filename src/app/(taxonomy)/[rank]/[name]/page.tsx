@@ -620,38 +620,42 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
   const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
   const otherPercentile = taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
 
+  function collapsable(span: number) {
+    return { base: span, xs: 12, sm: 12, md: span, lg: span, xl: span };
+  }
+
   return (
     <Grid>
       <Grid.Col span="auto">
         <Title order={5}>Data summary</Title>
         <Grid>
-          <Grid.Col span={4}>
+          <Grid.Col span={collapsable(4)}>
             <Stack>
               <Text fz="sm" fw={300}>Percentage of species with genomes</Text>
-              { taxon && <TachoChart mt={10} h={150} thresholds={thresholds} value={Math.round(genomePercentile || 0)} /> }
+              { taxon && <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(genomePercentile || 0)} /> }
             </Stack>
           </Grid.Col>
           { rank !== 'GENUS' &&
-          <Grid.Col span={3}>
+          <Grid.Col span={collapsable(3)}>
             <Stack>
               <Text fz="sm" fw={300}>{Humanize.capitalize(childTaxonLabel)} with genomes</Text>
-              { rankGenomes && <PieChart h={200} data={rankGenomes} /> }
+              { rankGenomes && <PieChart h={180} w={180} data={rankGenomes} /> }
             </Stack>
           </Grid.Col>
           }
-          <Grid.Col span={rank === 'GENUS' ? 8 : 5}>
+          <Grid.Col span={collapsable(rank === 'GENUS' ? 8 : 5)}>
             <Stack>
               <Text fz="sm" fw={300}>Species with genomes</Text>
               { speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} /> }
             </Stack>
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={collapsable(4)}>
             <Stack>
               <Text fz="sm" fw={300}>Percentage of species with any genetic data</Text>
-              { taxon && <TachoChart mt={10} h={150} thresholds={thresholds} value={Math.round(otherPercentile || 0)} /> }
+              { taxon && <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(otherPercentile || 0)} /> }
             </Stack>
           </Grid.Col>
-          <Grid.Col span={8}>
+          <Grid.Col span={collapsable(8)}>
             <Stack>
               <Text fz="sm" fw={300}>Species with any genetic data</Text>
               {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} /> }

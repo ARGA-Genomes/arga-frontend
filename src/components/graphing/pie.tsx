@@ -8,8 +8,6 @@ import { Box, BoxProps, Tooltip } from "@mantine/core";
 import Link from "next/link";
 
 
-const MARGIN_X = 10;
-const MARGIN_Y = 10;
 const INFLEXION_PADDING = 20;
 
 
@@ -158,7 +156,7 @@ export function PieChart({ data, labelled, ...rest }: PieChartProps & BoxProps) 
   const { ref, width, height } = useElementSize();
 
   const [highlighted, setHighlighted] = useState<PieDatum|undefined>();
-  const radius = Math.min(width - 2 * MARGIN_X, height - 2 * MARGIN_Y) / 2;
+  const radius = Math.min(width, height) / 2;
 
   const pieGenerator = d3.pie<PieDatum>().value(d => d.value);
   const arcs = pieGenerator(data);
