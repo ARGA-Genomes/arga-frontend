@@ -96,6 +96,7 @@ export function TachoChart({ thresholds, value, ...rest }: TachoChartProps & Box
         <text
           fontSize={40}
           textAnchor="middle"
+          y={-15}
         >
           {value}%
         </text>
