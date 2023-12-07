@@ -569,10 +569,6 @@ const CLASSIFICATIONS_CHILD_MAP: Record<string, string> = {
     SPECIALFORM: 'special form',
 }
 
-function childTaxa(rank: string) {
-  return ;
-}
-
 function pluralTaxon(rank: string) {
   if (rank === 'division') return 'divisions'
   else if (rank === 'kingdom') return 'kingdoms'
@@ -604,11 +600,21 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
   })
 
   const speciesGenomes = taxon?.speciesGenomeSummary.filter(i => i.genomes > 0).map(summary => {
-    return { name: summary.name || '', value: summary.genomes }
+    const linkName = encodeURIComponent(summary.name.replaceAll(' ', '_'));
+    return {
+      name: summary.name || '',
+      value: summary.genomes,
+      href: `/species/${linkName}`,
+    }
   }).sort((a, b) => b.value - a.value)
 
   const speciesOther = taxon?.speciesSummary.filter(i => i.totalGenomic > 0).map(summary => {
-    return { name: summary.name || '', value: summary.totalGenomic }
+    const linkName = encodeURIComponent(summary.name.replaceAll(' ', '_'));
+    return {
+      name: summary.name || '',
+      value: summary.totalGenomic,
+      href: `/species/${linkName}`,
+    }
   }).sort((a, b) => b.value - a.value)
 
   const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
@@ -622,25 +628,27 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
           <Grid.Col span={4}>
             <Stack>
               <Text fz="sm" fw={300}>Percentage of species with genomes</Text>
-              { taxon && <TachoChart h={250} thresholds={thresholds} value={Math.round(genomePercentile || 0)} /> }
+              { taxon && <TachoChart mt={10} h={150} thresholds={thresholds} value={Math.round(genomePercentile || 0)} /> }
             </Stack>
           </Grid.Col>
-          <Grid.Col span={4}>
+          { rank !== 'GENUS' &&
+          <Grid.Col span={3}>
             <Stack>
               <Text fz="sm" fw={300}>{Humanize.capitalize(childTaxonLabel)} with genomes</Text>
               { rankGenomes && <PieChart h={200} data={rankGenomes} /> }
             </Stack>
           </Grid.Col>
-          <Grid.Col span={4}>
+          }
+          <Grid.Col span={rank === 'GENUS' ? 8 : 5}>
             <Stack>
               <Text fz="sm" fw={300}>Species with genomes</Text>
-              { speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 6)} spacing={0.1} /> }
+              { speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} /> }
             </Stack>
           </Grid.Col>
           <Grid.Col span={4}>
             <Stack>
               <Text fz="sm" fw={300}>Percentage of species with any genetic data</Text>
-              { taxon && <TachoChart h={250} thresholds={thresholds} value={Math.round(otherPercentile || 0)} /> }
+              { taxon && <TachoChart mt={10} h={150} thresholds={thresholds} value={Math.round(otherPercentile || 0)} /> }
             </Stack>
           </Grid.Col>
           <Grid.Col span={8}>

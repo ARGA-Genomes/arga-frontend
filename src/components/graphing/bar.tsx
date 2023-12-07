@@ -4,8 +4,8 @@ import * as d3 from "d3";
 import { useSpring, animated } from '@react-spring/web'
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
-import { Box, BoxProps } from "@mantine/core";
-import { BoxPadding } from "tabler-icons-react";
+import { Box, BoxProps, Tooltip } from "@mantine/core";
+import Link from "next/link";
 
 
 const MARGIN = { top: 10, right: 10, bottom: 10, left: 10 };
@@ -22,9 +22,11 @@ interface Rect {
 interface BarProps {
   rect: Rect,
   data: BarDatum,
+  yAxisWidth?: number,
   highlight: boolean,
   onHighlight: (datum: BarDatum | undefined) => void,
 }
+
 
 function Bar(props: BarProps & SVGProps<SVGRectElement>)
 {
@@ -32,6 +34,7 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>)
   const {
     rect,
     data,
+    yAxisWidth,
     highlight,
     onHighlight,
     ...rest
@@ -42,10 +45,10 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>)
     to: { opacity: highlight ? 1 : 0.3 },
   });
 
-  return (
+  const bar = (
     <animated.g style={anim}>
       <rect
-        x={rect.x}
+        x={yAxisWidth}
         y={rect.y}
         width={rect.width}
         height={rect.height}
@@ -53,26 +56,24 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>)
         onMouseLeave={() => {onHighlight(undefined)}}
         {...rest}
       />
+
       <text
-        x={rect.x + 7}
+        x={0}
         y={rect.y + (rect.height / 2)}
-        textAnchor="start"
-        alignmentBaseline="central"
         fontSize={12}
+        fill="url(#truncateText)"
+        onMouseEnter={() => {onHighlight(data)}}
+        onMouseLeave={() => {onHighlight(undefined)}}
       >
         {data.name}
       </text>
-      <text
-        x={rect.width - 7}
-        y={rect.y + (rect.height / 2)}
-        textAnchor="end"
-        alignmentBaseline="central"
-        fontSize={12}
-        opacity={rect.width > 100 ? 1 : 0}
-      >
-        {data.value}
-      </text>
     </animated.g>
+  );
+
+  return (
+    <Tooltip.Floating label={`${data.name} - ${data.value}`} radius="md">
+      { data.href ? <Link href={data.href}>{bar}</Link> : bar }
+    </Tooltip.Floating>
   )
 };
 
@@ -105,17 +106,20 @@ function GridLine({ value, x1, x2, y1, y2, ...rest }: GridLineProps & any) {
 interface BarDatum {
   name: string,
   value: number,
+  href?: string,
 }
 
 interface BarChartProps {
   data: BarDatum[],
   spacing?: number,
+  labelWidth?: number,
 }
 
-export function BarChart({ data, spacing, ...rest }: BarChartProps & BoxProps) {
+export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps & BoxProps) {
   const { ref, width, height } = useElementSize();
 
-  const boundsWidth = width - MARGIN.right - MARGIN.left;
+  const yAxisWidth = labelWidth || 150;
+  const boundsWidth = width - 200;
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
   const [highlighted, setHighlighted] = useState<BarDatum|undefined>();
@@ -137,23 +141,27 @@ export function BarChart({ data, spacing, ...rest }: BarChartProps & BoxProps) {
 
   const color = d3
     .scaleOrdinal()
-    .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse())
+    .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length === 1 ? 2 : data.length).reverse())
 
   return (
     <Box ref={ref} {...rest}>
       <svg width={width} height={height}>
+        <linearGradient gradientUnits="userSpaceOnUse" x1="0" x2={yAxisWidth} y1="0" y2="0" id="truncateText">
+          <stop offset="70%" stopOpacity="1" />
+          <stop offset="100%" stopOpacity="0" />
+        </linearGradient>
+
         <g
           width={boundsWidth}
           height={boundsHeight}
-          // Commented the line below becausde the axis data at the bottom was getting cut off, feel free to uncomment it if not required
-          // transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
+          //transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
         >
         { grid.map((value, idx) => (
             <GridLine
               key={idx}
               value={value}
-              x1={xScale(value)}
-              x2={xScale(value)}
+              x1={xScale(value) + yAxisWidth}
+              x2={xScale(value) + yAxisWidth}
               y1={0}
               y2={boundsHeight}
               stroke="grey"
@@ -169,6 +177,7 @@ export function BarChart({ data, spacing, ...rest }: BarChartProps & BoxProps) {
               width: xScale(datum.value),
               height: yScale.bandwidth(),
             }}
+                yAxisWidth={yAxisWidth}
             data={datum}
             rx={5}
             opacity={0.8}

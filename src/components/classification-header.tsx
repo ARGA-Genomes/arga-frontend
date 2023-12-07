@@ -15,7 +15,7 @@ function Header({ rank, classification }: HeaderProps) {
       <Grid.Col span="auto">
         <Group gap={40}>
           <Text c="dimmed" fw={400}>{rank}</Text>
-          <Text fz={38} fw={700}>{classification}</Text>
+          <Text fz={38} fw={700} fs={rank === 'GENUS' ? 'italic' : ''}>{classification}</Text>
         </Group>
       </Grid.Col>
       <Grid.Col span="content">

@@ -14,7 +14,11 @@ query HomeStats {
   taxon(rank: DOMAIN, canonicalName: "Eukaryota") {
     summary {
       children
+      childrenData
+      childrenGenomes
       species
+      speciesData
+      speciesGenomes
     }
 
     dataSummary {
@@ -38,111 +42,100 @@ query HomeStats {
 }`;
 
 type DataBreakdown = {
-    name: string,
-    genomes: number,
-    totalGenomic: number,
+  name: string,
+  genomes: number,
+  totalGenomic: number,
 }
 
 type Taxonomy = {
-    dataSummary: DataBreakdown[]
-    speciesSummary: DataBreakdown[]
-    speciesGenomeSummary: DataBreakdown[]
-    summary: {
-        children: number,
-        species: number,
-    }
+  dataSummary: DataBreakdown[]
+  speciesSummary: DataBreakdown[]
+  speciesGenomeSummary: DataBreakdown[]
+  summary: {
+    children: number,
+    childrenData: number,
+    childrenGenomes: number
+    species: number,
+    speciesData: number,
+    speciesGenomes: number,
+  }
 };
 
 type TaxonResults = {
-    taxon: Taxonomy,
+  taxon: Taxonomy,
 }
 
 
 export default function ShowStats() {
-    const taxonResults = useQuery<TaxonResults>(GET_TAXON);
-    const taxon = taxonResults.data?.taxon
+  const taxonResults = useQuery<TaxonResults>(GET_TAXON);
+  const taxon = taxonResults.data?.taxon
 
-    const thresholds = [
-        { name: "low", color: "#f47625", start: 0, end: 50 },
-        { name: "decent", color: "#febb1e", start: 50, end: 75 },
-        { name: "great", color: "#97bc5d", start: 75, end: 100 },
-    ]
+  const thresholds = [
+    { name: "low", color: "#f47625", start: 0, end: 50 },
+    { name: "decent", color: "#febb1e", start: 50, end: 75 },
+    { name: "great", color: "#97bc5d", start: 75, end: 100 },
+  ]
 
-    const rankGenomes = taxon?.dataSummary.filter(i => i.genomes > 0).map(summary => {
-        return { name: summary.name || '', value: summary.genomes }
-    })
+  const speciesGenomes = taxon?.speciesGenomeSummary.filter(i => i.genomes > 0).map(summary => {
+    const linkName = encodeURIComponent(summary.name.replaceAll(' ', '_'));
+    return {
+      name: summary.name || '',
+      value: summary.genomes,
+      href: `/species/${linkName}`,
+    }
+  }).sort((a, b) => b.value - a.value)
 
-    const rankOther = taxon?.dataSummary.filter(i => i.totalGenomic > 0).map(summary => {
-        return { name: summary.name || '', value: summary.totalGenomic }
-    })
+  const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
 
-    const speciesGenomes = taxon?.speciesGenomeSummary.filter(i => i.genomes > 0).map(summary => {
-        return { name: summary.name || '', value: summary.genomes }
-    }).sort((a, b) => b.value - a.value)
+  return (
+    <Paper radius="20px" mr={50} style={{ position: "absolute", top: 200, right: 0, width: "650px" }}>
+      <LoadOverlay visible={taxonResults.loading} />
+      <Grid p={20}>
+        <Grid.Col span={6} mb={10}>
+          <Title order={5}>Data summary</Title>
+          <Stack>
+            <Text fz="sm" fw={300}>Percentage of species with genomes</Text>
+            {taxon && <TachoChart h={130} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />}
+          </Stack>
+        </Grid.Col>
 
-    const speciesOther = taxon?.speciesSummary.filter(i => i.totalGenomic > 0).map(summary => {
-        return { name: summary.name || '', value: summary.totalGenomic }
-    }).sort((a, b) => b.value - a.value)
+        <Grid.Col span={6} mb={10}>
+          <Title order={5}>Taxonomic breakdown</Title>
 
-    const genomePercentile = taxon && speciesGenomes && (speciesGenomes?.length / taxon?.summary.species) * 100;
+          <DataTable my={2}>
 
-    return (
-        <Paper radius="20px" mr={50} style={{ position: "absolute", top: 200, right: 0, width: "650px" }}>
-          <LoadOverlay visible={taxonResults.loading} />
-            <Grid p={20}>
-              <Grid.Col span={6}>
-                <Title order={5}>Data summary</Title>
-                <Stack>
-                  <Text fz="sm" fw={300}>Percentage of species with genomes</Text>
-                  {taxon && <TachoChart h={250} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />}
-                </Stack>
-              </Grid.Col>
+            <DataTableRow label="Number of species/OTUs">
+              <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
+            </DataTableRow>
 
-              <Grid.Col span={6}>
-                <Title order={5}>Taxonomic breakdown</Title>
+            <DataTableRow label="Species with genomes">
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
+            </DataTableRow>
 
-                <DataTable my={2}>
-                  <DataTableRow label={`Number of biota`}>
-                    <DataField value={taxon?.summary.children}></DataField>
-                  </DataTableRow>
-                  <DataTableRow label="Number of species/OTUs">
-                    <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
-                  </DataTableRow>
-                  <DataTableRow label={`Biota with genomes`}>
-                    <DataField value={rankGenomes?.length} />
-                  </DataTableRow>
-                  <DataTableRow label="Species with genomes">
-                    <DataField value={speciesGenomes?.length} />
-                  </DataTableRow>
-                  <DataTableRow label={`Biota with data`}>
-                    <DataField value={rankOther?.length} />
-                  </DataTableRow>
-                  <DataTableRow label="Species with data">
-                    <DataField value={speciesOther?.length} />
-                  </DataTableRow>
-                </DataTable>
+            <DataTableRow label="Species with data">
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
+            </DataTableRow>
+          </DataTable>
 
-                <Stack mx={10} mt={5}>
-                  <Attribute
-                    label="Species with most genomes"
-                    value={speciesGenomes && speciesGenomes[0]?.name}
-                    href={`/species/${speciesGenomes && speciesGenomes[0]?.name?.replaceAll(' ', '_')}/taxonomy`}
-                  />
-                </Stack>
-              </Grid.Col>
+          <Stack mx={10} mt={5}>
+            <Attribute
+              label="Species with most genomes"
+              value={speciesGenomes && speciesGenomes[0]?.name}
+              href={`/species/${speciesGenomes && speciesGenomes[0]?.name?.replaceAll(' ', '_')}/taxonomy`}
+            />
+          </Stack>
+        </Grid.Col>
 
-              <Grid.Col span={6}>
-                <Stack>
-                  <Text fz="sm" fw={300}>Species with genomes</Text>
-                  {speciesGenomes && <BarChart h={250} data={speciesGenomes.slice(0, 10)} spacing={0.1} />}
-                </Stack>
-              </Grid.Col>
-              <Grid.Col span={6} style={{alignSelf:"end"}}>
-                <Text fz="sm" fw={300}>Note: these statistics summarise the content indexed within ARGA.  The values relate to the species deemed relevant to Australia (either by endemicity or economic and social value), and for repositories that are indexed by ARGA.  The values may not be indicative of global values for all research.</Text>
-              </Grid.Col>
-
-            </Grid>
-        </Paper>
-
-    )
+        <Grid.Col span={12}>
+          <Stack>
+            <Text fz="sm" fw={300}>Species with genomes</Text>
+            {speciesGenomes && <BarChart h={250} data={speciesGenomes.slice(0, 10)} spacing={0.1} labelWidth={200} />}
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <Text fz="xs" fw={300}>Note: these statistics summarise the content indexed within ARGA.  The values relate to the species deemed relevant to Australia (either by endemicity or economic and social value), and for repositories that are indexed by ARGA.  The values may not be indicative of global values for all research.</Text>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  )
 }

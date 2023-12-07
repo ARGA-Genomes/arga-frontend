@@ -165,7 +165,7 @@ export function PieChart({ data, labelled, ...rest }: PieChartProps & BoxProps) 
 
   const color = d3
     .scaleOrdinal()
-    .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse())
+    .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length === 1 ? 2 : data.length).reverse())
 
   return (
     <Box ref={ref} {...rest}>

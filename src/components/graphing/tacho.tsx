@@ -69,12 +69,12 @@ interface TachoChartProps {
 export function TachoChart({ thresholds, value, ...rest }: TachoChartProps & BoxProps) {
   const { ref, width, height } = useElementSize();
 
-  const radius = Math.min(width, height) / 2;
+  const radius = Math.min(width, height);
   const valueColor = thresholdColor(value, thresholds)
 
   return (
     <Box ref={ref} {...rest}>
-      <svg width={width} height={height} viewBox={[-width/2, -height/2, width, height].join(' ')}>
+      <svg width={width} height={height} viewBox={[-width/2, -height, width, height].join(' ')}>
         { thresholds.map((threshold, idx) => (
           <Arc
             key={idx}
