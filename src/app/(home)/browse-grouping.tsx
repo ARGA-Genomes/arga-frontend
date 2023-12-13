@@ -83,8 +83,8 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={data?.overview.allSpecies}
-          category="All species"
+          total={0}
+          category="All items"
           image="/card-icons/view_all.svg"
           link="/domain/Eukaryota"
         />

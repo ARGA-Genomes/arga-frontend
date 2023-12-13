@@ -10,6 +10,8 @@ type Overview = {
   animals: number;
   plants: number;
   fungi: number;
+  protista: number,
+  allSpecies: number;
 };
 
 const GET_OVERVIEW = gql`
@@ -18,6 +20,8 @@ const GET_OVERVIEW = gql`
       animals
       plants
       fungi
+      protista
+      allSpecies
     }
   }
 `;
@@ -67,18 +71,18 @@ export default function BrowseTaxon() {
         </Carousel.Slide>
         <Carousel.Slide>
         <BrowseCard
-          total={0}
-          category="Bacteria"
-          image="/card-icons/taxon/bacteria.svg"
-          link="kingdom/Bacteria"
+          total={data?.overview.protista}
+          category="Protista"
+          image="/card-icons/taxon/protista.svg"
+          link="/superkingdom/Protista"
         />
         </Carousel.Slide>
         <Carousel.Slide>
         <BrowseCard
-          total={0}
-          category="Protista"
-          image="/card-icons/taxon/protista.svg"
-          link="/kingdom/Protista"
+          total={data?.overview.allSpecies}
+          category="All species"
+          image="/card-icons/New_Eukaryota.svg"
+          link="/domain/Eukaryota"
         />
         </Carousel.Slide>
       </Group>
