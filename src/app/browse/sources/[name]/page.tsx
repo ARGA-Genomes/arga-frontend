@@ -1,16 +1,27 @@
 'use client';
 
+import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, SimpleGrid, Text, Title, Group, Stack, Container } from "@mantine/core";
+import { Paper, SimpleGrid, Text, Title, Group, Stack, Container, Drawer, Box, Grid, SegmentedControl, Button, Accordion, Badge, Avatar } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
+import { useDisclosure } from "@mantine/hooks";
+import { SortAscending, Filter as IconFilter } from "tabler-icons-react";
+import { HasDataFilters } from "@/components/filtering/has-data";
+import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 
 
 const PAGE_SIZE = 10;
+type Filters = {
+
+  classifications: Filter[],
+  dataTypes: Filter[],
+}
+
 
 const GET_DETAILS = gql`
 query SourceDetails($name: String) {
@@ -98,8 +109,102 @@ type SpeciesQueryResults = {
 };
 
 
+interface FiltersProps {
+  filters: Filters,
+  onChange: (filters: Filters) => void,
+}
+
+function Filters({ filters, onChange }: FiltersProps) {
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
+
+  useEffect(() => {
+    onChange({
+      classifications,
+      dataTypes,
+    })
+  }, [classifications, dataTypes, onChange]);
+
+  return (
+    <Accordion defaultValue="hasData" variant='separated'>
+      <Accordion.Item value="hasData">
+        <Accordion.Control>
+          <FilterGroup
+            label="Data types"
+            description="Only show species that have specific types of data"
+            image="/card-icons/type/whole_genomes.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <HasDataFilters filters={dataTypes} onChange={setDataTypes} />
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item value="classification">
+        <Accordion.Control>
+          <FilterGroup
+            label="Higher classification filters"
+            description="Limit data based on taxonomy"
+            image="/card-icons/type/higher_taxon_report.svg"
+          />
+        </Accordion.Control>
+        <Accordion.Panel>
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+  )
+}
+
+
+interface FilterGroupProps {
+  label: string,
+  description: string,
+  image: string,
+}
+
+function FilterGroup({ label, description, image }: FilterGroupProps) {
+  return (
+    <Group wrap="nowrap">
+      <Avatar src={image} size="lg" />
+      <div>
+        <Text>{label}</Text>
+        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
+          {description}
+        </Text>
+      </div>
+    </Group>
+  )
+}
+
+
+function FilterBadge({ filter }: { filter: Filter }) {
+  return (
+    <Badge variant="outline">
+      {filter.value}
+    </Badge>
+  )
+}
+
+
+
 function Species({ source }: { source: string }) {
   const [page, setPage] = useState(1);
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const [filters, setFilters] = useState<Filters>({
+    classifications: [],
+    dataTypes: [],
+  });
+
+  const flattenFilters = (filters: Filters) => {
+    const items = [
+      ...filters.classifications,
+      ...filters.dataTypes,
+    ];
+
+    return items.filter((item): item is Filter => !!item);
+  }
 
   const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
     variables: { name: source, page, pageSize: PAGE_SIZE },
@@ -108,8 +213,49 @@ function Species({ source }: { source: string }) {
   const records = Array.from(data?.source.species.records || []);
 
   return (
-    <>
+    <Stack>
+      <Drawer
+        opened={opened}
+        onClose={close}
+        withCloseButton={false}
+        position="right"
+        size="xl"
+      >
+        <Box pt={200}>
+          <Filters filters={filters} onChange={setFilters} />
+        </Box>
+      </Drawer>
+
       <LoadOverlay visible={loading} />
+
+      <Grid gutter={50} align="baseline">
+        <Grid.Col span="content">
+          <Title order={5}>Browse species</Title>
+        </Grid.Col>
+
+        <Grid.Col span="auto">
+          <Group>
+            <Text fz="sm" fw={300}>Filters</Text>
+            { flattenFilters(filters).map(filter => <FilterBadge filter={filter} key={filter.value} />) }
+          </Group>
+        </Grid.Col>
+
+        <Grid.Col span="content">
+          <Group wrap="nowrap">
+            <SortAscending />
+            <Text>Sort by</Text>
+            <SegmentedControl radius="xl" data={[
+              { value: 'alpha', label: 'A-Z' },
+              { value: 'date', label: 'Date' },
+              { value: 'records', label: 'Records' },
+            ]}/>
+          </Group>
+        </Grid.Col>
+
+        <Grid.Col span="content">
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
+        </Grid.Col>
+      </Grid>
 
       { error ? <Title order={4}>{error.message}</Title> : null }
 
@@ -125,7 +271,7 @@ function Species({ source }: { source: string }) {
         pageSize={PAGE_SIZE}
         onChange={setPage}
       />
-    </>
+    </Stack>
   );
 }
 
@@ -174,7 +320,6 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
         <Container maw={MAX_WIDTH}>
           <Stack>
             <Paper p="xl" radius="lg" withBorder>
-              <Title order={5}>Browse species</Title>
               <Species source={source} />
             </Paper>
           </Stack>

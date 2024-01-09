@@ -84,6 +84,30 @@ export default function BrowseGrouping() {
       <Carousel.Slide>
         <BrowseCard
           total={0}
+          category="Bushfire Recovery"
+          image="/card-icons/dataset/fire_vulnerable.svg"
+          link="/browse/sources/ARGA_Bushfire_Recovery"
+        />
+      </Carousel.Slide>
+      <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Commercial"
+          image="/card-icons/dataset/commercial_and_trade_fishes.svg"
+          link="/browse/sources/ARGA_Commercial_Species"
+        />
+      </Carousel.Slide>
+      <Carousel.Slide>
+        <BrowseCard
+          total={0}
+          category="Venomous and Poisonous"
+          image="/card-icons/dataset/venomous_and_poisonous.svg"
+          link="/browse/sources/ARGA_Venomous_species"
+        />
+      </Carousel.Slide>
+      <Carousel.Slide>
+        <BrowseCard
+          total={0}
           category="All items"
           image="/card-icons/view_all.svg"
           link="/domain/Eukaryota"
