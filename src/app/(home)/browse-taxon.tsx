@@ -81,7 +81,7 @@ export default function BrowseTaxon() {
         <BrowseCard
           total={data?.overview.allSpecies}
           category="All species"
-          image="/card-icons/New_Eukaryota.svg"
+          image="/card-icons/taxon/eukaryota.svg"
           link="/domain/Eukaryota"
         />
         </Carousel.Slide>
