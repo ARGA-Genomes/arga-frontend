@@ -60,8 +60,8 @@ type DetailsQueryResults = {
 
 
 const GET_SPECIES = gql`
-query SourceSpecies($name: String, $page: Int, $pageSize: Int) {
-  source(by: { name: $name }) {
+query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
+  source(by: { name: $name }, filters: $filters) {
     species(page: $page, pageSize: $pageSize) {
       total
       records {
@@ -187,7 +187,6 @@ function FilterBadge({ filter }: { filter: Filter }) {
 }
 
 
-
 function Species({ source }: { source: string }) {
   const [page, setPage] = useState(1);
   const [opened, { open, close }] = useDisclosure(false);
@@ -207,7 +206,12 @@ function Species({ source }: { source: string }) {
   }
 
   const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
-    variables: { name: source, page, pageSize: PAGE_SIZE },
+    variables: {
+      page,
+      pageSize: PAGE_SIZE,
+      name: source,
+      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item)
+    },
   });
 
   const records = Array.from(data?.source.species.records || []);
