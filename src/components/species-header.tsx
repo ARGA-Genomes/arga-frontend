@@ -6,7 +6,7 @@ import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/typ
 import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
-import { CircleCheck } from "tabler-icons-react";
+import { CircleCheck, CircleX } from "tabler-icons-react";
 
 
 const GET_SPECIES = gql`
@@ -30,6 +30,9 @@ query SpeciesWithConservation($canonicalName: String) {
       medicinalUse
       sourceUrl
     }
+    referenceGenome {
+      recordId
+    }
   }
 }`;
 
@@ -38,6 +41,7 @@ type QueryResults = {
     taxonomy: Taxonomy,
     conservation: Conservation[],
     indigenousEcologicalKnowledge: IndigenousEcologicalKnowledge[],
+    referenceGenome?: { recordId: string }
   },
 };
 
@@ -46,9 +50,10 @@ interface HeaderProps {
   taxonomy: Taxonomy,
   conservation?: Conservation[],
   traits?: IndigenousEcologicalKnowledge[],
+  referenceGenome?: { recordId: string },
 }
 
-function Header({ taxonomy, conservation, traits }: HeaderProps) {
+function Header({ taxonomy, conservation, traits, referenceGenome }: HeaderProps) {
   const theme = useMantineTheme();
 
   return (
@@ -65,7 +70,10 @@ function Header({ taxonomy, conservation, traits }: HeaderProps) {
       <Grid.Col span="content" ml={80}>
         <Group h="100%" pl={30}>
           <Text fw={700} c="dimmed">Reference Genome</Text>
-          <CircleCheck size={35} color={theme.colors.moss[5]} />
+          { referenceGenome
+            ? <CircleCheck size={35} color={theme.colors.moss[5]} />
+            : <CircleX size={35} color={theme.colors.red[5]} />
+          }
         </Group>
       </Grid.Col>
     </Grid>
@@ -87,12 +95,20 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
   const taxonomy = data?.species.taxonomy;
   const conservation = data?.species.conservation;
   const traits = data?.species.indigenousEcologicalKnowledge;
+  const referenceGenome = data?.species.referenceGenome;
 
   return (
     <Paper py={20} pos="relative">
       <LoadOverlay visible={loading} />
       <Container maw={MAX_WIDTH}>
-      { taxonomy ? <Header taxonomy={taxonomy} conservation={conservation} traits={traits} /> : null }
+      { taxonomy
+        ? <Header
+            taxonomy={taxonomy}
+            conservation={conservation}
+            traits={traits}
+            referenceGenome={referenceGenome}
+          />
+        : null }
       </Container>
     </Paper>
   )
