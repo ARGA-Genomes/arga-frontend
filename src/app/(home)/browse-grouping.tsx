@@ -6,19 +6,21 @@ import {Carousel} from "@mantine/carousel";
 import { Group } from "@mantine/core";
 
 type Overview = {
-  agriculturalAndAquacultureAndCommercial: number;
-  bioSecurityAndPest: number;
-  inAustralia: number;
-  marine: number;
-  terrestrial: number;
-  threatenedSpecies: number;
-  allSpecies: number
+  allSpecies: number,
+  sources: [{
+    name: string,
+    total: number,
+  }],
 };
 
 const GET_OVERVIEW = gql`
   query {
     overview {
       allSpecies
+      sources {
+        name
+        total
+      }
     }
   }
 `;
@@ -30,6 +32,11 @@ type OverviewResults = {
 export default function BrowseGrouping() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
   if (error) return <p>Error : {error.message}</p>;
+
+  let sources: Record<string, number> = {};
+  for (const source of data?.overview.sources || []) {
+    sources[source.name] = source.total
+  }
 
   return (
     <Carousel
@@ -43,7 +50,7 @@ export default function BrowseGrouping() {
       <Group>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["Agriculture"] || 0}
           category="Agriculture"
           image="/card-icons/dataset/agriculture.svg"
           link="#"
@@ -51,7 +58,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["Agriculture"] || 0}
           category="Aquaculture"
           image="/card-icons/dataset/aquaculture.svg"
           link="#"
@@ -59,7 +66,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["Agriculture"] || 0}
           category="Terrestrial"
           image="/card-icons/dataset/terrestrial.svg"
           link="#"
@@ -67,7 +74,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["Agriculture"] || 0}
           category="Marine"
           image="/card-icons/dataset/marine.svg"
           link="#"
@@ -75,7 +82,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["ARGA Threatened Species"] || 0}
           category="Threatened"
           image="/card-icons/dataset/threatened_top_110_species.svg"
           link="/browse/sources/ARGA_Threatened_Species"
@@ -83,7 +90,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["ARGA Bushfire Recovery"] || 0}
           category="Bushfire Recovery"
           image="/card-icons/dataset/fire_vulnerable.svg"
           link="/browse/sources/ARGA_Bushfire_Recovery"
@@ -91,7 +98,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["ARGA Commercial Species"] || 0}
           category="Commercial"
           image="/card-icons/dataset/commercial_and_trade_fishes.svg"
           link="/browse/sources/ARGA_Commercial_Species"
@@ -99,7 +106,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={0}
+          total={data && sources["ARGA Venomous species"] || 0}
           category="Venomous and Poisonous"
           image="/card-icons/dataset/venomous_and_poisonous.svg"
           link="/browse/sources/ARGA_Venomous_species"
