@@ -303,7 +303,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
   const [_, setPreviousPage] = usePreviousPage();
 
   useEffect(() => {
-    setPreviousPage({ name: `browsing ${source}`, url: '/browse/sources/${params.name}' })
+    setPreviousPage({ name: `browsing ${source}`, url: `/browse/sources/${params.name}` })
   }, [setPreviousPage])
 
   return (
