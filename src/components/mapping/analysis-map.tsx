@@ -161,7 +161,7 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
         initialViewState={{
           latitude: DEFAULT_POSITION[0],
           longitude: DEFAULT_POSITION[1],
-          zoom: initialZoom || 3.7,
+          zoom: initialZoom || 3.1,
         }}
         layers={[
           bioRegionLayers(bioRegions),
@@ -172,6 +172,7 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
         onClick={onClick}
         onViewStateChange={closePopup}
         controller={true}
+        style={style}
       >
         <Map
           key="map"
@@ -181,7 +182,7 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
           initialViewState={{
             latitude: DEFAULT_POSITION[0],
             longitude: DEFAULT_POSITION[1],
-            zoom: 3.7,
+            zoom: 3.1,
           }}
         >
           {children}

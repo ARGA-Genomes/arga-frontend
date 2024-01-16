@@ -7,7 +7,7 @@ import { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { PaginationBar } from "@/components/pagination";
 import { AnalysisMap } from "@/components/mapping";
-import { RecordItem } from "@/components/record-list";
+import { RecordItem, RecordList } from "@/components/record-list";
 import { usePathname } from "next/navigation";
 import { Eye } from "tabler-icons-react";
 import Link from "next/link";
@@ -150,16 +150,17 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
   )
 }
 
-function RecordList({ records }: { records: WholeGenome[] }) {
+function WholeGenomeList({ records }: { records: WholeGenome[] }) {
   const path = usePathname();
 
   return (
-    <Stack>
+    <RecordList>
       { records.map((record, idx) => (
         <RecordItem key={idx} href={`${path}/${encodeURIComponent(record.accession || '')}`}>
           <RecordItemContent record={record} />
-        </RecordItem>)) }
-    </Stack>
+        </RecordItem>)
+      )}
+    </RecordList>
   )
 }
 
@@ -322,12 +323,12 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
 
           <Grid>
             <Grid.Col span={8}>
-              <Box pos="relative">
+              <Box pos="relative" mih={568}>
                 <LoadOverlay visible={loading} />
-                { data?.species.wholeGenomes ? <RecordList records={data?.species.wholeGenomes.records} /> : null }
+                { data?.species.wholeGenomes && <WholeGenomeList records={data?.species.wholeGenomes.records} /> }
               </Box>
             </Grid.Col>
-            <Grid.Col span={4}  mih={568}>
+            <Grid.Col span={4} mih={568}>
               <WholeGenomeMap records={data?.species.wholeGenomes.records} />
             </Grid.Col>
             <Grid.Col span={8}>

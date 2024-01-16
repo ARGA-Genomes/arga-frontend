@@ -6,7 +6,7 @@ import { Box, Grid, Group, Paper, Stack, Text, Title} from "@mantine/core";
 import { useState } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { LoadOverlay } from "@/components/load-overlay";
-import { RecordItem } from "@/components/record-list";
+import { RecordItem, RecordList } from "@/components/record-list";
 import { Attribute } from "@/components/highlight-stack";
 import { AnalysisMap, ArgaMap } from "@/components/mapping";
 import { usePathname } from "next/navigation";
@@ -186,16 +186,16 @@ function RecordItemContent({ record }: { record: Specimen }) {
   )
 }
 
-function RecordList({ records }: { records: Specimen[] }) {
+function SpecimenList({ records }: { records: Specimen[] }) {
   const path = usePathname();
 
   return (
-    <Stack>
+    <RecordList>
       { records.map(record => (
         <RecordItem key={record.id} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
-    </Stack>
+    </RecordList>
   )
 }
 
@@ -232,12 +232,12 @@ export default function Specimens({ params }: { params: { name: string } }) {
 
         <Grid py={20}>
           <Grid.Col span={8}>
-            <Box pos="relative">
+            <Box pos="relative" mih={568}>
               <LoadOverlay visible={loading} />
-              { data?.species.specimens ? <RecordList records={data.species.specimens.records} /> : null }
+              { data?.species.specimens ? <SpecimenList records={data.species.specimens.records} /> : null }
             </Box>
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={4} mih={568}>
             <SpecimenMap records={data?.species.specimens.records} />
           </Grid.Col>
 

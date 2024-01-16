@@ -7,7 +7,7 @@ import { AnalysisMap, ArgaMap } from "@/components/mapping";
 import React, { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { Attribute } from "@/components/highlight-stack";
-import { RecordItem } from "@/components/record-list";
+import { RecordItem, RecordList } from "@/components/record-list";
 import { PaginationBar } from "@/components/pagination";
 import { usePathname } from "next/navigation";
 import { Marker } from "@/components/mapping/analysis-map";
@@ -121,16 +121,16 @@ function RecordItemContent({ record }: { record: GenomicComponent }) {
   )
 }
 
-function RecordList({ records }: { records: GenomicComponent[] }) {
+function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
   const path = usePathname();
 
   return (
-    <Stack>
+    <RecordList>
       { records.map(record => (
         <RecordItem key={record.sequenceId} href={`${path}/${encodeURIComponent(record.recordId)}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
-    </Stack>
+    </RecordList>
   )
 }
 
@@ -157,12 +157,12 @@ export default function GenomicComponents({ params }: { params: { name: string }
 
       <Grid py={20}>
         <Grid.Col span={8}>
-          <Box pos="relative">
+          <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
-            { data?.species.genomicComponents ? <RecordList records={data.species.genomicComponents.records} /> : null }
+            {data?.species.genomicComponents ? <GenomicComponentList records={data.species.genomicComponents.records} /> : null }
           </Box>
         </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col span={4} mih={568}>
           <MarkerMap records={data?.species.genomicComponents.records} />
         </Grid.Col>
 

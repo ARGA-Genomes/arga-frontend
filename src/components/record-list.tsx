@@ -1,4 +1,6 @@
-import { Box, Button, Grid, Group, Paper, Stack } from "@mantine/core";
+import classes from './record-list.module.css';
+
+import { Button, Grid, Paper, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import Link from "next/link";
 import { Eye } from "tabler-icons-react";
@@ -35,5 +37,14 @@ export function RecordItem({ href, children }: RecordItemProps) {
         </Grid.Col>
       </Grid>
     </Paper>
+  )
+}
+
+
+export function RecordList({ children }: { children: React.ReactNode[] }) {
+  return (
+    <Stack>
+      { children.length > 0 ? children : <Text className={classes.emptyList}>no data</Text> }
+    </Stack>
   )
 }

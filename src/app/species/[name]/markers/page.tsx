@@ -7,7 +7,7 @@ import { AnalysisMap, ArgaMap } from "@/components/mapping";
 import React, { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { Attribute } from "@/components/highlight-stack";
-import { RecordItem } from "@/components/record-list";
+import { RecordItem, RecordList } from "@/components/record-list";
 import { PaginationBar } from "@/components/pagination";
 import { usePathname } from "next/navigation";
 import { Marker } from "@/components/mapping/analysis-map";
@@ -120,16 +120,16 @@ function RecordItemContent({ record }: { record: Loci }) {
   )
 }
 
-function RecordList({ records }: { records: Loci[] }) {
+function LociList({ records }: { records: Loci[] }) {
   const path = usePathname();
 
   return (
-    <Stack>
+    <RecordList>
       { records.map(record => (
         <RecordItem key={record.sequenceId} href={`${path}/${record.recordId}`}>
           <RecordItemContent record={record} />
         </RecordItem>)) }
-    </Stack>
+    </RecordList>
   )
 }
 
@@ -156,12 +156,12 @@ export default function Markers({ params }: { params: { name: string } }) {
 
       <Grid py={20}>
         <Grid.Col span={8}>
-          <Box pos="relative">
+          <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
-            { data?.species.markers ? <RecordList records={data.species.markers.records} /> : null }
+            { data?.species.markers ? <LociList records={data.species.markers.records} /> : null }
           </Box>
         </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col span={4} mih={568}>
           <MarkerMap records={data?.species.markers.records} />
         </Grid.Col>
 
