@@ -50,47 +50,7 @@ export default function BrowseGrouping() {
       <Group>
       <Carousel.Slide>
         <BrowseCard
-          total={data && sources["Agriculture"] || 0}
-          category="Agriculture"
-          image="/card-icons/dataset/agriculture.svg"
-          link="#"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data && sources["Agriculture"] || 0}
-          category="Aquaculture"
-          image="/card-icons/dataset/aquaculture.svg"
-          link="#"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data && sources["Agriculture"] || 0}
-          category="Terrestrial"
-          image="/card-icons/dataset/terrestrial.svg"
-          link="#"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data && sources["Agriculture"] || 0}
-          category="Marine"
-          image="/card-icons/dataset/marine.svg"
-          link="#"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data && sources["ARGA Threatened Species"] || 0}
-          category="Threatened"
-          image="/card-icons/dataset/threatened_top_110_species.svg"
-          link="/browse/sources/ARGA_Threatened_Species"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data && sources["ARGA Bushfire Recovery"] || 0}
+          total={data && (sources["ARGA Bushfire Recovery"] || 0)}
           category="Bushfire Recovery"
           image="/card-icons/dataset/fire_vulnerable.svg"
           link="/browse/sources/ARGA_Bushfire_Recovery"
@@ -98,7 +58,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={data && sources["ARGA Commercial Species"] || 0}
+          total={data && (sources["ARGA Commercial Species"] || 0)}
           category="Commercial"
           image="/card-icons/dataset/commercial_and_trade_fishes.svg"
           link="/browse/sources/ARGA_Commercial_Species"
@@ -106,18 +66,10 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={data && sources["ARGA Venomous species"] || 0}
+          total={data && (sources["ARGA Venomous species"] || 0)}
           category="Venomous and Poisonous"
           image="/card-icons/dataset/venomous_and_poisonous.svg"
           link="/browse/sources/ARGA_Venomous_species"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={0}
-          category="All items"
-          image="/card-icons/view_all.svg"
-          link="/domain/Eukaryota"
         />
       </Carousel.Slide>
       </Group>
