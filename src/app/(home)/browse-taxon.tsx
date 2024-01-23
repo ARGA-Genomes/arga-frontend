@@ -58,7 +58,7 @@ export default function BrowseTaxon() {
           total={data?.overview.plants}
           category="Plants"
           image="/card-icons/taxon/plants.svg"
-          link="/kingdom/Plantae"
+          link="/regnum/Plantae"
         />
       </Carousel.Slide> 
       <Carousel.Slide>
