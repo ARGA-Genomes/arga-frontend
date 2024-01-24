@@ -11,6 +11,7 @@ import {
   SimpleGrid,
   Stack,
   Text,
+  Image,
 } from "@mantine/core";
 import { Photo, Taxonomy, IndigenousEcologicalKnowledge } from "@/app/type";
 
