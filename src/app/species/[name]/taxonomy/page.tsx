@@ -279,6 +279,43 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   );
 }
 
+
+interface Badge {
+  icon: string,
+  url: string,
+}
+
+const LICENSE_ICON: Record<string, Badge> = {
+  "cc-by-nc-nd": { icon: "/badges/cc-by-nc-nd.svg", url: "http://creativecommons.org/licenses/by-nc-nd/4.0"},
+  "cc-by-nc-sa": { icon: "/badges/cc-by-nc-sa.svg", url: "http://creativecommons.org/licenses/by-nc-sa/4.0"},
+  "cc-by-nc": { icon: "/badges/cc-by-nc.svg", url: "http://creativecommons.org/licenses/by-nc/4.0"},
+  "cc-by-nd": { icon: "/badges/cc-by-nd.svg", url: "http://creativecommons.org/licenses/by-nd/4.0"},
+  "cc-by-sa": { icon: "/badges/cc-by-sa.svg", url: "http://creativecommons.org/licenses/by-sa/4.0"},
+  "cc-by": { icon: "/badges/cc-by.svg", url: "http://creativecommons.org/licenses/by/4.0"},
+  "cc0": { icon: "/badges/cc-zero.svg", url: "http://creativecommons.org/publicdomain/zero/1.0"},
+
+  "http://creativecommons.org/licenses/by-nc-sa/4.0/": { icon: "/badges/cc-by-nc-sa.svg", url: "http://creativecommons.org/licenses/by-nc-sa/4.0/"},
+  "http://creativecommons.org/licenses/by-nc/4.0/": { icon: "/badges/cc-by-nc.svg", url: "http://creativecommons.org/licenses/by-nc/4.0/"},
+  "http://creativecommons.org/licenses/by/4.0/": { icon: "/badges/cc-by.svg", url: "http://creativecommons.org/licenses/by/4.0/"},
+  "http://creativecommons.org/licenses/by-nc-nd/4.0/": { icon: "/badges/cc-by-nc-nd.svg", url: "http://creativecommons.org/licenses/by-nc-nd/4.0/"},
+
+  "public domain mark": { icon: "/badges/publicdomain.svg", url: "http://creativecommons.org/publicdomain/mark/1.0"},
+  "attribution-noncommercial 4.0 international": { icon: "/badges/cc-by-nc.svg", url: "https://creativecommons.org/licenses/by-nc/4.0/"},
+  "attribution 4.0 international": { icon: "/badges/cc-by.svg", url: "https://creativecommons.org/licenses/by/4.0/"},
+}
+
+function LicenseIcon({ license }: { license: string }) {
+  const badge = LICENSE_ICON[license.toLowerCase()];
+  return badge
+       ? (
+         <Link href={badge.url} target="_blank">
+           <Image src={badge.icon} h={15} w={80}></Image>
+         </Link>
+       )
+       : <Text fz="sm" c="dimmed">{license}</Text>
+}
+
+
 function SpeciesPhoto({ photo, taxonomy }: { photo?: Photo, taxonomy?: Taxonomy }) {
   return (
     <Paper radius={100}>
@@ -286,13 +323,14 @@ function SpeciesPhoto({ photo, taxonomy }: { photo?: Photo, taxonomy?: Taxonomy 
       {photo && (
         <Group px="md" py="xs" align="apart">
           <Text fz="sm" c="dimmed">
-            &copy; {photo?.rightsHolder}
+            &copy; {photo.rightsHolder}
           </Text>
           <Text fz="sm" c="dimmed">
-            <Link href={photo?.referenceUrl || "#"} target="_blank">
-              {photo?.publisher}
+            <Link href={photo.referenceUrl || "#"} target="_blank">
+              {photo.publisher}
             </Link>
           </Text>
+          { photo.license && <LicenseIcon license={photo.license}/> }
         </Group>
       )}
     </Paper>
