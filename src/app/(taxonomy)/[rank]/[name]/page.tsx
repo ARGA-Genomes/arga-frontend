@@ -99,7 +99,7 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
 
 
 const GET_TAXON = gql`
-query TaxonDetails($rank: TaxonRank, $canonicalName: String) {
+query TaxonDetails($rank: TaxonRank, $canonicalName: String, $descendantRank: TaxonRank) {
   taxon(rank: $rank, canonicalName: $canonicalName) {
     scientificName
     canonicalName
@@ -117,10 +117,14 @@ query TaxonDetails($rank: TaxonRank, $canonicalName: String) {
       depth
     }
 
+    descendants(rank: $descendantRank) {
+      canonicalName
+      species
+      speciesData
+      speciesGenomes
+    }
+
     summary {
-      children
-      childrenData
-      childrenGenomes
       species
       speciesData
       speciesGenomes
@@ -171,13 +175,16 @@ type Taxonomy = {
   speciesSummary: DataBreakdown[]
   speciesGenomeSummary: DataBreakdown[]
   summary: {
-    children: number,
-    childrenData: number,
-    childrenGenomes: number
     species: number,
     speciesData: number,
     speciesGenomes: number,
   }
+  descendants: {
+    canonicalName: string,
+    species: number,
+    speciesData: number,
+    speciesGenomes: number,
+  }[]
 };
 
 type DataSummary = {
@@ -597,11 +604,11 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
     { name: "great", color: "#97bc5d", start: 75, end: 100 },
   ]
 
-  const rankGenomes = taxon?.dataSummary.filter(i => i.genomes > 0).map(summary => {
+  const rankGenomes = taxon?.descendants.filter(d => d.speciesGenomes > 0).map(summary => {
     return {
-      name: summary.name || '',
-      value: summary.genomes,
-      href: `/${childTaxon}/${summary.name}`,
+      name: summary.canonicalName || '',
+      value: summary.speciesGenomes,
+      href: `/${childTaxon}/${summary.canonicalName}`,
     }
   })
 
@@ -676,19 +683,19 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
 
           <DataTable my={8}>
             <DataTableRow label={`Number of ${childTaxonLabel}`}>
-              <DataField value={taxon?.summary.children}></DataField>
+              <DataField value={taxon?.descendants.length}></DataField>
             </DataTableRow>
             <DataTableRow label="Number of species/OTUs">
               <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
             </DataTableRow>
             <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
-              <DataField value={Humanize.formatNumber(taxon?.summary.childrenGenomes || 0)} />
+              <DataField value={Humanize.formatNumber(taxon?.descendants.filter(d => d.speciesGenomes > 0).length || 0)} />
             </DataTableRow>
             <DataTableRow label="Species with genomes">
               <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
             </DataTableRow>
             <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
-              <DataField value={Humanize.formatNumber(taxon?.summary.childrenData || 0)} />
+              <DataField value={Humanize.formatNumber(taxon?.descendants.filter(d => d.speciesData > 0).length || 0)} />
             </DataTableRow>
             <DataTableRow label="Species with data">
               <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
@@ -716,6 +723,7 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
 
 export default function ClassificationPage({ params }: { params: { rank: string, name: string } }) {
   const rank = params.rank.toUpperCase();
+  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank].toUpperCase() || '';
 
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
@@ -723,7 +731,8 @@ export default function ClassificationPage({ params }: { params: { rank: string,
   const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
     variables: {
       rank,
-      canonicalName: params.name
+      canonicalName: params.name,
+      descendantRank: childTaxon,
     },
   });
   useEffect(() => {
