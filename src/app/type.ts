@@ -1,7 +1,8 @@
 type Taxonomy = {
     canonicalName: string,
-    authority: string,
+    authorship: string,
     status: string,
+    rank: string,
     kingdom?: string,
     phylum?: string,
     class?: string,

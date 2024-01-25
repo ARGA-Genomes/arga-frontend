@@ -1,0 +1,10 @@
+.imageAttribution {
+    font-weight: 600;
+    color: white;
+    background: rgba(25, 61, 77, 0.6);
+    border-radius: 0 var(--mantine-radius-lg) 0 var(--mantine-radius-lg);
+}
+
+.imageAttribution a {
+    color: var(--mantine-color-wheat-5);
+}

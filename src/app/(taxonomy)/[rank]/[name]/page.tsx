@@ -72,9 +72,13 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
       records {
         taxonomy {
           canonicalName
-          kingdom
         }
-        photo { url }
+        photo {
+          url
+          publisher
+          license
+          rightsHolder
+        }
         dataSummary {
           genomes
           loci
@@ -95,14 +99,16 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
 
 
 const GET_TAXON = gql`
-query TaxonSpecies($rank: TaxonRank, $canonicalName: String) {
+query TaxonDetails($rank: TaxonRank, $canonicalName: String) {
   taxon(rank: $rank, canonicalName: $canonicalName) {
     scientificName
-    scientificNameAuthorship
     canonicalName
+    authorship
     status
     nomenclaturalCode
     citation
+    source
+    sourceUrl
 
     hierarchy {
       scientificName
@@ -184,9 +190,8 @@ type DataSummary = {
 type Species = {
   taxonomy: {
     canonicalName: string,
-    kingdom?: string,
-  },
-  photo: { url: string },
+  }[],
+  photo?: { url: string },
   dataSummary: DataSummary,
 }
 
@@ -401,7 +406,7 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
 
 function FilterBadge({ filter }: { filter: Filter }) {
   return (
-    <Badge variant="outline">
+    <Badge variant="outline" color="shellfish.7">
       {filter.value}
     </Badge>
   )
@@ -466,7 +471,10 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
 
       <Grid gutter={50} align="baseline">
         <Grid.Col span="content">
-          <Title order={5}>Browse species</Title>
+          <Group>
+            <Title order={5}>Browse species</Title>
+            <Text fz="sm" fw={300}>({data?.taxa.species.total} results)</Text>
+          </Group>
         </Grid.Col>
 
         <Grid.Col span="auto">
@@ -489,13 +497,13 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open} color="shellfish.7">Filter</Button>
         </Grid.Col>
       </Grid>
 
       <SimpleGrid cols={5} pt={40}>
         {records?.map(record => (
-          <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
+          <SpeciesCard key={record.taxonomy[0]?.canonicalName} species={record} />
         ))}
       </SimpleGrid>
 
@@ -506,8 +514,6 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
         onChange={setPage}
       />
     </Stack>
-
-
   );
 }
 

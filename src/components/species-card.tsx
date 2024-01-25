@@ -1,17 +1,14 @@
 import Link from "next/link";
-import { Card, Text, Group, Stack, SimpleGrid } from "@mantine/core";
+import { Card, Text, Group, Stack, SimpleGrid, Box } from "@mantine/core";
 import { CircleCheck, CircleX } from "tabler-icons-react";
 import { SpeciesImage } from "./species-image";
+import { Photo } from "@/app/type";
 
 
 export interface Taxonomy {
   canonicalName: string,
   kingdom?: string,
 };
-
-export interface Photo {
-  url: string,
-}
 
 export interface DataSummary {
   genomes: number,
@@ -22,7 +19,7 @@ export interface DataSummary {
 
 export interface Species {
   taxonomy: Taxonomy,
-  photo: Photo,
+  photo?: Photo,
   dataSummary: DataSummary,
 }
 
@@ -40,23 +37,21 @@ function DataItem({ name, count }: { name: string; count: number }) {
 
 
 export function SpeciesCard({ species }: { species: Species }) {
-  const itemLinkName = species.taxonomy.canonicalName?.replaceAll(" ", "_");
+  const itemLinkName = species.taxonomy?.canonicalName?.replaceAll(" ", "_");
 
   return (
     <Card shadow="sm" radius="lg" withBorder miw={313}>
       <Card.Section bg="#a6c0cf">
         <Link href={`/species/${itemLinkName}`}>
-          <SpeciesImage
-            photo={species.photo}
-            taxonomy={species.taxonomy}
-            h={260}
-          />
+          <Box h={260}>
+            <SpeciesImage photo={species.photo} />
+          </Box>
         </Link>
       </Card.Section>
 
       <Stack gap={5} mt="sm">
         <Link href={`/species/${itemLinkName}`}>
-          <Text fz="sm" fw={700} fs="italic">{species.taxonomy.canonicalName}</Text>
+          <Text fz="sm" fw={700} fs="italic">{species.taxonomy?.canonicalName}</Text>
         </Link>
         <SimpleGrid cols={2}>
           <DataItem name="Genome" count={species.dataSummary.genomes} />

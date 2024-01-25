@@ -25,8 +25,8 @@ import Link from "next/link";
 
 
 const GET_TAXON = gql`
-query TaxonSpecies($canonicalName: String) {
-  taxon(rank: GENUS, canonicalName: $canonicalName) {
+query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
+  taxon(rank: $rank, canonicalName: $canonicalName) {
     hierarchy {
       canonicalName
       rank
@@ -53,14 +53,9 @@ const GET_SUMMARY = gql`
     species(canonicalName: $canonicalName) {
       taxonomy {
         canonicalName
-        authority
+        authorship
         status
-        kingdom
-        phylum
-        class
-        order
-        family
-        genus
+        rank
         synonyms {
           scientificName
         }
@@ -84,7 +79,7 @@ const GET_SUMMARY = gql`
 `;
 
 type Species = {
-    taxonomy: Taxonomy,
+    taxonomy: Taxonomy[],
     photos: Photo[],
     indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[],
 };
@@ -204,7 +199,6 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
     <Paper radius={16} p="md" withBorder>
       <Group mb={10}>
       <Text fw={700}  size="lg">Taxonomy</Text>      
-      {showSource(taxonomy.kingdom) && <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>}
       </Group>
 
       <SimpleGrid cols={2}>
@@ -212,7 +206,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
           <DataTableRow label="Scientific name">
             <Group gap={10}>
               <Text fw={600} fz="sm" fs="italic">{taxonomy.canonicalName}</Text>
-              <Text fw={600} fz="sm">{taxonomy.authority}</Text>
+              <Text fw={600} fz="sm">{taxonomy.authorship}</Text>
             </Group>
           </DataTableRow>
           <DataTableRow label="Status">
@@ -251,7 +245,10 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
 
 function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
-    variables: { canonicalName: taxonomy.genus },
+    variables: {
+      rank: taxonomy.rank,
+      canonicalName: taxonomy.canonicalName
+    },
   });
 
   const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
@@ -262,7 +259,6 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
 
       <Group>
         <Text fw={700} size="lg">Higher classification</Text>
-        {showSource(taxonomy.kingdom) && <Text c="attribute.5">Source: <Link href={`https://biodiversity.org.au/afd/taxa/${taxonomy.canonicalName}`}>AFD</Link></Text>}
       </Group>
 
       <Group>
@@ -317,23 +313,10 @@ function LicenseIcon({ license }: { license: string }) {
 }
 
 
-function SpeciesPhoto({ photo, taxonomy }: { photo?: Photo, taxonomy?: Taxonomy }) {
+function SpeciesPhoto({ photo }: { photo?: Photo }) {
   return (
-    <Paper radius={100}>
-      <SpeciesImage h={500} photo={photo} taxonomy={taxonomy} radius="lg" />
-      {photo && (
-        <Group px="md" py="xs" align="apart">
-          <Text fz="sm" c="dimmed">
-            &copy; {photo.rightsHolder}
-          </Text>
-          <Text fz="sm" c="dimmed">
-            <Link href={photo.referenceUrl || "#"} target="_blank">
-              {photo.publisher}
-            </Link>
-          </Text>
-          { photo.license && <LicenseIcon license={photo.license}/> }
-        </Group>
-      )}
+    <Paper h={500} radius="lg" style={{ overflow: 'hidden' }}>
+      <SpeciesImage photo={photo} />
     </Paper>
   );
 }
@@ -350,19 +333,21 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
     return <Text>Error : {error.message}</Text>;
   }
 
+  const taxonomy = data?.species.taxonomy[0];
+
   return (
     <>
       <Grid>
         <Grid.Col span={8}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
-            {data && <Details taxonomy={data.species.taxonomy} /> }
-            {data && <Classification taxonomy={data.species.taxonomy} /> }
+            {taxonomy && <Details taxonomy={taxonomy} /> }
+            {taxonomy && <Classification taxonomy={taxonomy} /> }
             <ExternalLinks canonicalName={canonicalName} species={data?.species} />
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
-          <SpeciesPhoto photo={data?.species.photos[0]} taxonomy={data?.species.taxonomy} />
+          <SpeciesPhoto photo={data?.species.photos[0]} taxonomy={taxonomy} />
         </Grid.Col>
       </Grid>
     </>

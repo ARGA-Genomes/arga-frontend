@@ -35,9 +35,6 @@ const GET_DISTRIBUTION = gql`
           dataset { name }
         }
       }
-      taxonomy {
-        kingdom
-      }
       specimens(page: 1, pageSize: 1000) {
         total
         records {
@@ -101,7 +98,6 @@ type QueryResults = {
       total: number,
       records: Specimen[],
     },
-    taxonomy: Taxonomy,
   }
 }
 
@@ -134,12 +130,6 @@ interface MapFilterOptionProps extends SwitchProps {
   label: string,
   count: number,
   total: number,
-}
-function showSource(kingdom:  String | undefined ) {
-  if  (kingdom && (kingdom.toLowerCase() ==="animalia" || kingdom.toLowerCase() ==="protista")) {
-    return true;
-  }
-  return false;
 }
 
 function MapFilterOption({ label, count, total, ...switchProps }: MapFilterOptionProps) {
@@ -266,6 +256,10 @@ export default function DistributionPage({ params }: { params: { name: string } 
     return <Text>Error : {error.message}</Text>;
   }
 
+  const hasRegions = (regions: Regions) => {
+    return regions.ibra.length > 0 || regions.imcra.length > 0
+  }
+
   return (
     <Paper p="lg" radius="lg" withBorder>
       <Stack gap="lg">
@@ -285,7 +279,7 @@ export default function DistributionPage({ params }: { params: { name: string } 
             </Grid.Col>
             <Grid.Col span={3}>
               { filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
-              {showSource(data?.species.taxonomy.kingdom) && <Text  c="attribute.5"><b>Source:</b> <Link href={`https://biodiversity.org.au/afd/taxa/${params.name}`}>Australian Faunal Directory</Link></Text>}
+              {data?.species.regions && hasRegions(data.species.regions) && <Text  c="attribute.5"><b>Source:</b> <Link href={`https://biodiversity.org.au/afd/taxa/${params.name}`}>Australian Faunal Directory</Link></Text>}
               <br/>
               <Text c={"attribute.5"}>
               <b>Note:</b> location data may be generalised for sensitive species. Location data should be verified from individual data point custodians. Please refer to the specimen page for full details of metadata provenance for specific collection locations.

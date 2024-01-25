@@ -38,7 +38,7 @@ query SpeciesWithConservation($canonicalName: String) {
 
 type QueryResults = {
   species: {
-    taxonomy: Taxonomy,
+    taxonomy: Taxonomy[],
     conservation: Conservation[],
     indigenousEcologicalKnowledge: IndigenousEcologicalKnowledge[],
     referenceGenome?: { recordId: string }
@@ -47,7 +47,7 @@ type QueryResults = {
 
 
 interface HeaderProps {
-  taxonomy: Taxonomy,
+  taxonomy: Taxonomy[],
   conservation?: Conservation[],
   traits?: IndigenousEcologicalKnowledge[],
   referenceGenome?: { recordId: string },
@@ -61,11 +61,11 @@ function Header({ taxonomy, conservation, traits, referenceGenome }: HeaderProps
       <Grid.Col span="auto">
         <Group gap={40}>
           <Text c="dimmed" fw={400}>Species</Text>
-          <Text fz={38} fw={700} fs="italic">{taxonomy.canonicalName}</Text>
+          <Text fz={38} fw={700} fs="italic">{taxonomy[0]?.canonicalName}</Text>
         </Group>
       </Grid.Col>
       <Grid.Col span="content">
-        <IconBar taxonomy={taxonomy} conservation={conservation} traits={traits} />
+        <IconBar taxonomy={taxonomy[0]} conservation={conservation} traits={traits} />
       </Grid.Col>
       <Grid.Col span="content" ml={80}>
         <Group h="100%" pl={30}>

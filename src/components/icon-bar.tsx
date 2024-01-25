@@ -302,7 +302,7 @@ export default function IconBar({ taxonomy, conservation, traits }: IconBarProps
   return (
     <Box>
       <Group>
-        {taxonomy.vernacularGroup ? (
+        {taxonomy?.vernacularGroup ? (
           <VernacularGroupIcon group={taxonomy.vernacularGroup} />
         ) : null}
         {conservation?.map((cons) => (
