@@ -22,7 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <head/>
+      <head>
+        <script src="https://cdn.usefathom.com/script.js" data-site="WKYXKFQB" defer></script>
+      </head>
       <body>
         <ApolloProvider client={client}>
           <MantineProvider theme={theme}>
