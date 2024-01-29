@@ -56,12 +56,17 @@ const GET_SUMMARY = gql`
         authorship
         status
         rank
-        synonyms {
-          scientificName
-        }
-        vernacularNames {
-          name
-        }
+      }
+      vernacularNames {
+        datasetId
+        vernacularName
+        citation
+        sourceUrl
+      }
+      synonyms {
+        scientificName
+        canonicalName
+        authorship
       }
       photos {
         url
@@ -78,10 +83,25 @@ const GET_SUMMARY = gql`
   }
 `;
 
+type VernacularName = {
+  datasetId: string;
+  vernacularName: string,
+  citation?: string,
+  sourceUrl?: string,
+}
+
+type Synonym = {
+  scientificName: string,
+  canonicalName: string,
+  authorship?: string,
+}
+
 type Species = {
-    taxonomy: Taxonomy[],
-    photos: Photo[],
-    indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[],
+  taxonomy: Taxonomy[],
+  vernacularNames: VernacularName[],
+  synonyms: Synonym[],
+  photos: Photo[],
+  indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[],
 };
 
 type QueryResults = {
@@ -193,7 +213,13 @@ function ExternalLinks(props: ExternalLinksProps) {
 }
 
 
-function Details({ taxonomy }: { taxonomy: Taxonomy }) {
+interface DetailsProps {
+  taxonomy: Taxonomy,
+  commonNames: VernacularName[],
+  synonyms: Synonym[],
+}
+
+function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Paper radius={16} p="md" withBorder>
@@ -214,7 +240,7 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
           </DataTableRow>
           <DataTableRow label="Synonyms">
             <Stack>
-              { taxonomy.synonyms.map(synonym => (
+              { synonyms.map(synonym => (
                 <Text fw={600} fz="sm" key={synonym.scientificName}>{synonym.scientificName}</Text>
               ))}
             </Stack>
@@ -225,13 +251,13 @@ function Details({ taxonomy }: { taxonomy: Taxonomy }) {
           <DataTableRow label="Common names">
             <Group display="block" w={{xs: 50, sm: 100, md: 150, lg: 200, xl: 270}}>
             <Text fw={600} fz="sm" truncate="end" >
-              {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
+              {commonNames.map(r => r.vernacularName).join(', ')}
             </Text>
             <Button onClick={() => setIsOpen(true)} bg="none" c="midnight.4" pl={-5} className="textButton">Show All</Button>
             </Group>
             <Modal opened={isOpen} onClose={() => setIsOpen(false)} className="commonNamesModal" centered>
             <Text fw={600} fz="sm">
-              {taxonomy.vernacularNames?.map(r => r.name).join(', ')}
+              {commonNames.map(r => r.vernacularName).join(', ')}
             </Text>
             </Modal>
           </DataTableRow>
@@ -333,6 +359,7 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
     return <Text>Error : {error.message}</Text>;
   }
 
+  const species = data?.species;
   const taxonomy = data?.species.taxonomy[0];
 
   return (
@@ -341,7 +368,7 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
         <Grid.Col span={8}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
-            {taxonomy && <Details taxonomy={taxonomy} /> }
+            {species && taxonomy && <Details taxonomy={taxonomy} commonNames={species.vernacularNames} synonyms={species.synonyms} /> }
             {taxonomy && <Classification taxonomy={taxonomy} /> }
             <ExternalLinks canonicalName={canonicalName} species={data?.species} />
           </Stack>
