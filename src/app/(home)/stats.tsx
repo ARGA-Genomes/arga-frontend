@@ -13,18 +13,9 @@ const GET_TAXON = gql`
 query HomeStats {
   taxon(rank: DOMAIN, canonicalName: "Eukaryota") {
     summary {
-      children
-      childrenData
-      childrenGenomes
       species
       speciesData
       speciesGenomes
-    }
-
-    dataSummary {
-      name
-      genomes
-      totalGenomic
     }
 
     speciesSummary {

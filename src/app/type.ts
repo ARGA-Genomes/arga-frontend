@@ -16,7 +16,7 @@ type Taxonomy = {
 
 type Photo = {
     url: string,
-    referenceUrl: string,
+    source: string,
     publisher: string,
     license: string,
     rightsHolder: string,

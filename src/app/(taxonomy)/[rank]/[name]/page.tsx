@@ -46,6 +46,7 @@ import { SpeciesCard } from '@/components/species-card';
 import { usePreviousPage } from '@/components/navigation-history';
 import { usePathname } from 'next/navigation';
 import { HasDataFilters } from '@/components/filtering/has-data';
+import { Photo } from '@/app/type';
 
 
 const PAGE_SIZE = 10;
@@ -71,6 +72,7 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
       total,
       records {
         taxonomy {
+          scientificName
           canonicalName
         }
         photo {
@@ -130,12 +132,6 @@ query TaxonDetails($rank: TaxonRank, $canonicalName: String, $descendantRank: Ta
       speciesGenomes
     }
 
-    dataSummary {
-      name
-      genomes
-      totalGenomic
-    }
-
     speciesSummary {
       name
       genomes
@@ -171,7 +167,6 @@ type Taxonomy = {
   nomenclaturalCode: string,
   citation: string,
   hierarchy: ClassificationNode[],
-  dataSummary: DataBreakdown[]
   speciesSummary: DataBreakdown[]
   speciesGenomeSummary: DataBreakdown[]
   summary: {
@@ -196,9 +191,10 @@ type DataSummary = {
 
 type Species = {
   taxonomy: {
+    scientificName: string,
     canonicalName: string,
-  }[],
-  photo?: { url: string },
+  },
+  photo?: Photo,
   dataSummary: DataSummary,
 }
 
@@ -510,7 +506,7 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
 
       <SimpleGrid cols={5} pt={40}>
         {records?.map(record => (
-          <SpeciesCard key={record.taxonomy[0]?.canonicalName} species={record} />
+          <SpeciesCard key={record.taxonomy.scientificName} species={record} />
         ))}
       </SimpleGrid>
 

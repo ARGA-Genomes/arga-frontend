@@ -62,7 +62,7 @@ function SpeciesPhoto({ photo }: SpeciesPhotoProps) {
       <Flex align="flex-end" w="inherit" h="inherit">
         <Group className={classes.imageAttribution} p={5} px={15}>
         <Text fz="xs">&copy; {photo.rightsHolder}</Text>
-        <Text fz="xs"><Link href={photo.referenceUrl || "#"} target="_blank">{photo.publisher}</Link></Text>
+        <Text fz="xs"><Link href={photo.source || "#"} target="_blank">{photo.publisher}</Link></Text>
         <Text fz="xs"><Link href={license.url || "#"} target="_blank">({license.name.toUpperCase()})</Link></Text>
       </Group>
       </Flex>

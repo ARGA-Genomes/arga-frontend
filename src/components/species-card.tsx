@@ -7,7 +7,6 @@ import { Photo } from "@/app/type";
 
 export interface Taxonomy {
   canonicalName: string,
-  kingdom?: string,
 };
 
 export interface DataSummary {

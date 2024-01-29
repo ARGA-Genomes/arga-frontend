@@ -13,7 +13,7 @@ import {
   Text,
   Image,
 } from "@mantine/core";
-import { Photo, Taxonomy, IndigenousEcologicalKnowledge } from "@/app/type";
+import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
 import { Attribute } from "@/components/highlight-stack";
 import { ExternalLink } from "tabler-icons-react";
@@ -65,7 +65,7 @@ const GET_SUMMARY = gql`
       }
       photos {
         url
-        referenceUrl
+        source
         publisher
         license
         rightsHolder
@@ -347,7 +347,7 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
-          <SpeciesPhoto photo={data?.species.photos[0]} taxonomy={taxonomy} />
+          <SpeciesPhoto photo={data?.species.photos[0]} />
         </Grid.Col>
       </Grid>
     </>
