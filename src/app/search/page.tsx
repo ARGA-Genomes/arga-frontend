@@ -47,6 +47,11 @@ type Classification = {
   order?: string,
   family?: string,
   genus?: string,
+  regnum?: string,
+  division?: string,
+  classis?: string,
+  ordo?: string,
+  familia?: string,
 }
 
 type DataSummary = {
@@ -122,6 +127,11 @@ query FullTextSearch ($query: String, $page: Int, $perPage: Int, $filters: [Filt
             order
             family
             genus
+            regnum
+            division
+            classis
+            ordo
+            familia
           }
           dataSummary {
             assemblies
@@ -242,11 +252,26 @@ function TaxonDetails({ item }: { item: Item }) {
 
   return (
     <SimpleGrid cols={6}>
-      <AttributePill label="Kingdom" value={taxon.kingdom} href={`/kingdom/${taxon.kingdom}`} />
-      <AttributePill label="Phylum" value={taxon.phylum} href={`/phylum/${taxon.phylum}`} />
-      <AttributePill label="Class" value={taxon.class} href={`/class/${taxon.class}`} />
-      <AttributePill label="Order" value={taxon.order} href={`/order/${taxon.order}`} />
-      <AttributePill label="Family" value={taxon.family} href={`/family/${taxon.family}`} />
+      { taxon.regnum
+        ? <AttributePill label="Regnum" value={taxon.regnum} href={`/regnum/${taxon.regnum}`} />
+        : <AttributePill label="Kingdom" value={taxon.kingdom} href={`/kingdom/${taxon.kingdom}`} />
+      }
+      { taxon.division
+        ? <AttributePill label="Division" value={taxon.division} href={`/division/${taxon.division}`} />
+        : <AttributePill label="Phylum" value={taxon.phylum} href={`/phylum/${taxon.phylum}`} />
+      }
+      { taxon.classis
+        ? <AttributePill label="Classis" value={taxon.classis} href={`/classis/${taxon.classis}`} />
+        : <AttributePill label="Class" value={taxon.class} href={`/class/${taxon.class}`} />
+      }
+      { taxon.ordo
+        ? <AttributePill label="Ordo" value={taxon.ordo} href={`/ordo/${taxon.ordo}`} />
+        : <AttributePill label="Order" value={taxon.order} href={`/order/${taxon.order}`} />
+      }
+      { taxon.familia
+        ? <AttributePill label="Familia" value={taxon.familia} href={`/familia/${taxon.familia}`} />
+        : <AttributePill label="Family" value={taxon.family} href={`/family/${taxon.family}`} />
+      }
       <AttributePill label="Genus" value={taxon.genus} href={`/genus/${taxon.genus}`} italic />
     </SimpleGrid>
   )
