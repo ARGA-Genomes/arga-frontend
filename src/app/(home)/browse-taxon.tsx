@@ -66,7 +66,7 @@ export default function BrowseTaxon() {
           total={data?.overview.fungi}
           category="Fungi"
           image="/card-icons/taxon/fungi.svg"
-          link="/kingdom/Fungi"
+          link="/regnum/Fungi"
         />
         </Carousel.Slide>
         <Carousel.Slide>

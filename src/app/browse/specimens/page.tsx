@@ -34,7 +34,6 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
       records {
         taxonomy {
           canonicalName
-          kingdom
         }
         photo { url }
         dataSummary {
@@ -66,7 +65,6 @@ type DataSummary = {
 type Species = {
   taxonomy: {
     canonicalName: string,
-    kingdom?: string,
   },
   photo: Photo,
   dataSummary: DataSummary,
