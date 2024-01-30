@@ -68,12 +68,12 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   PROTISTS_AND_OTHER_UNICELLULAR_ORGANISMS: {
     image: "/species-icons/protists.svg",
     label: "Protists and other unicellular organisms",
-    link: "/kingdom/Protozoa",
+    link: "/superkingdom/Protista",
   },
   FUNGI: {
     image: "/species-icons/fungi.svg",
     label: "Mushrooms and other fungi",
-    link: "/kingdom/Fungi",
+    link: "/regnum/Fungi",
   },
   MOLLUSCS: {
     image: "/species-icons/molluscs.svg",
@@ -83,6 +83,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   CRUSTACEANS: {
     image: "/species-icons/crustaceans.svg",
     label: "Marine crustaceans",
+    link: "/subphylum/Crustacea",
   },
   INSECTS: {
     image: "/species-icons/insects.svg",
@@ -107,18 +108,18 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   SEAWEEDS: {
     image: "/species-icons/seaweed.svg",
     label: "Seaweeds",
-    link: "/kingdom/Chromista",
+    link: "/regnum/Chromista",
   },
   HIGHER_PLANTS: {
     image: "/species-icons/plants.svg",
     label: "Higher plants",
-    link: "/kingdom/Plantae",
+    link: "/regnum/Plantae",
   },
 
   FLOWERING_PLANTS: {
     image: "/species-icons/plants.svg",
     label: "Flowering plants",
-    link: "/kingdom/Plantae",
+    link: "/regnum/Plantae",
   },
   ANIMALS: {
     image: "/species-icons/animals.svg",
@@ -128,17 +129,17 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   BROWN_ALGAE: {
     image: "/species-icons/brown_algae",
     label: "Brown algae",
-    link: "/phylum/Phaeophycea",
+    link: "/classis/Phaeophyceae",
   },
   RED_ALGAE: {
     image: "/species-icons/red_algae",
     label: "Red algae",
-    link: "/phylum/Rhodophyta",
+    link: "/division/Rhodophyta",
   },
   GREEN_ALGAE: {
     image: "/species-icons/green_algae",
     label: "Green algae",
-    link: "/phylum/Chlorophyta",
+    link: "/division/Chlorophyta",
   },
   ECHINODERMS: {
     image: "/species-icons/echinoderms.svg",
@@ -158,11 +159,12 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   CYANOBACTERIA: {
     image: "/species-icons/cyanobacteria.svg",
     label: "Cyanobacteria",
-    link: "/phylum/Cyanobacteria",
+    link: "/division/Cyanobacteria",
   },
   SHARKS_AND_RAYS: {
     image: "/species-icons/sharks.svg",
     label: "Sharks and rays",
+    link: "/subclass/Elasmobranchii",
   },
 };
 
