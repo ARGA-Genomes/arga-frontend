@@ -13,6 +13,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { SortAscending, Filter as IconFilter } from "tabler-icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
+import { Photo } from "@/app/type";
 
 
 const PAGE_SIZE = 10;
@@ -81,10 +82,6 @@ query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [Filter
     }
   }
 }`;
-
-type Photo = {
-  url: string,
-}
 
 type DataSummary = {
   genomes: number,

@@ -1,6 +1,7 @@
 'use client';
 
 import { MAX_WIDTH } from "@/app/constants";
+import { Photo } from "@/app/type";
 import DataTypeHeader from "@/components/data-type-header";
 import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { HasDataFilters } from "@/components/filtering/has-data";
@@ -67,7 +68,7 @@ type Species = {
     canonicalName: string,
     kingdom?: string,
   },
-  photo: { url: string },
+  photo: Photo,
   dataSummary: DataSummary,
 }
 

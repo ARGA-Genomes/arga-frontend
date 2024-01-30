@@ -12,6 +12,7 @@ import Link from "next/link";
 import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
+import { Photo } from "@/app/type";
 
 
 const PAGE_SIZE = 10;
@@ -62,10 +63,6 @@ query DatasetSpecies($name: String, $page: Int) {
     }
   }
 }`;
-
-type Photo = {
-  url: string,
-}
 
 type DataSummary = {
   genomes: number,
