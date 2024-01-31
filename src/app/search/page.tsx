@@ -55,11 +55,11 @@ type Classification = {
 }
 
 type DataSummary = {
-  assemblies: number,
-  referenceGenomes: number,
-  wholeGenomes: number,
-  partialGenomes: number,
-  barcodes: number,
+  genomes: number,
+  loci: number,
+  specimens: number,
+  other: number,
+  totalGenomic: number,
 }
 
 type Item = {
@@ -134,11 +134,11 @@ query FullTextSearch ($query: String, $page: Int, $perPage: Int, $filters: [Filt
             familia
           }
           dataSummary {
-            assemblies
-            referenceGenomes
-            wholeGenomes
-            partialGenomes
-            barcodes
+            genomes
+            loci
+            specimens
+            other
+            totalGenomic
           }
         }
         ... on GenomeItem {
@@ -240,8 +240,8 @@ function TaxonItem({ item }: { item: Item }) {
 function TaxonSummary({ data }: { data: DataSummary }) {
   return (
     <SimpleGrid cols={2}>
-      <AttributePill label="Genomes" color={data.assemblies ? "moss.3" : "bushfire.2"} value={data.assemblies} />
-      <AttributePill label="Genetic Loci" color={data.barcodes ? "moss.3" : "bushfire.2"} value={data.barcodes} />
+      <AttributePill label="Genomes" color={data.genomes ? "moss.3" : "bushfire.2"} value={data.genomes} />
+      <AttributePill label="Other" color={data.totalGenomic ? "moss.3" : "bushfire.2"} value={data.totalGenomic} />
     </SimpleGrid>
   )
 }
