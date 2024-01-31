@@ -1,16 +1,15 @@
 'use client';
 
 import { gql, useQuery } from "@apollo/client";
-import {Box, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { AnalysisMap, ArgaMap } from "@/components/mapping";
+import {Box, Button, Center, Grid, Paper, Stack, Text, Title } from "@mantine/core";
 
 import React, { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
-import { Attribute } from "@/components/highlight-stack";
+import { Attribute, AttributePill, DataField } from "@/components/data-fields";
 import { RecordItem, RecordList } from "@/components/record-list";
 import { PaginationBar } from "@/components/pagination";
 import { usePathname } from "next/navigation";
-import { Marker } from "@/components/mapping/analysis-map";
+import { ExternalLink } from "tabler-icons-react";
 
 
 const PAGE_SIZE = 5;
@@ -33,6 +32,8 @@ query SpeciesComponents($canonicalName: String, $page: Int, $pageSize: Int) {
         estimatedSize
         releaseDate
         dataType
+        accessRights
+        sourceUri
       }
     }
   }
@@ -51,6 +52,8 @@ type GenomicComponent = {
   estimatedSize?: string,
   releaseDate?: string,
   dataType?: string,
+  accessRights?: string,
+  sourceUri?: string,
 }
 
 type QueryResults = {
@@ -63,71 +66,61 @@ type QueryResults = {
 };
 
 
-function toMarker (color: [number, number, number, number], records?: GenomicComponent[]) {
-  if (!records) return [];
-  return records.map(r => {
-    return {
-      recordId: r.recordId || "unknown",
-      latitude: r.latitude,
-      longitude: r.longitude,
-      color: color,
-    }
-  })
-}
-
-function MarkerMap({ records }: { records : GenomicComponent[] | undefined }) {
-  const markers = toMarker([123, 161, 63, 220], records).filter(s => s.latitude) as Marker[];
-
-  return (
-    <Box pos="relative" h="100%">
-      <AnalysisMap
-        markers={markers}
-        style={{ borderRadius: 'var(--mantine-radius-lg)', overflow: 'hidden' }}
-      >
-      </AnalysisMap>
-    </Box>
-  )
-}
-
-
-function LabeledValue({ label, value }: { label: string, value: string|undefined }) {
-  return (
-    <Group gap={20}>
-      <Text fw={300} size="sm">{label}</Text>
-      <Text fw={600}>{value}</Text>
-    </Group>
-  )
-}
-
 function RecordItemContent({ record }: { record: GenomicComponent }) {
   return (
       <Grid p={20}>
-        <Grid.Col span={6}>
-          <Stack gap={5}>
-            <LabeledValue label="Accession" value={record.accession} />
-            <Text size="xs" fw={600}>{record.datasetName}</Text>
-          </Stack>
+        <Grid.Col span={2}>
+          <Attribute label="Accession">
+            <Box pt={5}><DataField value={record.accession} /></Box>
+          </Attribute>
         </Grid.Col>
         <Grid.Col span={2}>
-          <Attribute label="Library type" value={record.dataType} />
+          <AttributePill label="Data type" value={record.dataType} />
         </Grid.Col>
         <Grid.Col span={2}>
-          <Attribute label="Publication date" value={record.releaseDate} />
+          <AttributePill label="Library type" value={undefined} />
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <AttributePill label="Access status" value={record.accessRights} />
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <AttributePill label="Data license" value={undefined} />
         </Grid.Col>
         <Grid.Col span={2}>
-          <Attribute label="Source" value="No data"/>
+          <AttributePill label="Source" value={record.datasetName}/>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <Attribute label="Publication date">
+            <Box pt={5}><DataField value={record.releaseDate} /></Box>
+          </Attribute>
         </Grid.Col>
       </Grid>
   )
 }
 
 function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
-  const path = usePathname();
-
   return (
     <RecordList>
-      { records.map(record => (
-        <RecordItem key={record.sequenceId} href={`${path}/${encodeURIComponent(record.recordId)}`}>
+      { records.map((record, idx) => (
+        <RecordItem
+          key={idx}
+          href={record.sourceUri}
+          target="_blank"
+          rightSection={
+            <Button
+              color="midnight"
+              h="100%"
+              w="100%"
+              disabled={!record.sourceUri}
+              style={{ borderRadius: "0 16px 16px 0" }}
+            >
+              <Stack>
+                <Center><ExternalLink size="30px" /></Center>
+                go to source
+              </Stack>
+            </Button>
+          }
+        >
           <RecordItemContent record={record} />
         </RecordItem>)) }
     </RecordList>
@@ -156,17 +149,14 @@ export default function GenomicComponents({ params }: { params: { name: string }
       <Title order={3}>Genomic components</Title>
 
       <Grid py={20}>
-        <Grid.Col span={8}>
+        <Grid.Col span={12}>
           <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
             {data?.species.genomicComponents ? <GenomicComponentList records={data.species.genomicComponents.records} /> : null }
           </Box>
         </Grid.Col>
-        <Grid.Col span={4} mih={568}>
-          <MarkerMap records={data?.species.genomicComponents.records} />
-        </Grid.Col>
 
-        <Grid.Col span={8}>
+        <Grid.Col span={12}>
           <PaginationBar
             total={data?.species.genomicComponents.total}
             page={page}
