@@ -678,21 +678,27 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
           <Title order={5}>Taxonomic breakdown</Title>
 
           <DataTable my={8}>
+            { rank !== 'GENUS' &&
             <DataTableRow label={`Number of ${childTaxonLabel}`}>
               <DataField value={taxon?.descendants.length}></DataField>
             </DataTableRow>
+            }
             <DataTableRow label="Number of species/OTUs">
               <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
             </DataTableRow>
+            { rank !== 'GENUS' &&
             <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
               <DataField value={Humanize.formatNumber(taxon?.descendants.filter(d => d.speciesGenomes > 0).length || 0)} />
             </DataTableRow>
+            }
             <DataTableRow label="Species with genomes">
               <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
             </DataTableRow>
+            { rank !== 'GENUS' &&
             <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
               <DataField value={Humanize.formatNumber(taxon?.descendants.filter(d => d.speciesData > 0).length || 0)} />
             </DataTableRow>
+            }
             <DataTableRow label="Species with data">
               <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
             </DataTableRow>
