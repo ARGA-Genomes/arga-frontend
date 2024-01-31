@@ -66,7 +66,7 @@ export default function BrowseGrouping() {
       </Carousel.Slide>
       <Carousel.Slide>
         <BrowseCard
-          total={data && (sources["ARGA Venomous species"] || 0)}
+          total={data && (sources["ARGA Venomous and Poisonous Species"] || 0)}
           category="Venomous and Poisonous"
           image="/card-icons/dataset/venomous_and_poisonous.svg"
           link="/browse/sources/ARGA_Venomous_species"
