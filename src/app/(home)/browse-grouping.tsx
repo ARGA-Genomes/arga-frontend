@@ -69,7 +69,7 @@ export default function BrowseGrouping() {
           total={data && (sources["ARGA Venomous and Poisonous Species"] || 0)}
           category="Venomous and Poisonous"
           image="/card-icons/dataset/venomous_and_poisonous.svg"
-          link="/browse/sources/ARGA_Venomous_species"
+          link="/browse/sources/ARGA_Venomous_and_Poisonous_Species"
         />
       </Carousel.Slide>
       </Group>
