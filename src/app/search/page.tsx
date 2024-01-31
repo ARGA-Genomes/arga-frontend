@@ -238,10 +238,12 @@ function TaxonItem({ item }: { item: Item }) {
 }
 
 function TaxonSummary({ data }: { data: DataSummary }) {
+  const other = data.loci + data.other;
+
   return (
     <SimpleGrid cols={2}>
-      <AttributePill label="Genomes" color={data.genomes ? "moss.3" : "bushfire.2"} value={data.genomes} />
-      <AttributePill label="Other" color={data.totalGenomic ? "moss.3" : "bushfire.2"} value={data.totalGenomic} />
+      <AttributePill label="Assemblies" color={data.genomes ? "moss.3" : "bushfire.2"} value={data.genomes} />
+      <AttributePill label="Other data" color={other ? "moss.3" : "bushfire.2"} value={other} />
     </SimpleGrid>
   )
 }
