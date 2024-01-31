@@ -2,7 +2,7 @@
     font-weight: 600;
     color: white;
     background: rgba(25, 61, 77, 0.6);
-    border-radius: 0 var(--mantine-radius-lg) 0 var(--mantine-radius-lg);
+    border-radius: 0 var(--mantine-radius-lg) 0 0;
 }
 
 .imageAttribution a {

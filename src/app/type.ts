@@ -16,10 +16,10 @@ type Taxonomy = {
 
 type Photo = {
     url: string,
-    source: string,
-    publisher: string,
-    license: string,
-    rightsHolder: string,
+    source?: string,
+    publisher?: string,
+    license?: string,
+    rightsHolder?: string,
 }
 
 type Distribution = {
