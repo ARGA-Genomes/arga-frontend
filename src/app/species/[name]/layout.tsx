@@ -2,12 +2,38 @@
 
 import classes from "./layout.module.css";
 
-import { Container, Paper, Stack, Tabs, Text } from "@mantine/core";
+import { gql, useQuery } from "@apollo/client";
+import { Container, Paper, Stack, Tabs } from "@mantine/core";
 import SpeciesHeader from "@/components/species-header";
-import { RedirectType, redirect, usePathname, useSearchParams } from "next/navigation";
+import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
+
+const GET_SPECIES_DATA_SUMMARY = gql`
+query SpeciesWithDataSummary($canonicalName: String) {
+  species(canonicalName: $canonicalName) {
+    dataSummary {
+      genomes
+      loci
+      specimens
+      other
+      totalGenomic
+    }
+  }
+}`;
+
+type QueryResults = {
+  species: {
+    dataSummary: {
+      genomes?: number,
+      loci?: number,
+      specimens?: number,
+      other?: number,
+      totalGenomic?: number,
+    }
+  },
+};
 
 
 function DataTabs({ name, children }: { name: string, children: React.ReactNode }) {
@@ -17,6 +43,13 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
   function changeTab(value: string) {
     router.replace(`/species/${name}/${value}`);
   }
+
+  const canonicalName = name.replaceAll("_", " ");
+  const { data } = useQuery<QueryResults>(GET_SPECIES_DATA_SUMMARY, {
+    variables: { canonicalName },
+  });
+
+  const summary = data?.species.dataSummary;
 
   // based on the current url the active tab should always be
   // the fourth component in the path name
@@ -37,11 +70,11 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
     >
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
-          <Tabs.Tab value="whole_genomes">Genome Assemblies</Tabs.Tab>
-          <Tabs.Tab value="components">Genomic Components</Tabs.Tab>
-          <Tabs.Tab value="markers">Single Loci</Tabs.Tab>
+          <Tabs.Tab value="whole_genomes">Genome Assemblies ({summary?.genomes || "0"})</Tabs.Tab>
+          <Tabs.Tab value="components">Genomic Components ({summary?.other || "0"})</Tabs.Tab>
+          <Tabs.Tab value="markers">Single Loci ({summary?.loci || "0"})</Tabs.Tab>
           <Tabs.Tab value="distribution">Data Distribution</Tabs.Tab>
-          <Tabs.Tab value="specimens">Specimens</Tabs.Tab>
+          <Tabs.Tab value="specimens">Specimens ({summary?.specimens || "0"})</Tabs.Tab>
           <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
         </Tabs.List>
       </Container>
