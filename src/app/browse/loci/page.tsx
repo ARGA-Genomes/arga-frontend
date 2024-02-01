@@ -35,7 +35,12 @@ query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
         taxonomy {
           canonicalName
         }
-        photo { url }
+        photo {
+          url
+          publisher
+          license
+          rightsHolder
+        }
         dataSummary {
           genomes
           loci
