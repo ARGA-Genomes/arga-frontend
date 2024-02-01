@@ -56,6 +56,8 @@ const GET_SUMMARY = gql`
         authorship
         status
         rank
+        source
+        sourceUrl
       }
       vernacularNames {
         datasetId
@@ -205,12 +207,6 @@ function ExternalLinks(props: ExternalLinksProps) {
     </Paper>
   );
 }
- function showSource(kingdom:  String | undefined ) {
-  if  (kingdom && (kingdom.toLowerCase() ==="animalia" || kingdom.toLowerCase() ==="protista")) {
-    return true;
-  }
-  return false;
-}
 
 
 interface DetailsProps {
@@ -223,8 +219,15 @@ function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Paper radius={16} p="md" withBorder>
-      <Group mb={10}>
-      <Text fw={700}  size="lg">Taxonomy</Text>      
+      <Group mb={10} align="baseline">
+        <Text fw={700}  size="lg">Taxonomy</Text>
+        <Text fz="sm" fw={300}>
+          Source:&nbsp;
+          { taxonomy.sourceUrl
+            ? <Link href={taxonomy.sourceUrl}>{taxonomy.source}</Link>
+            : taxonomy.source
+          }
+        </Text>
       </Group>
 
       <SimpleGrid cols={2}>

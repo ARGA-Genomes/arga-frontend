@@ -47,6 +47,7 @@ import { usePreviousPage } from '@/components/navigation-history';
 import { usePathname } from 'next/navigation';
 import { HasDataFilters } from '@/components/filtering/has-data';
 import { Photo } from '@/app/type';
+import Link from 'next/link';
 
 
 const PAGE_SIZE = 10;
@@ -165,7 +166,9 @@ type Taxonomy = {
   canonicalName: string,
   status: string,
   nomenclaturalCode: string,
-  citation: string,
+  citation?: string,
+  source?: string,
+  sourceUrl?: string,
   hierarchy: ClassificationNode[],
   speciesSummary: DataBreakdown[]
   speciesGenomeSummary: DataBreakdown[]
@@ -237,7 +240,12 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
       </tr>
       <tr>
         <td>Source</td>
-        <td><DataField value={taxon?.citation}/></td>
+        <td>
+          { taxon?.sourceUrl
+            ? <Link href={taxon?.sourceUrl} target="_blank"><DataField value={taxon?.source} /></Link>
+            : <DataField value={taxon?.source} />
+          }
+        </td>
       </tr>
       </tbody>
     </Table>

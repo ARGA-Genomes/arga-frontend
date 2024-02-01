@@ -12,6 +12,8 @@ type Taxonomy = {
     vernacularGroup?: string,
     vernacularNames: { name: string }[],
     synonyms: { scientificName: string }[],
+    source?: string,
+    sourceUrl?: string,
 };
 
 type Photo = {
