@@ -71,6 +71,9 @@ query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [Filter
         }
         photo {
           url
+          publisher
+          license
+          rightsHolder
         }
         dataSummary {
           genomes
