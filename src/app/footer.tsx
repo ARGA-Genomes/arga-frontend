@@ -32,7 +32,7 @@ export function Footer() {
             <FooterLink href="https://arga.org.au/contact/">Contact us</FooterLink>
             <FooterLink href="https://arga.org.au/about/">About us</FooterLink>
             <FooterLink href="https://arga.org.au/help/">Help</FooterLink>
-            <FooterLink href="https://arga.org.au/acknowledging/">Acknowledging ARGA</FooterLink>
+            <FooterLink href="https://arga.org.au/help/#acknowledging-arga">Acknowledging ARGA</FooterLink>
           </Stack>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 10, lg: 10, xl: 10 }}>
