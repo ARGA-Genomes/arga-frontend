@@ -20,9 +20,10 @@ import { AttributePill, Attribute, DataField } from "@/components/highlight-stac
 import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
 import Link from "next/link";
 import { AnnotationEvent, AssemblyEvent, DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
-import { ArgaMap } from "@/components/mapping";
+import { AnalysisMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { useLocalStorage } from "@mantine/hooks";
+import { Marker } from "@/components/mapping/analysis-map";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -241,10 +242,26 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
   )
 }
 
+
 function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
+  let position: [number, number] | undefined = (specimen && specimen.latitude && specimen.longitude) ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
+
+  let marker = position && {
+    recordId: specimen?.recordId,
+    latitude: position[0],
+    longitude: position[1],
+    color: [103, 151, 180, 220],
+  } as Marker
+
   return (
-    <Box pos="relative" h={180}>
-      <ArgaMap />
+    <Box pos="relative" h={300}>
+      <AnalysisMap
+        markers={marker ? [marker] : []}
+        style={{ borderRadius: 'var(--mantine-radius-lg)', overflow: 'hidden' }}
+        initialPosition={position}
+        initialZoom={position ? 7.0 : 2.4}
+      >
+      </AnalysisMap>
     </Box>
   )
 }

@@ -168,8 +168,8 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
       <DeckGL
         views={view}
         initialViewState={{
-          latitude: DEFAULT_POSITION[0],
-          longitude: DEFAULT_POSITION[1],
+          latitude: (initialPosition && initialPosition[0]) || DEFAULT_POSITION[0],
+          longitude: (initialPosition && initialPosition[1]) || DEFAULT_POSITION[1],
           zoom: initialZoom || 3.1,
         }}
         layers={[
