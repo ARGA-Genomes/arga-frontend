@@ -2,9 +2,12 @@
 
 import { LoadOverlay } from "@/components/load-overlay";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Grid, Title, Paper, Button } from "@mantine/core";
-import { Attribute } from "@/components/highlight-stack";
+import { Grid, Title, Paper, Button, Stack, Container } from "@mantine/core";
 import Link from "next/link";
+import { DateTime } from "luxon";
+import { AttributePill } from "@/components/data-fields";
+import { ExternalLink } from "tabler-icons-react";
+import { MAX_WIDTH } from "../constants";
 
 
 const GET_DATASETS = gql`
@@ -57,32 +60,53 @@ type QueryResults = {
   sources: Source[],
 };
 
-function SourceRow({ source }: { source: Source }) {
+
+function DatasetRow({ dataset }: { dataset: Dataset }) {
   return (
-    <Paper p="l" radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
-      <Grid p={10} columns={22}>
-        <Grid.Col span={3}>
-          <Attribute label="Data source name" value={source.name}/>
+    <Paper radius="lg">
+      <Grid>
+        <Grid.Col span={4} p="lg">
+          <AttributePill label="Data source name" value={dataset.name} />
         </Grid.Col>
-        <Grid.Col span={19}>
-          <Attribute label="Rights holder" value={source.rightsHolder}/>
+        <Grid.Col span={3} p="lg">
+          <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>
-        <Grid.Col span={12}>
-          <Attribute label="Access rights" value={source.accessRights}/>
+        <Grid.Col span={2} p="lg">
+          <AttributePill label="Access rights" value={dataset.license} />
         </Grid.Col>
-        <Grid.Col span={3}>
-          <Attribute label="Number of records" value="No data"/>
+        <Grid.Col span={2} p="lg">
+          <AttributePill label="Last updated" value={DateTime.fromISO(dataset.updatedAt).toLocaleString()} />
         </Grid.Col>
-        <Grid.Col span={3}>
-          <Attribute label="Last updated" value="No data"/>
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <Box m="md">
-            <Button w={170}></Button>
-          </Box>
+        <Grid.Col span={1}>
+          <Link href={dataset.url || "#"}>
+            <Button
+              w="100%"
+              h="100%"
+              color="midnight"
+              style={{ borderRadius: "0 16px 16px 0" }}
+              disabled={!dataset.url}
+            >
+              <Stack align="center">
+                <ExternalLink size="30px" />
+                Go to source
+              </Stack>
+            </Button>
+          </Link>
         </Grid.Col>
       </Grid>
     </Paper>
+  )
+}
+
+
+function SourceRow({ source }: { source: Source }) {
+  return (
+    <Stack>
+      <Title order={4}>{source.name}</Title>
+      <Stack>
+        { source.datasets.map((dataset, idx) => <DatasetRow dataset={dataset} key={idx} />) }
+      </Stack>
+    </Stack>
   )
 }
 
@@ -90,14 +114,23 @@ export default function DatasetsPage() {
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
 
   return (
-    <>
-      <Box p={20}>
-        <Title>Data sources indexed in ARGA</Title>
-        <Paper p="xs" radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }}>
-          <LoadOverlay visible={loading} />
-          { data?.sources.map(source => <SourceRow source={source} key={source.name} />) }
+      <Stack gap="xl" my="xl">
+        <Paper py={20} pos="relative">
+          <Container maw={MAX_WIDTH}>
+            <Title>Data sources indexed in ARGA</Title>
+          </Container>
         </Paper>
-      </Box>
-    </>
+
+        <Paper py="lg">
+          <Container maw={MAX_WIDTH}>
+            <Paper p="lg" radius="lg" withBorder>
+              <LoadOverlay visible={loading} />
+              <Stack gap={50}>
+                { data?.sources.map(source => <SourceRow source={source} key={source.name} />) }
+              </Stack>
+            </Paper>
+          </Container>
+        </Paper>
+      </Stack>
   );
 }
