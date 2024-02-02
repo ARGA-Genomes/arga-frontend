@@ -245,18 +245,6 @@ function Species({ source }: { source: string }) {
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Group wrap="nowrap">
-            <SortAscending />
-            <Text>Sort by</Text>
-            <SegmentedControl radius="xl" data={[
-              { value: 'alpha', label: 'A-Z' },
-              { value: 'date', label: 'Date' },
-              { value: 'records', label: 'Records' },
-            ]}/>
-          </Group>
-        </Grid.Col>
-
-        <Grid.Col span="content">
           <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
         </Grid.Col>
       </Grid>
