@@ -106,7 +106,12 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
           <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Access rights" value={license?.name || dataset.license} href={license?.url} />
+          <AttributePill
+            label="Access rights"
+            value={license?.name || dataset.license}
+            href={license?.url}
+            color={license ? "moss.3" : undefined}
+          />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill label="Last updated" value={DateTime.fromISO(dataset.updatedAt).toLocaleString()} />
