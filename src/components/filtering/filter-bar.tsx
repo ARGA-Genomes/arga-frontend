@@ -44,18 +44,6 @@ export function FilterBar(props: FilterBarProps) {
       </Grid.Col>
 
       <Grid.Col span="content">
-        <Group wrap="nowrap">
-          <SortAscending />
-          <Text>Sort by</Text>
-          <SegmentedControl radius="xl" data={[
-            { value: 'alpha', label: 'A-Z' },
-            { value: 'date', label: 'Date' },
-            { value: 'records', label: 'Records' },
-          ]}/>
-        </Group>
-      </Grid.Col>
-
-      <Grid.Col span="content">
         <Button leftSection={<IconFilter />} variant="subtle" onClick={open} color="shellfish.7">Filter</Button>
       </Grid.Col>
     </Grid>
