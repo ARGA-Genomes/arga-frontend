@@ -38,6 +38,7 @@ export function FilterBar(props: FilterBarProps) {
       <Grid.Col span="auto">
         <Group>
           <Text fz="sm" fw={300}>Filters</Text>
+          { props.filters.length === 0 && <Text fz="sm" c="dimmed" fw={300}>None</Text> }
           { props.filters.map(filter => <FilterBadge filter={filter} key={filter.value} />) }
         </Group>
       </Grid.Col>
@@ -55,7 +56,7 @@ export function FilterBar(props: FilterBarProps) {
       </Grid.Col>
 
       <Grid.Col span="content">
-        <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
+        <Button leftSection={<IconFilter />} variant="subtle" onClick={open} color="shellfish.7">Filter</Button>
       </Grid.Col>
     </Grid>
     </>
@@ -64,7 +65,7 @@ export function FilterBar(props: FilterBarProps) {
 
 function FilterBadge({ filter }: { filter: Filter }) {
   return (
-    <Badge variant="outline">
+    <Badge variant="outline" color="shellfish.7">
       {filter.value}
     </Badge>
   )

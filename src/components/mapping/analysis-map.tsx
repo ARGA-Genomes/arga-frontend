@@ -1,6 +1,7 @@
 "use client";
 
 import 'maplibre-gl/dist/maplibre-gl.css';
+import classes from './analysis-map.module.css';
 
 import { Map } from 'react-map-gl/maplibre';
 import DeckGL, { BitmapLayer, GeoJsonLayer, MapView, ScatterplotLayer, TileLayer } from 'deck.gl/typed';
@@ -8,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { GeoJSON } from 'geojson';
 import { gql, useQuery } from '@apollo/client';
 import Link from 'next/link';
-import { Modal, Paper } from '@mantine/core';
+import { Text, Paper, Center } from '@mantine/core';
 import { Layer } from '@/app/type';
 
 // center on Australia by default
@@ -153,9 +154,17 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
     else {setPopupLink(``)}
   }
 
+  const hasData = markers && markers.length > 0;
 
   return (
     <>
+      { !hasData && (
+      <Paper className={classes.emptyMapOverlay}>
+        <Center>
+          <Text className={classes.emptyMapText}>no data</Text>
+        </Center>
+      </Paper>
+      )}
       <DeckGL
         views={view}
         initialViewState={{
@@ -188,13 +197,8 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
           {children}
         </Map>
       </DeckGL>
-      {/* Use either the modal or the paper div for popup */}
-      {/* <Modal opened={isOpen} onClose={() => setIsOpen(false)} centered>
-        View specimen details: &nbsp;
-        <Link href={`/species/${speciesName}/specimens/${clickedMarker}`}>{clickedMarker}
-        </Link>
-      </Modal> */}
-      {isOpen && <Paper h={50} w={300} radius={5} p={10} 
+
+      {isOpen && <Paper h={50} w={300} radius={5} p={10}
       style={{zIndex:200, display: isOpen? 'table': 'hidden', position: 'fixed', left: popupPosition.x, top: popupPosition.y, alignContent: 'center'}} onClick={closePopup}>
         View details: &nbsp;
         <Link href={popupLink}>{clickedMarker}

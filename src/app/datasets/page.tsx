@@ -117,7 +117,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
           <AttributePill label="Last updated" value={DateTime.fromISO(dataset.updatedAt).toLocaleString()} />
         </Grid.Col>
         <Grid.Col span={1}>
-          <Link href={dataset.url || "#"}>
+          <Link href={dataset.url || "#"} target="_blank">
             <Button
               w="100%"
               h="100%"

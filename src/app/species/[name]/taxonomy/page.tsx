@@ -224,7 +224,7 @@ function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
         <Text fz="sm" fw={300}>
           Source:&nbsp;
           { taxonomy.sourceUrl
-            ? <Link href={taxonomy.sourceUrl}>{taxonomy.source}</Link>
+            ? <Link href={taxonomy.sourceUrl} target="_blank">{taxonomy.source}</Link>
             : taxonomy.source
           }
         </Text>
