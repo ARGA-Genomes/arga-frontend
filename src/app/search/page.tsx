@@ -77,6 +77,7 @@ type Item = {
   genomeRep?: string,
   dataSource?: string,
   level?: string,
+  assemblyType?: string,
   referenceGenome?: boolean,
   releaseDate?: string,
 
@@ -150,6 +151,7 @@ query FullTextSearch ($query: String, $page: Int, $perPage: Int, $filters: [Filt
           genomeRep
           dataSource
           level
+          assemblyType
           referenceGenome
           releaseDate
         }
@@ -338,8 +340,8 @@ function GenomeDetails({ item }: { item: Item }) {
   return (
     <SimpleGrid cols={4}>
       <Attribute label="Accession"><DataField value={item.accession}/></Attribute>
-      <AttributePill label="Representation" value={item.dataSource} />
-      <AttributePill label="Assembly type" value={item.level} />
+      <AttributePill label="Representation" value={item.genomeRep} />
+      <AttributePill label="Assembly type" value={item.assemblyType} />
       <AttributePill label="Assembly level" value={item.level} />
     </SimpleGrid>
   )
@@ -599,19 +601,6 @@ function Filters({ filters, onChange }: FiltersProps) {
         </Accordion.Control>
         <Accordion.Panel>
           <DataTypeFilters filters={dataTypes} onChange={setDataTypes} />
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="classification">
-        <Accordion.Control>
-          <FilterGroup
-            label="Higher classification filters"
-            description="Limit data based on taxonomy"
-            image="/card-icons/type/higher_taxon_report.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
