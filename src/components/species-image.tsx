@@ -4,7 +4,6 @@ import classes from "./species-image.module.css";
 
 import {
   BackgroundImage,
-  BackgroundImageProps,
   Text,
   Group,
   Flex,

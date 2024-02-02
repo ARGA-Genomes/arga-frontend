@@ -61,7 +61,41 @@ type QueryResults = {
 };
 
 
+interface License {
+  name: string,
+  url: string,
+}
+
+const LICENSES: Record<string, License> = {
+  "cc-by-nc-nd": { name: "(CC-BY-NC)", url: "http://creativecommons.org/licenses/by-nc-nd/4.0"},
+  "cc-by-nc-sa": { name: "(CC-BY-NC-SA)", url: "http://creativecommons.org/licenses/by-nc-sa/4.0"},
+  "cc-by-nc": { name: "(CC-BY-NC)", url: "http://creativecommons.org/licenses/by-nc/4.0"},
+  "cc-by-nd": { name: "(CC-BY-ND)", url: "http://creativecommons.org/licenses/by-nd/4.0"},
+  "cc-by-sa": { name: "(CC-BY-SA)", url: "http://creativecommons.org/licenses/by-sa/4.0"},
+  "cc-by": { name: "(CC-BY)", url: "http://creativecommons.org/licenses/by/4.0"},
+  "cc0": { name: "(CC0)", url: "http://creativecommons.org/publicdomain/zero/1.0"},
+
+  "http://creativecommons.org/licenses/by-nc-sa/4.0/": { name: "CC-BY-NC-SA", url: "http://creativecommons.org/licenses/by-nc-sa/4.0/"},
+  "http://creativecommons.org/licenses/by-nc/4.0/": { name: "CC-BY-NC", url: "http://creativecommons.org/licenses/by-nc/4.0/"},
+  "http://creativecommons.org/licenses/by/4.0/": { name: "CC-BY", url: "http://creativecommons.org/licenses/by/4.0/"},
+  "http://creativecommons.org/licenses/by-sa/4.0/": { name: "CC-BY-SA", url: "http://creativecommons.org/licenses/by-sa/4.0/"},
+  "http://creativecommons.org/licenses/by-nc-nd/4.0/": { name: "CC-BY-NC-ND", url: "http://creativecommons.org/licenses/by-nc-nd/4.0/"},
+
+  "http://creativecommons.org/licenses/by-nc-sa/3.0/": { name: "CC-BY-NC-SA", url: "http://creativecommons.org/licenses/by-nc-sa/3.0/"},
+  "http://creativecommons.org/licenses/by-nc/3.0/": { name: "CC-BY-NC", url: "http://creativecommons.org/licenses/by-nc/3.0/"},
+  "http://creativecommons.org/licenses/by/3.0/": { name: "CC-BY", url: "http://creativecommons.org/licenses/by/3.0/"},
+  "http://creativecommons.org/licenses/by-sa/3.0/": { name: "CC-BY-SA", url: "http://creativecommons.org/licenses/by-sa/3.0/"},
+  "http://creativecommons.org/licenses/by-nc-nd/3.0/": { name: "CC-BY-NC-ND", url: "http://creativecommons.org/licenses/by-nc-nd/3.0/"},
+
+  "public domain mark": { name: "Public Domain", url: "http://creativecommons.org/publicdomain/mark/1.0"},
+  "attribution-noncommercial 4.0 international": { name: "(CC-BY-NC)", url: "https://creativecommons.org/licenses/by-nc/4.0/"},
+  "attribution 4.0 international": { name: "(CC-BY)", url: "https://creativecommons.org/licenses/by/4.0/"},
+}
+
+
 function DatasetRow({ dataset }: { dataset: Dataset }) {
+  const license = dataset.license ? LICENSES[dataset.license.toLowerCase()] : undefined;
+
   return (
     <Paper radius="lg">
       <Grid>
@@ -72,7 +106,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
           <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Access rights" value={dataset.license} />
+          <AttributePill label="Access rights" value={license?.name || dataset.license} href={license?.url} />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill label="Last updated" value={DateTime.fromISO(dataset.updatedAt).toLocaleString()} />
