@@ -70,11 +70,11 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
     >
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
-          <Tabs.Tab value="whole_genomes">Genome Assemblies ({summary?.genomes || "0"})</Tabs.Tab>
-          <Tabs.Tab value="components">Genomic Components ({summary?.other || "0"})</Tabs.Tab>
-          <Tabs.Tab value="markers">Single Loci ({summary?.loci || "0"})</Tabs.Tab>
+          <Tabs.Tab value="whole_genomes">Genome Assemblies</Tabs.Tab>
+          <Tabs.Tab value="components">Genomic Components</Tabs.Tab>
+          <Tabs.Tab value="markers">Single Loci</Tabs.Tab>
           <Tabs.Tab value="distribution">Data Distribution</Tabs.Tab>
-          <Tabs.Tab value="specimens">Specimens ({summary?.specimens || "0"})</Tabs.Tab>
+          <Tabs.Tab value="specimens">Specimens</Tabs.Tab>
           <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
         </Tabs.List>
       </Container>
