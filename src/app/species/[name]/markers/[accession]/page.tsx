@@ -102,7 +102,7 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
-  const depositionBase = sequence?.datasetName === "BOLD" && `https://www.boldsystems.org/index.php/Public_BarcodeCluster?clusteruri=`;
+  const depositionBase = sequence?.datasetName === "BOLD" && 'https://www.boldsystems.org/index.php/Public_RecordView?processid=';
 
   return (
     <Grid>
@@ -141,7 +141,7 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
           <Stack>
             <Title order={5}>Original data</Title>
             <LinkButton color="midnight" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>get FASTA</LinkButton>
-            <LinkButton color="midnight" radius="md" leftSection={<IconLink />} href={deposition?.url && `${depositionBase}${deposition?.url}`}>go to source</LinkButton>
+            <LinkButton color="midnight" radius="md" leftSection={<IconLink />} href={deposition?.accession && `${depositionBase}${deposition?.accession}`}>go to source</LinkButton>
             <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
           </Stack>
         </Paper>
