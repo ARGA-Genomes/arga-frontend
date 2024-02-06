@@ -54,7 +54,7 @@ export function TopNav() {
     </Modal>
 
     <Group justify="space-between" align="end" px={30}>
-      <Link href='/' >
+      <Link href='/' onClick={() => setActive(0)}>
         <Image py={30} src='/arga-logo.svg' alt='Australian Reference Genome Atlas' width={450} />
       </Link>
 

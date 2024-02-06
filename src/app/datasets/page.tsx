@@ -2,7 +2,7 @@
 
 import { LoadOverlay } from "@/components/load-overlay";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Title, Paper, Button, Stack, Container } from "@mantine/core";
+import { Grid, Title, Paper, Button, Stack, Container, Text } from "@mantine/core";
 import Link from "next/link";
 import { DateTime } from "luxon";
 import { AttributePill } from "@/components/data-fields";
@@ -156,7 +156,7 @@ export default function DatasetsPage() {
       <Stack gap="xl" my="xl">
         <Paper py={20} pos="relative">
           <Container maw={MAX_WIDTH}>
-            <Title>Data sources indexed in ARGA</Title>
+            <Text fz={38} fw={700}>Data sources indexed in ARGA</Text>
           </Container>
         </Paper>
 
