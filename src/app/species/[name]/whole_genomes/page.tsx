@@ -66,6 +66,7 @@ query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int, $f
         releaseDate
         latitude
         longitude
+        representation
       }
     }
   }

@@ -45,6 +45,7 @@ const BADGE_COLOURS: Record<string, string> = {
   "no": "bushfire.3",
   "representative genome": "moss.3",
   "Full": "moss.3",
+  "Complete": "moss.3",
   "Partial": "bushfire.3",
   "Chromosome": "moss.3",
   "Contig": "bushfire.3",
