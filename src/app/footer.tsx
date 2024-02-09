@@ -31,6 +31,7 @@ export function Footer() {
           <Stack className={classes['footer-nav']}>
             <FooterLink href="https://arga.org.au/contact/">Contact us</FooterLink>
             <FooterLink href="https://arga.org.au/about/">About us</FooterLink>
+            <FooterLink href="mailto:support@arga.org.au">Help</FooterLink>
             <FooterLink href="https://arga.org.au/user-guide/">User guide</FooterLink>
             <FooterLink href="https://arga.org.au/user-guide/#acknowledging-arga">Acknowledging ARGA</FooterLink>
           </Stack>
