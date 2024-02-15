@@ -14,6 +14,7 @@ import { TopNav } from './top-nav';
 import { MAX_WIDTH } from './constants';
 import { Footer } from './footer';
 import { TraceLoaderProvider } from '@/components/traces/context';
+import Fathom from '@/components/fathom';
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -22,10 +23,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <head>
-        <script src="https://cdn.usefathom.com/script.js" data-site="WKYXKFQB" defer></script>
-      </head>
       <body>
+        <Fathom/>
         <ApolloProvider client={client}>
           <MantineProvider theme={theme}>
             <TraceLoaderProvider>

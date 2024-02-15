@@ -38,6 +38,7 @@
     "embla-carousel-react": "^7.0.0",
     "eslint": "8.50.0",
     "eslint-config-next": "13.5.3",
+    "fathom-client": "^3.6.0",
     "flag": "^5.0.1",
     "graphql": "^16.8.1",
     "humanize-plus": "^1.8.2",
