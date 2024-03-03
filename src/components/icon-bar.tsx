@@ -82,7 +82,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   },
   CRUSTACEANS: {
     image: "/species-icons/crustaceans.svg",
-    label: "Marine crustaceans",
+    label: "Crustaceans",
     link: "/subphylum/Crustacea",
   },
   INSECTS: {
@@ -91,7 +91,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     link: "/class/Insecta",
   },
   FROGS_AND_OTHER_AMPHIBIANS: {
-    image: "/species-icons/frogs.svg",
+    image: "/species-icons/frogs_updated.svg",
     label: "Frogs and other amphibians",
     link: "/class/Amphibia",
   },
@@ -117,7 +117,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   },
 
   FLOWERING_PLANTS: {
-    image: "/species-icons/plants.svg",
+    image: "/species-icons/flowering_plants.svg",
     label: "Flowering plants",
     link: "/regnum/Plantae",
   },
@@ -165,6 +165,16 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "/species-icons/sharks.svg",
     label: "Sharks and rays",
     link: "/subclass/Elasmobranchii",
+  },
+  SPIDERS: {
+    image: "/species-icons/spiders.svg",
+    label: "Spiders",
+    link: "/order/Araneae",
+  },
+  REPTILES: {
+    image: "/species-icons/reptiles.svg",
+    label: "Reptiles",
+    link: "/class/Reptilia",
   },
 };
 
