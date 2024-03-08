@@ -1,5 +1,19 @@
-import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
-import { Box, Group, ThemeIcon, Image, Tooltip, Text, Popover, Stack, SimpleGrid } from "@mantine/core";
+import {
+  Conservation,
+  IndigenousEcologicalKnowledge,
+  Taxonomy,
+} from "@/app/type";
+import {
+  Box,
+  Group,
+  ThemeIcon,
+  Image,
+  Tooltip,
+  Text,
+  Popover,
+  Stack,
+  SimpleGrid,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { CircleCheck, CircleX } from "tabler-icons-react";
@@ -106,7 +120,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     link: "/class/Mammalia",
   },
   SEAWEEDS: {
-    image: "/species-icons/seaweed.svg",
+    image: "/species-icons/algae.svg",
     label: "Seaweeds",
     link: "/regnum/Chromista",
   },
@@ -127,17 +141,17 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     link: "/kingdom/Animalia",
   },
   BROWN_ALGAE: {
-    image: "/species-icons/brown_algae",
+    image: "/species-icons/brown_algae.svg",
     label: "Brown algae",
     link: "/classis/Phaeophyceae",
   },
   RED_ALGAE: {
-    image: "/species-icons/red_algae",
+    image: "/species-icons/red_algae.svg",
     label: "Red algae",
     link: "/division/Rhodophyta",
   },
   GREEN_ALGAE: {
-    image: "/species-icons/green_algae",
+    image: "/species-icons/green_algae.svg",
     label: "Green algae",
     link: "/division/Chlorophyta",
   },
@@ -176,6 +190,11 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     label: "Reptiles",
     link: "/class/Reptilia",
   },
+  MOSSES: {
+    image: "/species-icons/mosses.svg",
+    label: "Mosses",
+    link: "/classis/Bryopsida",
+  },
 };
 
 const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
@@ -194,22 +213,25 @@ const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
     image: "/species-icons/iek_noongar_boodjar.svg",
     link: "/browse/datasets/Indigenous Ecological Knowledge: Noongar Boodjar People",
   },
-}
+};
 
-function ConservationIcon({ status, source }: { status: string, source: string | undefined }) {
-  const icon = CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
+function ConservationIcon({
+  status,
+  source,
+}: {
+  status: string;
+  source: string | undefined;
+}) {
+  const icon =
+    CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
   const tooltip = `${icon.label || status} | ${source}`;
 
   return (
     <Tooltip label={tooltip}>
       <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
-        {icon.image &&
-         <Image
-           src={icon?.image}
-           alt={icon.label || status}
-           w={60}
-         />
-        }
+        {icon.image && (
+          <Image src={icon?.image} alt={icon.label || status} w={60} />
+        )}
       </ThemeIcon>
     </Tooltip>
   );
@@ -222,11 +244,7 @@ function VernacularGroupIcon({ group }: { group: string }) {
   const component = (
     <Tooltip label={icon.label}>
       <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
-        <Image
-          src={icon.image}
-          alt={`Icon of ${icon.label}`}
-          w={60}
-        />
+        <Image src={icon.image} alt={`Icon of ${icon.label}`} w={60} />
       </ThemeIcon>
     </Tooltip>
   );
@@ -239,28 +257,66 @@ function VernacularGroupIcon({ group }: { group: string }) {
 }
 
 interface IndigenousLanguageGroupIconProps {
-  group: string,
-  trait: IndigenousEcologicalKnowledge,
+  group: string;
+  trait: IndigenousEcologicalKnowledge;
 }
 
-function IndigenousLanguageGroupIcon({ group, trait }: IndigenousLanguageGroupIconProps) {
+function IndigenousLanguageGroupIcon({
+  group,
+  trait,
+}: IndigenousLanguageGroupIconProps) {
   const [opened, { close, open }] = useDisclosure(false);
-  const extraDimmed = 'rgba(134, 142, 150, .3)';
+  const extraDimmed = "rgba(134, 142, 150, .3)";
 
   const icon = INDIGENOUS_LANGUAGE_GROUP_ICON[group];
   const component = (
     <Popover position="bottom" withArrow shadow="md" opened={opened}>
       <Popover.Target>
-        <Image w={60} src={icon?.image} alt="" onMouseEnter={open} onMouseLeave={close} />
+        <Image
+          w={60}
+          src={icon?.image}
+          alt=""
+          onMouseEnter={open}
+          onMouseLeave={close}
+        />
       </Popover.Target>
       <Popover.Dropdown>
         <Stack>
           <Text>{icon?.label}</Text>
-          <Text size="sm"><strong>Name:</strong> {trait.name}</Text>
+          <Text size="sm">
+            <strong>Name:</strong> {trait.name}
+          </Text>
           <SimpleGrid cols={3}>
-            <AttributeIcon label="Food use" icon={trait.foodUse ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} />} />
-            <AttributeIcon label="Medicinal use" icon={trait.medicinalUse ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} />} />
-            <AttributeIcon label="Cultural connection" icon={trait.culturalConnection ? <CircleCheck color="green" /> : <CircleX color={extraDimmed} />} />
+            <AttributeIcon
+              label="Food use"
+              icon={
+                trait.foodUse ? (
+                  <CircleCheck color="green" />
+                ) : (
+                  <CircleX color={extraDimmed} />
+                )
+              }
+            />
+            <AttributeIcon
+              label="Medicinal use"
+              icon={
+                trait.medicinalUse ? (
+                  <CircleCheck color="green" />
+                ) : (
+                  <CircleX color={extraDimmed} />
+                )
+              }
+            />
+            <AttributeIcon
+              label="Cultural connection"
+              icon={
+                trait.culturalConnection ? (
+                  <CircleCheck color="green" />
+                ) : (
+                  <CircleX color={extraDimmed} />
+                )
+              }
+            />
           </SimpleGrid>
         </Stack>
       </Popover.Dropdown>
@@ -268,9 +324,7 @@ function IndigenousLanguageGroupIcon({ group, trait }: IndigenousLanguageGroupIc
   );
 
   return (
-    <>
-      {icon?.link ? <Link href={icon.link}>{component}</Link> : component}
-    </>
+    <>{icon?.link ? <Link href={icon.link}>{component}</Link> : component}</>
   );
 }
 
@@ -305,12 +359,16 @@ function DebugIconBar() {
 }
 
 interface IconBarProps {
-  taxonomy: Taxonomy,
-  conservation?: Conservation[],
-  traits?: IndigenousEcologicalKnowledge[],
+  taxonomy: Taxonomy;
+  conservation?: Conservation[];
+  traits?: IndigenousEcologicalKnowledge[];
 }
 
-export default function IconBar({ taxonomy, conservation, traits }: IconBarProps) {
+export default function IconBar({
+  taxonomy,
+  conservation,
+  traits,
+}: IconBarProps) {
   return (
     <Box>
       <Group>
