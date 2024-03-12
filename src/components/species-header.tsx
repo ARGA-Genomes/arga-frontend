@@ -114,66 +114,6 @@ function Header({
         </Group>
       </Flex>
     </Flex>
-    // <Flex justify="space-between" direction={{ base: "column", md: "row" }}>
-    //   <Group gap={40}>
-    //     <Text c="dimmed" fw={400}>
-    //       Species
-    //     </Text>
-    //     <Text fz={38} fw={700} fs="italic">
-    //       {taxonomy[0]?.canonicalName}
-    //     </Text>
-    //   </Group>
-
-    //   <Flex>
-    //     <IconBar
-    //       taxonomy={taxonomy[0]}
-    //       conservation={conservation}
-    //       traits={traits}
-    //     />
-
-    //     <Group h="100%">
-    //       <Text fw={700} c="dimmed">
-    //         Reference Genome
-    //       </Text>
-    //       {referenceGenome ? (
-    //         <CircleCheck size={35} color={theme.colors.moss[5]} />
-    //       ) : (
-    //         <CircleX size={35} color={theme.colors.red[5]} />
-    //       )}
-    //     </Group>
-    //   </Flex>
-    // </Flex>
-    // <Grid>
-    //   <Grid.Col span="auto">
-    //     <Group gap={40}>
-    //       <Text c="dimmed" fw={400}>
-    //         Species
-    //       </Text>
-    //       <Text fz={38} fw={700} fs="italic">
-    //         {taxonomy[0]?.canonicalName}
-    //       </Text>
-    //     </Group>
-    //   </Grid.Col>
-    //   <Grid.Col span="content">
-    //     <IconBar
-    //       taxonomy={taxonomy[0]}
-    //       conservation={conservation}
-    //       traits={traits}
-    //     />
-    //   </Grid.Col>
-    //   <Grid.Col span="content" ml={80}>
-    //     <Group h="100%" pl={30}>
-    //       <Text fw={700} c="dimmed">
-    //         Reference Genome
-    //       </Text>
-    //       {referenceGenome ? (
-    //         <CircleCheck size={35} color={theme.colors.moss[5]} />
-    //       ) : (
-    //         <CircleX size={35} color={theme.colors.red[5]} />
-    //       )}
-    //     </Group>
-    //   </Grid.Col>
-    // </Grid>
   );
 }
 
