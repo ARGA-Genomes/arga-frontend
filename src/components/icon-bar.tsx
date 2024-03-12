@@ -16,7 +16,12 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import { CircleCheck, CircleX } from "tabler-icons-react";
+import {
+  CircleCheck,
+  CircleX,
+  ArrowBigLeft,
+  ArrowBigRight,
+} from "tabler-icons-react";
 import { AttributeIcon } from "./highlight-stack";
 
 interface IconData {
@@ -119,17 +124,11 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     label: "Mammals",
     link: "/class/Mammalia",
   },
-  SEAWEEDS: {
-    image: "/species-icons/algae.svg",
-    label: "Seaweeds",
-    link: "/regnum/Chromista",
-  },
   HIGHER_PLANTS: {
     image: "/species-icons/plants.svg",
     label: "Higher plants",
     link: "/regnum/Plantae",
   },
-
   FLOWERING_PLANTS: {
     image: "/species-icons/flowering_plants.svg",
     label: "Flowering plants",
@@ -195,6 +194,16 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     label: "Mosses",
     link: "/classis/Bryopsida",
   },
+  LIVERWORTS: {
+    image: "/species-icons/liverworts.svg",
+    label: "Liverworts",
+    link: "/division/Marchantiophyta",
+  },
+  HORNWORTS: {
+    image: "/species-icons/hornworts.svg",
+    label: "Hornworts",
+    link: "/division/Anthocerotophyta",
+  },
 };
 
 const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
@@ -250,9 +259,7 @@ function VernacularGroupIcon({ group }: { group: string }) {
   );
 
   return (
-    <Tooltip label={icon.label}>
-      {icon.link ? <Link href={icon.link}>{component}</Link> : component}
-    </Tooltip>
+    <>{icon.link ? <Link href={icon.link}>{component}</Link> : component}</>
   );
 }
 
