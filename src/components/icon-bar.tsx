@@ -14,15 +14,13 @@ import {
   Stack,
   SimpleGrid,
 } from "@mantine/core";
+import { Carousel } from "@mantine/carousel";
+import "@mantine/carousel/styles.css";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import {
-  CircleCheck,
-  CircleX,
-  ArrowBigLeft,
-  ArrowBigRight,
-} from "tabler-icons-react";
+import { CircleCheck, CircleX } from "tabler-icons-react";
 import { AttributeIcon } from "./highlight-stack";
+import { useEffect, useState } from "react";
 
 interface IconData {
   label?: string;
@@ -105,7 +103,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     link: "/subphylum/Crustacea",
   },
   INSECTS: {
-    image: "/species-icons/insects.svg",
+    image: "/species-icons/insecta.svg",
     label: "Insects",
     link: "/class/Insecta",
   },
@@ -376,27 +374,135 @@ export default function IconBar({
   conservation,
   traits,
 }: IconBarProps) {
+  const headerIcons = [taxonomy.vernacularGroup];
+
+  const [winWidth, setWinWidth] = useState(window.innerWidth);
+  const detectResize = () => {
+    setWinWidth(window.innerWidth);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", detectResize);
+
+    return () => {
+      window.removeEventListener("resize", detectResize);
+    };
+  }, [winWidth]);
+
+  const setControls = () => {
+    if (winWidth >= 992) {
+      if (headerIcons.length <= 6) {
+        return false;
+      } else {
+        return true;
+      }
+    } else if (winWidth >= 768 && winWidth < 992) {
+      if (headerIcons.length <= 5) {
+        return false;
+      } else {
+        return true;
+      }
+    } else if (winWidth >= 576 && winWidth < 768) {
+      if (headerIcons.length <= 4) {
+        return false;
+      } else {
+        return true;
+      }
+    } else if (winWidth < 576) {
+      if (headerIcons.length <= 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  };
+
   return (
-    <Box>
-      <Group>
-        {taxonomy?.vernacularGroup ? (
-          <VernacularGroupIcon group={taxonomy.vernacularGroup} />
-        ) : null}
-        {conservation?.map((cons) => (
-          <ConservationIcon
-            status={cons.status.toLowerCase()}
-            source={cons.source}
-            key={cons.status + cons.source}
-          />
-        ))}
-        {traits?.map((trait) => (
-          <IndigenousLanguageGroupIcon
-            group={trait.datasetName}
-            trait={trait}
-            key={trait.id}
-          />
-        ))}
-      </Group>
-    </Box>
+    <Carousel
+      slideSize={{
+        base:
+          headerIcons.length <= 3
+            ? (100 / headerIcons.length).toString() + "%"
+            : "33.333333%",
+        xs:
+          headerIcons.length <= 4
+            ? (100 / headerIcons.length).toString() + "%"
+            : "25%",
+        sm:
+          headerIcons.length <= 5
+            ? (100 / headerIcons.length).toString() + "%"
+            : "20%",
+        md:
+          headerIcons.length <= 6
+            ? (100 / headerIcons.length).toString() + "%"
+            : "16.66666666%",
+      }}
+      maw={{
+        base:
+          headerIcons.length <= 3
+            ? (70 * headerIcons.length).toString() + "px"
+            : "306px",
+        xs:
+          headerIcons.length <= 4
+            ? (70 * headerIcons.length).toString() + "px"
+            : "376px",
+        sm:
+          headerIcons.length <= 5
+            ? (70 * headerIcons.length).toString() + "px"
+            : "446px",
+        md:
+          headerIcons.length <= 6
+            ? (70 * headerIcons.length).toString() + "px"
+            : "516px",
+      }}
+      pr={{
+        base: headerIcons.length <= 3 ? "0" : "3em",
+        xs: headerIcons.length <= 4 ? "0" : "3em",
+        sm: headerIcons.length <= 5 ? "0" : "3em",
+        md: headerIcons.length <= 6 ? "0" : "3em",
+      }}
+      pl={{
+        base: headerIcons.length <= 3 ? "0" : "3em",
+        xs: headerIcons.length <= 4 ? "0" : "3em",
+        sm: headerIcons.length <= 5 ? "0" : "3em",
+        md: headerIcons.length <= 6 ? "0" : "3em",
+      }}
+      withControls={setControls()}
+      draggable={setControls()}
+      align="start"
+      loop
+    >
+      {headerIcons.map(
+        (icon) =>
+          icon && (
+            <Carousel.Slide pr="5px" pl="5px">
+              <Box w="100%" display="flex" style={{ justifyContent: "center" }}>
+                <VernacularGroupIcon group={icon} />
+              </Box>
+            </Carousel.Slide>
+          )
+      )}
+    </Carousel>
+    // <Box>
+    //   <Group>
+    //     {taxonomy?.vernacularGroup ? (
+    //       <VernacularGroupIcon group={taxonomy.vernacularGroup} />
+    //     ) : null}
+    //     {conservation?.map((cons) => (
+    //       <ConservationIcon
+    //         status={cons.status.toLowerCase()}
+    //         source={cons.source}
+    //         key={cons.status + cons.source}
+    //       />
+    //     ))}
+    //     {traits?.map((trait) => (
+    //       <IndigenousLanguageGroupIcon
+    //         group={trait.datasetName}
+    //         trait={trait}
+    //         key={trait.id}
+    //       />
+    //     ))}
+    //   </Group>
+    // </Box>
   );
 }

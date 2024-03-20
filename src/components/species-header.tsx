@@ -9,6 +9,9 @@ import {
   Text,
   Flex,
   useMantineTheme,
+  Box,
+  Center,
+  Badge,
 } from "@mantine/core";
 import {
   Conservation,
@@ -19,6 +22,7 @@ import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
 import { CircleCheck, CircleX } from "tabler-icons-react";
+import { IconCircleCheckFilled, IconCircleXFilled } from "@tabler/icons-react";
 
 const GET_SPECIES = gql`
   query SpeciesWithConservation($canonicalName: String) {
@@ -71,18 +75,22 @@ function Header({
   referenceGenome,
 }: HeaderProps) {
   const theme = useMantineTheme();
+  const refGenomeBackground = referenceGenome
+    ? theme.colors.moss[5]
+    : theme.colors.red[5];
 
   return (
+    // Original format
     <Flex
       justify="space-between"
-      direction={{ base: "column", md: "row" }}
+      direction={{ base: "column", lg: "row" }}
+      align={{ base: "normal", lg: "center" }}
       gap="md"
-      wrap="wrap"
     >
       <Flex
-        direction={{ base: "column", md: "row" }}
-        gap={{ base: 0, md: 40 }}
-        align={{ base: "normal", md: "center" }}
+        direction={{ base: "column", lg: "row" }}
+        gap={{ base: 0, lg: 40 }}
+        align={{ base: "normal", lg: "center" }}
       >
         <Text c="dimmed" fw={400}>
           Species
@@ -93,8 +101,9 @@ function Header({
       </Flex>
 
       <Flex
-        direction={{ base: "column", md: "row" }}
-        gap={{ base: "md", md: "xl" }}
+        direction={{ base: "column", lg: "row" }}
+        gap={{ base: "md", lg: "xl" }}
+        align={{ base: "normal", lg: "center" }}
       >
         <IconBar
           taxonomy={taxonomy[0]}
@@ -102,9 +111,9 @@ function Header({
           traits={traits}
         />
 
-        <Group h="100%" wrap="nowrap">
+        <Group h="100%" wrap="nowrap" gap={5}>
           <Text fw={700} c="dimmed" style={{ whiteSpace: "nowrap" }}>
-            Reference Genome
+            Reference genome available
           </Text>
           {referenceGenome ? (
             <CircleCheck size={35} color={theme.colors.moss[5]} />
