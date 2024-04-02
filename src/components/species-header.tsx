@@ -22,7 +22,6 @@ import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
 import { CircleCheck, CircleX } from "tabler-icons-react";
-import { IconCircleCheckFilled, IconCircleXFilled } from "@tabler/icons-react";
 
 const GET_SPECIES = gql`
   query SpeciesWithConservation($canonicalName: String) {
@@ -30,6 +29,7 @@ const GET_SPECIES = gql`
       taxonomy {
         canonicalName
         vernacularGroup
+        source
       }
       conservation {
         status

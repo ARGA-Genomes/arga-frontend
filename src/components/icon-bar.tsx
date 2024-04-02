@@ -130,7 +130,7 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   FLOWERING_PLANTS: {
     image: "/species-icons/flowering_plants.svg",
     label: "Flowering plants",
-    link: "/regnum/Plantae",
+    link: "/subclassis/Magnoliidae",
   },
   ANIMALS: {
     image: "/species-icons/animals.svg",
@@ -201,6 +201,31 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "/species-icons/hornworts.svg",
     label: "Hornworts",
     link: "/division/Anthocerotophyta",
+  },
+  LICHENS: {
+    image: "/species-icons/lichens.svg",
+    label: "Lichens",
+    link: "",
+  },
+  FERNS: {
+    image: "/species-icons/ferns.svg",
+    label: "Ferns",
+    link: "/subclassis/Polypodiidae",
+  },
+  CONIFERS_AND_CYCADS: {
+    image: "/species-icons/conifers_and_cycads.svg",
+    label: "Conifers and cycads",
+    link: "/ordo/Pinales",
+  },
+  DIATOMS: {
+    image: "/species-icons/diatoms.svg",
+    label: "Diatoms",
+    link: "/division/Bacillariophyta",
+  },
+  CHROMISTS: {
+    image: "/species-icons/chromists.svg",
+    label: "Chromists",
+    link: "/regnum/Chromista",
   },
 };
 
@@ -363,6 +388,18 @@ function DebugIconBar() {
   );
 }
 
+function isLichen(source: string | undefined) {
+  if (source !== undefined) {
+    if (source === "Australian Lichen List") {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+
 interface IconBarProps {
   taxonomy: Taxonomy;
   conservation?: Conservation[];
@@ -375,6 +412,7 @@ export default function IconBar({
   traits,
 }: IconBarProps) {
   const headerIcons = [taxonomy.vernacularGroup];
+  isLichen(taxonomy.source) ? headerIcons.push("LICHENS") : undefined;
 
   const [winWidth, setWinWidth] = useState(window.innerWidth);
   const detectResize = () => {
