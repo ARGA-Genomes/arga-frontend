@@ -511,9 +511,9 @@ export default function IconBar({
       loop
     >
       {headerIcons.map(
-        (icon) =>
+        (icon, index) =>
           icon && (
-            <Carousel.Slide pr="5px" pl="5px">
+            <Carousel.Slide pr="5px" pl="5px" key={index}>
               <Box w="100%" display="flex" style={{ justifyContent: "center" }}>
                 <VernacularGroupIcon group={icon} />
               </Box>
