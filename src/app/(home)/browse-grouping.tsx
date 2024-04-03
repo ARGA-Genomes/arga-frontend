@@ -2,8 +2,9 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { BrowseCard } from "@/components/browse-card";
-import { Carousel } from "@mantine/carousel";
+import { Carousel, Embla } from "@mantine/carousel";
 import { Group } from "@mantine/core";
+import "@mantine/carousel/styles.css";
 
 type Overview = {
   allSpecies: number;
@@ -42,14 +43,13 @@ export default function BrowseGrouping() {
 
   return (
     <Carousel
-      height={340}
-      slideSize={{ base: 230, md: "50%" }}
-      slideGap={{ base: "md", sm: 0 }}
+      slideSize={150}
+      slideGap="sm"
       slidesToScroll="auto"
       align="start"
       withControls={false}
     >
-      <Group>
+      <Group align="flex-start">
         <Carousel.Slide>
           <BrowseCard
             total={data && (sources["ARGA Bushfire Recovery"] || 0)}

@@ -3,8 +3,9 @@
 import { gql, useQuery } from "@apollo/client";
 
 import { BrowseCard } from "@/components/browse-card";
-import {Carousel} from "@mantine/carousel";
+import { Carousel, Embla } from "@mantine/carousel";
 import { Group } from "@mantine/core";
+import "@mantine/carousel/styles.css";
 
 type Overview = {
   wholeGenomes: number;
@@ -32,38 +33,37 @@ export default function BrowseType() {
 
   return (
     <Carousel
-      height={340}
-      slideSize={{ base: 230, md: '50%' }}
-      slideGap={{ base: "md", sm: 0 }}
-      slidesToScroll='auto'
+      slideSize={150}
+      slideGap="sm"
+      slidesToScroll="auto"
       align="start"
       withControls={false}
     >
-      <Group>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data?.overview.wholeGenomes}
-          category="Genome assemblies"
-          image="/card-icons/type/whole_genomes.svg"
-          link="/browse/genomes"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data?.overview.loci}
-          category="Single loci"
-          image="/card-icons/type/markers.svg"
-          link="/browse/loci"
-        />
-      </Carousel.Slide>
-      <Carousel.Slide>
-        <BrowseCard
-          total={data?.overview.specimens}
-          category="Specimens"
-          image="/card-icons/type/specimens.svg"
-          link="/browse/specimens"
-        />
-      </Carousel.Slide>
+      <Group align="flex-start">
+        <Carousel.Slide>
+          <BrowseCard
+            total={data?.overview.wholeGenomes}
+            category="Genome assemblies"
+            image="/card-icons/type/whole_genomes.svg"
+            link="/browse/genomes"
+          />
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <BrowseCard
+            total={data?.overview.loci}
+            category="Single loci"
+            image="/card-icons/type/markers.svg"
+            link="/browse/loci"
+          />
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <BrowseCard
+            total={data?.overview.specimens}
+            category="Specimens"
+            image="/card-icons/type/specimens.svg"
+            link="/browse/specimens"
+          />
+        </Carousel.Slide>
       </Group>
     </Carousel>
   );
