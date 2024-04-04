@@ -21,6 +21,7 @@ import Link from "next/link";
 import { CircleCheck, CircleX } from "tabler-icons-react";
 import { AttributeIcon } from "./highlight-stack";
 import { useEffect, useState } from "react";
+import { gql, useQuery } from "@apollo/client";
 
 interface IconData {
   label?: string;
@@ -205,7 +206,6 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   LICHENS: {
     image: "/species-icons/lichens.svg",
     label: "Lichens",
-    link: "",
   },
   FERNS: {
     image: "/species-icons/ferns.svg",
@@ -215,7 +215,6 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   CONIFERS_AND_CYCADS: {
     image: "/species-icons/conifers_and_cycads.svg",
     label: "Conifers and cycads",
-    link: "/ordo/Pinales",
   },
   DIATOMS: {
     image: "/species-icons/diatoms.svg",
@@ -269,9 +268,17 @@ function ConservationIcon({
   );
 }
 
-function VernacularGroupIcon({ group }: { group: string }) {
+interface VernacularGroupIconProps {
+  group: string;
+  iconLink?: string;
+}
+
+function VernacularGroupIcon({ group, iconLink }: VernacularGroupIconProps) {
   const icon = VERNACULAR_GROUP_ICON[group];
   if (!icon) return null;
+  if (!iconLink) {
+    iconLink = icon.link;
+  }
 
   const component = (
     <Tooltip label={icon.label}>
@@ -281,9 +288,7 @@ function VernacularGroupIcon({ group }: { group: string }) {
     </Tooltip>
   );
 
-  return (
-    <>{icon.link ? <Link href={icon.link}>{component}</Link> : component}</>
-  );
+  return <>{iconLink ? <Link href={iconLink}>{component}</Link> : component}</>;
 }
 
 interface IndigenousLanguageGroupIconProps {
@@ -398,6 +403,55 @@ function isLichen(source: string | undefined) {
   } else {
     return false;
   }
+}
+
+const GET_TAXON = gql`
+  query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
+    taxon(rank: $rank, canonicalName: $canonicalName) {
+      hierarchy {
+        canonicalName
+        rank
+        depth
+      }
+    }
+  }
+`;
+
+type ClassificationNode = {
+  canonicalName: string;
+  rank: string;
+  depth: number;
+};
+
+type TaxonQuery = {
+  taxon: {
+    hierarchy: ClassificationNode[];
+  };
+};
+
+// The taxonomic groups that make up Conifers and Cycads are disjoint
+// Returns the appropriate taxonomic link for whichever ordo the species is from
+function getConiferCycadLink(taxonomy: Taxonomy) {
+  var taxonLink = "/ordo/";
+  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+    variables: {
+      rank: taxonomy.rank,
+      canonicalName: taxonomy.canonicalName,
+    },
+  });
+
+  const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
+  hierarchy?.forEach((taxon) => {
+    if (
+      taxon.rank === "ORDO" &&
+      (taxon.canonicalName === "Pinales" || taxon.canonicalName === "Cycadales")
+    ) {
+      taxonLink += taxon.canonicalName;
+      return taxonLink;
+    }
+  });
+
+  return taxonLink;
 }
 
 interface IconBarProps {
@@ -515,32 +569,18 @@ export default function IconBar({
           icon && (
             <Carousel.Slide pr="5px" pl="5px" key={index}>
               <Box w="100%" display="flex" style={{ justifyContent: "center" }}>
-                <VernacularGroupIcon group={icon} />
+                {icon === "CONIFERS_AND_CYCADS" ? (
+                  <VernacularGroupIcon
+                    group={icon}
+                    iconLink={getConiferCycadLink(taxonomy)}
+                  />
+                ) : (
+                  <VernacularGroupIcon group={icon} />
+                )}
               </Box>
             </Carousel.Slide>
           )
       )}
     </Carousel>
-    // <Box>
-    //   <Group>
-    //     {taxonomy?.vernacularGroup ? (
-    //       <VernacularGroupIcon group={taxonomy.vernacularGroup} />
-    //     ) : null}
-    //     {conservation?.map((cons) => (
-    //       <ConservationIcon
-    //         status={cons.status.toLowerCase()}
-    //         source={cons.source}
-    //         key={cons.status + cons.source}
-    //       />
-    //     ))}
-    //     {traits?.map((trait) => (
-    //       <IndigenousLanguageGroupIcon
-    //         group={trait.datasetName}
-    //         trait={trait}
-    //         key={trait.id}
-    //       />
-    //     ))}
-    //   </Group>
-    // </Box>
   );
 }

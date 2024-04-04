@@ -30,6 +30,7 @@ const GET_SPECIES = gql`
         canonicalName
         vernacularGroup
         source
+        rank
       }
       conservation {
         status
