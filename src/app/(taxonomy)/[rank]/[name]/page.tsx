@@ -1,6 +1,6 @@
 "use client";
 
-import * as Humanize from 'humanize-plus';
+import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import {
   Paper,
@@ -40,216 +40,224 @@ import { DrainageBasinFilters } from "@/components/filtering/drainage-basin";
 import { TachoChart } from "@/components/graphing/tacho";
 import { PieChart } from "@/components/graphing/pie";
 import { BarChart } from "@/components/graphing/bar";
-import { BushfireRecoveryFilters } from '@/components/filtering/bushfire-recovery';
-import { DataTable, DataTableRow } from '@/components/data-table';
-import { SpeciesCard } from '@/components/species-card';
-import { usePreviousPage } from '@/components/navigation-history';
-import { usePathname } from 'next/navigation';
-import { HasDataFilters } from '@/components/filtering/has-data';
-import { Photo } from '@/app/type';
-import Link from 'next/link';
-
+import { BushfireRecoveryFilters } from "@/components/filtering/bushfire-recovery";
+import { DataTable, DataTableRow } from "@/components/data-table";
+import { SpeciesCard } from "@/components/species-card";
+import { usePreviousPage } from "@/components/navigation-history";
+import { usePathname } from "next/navigation";
+import { HasDataFilters } from "@/components/filtering/has-data";
+import { Photo } from "@/app/type";
+import Link from "next/link";
 
 const PAGE_SIZE = 10;
 
-
 type Filters = {
-  classifications: Filter[],
-  vernacularGroup?: Filter,
-  ecology?: Filter,
-  ibra?: Filter,
-  imcra?: Filter,
-  state?: Filter,
-  drainageBasin?: Filter,
-  bushfireRecovery: Filter[],
-  dataTypes: Filter[],
-}
-
+  classifications: Filter[];
+  vernacularGroup?: Filter;
+  ecology?: Filter;
+  ibra?: Filter;
+  imcra?: Filter;
+  state?: Filter;
+  drainageBasin?: Filter;
+  bushfireRecovery: Filter[];
+  dataTypes: Filter[];
+};
 
 const GET_SPECIES = gql`
-query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
-  taxa(filters: $filters) {
-    species(page: $page, perPage: $perPage) {
-      total,
-      records {
-        taxonomy {
-          scientificName
-          canonicalName
-        }
-        photo {
-          url
-          publisher
-          license
-          rightsHolder
-        }
-        dataSummary {
-          genomes
-          loci
-          specimens
-          other
+  query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
+    taxa(filters: $filters) {
+      species(page: $page, perPage: $perPage) {
+        total
+        records {
+          taxonomy {
+            scientificName
+            canonicalName
+          }
+          photo {
+            url
+            publisher
+            license
+            rightsHolder
+          }
+          dataSummary {
+            genomes
+            loci
+            specimens
+            other
+          }
         }
       }
-    }
-    filterOptions {
-      ecology
-      ibra
-      imcra
-      state
-      drainageBasin
+      filterOptions {
+        ecology
+        ibra
+        imcra
+        state
+        drainageBasin
+      }
     }
   }
-}`;
-
+`;
 
 const GET_TAXON = gql`
-query TaxonDetails($rank: TaxonRank, $canonicalName: String, $descendantRank: TaxonRank) {
-  taxon(rank: $rank, canonicalName: $canonicalName) {
-    scientificName
-    canonicalName
-    authorship
-    status
-    nomenclaturalCode
-    citation
-    source
-    sourceUrl
-
-    hierarchy {
+  query TaxonDetails(
+    $rank: TaxonRank
+    $canonicalName: String
+    $descendantRank: TaxonRank
+  ) {
+    taxon(rank: $rank, canonicalName: $canonicalName) {
       scientificName
       canonicalName
-      rank
-      depth
-    }
+      authorship
+      status
+      nomenclaturalCode
+      citation
+      source
+      sourceUrl
 
-    descendants(rank: $descendantRank) {
-      canonicalName
-      species
-      speciesData
-      speciesGenomes
-    }
+      hierarchy {
+        scientificName
+        canonicalName
+        rank
+        depth
+      }
 
-    summary {
-      species
-      speciesData
-      speciesGenomes
-    }
+      descendants(rank: $descendantRank) {
+        canonicalName
+        species
+        speciesData
+        speciesGenomes
+      }
 
-    speciesSummary {
-      name
-      genomes
-      totalGenomic
-    }
+      summary {
+        species
+        speciesData
+        speciesGenomes
+      }
 
-    speciesGenomeSummary {
-      name
-      genomes
-      totalGenomic
+      speciesSummary {
+        name
+        genomes
+        totalGenomic
+      }
+
+      speciesGenomeSummary {
+        name
+        genomes
+        totalGenomic
+      }
     }
   }
-}`;
+`;
 
 type DataBreakdown = {
-  name: string,
-  genomes: number,
-  totalGenomic: number,
-}
+  name: string;
+  genomes: number;
+  totalGenomic: number;
+};
 
 type ClassificationNode = {
-  scientificName: string,
-  canonicalName: string,
-  rank: string,
-  depth: number,
-}
+  scientificName: string;
+  canonicalName: string;
+  rank: string;
+  depth: number;
+};
 
 type Taxonomy = {
-  scientificName: string,
-  scientificNameAuthorship: string,
-  canonicalName: string,
-  status: string,
-  nomenclaturalCode: string,
-  citation?: string,
-  source?: string,
-  sourceUrl?: string,
-  hierarchy: ClassificationNode[],
-  speciesSummary: DataBreakdown[]
-  speciesGenomeSummary: DataBreakdown[]
+  scientificName: string;
+  scientificNameAuthorship: string;
+  canonicalName: string;
+  status: string;
+  nomenclaturalCode: string;
+  citation?: string;
+  source?: string;
+  sourceUrl?: string;
+  hierarchy: ClassificationNode[];
+  speciesSummary: DataBreakdown[];
+  speciesGenomeSummary: DataBreakdown[];
   summary: {
-    species: number,
-    speciesData: number,
-    speciesGenomes: number,
-  }
+    species: number;
+    speciesData: number;
+    speciesGenomes: number;
+  };
   descendants: {
-    canonicalName: string,
-    species: number,
-    speciesData: number,
-    speciesGenomes: number,
-  }[]
+    canonicalName: string;
+    species: number;
+    speciesData: number;
+    speciesGenomes: number;
+  }[];
 };
 
 type DataSummary = {
-  genomes: number,
-  loci: number,
-  specimens: number,
-  other: number,
-}
+  genomes: number;
+  loci: number;
+  specimens: number;
+  other: number;
+};
 
 type Species = {
   taxonomy: {
-    scientificName: string,
-    canonicalName: string,
-  },
-  photo?: Photo,
-  dataSummary: DataSummary,
-}
+    scientificName: string;
+    canonicalName: string;
+  };
+  photo?: Photo;
+  dataSummary: DataSummary;
+};
 
 type FilterOptions = {
-  ecology: string[],
-  ibra: string[],
-  imcra: string[],
-  state: string[],
-  drainageBasin: string[],
-}
+  ecology: string[];
+  ibra: string[];
+  imcra: string[];
+  state: string[];
+  drainageBasin: string[];
+};
 
 type Taxa = {
   species: {
-    records: Species[],
-    total: number,
-  },
-  filterOptions: FilterOptions,
+    records: Species[];
+    total: number;
+  };
+  filterOptions: FilterOptions;
 };
 
 type QueryResults = {
-  taxa: Taxa,
+  taxa: Taxa;
 };
 
 type TaxonResults = {
-  taxon: Taxonomy,
-}
-
+  taxon: Taxonomy;
+};
 
 function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
   return (
     <Table>
       <tbody>
-      <tr>
-        <td>Scientific name</td>
-        <td><DataField value={taxon?.scientificName}/></td>
-      </tr>
-      <tr>
-        <td>Status</td>
-        <td><DataField value={taxon?.status.toLocaleLowerCase()}/></td>
-      </tr>
-      <tr>
-        <td>Source</td>
-        <td>
-          { taxon?.sourceUrl
-            ? <Link href={taxon?.sourceUrl} target="_blank"><DataField value={taxon?.source} /></Link>
-            : <DataField value={taxon?.source} />
-          }
-        </td>
-      </tr>
+        <tr>
+          <td>Scientific name</td>
+          <td>
+            <DataField value={taxon?.scientificName} />
+          </td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td>
+            <DataField value={taxon?.status.toLocaleLowerCase()} />
+          </td>
+        </tr>
+        <tr>
+          <td>Source</td>
+          <td>
+            {taxon?.sourceUrl ? (
+              <Link href={taxon?.sourceUrl} target="_blank">
+                <DataField value={taxon?.source} />
+              </Link>
+            ) : (
+              <DataField value={taxon?.source} />
+            )}
+          </td>
+        </tr>
       </tbody>
     </Table>
-  )
+  );
 }
 
 function HigherClassification({ taxon }: { taxon: Taxonomy | undefined }) {
@@ -257,35 +265,42 @@ function HigherClassification({ taxon }: { taxon: Taxonomy | undefined }) {
 
   return (
     <Group>
-      { hierarchy?.map((node, idx) => (
+      {hierarchy?.map((node, idx) => (
         <Attribute
           key={idx}
           label={Humanize.capitalize(node.rank.toLowerCase())}
           value={node.canonicalName}
-          href={`/${node.rank.toLowerCase() }/${node.canonicalName}`}
+          href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
         />
-      )) }
+      ))}
     </Group>
-  )
+  );
 }
 
-
 interface FiltersProps {
-  filters: Filters,
-  options?: FilterOptions,
-  onChange: (filters: Filters) => void,
+  filters: Filters;
+  options?: FilterOptions;
+  onChange: (filters: Filters) => void;
 }
 
 function Filters({ filters, options, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
-  const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(filters.vernacularGroup)
-  const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology)
-  const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra)
-  const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra)
-  const [state, setState] = useState<Filter | undefined>(filters.state)
-  const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin)
-  const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(filters.bushfireRecovery)
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
+  const [classifications, setClassifications] = useState<Filter[]>(
+    filters.classifications
+  );
+  const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(
+    filters.vernacularGroup
+  );
+  const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology);
+  const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra);
+  const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra);
+  const [state, setState] = useState<Filter | undefined>(filters.state);
+  const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(
+    filters.drainageBasin
+  );
+  const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(
+    filters.bushfireRecovery
+  );
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
     onChange({
@@ -298,11 +313,22 @@ function Filters({ filters, options, onChange }: FiltersProps) {
       drainageBasin,
       bushfireRecovery,
       dataTypes,
-    })
-  }, [classifications, vernacularGroup, ecology, ibra, imcra, state, drainageBasin, bushfireRecovery, dataTypes, onChange]);
+    });
+  }, [
+    classifications,
+    vernacularGroup,
+    ecology,
+    ibra,
+    imcra,
+    state,
+    drainageBasin,
+    bushfireRecovery,
+    dataTypes,
+    onChange,
+  ]);
 
   return (
-    <Accordion defaultValue="classification" variant='separated'>
+    <Accordion defaultValue="classification" variant="separated">
       <Accordion.Item value="classification">
         <Accordion.Control>
           <FilterGroup
@@ -312,7 +338,10 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+          <HigherClassificationFilters
+            filters={classifications}
+            onChange={setClassifications}
+          />
         </Accordion.Panel>
       </Accordion.Item>
 
@@ -338,7 +367,10 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
+          <VernacularGroupFilters
+            value={vernacularGroup?.value}
+            onChange={setVernacularGroup}
+          />
         </Accordion.Panel>
       </Accordion.Item>
 
@@ -352,26 +384,56 @@ function Filters({ filters, options, onChange }: FiltersProps) {
         </Accordion.Control>
         <Accordion.Panel>
           <Stack>
-          <Box>
-            <Text fw={300} fz="sm">Ecology</Text>
-            <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
-          </Box>
-          <Box>
-            <Text fw={300} fz="sm">Ibra Region</Text>
-            <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
-          </Box>
-          <Box>
-            <Text fw={300} fz="sm">Imcra Region</Text>
-            <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
-          </Box>
-          <Box>
-            <Text fw={300} fz="sm">State</Text>
-            <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
-          </Box>
-          <Box>
-            <Text fw={300} fz="sm">Drainage Basin</Text>
-            <DrainageBasinFilters value={drainageBasin?.value} options={options?.drainageBasin || []} onChange={setDrainageBasin} />
-          </Box>
+            <Box>
+              <Text fw={300} fz="sm">
+                Ecology
+              </Text>
+              <EcologyFilters
+                value={ecology?.value}
+                options={options?.ecology || []}
+                onChange={setEcology}
+              />
+            </Box>
+            <Box>
+              <Text fw={300} fz="sm">
+                Ibra Region
+              </Text>
+              <IbraFilters
+                value={ibra?.value}
+                options={options?.ibra || []}
+                onChange={setIbra}
+              />
+            </Box>
+            <Box>
+              <Text fw={300} fz="sm">
+                Imcra Region
+              </Text>
+              <ImcraFilters
+                value={imcra?.value}
+                options={options?.imcra || []}
+                onChange={setImcra}
+              />
+            </Box>
+            <Box>
+              <Text fw={300} fz="sm">
+                State
+              </Text>
+              <StateFilters
+                value={state?.value}
+                options={options?.state || []}
+                onChange={setState}
+              />
+            </Box>
+            <Box>
+              <Text fw={300} fz="sm">
+                Drainage Basin
+              </Text>
+              <DrainageBasinFilters
+                value={drainageBasin?.value}
+                options={options?.drainageBasin || []}
+                onChange={setDrainageBasin}
+              />
+            </Box>
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
@@ -386,18 +448,21 @@ function Filters({ filters, options, onChange }: FiltersProps) {
         </Accordion.Control>
         <Accordion.Panel>
           <Stack>
-            <BushfireRecoveryFilters filters={bushfireRecovery} onChange={setBushfireRecovery} />
+            <BushfireRecoveryFilters
+              filters={bushfireRecovery}
+              onChange={setBushfireRecovery}
+            />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
-  )
+  );
 }
 
 interface FilterGroupProps {
-  label: string,
-  description: string,
-  image: string,
+  label: string;
+  description: string;
+  image: string;
 }
 
 function FilterGroup({ label, description, image }: FilterGroupProps) {
@@ -411,25 +476,36 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
         </Text>
       </div>
     </Group>
-  )
+  );
 }
-
 
 function FilterBadge({ filter }: { filter: Filter }) {
   return (
     <Badge variant="outline" color="shellfish.7">
       {filter.value}
     </Badge>
-  )
+  );
 }
 
-
-function Species({ rank, canonicalName }: { rank: string, canonicalName: string }) {
+function Species({
+  rank,
+  canonicalName,
+}: {
+  rank: string;
+  canonicalName: string;
+}) {
   const [page, setPage] = useState(1);
   const [opened, { open, close }] = useDisclosure(false);
 
   const [filters, setFilters] = useState<Filters>({
-    classifications: [{ filter: rank, action: "INCLUDE", value: canonicalName, editable: false }],
+    classifications: [
+      {
+        filter: rank,
+        action: "INCLUDE",
+        value: canonicalName,
+        editable: false,
+      },
+    ],
     bushfireRecovery: [],
     dataTypes: [],
   });
@@ -448,21 +524,27 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
     ];
 
     return items.filter((item): item is Filter => !!item);
-  }
+  };
 
-  const { loading, error, data, previousData } = useQuery<QueryResults>(GET_SPECIES, {
-    variables: {
-      page,
-      perPage: PAGE_SIZE,
-      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item)
-    },
-  });
+  const { loading, error, data, previousData } = useQuery<QueryResults>(
+    GET_SPECIES,
+    {
+      variables: {
+        page,
+        perPage: PAGE_SIZE,
+        filters: flattenFilters(filters)
+          .map(intoFilterItem)
+          .filter((item) => item),
+      },
+    }
+  );
 
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
 
-  const records = data?.taxa.species.records || previousData?.taxa.species.records;
+  const records =
+    data?.taxa.species.records || previousData?.taxa.species.records;
 
   return (
     <Stack>
@@ -474,7 +556,11 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
         size="xl"
       >
         <Box pt={200}>
-          <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
+          <Filters
+            filters={filters}
+            options={data?.taxa.filterOptions}
+            onChange={setFilters}
+          />
         </Box>
       </Drawer>
 
@@ -484,24 +570,37 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
         <Grid.Col span="content">
           <Group>
             <Title order={5}>Browse species</Title>
-            <Text fz="sm" fw={300}>({data?.taxa.species.total} results)</Text>
+            <Text fz="sm" fw={300}>
+              ({data?.taxa.species.total} results)
+            </Text>
           </Group>
         </Grid.Col>
 
         <Grid.Col span="auto">
           <Group>
-            <Text fz="sm" fw={300}>Filters</Text>
-            { flattenFilters(filters).map(filter => <FilterBadge filter={filter} key={filter.value} />) }
+            <Text fz="sm" fw={300}>
+              Filters
+            </Text>
+            {flattenFilters(filters).map((filter) => (
+              <FilterBadge filter={filter} key={filter.value} />
+            ))}
           </Group>
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button leftSection={<IconFilter />} variant="subtle" onClick={open} color="shellfish.7">Filter</Button>
+          <Button
+            leftSection={<IconFilter />}
+            variant="subtle"
+            onClick={open}
+            color="shellfish.7"
+          >
+            Filter
+          </Button>
         </Grid.Col>
       </Grid>
 
       <SimpleGrid cols={5} pt={40}>
-        {records?.map(record => (
+        {records?.map((record) => (
           <SpeciesCard key={record.taxonomy.scientificName} species={record} />
         ))}
       </SimpleGrid>
@@ -516,114 +615,128 @@ function Species({ rank, canonicalName }: { rank: string, canonicalName: string 
   );
 }
 
-
 const CLASSIFICATIONS_CHILD_MAP: Record<string, string> = {
-    DOMAIN: 'kingdom',
-    SUPERKINGDOM: 'kingdom',
-    KINGDOM: 'phylum',
-    SUBKINGDOM: 'phylum',
-    PHYLUM: 'class',
-    SUBPHYLUM: 'class',
-    SUPERCLASS: 'class',
-    CLASS: 'order',
-    SUBCLASS: 'order',
-    INFRACLASS: 'order',
-    SUPERORDER: 'order',
-    ORDER: 'family',
-    SUBORDER: 'family',
-    INFRAORDER: 'family',
-    SUPERFAMILY: 'family',
-    FAMILY: 'genus',
-    SUBFAMILY: 'genus',
-    SUPERTRIBE: 'genus',
-    TRIBE: 'genus',
-    SUBTRIBE: 'genus',
-    GENUS: 'species',
-    SUBGENUS: 'species',
-    SPECIES: 'subspecies',
-    SUBSPECIES: 'subspecies',
+  DOMAIN: "kingdom",
+  SUPERKINGDOM: "kingdom",
+  KINGDOM: "phylum",
+  SUBKINGDOM: "phylum",
+  PHYLUM: "class",
+  SUBPHYLUM: "class",
+  SUPERCLASS: "class",
+  CLASS: "order",
+  SUBCLASS: "order",
+  INFRACLASS: "order",
+  SUPERORDER: "order",
+  ORDER: "family",
+  SUBORDER: "family",
+  INFRAORDER: "family",
+  SUPERFAMILY: "family",
+  FAMILY: "genus",
+  SUBFAMILY: "genus",
+  SUPERTRIBE: "genus",
+  TRIBE: "genus",
+  SUBTRIBE: "genus",
+  GENUS: "species",
+  SUBGENUS: "species",
+  SPECIES: "subspecies",
+  SUBSPECIES: "subspecies",
 
-    UNRANKED: 'unranked',
-    HIGHERTAXON: 'higher taxon',
+  UNRANKED: "unranked",
+  HIGHERTAXON: "higher taxon",
 
-    AGGREGATEGENERA: 'aggregate genera',
-    AGGREGATESPECIES: 'aggregate species',
-    INCERTAESEDIS: 'incertae sedis',
+  AGGREGATEGENERA: "aggregate genera",
+  AGGREGATESPECIES: "aggregate species",
+  INCERTAESEDIS: "incertae sedis",
 
-    REGNUM: 'division',
-    DIVISION: 'classis',
-    SUBDIVISION: 'classis',
-    CLASSIS: 'ordo',
-    SUBCLASSIS: 'ordo',
-    SUPERORDO: 'ordo',
-    ORDO: 'familia',
-    SUBORDO: 'familia',
-    COHORT: 'familia',
-    FAMILIA: 'genus',
-    SUBFAMILIA: 'genus',
-    SECTION: 'species',
-    SECTIO: 'species',
-    SERIES: 'species',
-    VARIETAS: 'subvarietas',
-    SUBVARIETAS: 'subvarietas',
-    FORMA: 'forma',
+  REGNUM: "division",
+  DIVISION: "classis",
+  SUBDIVISION: "classis",
+  CLASSIS: "ordo",
+  SUBCLASSIS: "ordo",
+  SUPERORDO: "ordo",
+  ORDO: "familia",
+  SUBORDO: "familia",
+  COHORT: "familia",
+  FAMILIA: "genus",
+  SUBFAMILIA: "genus",
+  SECTION: "species",
+  SECTIO: "species",
+  SERIES: "species",
+  VARIETAS: "subvarietas",
+  SUBVARIETAS: "subvarietas",
+  FORMA: "forma",
 
-    NOTHOVARIETAS: 'nothovarietas',
-    INFRASPECIES: 'infraspecies',
-    REGIO: 'regio',
-    SPECIALFORM: 'special form',
-}
+  NOTHOVARIETAS: "nothovarietas",
+  INFRASPECIES: "infraspecies",
+  REGIO: "regio",
+  SPECIALFORM: "special form",
+};
 
 function pluralTaxon(rank: string) {
-  if (rank === 'division') return 'divisions'
-  else if (rank === 'kingdom') return 'kingdoms'
-  else if (rank === 'phylum') return 'phyla'
-  else if (rank === 'class') return 'classes'
-  else if (rank === 'order') return 'orders'
-  else if (rank === 'family') return 'families'
-  else if (rank === 'genus') return 'genera'
-  else return rank
+  if (rank === "division") return "divisions";
+  else if (rank === "kingdom") return "kingdoms";
+  else if (rank === "phylum") return "phyla";
+  else if (rank === "class") return "classes";
+  else if (rank === "order") return "orders";
+  else if (rank === "family") return "families";
+  else if (rank === "genus") return "genera";
+  else return rank;
 }
 
-
-function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefined }) {
-  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || '';
+function DataSummary({
+  rank,
+  taxon,
+}: {
+  rank: string;
+  taxon: Taxonomy | undefined;
+}) {
+  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
   const childTaxonLabel = pluralTaxon(childTaxon);
 
   const thresholds = [
     { name: "low", color: "#f47625", start: 0, end: 50 },
     { name: "decent", color: "#febb1e", start: 50, end: 75 },
     { name: "great", color: "#97bc5d", start: 75, end: 100 },
-  ]
+  ];
 
-  const rankGenomes = taxon?.descendants.filter(d => d.speciesGenomes > 0).map(summary => {
-    return {
-      name: summary.canonicalName || '',
-      value: summary.speciesGenomes,
-      href: `/${childTaxon}/${summary.canonicalName}`,
-    }
-  })
+  const rankGenomes = taxon?.descendants
+    .filter((d) => d.speciesGenomes > 0)
+    .map((summary) => {
+      return {
+        name: summary.canonicalName || "",
+        value: summary.speciesGenomes,
+        href: `/${childTaxon}/${summary.canonicalName}`,
+      };
+    });
 
-  const speciesGenomes = taxon?.speciesGenomeSummary.filter(i => i.genomes > 0).map(summary => {
-    const linkName = encodeURIComponent(summary.name.replaceAll(' ', '_'));
-    return {
-      name: summary.name || '',
-      value: summary.genomes,
-      href: `/species/${linkName}`,
-    }
-  }).sort((a, b) => b.value - a.value)
+  const speciesGenomes = taxon?.speciesGenomeSummary
+    .filter((i) => i.genomes > 0)
+    .map((summary) => {
+      const linkName = encodeURIComponent(summary.name.replaceAll(" ", "_"));
+      return {
+        name: summary.name || "",
+        value: summary.genomes,
+        href: `/species/${linkName}`,
+      };
+    })
+    .sort((a, b) => b.value - a.value);
 
-  const speciesOther = taxon?.speciesSummary.filter(i => i.totalGenomic > 0).map(summary => {
-    const linkName = encodeURIComponent(summary.name.replaceAll(' ', '_'));
-    return {
-      name: summary.name || '',
-      value: summary.totalGenomic,
-      href: `/species/${linkName}`,
-    }
-  }).sort((a, b) => b.value - a.value)
+  const speciesOther = taxon?.speciesSummary
+    .filter((i) => i.totalGenomic > 0)
+    .map((summary) => {
+      const linkName = encodeURIComponent(summary.name.replaceAll(" ", "_"));
+      return {
+        name: summary.name || "",
+        value: summary.totalGenomic,
+        href: `/species/${linkName}`,
+      };
+    })
+    .sort((a, b) => b.value - a.value);
 
-  const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
-  const otherPercentile = taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
+  const genomePercentile =
+    taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
+  const otherPercentile =
+    taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
 
   function collapsable(span: number) {
     return { base: span, xs: 12, sm: 12, md: span, lg: span, xl: span };
@@ -636,34 +749,72 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
         <Grid>
           <Grid.Col span={collapsable(4)}>
             <Stack>
-              <Text fz="sm" fw={300}>Percentage of species with genomes</Text>
-              { taxon && <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(genomePercentile || 0)} /> }
+              <Text fz="sm" fw={300}>
+                Percentage of species with genomes
+              </Text>
+              {taxon && (
+                <TachoChart
+                  mt={10}
+                  h={150}
+                  w={300}
+                  thresholds={thresholds}
+                  value={Math.round(genomePercentile || 0)}
+                />
+              )}
             </Stack>
           </Grid.Col>
-          { rank !== 'GENUS' &&
-          <Grid.Col span={collapsable(3)}>
+          {rank !== "GENUS" && (
+            <Grid.Col span={collapsable(3)}>
+              <Stack>
+                <Text fz="sm" fw={300}>
+                  {Humanize.capitalize(childTaxonLabel)} with genomes
+                </Text>
+                {rankGenomes && <PieChart h={180} w={180} data={rankGenomes} />}
+              </Stack>
+            </Grid.Col>
+          )}
+          <Grid.Col span={collapsable(rank === "GENUS" ? 8 : 5)}>
             <Stack>
-              <Text fz="sm" fw={300}>{Humanize.capitalize(childTaxonLabel)} with genomes</Text>
-              { rankGenomes && <PieChart h={180} w={180} data={rankGenomes} /> }
-            </Stack>
-          </Grid.Col>
-          }
-          <Grid.Col span={collapsable(rank === 'GENUS' ? 8 : 5)}>
-            <Stack>
-              <Text fz="sm" fw={300}>Species with genomes</Text>
-              { speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} /> }
+              <Text fz="sm" fw={300}>
+                Species with genomes
+              </Text>
+              {speciesGenomes && (
+                <BarChart
+                  h={200}
+                  data={speciesGenomes.slice(0, 8)}
+                  spacing={0.1}
+                />
+              )}
             </Stack>
           </Grid.Col>
           <Grid.Col span={collapsable(4)}>
             <Stack>
-              <Text fz="sm" fw={300}>Percentage of species with any genetic data</Text>
-              { taxon && <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(otherPercentile || 0)} /> }
+              <Text fz="sm" fw={300}>
+                Percentage of species with any genetic data
+              </Text>
+              {taxon && (
+                <TachoChart
+                  mt={10}
+                  h={150}
+                  w={300}
+                  thresholds={thresholds}
+                  value={Math.round(otherPercentile || 0)}
+                />
+              )}
             </Stack>
           </Grid.Col>
           <Grid.Col span={collapsable(8)}>
             <Stack>
-              <Text fz="sm" fw={300}>Species with any genetic data</Text>
-              {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} /> }
+              <Text fz="sm" fw={300}>
+                Species with any genetic data
+              </Text>
+              {speciesOther && (
+                <BarChart
+                  h={200}
+                  data={speciesOther.slice(0, 8)}
+                  spacing={0.1}
+                />
+              )}
             </Stack>
           </Grid.Col>
         </Grid>
@@ -674,29 +825,51 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
           <Title order={5}>Taxonomic breakdown</Title>
 
           <DataTable my={8}>
-            { rank !== 'GENUS' &&
-            <DataTableRow label={`Number of ${childTaxonLabel}`}>
-              <DataField value={taxon?.descendants.length}></DataField>
-            </DataTableRow>
-            }
+            {rank !== "GENUS" && (
+              <DataTableRow label={`Number of ${childTaxonLabel}`}>
+                <DataField value={taxon?.descendants.length}></DataField>
+              </DataTableRow>
+            )}
             <DataTableRow label="Number of species/OTUs">
-              <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
+              <DataField
+                value={Humanize.formatNumber(taxon?.summary.species || 0)}
+              />
             </DataTableRow>
-            { rank !== 'GENUS' &&
-            <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
-              <DataField value={Humanize.formatNumber(taxon?.descendants.filter(d => d.speciesGenomes > 0).length || 0)} />
-            </DataTableRow>
-            }
+            {rank !== "GENUS" && (
+              <DataTableRow
+                label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}
+              >
+                <DataField
+                  value={Humanize.formatNumber(
+                    taxon?.descendants.filter((d) => d.speciesGenomes > 0)
+                      .length || 0
+                  )}
+                />
+              </DataTableRow>
+            )}
             <DataTableRow label="Species with genomes">
-              <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
+              <DataField
+                value={Humanize.formatNumber(
+                  taxon?.summary.speciesGenomes || 0
+                )}
+              />
             </DataTableRow>
-            { rank !== 'GENUS' &&
-            <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
-              <DataField value={Humanize.formatNumber(taxon?.descendants.filter(d => d.speciesData > 0).length || 0)} />
-            </DataTableRow>
-            }
+            {rank !== "GENUS" && (
+              <DataTableRow
+                label={`${Humanize.capitalize(childTaxonLabel)} with data`}
+              >
+                <DataField
+                  value={Humanize.formatNumber(
+                    taxon?.descendants.filter((d) => d.speciesData > 0)
+                      .length || 0
+                  )}
+                />
+              </DataTableRow>
+            )}
             <DataTableRow label="Species with data">
-              <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
+              <DataField
+                value={Humanize.formatNumber(taxon?.summary.speciesData || 0)}
+              />
             </DataTableRow>
           </DataTable>
 
@@ -704,24 +877,31 @@ function DataSummary({ rank, taxon }: { rank: string, taxon: Taxonomy | undefine
             <Attribute
               label="Species with most genomes"
               value={speciesGenomes && speciesGenomes[0]?.name}
-              href={`/species/${speciesGenomes && speciesGenomes[0]?.name?.replaceAll(' ', '_')}/taxonomy`}
+              href={`/species/${
+                speciesGenomes && speciesGenomes[0]?.name?.replaceAll(" ", "_")
+              }/taxonomy`}
             />
             <Attribute
               label="Species with most data"
               value={speciesOther && speciesOther[0]?.name}
-              href={`/species/${speciesOther && speciesOther[0]?.name.replaceAll(' ', '_')}/taxonomy`}
+              href={`/species/${
+                speciesOther && speciesOther[0]?.name.replaceAll(" ", "_")
+              }/taxonomy`}
             />
           </Stack>
         </Paper>
       </Grid.Col>
     </Grid>
-  )
+  );
 }
 
-
-export default function ClassificationPage({ params }: { params: { rank: string, name: string } }) {
+export default function ClassificationPage({
+  params,
+}: {
+  params: { rank: string; name: string };
+}) {
   const rank = params.rank.toUpperCase();
-  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank].toUpperCase() || '';
+  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank].toUpperCase() || "";
 
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
@@ -734,8 +914,8 @@ export default function ClassificationPage({ params }: { params: { rank: string,
     },
   });
   useEffect(() => {
-    setPreviousPage({ name: `browsing ${params.name}`, url: pathname })
-  }, [setPreviousPage])
+    setPreviousPage({ name: `browsing ${params.name}`, url: pathname });
+  }, [setPreviousPage]);
 
   return (
     <Stack mt={40}>
@@ -747,14 +927,18 @@ export default function ClassificationPage({ params }: { params: { rank: string,
             <Grid>
               <Grid.Col span={3}>
                 <LoadPanel visible={taxonResults.loading} h={180}>
-                  <Title pb={10} order={5}>Taxonomy</Title>
-                  <TaxonomyDetails taxon={taxonResults.data?.taxon}/>
+                  <Title pb={10} order={5}>
+                    Taxonomy
+                  </Title>
+                  <TaxonomyDetails taxon={taxonResults.data?.taxon} />
                 </LoadPanel>
               </Grid.Col>
               <Grid.Col span={9}>
                 <LoadPanel visible={taxonResults.loading} h={180}>
-                  <Title pb={10} order={5}>Higher classification</Title>
-                  <HigherClassification taxon={taxonResults.data?.taxon}/>
+                  <Title pb={10} order={5}>
+                    Higher classification
+                  </Title>
+                  <HigherClassification taxon={taxonResults.data?.taxon} />
                 </LoadPanel>
               </Grid.Col>
             </Grid>

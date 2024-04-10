@@ -3,11 +3,10 @@ import { forwardRef } from "react";
 import { Filter } from "./common";
 import { constantCase, pascalCase } from "change-case";
 
-
 interface GroupItem {
-  label: string,
-  image: string,
-  link?: string,
+  label: string;
+  image: string;
+  link?: string;
 }
 
 const VERNACULAR_GROUPS: Record<string, GroupItem> = {
@@ -55,70 +54,112 @@ const VERNACULAR_GROUPS: Record<string, GroupItem> = {
     image: "/species-icons/mammals.svg",
     link: "/class/Mammalia",
   },
-  SEAWEEDS: {
-    label: "Seaweeds",
-    image: "/species-icons/seaweed_light.svg",
-    link: "/kingdom/Chromista",
-  },
   HIGHER_PLANTS: {
     label: "Higher plants",
-    image: "/species-icons/plants_light.svg",
-    link: "/kingdom/Plantae",
+    image: "/species-icons/plants.svg",
+    link: "/regnum/Plantae",
   },
-
   FLOWERING_PLANTS: {
-      label: "Flowering plants",
-      image: "/species-icons/plants_light.svg",
-      link: "/kingdom/Plantae",
+    image: "/species-icons/flowering_plants.svg",
+    label: "Flowering plants",
+    link: "/subclassis/Magnoliidae",
   },
   ANIMALS: {
-      label: "Animals",
-      image: "",
-      link: "/kingdom/Animalia",
+    image: "/species-icons/animals.svg",
+    label: "Animals",
+    link: "/kingdom/Animalia",
   },
   BROWN_ALGAE: {
-      image: "",
-      label: "Brown algae",
-      link: "/phylum/Phaeophycea",
+    image: "/species-icons/brown_algae.svg",
+    label: "Brown algae",
+    link: "/classis/Phaeophyceae",
   },
   RED_ALGAE: {
-      label: "Red algae",
-      image: "",
-      link: "/phylum/Rhodophyta",
+    image: "/species-icons/red_algae.svg",
+    label: "Red algae",
+    link: "/division/Rhodophyta",
   },
   GREEN_ALGAE: {
-      label: "Green algae",
-      image: "",
-      link: "/phylum/Chlorophyta",
+    image: "/species-icons/green_algae.svg",
+    label: "Green algae",
+    link: "/division/Chlorophyta",
   },
   ECHINODERMS: {
-      label: "Echinoderms",
-      image: "",
-      link: "/phylum/Echinodermata",
+    image: "/species-icons/echinoderms.svg",
+    label: "Echinoderms",
+    link: "/phylum/Echinodermata",
   },
   FIN_FISHES: {
-      label: "Fin fishes",
-      image: "",
-      link: "/class/Actinopterygii",
+    image: "/species-icons/finfishes.svg",
+    label: "Fin fishes",
+    link: "/class/Actinopterygii",
   },
   CORALS_AND_JELLYFISHES: {
-      label: "Corals and jellyfishes",
-      image: "",
-      link: "/phylum/Cnidaria",
+    image: "/species-icons/cnidaria.svg",
+    label: "Corals and jellyfishes",
+    link: "/phylum/Cnidaria",
   },
   CYANOBACTERIA: {
-      label: "Cyanobacteria",
-      image: "",
-      link: "/phylum/Cyanobacteria",
+    image: "/species-icons/cyanobacteria.svg",
+    label: "Cyanobacteria",
+    link: "/division/Cyanobacteria",
   },
   SHARKS_AND_RAYS: {
-      label: "Sharks and rays",
-      image: "",
+    image: "/species-icons/sharks.svg",
+    label: "Sharks and rays",
+    link: "/subclass/Elasmobranchii",
+  },
+  SPIDERS: {
+    image: "/species-icons/spiders.svg",
+    label: "Spiders",
+    link: "/order/Araneae",
+  },
+  REPTILES: {
+    image: "/species-icons/reptiles.svg",
+    label: "Reptiles",
+    link: "/class/Reptilia",
+  },
+  MOSSES: {
+    image: "/species-icons/mosses.svg",
+    label: "Mosses",
+    link: "/classis/Bryopsida",
+  },
+  LIVERWORTS: {
+    image: "/species-icons/liverworts.svg",
+    label: "Liverworts",
+    link: "/division/Marchantiophyta",
+  },
+  HORNWORTS: {
+    image: "/species-icons/hornworts.svg",
+    label: "Hornworts",
+    link: "/division/Anthocerotophyta",
+  },
+  LICHENS: {
+    image: "/species-icons/lichens.svg",
+    label: "Lichens",
+  },
+  FERNS: {
+    image: "/species-icons/ferns.svg",
+    label: "Ferns",
+    link: "/subclassis/Polypodiidae",
+  },
+  CONIFERS_AND_CYCADS: {
+    image: "/species-icons/conifers_and_cycads.svg",
+    label: "Conifers and cycads",
+  },
+  DIATOMS: {
+    image: "/species-icons/diatoms.svg",
+    label: "Diatoms",
+    link: "/division/Bacillariophyta",
+  },
+  CHROMISTS: {
+    image: "/species-icons/chromists.svg",
+    label: "Chromists",
+    link: "/regnum/Chromista",
   },
 };
 
-
-interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
+interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
   label: string;
   image: string;
 }
@@ -137,16 +178,20 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
 );
 SelectItem.displayName = "SelectItem";
 
-
 interface VernacularGroupFiltersProps {
-  value?: string,
-  onChange: (item: Filter | undefined) => void,
+  value?: string;
+  onChange: (item: Filter | undefined) => void;
 }
 
-export function VernacularGroupFilters({ value, onChange }: VernacularGroupFiltersProps) {
-  const data = Object.entries(VERNACULAR_GROUPS).map(([key, value]) => {
-    return { value: key, ...value }
-  }).sort((a, b) => a.value.localeCompare(b.value));
+export function VernacularGroupFilters({
+  value,
+  onChange,
+}: VernacularGroupFiltersProps) {
+  const data = Object.entries(VERNACULAR_GROUPS)
+    .map(([key, value]) => {
+      return { value: key, ...value };
+    })
+    .sort((a, b) => a.value.localeCompare(b.value));
 
   const changeFilter = (value: string | null) => {
     if (!value) return onChange(undefined);
@@ -156,8 +201,8 @@ export function VernacularGroupFilters({ value, onChange }: VernacularGroupFilte
       action: "INCLUDE",
       value: pascalCase(value),
       editable: true,
-    })
-  }
+    });
+  };
 
   return (
     <Stack>
@@ -168,5 +213,5 @@ export function VernacularGroupFilters({ value, onChange }: VernacularGroupFilte
         onChange={changeFilter}
       />
     </Stack>
-  )
+  );
 }
