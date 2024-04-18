@@ -429,31 +429,6 @@ type TaxonQuery = {
   };
 };
 
-// The taxonomic groups that make up Conifers and Cycads are disjoint
-// Returns the appropriate taxonomic link for whichever ordo the species is from
-function getConiferCycadLink(taxonomy: Taxonomy) {
-  var taxonLink = "/ordo/";
-  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
-    variables: {
-      rank: taxonomy.rank,
-      canonicalName: taxonomy.canonicalName,
-    },
-  });
-
-  const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
-  hierarchy?.forEach((taxon) => {
-    if (
-      taxon.rank === "ORDO" &&
-      (taxon.canonicalName === "Pinales" || taxon.canonicalName === "Cycadales")
-    ) {
-      taxonLink += taxon.canonicalName;
-      return taxonLink;
-    }
-  });
-
-  return taxonLink;
-}
-
 interface IconBarProps {
   taxonomy: Taxonomy;
   conservation?: Conservation[];
@@ -508,6 +483,27 @@ export default function IconBar({
       }
     }
   };
+
+  // The taxonomic groups that make up Conifers and Cycads are disjoint - finds the
+  // appropriate taxonomic link for whichever ordo the species is from
+  let coniferCycadLink = "/ordo/";
+  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+    skip: taxonomy.vernacularGroup !== "CONIFERS_AND_CYCADS",
+    variables: {
+      rank: taxonomy.rank,
+      canonicalName: taxonomy.canonicalName,
+    },
+  });
+
+  const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
+  hierarchy?.forEach((taxon) => {
+    if (
+      taxon.rank === "ORDO" &&
+      (taxon.canonicalName === "Pinales" || taxon.canonicalName === "Cycadales")
+    ) {
+      coniferCycadLink += taxon.canonicalName;
+    }
+  });
 
   return (
     <Carousel
@@ -572,7 +568,7 @@ export default function IconBar({
                 {icon === "CONIFERS_AND_CYCADS" ? (
                   <VernacularGroupIcon
                     group={icon}
-                    iconLink={getConiferCycadLink(taxonomy)}
+                    iconLink={coniferCycadLink}
                   />
                 ) : (
                   <VernacularGroupIcon group={icon} />

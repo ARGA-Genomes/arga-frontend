@@ -1285,32 +1285,29 @@ export default function ClassificationPage({
 
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
-  let eukaryotaTaxonResults;
-  let taxonResults;
+
+  const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
+    skip: rank === "DOMAIN" && params.name === "Eukaryota",
+    variables: {
+      rank,
+      canonicalName: params.name,
+      descendantRank: childTaxon,
+    },
+  });
 
   // need a special case/query for when taxon domain === Eukaryota
-  if (rank === "DOMAIN" && params.name === "Eukaryota") {
-    eukaryotaTaxonResults = useQuery<EukaryotaTaxonResults>(
-      GET_EUKARYOTA_TAXON,
-      {
-        variables: {
-          rank,
-          canonicalName: params.name,
-          kingdomDescendantRank: "KINGDOM",
-          regnumDescendantRank: "REGNUM",
-        },
-      }
-    );
-    console.log(eukaryotaTaxonResults);
-  } else {
-    taxonResults = useQuery<TaxonResults>(GET_TAXON, {
+  const eukaryotaTaxonResults = useQuery<EukaryotaTaxonResults>(
+    GET_EUKARYOTA_TAXON,
+    {
+      skip: !(rank === "DOMAIN" && params.name === "Eukaryota"),
       variables: {
         rank,
         canonicalName: params.name,
-        descendantRank: childTaxon,
+        kingdomDescendantRank: "KINGDOM",
+        regnumDescendantRank: "REGNUM",
       },
-    });
-  }
+    }
+  );
 
   useEffect(() => {
     setPreviousPage({ name: `browsing ${params.name}`, url: pathname });
@@ -1325,7 +1322,7 @@ export default function ClassificationPage({
           <Stack>
             <Grid>
               <Grid.Col span={3}>
-                {taxonResults && (
+                {taxonResults.called && (
                   <LoadPanel visible={taxonResults.loading} h={180}>
                     <Title pb={10} order={5}>
                       Taxonomy
@@ -1333,7 +1330,7 @@ export default function ClassificationPage({
                     <TaxonomyDetails taxon={taxonResults.data?.taxon} />
                   </LoadPanel>
                 )}
-                {eukaryotaTaxonResults && (
+                {eukaryotaTaxonResults.called && (
                   <LoadPanel visible={eukaryotaTaxonResults.loading} h={180}>
                     <Title pb={10} order={5}>
                       Taxonomy
@@ -1345,7 +1342,7 @@ export default function ClassificationPage({
                 )}
               </Grid.Col>
               <Grid.Col span={9}>
-                {taxonResults && (
+                {taxonResults.called && (
                   <LoadPanel visible={taxonResults.loading} h={180}>
                     <Title pb={10} order={5}>
                       Higher classification
@@ -1353,7 +1350,7 @@ export default function ClassificationPage({
                     <HigherClassification taxon={taxonResults.data?.taxon} />
                   </LoadPanel>
                 )}
-                {eukaryotaTaxonResults && (
+                {eukaryotaTaxonResults.called && (
                   <LoadPanel visible={eukaryotaTaxonResults.loading} h={180}>
                     <Title pb={10} order={5}>
                       Higher classification
@@ -1367,10 +1364,10 @@ export default function ClassificationPage({
             </Grid>
 
             <Paper p="xl" radius="lg" pos="relative" withBorder>
-              {taxonResults && (
+              {taxonResults.called && (
                 <DataSummary rank={rank} taxon={taxonResults.data?.taxon} />
               )}
-              {eukaryotaTaxonResults && (
+              {eukaryotaTaxonResults.called && (
                 <EukaryotaDataSummary
                   rank={rank}
                   taxon={eukaryotaTaxonResults.data?.taxon}
