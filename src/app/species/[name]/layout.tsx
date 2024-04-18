@@ -11,37 +11,45 @@ import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 
 const GET_SPECIES_DATA_SUMMARY = gql`
-query SpeciesWithDataSummary($canonicalName: String) {
-  species(canonicalName: $canonicalName) {
-    dataSummary {
-      genomes
-      loci
-      specimens
-      other
-      totalGenomic
+  query SpeciesWithDataSummary($canonicalName: String) {
+    species(canonicalName: $canonicalName) {
+      dataSummary {
+        genomes
+        loci
+        specimens
+        other
+        totalGenomic
+      }
     }
   }
-}`;
+`;
 
 type QueryResults = {
   species: {
     dataSummary: {
-      genomes?: number,
-      loci?: number,
-      specimens?: number,
-      other?: number,
-      totalGenomic?: number,
-    }
-  },
+      genomes?: number;
+      loci?: number;
+      specimens?: number;
+      other?: number;
+      totalGenomic?: number;
+    };
+  };
 };
 
-
-function DataTabs({ name, children }: { name: string, children: React.ReactNode }) {
+function DataTabs({
+  name,
+  children,
+}: {
+  name: string;
+  children: React.ReactNode;
+}) {
   const path = usePathname();
   const router = useRouter();
 
-  function changeTab(value: string) {
-    router.replace(`/species/${name}/${value}`);
+  function changeTab(value: string | null) {
+    if (value !== null) {
+      router.replace(`/species/${name}/${value}`);
+    }
   }
 
   const canonicalName = name.replaceAll("_", " ");
@@ -53,10 +61,10 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
 
   // based on the current url the active tab should always be
   // the fourth component in the path name
-  const tab = path?.split('/')[3];
+  const tab = path?.split("/")[3];
 
-  if (!tab)
-    redirect(`/species/${name}/whole_genomes`, RedirectType.replace);
+  if (!tab) redirect(`/species/${name}/whole_genomes`, RedirectType.replace);
+  console.log(tab);
 
   return (
     <Tabs
@@ -86,28 +94,28 @@ function DataTabs({ name, children }: { name: string, children: React.ReactNode 
   );
 }
 
-
 interface SpeciesLayoutProps {
   params: { name: string };
   children: React.ReactNode;
 }
 
-export default function SpeciesLayout({ params, children }: SpeciesLayoutProps) {
+export default function SpeciesLayout({
+  params,
+  children,
+}: SpeciesLayoutProps) {
   const canonicalName = params.name.replaceAll("_", " ");
 
   return (
-      <Stack gap={0} mt="xl">
-        <Container mb={20} w="100%" maw={MAX_WIDTH}>
-          <PreviousPage />
-        </Container>
+    <Stack gap={0} mt="xl">
+      <Container mb={20} w="100%" maw={MAX_WIDTH}>
+        <PreviousPage />
+      </Container>
 
-        <SpeciesHeader canonicalName={canonicalName} />
+      <SpeciesHeader canonicalName={canonicalName} />
 
-        <DataTabs name={params.name}>
-          <Container maw={MAX_WIDTH}>
-            {children}
-          </Container>
-        </DataTabs>
-      </Stack>
+      <DataTabs name={params.name}>
+        <Container maw={MAX_WIDTH}>{children}</Container>
+      </DataTabs>
+    </Stack>
   );
 }
