@@ -49,7 +49,7 @@ export default function BrowseGrouping() {
       align="start"
       withControls={false}
     >
-      <Group align="flex-start">
+      <Group justify="center" align="flex-start">
         <Carousel.Slide>
           <BrowseCard
             total={data && (sources["ARGA Bushfire Recovery"] || 0)}

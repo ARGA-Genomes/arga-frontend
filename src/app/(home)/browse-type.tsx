@@ -39,7 +39,7 @@ export default function BrowseType() {
       align="start"
       withControls={false}
     >
-      <Group align="flex-start">
+      <Group justify="center" align="flex-start">
         <Carousel.Slide>
           <BrowseCard
             total={data?.overview.wholeGenomes}

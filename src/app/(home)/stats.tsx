@@ -4,7 +4,7 @@ import { Attribute, DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text } from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Center } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -83,15 +83,17 @@ export default function ShowStats() {
     taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
 
   return (
-    <Paper radius="lg" style={{ top: 200, right: 0, width: "650px" }}>
+    <Paper radius="lg" style={{ top: 200, right: 0, width: 610 }}>
       <LoadOverlay visible={taxonResults.loading} />
       <Grid p={20}>
+        {/* <Grid.Col span={12}>
+          <Center>
+            <Title order={5}>Data summary</Title>
+          </Center>
+        </Grid.Col> */}
         <Grid.Col span={6} mb={10}>
-          <Title order={5}>Data summary</Title>
           <Stack>
-            <Text fz="sm" fw={300}>
-              Percentage of species with genomes
-            </Text>
+            <Title order={5}>Percentage of species with genomes</Title>
             {taxon && (
               <TachoChart
                 h={130}
@@ -140,9 +142,7 @@ export default function ShowStats() {
 
         <Grid.Col span={12}>
           <Stack>
-            <Text fz="sm" fw={300}>
-              Species with genomes
-            </Text>
+            <Title order={5}>Species with genomes</Title>
             {speciesGenomes && (
               <BarChart
                 h={250}
