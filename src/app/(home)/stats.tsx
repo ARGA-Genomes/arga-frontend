@@ -4,10 +4,11 @@ import { Attribute, DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Center } from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Group } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
+import { DonutChart } from "@/components/graphing/pie";
 
 const GET_TAXON = gql`
   query HomeStats {
@@ -28,6 +29,20 @@ const GET_TAXON = gql`
         name
         genomes
         totalGenomic
+      }
+
+      kingdomDescendants: descendants(rank: KINGDOM) {
+        canonicalName
+        species
+        speciesData
+        speciesGenomes
+      }
+
+      regnumDescendants: descendants(rank: REGNUM) {
+        canonicalName
+        species
+        speciesData
+        speciesGenomes
       }
     }
   }
@@ -51,13 +66,25 @@ type Taxonomy = {
     speciesData: number;
     speciesGenomes: number;
   };
+  kingdomDescendants: {
+    canonicalName: string;
+    species: number;
+    speciesData: number;
+    speciesGenomes: number;
+  }[];
+  regnumDescendants: {
+    canonicalName: string;
+    species: number;
+    speciesData: number;
+    speciesGenomes: number;
+  }[];
 };
 
 type TaxonResults = {
   taxon: Taxonomy;
 };
 
-export default function ShowStats() {
+export function ShowStats() {
   const taxonResults = useQuery<TaxonResults>(GET_TAXON);
   const taxon = taxonResults.data?.taxon;
 
@@ -164,54 +191,68 @@ export default function ShowStats() {
         </Grid.Col>
       </Grid>
     </Paper>
-    // <Paper radius="20px" mr={50} style={{ position: "absolute", top: 200, right: 0, width: "650px" }}>
-    //   <LoadOverlay visible={taxonResults.loading} />
-    //   <Grid p={20}>
-    //     <Grid.Col span={6} mb={10}>
-    //       <Title order={5}>Data summary</Title>
-    //       <Stack>
-    //         <Text fz="sm" fw={300}>Percentage of species with genomes</Text>
-    //         {taxon && <TachoChart h={130} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />}
-    //       </Stack>
-    //     </Grid.Col>
+  );
+}
 
-    //     <Grid.Col span={6} mb={10}>
-    //       <Title order={5}>Taxonomic breakdown</Title>
+export function ShowTaxonomicCoverageStats() {
+  const taxonResults = useQuery<TaxonResults>(GET_TAXON);
+  const taxon = taxonResults.data?.taxon;
 
-    //       <DataTable my={2}>
+  const domainData = [
+    { name: "Archaea", value: 1, label: 0 },
+    {
+      name: "Eukaryota",
+      value: 1,
+      label: taxon?.summary.speciesData,
+      href: "/domain/Eukaryota",
+    },
+    { name: "Bacteria", value: 1, label: 0 },
+  ];
 
-    //         <DataTableRow label="Number of species/OTUs">
-    //           <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
-    //         </DataTableRow>
+  const kingdomRegnumData = taxon?.kingdomDescendants
+    .map((descendant) => {
+      return {
+        name: descendant.canonicalName,
+        value: 1,
+        label: descendant.speciesData,
+        href: `/kingdom/${descendant.canonicalName}`,
+      };
+    })
+    .concat(
+      taxon?.regnumDescendants.map((descendant) => {
+        return {
+          name: descendant.canonicalName,
+          value: 1,
+          label: descendant.speciesData,
+          href: `/regnum/${descendant.canonicalName}`,
+        };
+      })
+    );
 
-    //         <DataTableRow label="Species with genomes">
-    //           <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
-    //         </DataTableRow>
+  console.log(domainData);
+  console.log(kingdomRegnumData);
 
-    //         <DataTableRow label="Species with data">
-    //           <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
-    //         </DataTableRow>
-    //       </DataTable>
-
-    //       <Stack mx={10} mt={5}>
-    //         <Attribute
-    //           label="Species with most genomes"
-    //           value={speciesGenomes && speciesGenomes[0]?.name}
-    //           href={`/species/${speciesGenomes && speciesGenomes[0]?.name?.replaceAll(' ', '_')}/taxonomy`}
-    //         />
-    //       </Stack>
-    //     </Grid.Col>
-
-    //     <Grid.Col span={12}>
-    //       <Stack>
-    //         <Text fz="sm" fw={300}>Species with genomes</Text>
-    //         {speciesGenomes && <BarChart h={250} data={speciesGenomes.slice(0, 10)} spacing={0.1} labelWidth={200} />}
-    //       </Stack>
-    //     </Grid.Col>
-    //     <Grid.Col span={12}>
-    //       <Text fz="xs" fw={300}>Note: these statistics summarise the content indexed within ARGA.  The values relate to the species deemed relevant to Australia (either by endemicity or economic and social value), and for repositories that are indexed by ARGA.  The values may not be indicative of global values for all research.</Text>
-    //     </Grid.Col>
-    //   </Grid>
-    // </Paper>
+  return (
+    <Group gap={80} justify="center">
+      <Stack>
+        <Title order={4} c="white" pl={30}>
+          Domains
+        </Title>
+        <DonutChart h={375} w={375} data={domainData} labelled={true} />
+      </Stack>
+      <Stack>
+        <Title order={4} c="white" pl={30}>
+          Kingdoms/Regna
+        </Title>
+        {kingdomRegnumData && (
+          <DonutChart
+            h={375}
+            w={375}
+            data={kingdomRegnumData}
+            labelled={true}
+          />
+        )}
+      </Stack>
+    </Group>
   );
 }
