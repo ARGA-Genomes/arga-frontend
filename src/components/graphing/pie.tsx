@@ -179,12 +179,7 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
     endAngle: endAngle,
   };
 
-  const inflexionPoint = arcGenerator.centroid(inflexionInfo);
-
-  const isRightLabel = inflexionPoint[0] > 0;
-  const centreLabel = data.name + "\n" + data.label + " records";
-
-  return (
+  const arc = (
     <animated.g style={anim}>
       <path
         d={slicePath}
@@ -202,6 +197,8 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize={20}
+        stroke="black"
+        strokeWidth={0.2}
       >
         {data.name}
       </text>
@@ -225,6 +222,8 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
       </text>
     </animated.g>
   );
+
+  return <>{data.href ? <Link href={data.href}>{arc}</Link> : arc}</>;
 }
 
 interface PieDatum {
@@ -330,7 +329,8 @@ export function DonutChart({
             data: arc.data,
             startAngle: arc.startAngle,
             endAngle: arc.endAngle,
-            innerRadius: 60,
+            padAngle: 0.03,
+            innerRadius: 50,
             outerRadius: radius,
             fill: color(idx.toString()) as string,
             highlight:
