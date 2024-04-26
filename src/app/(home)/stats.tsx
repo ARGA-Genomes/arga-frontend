@@ -4,7 +4,16 @@ import { Attribute, DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Group } from "@mantine/core";
+import {
+  Grid,
+  Paper,
+  Stack,
+  Title,
+  Text,
+  Group,
+  Skeleton,
+  Center,
+} from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -32,6 +41,13 @@ const GET_TAXON = gql`
       }
 
       kingdomDescendants: descendants(rank: KINGDOM) {
+        canonicalName
+        species
+        speciesData
+        speciesGenomes
+      }
+
+      superKingdomDescendants: descendants(rank: SUPERKINGDOM) {
         canonicalName
         species
         speciesData
@@ -67,6 +83,12 @@ type Taxonomy = {
     speciesGenomes: number;
   };
   kingdomDescendants: {
+    canonicalName: string;
+    species: number;
+    speciesData: number;
+    speciesGenomes: number;
+  }[];
+  superKingdomDescendants: {
     canonicalName: string;
     species: number;
     speciesData: number;
@@ -196,6 +218,8 @@ export function ShowStats() {
 
 export function ShowTaxonomicCoverageStats() {
   const taxonResults = useQuery<TaxonResults>(GET_TAXON);
+  if (taxonResults.error) return <p>Error : {taxonResults.error.message}</p>;
+
   const taxon = taxonResults.data?.taxon;
 
   const domainData = [
@@ -219,38 +243,59 @@ export function ShowTaxonomicCoverageStats() {
       };
     })
     .concat(
-      taxon?.regnumDescendants.map((descendant) => {
+      taxon?.regnumDescendants
+        .filter((descendant) => descendant.canonicalName !== "Protista")
+        .map((descendant) => {
+          return {
+            name: descendant.canonicalName,
+            value: 1,
+            label: descendant.speciesData,
+            href: `/regnum/${descendant.canonicalName}`,
+          };
+        })
+    )
+    .concat(
+      taxon?.superKingdomDescendants.map((descendant) => {
         return {
           name: descendant.canonicalName,
           value: 1,
           label: descendant.speciesData,
-          href: `/regnum/${descendant.canonicalName}`,
+          href: `/superkingdom/${descendant.canonicalName}`,
         };
       })
     );
 
-  console.log(domainData);
-  console.log(kingdomRegnumData);
-
   return (
     <Group gap={80} justify="center">
       <Stack>
-        <Title order={4} c="white" pl={30}>
-          Domains
-        </Title>
-        <DonutChart h={375} w={375} data={domainData} labelled={true} />
+        <Skeleton visible={taxonResults.loading}>
+          <Center>
+            <Title order={4} c="white">
+              Domains
+            </Title>
+          </Center>
+        </Skeleton>
+        <Skeleton visible={taxonResults.loading} circle>
+          <DonutChart h={375} w={375} data={domainData} labelled={true} />
+        </Skeleton>
       </Stack>
-      <Stack>
-        <Title order={4} c="white" pl={30}>
-          Kingdoms/Regna
-        </Title>
+      <Stack align="center">
+        <Skeleton visible={taxonResults.loading}>
+          <Center>
+            <Title order={4} c="white">
+              Kingdoms
+            </Title>
+          </Center>
+        </Skeleton>
         {kingdomRegnumData && (
-          <DonutChart
-            h={375}
-            w={375}
-            data={kingdomRegnumData}
-            labelled={true}
-          />
+          <Skeleton visible={taxonResults.loading} circle h={375} w={375}>
+            <DonutChart
+              h={375}
+              w={375}
+              data={kingdomRegnumData}
+              labelled={true}
+            />
+          </Skeleton>
         )}
       </Stack>
     </Group>
