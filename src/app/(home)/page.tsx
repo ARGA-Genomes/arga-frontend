@@ -131,17 +131,23 @@ export default function HomePage() {
             </Stack>
           </Stack>
           <Group gap={80} pb={40} align="flex-start" justify="center">
-            <Stack>
+            <Stack align="center" gap={40}>
               <Title order={3} c="moss.5" fz={30} fw={600}>
                 Taxonomic coverage
               </Title>
               <ShowTaxonomicCoverageStats />
             </Stack>
-            <Stack gap={26} justify="space-between">
+            <Stack gap={40} justify="space-between" align="center">
               <Title order={3} c="moss.5" fz={30} fw={600}>
                 Recent updates
               </Title>
-              <Paper w={425} h={425} bg="midnight.6" radius="lg"></Paper>
+              <Paper
+                w={400}
+                h={425}
+                bg="midnight.6"
+                radius="lg"
+                shadow="sm"
+              ></Paper>
             </Stack>
           </Group>
         </Stack>
