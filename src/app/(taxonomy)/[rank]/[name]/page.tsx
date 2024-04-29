@@ -180,6 +180,13 @@ const GET_EUKARYOTA_TAXON = gql`
         speciesGenomes
       }
 
+      superKingdomDescendants: descendants(rank: SUPERKINGDOM) {
+        canonicalName
+        species
+        speciesData
+        speciesGenomes
+      }
+
       regnumDescendants: descendants(rank: $regnumDescendantRank) {
         canonicalName
         species
@@ -264,6 +271,12 @@ type EukaryotaTaxonomy = {
     speciesGenomes: number;
   };
   kingdomDescendants: {
+    canonicalName: string;
+    species: number;
+    speciesData: number;
+    speciesGenomes: number;
+  }[];
+  superKingdomDescendants: {
     canonicalName: string;
     species: number;
     speciesData: number;
@@ -1074,9 +1087,22 @@ function EukaryotaDataSummary({
       };
     })
     .concat(
-      taxon?.regnumDescendants.map((descendant) => {
+      taxon?.regnumDescendants
+        .filter((descendant) => descendant.canonicalName !== "Protista")
+        .map((descendant) => {
+          return {
+            rank: "regnum",
+            canonicalName: descendant.canonicalName,
+            species: descendant.species,
+            speciesData: descendant.speciesData,
+            speciesGenomes: descendant.speciesGenomes,
+          };
+        })
+    )
+    .concat(
+      taxon?.superKingdomDescendants.map((descendant) => {
         return {
-          rank: "regnum",
+          rank: "superkingdom",
           canonicalName: descendant.canonicalName,
           species: descendant.species,
           speciesData: descendant.speciesData,
