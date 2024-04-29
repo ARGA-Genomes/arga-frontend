@@ -135,14 +135,14 @@ export function ShowStats() {
     <Paper radius="lg" style={{ top: 200, right: 0, width: 610 }}>
       <LoadOverlay visible={taxonResults.loading} />
       <Grid p={20}>
-        {/* <Grid.Col span={12}>
+        <Grid.Col span={12}>
           <Center>
-            <Title order={5}>Data summary</Title>
+            <Title order={4}>Data summary</Title>
           </Center>
-        </Grid.Col> */}
+        </Grid.Col>
         <Grid.Col span={6} mb={10}>
           <Stack>
-            <Title order={5}>Percentage of species with genomes</Title>
+            <Text>Percentage of species with genomes</Text>
             {taxon && (
               <TachoChart
                 h={130}
@@ -154,7 +154,7 @@ export function ShowStats() {
         </Grid.Col>
 
         <Grid.Col span={6} mb={10}>
-          <Title order={5}>Taxonomic breakdown</Title>
+          <Text>Taxonomic breakdown</Text>
 
           <DataTable my={2}>
             <DataTableRow label="Number of species/OTUs">
@@ -191,7 +191,7 @@ export function ShowStats() {
 
         <Grid.Col span={12}>
           <Stack>
-            <Title order={5}>Species with genomes</Title>
+            <Text>Species with genomes</Text>
             {speciesGenomes && (
               <BarChart
                 h={250}
