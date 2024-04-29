@@ -329,7 +329,7 @@ export function DonutChart({
             data: arc.data,
             startAngle: arc.startAngle,
             endAngle: arc.endAngle,
-            padAngle: 0.03,
+            padangle: 0.03,
             innerRadius: 50,
             outerRadius: radius,
             fill: color(idx.toString()) as string,
