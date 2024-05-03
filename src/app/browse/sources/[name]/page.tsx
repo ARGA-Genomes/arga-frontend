@@ -1,9 +1,25 @@
-'use client';
+"use client";
 
 import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, SimpleGrid, Text, Title, Group, Stack, Container, Drawer, Box, Grid, SegmentedControl, Button, Accordion, Badge, Avatar } from "@mantine/core";
+import {
+  Paper,
+  SimpleGrid,
+  Text,
+  Title,
+  Group,
+  Stack,
+  Container,
+  Drawer,
+  Box,
+  Grid,
+  SegmentedControl,
+  Button,
+  Accordion,
+  Badge,
+  Avatar,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
@@ -15,118 +31,120 @@ import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { Photo } from "@/app/type";
 
-
 const PAGE_SIZE = 10;
 type Filters = {
-
-  classifications: Filter[],
-  dataTypes: Filter[],
-}
-
+  classifications: Filter[];
+  dataTypes: Filter[];
+};
 
 const GET_DETAILS = gql`
-query SourceDetails($name: String) {
-  source(by: { name: $name }) {
-    license
-    accessRights
-    rightsHolder
-    author
-    name
-
-    datasets {
+  query SourceDetails($name: String) {
+    source(by: { name: $name }) {
+      license
+      accessRights
+      rightsHolder
+      author
       name
-      globalId
+
+      datasets {
+        name
+      }
     }
   }
-}`;
+`;
 
 type Dataset = {
-  name: string,
-  globalId: string,
-}
+  name: string;
+};
 
 type Source = {
-  license: string,
-  accessRights: string,
-  rightsHolder: string,
-  author: string,
-  name: string,
+  license: string;
+  accessRights: string;
+  rightsHolder: string;
+  author: string;
+  name: string;
 
-  datasets: Dataset[],
+  datasets: Dataset[];
 };
 
 type DetailsQueryResults = {
-  source: Source,
+  source: Source;
 };
 
-
 const GET_SPECIES = gql`
-query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
-  source(by: { name: $name }, filters: $filters) {
-    species(page: $page, pageSize: $pageSize) {
-      total
-      records {
-        taxonomy {
-          canonicalName
-        }
-        photo {
-          url
-          publisher
-          license
-          rightsHolder
-        }
-        dataSummary {
-          genomes
-          loci
-          specimens
-          other
+  query SourceSpecies(
+    $name: String
+    $page: Int
+    $pageSize: Int
+    $filters: [FilterItem]
+  ) {
+    source(by: { name: $name }, filters: $filters) {
+      species(page: $page, pageSize: $pageSize) {
+        total
+        records {
+          taxonomy {
+            canonicalName
+          }
+          photo {
+            url
+            publisher
+            license
+            rightsHolder
+          }
+          dataSummary {
+            genomes
+            loci
+            specimens
+            other
+          }
         }
       }
     }
   }
-}`;
+`;
 
 type DataSummary = {
-  genomes: number,
-  loci: number,
-  specimens: number,
-  other: number,
-}
+  genomes: number;
+  loci: number;
+  specimens: number;
+  other: number;
+};
 
 type Record = {
-  taxonomy: { canonicalName: string },
-  photo: Photo,
-  dataSummary: DataSummary,
-}
+  taxonomy: { canonicalName: string };
+  photo: Photo;
+  dataSummary: DataSummary;
+};
 
 type SpeciesQueryResults = {
   source: {
     species: {
-      records: Record[],
-      total: number,
-    }
-  },
+      records: Record[];
+      total: number;
+    };
+  };
 };
 
-
 interface FiltersProps {
-  filters: Filters,
-  onChange: (filters: Filters) => void,
+  filters: Filters;
+  onChange: (filters: Filters) => void;
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
+  const [classifications, setClassifications] = useState<Filter[]>(
+    filters.classifications
+  );
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
     onChange({
       classifications,
       dataTypes,
-    })
+    });
   }, [classifications, dataTypes, onChange]);
 
   return (
-    <Accordion defaultValue="hasData" variant='separated'>
+    <Accordion defaultValue="hasData" variant="separated">
       <Accordion.Item value="hasData">
         <Accordion.Control>
           <FilterGroup
@@ -149,18 +167,20 @@ function Filters({ filters, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+          <HigherClassificationFilters
+            filters={classifications}
+            onChange={setClassifications}
+          />
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
-  )
+  );
 }
 
-
 interface FilterGroupProps {
-  label: string,
-  description: string,
-  image: string,
+  label: string;
+  description: string;
+  image: string;
 }
 
 function FilterGroup({ label, description, image }: FilterGroupProps) {
@@ -174,18 +194,12 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
         </Text>
       </div>
     </Group>
-  )
+  );
 }
-
 
 function FilterBadge({ filter }: { filter: Filter }) {
-  return (
-    <Badge variant="outline">
-      {filter.value}
-    </Badge>
-  )
+  return <Badge variant="outline">{filter.value}</Badge>;
 }
-
 
 function Species({ source }: { source: string }) {
   const [page, setPage] = useState(1);
@@ -197,20 +211,19 @@ function Species({ source }: { source: string }) {
   });
 
   const flattenFilters = (filters: Filters) => {
-    const items = [
-      ...filters.classifications,
-      ...filters.dataTypes,
-    ];
+    const items = [...filters.classifications, ...filters.dataTypes];
 
     return items.filter((item): item is Filter => !!item);
-  }
+  };
 
   const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
     variables: {
       page,
       pageSize: PAGE_SIZE,
       name: source,
-      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item)
+      filters: flattenFilters(filters)
+        .map(intoFilterItem)
+        .filter((item) => item),
     },
   });
 
@@ -239,17 +252,23 @@ function Species({ source }: { source: string }) {
 
         <Grid.Col span="auto">
           <Group>
-            <Text fz="sm" fw={300}>Filters</Text>
-            { flattenFilters(filters).map(filter => <FilterBadge filter={filter} key={filter.value} />) }
+            <Text fz="sm" fw={300}>
+              Filters
+            </Text>
+            {flattenFilters(filters).map((filter) => (
+              <FilterBadge filter={filter} key={filter.value} />
+            ))}
           </Group>
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>
+            Filter
+          </Button>
         </Grid.Col>
       </Grid>
 
-      { error ? <Title order={4}>{error.message}</Title> : null }
+      {error ? <Title order={4}>{error.message}</Title> : null}
 
       <SimpleGrid cols={5}>
         {records.map((record) => (
@@ -267,41 +286,50 @@ function Species({ source }: { source: string }) {
   );
 }
 
-
 function SourceDetails({ source }: { source: string }) {
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-    variables: { name: source }
+    variables: { name: source },
   });
 
   return (
     <Stack gap={0}>
       <LoadOverlay visible={loading} />
 
-      { error ? <Text>{error.message}</Text> : null }
+      {error ? <Text>{error.message}</Text> : null}
 
-      <Text c="dimmed" size="xs">{data?.source.author}</Text>
-      <Text c="dimmed" size="xs">&copy; {data?.source.rightsHolder}</Text>
+      <Text c="dimmed" size="xs">
+        {data?.source.author}
+      </Text>
+      <Text c="dimmed" size="xs">
+        &copy; {data?.source.rightsHolder}
+      </Text>
     </Stack>
-  )
+  );
 }
-
 
 export default function BrowseSource({ params }: { params: { name: string } }) {
   const source = decodeURIComponent(params.name).replaceAll("_", " ");
   const [_, setPreviousPage] = usePreviousPage();
 
   useEffect(() => {
-    setPreviousPage({ name: `browsing ${source}`, url: `/browse/sources/${params.name}` })
-  }, [setPreviousPage])
+    setPreviousPage({
+      name: `browsing ${source}`,
+      url: `/browse/sources/${params.name}`,
+    });
+  }, [setPreviousPage]);
 
   return (
     <Stack mt="xl">
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Group gap={40}>
-            <Text c="dimmed" fw={400}>SOURCE</Text>
+            <Text c="dimmed" fw={400}>
+              SOURCE
+            </Text>
             <Stack gap={0}>
-              <Text fz={38} fw={700}>{source}</Text>
+              <Text fz={38} fw={700}>
+                {source}
+              </Text>
               <SourceDetails source={source} />
             </Stack>
           </Group>

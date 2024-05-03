@@ -22,6 +22,7 @@ import BrowseType from "@/app/(home)/browse-type";
 import { MAX_WIDTH } from "../constants";
 import { ShowStats, ShowTaxonomicCoverageStats } from "./stats";
 import classes from "./page.module.css";
+import BrowseDataSources from "./browse-datasources";
 
 function Search() {
   const router = useRouter();
@@ -110,8 +111,8 @@ export default function HomePage() {
         </Box>
       </Box>
       <Box bg="midnight.7" w="100%">
-        <Stack mx={60}>
-          <Stack gap={80} pb={40}>
+        <Stack mx={60} gap={40}>
+          <Stack gap={80}>
             <Stack gap={40} pt={40} align="center">
               <Title order={3} c="moss.5" fz={30} fw={600}>
                 Browse by data type
