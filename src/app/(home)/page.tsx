@@ -132,13 +132,13 @@ export default function HomePage() {
             </Stack>
           </Stack>
           <Group gap={80} pb={40} align="flex-start" justify="center">
-            <Stack gap={40} className={classes.bottomStack}>
+            <Stack gap={40} align="center">
               <Title order={3} c="moss.5" fz={30} fw={600}>
                 Taxonomic coverage
               </Title>
               <ShowTaxonomicCoverageStats />
             </Stack>
-            <Stack gap={40} className={classes.bottomStack}>
+            <Stack gap={40} className={classes.bottomStack} display="none">
               <Title order={3} c="moss.5" fz={30} fw={600}>
                 Recent updates
               </Title>
