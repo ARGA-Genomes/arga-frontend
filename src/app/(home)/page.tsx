@@ -22,7 +22,6 @@ import BrowseType from "@/app/(home)/browse-type";
 import { MAX_WIDTH } from "../constants";
 import { ShowStats, ShowTaxonomicCoverageStats } from "./stats";
 import classes from "./page.module.css";
-import BrowseDataSources from "./browse-datasources";
 
 function Search() {
   const router = useRouter();
