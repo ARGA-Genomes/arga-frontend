@@ -22,6 +22,8 @@ import BrowseType from "@/app/(home)/browse-type";
 import { MAX_WIDTH } from "../constants";
 import { ShowStats, ShowTaxonomicCoverageStats } from "./stats";
 import classes from "./page.module.css";
+import { ScrollArea } from "@mantine/core";
+import RecentUpdatesContainer from "../../components/recent-updates-container";
 
 function Search() {
   const router = useRouter();
@@ -132,23 +134,17 @@ export default function HomePage() {
             </Stack>
           </Stack>
           <Group gap={80} pb={40} align="flex-start" justify="center">
-            <Stack gap={40} align="center">
+            <Stack gap={40} className={classes.bottomStack}>
               <Title order={3} c="moss.5" fz={30} fw={600}>
                 Taxonomic coverage
               </Title>
               <ShowTaxonomicCoverageStats />
             </Stack>
-            <Stack gap={40} className={classes.bottomStack} display="none">
+            <Stack gap={40} className={classes.bottomStack}>
               <Title order={3} c="moss.5" fz={30} fw={600}>
                 Recent updates
               </Title>
-              <Paper
-                w={400}
-                h={425}
-                bg="midnight.6"
-                radius="lg"
-                shadow="sm"
-              ></Paper>
+              <RecentUpdatesContainer />
             </Stack>
           </Group>
         </Stack>
