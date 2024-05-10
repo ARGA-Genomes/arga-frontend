@@ -8,8 +8,8 @@ const workSans = localFont({
   src: "../public/fonts/WorkSans-VariableFont_wght.ttf",
 });
 
-const gotham = localFont({
-  src: "../public/fonts/gotham/GothamBook.ttf",
+const gothamBold = localFont({
+  src: "../public/fonts/gotham/GothamBold.ttf",
 });
 
 export const theme = createTheme({
@@ -107,8 +107,8 @@ export const theme = createTheme({
   fontFamily: workSans.style.fontFamily,
 
   headings: {
-    fontFamily: gotham.style.fontFamily,
-    fontWeight: "550",
+    fontFamily: gothamBold.style.fontFamily,
+    // fontWeight: "550",
 
     sizes: {
       h1: { fontSize: rem(38) },

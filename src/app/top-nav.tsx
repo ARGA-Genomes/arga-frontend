@@ -16,6 +16,7 @@ import {
   Modal,
   useMantineTheme,
   Collapse,
+  Button,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
 import { useState } from "react";
@@ -80,19 +81,36 @@ export function TopNav() {
       <Group
         justify="space-between"
         align="center"
-        // px={30}
+        pl={25}
         wrap="nowrap"
         h="100%"
       >
-        <Link href="/" onClick={() => setActive(0)}>
+        {/* <Link href="/" onClick={() => setActive(0)}>
           <Image
             // py="50px"
             p="md"
             src="/arga-logo.svg"
             alt="Australian Reference Genome Atlas"
-            width={450}
+            h="100%"
+            w="auto"
           />
-        </Link>
+        </Link> */}
+        <Button
+          variant="transparent"
+          component="a"
+          href="/"
+          onClick={() => setActive(0)}
+          // mah={165}
+          w="auto"
+        >
+          <Image
+            // py="50px"
+            p="md"
+            src="/arga-logo.svg"
+            alt="Australian Reference Genome Atlas"
+            // h="100%"
+          />
+        </Button>
 
         <Stack h="100%">
           <Group align="center" justify="end" mr={20} wrap="nowrap" h="100%">

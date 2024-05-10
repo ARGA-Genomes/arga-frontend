@@ -132,13 +132,11 @@ export function ShowStats() {
     taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
 
   return (
-    <Paper radius="lg" style={{ top: 200, right: 0, width: 610 }}>
+    <Paper radius="lg" style={{ top: 200, right: 0, width: 640 }}>
       <LoadOverlay visible={taxonResults.loading} />
       <Grid p={20}>
         <Grid.Col span={12}>
-          <Center>
-            <Title order={4}>Data summary</Title>
-          </Center>
+          <Title order={4}>Data summary</Title>
         </Grid.Col>
         <Grid.Col span={6} mb={10}>
           <Stack>
@@ -227,7 +225,7 @@ export function ShowTaxonomicCoverageStats() {
     {
       name: "Eukaryota",
       value: 1,
-      label: taxon?.summary.speciesData,
+      label: taxon?.summary.species,
       href: "/domain/Eukaryota",
     },
     { name: "Bacteria", value: 1, label: 0 },
@@ -238,7 +236,7 @@ export function ShowTaxonomicCoverageStats() {
       return {
         name: descendant.canonicalName,
         value: 1,
-        label: descendant.speciesData,
+        label: descendant.species,
         href: `/kingdom/${descendant.canonicalName}`,
       };
     })
@@ -249,7 +247,7 @@ export function ShowTaxonomicCoverageStats() {
           return {
             name: descendant.canonicalName,
             value: 1,
-            label: descendant.speciesData,
+            label: descendant.species,
             href: `/regnum/${descendant.canonicalName}`,
           };
         })
@@ -259,7 +257,7 @@ export function ShowTaxonomicCoverageStats() {
         return {
           name: descendant.canonicalName,
           value: 1,
-          label: descendant.speciesData,
+          label: descendant.species,
           href: `/superkingdom/${descendant.canonicalName}`,
         };
       })
