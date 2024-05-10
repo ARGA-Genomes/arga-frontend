@@ -53,7 +53,7 @@ export default function RootLayout({
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <AppShell header={{ height: 165 }} zIndex={2000} withBorder={false}>
-      <AppShell.Header bg="midnight.8">
+      <AppShell.Header className={classes.header}>
         <TopNav />
       </AppShell.Header>
 

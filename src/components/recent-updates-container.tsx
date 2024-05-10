@@ -4,7 +4,7 @@ import updatesData from "../../public/public-changelog.json";
 export default function RecentUpdatesContainer() {
   const changelog = updatesData.changelog;
   return (
-    <Paper w={400} h={425} bg="midnight.6" radius="lg" shadow="sm">
+    <Paper w={400} h={425} bg="midnight.8" radius="lg" shadow="sm">
       <ScrollArea h="100%" offsetScrollbars scrollbars="y">
         <Grid p={30} justify="center" columns={3}>
           {changelog.map((update) => {
@@ -16,7 +16,7 @@ export default function RecentUpdatesContainer() {
                 <Grid.Col span={2}>
                   {update.updates.map((updateMsg) => {
                     return (
-                      <Text key={update.date} c="midnight.2">
+                      <Text key={update.date} c="midnight.3">
                         {updateMsg}
                       </Text>
                     );

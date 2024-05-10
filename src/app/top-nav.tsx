@@ -120,7 +120,7 @@ export function TopNav() {
       </Group>
 
       <Collapse in={opened} hiddenFrom="md">
-        <Stack h="100vh" bg={theme.colors.midnight[8]}>
+        <Stack h="100vh" bg={theme.colors.midnight[11]}>
           {items}
         </Stack>
       </Collapse>

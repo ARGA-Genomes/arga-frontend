@@ -1,13 +1,13 @@
 .navlink {
     color: white;
-    border-bottom: rem(5) solid var(--mantine-color-midnight-8);
+    border-bottom: rem(5) solid var(--mantine-color-midnight-11);
 
     @media (max-width: $mantine-breakpoint-md) {
         border-bottom: none;
     }
 
     &:hover {
-        background: var(--mantine-color-midnight-8);
+        background: var(--mantine-color-midnight-11);
         border-bottom: rem(5) solid white;
         color: var(--mantine-color-bushfire-4);
 
@@ -17,7 +17,7 @@
     }
 
     &[data-active] {
-        background: var(--mantine-color-midnight-8);
+        background: var(--mantine-color-midnight-11);
         border-bottom: rem(5) solid white;
         color: var(--mantine-color-wheat-4);
 

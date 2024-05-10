@@ -66,19 +66,16 @@ function Search() {
 export default function HomePage() {
   return (
     <Stack gap={0}>
-      <Box bg="midnight.6" w="100%">
+      <Box bg="midnight.9" w="100%">
         <Box m={60}>
           <Center>
             <Flex
               direction={{ base: "column", xl: "row" }}
               gap={{ base: 30, xl: 100 }}
-              // justify="center"
-              // align="center"
-              // justify="space-between"
             >
               <Stack gap={30} w={610}>
-                <Title order={3} c="wheat.4" fz={28}>
-                  deepen discovery - trawl traits - curate collections
+                <Title order={3} c="wheat.4" fz={28} fw={700}>
+                  deepen discovery — trawl traits — curate collections
                 </Title>
                 <Text c="white" size="lg">
                   For plants, animals, microbes and other species endemic or
@@ -111,7 +108,7 @@ export default function HomePage() {
           </Center>
         </Box>
       </Box>
-      <Box bg="midnight.7" w="100%">
+      <Box bg="midnight.10" w="100%">
         <Stack mx={60} gap={40}>
           <Stack gap={80}>
             <Stack gap={40} pt={40} align="center">
