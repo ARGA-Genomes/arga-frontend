@@ -63,7 +63,7 @@ export function TopNav() {
   };
 
   return (
-    <Stack gap="0" h="100%">
+    <Stack gap={40} h="100%">
       <Modal
         opened={savedOpened}
         onClose={savedHandler.close}
@@ -85,35 +85,23 @@ export function TopNav() {
         wrap="nowrap"
         h="100%"
       >
-        {/* <Link href="/" onClick={() => setActive(0)}>
+        <Link href="/" onClick={() => setActive(0)}>
           <Image
-            // py="50px"
             p="md"
             src="/arga-logo.svg"
             alt="Australian Reference Genome Atlas"
-            h="100%"
-            w="auto"
           />
-        </Link> */}
-        <Button
-          variant="transparent"
-          component="a"
-          href="/"
-          onClick={() => setActive(0)}
-          // mah={165}
-          w="auto"
-        >
-          <Image
-            // py="50px"
-            p="md"
-            src="/arga-logo.svg"
-            alt="Australian Reference Genome Atlas"
-            // h="100%"
-          />
-        </Button>
+        </Link>
 
         <Stack h="100%">
-          <Group align="center" justify="end" mr={20} wrap="nowrap" h="100%">
+          <Group
+            align="center"
+            justify="end"
+            mr={20}
+            wrap="nowrap"
+            h="100%"
+            className={classes.cart}
+          >
             <Indicator
               inline
               label={saved?.length}
@@ -126,18 +114,21 @@ export function TopNav() {
               </Avatar>
             </Indicator>
             <Burger
-              hiddenFrom="md"
               opened={opened}
               onClick={toggle}
               size="md"
               color={"white"}
+              className={classes.burgerNav}
             />
           </Group>
-          <Group visibleFrom="md">{items}</Group>
+
+          <Group wrap="nowrap" className={classes.menuItems}>
+            {items}
+          </Group>
         </Stack>
       </Group>
 
-      <Collapse in={opened} hiddenFrom="md">
+      <Collapse in={opened}>
         <Stack h="100vh" bg={theme.colors.midnight[11]}>
           {items}
         </Stack>
