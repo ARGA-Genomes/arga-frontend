@@ -81,7 +81,7 @@ export function TopNav() {
       <Group
         justify="space-between"
         align="center"
-        pl={25}
+        px={25}
         wrap="nowrap"
         h="100%"
       >
@@ -100,15 +100,12 @@ export function TopNav() {
           component="a"
           href="/"
           onClick={() => setActive(0)}
-          // mah={165}
-          w="auto"
         >
           <Image
             // py="50px"
             p="md"
             src="/arga-logo.svg"
             alt="Australian Reference Genome Atlas"
-            // h="100%"
           />
         </Button>
 
