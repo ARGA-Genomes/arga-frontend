@@ -85,32 +85,33 @@ export function TopNav() {
         wrap="nowrap"
         h="100%"
       >
-        {/* <Link href="/" onClick={() => setActive(0)}>
+        <Link style={{ flexGrow: 1 }} href="/" onClick={() => setActive(0)}>
           <Image
             // py="50px"
             p="md"
             src="/arga-logo.svg"
             alt="Australian Reference Genome Atlas"
-            h="100%"
-            w="auto"
+            mah={165}
+            maw={505}
           />
-        </Link> */}
-        <Button
+        </Link>
+        {/* <Button
           variant="transparent"
           component="a"
           href="/"
           onClick={() => setActive(0)}
-          // mah={165}
-          w="auto"
+          mah={165}
+          maw={400}
         >
           <Image
             // py="50px"
             p="md"
             src="/arga-logo.svg"
             alt="Australian Reference Genome Atlas"
-            // h="100%"
+            h="100%"
+            w="100%"
           />
-        </Button>
+        </Button> */}
 
         <Stack h="100%">
           <Group align="center" justify="end" mr={20} wrap="nowrap" h="100%">
