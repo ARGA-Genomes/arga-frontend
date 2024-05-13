@@ -20,7 +20,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
 import { useState } from "react";
-import { Checklist } from "tabler-icons-react";
+import { SortDescending } from "tabler-icons-react";
 
 const links = [
   { link: "/", label: "APP HOME" },
@@ -110,7 +110,7 @@ export function TopNav() {
               disabled={!saved?.length}
             >
               <Avatar size="lg" onClick={showSaved} component="a" href="#">
-                <Checklist size={30} color="white" />
+                <SortDescending size={35} color="white" strokeWidth="1.75" />
               </Avatar>
             </Indicator>
             <Burger
