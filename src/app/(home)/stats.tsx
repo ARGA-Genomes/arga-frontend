@@ -139,11 +139,11 @@ export function ShowStats() {
           <Title order={4}>Data summary</Title>
         </Grid.Col>
         <Grid.Col span={6} mb={10}>
-          <Stack>
-            <Text>Percentage of species with genomes</Text>
+          <Stack gap="sm">
+            <Title order={6}>Percentage of species with genomes</Title>
             {taxon && (
               <TachoChart
-                h={130}
+                h={115}
                 thresholds={thresholds}
                 value={Math.round(genomePercentile || 0)}
               />
@@ -152,44 +152,36 @@ export function ShowStats() {
         </Grid.Col>
 
         <Grid.Col span={6} mb={10}>
-          <Text>Taxonomic breakdown</Text>
+          <Stack gap="sm">
+            <Title order={6}>Taxonomic breakdown</Title>
 
-          <DataTable my={2}>
-            <DataTableRow label="Number of species/OTUs">
-              <DataField
-                value={Humanize.formatNumber(taxon?.summary.species || 0)}
-              />
-            </DataTableRow>
+            <DataTable my={2}>
+              <DataTableRow label="Number of species/OTUs">
+                <DataField
+                  value={Humanize.formatNumber(taxon?.summary.species || 0)}
+                />
+              </DataTableRow>
 
-            <DataTableRow label="Species with genomes">
-              <DataField
-                value={Humanize.formatNumber(
-                  taxon?.summary.speciesGenomes || 0
-                )}
-              />
-            </DataTableRow>
+              <DataTableRow label="Species with genomes">
+                <DataField
+                  value={Humanize.formatNumber(
+                    taxon?.summary.speciesGenomes || 0
+                  )}
+                />
+              </DataTableRow>
 
-            <DataTableRow label="Species with data">
-              <DataField
-                value={Humanize.formatNumber(taxon?.summary.speciesData || 0)}
-              />
-            </DataTableRow>
-          </DataTable>
-
-          <Stack mx={10} mt={5}>
-            <Attribute
-              label="Species with most genomes"
-              value={speciesGenomes && speciesGenomes[0]?.name}
-              href={`/species/${
-                speciesGenomes && speciesGenomes[0]?.name?.replaceAll(" ", "_")
-              }/taxonomy`}
-            />
+              <DataTableRow label="Species with data">
+                <DataField
+                  value={Humanize.formatNumber(taxon?.summary.speciesData || 0)}
+                />
+              </DataTableRow>
+            </DataTable>
           </Stack>
         </Grid.Col>
 
-        <Grid.Col span={12}>
+        <Grid.Col span={12} pt={10}>
           <Stack>
-            <Text>Species with genomes</Text>
+            <Title order={6}>Species with genomes</Title>
             {speciesGenomes && (
               <BarChart
                 h={250}
@@ -201,7 +193,7 @@ export function ShowStats() {
           </Stack>
         </Grid.Col>
         <Grid.Col span={12}>
-          <Text fz="xs" fw={300}>
+          <Text fz={10} c="midnight.6">
             Note: these statistics summarise the content indexed within ARGA.
             The values relate to the species deemed relevant to Australia
             (either by endemicity or economic and social value), and for

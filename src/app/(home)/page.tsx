@@ -72,6 +72,7 @@ export default function HomePage() {
             <Flex
               direction={{ base: "column", xl: "row" }}
               gap={{ base: 30, xl: 80 }}
+              align="center"
             >
               <Stack gap={50} w={640}>
                 <Stack gap={30}>
@@ -111,28 +112,28 @@ export default function HomePage() {
         </Box>
       </Box>
       <Box bg="midnight.10" w="100%">
-        <Stack mx={60} gap={40}>
+        <Stack mt={80} mx={60} gap={80}>
           <Stack gap={80}>
-            <Stack gap={40} pt={40} align="center">
+            <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
                 Browse by data type
               </Title>
               <BrowseType />
             </Stack>
-            <Stack gap={40} align="center">
+            <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
                 Browse by taxonomic group
               </Title>
               <BrowseTaxon />
             </Stack>
-            <Stack gap={40} align="center">
+            <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
                 Browse by functional or ecological group
               </Title>
               <BrowseGrouping />
             </Stack>
           </Stack>
-          <Group gap={80} pb={40} align="flex-start" justify="center">
+          <Group gap={80} pb={80} align="flex-start" justify="center">
             <Stack gap={40} className={classes.bottomStack}>
               <Title order={3} c="moss.5" fz={28}>
                 Taxonomic coverage
