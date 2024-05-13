@@ -18,7 +18,7 @@ import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import { CircleCheck, CircleX } from "tabler-icons-react";
+import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 import { AttributeIcon } from "./highlight-stack";
 import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
@@ -326,9 +326,9 @@ function IndigenousLanguageGroupIcon({
               label="Food use"
               icon={
                 trait.foodUse ? (
-                  <CircleCheck color="green" />
+                  <IconCircleCheck color="green" />
                 ) : (
-                  <CircleX color={extraDimmed} />
+                  <IconCircleX color={extraDimmed} />
                 )
               }
             />
@@ -336,9 +336,9 @@ function IndigenousLanguageGroupIcon({
               label="Medicinal use"
               icon={
                 trait.medicinalUse ? (
-                  <CircleCheck color="green" />
+                  <IconCircleCheck color="green" />
                 ) : (
-                  <CircleX color={extraDimmed} />
+                  <IconCircleX color={extraDimmed} />
                 )
               }
             />
@@ -346,9 +346,9 @@ function IndigenousLanguageGroupIcon({
               label="Cultural connection"
               icon={
                 trait.culturalConnection ? (
-                  <CircleCheck color="green" />
+                  <IconCircleCheck color="green" />
                 ) : (
-                  <CircleX color={extraDimmed} />
+                  <IconCircleX color={extraDimmed} />
                 )
               }
             />

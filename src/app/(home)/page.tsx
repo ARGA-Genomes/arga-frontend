@@ -16,7 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import BrowseGrouping from "./browse-grouping";
 import BrowseTaxon from "./browse-taxon";
-import { Search as IconSearch } from "tabler-icons-react";
+import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
 import { MAX_WIDTH } from "../constants";

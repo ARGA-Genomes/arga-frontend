@@ -21,7 +21,7 @@ import {
 import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
-import { CircleCheck, CircleX } from "tabler-icons-react";
+import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 
 const GET_SPECIES = gql`
   query SpeciesWithConservation($canonicalName: String) {
@@ -117,9 +117,9 @@ function Header({
             Reference genome available
           </Text>
           {referenceGenome ? (
-            <CircleCheck size={35} color={theme.colors.moss[5]} />
+            <IconCircleCheck size={35} color={theme.colors.moss[5]} />
           ) : (
-            <CircleX size={35} color={theme.colors.red[5]} />
+            <IconCircleX size={35} color={theme.colors.red[5]} />
           )}
         </Group>
       </Flex>

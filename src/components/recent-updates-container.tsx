@@ -1,10 +1,18 @@
 import { Grid, Text, ScrollArea, Paper } from "@mantine/core";
 import updatesData from "../../public/public-changelog.json";
+import classes from "./recent-updates-container.module.css";
 
 export default function RecentUpdatesContainer() {
   const changelog = updatesData.changelog;
   return (
-    <Paper w={400} h={425} bg="midnight.8" radius="lg" shadow="sm">
+    <Paper
+      w={400}
+      h={425}
+      radius="lg"
+      // shadow="lg"
+      withBorder
+      className={classes.recentUpdatesContainer}
+    >
       <ScrollArea h="100%" offsetScrollbars scrollbars="y">
         <Grid p={30} justify="center" columns={3}>
           {changelog.map((update) => {

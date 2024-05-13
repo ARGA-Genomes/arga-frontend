@@ -51,7 +51,7 @@
     "react-dom": "18.2.0",
     "react-leaflet": "^4.2.1",
     "react-map-gl": "^7.1.6",
-    "tabler-icons-react": "^1.56.0",
+    "@tabler/icons-react": "3.0.0",
     "typescript": "5.2.2"
   },
   "devDependencies": {

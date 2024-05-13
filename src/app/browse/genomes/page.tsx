@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { MAX_WIDTH } from "@/app/constants";
 import { Photo } from "@/app/type";
@@ -11,110 +11,125 @@ import { usePreviousPage } from "@/components/navigation-history";
 import { PaginationBar } from "@/components/pagination";
 import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
-import { Accordion, Avatar, Badge, Box, Button, Center, Container, Drawer, Grid, Group, Paper, SegmentedControl, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import {
+  Accordion,
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Center,
+  Container,
+  Drawer,
+  Grid,
+  Group,
+  Paper,
+  SegmentedControl,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { Filter as IconFilter, SortAscending } from "tabler-icons-react";
-
+import { IconFilter } from "@tabler/icons-react";
 
 const PAGE_SIZE = 10;
 
-
 type Filters = {
-  classifications: Filter[],
-  dataTypes: Filter[],
-}
-
+  classifications: Filter[];
+  dataTypes: Filter[];
+};
 
 const GET_SPECIES = gql`
-query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
-  taxa(filters: $filters) {
-    species(page: $page, perPage: $perPage) {
-      total,
-      records {
-        taxonomy {
-          canonicalName
-        }
-        photo {
-          url
-          publisher
-          license
-          rightsHolder
-        }
-        dataSummary {
-          genomes
-          loci
-          specimens
-          other
+  query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
+    taxa(filters: $filters) {
+      species(page: $page, perPage: $perPage) {
+        total
+        records {
+          taxonomy {
+            canonicalName
+          }
+          photo {
+            url
+            publisher
+            license
+            rightsHolder
+          }
+          dataSummary {
+            genomes
+            loci
+            specimens
+            other
+          }
         }
       }
-    }
-    filterOptions {
-      ecology
-      ibra
-      imcra
-      state
-      drainageBasin
+      filterOptions {
+        ecology
+        ibra
+        imcra
+        state
+        drainageBasin
+      }
     }
   }
-}`;
-
+`;
 
 type DataSummary = {
-  genomes: number,
-  loci: number,
-  specimens: number,
-  other: number,
-}
+  genomes: number;
+  loci: number;
+  specimens: number;
+  other: number;
+};
 
 type Species = {
   taxonomy: {
-    canonicalName: string,
-  },
-  photo: Photo,
-  dataSummary: DataSummary,
-}
+    canonicalName: string;
+  };
+  photo: Photo;
+  dataSummary: DataSummary;
+};
 
 type FilterOptions = {
-  ecology: string[],
-  ibra: string[],
-  imcra: string[],
-  state: string[],
-  drainageBasin: string[],
-}
+  ecology: string[];
+  ibra: string[];
+  imcra: string[];
+  state: string[];
+  drainageBasin: string[];
+};
 
 type Taxa = {
   species: {
-    records: Species[],
-    total: number,
-  },
-  filterOptions: FilterOptions,
+    records: Species[];
+    total: number;
+  };
+  filterOptions: FilterOptions;
 };
 
 type QueryResults = {
-  taxa: Taxa,
+  taxa: Taxa;
 };
 
-
 interface FiltersProps {
-  filters: Filters,
-  options?: FilterOptions,
-  onChange: (filters: Filters) => void,
+  filters: Filters;
+  options?: FilterOptions;
+  onChange: (filters: Filters) => void;
 }
 
 function Filters({ filters, options, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
+  const [classifications, setClassifications] = useState<Filter[]>(
+    filters.classifications
+  );
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
     onChange({
       classifications,
       dataTypes,
-    })
+    });
   }, [classifications, dataTypes, onChange]);
 
   return (
-    <Accordion defaultValue="hasData" variant='separated'>
+    <Accordion defaultValue="hasData" variant="separated">
       <Accordion.Item value="hasData">
         <Accordion.Control>
           <FilterGroup
@@ -137,18 +152,20 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
+          <HigherClassificationFilters
+            filters={classifications}
+            onChange={setClassifications}
+          />
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
-  )
+  );
 }
 
-
 interface FilterGroupProps {
-  label: string,
-  description: string,
-  image: string,
+  label: string;
+  description: string;
+  image: string;
 }
 
 function FilterGroup({ label, description, image }: FilterGroupProps) {
@@ -162,18 +179,12 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
         </Text>
       </div>
     </Group>
-  )
+  );
 }
-
 
 function FilterBadge({ filter }: { filter: Filter }) {
-  return (
-    <Badge variant="outline">
-      {filter.value}
-    </Badge>
-  )
+  return <Badge variant="outline">{filter.value}</Badge>;
 }
-
 
 function Species() {
   const [page, setPage] = useState(1);
@@ -181,27 +192,37 @@ function Species() {
 
   const [filters, setFilters] = useState<Filters>({
     classifications: [],
-    dataTypes: [{ filter: "HAS_DATA", action: "INCLUDE", value: "Genome", editable: false }],
+    dataTypes: [
+      {
+        filter: "HAS_DATA",
+        action: "INCLUDE",
+        value: "Genome",
+        editable: false,
+      },
+    ],
   });
 
   const flattenFilters = (filters: Filters) => {
-    const items = [
-      ...filters.classifications,
-      ...filters.dataTypes,
-    ];
+    const items = [...filters.classifications, ...filters.dataTypes];
 
     return items.filter((item): item is Filter => !!item);
-  }
+  };
 
-  const { loading, error, data, previousData } = useQuery<QueryResults>(GET_SPECIES, {
-    variables: {
-      page,
-      perPage: PAGE_SIZE,
-      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item)
+  const { loading, error, data, previousData } = useQuery<QueryResults>(
+    GET_SPECIES,
+    {
+      variables: {
+        page,
+        perPage: PAGE_SIZE,
+        filters: flattenFilters(filters)
+          .map(intoFilterItem)
+          .filter((item) => item),
+      },
     }
-  });
+  );
 
-  const records = data?.taxa.species.records || previousData?.taxa.species.records;
+  const records =
+    data?.taxa.species.records || previousData?.taxa.species.records;
 
   return (
     <Stack>
@@ -213,12 +234,16 @@ function Species() {
         size="xl"
       >
         <Box pt={200}>
-          <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
+          <Filters
+            filters={filters}
+            options={data?.taxa.filterOptions}
+            onChange={setFilters}
+          />
         </Box>
       </Drawer>
 
       <LoadOverlay visible={loading} />
-      { error && <Text>{error.message}</Text> }
+      {error && <Text>{error.message}</Text>}
 
       <Grid gutter={50} align="baseline">
         <Grid.Col span="content">
@@ -227,20 +252,30 @@ function Species() {
 
         <Grid.Col span="auto">
           <Group>
-            <Text fz="sm" fw={300}>Filters</Text>
-            { flattenFilters(filters).map(filter => <FilterBadge filter={filter} key={filter.value} />) }
+            <Text fz="sm" fw={300}>
+              Filters
+            </Text>
+            {flattenFilters(filters).map((filter) => (
+              <FilterBadge filter={filter} key={filter.value} />
+            ))}
           </Group>
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>Filter</Button>
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>
+            Filter
+          </Button>
         </Grid.Col>
       </Grid>
 
-      { records?.length === 0 && <Center><Text fz="xl">No data found</Text></Center> }
+      {records?.length === 0 && (
+        <Center>
+          <Text fz="xl">No data found</Text>
+        </Center>
+      )}
 
       <SimpleGrid cols={5} pt={40}>
-        {records?.map(record => (
+        {records?.map((record) => (
           <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
         ))}
       </SimpleGrid>
@@ -255,13 +290,12 @@ function Species() {
   );
 }
 
-
 export default function GenomeListPage() {
   const [_, setPreviousPage] = usePreviousPage();
 
   useEffect(() => {
-    setPreviousPage({ name: `browsing genomes`, url: '/browse/genomes' })
-  }, [setPreviousPage])
+    setPreviousPage({ name: `browsing genomes`, url: "/browse/genomes" });
+  }, [setPreviousPage]);
 
   return (
     <Stack mt={40}>

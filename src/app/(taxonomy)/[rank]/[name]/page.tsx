@@ -21,7 +21,7 @@ import {
   Avatar,
 } from "@mantine/core";
 
-import { Filter as IconFilter, SortAscending } from "tabler-icons-react";
+import { IconFilter } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
 import { Filter, intoFilterItem } from "@/components/filtering/common";

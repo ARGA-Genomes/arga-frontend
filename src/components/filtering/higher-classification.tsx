@@ -1,26 +1,27 @@
 import { Button, Stack, Grid, Select, Flex } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import { useEffect } from "react";
-import { Minus, Plus } from "tabler-icons-react";
+import { IconMinus, IconPlus } from "@tabler/icons-react";
 import { DebouncedInputFilter, Filter } from "./common";
 
-
 const CLASSIFICATIONS = [
-  {value: "KINGDOM", label: "Kingdom"},
-  {value: "PHYLUM", label: "Phylum"},
-  {value: "CLASS", label: "Class"},
-  {value: "ORDER", label: "Order"},
-  {value: "FAMILY", label: "Family"},
-  {value: "GENUS", label: "Genus"},
-]
-
+  { value: "KINGDOM", label: "Kingdom" },
+  { value: "PHYLUM", label: "Phylum" },
+  { value: "CLASS", label: "Class" },
+  { value: "ORDER", label: "Order" },
+  { value: "FAMILY", label: "Family" },
+  { value: "GENUS", label: "Genus" },
+];
 
 interface HigherClassificationFiltersProps {
-  filters: Filter[],
-  onChange: (items: Filter[]) => void,
+  filters: Filter[];
+  onChange: (items: Filter[]) => void;
 }
 
-export function HigherClassificationFilters({ filters, onChange }: HigherClassificationFiltersProps) {
+export function HigherClassificationFilters({
+  filters,
+  onChange,
+}: HigherClassificationFiltersProps) {
   const [items, handlers] = useListState<Filter>(filters);
   useEffect(() => onChange(items), [items, onChange]);
 
@@ -31,51 +32,63 @@ export function HigherClassificationFilters({ filters, onChange }: HigherClassif
       value: "",
       editable: true,
     });
-  }
+  };
 
   const removeFilter = (index: number) => {
     handlers.remove(index);
-  }
+  };
 
   const filterChanged = (index: number, value: string | null) => {
     if (value) {
-      handlers.setItemProp(index, 'filter', value);
+      handlers.setItemProp(index, "filter", value);
     }
-  }
+  };
 
   const valueChanged = (index: number, value: string) => {
-    handlers.setItemProp(index, 'value', value);
-  }
+    handlers.setItemProp(index, "value", value);
+  };
 
   return (
     <Stack>
-      { items.map((item, idx) => (
+      {items.map((item, idx) => (
         <Grid key={`classification-filter-${idx}`}>
           <Grid.Col span="auto">
             <Flex>
               <Select
                 value={item.filter}
                 disabled={!item.editable}
-                onChange={value => filterChanged(idx, value)}
-                data={CLASSIFICATIONS.map(option => { return {
-                  value: option.value,
-                  label: option.label,
-                  disabled: items.findIndex(item => item.filter == option.value) !== -1,
-                }})}
+                onChange={(value) => filterChanged(idx, value)}
+                data={CLASSIFICATIONS.map((option) => {
+                  return {
+                    value: option.value,
+                    label: option.label,
+                    disabled:
+                      items.findIndex((item) => item.filter == option.value) !==
+                      -1,
+                  };
+                })}
               />
               <DebouncedInputFilter
                 initialValue={item.value}
                 disabled={!item.editable}
-                onChange={value => valueChanged(idx, value)}
+                onChange={(value) => valueChanged(idx, value)}
               />
             </Flex>
           </Grid.Col>
           <Grid.Col span="content">
-            <Button color="red" onClick={() => removeFilter(idx)} disabled={!item.editable}><Minus /></Button>
+            <Button
+              color="red"
+              onClick={() => removeFilter(idx)}
+              disabled={!item.editable}
+            >
+              <IconMinus />
+            </Button>
           </Grid.Col>
         </Grid>
       ))}
-      <Button color="midnight" leftSection={<Plus />} onClick={addFilter}>Add filter</Button>
+      <Button color="midnight" leftSection={<IconPlus />} onClick={addFilter}>
+        Add filter
+      </Button>
     </Stack>
-  )
+  );
 }

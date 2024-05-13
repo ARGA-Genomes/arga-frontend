@@ -16,37 +16,36 @@ import {
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
 import { Attribute } from "@/components/highlight-stack";
-import { ExternalLink } from "tabler-icons-react";
+import { IconExternalLink } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { SpeciesImage } from "@/components/species-image";
 import Link from "next/link";
 
-
 const GET_TAXON = gql`
-query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
-  taxon(rank: $rank, canonicalName: $canonicalName) {
-    hierarchy {
-      canonicalName
-      rank
-      depth
+  query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
+    taxon(rank: $rank, canonicalName: $canonicalName) {
+      hierarchy {
+        canonicalName
+        rank
+        depth
+      }
     }
   }
-}`;
+`;
 
 type ClassificationNode = {
-  canonicalName: string,
-  rank: string,
-  depth: number,
-}
+  canonicalName: string;
+  rank: string;
+  depth: number;
+};
 
 type TaxonQuery = {
   taxon: {
-    hierarchy: ClassificationNode[],
-  },
+    hierarchy: ClassificationNode[];
+  };
 };
-
 
 const GET_SUMMARY = gql`
   query SpeciesSummary($canonicalName: String) {
@@ -87,29 +86,28 @@ const GET_SUMMARY = gql`
 
 type VernacularName = {
   datasetId: string;
-  vernacularName: string,
-  citation?: string,
-  sourceUrl?: string,
-}
+  vernacularName: string;
+  citation?: string;
+  sourceUrl?: string;
+};
 
 type Synonym = {
-  scientificName: string,
-  canonicalName: string,
-  authorship?: string,
-}
+  scientificName: string;
+  canonicalName: string;
+  authorship?: string;
+};
 
 type Species = {
-  taxonomy: Taxonomy[],
-  vernacularNames: VernacularName[],
-  synonyms: Synonym[],
-  photos: Photo[],
-  indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[],
+  taxonomy: Taxonomy[];
+  vernacularNames: VernacularName[];
+  synonyms: Synonym[];
+  photos: Photo[];
+  indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[];
 };
 
 type QueryResults = {
-  species: Species,
+  species: Species;
 };
-
 
 interface TaxonMatch {
   identifier: string;
@@ -119,8 +117,8 @@ interface TaxonMatch {
 }
 
 interface ExternalLinksProps {
-  canonicalName: string,
-  species?: Species,
+  canonicalName: string;
+  species?: Species;
 }
 
 function ExternalLinks(props: ExternalLinksProps) {
@@ -133,7 +131,9 @@ function ExternalLinks(props: ExternalLinksProps) {
     async function matchTaxon() {
       try {
         const response = await fetch(
-          `https://api.ala.org.au/species/guid/${encodeURIComponent(props.canonicalName)}`
+          `https://api.ala.org.au/species/guid/${encodeURIComponent(
+            props.canonicalName
+          )}`
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
@@ -150,7 +150,9 @@ function ExternalLinks(props: ExternalLinksProps) {
 
   return (
     <Paper radius={16} p="md" withBorder>
-      <Text fw={700} mb={10} size="lg">External links</Text>
+      <Text fw={700} mb={10} size="lg">
+        External links
+      </Text>
       <Group mt="md" gap="xs">
         <Button
           component="a"
@@ -158,16 +160,18 @@ function ExternalLinks(props: ExternalLinksProps) {
           color="gray"
           variant="light"
           size="xs"
-          leftSection={<ExternalLink size="1rem" color="black" />}
+          leftSection={<IconExternalLink size="1rem" color="black" />}
           loading={!matchedTaxon}
           disabled={Array.isArray(matchedTaxon) && matchedTaxon.length === 0}
           href={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`}
           target="_blank"
         >
-          <Text>View on&nbsp;<b>ALA</b></Text>
+          <Text>
+            View on&nbsp;<b>ALA</b>
+          </Text>
         </Button>
 
-        {props.species?.indigenousEcologicalKnowledge?.map(iek => (
+        {props.species?.indigenousEcologicalKnowledge?.map((iek) => (
           <Button
             key={iek.id}
             component="a"
@@ -175,11 +179,13 @@ function ExternalLinks(props: ExternalLinksProps) {
             color="gray"
             variant="light"
             size="xs"
-            leftSection={<ExternalLink size="1rem" color="black" />}
+            leftSection={<IconExternalLink size="1rem" color="black" />}
             href={iek.sourceUrl}
             target="_blank"
           >
-            <Text >View on&nbsp;<b>Profiles</b></Text>
+            <Text>
+              View on&nbsp;<b>Profiles</b>
+            </Text>
           </Button>
         ))}
 
@@ -188,7 +194,7 @@ function ExternalLinks(props: ExternalLinksProps) {
             radius="md"
             color="midnight"
             size="xs"
-            leftSection={<ExternalLink size="1rem" />}
+            leftSection={<IconExternalLink size="1rem" />}
           >
             View on&nbsp;<b>FrogID</b>
           </Button>
@@ -198,7 +204,7 @@ function ExternalLinks(props: ExternalLinksProps) {
             radius="md"
             color="midnight"
             size="xs"
-            leftSection={<ExternalLink size="1rem" />}
+            leftSection={<IconExternalLink size="1rem" />}
           >
             View on&nbsp;<b>AFD</b>
           </Button>
@@ -208,25 +214,29 @@ function ExternalLinks(props: ExternalLinksProps) {
   );
 }
 
-
 interface DetailsProps {
-  taxonomy: Taxonomy,
-  commonNames: VernacularName[],
-  synonyms: Synonym[],
+  taxonomy: Taxonomy;
+  commonNames: VernacularName[];
+  synonyms: Synonym[];
 }
 
 function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Paper radius={16} p="md" withBorder>
       <Group mb={10} align="baseline">
-        <Text fw={700}  size="lg">Taxonomy</Text>
+        <Text fw={700} size="lg">
+          Taxonomy
+        </Text>
         <Text fz="sm" fw={300}>
           Source:&nbsp;
-          { taxonomy.sourceUrl
-            ? <Link href={taxonomy.sourceUrl} target="_blank">{taxonomy.source}</Link>
-            : taxonomy.source
-          }
+          {taxonomy.sourceUrl ? (
+            <Link href={taxonomy.sourceUrl} target="_blank">
+              {taxonomy.source}
+            </Link>
+          ) : (
+            taxonomy.source
+          )}
         </Text>
       </Group>
 
@@ -234,17 +244,25 @@ function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
         <DataTable>
           <DataTableRow label="Scientific name">
             <Group gap={10}>
-              <Text fw={600} fz="sm" fs="italic">{taxonomy.canonicalName}</Text>
-              <Text fw={600} fz="sm">{taxonomy.authorship}</Text>
+              <Text fw={600} fz="sm" fs="italic">
+                {taxonomy.canonicalName}
+              </Text>
+              <Text fw={600} fz="sm">
+                {taxonomy.authorship}
+              </Text>
             </Group>
           </DataTableRow>
           <DataTableRow label="Status">
-            <Text fw={600} fz="sm">{taxonomy.status.toLowerCase()}</Text>
+            <Text fw={600} fz="sm">
+              {taxonomy.status.toLowerCase()}
+            </Text>
           </DataTableRow>
           <DataTableRow label="Synonyms">
             <Stack>
-              { synonyms.map(synonym => (
-                <Text fw={600} fz="sm" key={synonym.scientificName}>{synonym.scientificName}</Text>
+              {synonyms.map((synonym) => (
+                <Text fw={600} fz="sm" key={synonym.scientificName}>
+                  {synonym.scientificName}
+                </Text>
               ))}
             </Stack>
           </DataTableRow>
@@ -252,16 +270,32 @@ function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
 
         <DataTable>
           <DataTableRow label="Common names">
-            <Group display="block" w={{xs: 50, sm: 100, md: 150, lg: 200, xl: 270}}>
-            <Text fw={600} fz="sm" truncate="end" >
-              {commonNames.map(r => r.vernacularName).join(', ')}
-            </Text>
-            <Button onClick={() => setIsOpen(true)} bg="none" c="midnight.4" pl={-5} className="textButton">Show All</Button>
+            <Group
+              display="block"
+              w={{ xs: 50, sm: 100, md: 150, lg: 200, xl: 270 }}
+            >
+              <Text fw={600} fz="sm" truncate="end">
+                {commonNames.map((r) => r.vernacularName).join(", ")}
+              </Text>
+              <Button
+                onClick={() => setIsOpen(true)}
+                bg="none"
+                c="midnight.4"
+                pl={-5}
+                className="textButton"
+              >
+                Show All
+              </Button>
             </Group>
-            <Modal opened={isOpen} onClose={() => setIsOpen(false)} className="commonNamesModal" centered>
-            <Text fw={600} fz="sm">
-              {commonNames.map(r => r.vernacularName).join(', ')}
-            </Text>
+            <Modal
+              opened={isOpen}
+              onClose={() => setIsOpen(false)}
+              className="commonNamesModal"
+              centered
+            >
+              <Text fw={600} fz="sm">
+                {commonNames.map((r) => r.vernacularName).join(", ")}
+              </Text>
             </Modal>
           </DataTableRow>
           <DataTableRow label="Subspecies"></DataTableRow>
@@ -271,12 +305,11 @@ function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
   );
 }
 
-
 function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
     variables: {
       rank: taxonomy.rank,
-      canonicalName: taxonomy.canonicalName
+      canonicalName: taxonomy.canonicalName,
     },
   });
 
@@ -287,69 +320,112 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
       <LoadOverlay visible={loading} />
 
       <Group>
-        <Text fw={700} size="lg">Higher classification</Text>
+        <Text fw={700} size="lg">
+          Higher classification
+        </Text>
       </Group>
 
       <Group>
-        { error && <Text>{error.message}</Text> }
-        { hierarchy?.map((node, idx) => (
+        {error && <Text>{error.message}</Text>}
+        {hierarchy?.map((node, idx) => (
           <Attribute
             key={idx}
             label={Humanize.capitalize(node.rank.toLowerCase())}
             value={node.canonicalName}
-            href={`/${node.rank.toLowerCase() }/${node.canonicalName}`}
+            href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
           />
-        )) }
+        ))}
       </Group>
     </Paper>
   );
 }
 
-
 interface Badge {
-  icon: string,
-  url: string,
+  icon: string;
+  url: string;
 }
 
 const LICENSE_ICON: Record<string, Badge> = {
-  "cc-by-nc-nd": { icon: "/badges/cc-by-nc-nd.svg", url: "http://creativecommons.org/licenses/by-nc-nd/4.0"},
-  "cc-by-nc-sa": { icon: "/badges/cc-by-nc-sa.svg", url: "http://creativecommons.org/licenses/by-nc-sa/4.0"},
-  "cc-by-nc": { icon: "/badges/cc-by-nc.svg", url: "http://creativecommons.org/licenses/by-nc/4.0"},
-  "cc-by-nd": { icon: "/badges/cc-by-nd.svg", url: "http://creativecommons.org/licenses/by-nd/4.0"},
-  "cc-by-sa": { icon: "/badges/cc-by-sa.svg", url: "http://creativecommons.org/licenses/by-sa/4.0"},
-  "cc-by": { icon: "/badges/cc-by.svg", url: "http://creativecommons.org/licenses/by/4.0"},
-  "cc0": { icon: "/badges/cc-zero.svg", url: "http://creativecommons.org/publicdomain/zero/1.0"},
+  "cc-by-nc-nd": {
+    icon: "/badges/cc-by-nc-nd.svg",
+    url: "http://creativecommons.org/licenses/by-nc-nd/4.0",
+  },
+  "cc-by-nc-sa": {
+    icon: "/badges/cc-by-nc-sa.svg",
+    url: "http://creativecommons.org/licenses/by-nc-sa/4.0",
+  },
+  "cc-by-nc": {
+    icon: "/badges/cc-by-nc.svg",
+    url: "http://creativecommons.org/licenses/by-nc/4.0",
+  },
+  "cc-by-nd": {
+    icon: "/badges/cc-by-nd.svg",
+    url: "http://creativecommons.org/licenses/by-nd/4.0",
+  },
+  "cc-by-sa": {
+    icon: "/badges/cc-by-sa.svg",
+    url: "http://creativecommons.org/licenses/by-sa/4.0",
+  },
+  "cc-by": {
+    icon: "/badges/cc-by.svg",
+    url: "http://creativecommons.org/licenses/by/4.0",
+  },
+  cc0: {
+    icon: "/badges/cc-zero.svg",
+    url: "http://creativecommons.org/publicdomain/zero/1.0",
+  },
 
-  "http://creativecommons.org/licenses/by-nc-sa/4.0/": { icon: "/badges/cc-by-nc-sa.svg", url: "http://creativecommons.org/licenses/by-nc-sa/4.0/"},
-  "http://creativecommons.org/licenses/by-nc/4.0/": { icon: "/badges/cc-by-nc.svg", url: "http://creativecommons.org/licenses/by-nc/4.0/"},
-  "http://creativecommons.org/licenses/by/4.0/": { icon: "/badges/cc-by.svg", url: "http://creativecommons.org/licenses/by/4.0/"},
-  "http://creativecommons.org/licenses/by-nc-nd/4.0/": { icon: "/badges/cc-by-nc-nd.svg", url: "http://creativecommons.org/licenses/by-nc-nd/4.0/"},
+  "http://creativecommons.org/licenses/by-nc-sa/4.0/": {
+    icon: "/badges/cc-by-nc-sa.svg",
+    url: "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+  },
+  "http://creativecommons.org/licenses/by-nc/4.0/": {
+    icon: "/badges/cc-by-nc.svg",
+    url: "http://creativecommons.org/licenses/by-nc/4.0/",
+  },
+  "http://creativecommons.org/licenses/by/4.0/": {
+    icon: "/badges/cc-by.svg",
+    url: "http://creativecommons.org/licenses/by/4.0/",
+  },
+  "http://creativecommons.org/licenses/by-nc-nd/4.0/": {
+    icon: "/badges/cc-by-nc-nd.svg",
+    url: "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+  },
 
-  "public domain mark": { icon: "/badges/publicdomain.svg", url: "http://creativecommons.org/publicdomain/mark/1.0"},
-  "attribution-noncommercial 4.0 international": { icon: "/badges/cc-by-nc.svg", url: "https://creativecommons.org/licenses/by-nc/4.0/"},
-  "attribution 4.0 international": { icon: "/badges/cc-by.svg", url: "https://creativecommons.org/licenses/by/4.0/"},
-}
+  "public domain mark": {
+    icon: "/badges/publicdomain.svg",
+    url: "http://creativecommons.org/publicdomain/mark/1.0",
+  },
+  "attribution-noncommercial 4.0 international": {
+    icon: "/badges/cc-by-nc.svg",
+    url: "https://creativecommons.org/licenses/by-nc/4.0/",
+  },
+  "attribution 4.0 international": {
+    icon: "/badges/cc-by.svg",
+    url: "https://creativecommons.org/licenses/by/4.0/",
+  },
+};
 
 function LicenseIcon({ license }: { license: string }) {
   const badge = LICENSE_ICON[license.toLowerCase()];
-  return badge
-       ? (
-         <Link href={badge.url} target="_blank">
-           <Image src={badge.icon} h={15} w={80}></Image>
-         </Link>
-       )
-       : <Text fz="sm" c="dimmed">{license}</Text>
+  return badge ? (
+    <Link href={badge.url} target="_blank">
+      <Image src={badge.icon} h={15} w={80}></Image>
+    </Link>
+  ) : (
+    <Text fz="sm" c="dimmed">
+      {license}
+    </Text>
+  );
 }
-
 
 function SpeciesPhoto({ photo }: { photo?: Photo }) {
   return (
-    <Paper h={500} radius="lg" style={{ overflow: 'hidden' }}>
+    <Paper h={500} radius="lg" style={{ overflow: "hidden" }}>
       <SpeciesImage photo={photo} />
     </Paper>
   );
 }
-
 
 export default function TaxonomyPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
@@ -371,9 +447,18 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
         <Grid.Col span={8}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
-            {species && taxonomy && <Details taxonomy={taxonomy} commonNames={species.vernacularNames} synonyms={species.synonyms} /> }
-            {taxonomy && <Classification taxonomy={taxonomy} /> }
-            <ExternalLinks canonicalName={canonicalName} species={data?.species} />
+            {species && taxonomy && (
+              <Details
+                taxonomy={taxonomy}
+                commonNames={species.vernacularNames}
+                synonyms={species.synonyms}
+              />
+            )}
+            {taxonomy && <Classification taxonomy={taxonomy} />}
+            <ExternalLinks
+              canonicalName={canonicalName}
+              species={data?.species}
+            />
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>

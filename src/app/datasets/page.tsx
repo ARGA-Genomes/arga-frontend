@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { DateTime } from "luxon";
 import { AttributePill } from "@/components/data-fields";
-import { ExternalLink } from "tabler-icons-react";
+import { IconExternalLink } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 
 const GET_DATASETS = gql`
@@ -195,7 +195,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
               disabled={!dataset.url}
             >
               <Stack align="center">
-                <ExternalLink size="30px" />
+                <IconExternalLink size="30px" />
                 Go to source
               </Stack>
             </Button>

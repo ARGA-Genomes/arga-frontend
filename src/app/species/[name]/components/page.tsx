@@ -1,7 +1,16 @@
-'use client';
+"use client";
 
 import { gql, useQuery } from "@apollo/client";
-import {Box, Button, Center, Grid, Paper, Stack, Text, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Center,
+  Grid,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 
 import React, { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -9,99 +18,102 @@ import { Attribute, AttributePill, DataField } from "@/components/data-fields";
 import { RecordItem, RecordList } from "@/components/record-list";
 import { PaginationBar } from "@/components/pagination";
 import { usePathname } from "next/navigation";
-import { ExternalLink } from "tabler-icons-react";
-
+import { IconExternalLink } from "@tabler/icons-react";
 
 const PAGE_SIZE = 5;
 
 const GET_SPECIES = gql`
-query SpeciesComponents($canonicalName: String, $page: Int, $pageSize: Int) {
-  species(canonicalName: $canonicalName) {
-    genomicComponents(page: $page, pageSize: $pageSize) {
-      total
-      records {
-        sequenceId
-        datasetName
-        recordId
-        accession
-        latitude
-        longitude
-        materialSampleId
-        sequencedBy
-        depositedBy
-        estimatedSize
-        releaseDate
-        dataType
-        accessRights
-        sourceUri
+  query SpeciesComponents($canonicalName: String, $page: Int, $pageSize: Int) {
+    species(canonicalName: $canonicalName) {
+      genomicComponents(page: $page, pageSize: $pageSize) {
+        total
+        records {
+          sequenceId
+          datasetName
+          recordId
+          accession
+          latitude
+          longitude
+          materialSampleId
+          sequencedBy
+          depositedBy
+          estimatedSize
+          releaseDate
+          dataType
+          accessRights
+          sourceUri
+        }
       }
     }
   }
-}`;
+`;
 
 type GenomicComponent = {
-  sequenceId: string,
-  datasetName: string,
-  recordId: string,
-  accession?: string,
-  latitude?: number,
-  longitude?: number,
-  materialSampleId?: string,
-  sequencedBy?: string,
-  depositedBy?: string,
-  estimatedSize?: string,
-  releaseDate?: string,
-  dataType?: string,
-  accessRights?: string,
-  sourceUri?: string,
-}
+  sequenceId: string;
+  datasetName: string;
+  recordId: string;
+  accession?: string;
+  latitude?: number;
+  longitude?: number;
+  materialSampleId?: string;
+  sequencedBy?: string;
+  depositedBy?: string;
+  estimatedSize?: string;
+  releaseDate?: string;
+  dataType?: string;
+  accessRights?: string;
+  sourceUri?: string;
+};
 
 type QueryResults = {
   species: {
     genomicComponents: {
-      total: number,
-      records: GenomicComponent[],
-    }
-  },
+      total: number;
+      records: GenomicComponent[];
+    };
+  };
 };
-
 
 function RecordItemContent({ record }: { record: GenomicComponent }) {
   return (
-      <Grid p={20}>
-        <Grid.Col span={2}>
-          <Attribute label="Accession">
-            <Box pt={5}><DataField value={record.accession} /></Box>
-          </Attribute>
-        </Grid.Col>
-        <Grid.Col span={2}>
-          <AttributePill label="Data type" value={record.dataType} />
-        </Grid.Col>
-        <Grid.Col span={2}>
-          <AttributePill label="Library type" value={undefined} />
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <AttributePill label="Access status" value={record.accessRights} />
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <AttributePill label="Data license" value={undefined} />
-        </Grid.Col>
-        <Grid.Col span={2}>
-          <AttributePill label="Source" value={record.datasetName}/>
-        </Grid.Col>
-        <Grid.Col span={2}>
-          <Attribute label="Publication date">
-            <Box pt={5}><DataField value={record.releaseDate} /></Box>
-          </Attribute>
-        </Grid.Col>
-      </Grid>
-  )
+    <Grid p={20}>
+      <Grid.Col span={2}>
+        <Attribute label="Accession">
+          <Box pt={5}>
+            <DataField value={record.accession} />
+          </Box>
+        </Attribute>
+      </Grid.Col>
+      <Grid.Col span={2}>
+        <AttributePill label="Data type" value={record.dataType} />
+      </Grid.Col>
+      <Grid.Col span={2}>
+        <AttributePill label="Library type" value={undefined} />
+      </Grid.Col>
+      <Grid.Col span={1}>
+        <AttributePill label="Access status" value={record.accessRights} />
+      </Grid.Col>
+      <Grid.Col span={1}>
+        <AttributePill label="Data license" value={undefined} />
+      </Grid.Col>
+      <Grid.Col span={2}>
+        <AttributePill label="Source" value={record.datasetName} />
+      </Grid.Col>
+      <Grid.Col span={2}>
+        <Attribute label="Publication date">
+          <Box pt={5}>
+            <DataField value={record.releaseDate} />
+          </Box>
+        </Attribute>
+      </Grid.Col>
+    </Grid>
+  );
 }
 
 function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
   return (
     <RecordList>
-      { records.map((record, idx) => (
+      {records.map((record, idx) => (
         <RecordItem
           key={idx}
           href={record.sourceUri}
@@ -115,20 +127,26 @@ function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
               style={{ borderRadius: "0 16px 16px 0" }}
             >
               <Stack>
-                <Center><ExternalLink size="30px" /></Center>
+                <Center>
+                  <IconExternalLink size="30px" />
+                </Center>
                 go to source
               </Stack>
             </Button>
           }
         >
           <RecordItemContent record={record} />
-        </RecordItem>)) }
+        </RecordItem>
+      ))}
     </RecordList>
-  )
+  );
 }
 
-
-export default function GenomicComponents({ params }: { params: { name: string } }) {
+export default function GenomicComponents({
+  params,
+}: {
+  params: { name: string };
+}) {
   const canonicalName = params.name.replaceAll("_", " ");
   const [page, setPage] = useState(1);
 
@@ -141,7 +159,7 @@ export default function GenomicComponents({ params }: { params: { name: string }
   });
 
   if (error) {
-    return (<Text>Error : {error.message}</Text>);
+    return <Text>Error : {error.message}</Text>;
   }
 
   return (
@@ -152,7 +170,11 @@ export default function GenomicComponents({ params }: { params: { name: string }
         <Grid.Col span={12}>
           <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
-            {data?.species.genomicComponents ? <GenomicComponentList records={data.species.genomicComponents.records} /> : null }
+            {data?.species.genomicComponents ? (
+              <GenomicComponentList
+                records={data.species.genomicComponents.records}
+              />
+            ) : null}
           </Box>
         </Grid.Col>
 

@@ -26,7 +26,7 @@ import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { useDisclosure } from "@mantine/hooks";
-import { SortAscending, Filter as IconFilter } from "tabler-icons-react";
+import { IconFilter } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { Photo } from "@/app/type";
