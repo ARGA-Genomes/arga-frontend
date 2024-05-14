@@ -256,7 +256,7 @@ export function ShowTaxonomicCoverageStats() {
     );
 
   return (
-    <Group gap={80} justify="center">
+    <Group gap={40} justify="center">
       <Stack>
         <Skeleton visible={taxonResults.loading}>
           <Center>
