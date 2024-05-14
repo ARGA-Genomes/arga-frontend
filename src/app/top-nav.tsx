@@ -53,7 +53,7 @@ export function TopNav() {
         active={active === index}
         className={classes.navlink}
         px={30}
-        pb={40}
+        pb={25}
       />
     </Link>
   ));
