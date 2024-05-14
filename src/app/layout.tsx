@@ -60,12 +60,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
       <AppShell.Main>{children}</AppShell.Main>
 
-      <Paper className={classes.footer} radius={0}>
-        <Container maw={MAX_WIDTH}>
-          <Footer />
-        </Container>
-        <Image src="/dna_footer.jpg" h={160} />
-      </Paper>
+      <Footer />
     </AppShell>
   );
 }
