@@ -197,8 +197,8 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize={20}
-        stroke="black"
-        strokeWidth={0.2}
+        fontWeight={450}
+        fill="#1c303c"
       >
         {data.name}
       </text>
@@ -208,6 +208,8 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize={14}
+        fontWeight={450}
+        fill="#1A3443"
       >
         {data.label}
       </text>
@@ -217,6 +219,8 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize={14}
+        fontWeight={450}
+        fill="#1A3443"
       >
         records
       </text>

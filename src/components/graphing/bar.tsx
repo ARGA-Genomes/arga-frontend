@@ -1,44 +1,32 @@
-'use client';
+"use client";
 
 import * as d3 from "d3";
-import { useSpring, animated } from '@react-spring/web'
+import { useSpring, animated } from "@react-spring/web";
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps, Tooltip } from "@mantine/core";
 import Link from "next/link";
 
-
 const MARGIN = { top: 10, right: 10, bottom: 10, left: 10 };
 
-
 interface Rect {
-  x: number,
-  y: number,
-  width: number,
-  height: number,
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
-
 
 interface BarProps {
-  rect: Rect,
-  data: BarDatum,
-  yAxisWidth?: number,
-  highlight: boolean,
-  onHighlight: (datum: BarDatum | undefined) => void,
+  rect: Rect;
+  data: BarDatum;
+  yAxisWidth?: number;
+  highlight: boolean;
+  onHighlight: (datum: BarDatum | undefined) => void;
 }
 
-
-function Bar(props: BarProps & SVGProps<SVGRectElement>)
-{
+function Bar(props: BarProps & SVGProps<SVGRectElement>) {
   // unwrap properties for convenience
-  const {
-    rect,
-    data,
-    yAxisWidth,
-    highlight,
-    onHighlight,
-    ...rest
-  } = props;
+  const { rect, data, yAxisWidth, highlight, onHighlight, ...rest } = props;
 
   const anim = useSpring({
     from: { opacity: highlight ? 0.3 : 1 },
@@ -52,18 +40,26 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>)
         y={rect.y}
         width={rect.width}
         height={rect.height}
-        onMouseEnter={() => {onHighlight(data)}}
-        onMouseLeave={() => {onHighlight(undefined)}}
+        onMouseEnter={() => {
+          onHighlight(data);
+        }}
+        onMouseLeave={() => {
+          onHighlight(undefined);
+        }}
         {...rest}
       />
 
       <text
         x={0}
-        y={rect.y + (rect.height / 2)}
+        y={rect.y + rect.height / 2}
         fontSize={12}
         fill="url(#truncateText)"
-        onMouseEnter={() => {onHighlight(data)}}
-        onMouseLeave={() => {onHighlight(undefined)}}
+        onMouseEnter={() => {
+          onHighlight(data);
+        }}
+        onMouseLeave={() => {
+          onHighlight(undefined);
+        }}
       >
         {data.name}
       </text>
@@ -72,17 +68,87 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>)
 
   return (
     <Tooltip.Floating label={`${data.name} - ${data.value}`} radius="md">
-      { data.href ? <Link href={data.href}>{bar}</Link> : bar }
+      {data.href ? <Link href={data.href}>{bar}</Link> : bar}
     </Tooltip.Floating>
-  )
-};
+  );
+}
 
+interface BarArcProps {
+  data: BarDatum;
+  innerRadius: number;
+  outerRadius: number;
+  startAngle: number;
+  endAngle: number;
+  textAnchor?: string;
+  labelTransform?: string;
+  labelRotation?: string;
+  highlight: boolean;
+  onHighlight: (datum: BarDatum | undefined) => void;
+}
+
+function BarArc(props: BarArcProps & SVGProps<SVGRectElement>) {
+  const {
+    data,
+    innerRadius,
+    outerRadius,
+    startAngle,
+    endAngle,
+    textAnchor,
+    labelTransform,
+    labelRotation,
+    highlight,
+    onHighlight,
+    ...rest
+  } = props;
+
+  const anim = useSpring({
+    from: { opacity: highlight ? 0.3 : 1 },
+    to: { opacity: highlight ? 1 : 0.3 },
+  });
+
+  const arcGenerator = d3.arc();
+  const slicePath = arcGenerator(props) || undefined;
+
+  const barArc = (
+    <animated.g style={anim}>
+      <path
+        d={slicePath}
+        onMouseEnter={() => {
+          onHighlight(data);
+        }}
+        onMouseLeave={() => {
+          onHighlight(undefined);
+        }}
+        {...rest}
+      />
+      <text
+        transform={labelTransform! + labelRotation!}
+        textAnchor={textAnchor}
+        alignmentBaseline="middle"
+        fontSize={14}
+        fill="white"
+        strokeWidth={0.2}
+      >
+        {data.name}
+      </text>
+    </animated.g>
+  );
+
+  return (
+    <Tooltip.Floating
+      label={`${data.name} - ${data.value} records`}
+      radius="md"
+    >
+      {data.href ? <Link href={data.href}>{barArc}</Link> : barArc}
+    </Tooltip.Floating>
+  );
+}
 
 interface GridLineProps {
-  x1: number,
-  x2: number,
-  y1: number,
-  y2: number,
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
 }
 
 function GridLine({ value, x1, x2, y1, y2, ...rest }: GridLineProps & any) {
@@ -99,32 +165,36 @@ function GridLine({ value, x1, x2, y1, y2, ...rest }: GridLineProps & any) {
         {value}
       </text>
     </g>
-  )
+  );
 }
 
-
 interface BarDatum {
-  name: string,
-  value: number,
-  href?: string,
+  name: string;
+  value: number;
+  href?: string;
 }
 
 interface BarChartProps {
-  data: BarDatum[],
-  spacing?: number,
-  labelWidth?: number,
+  data: BarDatum[];
+  spacing?: number;
+  labelWidth?: number;
 }
 
-export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps & BoxProps) {
+export function BarChart({
+  data,
+  spacing,
+  labelWidth,
+  ...rest
+}: BarChartProps & BoxProps) {
   const { ref, width, height } = useElementSize();
 
   const yAxisWidth = labelWidth || 150;
   const boundsWidth = width - 200;
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
-  const [highlighted, setHighlighted] = useState<BarDatum|undefined>();
+  const [highlighted, setHighlighted] = useState<BarDatum | undefined>();
 
-  const groups = data.sort((a, b) => b.value - a.value).map(d => d.name);
+  const groups = data.sort((a, b) => b.value - a.value).map((d) => d.name);
   const yScale = d3
     .scaleBand()
     .domain(groups)
@@ -141,12 +211,26 @@ export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps &
 
   const color = d3
     .scaleOrdinal()
-    .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length === 1 ? 2 : data.length).reverse())
+    .range(
+      d3
+        .quantize(
+          (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
+          data.length === 1 ? 2 : data.length
+        )
+        .reverse()
+    );
 
   return (
     <Box ref={ref} {...rest}>
       <svg width={width} height={height}>
-        <linearGradient gradientUnits="userSpaceOnUse" x1="0" x2={yAxisWidth} y1="0" y2="0" id="truncateText">
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          x2={yAxisWidth}
+          y1="0"
+          y2="0"
+          id="truncateText"
+        >
           <stop offset="70%" stopOpacity="1" />
           <stop offset="100%" stopOpacity="0" />
         </linearGradient>
@@ -156,7 +240,7 @@ export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps &
           height={boundsHeight}
           //transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
         >
-        { grid.map((value, idx) => (
+          {grid.map((value, idx) => (
             <GridLine
               key={idx}
               value={value}
@@ -167,27 +251,126 @@ export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps &
               stroke="grey"
               opacity={0.3}
             />
-        ))}
-        { data.map((datum, idx) => (
-          <Bar
-            key={idx}
-            rect={{
-              x: xScale(0),
-              y: yScale(datum.name) || 0,
-              width: xScale(datum.value),
-              height: yScale.bandwidth(),
-            }}
-                yAxisWidth={yAxisWidth}
-            data={datum}
-            rx={5}
-            opacity={0.8}
-            fill={color(idx.toString()) as string}
-            highlight={highlighted === undefined || highlighted.name == datum.name}
-            onHighlight={setHighlighted}
-          />
-        ))}
+          ))}
+          {data.map((datum, idx) => (
+            <Bar
+              key={idx}
+              rect={{
+                x: xScale(0),
+                y: yScale(datum.name) || 0,
+                width: xScale(datum.value),
+                height: yScale.bandwidth(),
+              }}
+              yAxisWidth={yAxisWidth}
+              data={datum}
+              rx={5}
+              opacity={0.8}
+              fill={color(idx.toString()) as string}
+              highlight={
+                highlighted === undefined || highlighted.name == datum.name
+              }
+              onHighlight={setHighlighted}
+            />
+          ))}
         </g>
       </svg>
     </Box>
   );
-};
+}
+
+interface CircularBarChartProps {
+  data: BarDatum[];
+  margin: number;
+}
+
+export function CircularBarChart({
+  data,
+  margin,
+  ...rest
+}: CircularBarChartProps & BoxProps) {
+  const { ref, width, height } = useElementSize();
+  const innerRadius = 50;
+  const outerRadius = Math.min(width, height) / 2 - margin;
+
+  const [highlighted, setHighlighted] = useState<BarDatum | undefined>();
+
+  const maxValue = data.reduce((max, current) => {
+    return Math.max(max, current.value);
+  }, -Infinity);
+
+  const xScale = d3
+    .scaleBand()
+    .range([0, 2 * Math.PI])
+    .padding(0.02)
+    .domain(
+      data.map(function (d) {
+        return d.name;
+      })
+    );
+
+  const yScale = d3
+    .scaleRadial()
+    .range([innerRadius, outerRadius])
+    .domain([0, maxValue]);
+
+  const color = d3
+    .scaleOrdinal()
+    .range(
+      d3
+        .quantize(
+          (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
+          data.length === 1 ? 2 : data.length
+        )
+        .reverse()
+    );
+
+  return (
+    <Box ref={ref} {...rest}>
+      <svg
+        width={width}
+        height={height}
+        viewBox={[-width / 2, -height / 2, width, height].join(" ")}
+      >
+        {data.map((datum, idx) => (
+          <BarArc
+            key={idx}
+            data={datum}
+            innerRadius={innerRadius}
+            outerRadius={yScale(datum.value)}
+            startAngle={xScale(datum.name)!}
+            endAngle={xScale(datum.name)! + xScale.bandwidth()}
+            textAnchor={
+              (xScale(datum.name)! + xScale.bandwidth() / 2 + Math.PI) %
+                (2 * Math.PI) <
+              Math.PI
+                ? "end"
+                : "start"
+            }
+            labelTransform={
+              "rotate(" +
+              (((xScale(datum.name)! + xScale.bandwidth() / 2) * 180) /
+                Math.PI -
+                90) +
+              ")" +
+              "translate(" +
+              (yScale(datum.value) + 10) +
+              ",0)"
+            }
+            labelRotation={
+              (xScale(datum.name)! + xScale.bandwidth() / 2 + Math.PI) %
+                (2 * Math.PI) <
+              Math.PI
+                ? "rotate(180)"
+                : "rotate(0)"
+            }
+            fill={color(idx.toString()) as string}
+            highlight={
+              highlighted === undefined || highlighted.name == datum.name
+            }
+            onHighlight={setHighlighted}
+          />
+        ))}
+      </svg>
+    </Box>
+  );
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import * as d3 from "d3";
 import { Attribute, DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
@@ -13,11 +14,14 @@ import {
   Group,
   Skeleton,
   Center,
+  Box,
 } from "@mantine/core";
 import * as Humanize from "humanize-plus";
-import { BarChart } from "@/components/graphing/bar";
+import { BarChart, CircularBarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DonutChart } from "@/components/graphing/pie";
+import { CircularPackingChart } from "@/components/graphing/circular-packing";
+import { useState } from "react";
 
 const GET_TAXON = gql`
   query HomeStats {
@@ -104,6 +108,131 @@ type Taxonomy = {
 
 type TaxonResults = {
   taxon: Taxonomy;
+};
+
+const GET_DESCENDANTS = gql`
+  query DescendantStats {
+    eukaryotaTaxon: taxon(rank: DOMAIN, canonicalName: "Eukaryota") {
+      canonicalName
+      summary {
+        species
+      }
+    }
+
+    animaliaTaxon: taxon(rank: KINGDOM, canonicalName: "Animalia") {
+      canonicalName
+      summary {
+        species
+      }
+      descendants(rank: PHYLUM) {
+        canonicalName
+        species
+      }
+    }
+
+    protistaTaxon: taxon(rank: SUPERKINGDOM, canonicalName: "Protista") {
+      canonicalName
+      summary {
+        species
+      }
+      descendants(rank: PHYLUM) {
+        canonicalName
+        species
+      }
+    }
+
+    fungiTaxon: taxon(rank: REGNUM, canonicalName: "Fungi") {
+      canonicalName
+      summary {
+        species
+      }
+      descendants(rank: DIVISION) {
+        canonicalName
+        species
+      }
+    }
+
+    plantaeTaxon: taxon(rank: REGNUM, canonicalName: "Plantae") {
+      canonicalName
+      summary {
+        species
+      }
+      descendants(rank: DIVISION) {
+        canonicalName
+        species
+      }
+    }
+
+    chromistaTaxon: taxon(rank: REGNUM, canonicalName: "Chromista") {
+      canonicalName
+      summary {
+        species
+      }
+      descendants(rank: DIVISION) {
+        canonicalName
+        species
+      }
+    }
+  }
+`;
+
+type EukaryotaDescendantResults = {
+  eukaryotaTaxon: {
+    canonicalName: string;
+    summary: {
+      species: number;
+    };
+  };
+  animaliaTaxon: {
+    canonicalName: string;
+    summary: {
+      species: number;
+    };
+    descendants: {
+      canonicalName: string;
+      species: number;
+    }[];
+  };
+  protistaTaxon: {
+    canonicalName: string;
+    summary: {
+      species: number;
+    };
+    descendants: {
+      canonicalName: string;
+      species: number;
+    }[];
+  };
+  fungiTaxon: {
+    canonicalName: string;
+    summary: {
+      species: number;
+    };
+    descendants: {
+      canonicalName: string;
+      species: number;
+    }[];
+  };
+  plantaeTaxon: {
+    canonicalName: string;
+    summary: {
+      species: number;
+    };
+    descendants: {
+      canonicalName: string;
+      species: number;
+    }[];
+  };
+  chromistaTaxon: {
+    canonicalName: string;
+    summary: {
+      species: number;
+    };
+    descendants: {
+      canonicalName: string;
+      species: number;
+    }[];
+  };
 };
 
 export function ShowStats() {
@@ -212,6 +341,49 @@ export function ShowTaxonomicCoverageStats() {
 
   const taxon = taxonResults.data?.taxon;
 
+  // const domainData = [
+  //   { name: "Archaea", value: 1, label: 0 },
+  //   {
+  //     name: "Eukaryota",
+  //     value: 1,
+  //     label: taxon?.summary.species,
+  //     href: "/domain/Eukaryota",
+  //   },
+  //   { name: "Bacteria", value: 1, label: 0 },
+  // ];
+
+  // const kingdomRegnumData = taxon?.kingdomDescendants
+  //   .map((descendant) => {
+  //     return {
+  //       name: descendant.canonicalName,
+  //       value: 1,
+  //       label: descendant.species,
+  //       href: `/kingdom/${descendant.canonicalName}`,
+  //     };
+  //   })
+  //   .concat(
+  //     taxon?.regnumDescendants
+  //       .filter((descendant) => descendant.canonicalName !== "Protista")
+  //       .map((descendant) => {
+  //         return {
+  //           name: descendant.canonicalName,
+  //           value: 1,
+  //           label: descendant.species,
+  //           href: `/regnum/${descendant.canonicalName}`,
+  //         };
+  //       })
+  //   )
+  //   .concat(
+  //     taxon?.superKingdomDescendants.map((descendant) => {
+  //       return {
+  //         name: descendant.canonicalName,
+  //         value: 1,
+  //         label: descendant.species,
+  //         href: `/superkingdom/${descendant.canonicalName}`,
+  //       };
+  //     })
+  //   );
+
   const domainData = [
     { name: "Archaea", value: 1, label: 0 },
     {
@@ -227,8 +399,7 @@ export function ShowTaxonomicCoverageStats() {
     .map((descendant) => {
       return {
         name: descendant.canonicalName,
-        value: 1,
-        label: descendant.species,
+        value: descendant.species,
         href: `/kingdom/${descendant.canonicalName}`,
       };
     })
@@ -238,8 +409,7 @@ export function ShowTaxonomicCoverageStats() {
         .map((descendant) => {
           return {
             name: descendant.canonicalName,
-            value: 1,
-            label: descendant.species,
+            value: descendant.species,
             href: `/regnum/${descendant.canonicalName}`,
           };
         })
@@ -248,14 +418,47 @@ export function ShowTaxonomicCoverageStats() {
       taxon?.superKingdomDescendants.map((descendant) => {
         return {
           name: descendant.canonicalName,
-          value: 1,
-          label: descendant.species,
+          value: descendant.species,
           href: `/superkingdom/${descendant.canonicalName}`,
         };
       })
     );
 
   return (
+    // <Group gap={40} justify="center">
+    //   <Stack>
+    //     <Skeleton visible={taxonResults.loading}>
+    //       <Center>
+    //         <Title order={4} c="white">
+    //           Domains
+    //         </Title>
+    //       </Center>
+    //     </Skeleton>
+    //     <Skeleton visible={taxonResults.loading} circle>
+    //       <DonutChart h={375} w={375} data={domainData} labelled={true} />
+    //     </Skeleton>
+    //   </Stack>
+    //   <Stack align="center">
+    //     <Skeleton visible={taxonResults.loading}>
+    //       <Center>
+    //         <Title order={4} c="white">
+    //           Kingdoms
+    //         </Title>
+    //       </Center>
+    //     </Skeleton>
+    //     {kingdomRegnumData && (
+    //       <Skeleton visible={taxonResults.loading} circle h={375} w={375}>
+    //         <DonutChart
+    //           h={375}
+    //           w={375}
+    //           data={kingdomRegnumData}
+    //           labelled={true}
+    //         />
+    //       </Skeleton>
+    //     )}
+    //   </Stack>
+    // </Group>
+
     <Group gap={40} justify="center">
       <Stack>
         <Skeleton visible={taxonResults.loading}>
@@ -266,7 +469,7 @@ export function ShowTaxonomicCoverageStats() {
           </Center>
         </Skeleton>
         <Skeleton visible={taxonResults.loading} circle>
-          <DonutChart h={375} w={375} data={domainData} labelled={true} />
+          <DonutChart h={350} w={350} data={domainData} labelled={true} />
         </Skeleton>
       </Stack>
       <Stack align="center">
@@ -279,15 +482,69 @@ export function ShowTaxonomicCoverageStats() {
         </Skeleton>
         {kingdomRegnumData && (
           <Skeleton visible={taxonResults.loading} circle h={375} w={375}>
-            <DonutChart
-              h={375}
-              w={375}
+            <CircularBarChart
+              h={400}
+              w={400}
+              margin={30}
               data={kingdomRegnumData}
-              labelled={true}
             />
           </Skeleton>
         )}
       </Stack>
     </Group>
+  );
+}
+
+type TreeNode = {
+  name: string;
+  value?: number;
+  children?: TreeNode[];
+};
+
+export function ShowCircularTaxonomy() {
+  const [treeData, setTreeData] = useState<TreeNode>();
+  const { data, loading, error } = useQuery<EukaryotaDescendantResults>(
+    GET_DESCENDANTS,
+    {
+      onCompleted: (data) => {
+        const kingdomsRegnaTaxa = [
+          data.animaliaTaxon,
+          data.protistaTaxon,
+          data.plantaeTaxon,
+          data.fungiTaxon,
+          data.chromistaTaxon,
+        ];
+        const tData: TreeNode = {
+          name: data.eukaryotaTaxon.canonicalName,
+          children: kingdomsRegnaTaxa.map((taxon) => {
+            return {
+              name: taxon.canonicalName,
+              children: taxon.descendants.map((descendant) => {
+                return {
+                  name: descendant.canonicalName,
+                  value: descendant.species,
+                };
+              }),
+            };
+          }),
+        };
+        // console.log(tData);
+        setTreeData(tData);
+      },
+    }
+  );
+
+  if (loading) {
+    return <p>loading...</p>;
+  }
+
+  return (
+    <>
+      {treeData && (
+        // <CircularPacking data={treeData} width={1000} height={700} />
+
+        <CircularPackingChart data={treeData} width={640} height={640} />
+      )}
+    </>
   );
 }

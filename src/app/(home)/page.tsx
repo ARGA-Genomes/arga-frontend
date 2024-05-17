@@ -20,7 +20,11 @@ import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
 import { MAX_WIDTH } from "../constants";
-import { ShowStats, ShowTaxonomicCoverageStats } from "./stats";
+import {
+  ShowStats,
+  ShowTaxonomicCoverageStats,
+  ShowCircularTaxonomy,
+} from "./stats";
 import classes from "./page.module.css";
 import { ScrollArea } from "@mantine/core";
 import RecentUpdatesContainer from "../../components/recent-updates-container";
@@ -139,6 +143,7 @@ export default function HomePage() {
                 Taxonomic coverage
               </Title>
               <ShowTaxonomicCoverageStats />
+              <ShowCircularTaxonomy />
             </Stack>
             {/* <Stack gap={40} className={classes.bottomStack}>
               <Title order={3} c="moss.5" fz={28}>
