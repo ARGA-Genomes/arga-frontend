@@ -21,6 +21,7 @@ import { BarChart, CircularBarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DonutChart } from "@/components/graphing/pie";
 import { CircularPackingChart } from "@/components/graphing/circular-packing";
+import { SunburstChart } from "@/components/graphing/sunburst";
 import { useState } from "react";
 
 const GET_TAXON = gql`
@@ -498,11 +499,13 @@ export function ShowTaxonomicCoverageStats() {
 type TreeNode = {
   name: string;
   value?: number;
+  color?: string;
   children?: TreeNode[];
 };
 
 export function ShowCircularTaxonomy() {
   const [treeData, setTreeData] = useState<TreeNode>();
+
   const { data, loading, error } = useQuery<EukaryotaDescendantResults>(
     GET_DESCENDANTS,
     {
@@ -543,8 +546,52 @@ export function ShowCircularTaxonomy() {
       {treeData && (
         // <CircularPacking data={treeData} width={1000} height={700} />
 
-        <CircularPackingChart data={treeData} width={640} height={640} />
+        <CircularPackingChart data={treeData} width={520} height={520} />
       )}
+    </>
+  );
+}
+
+export function ShowSunburstTaxonomy() {
+  const [treeData, setTreeData] = useState<TreeNode>();
+  const { data, loading, error } = useQuery<EukaryotaDescendantResults>(
+    GET_DESCENDANTS,
+    {
+      onCompleted: (data) => {
+        const kingdomsRegnaTaxa = [
+          data.animaliaTaxon,
+          data.protistaTaxon,
+          data.plantaeTaxon,
+          data.fungiTaxon,
+          data.chromistaTaxon,
+        ];
+        const tData: TreeNode = {
+          name: data.eukaryotaTaxon.canonicalName,
+          children: kingdomsRegnaTaxa.map((taxon) => {
+            return {
+              name: taxon.canonicalName,
+              children: taxon.descendants.map((descendant) => {
+                return {
+                  name: descendant.canonicalName,
+                  value: descendant.species,
+                };
+              }),
+            };
+          }),
+        };
+        // console.log(tData);
+        setTreeData(tData);
+      },
+    }
+  );
+
+  if (loading) {
+    return <p>loading...</p>;
+  }
+
+  return (
+    <>
+      {treeData && <SunburstChart data={treeData} width={520} height={520} />}
     </>
   );
 }

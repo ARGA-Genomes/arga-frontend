@@ -1,5 +1,6 @@
 "use client";
 
+import * as d3 from "d3";
 import { useSpring, animated } from "@react-spring/web";
 import { useState } from "react";
 import { CirclePacking, LabelProps } from "@nivo/circle-packing";
@@ -40,7 +41,6 @@ export function CircularPackingChart({
       return "";
     }
   };
-
   const CustomLabelComponent = (label: LabelProps<TreeNode>) => {
     const isTopLevel = label.node.height === 2 || label.node.height === 1;
     const color = setColors(label.node.data.name);

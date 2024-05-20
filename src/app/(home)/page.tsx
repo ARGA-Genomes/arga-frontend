@@ -24,6 +24,7 @@ import {
   ShowStats,
   ShowTaxonomicCoverageStats,
   ShowCircularTaxonomy,
+  ShowSunburstTaxonomy,
 } from "./stats";
 import classes from "./page.module.css";
 import { ScrollArea } from "@mantine/core";
@@ -142,8 +143,11 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Taxonomic coverage
               </Title>
-              <ShowTaxonomicCoverageStats />
-              <ShowCircularTaxonomy />
+              {/* <ShowTaxonomicCoverageStats /> */}
+              <Group>
+                <ShowCircularTaxonomy />
+                <ShowSunburstTaxonomy />
+              </Group>
             </Stack>
             {/* <Stack gap={40} className={classes.bottomStack}>
               <Title order={3} c="moss.5" fz={28}>
