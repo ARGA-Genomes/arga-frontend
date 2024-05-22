@@ -40,8 +40,8 @@ type CenteredValueProps = {
 
 export function SunburstChart({ data, width, height }: SunburstChartProps) {
   const [chartData, setChartData] = useState<TreeNode>(data);
-  const [currentFocus, setCurrentFocus] = useState("Eukaryota");
-  const [prevFocus, setPrevFocus] = useState<string | null>(null);
+  const [parent, setParent] = useState<string | null>(null);
+  const [path, setPath] = useState<string[]>(["Eukaryota"]);
 
   const customColor = (numCategories: number | undefined) => {
     if (numCategories) {
@@ -67,23 +67,32 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
             fontWeight: 600,
           }}
         >
-          {currentFocus}
+          {path[0]}
         </text>
-        {prevFocus && (
+        {parent && (
           <text
             x={centerX}
             y={centerY + 25}
             fill="white"
             textAnchor="middle"
             dominantBaseline="bottom"
+            // going up one taxonomic level
             onClick={() => {
-              setChartData(data);
-              setPrevFocus(null);
-              setCurrentFocus("Eukaryota");
+              if (parent === "Eukaryota") {
+                setChartData(data);
+              } else {
+                const foundObject = findObject(flatten(data.children), parent);
+                if (foundObject && foundObject.children) {
+                  setChartData(foundObject);
+                }
+              }
+              const tmpPath = path.slice(1);
+              setPath(tmpPath);
+              setParent(tmpPath[1]);
             }}
             className={classes.sunburstButton}
           >
-            Back to {prevFocus}
+            Back to {parent}
           </text>
         )}
       </animated.g>
@@ -113,15 +122,17 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
         modifiers: [["darker", 1.4]],
       }}
       layers={["arcs", "arcLabels", CenteredValue]}
+      // going down one taxonomic level
       onClick={(clickedDatum, event) => {
         const foundObject = findObject(
           flatten(chartData.children),
           clickedDatum.data.name
         );
         if (foundObject && foundObject.children) {
+          const tmpPath = [clickedDatum.data.name, ...path];
+          setPath(tmpPath);
+          setParent(tmpPath[1]);
           setChartData(foundObject);
-          setPrevFocus(currentFocus);
-          setCurrentFocus(clickedDatum.data.name);
         }
       }}
     />

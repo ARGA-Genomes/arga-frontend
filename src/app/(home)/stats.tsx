@@ -585,13 +585,9 @@ export function ShowSunburstTaxonomy() {
     }
   );
 
-  if (loading) {
-    return <p>loading...</p>;
-  }
-
   return (
-    <>
+    <Skeleton visible={loading} circle>
       {treeData && <SunburstChart data={treeData} width={520} height={520} />}
-    </>
+    </Skeleton>
   );
 }
