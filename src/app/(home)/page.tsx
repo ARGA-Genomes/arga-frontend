@@ -143,11 +143,7 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Taxonomic coverage
               </Title>
-              {/* <ShowTaxonomicCoverageStats /> */}
-              <Group>
-                <ShowCircularTaxonomy />
-                <ShowSunburstTaxonomy />
-              </Group>
+              <ShowSunburstTaxonomy />
             </Stack>
             {/* <Stack gap={40} className={classes.bottomStack}>
               <Title order={3} c="moss.5" fz={28}>

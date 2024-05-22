@@ -7,7 +7,7 @@ export default function RecentUpdatesContainer() {
   return (
     <Paper
       w={400}
-      h={425}
+      h={520}
       radius="lg"
       // shadow="lg"
       withBorder
