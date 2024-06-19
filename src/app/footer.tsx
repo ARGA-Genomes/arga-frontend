@@ -52,6 +52,9 @@ export function Footer() {
             <FooterLink href="https://arga.org.au/about/">
               About ARGA
             </FooterLink>
+            <FooterLink href="https://arga.org.au/data-use-policy/">
+              Data Policy
+            </FooterLink>
             <FooterLink href="mailto:support@arga.org.au">Help</FooterLink>
             <FooterLink href="https://arga.org.au/user-guide/">
               User-guide
@@ -124,7 +127,7 @@ export function Footer() {
           </Text>
         </Stack>
       </Group>
-      <Image src="/dna_footer.jpg" h={160} />
+      <Image src="/gene-pattern.svg" h={160} />
     </Box>
   );
 }
