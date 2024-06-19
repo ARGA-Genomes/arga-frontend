@@ -287,7 +287,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
               >
                 <Center>
                   <Button
-                    color="midnight"
+                    color="midnight.10"
                     radius="md"
                     leftSection={<IconEye />}
                   >

@@ -120,7 +120,7 @@ function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
           target="_blank"
           rightSection={
             <Button
-              color="midnight"
+              color="midnight.10"
               h="100%"
               w="100%"
               disabled={!record.sourceUri}

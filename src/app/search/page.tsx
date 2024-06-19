@@ -264,7 +264,7 @@ function TaxonItem({ item }: { item: Item }) {
           <Link href={`/species/${itemLinkName}`}>
             <Button
               h="100%"
-              bg="midnight"
+              bg="midnight.10"
               style={{
                 borderRadius:
                   "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
@@ -448,7 +448,7 @@ function GenomeItem({ item }: { item: Item }) {
           >
             <Button
               h="100%"
-              bg="midnight"
+              bg="midnight.10"
               style={{
                 borderRadius:
                   "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
@@ -556,7 +556,7 @@ function LocusItem({ item }: { item: Item }) {
           <Link href={`/species/${itemLinkName}/markers/${item.accession}`}>
             <Button
               h="100%"
-              bg="midnight"
+              bg="midnight.10"
               style={{
                 borderRadius:
                   "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
@@ -662,7 +662,7 @@ function SpecimenItem({ item }: { item: Item }) {
           <Link href={`/species/${itemLinkName}/specimens/${item.accession}`}>
             <Button
               h="100%"
-              bg="midnight"
+              bg="midnight.10"
               style={{
                 borderRadius:
                   "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
@@ -756,7 +756,7 @@ function Search(props: SearchProperties) {
   }
 
   return (
-    <Paper bg="midnight.1" p={10} radius={0}>
+    <Paper bg="midnight.0" p={10} radius={0}>
       <Box>
         <form
           onSubmit={(ev) => {
@@ -765,7 +765,7 @@ function Search(props: SearchProperties) {
           }}
         >
           <Grid align="center" m={10}>
-            <Grid.Col span={7}>
+            <Grid.Col span={12}>
               <TextInput
                 placeholder="e.g. sequence accession, species name"
                 value={value}

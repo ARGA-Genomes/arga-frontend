@@ -173,7 +173,7 @@ function MoleculeDetails({
           <Stack>
             <Title order={5}>Original data</Title>
             <LinkButton
-              color="midnight"
+              color="midnight.10"
               radius="md"
               leftSection={<IconDownload />}
               href={deposition?.sourceUri}
@@ -181,7 +181,7 @@ function MoleculeDetails({
               get FASTA
             </LinkButton>
             <LinkButton
-              color="midnight"
+              color="midnight.10"
               radius="md"
               leftSection={<IconLink />}
               href={
@@ -192,7 +192,7 @@ function MoleculeDetails({
               go to source
             </LinkButton>
             <Button
-              color="midnight"
+              color="midnight.10"
               radius="md"
               leftSection={<IconCloudUpload />}
               disabled
@@ -351,7 +351,7 @@ function SpecimenPreview({
             <Link href={`../specimens/${specimen?.recordId}`}>
               <Button
                 radius="md"
-                color="midnight"
+                color="midnight.10"
                 leftSection={<IconMicroscope />}
               >
                 go to specimen

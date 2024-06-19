@@ -181,7 +181,7 @@ function GenomeDetails({
           <Stack>
             <Title order={5}>Original data</Title>
             <Button
-              color="midnight"
+              color="midnight.10"
               radius="md"
               leftSection={<IconCircleCheck />}
               onClick={saveToList}
@@ -189,7 +189,7 @@ function GenomeDetails({
               add to list
             </Button>
             <LinkButton
-              color="midnight"
+              color="midnight.10"
               radius="md"
               leftSection={<IconDownload />}
               href={deposition?.sourceUri}
@@ -197,7 +197,7 @@ function GenomeDetails({
               get data
             </LinkButton>
             <LinkButton
-              color="midnight"
+              color="midnight.10"
               radius="md"
               leftSection={<IconLink />}
               href={deposition?.url}
@@ -205,7 +205,7 @@ function GenomeDetails({
               go to source
             </LinkButton>
             <Button
-              color="midnight"
+              color="midnight.10"
               radius="md"
               leftSection={<IconCloudUpload />}
               disabled
@@ -404,7 +404,7 @@ function SpecimenPreview({
             <Link href={`../specimens/${specimen?.recordId}`}>
               <Button
                 radius="md"
-                color="midnight"
+                color="midnight.10"
                 leftSection={<IconMicroscope />}
               >
                 go to specimen

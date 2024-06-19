@@ -22,7 +22,7 @@ export function RecordItem({
 
   const right = rightSection || (
     <Button
-      color="midnight"
+      color="midnight.10"
       h="100%"
       w="100%"
       style={{ borderRadius: "0 16px 16px 0" }}
