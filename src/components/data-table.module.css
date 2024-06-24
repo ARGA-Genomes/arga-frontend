@@ -2,7 +2,7 @@
     height: 1px;
 
     tbody tr {
-        height: 45;
+        height: 10;
 
         td {
             &:first-child {
