@@ -1,0 +1,4 @@
+.sunburstButton:hover {
+    cursor: pointer;
+    fill: var(--mantine-color-midnight-5);
+}

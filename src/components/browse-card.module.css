@@ -8,9 +8,9 @@
 }
 
 .card {
-    background-color: var(--mantine-color-midnight-7);
+    background-color: var(--mantine-color-midnight-10);
 
     @mixin hover {
-        background-color: var(--mantine-color-midnight-8);
+        background-color: var(--mantine-color-midnight-11);
     }
 }

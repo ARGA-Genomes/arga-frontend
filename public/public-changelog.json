@@ -1,0 +1,15 @@
+{
+    "changelog": [
+        {
+            "date": "TBC",
+            "updates": ["UI fixes", "New UI features: taxonomic coverage graphs, recent updates section"]
+        },
+        {
+            "date": "03/04/2024",
+            "updates": ["UI fixes", "New UI feature: new taxonomic icons"]
+        },
+        {
+            "date": "07/02/2024",
+            "updates": ["Public release"]
+        }]
+}

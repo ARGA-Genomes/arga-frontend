@@ -16,15 +16,27 @@ import {
 } from "@mantine/core";
 import { LoadPanel } from "@/components/load-overlay";
 import { AttributePill, DataField } from "@/components/highlight-stack";
-import { ArrowNarrowLeft, CircleCheck, CircleX, CloudUpload, Download as IconDownload, Link as IconLink, Microscope } from "tabler-icons-react";
+import {
+  IconArrowNarrowLeft,
+  IconCircleCheck,
+  IconCircleX,
+  IconCloudUpload,
+  IconDownload,
+  IconLink,
+  IconMicroscope,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { CopyableData } from "@/components/data-fields";
-import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
+import {
+  DataDepositionEvent,
+  Sequence,
+  SequencingEvent,
+  SequencingRunEvent,
+} from "@/queries/sequence";
 import { AnalysisMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TraceData } from "@/components/traces/trace-data";
 import { Marker } from "@/components/mapping/analysis-map";
-
 
 const GET_ASSEMBLY = gql`
   query MarkerFullData($recordId: String) {
@@ -33,7 +45,9 @@ const GET_ASSEMBLY = gql`
       ...SequenceDetails
 
       events {
-        sequencing { ...SequencingEventDetails }
+        sequencing {
+          ...SequencingEventDetails
+        }
         sequencingRuns {
           id
           ...SequencingRunEventDetails
@@ -44,9 +58,15 @@ const GET_ASSEMBLY = gql`
             traceLink
           }
         }
-        assemblies { ...AssemblyEventDetails }
-        annotations { ...AnnotationEventDetails }
-        dataDepositions { ...DataDepositionEventDetails }
+        assemblies {
+          ...AssemblyEventDetails
+        }
+        annotations {
+          ...AnnotationEventDetails
+        }
+        dataDepositions {
+          ...DataDepositionEventDetails
+        }
       }
     }
 
@@ -56,7 +76,9 @@ const GET_ASSEMBLY = gql`
       latitude
       longitude
       events {
-        accessions { id }
+        accessions {
+          id
+        }
       }
     }
   }
@@ -64,45 +86,55 @@ const GET_ASSEMBLY = gql`
 
 type SequenceDetails = Sequence & {
   events: {
-    sequencing: SequencingEvent[],
-    sequencingRuns: SequencingRunEvent[],
-    dataDepositions: DataDepositionEvent[],
-  },
+    sequencing: SequencingEvent[];
+    sequencingRuns: SequencingRunEvent[];
+    dataDepositions: DataDepositionEvent[];
+  };
 };
 
 type SpecimenDetails = {
-  recordId: string,
-  collectionCode?: string,
-  latitude?: number,
-  longitude?: number,
+  recordId: string;
+  collectionCode?: string;
+  latitude?: number;
+  longitude?: number;
   events: {
-    accessions: { id: string }[],
-  }
-}
-
-type SequenceQueryResults = {
-  sequence: SequenceDetails[],
-  specimen: SpecimenDetails,
+    accessions: { id: string }[];
+  };
 };
 
+type SequenceQueryResults = {
+  sequence: SequenceDetails[];
+  specimen: SpecimenDetails;
+};
 
 interface LinkButtonProps extends ButtonProps {
-  href?: string,
-  children?: React.ReactNode,
+  href?: string;
+  children?: React.ReactNode;
 }
 
 function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
-  return href
-       ? <Button component="a" href={href} target="_blank" {...buttonProps}>{children}</Button>
-       : <Button {...buttonProps} disabled>{children}</Button>
+  return href ? (
+    <Button component="a" href={href} target="_blank" {...buttonProps}>
+      {children}
+    </Button>
+  ) : (
+    <Button {...buttonProps} disabled>
+      {children}
+    </Button>
+  );
 }
 
-
-function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
+function MoleculeDetails({
+  sequence,
+}: {
+  sequence: SequenceDetails | undefined;
+}) {
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
-  const depositionBase = sequence?.datasetName === "BOLD" && 'https://www.boldsystems.org/index.php/Public_RecordView?processid=';
+  const depositionBase =
+    sequence?.datasetName === "BOLD" &&
+    "https://www.boldsystems.org/index.php/Public_RecordView?processid=";
 
   return (
     <Grid>
@@ -140,83 +172,166 @@ function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <LinkButton color="midnight" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>get FASTA</LinkButton>
-            <LinkButton color="midnight" radius="md" leftSection={<IconLink />} href={deposition?.accession && `${depositionBase}${deposition?.accession}`}>go to source</LinkButton>
-            <Button color="midnight" radius="md" leftSection={<CloudUpload />} disabled>send to Galaxy</Button>
+            <LinkButton
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconDownload />}
+              href={deposition?.sourceUri}
+            >
+              get FASTA
+            </LinkButton>
+            <LinkButton
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconLink />}
+              href={
+                deposition?.accession &&
+                `${depositionBase}${deposition?.accession}`
+              }
+            >
+              go to source
+            </LinkButton>
+            <Button
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconCloudUpload />}
+              disabled
+            >
+              send to Galaxy
+            </Button>
           </Stack>
         </Paper>
       </Grid.Col>
 
       <Grid.Col span={12}>
         <DataTable>
-          <DataTableRow label="Publication"><DataField value={deposition?.reference} /></DataTableRow>
-          <DataTableRow label="Sequence">
-            { sequencing?.dnaSequence
-              ?<CopyableData value={sequencing.dnaSequence} />
-              : <DataField value={undefined} />
-            }
+          <DataTableRow label="Publication">
+            <DataField value={deposition?.reference} />
           </DataTableRow>
-          <DataTableRow label="Translation"><DataField value={undefined} /></DataTableRow>
+          <DataTableRow label="Sequence">
+            {sequencing?.dnaSequence ? (
+              <CopyableData value={sequencing.dnaSequence} />
+            ) : (
+              <DataField value={undefined} />
+            )}
+          </DataTableRow>
+          <DataTableRow label="Translation">
+            <DataField value={undefined} />
+          </DataTableRow>
         </DataTable>
       </Grid.Col>
     </Grid>
-  )
+  );
 }
 
-function DataAvailabilityItem({ value, children }: { value: boolean|undefined, children: React.ReactNode }) {
+function DataAvailabilityItem({
+  value,
+  children,
+}: {
+  value: boolean | undefined;
+  children: React.ReactNode;
+}) {
   return (
     <Group wrap="nowrap">
-      { value ? <CircleCheck color="green" /> : <CircleX color="red" /> }
-      <Text fz="sm" fw={300}>{children}</Text>
+      {value ? <IconCircleCheck color="green" /> : <IconCircleX color="red" />}
+      <Text fz="sm" fw={300}>
+        {children}
+      </Text>
     </Group>
-  )
+  );
 }
 
-function DataAvailability({ sequence, specimen }: { sequence: SequenceDetails | undefined, specimen: SpecimenDetails | undefined }) {
+function DataAvailability({
+  sequence,
+  specimen,
+}: {
+  sequence: SequenceDetails | undefined;
+  specimen: SpecimenDetails | undefined;
+}) {
   const sequencing = sequence?.events.sequencing[0];
   const sequencingRun = sequence?.events.sequencingRuns[0];
   const deposition = sequence?.events.dataDepositions[0];
 
   return (
     <Stack>
-      <DataAvailabilityItem value={!!sequencing?.dnaSequence}>Marker data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Contig data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!sequencingRun?.trace?.traceLink}>Trace files available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!deposition?.url}>Marker publication available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen?.events.accessions.length}>Specimen voucher accessioned</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen?.latitude}>Specimen location available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencing?.dnaSequence}>
+        Marker data available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={false}>
+        Contig data available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencingRun?.trace?.traceLink}>
+        Trace files available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!deposition?.url}>
+        Marker publication available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen}>
+        Specimen collection data available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.events.accessions.length}>
+        Specimen voucher accessioned
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.latitude}>
+        Specimen location available
+      </DataAvailabilityItem>
     </Stack>
-  )
+  );
 }
 
-function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined }) {
+function DataProvenance({
+  sequence,
+}: {
+  sequence: SequenceDetails | undefined;
+}) {
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
   return (
     <DataTable>
-      <DataTableRow label="Accession"><DataField value={sequence?.recordId} /></DataTableRow>
-      <DataTableRow label="Sequence author"><DataField value={sequencing?.sequencedBy} /></DataTableRow>
-      <DataTableRow label="Institution"><DataField value={deposition?.institutionName} /></DataTableRow>
-      <DataTableRow label="Deposited by"><DataField value={deposition?.submittedBy} /></DataTableRow>
+      <DataTableRow label="Accession">
+        <DataField value={sequence?.recordId} />
+      </DataTableRow>
+      <DataTableRow label="Sequence author">
+        <DataField value={sequencing?.sequencedBy} />
+      </DataTableRow>
+      <DataTableRow label="Institution">
+        <DataField value={deposition?.institutionName} />
+      </DataTableRow>
+      <DataTableRow label="Deposited by">
+        <DataField value={deposition?.submittedBy} />
+      </DataTableRow>
     </DataTable>
-  )
+  );
 }
 
-function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefined }) {
+function AmplificationMethods({
+  sequence,
+}: {
+  sequence: SequenceDetails | undefined;
+}) {
   const sequencingRun = sequence?.events.sequencingRuns[0];
 
   return (
     <DataTable>
-      <DataTableRow label="Primer forward"><DataField value={sequencingRun?.sequencePrimerForwardName} /></DataTableRow>
-      <DataTableRow label="Primer reverse"><DataField value={sequencingRun?.sequencingPrimerReverseName} /></DataTableRow>
-      <DataTableRow label="Data source"><DataField value={sequence?.datasetName} /></DataTableRow>
+      <DataTableRow label="Primer forward">
+        <DataField value={sequencingRun?.sequencePrimerForwardName} />
+      </DataTableRow>
+      <DataTableRow label="Primer reverse">
+        <DataField value={sequencingRun?.sequencingPrimerReverseName} />
+      </DataTableRow>
+      <DataTableRow label="Data source">
+        <DataField value={sequence?.datasetName} />
+      </DataTableRow>
     </DataTable>
-  )
+  );
 }
 
-function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
+function SpecimenPreview({
+  specimen,
+}: {
+  specimen: SpecimenDetails | undefined;
+}) {
   return (
     <Grid>
       <Grid.Col span={7}>
@@ -224,13 +339,23 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
           <Title order={5}>Specimen information</Title>
 
           <DataTable>
-            <DataTableRow label="Sample ID"><DataField value={specimen?.recordId} /></DataTableRow>
-            <DataTableRow label="Sequenced by"><DataField value={specimen?.collectionCode} /></DataTableRow>
+            <DataTableRow label="Sample ID">
+              <DataField value={specimen?.recordId} />
+            </DataTableRow>
+            <DataTableRow label="Sequenced by">
+              <DataField value={specimen?.collectionCode} />
+            </DataTableRow>
           </DataTable>
 
           <Center>
             <Link href={`../specimens/${specimen?.recordId}`}>
-              <Button radius="md" color="midnight" leftSection={<Microscope />}>go to specimen</Button>
+              <Button
+                radius="md"
+                color="midnight.10"
+                leftSection={<IconMicroscope />}
+              >
+                go to specimen
+              </Button>
             </Link>
           </Center>
         </Stack>
@@ -239,51 +364,63 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
         <SpecimenMap specimen={specimen} />
       </Grid.Col>
     </Grid>
-  )
+  );
 }
 
+function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
+  let position: [number, number] | undefined =
+    specimen && specimen.latitude && specimen.longitude
+      ? [Number(specimen.latitude), Number(specimen.longitude)]
+      : undefined;
 
-function SpecimenMap({ specimen }: { specimen : SpecimenDetails | undefined }) {
-  let position: [number, number] | undefined = (specimen && specimen.latitude && specimen.longitude) ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
-
-  let marker = position && {
-    recordId: specimen?.recordId,
-    latitude: position[0],
-    longitude: position[1],
-    color: [103, 151, 180, 220],
-  } as Marker
+  let marker =
+    position &&
+    ({
+      recordId: specimen?.recordId,
+      latitude: position[0],
+      longitude: position[1],
+      color: [103, 151, 180, 220],
+    } as Marker);
 
   return (
     <Box pos="relative" h={300}>
       <AnalysisMap
         markers={marker ? [marker] : []}
-        style={{ borderRadius: 'var(--mantine-radius-lg)', overflow: 'hidden' }}
+        style={{ borderRadius: "var(--mantine-radius-lg)", overflow: "hidden" }}
         initialPosition={position}
         initialZoom={position ? 7.0 : 2.4}
-      >
-      </AnalysisMap>
+      ></AnalysisMap>
     </Box>
-  )
+  );
 }
 
-
-function TraceDataList({ sequence }: { sequence: SequenceDetails | undefined }) {
+function TraceDataList({
+  sequence,
+}: {
+  sequence: SequenceDetails | undefined;
+}) {
   return (
     <Stack>
-      { sequence?.events.sequencingRuns.map((run, idx) => (
-        run.trace && <TraceData key={idx} trace={run.trace} />
-      ))}
+      {sequence?.events.sequencingRuns.map(
+        (run, idx) => run.trace && <TraceData key={idx} trace={run.trace} />
+      )}
     </Stack>
-  )
+  );
 }
 
-
-export default function MarkerPage({ params }: { params: { accession: string } }) {
-  const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
-    variables: {
-      recordId: params.accession,
-    },
-  });
+export default function MarkerPage({
+  params,
+}: {
+  params: { accession: string };
+}) {
+  const { loading, error, data } = useQuery<SequenceQueryResults>(
+    GET_ASSEMBLY,
+    {
+      variables: {
+        recordId: params.accession,
+      },
+    }
+  );
 
   if (error) {
     return <Text>Error : {error.message}</Text>;
@@ -295,16 +432,23 @@ export default function MarkerPage({ params }: { params: { accession: string } }
     <Stack gap={20}>
       <Link href="./">
         <Group gap={5}>
-          <ArrowNarrowLeft />
+          <IconArrowNarrowLeft />
           <Text fz={18}>Back to markers</Text>
         </Group>
       </Link>
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${sequence?.recordId}`}</Title>
-          <Text fz="sm" c="dimmed">Source</Text>
-          <Text fz="sm" c="dimmed" fw={700}>{sequence?.datasetName}</Text>
+          <Title
+            order={3}
+            mb={10}
+          >{`Full data view: ${sequence?.recordId}`}</Title>
+          <Text fz="sm" c="dimmed">
+            Source
+          </Text>
+          <Text fz="sm" c="dimmed" fw={700}>
+            {sequence?.datasetName}
+          </Text>
         </Group>
 
         <Grid>
@@ -316,22 +460,27 @@ export default function MarkerPage({ params }: { params: { accession: string } }
           </Grid.Col>
           <Grid.Col span={3}>
             <LoadPanel visible={loading} h={450}>
-              <Title order={5} mb={10}>Data availability</Title>
+              <Title order={5} mb={10}>
+                Data availability
+              </Title>
               <DataAvailability sequence={sequence} specimen={data?.specimen} />
             </LoadPanel>
           </Grid.Col>
 
           <Grid.Col span={3}>
             <LoadPanel visible={loading}>
-              <Title order={5} mb={10}>Trace data</Title>
+              <Title order={5} mb={10}>
+                Trace data
+              </Title>
               <TraceDataList sequence={sequence} />
             </LoadPanel>
           </Grid.Col>
 
-
           <Grid.Col span={4}>
             <LoadPanel visible={loading}>
-              <Title order={5} mb={10}>Data provenance</Title>
+              <Title order={5} mb={10}>
+                Data provenance
+              </Title>
               <DataProvenance sequence={sequence} />
             </LoadPanel>
           </Grid.Col>
@@ -342,7 +491,9 @@ export default function MarkerPage({ params }: { params: { accession: string } }
           </Grid.Col>
           <Grid.Col span={3}>
             <LoadPanel visible={loading}>
-              <Title order={5} mb={10}>Amplification methods</Title>
+              <Title order={5} mb={10}>
+                Amplification methods
+              </Title>
               <AmplificationMethods sequence={sequence} />
             </LoadPanel>
           </Grid.Col>

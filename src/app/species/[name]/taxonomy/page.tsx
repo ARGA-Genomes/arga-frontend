@@ -26,7 +26,7 @@ import {
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
 import { Attribute } from "@/components/highlight-stack";
-import { ExternalLink } from "tabler-icons-react";
+import { IconExternalLink } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";

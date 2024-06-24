@@ -1,13 +1,26 @@
+.footerIcon:hover {
+    /* fill: white; */
+    color: var(--mantine-color-midnight-5);
+}
+
 .footer-link {
     color: var(--mantine-color-gray-2);
+
+    &:hover {
+        color: var(--mantine-color-midnight-5);
+    }
 }
 
 .footer-nav {
     height: 100%;
-    margin-right: 20px;
+    padding-right: 30px;
+    border-right: 1px solid var(--mantine-color-gray-2);
 
-    @media (min-width: $mantine-breakpoint-md) {
-        border-right: 3px solid var(--mantine-color-gray-2);
+    @media (max-width: 1305px) {
+        border-right: none;
+        border-top:  1px solid var(--mantine-color-gray-2);
+        padding-top: 15px;
+        padding-right: 0px;
     }
 }
 
@@ -37,5 +50,37 @@
         @media (max-width: $mantine-breakpoint-md) {
             border-bottom: none;
         }
+    }
+}
+
+.footerFlex {
+    flex-direction: column;
+    @media (max-width: 1305px) {
+        flex-direction: row;
+      }
+}
+
+.footerSocials {
+    justify-content: flex-start;
+    @media (max-width: 1305px) {
+        justify-content: center;
+      }
+}
+
+.footerGroup {
+    gap: 60px;
+    margin: 60px;
+    margin-top: 0px;
+    padding-top: 60px;
+    @media (max-width: 1305px) {
+        gap: 20px;
+        flex-direction: column-reverse;
+        margin-bottom: 30px;
+      }
+}
+
+.footerLogos {
+    @media (max-width: 1305px) {
+        padding-bottom: 15px;
     }
 }

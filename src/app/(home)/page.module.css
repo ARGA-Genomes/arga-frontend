@@ -1,0 +1,8 @@
+.bottomStack {
+    align-items: stretch;
+  
+    @media (max-width: 1430px) {
+      align-items: center;
+    }
+  }
+  

@@ -28,11 +28,15 @@ const GET_DISTRIBUTION = gql`
       regions {
         ibra {
           names
-          dataset { name }
+          dataset {
+            name
+          }
         }
         imcra {
           names
-          dataset { name }
+          dataset {
+            name
+          }
         }
       }
       specimens(page: 1, pageSize: 1000) {
@@ -65,84 +69,97 @@ const GET_DISTRIBUTION = gql`
 `;
 
 type RegionDistribution = {
-  names: string[],
-  dataset: { name: string }
-}
+  names: string[];
+  dataset: { name: string };
+};
 
 type Regions = {
-  ibra: RegionDistribution[],
-  imcra: RegionDistribution[],
-}
+  ibra: RegionDistribution[];
+  imcra: RegionDistribution[];
+};
 
 type Specimen = {
-  id: string,
-  recordId?: string,
-  latitude?: number,
-  longitude?: number,
-  color?: string,
-  type: Layer
-}
+  id: string;
+  recordId?: string;
+  latitude?: number;
+  longitude?: number;
+  color?: string;
+  type: Layer;
+};
 
 type QueryResults = {
   species: {
-    regions: Regions,
+    regions: Regions;
     specimens: {
-      total: number,
-      records: Specimen[],
-    },
+      total: number;
+      records: Specimen[];
+    };
     wholeGenomes: {
-      total: number,
-      records: Specimen[],
-    },
+      total: number;
+      records: Specimen[];
+    };
     markers: {
-      total: number,
-      records: Specimen[],
-    },
-  }
-}
-
+      total: number;
+      records: Specimen[];
+    };
+  };
+};
 
 interface DistributionAnalysisProps {
-  regions?: Regions,
-  markers?: Marker[],
-  speciesName: string
+  regions?: Regions;
+  markers?: Marker[];
+  speciesName: string;
 }
 
-function DistributionAnalysis({ regions, markers, speciesName }: DistributionAnalysisProps) {
+function DistributionAnalysis({
+  regions,
+  markers,
+  speciesName,
+}: DistributionAnalysisProps) {
   const flattened = {
-    ibra: regions?.ibra.map(r => r.names).flat() || [],
-    imcra: regions?.imcra.map(r => r.names).flat() || [],
+    ibra: regions?.ibra.map((r) => r.names).flat() || [],
+    imcra: regions?.imcra.map((r) => r.names).flat() || [],
   };
 
   return (
     <AnalysisMap
       regions={flattened}
       markers={markers}
-      style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', overflow: 'hidden' }}
-      speciesName= {speciesName}
-    >
-    </AnalysisMap>
-  )
+      style={{
+        borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+        overflow: "hidden",
+      }}
+      speciesName={speciesName}
+    ></AnalysisMap>
+  );
 }
-
 
 interface MapFilterOptionProps extends SwitchProps {
-  label: string,
-  count: number,
-  total: number,
+  label: string;
+  count: number;
+  total: number;
 }
 
-function MapFilterOption({ label, count, total, ...switchProps }: MapFilterOptionProps) {
+function MapFilterOption({
+  label,
+  count,
+  total,
+  ...switchProps
+}: MapFilterOptionProps) {
   let checkboxStyle = {
-    labelWrapper: { width: '100%' },
-  }
+    labelWrapper: { width: "100%" },
+  };
 
   const text = (
     <Group>
-      <Text fz="lg" fw={550}>{label}</Text>
-      <Text fz="lg">{count}/{total}</Text>
+      <Text fz="lg" fw={550}>
+        {label}
+      </Text>
+      <Text fz="lg">
+        {count}/{total}
+      </Text>
     </Group>
-  )
+  );
 
   return (
     <Switch
@@ -154,58 +171,110 @@ function MapFilterOption({ label, count, total, ...switchProps }: MapFilterOptio
       styles={checkboxStyle}
       {...switchProps}
     />
-  )
+  );
 }
-
 
 type Filters = {
-  wholeGenomes: { total: number, count: number },
-  loci: { total: number, count: number },
-  specimens: { total: number, count: number },
-  other: { total: number, count: number },
-}
+  wholeGenomes: { total: number; count: number };
+  loci: { total: number; count: number };
+  specimens: { total: number; count: number };
+  other: { total: number; count: number };
+};
 
 interface SummaryProps {
-  regions?: Regions,
-  filters: Filters,
+  regions?: Regions;
+  filters: Filters;
   onFilter: (layer: Layer, enabled: boolean) => void;
 }
 
-function Summary({ regions, filters, onFilter }: SummaryProps ) {
-
+function Summary({ regions, filters, onFilter }: SummaryProps) {
   return (
     <Stack p={10} gap="md">
-      <Title order={3} fw={650}>Indexed data</Title>
+      <Title order={3} fw={650}>
+        Indexed data
+      </Title>
       <Stack gap={5} mb={30}>
-        <MapFilterOption onChange={e => onFilter(Layer.WholeGenome, e.currentTarget.checked)} size="md" color="bushfire" label="Whole genomes" count={filters.wholeGenomes.count} total={filters.wholeGenomes.total} />
-        <MapFilterOption onChange={e => onFilter(Layer.Loci, e.currentTarget.checked)} size="md" color="moss.7" label="Loci" count={filters.loci.count} total={filters.loci.total} />
-        <MapFilterOption onChange={e => onFilter(Layer.OtherData, e.currentTarget.checked)} size="md" color="moss.3" label="Other data" count={filters.other.count} total={filters.other.total} />
-        <MapFilterOption onChange={e => onFilter(Layer.Specimens, e.currentTarget.checked)} size="md" color="midnight.4" label="Specimens" count={filters.specimens.count} total={filters.specimens.total} />
+        <MapFilterOption
+          onChange={(e) => onFilter(Layer.WholeGenome, e.currentTarget.checked)}
+          size="md"
+          color="bushfire"
+          label="Whole genomes"
+          count={filters.wholeGenomes.count}
+          total={filters.wholeGenomes.total}
+        />
+        <MapFilterOption
+          onChange={(e) => onFilter(Layer.Loci, e.currentTarget.checked)}
+          size="md"
+          color="moss.7"
+          label="Loci"
+          count={filters.loci.count}
+          total={filters.loci.total}
+        />
+        <MapFilterOption
+          onChange={(e) => onFilter(Layer.OtherData, e.currentTarget.checked)}
+          size="md"
+          color="moss.3"
+          label="Other data"
+          count={filters.other.count}
+          total={filters.other.total}
+        />
+        <MapFilterOption
+          onChange={(e) => onFilter(Layer.Specimens, e.currentTarget.checked)}
+          size="md"
+          color="rgba(103, 151, 180, 220)"
+          label="Specimens"
+          count={filters.specimens.count}
+          total={filters.specimens.total}
+        />
       </Stack>
 
-        <Title order={3} fw={650}>Distribution</Title>
-        <Text>{regions?.ibra.map(r => r.names).flat().join(", ")}</Text>
-        <Text>{regions?.imcra.map(r => r.names).flat().join(", ")}</Text>
-      </Stack>
-  )
+      <Title order={3} fw={650}>
+        Distribution
+      </Title>
+      <Text>
+        {regions?.ibra
+          .map((r) => r.names)
+          .flat()
+          .join(", ")}
+      </Text>
+      <Text>
+        {regions?.imcra
+          .map((r) => r.names)
+          .flat()
+          .join(", ")}
+      </Text>
+    </Stack>
+  );
 }
 
-
-function toMarker (color: [number, number, number, number], type: Layer, records?: Specimen[]) {
+function toMarker(
+  color: [number, number, number, number],
+  type: Layer,
+  records?: Specimen[]
+) {
   if (!records) return [];
-  return records.map(r => {
+  return records.map((r) => {
     return {
       recordId: r.recordId || "unknown",
       latitude: r.latitude,
       longitude: r.longitude,
       color: color,
-      type: type
-    }
-  })
+      type: type,
+    };
+  });
 }
 
-export default function DistributionPage({ params }: { params: { name: string } }) {
-  const [layers, setLayers] = useState({ wholeGenome: true, loci: true, other: true, specimens: true });
+export default function DistributionPage({
+  params,
+}: {
+  params: { name: string };
+}) {
+  const [layers, setLayers] = useState({
+    wholeGenome: true,
+    loci: true,
+    other: true,
+    specimens: true,
+  });
   const [allSpecimens, setAllSpecimens] = useState<Marker[]>([]);
 
   const canonicalName = params.name.replaceAll("_", " ");
@@ -216,12 +285,24 @@ export default function DistributionPage({ params }: { params: { name: string } 
 
   useEffect(() => {
     const combined = [
-      ...toMarker([103, 151, 180, 220], Layer.Specimens, layers.specimens ? data?.species.specimens.records : undefined),
-      ...toMarker([123, 161, 63, 220], Layer.Loci, layers.loci ? data?.species.markers.records : undefined),
-      ...toMarker([243, 117, 36, 220], Layer.WholeGenome, layers.wholeGenome ? data?.species.wholeGenomes.records : undefined),
+      ...toMarker(
+        [103, 151, 180, 220],
+        Layer.Specimens,
+        layers.specimens ? data?.species.specimens.records : undefined
+      ),
+      ...toMarker(
+        [123, 161, 63, 220],
+        Layer.Loci,
+        layers.loci ? data?.species.markers.records : undefined
+      ),
+      ...toMarker(
+        [243, 117, 36, 220],
+        Layer.WholeGenome,
+        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined
+      ),
     ];
     // filter out null island as well as specimens without coords
-    setAllSpecimens(combined.filter(s => s.latitude) as Marker[]);
+    setAllSpecimens(combined.filter((s) => s.latitude) as Marker[]);
   }, [data, layers, setAllSpecimens]);
 
   let filters = null;
@@ -231,16 +312,16 @@ export default function DistributionPage({ params }: { params: { name: string } 
     const markers = data?.species.markers;
 
     // filter out null island as well as specimens without coords
-    const validGenomes = wholeGenomes?.records.filter(s => s.latitude);
-    const validMarkers = markers?.records.filter(s => s.latitude);
-    const validSpecimens = specimens?.records.filter(s => s.latitude);
+    const validGenomes = wholeGenomes?.records.filter((s) => s.latitude);
+    const validMarkers = markers?.records.filter((s) => s.latitude);
+    const validSpecimens = specimens?.records.filter((s) => s.latitude);
 
     filters = {
       wholeGenomes: { total: wholeGenomes.total, count: validGenomes.length },
       loci: { total: markers.total, count: validMarkers.length },
       specimens: { total: specimens.total, count: validSpecimens.length },
       other: { total: 0, count: 0 },
-    }
+    };
   }
 
   const onFilter = (layer: Layer, enabled: boolean) => {
@@ -249,16 +330,16 @@ export default function DistributionPage({ params }: { params: { name: string } 
       loci: layer === Layer.Loci ? enabled : layers.loci,
       other: layer === Layer.OtherData ? enabled : layers.other,
       specimens: layer === Layer.Specimens ? enabled : layers.specimens,
-    })
-  }
+    });
+  };
 
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
 
   const hasRegions = (regions: Regions) => {
-    return regions.ibra.length > 0 || regions.imcra.length > 0
-  }
+    return regions.ibra.length > 0 || regions.imcra.length > 0;
+  };
 
   return (
     <Paper p="lg" radius="lg" withBorder>
@@ -278,11 +359,30 @@ export default function DistributionPage({ params }: { params: { name: string } 
               </Stack>
             </Grid.Col>
             <Grid.Col span={3}>
-              { filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
-              {data?.species.regions && hasRegions(data.species.regions) && <Text  c="attribute.5"><b>Source:</b> <Link href={`https://biodiversity.org.au/afd/taxa/${params.name}`}>Australian Faunal Directory</Link></Text>}
-              <br/>
+              {filters && (
+                <Summary
+                  regions={data?.species.regions}
+                  filters={filters}
+                  onFilter={onFilter}
+                />
+              )}
+              {data?.species.regions && hasRegions(data.species.regions) && (
+                <Text c="attribute.5">
+                  <b>Source:</b>{" "}
+                  <Link
+                    href={`https://biodiversity.org.au/afd/taxa/${params.name}`}
+                  >
+                    Australian Faunal Directory
+                  </Link>
+                </Text>
+              )}
+              <br />
               <Text c={"attribute.5"}>
-              <b>Note:</b> location data may be generalised for sensitive species. Location data should be verified from individual data point custodians. Please refer to the specimen page for full details of metadata provenance for specific collection locations.
+                <b>Note:</b> location data may be generalised for sensitive
+                species. Location data should be verified from individual data
+                point custodians. Please refer to the specimen page for full
+                details of metadata provenance for specific collection
+                locations.
               </Text>
             </Grid.Col>
           </Grid>

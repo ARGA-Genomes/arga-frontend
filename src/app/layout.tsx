@@ -52,19 +52,15 @@ export default function RootLayout({
 // each page.
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <AppShell header={{ height: 165 }} zIndex={2000} withBorder={false}>
-      <AppShell.Header bg="midnight.8">
+    //165
+    <AppShell header={{ height: 180 }} zIndex={2000} withBorder={false}>
+      <AppShell.Header className={classes.header}>
         <TopNav />
       </AppShell.Header>
 
       <AppShell.Main>{children}</AppShell.Main>
 
-      <Paper className={classes.footer} radius={0}>
-        <Container maw={MAX_WIDTH}>
-          <Footer />
-        </Container>
-        <Image src="/dna_footer.jpg" h={160} />
-      </Paper>
+      <Footer />
     </AppShell>
   );
 }

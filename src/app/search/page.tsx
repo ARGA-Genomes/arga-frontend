@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery } from "@apollo/client";
 
 import {
   Text,
@@ -16,199 +16,235 @@ import {
   SimpleGrid,
   Accordion,
   Avatar,
-  Alert
+  Alert,
 } from "@mantine/core";
-import Link from 'next/link';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { ExclamationMark, Eye, Search as IconSearch } from "tabler-icons-react";
-import { MAX_WIDTH } from '../constants';
-import { LoadPanel } from '@/components/load-overlay';
-import { FilterBar } from '@/components/filtering/filter-bar';
-import { PaginationBar } from '@/components/pagination';
-import { Attribute, AttributePill, DataField } from '@/components/data-fields';
-import { HighlightStack } from '@/components/highlight-stack';
-import { usePreviousPage } from '@/components/navigation-history';
-import { useHover } from '@mantine/hooks';
-import { Filter, intoFilterItem } from '@/components/filtering/common';
-import { HigherClassificationFilters } from '@/components/filtering/higher-classification';
-import { DataTypeFilters } from '@/components/filtering/data-type';
-
+import Link from "next/link";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { IconExclamationMark, IconEye, IconSearch } from "@tabler/icons-react";
+import { MAX_WIDTH } from "../constants";
+import { LoadPanel } from "@/components/load-overlay";
+import { FilterBar } from "@/components/filtering/filter-bar";
+import { PaginationBar } from "@/components/pagination";
+import { Attribute, AttributePill, DataField } from "@/components/data-fields";
+import { HighlightStack } from "@/components/highlight-stack";
+import { usePreviousPage } from "@/components/navigation-history";
+import { useHover } from "@mantine/hooks";
+import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
+import { DataTypeFilters } from "@/components/filtering/data-type";
 
 type Filters = {
-  classifications: Filter[],
-  dataTypes: Filter[],
-}
+  classifications: Filter[];
+  dataTypes: Filter[];
+};
 
 type Classification = {
-  kingdom?: string,
-  phylum?: string,
-  class?: string,
-  order?: string,
-  family?: string,
-  genus?: string,
-  regnum?: string,
-  division?: string,
-  classis?: string,
-  ordo?: string,
-  familia?: string,
-}
+  kingdom?: string;
+  phylum?: string;
+  class?: string;
+  order?: string;
+  family?: string;
+  genus?: string;
+  regnum?: string;
+  division?: string;
+  classis?: string;
+  ordo?: string;
+  familia?: string;
+};
 
 type DataSummary = {
-  genomes: number,
-  loci: number,
-  specimens: number,
-  other: number,
-  totalGenomic: number,
-}
+  genomes: number;
+  loci: number;
+  specimens: number;
+  other: number;
+  totalGenomic: number;
+};
 
 type Item = {
-  type: string,
-  score: number,
-  status: string,
-  canonicalName: string,
-  subspecies?: string[],
-  synonyms?: string[],
-  commonNames?: string[],
-  classification?: Classification,
-  dataSummary: DataSummary,
+  type: string;
+  score: number;
+  status: string;
+  canonicalName: string;
+  subspecies?: string[];
+  synonyms?: string[];
+  commonNames?: string[];
+  classification?: Classification;
+  dataSummary: DataSummary;
 
-  accession?: string,
-  genomeRep?: string,
-  dataSource?: string,
-  level?: string,
-  assemblyType?: string,
-  referenceGenome?: boolean,
-  releaseDate?: string,
+  accession?: string;
+  genomeRep?: string;
+  dataSource?: string;
+  level?: string;
+  assemblyType?: string;
+  referenceGenome?: boolean;
+  releaseDate?: string;
 
-  locusType?: string,
-  voucherStatus?: string,
-  eventDate?: string,
-  eventLocation?: string,
+  locusType?: string;
+  voucherStatus?: string;
+  eventDate?: string;
+  eventLocation?: string;
 
-  institutionCode?: string,
-  collectionCode?: string,
-  recordedBy?: string,
-  identifiedBy?: string,
+  institutionCode?: string;
+  collectionCode?: string;
+  recordedBy?: string;
+  identifiedBy?: string;
 };
 
 type FullTextResults = {
-  records: Item[],
-  total: number
-}
+  records: Item[];
+  total: number;
+};
 
 type SearchResults = {
-  fullText: FullTextResults,
+  fullText: FullTextResults;
 };
 
 type QueryResults = {
-  search: SearchResults,
+  search: SearchResults;
 };
 
 const PAGE_SIZE = 10;
 
 const SEARCH_FULLTEXT = gql`
-query FullTextSearch ($query: String, $page: Int, $perPage: Int, $filters: [FilterItem]) {
-  search(filters: $filters) {
-    fullText (query: $query, page: $page, perPage: $perPage) {
-      total
-      records {
-        ... on TaxonItem {
-          type
-          status
-          score
-          canonicalName
-          subspecies
-          synonyms
-          commonNames
-          classification {
-            kingdom
-            phylum
-            class
-            order
-            family
-            genus
-            regnum
-            division
-            classis
-            ordo
-            familia
+  query FullTextSearch(
+    $query: String
+    $page: Int
+    $perPage: Int
+    $filters: [FilterItem]
+  ) {
+    search(filters: $filters) {
+      fullText(query: $query, page: $page, perPage: $perPage) {
+        total
+        records {
+          ... on TaxonItem {
+            type
+            status
+            score
+            canonicalName
+            subspecies
+            synonyms
+            commonNames
+            classification {
+              kingdom
+              phylum
+              class
+              order
+              family
+              genus
+              regnum
+              division
+              classis
+              ordo
+              familia
+            }
+            dataSummary {
+              genomes
+              loci
+              specimens
+              other
+              totalGenomic
+            }
           }
-          dataSummary {
-            genomes
-            loci
-            specimens
-            other
-            totalGenomic
+          ... on GenomeItem {
+            type
+            status
+            score
+            canonicalName
+            accession
+            genomeRep
+            dataSource
+            level
+            assemblyType
+            referenceGenome
+            releaseDate
           }
-        }
-        ... on GenomeItem {
-          type
-          status
-          score
-          canonicalName
-          accession
-          genomeRep
-          dataSource
-          level
-          assemblyType
-          referenceGenome
-          releaseDate
-        }
-        ... on LocusItem {
-          type
-          status
-          score
-          canonicalName
-          accession
-          locusType
-          dataSource
-          voucherStatus
-          eventDate
-          eventLocation
-        }
-        ... on SpecimenItem {
-          type
-          status
-          score
-          canonicalName
-          accession
-          dataSource
-          institutionCode
-          collectionCode
-          recordedBy
-          identifiedBy
-          eventDate
-          eventLocation
+          ... on LocusItem {
+            type
+            status
+            score
+            canonicalName
+            accession
+            locusType
+            dataSource
+            voucherStatus
+            eventDate
+            eventLocation
+          }
+          ... on SpecimenItem {
+            type
+            status
+            score
+            canonicalName
+            accession
+            dataSource
+            institutionCode
+            collectionCode
+            recordedBy
+            identifiedBy
+            eventDate
+            eventLocation
+          }
         }
       }
     }
   }
-}`
-
+`;
 
 function TaxonItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   const { hovered, ref } = useHover();
 
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px var(--mantine-color-moss-4)' }} ref={ref} bg={hovered ? "#96bb5c22" : undefined}>
+    <Paper
+      radius="lg"
+      withBorder
+      style={{ border: "solid 1px var(--mantine-color-moss-4)" }}
+      ref={ref}
+      bg={hovered ? "#96bb5c22" : undefined}
+    >
       <Grid gutter="xl">
         <Grid.Col span="content">
-          <Paper bg="moss.4" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
+          <Paper
+            bg="moss.4"
+            w={180}
+            style={{
+              borderRadius:
+                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              border: "none",
+            }}
+          >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/species_report.svg"} fit="contain" h={80} w="auto" alt="" />
-              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Species Report</Text>
+              <Image
+                src={"card-icons/type/species_report.svg"}
+                fit="contain"
+                h={80}
+                w="auto"
+                alt=""
+              />
+              <Text
+                c="white"
+                fw={600}
+                fz="md"
+                mb="sm"
+                style={{ alignSelf: "end", lineHeight: "normal" }}
+              >
+                Species Report
+              </Text>
             </Group>
           </Paper>
         </Grid.Col>
 
         <Grid.Col span={2} my="auto">
           <Attribute label="Accepted species name">
-            <Stack gap={0} justify='center'>
-              <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
+            <Stack gap={0} justify="center">
+              <Text ml="sm" size="sm" fw={550} fs="italic">
+                {item.canonicalName}
+              </Text>
               <Text ml="sm" fz="sm" c="dimmed">
-                {item.synonyms && item.synonyms[0] ? `syn. ${item.synonyms[0]}` : null}
+                {item.synonyms && item.synonyms[0]
+                  ? `syn. ${item.synonyms[0]}`
+                  : null}
               </Text>
             </Stack>
           </Attribute>
@@ -226,9 +262,16 @@ function TaxonItem({ item }: { item: Item }) {
 
         <Grid.Col span="content">
           <Link href={`/species/${itemLinkName}`}>
-            <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
-              <Stack gap={3} align='center'>
-                <Eye />
+            <Button
+              h="100%"
+              bg="midnight.10"
+              style={{
+                borderRadius:
+                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+              }}
+            >
+              <Stack gap={3} align="center">
+                <IconEye />
                 <Text fw={600}>view</Text>
               </Stack>
             </Button>
@@ -236,7 +279,7 @@ function TaxonItem({ item }: { item: Item }) {
         </Grid.Col>
       </Grid>
     </Paper>
-  )
+  );
 }
 
 function TaxonSummary({ data }: { data: DataSummary }) {
@@ -244,10 +287,18 @@ function TaxonSummary({ data }: { data: DataSummary }) {
 
   return (
     <SimpleGrid cols={2}>
-      <AttributePill label="Assemblies" color={data.genomes ? "moss.3" : "bushfire.2"} value={data.genomes} />
-      <AttributePill label="Other data" color={other ? "moss.3" : "bushfire.2"} value={other} />
+      <AttributePill
+        label="Assemblies"
+        color={data.genomes ? "moss.3" : "bushfire.2"}
+        value={data.genomes}
+      />
+      <AttributePill
+        label="Other data"
+        color={other ? "moss.3" : "bushfire.2"}
+        value={other}
+      />
     </SimpleGrid>
-  )
+  );
 }
 
 function TaxonDetails({ item }: { item: Item }) {
@@ -256,51 +307,130 @@ function TaxonDetails({ item }: { item: Item }) {
 
   return (
     <SimpleGrid cols={6}>
-      { taxon.regnum
-        ? <AttributePill label="Regnum" value={taxon.regnum} href={`/regnum/${taxon.regnum}`} />
-        : <AttributePill label="Kingdom" value={taxon.kingdom} href={`/kingdom/${taxon.kingdom}`} />
-      }
-      { taxon.division
-        ? <AttributePill label="Division" value={taxon.division} href={`/division/${taxon.division}`} />
-        : <AttributePill label="Phylum" value={taxon.phylum} href={`/phylum/${taxon.phylum}`} />
-      }
-      { taxon.classis
-        ? <AttributePill label="Classis" value={taxon.classis} href={`/classis/${taxon.classis}`} />
-        : <AttributePill label="Class" value={taxon.class} href={`/class/${taxon.class}`} />
-      }
-      { taxon.ordo
-        ? <AttributePill label="Ordo" value={taxon.ordo} href={`/ordo/${taxon.ordo}`} />
-        : <AttributePill label="Order" value={taxon.order} href={`/order/${taxon.order}`} />
-      }
-      { taxon.familia
-        ? <AttributePill label="Familia" value={taxon.familia} href={`/familia/${taxon.familia}`} />
-        : <AttributePill label="Family" value={taxon.family} href={`/family/${taxon.family}`} />
-      }
-      <AttributePill label="Genus" value={taxon.genus} href={`/genus/${taxon.genus}`} italic />
+      {taxon.regnum ? (
+        <AttributePill
+          label="Regnum"
+          value={taxon.regnum}
+          href={`/regnum/${taxon.regnum}`}
+        />
+      ) : (
+        <AttributePill
+          label="Kingdom"
+          value={taxon.kingdom}
+          href={`/kingdom/${taxon.kingdom}`}
+        />
+      )}
+      {taxon.division ? (
+        <AttributePill
+          label="Division"
+          value={taxon.division}
+          href={`/division/${taxon.division}`}
+        />
+      ) : (
+        <AttributePill
+          label="Phylum"
+          value={taxon.phylum}
+          href={`/phylum/${taxon.phylum}`}
+        />
+      )}
+      {taxon.classis ? (
+        <AttributePill
+          label="Classis"
+          value={taxon.classis}
+          href={`/classis/${taxon.classis}`}
+        />
+      ) : (
+        <AttributePill
+          label="Class"
+          value={taxon.class}
+          href={`/class/${taxon.class}`}
+        />
+      )}
+      {taxon.ordo ? (
+        <AttributePill
+          label="Ordo"
+          value={taxon.ordo}
+          href={`/ordo/${taxon.ordo}`}
+        />
+      ) : (
+        <AttributePill
+          label="Order"
+          value={taxon.order}
+          href={`/order/${taxon.order}`}
+        />
+      )}
+      {taxon.familia ? (
+        <AttributePill
+          label="Familia"
+          value={taxon.familia}
+          href={`/familia/${taxon.familia}`}
+        />
+      ) : (
+        <AttributePill
+          label="Family"
+          value={taxon.family}
+          href={`/family/${taxon.family}`}
+        />
+      )}
+      <AttributePill
+        label="Genus"
+        value={taxon.genus}
+        href={`/genus/${taxon.genus}`}
+        italic
+      />
     </SimpleGrid>
-  )
+  );
 }
-
 
 function GenomeItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   const { hovered, ref } = useHover();
 
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px #f47c2e' }} ref={ref} bg={hovered ? "#f47c2e22" : undefined}>
+    <Paper
+      radius="lg"
+      withBorder
+      style={{ border: "solid 1px #f47c2e" }}
+      ref={ref}
+      bg={hovered ? "#f47c2e22" : undefined}
+    >
       <Grid gutter="xl">
         <Grid.Col span="content">
-          <Paper bg="#f47c2e" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
+          <Paper
+            bg="#f47c2e"
+            w={180}
+            style={{
+              borderRadius:
+                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              border: "none",
+            }}
+          >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/whole_genomes.svg"} fit="contain" h={80} w="auto" alt="" />
-              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Genome Assembly</Text>
+              <Image
+                src={"card-icons/type/whole_genomes.svg"}
+                fit="contain"
+                h={80}
+                w="auto"
+                alt=""
+              />
+              <Text
+                c="white"
+                fw={600}
+                fz="md"
+                mb="sm"
+                style={{ alignSelf: "end", lineHeight: "normal" }}
+              >
+                Genome Assembly
+              </Text>
             </Group>
           </Paper>
         </Grid.Col>
 
         <Grid.Col span={2} my="auto">
           <Attribute label="Accepted species name">
-            <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
+            <Text ml="sm" size="sm" fw={550} fs="italic">
+              {item.canonicalName}
+            </Text>
           </Attribute>
         </Grid.Col>
 
@@ -313,10 +443,19 @@ function GenomeItem({ item }: { item: Item }) {
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Link href={`/species/${itemLinkName}/whole_genomes/${item.accession}`}>
-            <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
-              <Stack gap={3} align='center'>
-                <Eye />
+          <Link
+            href={`/species/${itemLinkName}/whole_genomes/${item.accession}`}
+          >
+            <Button
+              h="100%"
+              bg="midnight.10"
+              style={{
+                borderRadius:
+                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+              }}
+            >
+              <Stack gap={3} align="center">
+                <IconEye />
                 <Text fw={600}>view</Text>
               </Stack>
             </Button>
@@ -324,27 +463,33 @@ function GenomeItem({ item }: { item: Item }) {
         </Grid.Col>
       </Grid>
     </Paper>
-  )
+  );
 }
 
 function GenomeSummary({ item }: { item: Item }) {
   return (
     <SimpleGrid cols={2}>
-      <Attribute label="Data source"><DataField value={item.dataSource}/></Attribute>
-      <Attribute label="Release date"><DataField value={item.releaseDate}/></Attribute>
+      <Attribute label="Data source">
+        <DataField value={item.dataSource} />
+      </Attribute>
+      <Attribute label="Release date">
+        <DataField value={item.releaseDate} />
+      </Attribute>
     </SimpleGrid>
-  )
+  );
 }
 
 function GenomeDetails({ item }: { item: Item }) {
   return (
     <SimpleGrid cols={4}>
-      <Attribute label="Accession"><DataField value={item.accession}/></Attribute>
+      <Attribute label="Accession">
+        <DataField value={item.accession} />
+      </Attribute>
       <AttributePill label="Representation" value={item.genomeRep} />
       <AttributePill label="Assembly type" value={item.assemblyType} />
       <AttributePill label="Assembly level" value={item.level} />
     </SimpleGrid>
-  )
+  );
 }
 
 function LocusItem({ item }: { item: Item }) {
@@ -352,20 +497,50 @@ function LocusItem({ item }: { item: Item }) {
   const { hovered, ref } = useHover();
 
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px #58a39d' }} ref={ref} bg={hovered ? "#58a39d22" : undefined}>
+    <Paper
+      radius="lg"
+      withBorder
+      style={{ border: "solid 1px #58a39d" }}
+      ref={ref}
+      bg={hovered ? "#58a39d22" : undefined}
+    >
       <Grid gutter="xl">
         <Grid.Col span="content">
-          <Paper bg="#58a39d" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
+          <Paper
+            bg="#58a39d"
+            w={180}
+            style={{
+              borderRadius:
+                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              border: "none",
+            }}
+          >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/markers.svg"} fit="contain" h={80} w="auto" alt="" />
-              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Locus</Text>
+              <Image
+                src={"card-icons/type/markers.svg"}
+                fit="contain"
+                h={80}
+                w="auto"
+                alt=""
+              />
+              <Text
+                c="white"
+                fw={600}
+                fz="md"
+                mb="sm"
+                style={{ alignSelf: "end", lineHeight: "normal" }}
+              >
+                Locus
+              </Text>
             </Group>
           </Paper>
         </Grid.Col>
 
         <Grid.Col span={2} my="auto">
           <Attribute label="Accepted species name">
-            <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
+            <Text ml="sm" size="sm" fw={550} fs="italic">
+              {item.canonicalName}
+            </Text>
           </Attribute>
         </Grid.Col>
 
@@ -379,9 +554,16 @@ function LocusItem({ item }: { item: Item }) {
 
         <Grid.Col span="content">
           <Link href={`/species/${itemLinkName}/markers/${item.accession}`}>
-            <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
-              <Stack gap={3} align='center'>
-                <Eye />
+            <Button
+              h="100%"
+              bg="midnight.10"
+              style={{
+                borderRadius:
+                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+              }}
+            >
+              <Stack gap={3} align="center">
+                <IconEye />
                 <Text fw={600}>view</Text>
               </Stack>
             </Button>
@@ -389,16 +571,20 @@ function LocusItem({ item }: { item: Item }) {
         </Grid.Col>
       </Grid>
     </Paper>
-  )
+  );
 }
 
 function LocusSummary({ item }: { item: Item }) {
   return (
     <SimpleGrid cols={2}>
-      <Attribute label="Data source"><DataField value={item.dataSource}/></Attribute>
-      <Attribute label="Release date"><DataField value={item.eventDate}/></Attribute>
+      <Attribute label="Data source">
+        <DataField value={item.dataSource} />
+      </Attribute>
+      <Attribute label="Release date">
+        <DataField value={item.eventDate} />
+      </Attribute>
     </SimpleGrid>
-  )
+  );
 }
 
 function LocusDetails({ item }: { item: Item }) {
@@ -409,29 +595,58 @@ function LocusDetails({ item }: { item: Item }) {
       <AttributePill label="Sequence length" />
       <AttributePill label="Source molecule" />
     </SimpleGrid>
-  )
+  );
 }
-
 
 function SpecimenItem({ item }: { item: Item }) {
   const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
   const { hovered, ref } = useHover();
 
   return (
-    <Paper radius="lg" withBorder style={{ border: 'solid 1px #f47c2e' }} ref={ref} bg={hovered ? "#f47c2e22" : undefined}>
+    <Paper
+      radius="lg"
+      withBorder
+      style={{ border: "solid 1px #f47c2e" }}
+      ref={ref}
+      bg={hovered ? "#f47c2e22" : undefined}
+    >
       <Grid gutter="xl">
         <Grid.Col span="content">
-          <Paper bg="#f47c2e" w={180} style={{ borderRadius: 'var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)', border: 'none' }}>
+          <Paper
+            bg="#f47c2e"
+            w={180}
+            style={{
+              borderRadius:
+                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              border: "none",
+            }}
+          >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/specimens.svg"} fit="contain" h={80} w="auto" alt="" />
-              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>Specimen</Text>
+              <Image
+                src={"card-icons/type/specimens.svg"}
+                fit="contain"
+                h={80}
+                w="auto"
+                alt=""
+              />
+              <Text
+                c="white"
+                fw={600}
+                fz="md"
+                mb="sm"
+                style={{ alignSelf: "end", lineHeight: "normal" }}
+              >
+                Specimen
+              </Text>
             </Group>
           </Paper>
         </Grid.Col>
 
         <Grid.Col span={2} my="auto">
           <Attribute label="Accepted species name">
-            <Text ml="sm" size="sm" fw={550} fs="italic">{item.canonicalName}</Text>
+            <Text ml="sm" size="sm" fw={550} fs="italic">
+              {item.canonicalName}
+            </Text>
           </Attribute>
         </Grid.Col>
 
@@ -445,9 +660,16 @@ function SpecimenItem({ item }: { item: Item }) {
 
         <Grid.Col span="content">
           <Link href={`/species/${itemLinkName}/specimens/${item.accession}`}>
-            <Button h="100%" bg="midnight" style={{ borderRadius: '0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0' }}>
-              <Stack gap={3} align='center'>
-                <Eye />
+            <Button
+              h="100%"
+              bg="midnight.10"
+              style={{
+                borderRadius:
+                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+              }}
+            >
+              <Stack gap={3} align="center">
+                <IconEye />
                 <Text fw={600}>view</Text>
               </Stack>
             </Button>
@@ -455,16 +677,20 @@ function SpecimenItem({ item }: { item: Item }) {
         </Grid.Col>
       </Grid>
     </Paper>
-  )
+  );
 }
 
 function SpecimenSummary({ item }: { item: Item }) {
   return (
     <SimpleGrid cols={2}>
-      <Attribute label="Data source"><DataField value={item.dataSource}/></Attribute>
-      <Attribute label="Collected date"><DataField value={item.eventDate}/></Attribute>
+      <Attribute label="Data source">
+        <DataField value={item.dataSource} />
+      </Attribute>
+      <Attribute label="Collected date">
+        <DataField value={item.eventDate} />
+      </Attribute>
     </SimpleGrid>
-  )
+  );
 }
 
 function SpecimenDetails({ item }: { item: Item }) {
@@ -475,69 +701,75 @@ function SpecimenDetails({ item }: { item: Item }) {
       <AttributePill label="Collection" value={item.collectionCode} />
       <AttributePill label="Collected by" value={item.recordedBy} />
     </SimpleGrid>
-  )
+  );
 }
-
 
 function SearchItem({ item }: { item: Item }) {
   switch (item.type) {
-    case 'TAXON':
-      return (<TaxonItem item={item} />)
-    case 'GENOME':
-      return (<GenomeItem item={item} />)
-    case 'LOCUS':
-      return (<LocusItem item={item} />)
-    case 'SPECIMEN':
-      return (<SpecimenItem item={item} />)
+    case "TAXON":
+      return <TaxonItem item={item} />;
+    case "GENOME":
+      return <GenomeItem item={item} />;
+    case "LOCUS":
+      return <LocusItem item={item} />;
+    case "SPECIMEN":
+      return <SpecimenItem item={item} />;
     default:
-      return null
+      return null;
   }
 }
 
 function SearchResults({ results }: { results: Item[] }) {
   return (
     <Stack gap="xs">
-      {results.map(record => (
-        <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
+      {results.map((record) => (
+        <SearchItem
+          item={record}
+          key={`${record.canonicalName}-${record.type}`}
+        />
       ))}
     </Stack>
-  )
+  );
 }
 
-
 interface SearchProperties {
-  onSearch: (searchTerms: string, dataType: string) => void,
-  data: QueryResults | undefined,
-  loading: boolean
+  onSearch: (searchTerms: string, dataType: string) => void;
+  data: QueryResults | undefined;
+  loading: boolean;
 }
 
 function Search(props: SearchProperties) {
   const searchParams = useSearchParams();
 
-  const [value, setValue] = useState(searchParams.get('q') || "")
-  const [searchTerms, setSearchTerms] = useState(searchParams.get('q') || "")
-  const [dataType, setDataType] = useState(searchParams.get('type') || "all")
+  const [value, setValue] = useState(searchParams.get("q") || "");
+  const [searchTerms, setSearchTerms] = useState(searchParams.get("q") || "");
+  const [dataType, setDataType] = useState(searchParams.get("type") || "all");
 
   function onFilter(value: string) {
-    setDataType(value)
-    props.onSearch(searchTerms, value)
+    setDataType(value);
+    props.onSearch(searchTerms, value);
   }
 
   function onSearch(value: string) {
-    setSearchTerms(value)
-    props.onSearch(value, dataType)
+    setSearchTerms(value);
+    props.onSearch(value, dataType);
   }
 
   return (
-    <Paper bg="midnight.1" p={10} radius={0}>
+    <Paper bg="midnight.0" p={10} radius={0}>
       <Box>
-        <form onSubmit={(ev) => { ev.preventDefault(); onSearch(value) }}>
+        <form
+          onSubmit={(ev) => {
+            ev.preventDefault();
+            onSearch(value);
+          }}
+        >
           <Grid align="center" m={10}>
-            <Grid.Col span={7}>
+            <Grid.Col span={12}>
               <TextInput
                 placeholder="e.g. sequence accession, species name"
                 value={value}
-                onChange={val => setValue(val.target.value)}
+                onChange={(val) => setValue(val.target.value)}
                 leftSectionWidth={60}
                 size="xl"
                 radius={16}
@@ -548,14 +780,13 @@ function Search(props: SearchProperties) {
         </form>
       </Box>
     </Paper>
-  )
+  );
 }
 
-
 interface FilterGroupProps {
-  label: string,
-  description: string,
-  image: string,
+  label: string;
+  description: string;
+  image: string;
 }
 
 function FilterGroup({ label, description, image }: FilterGroupProps) {
@@ -569,28 +800,29 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
         </Text>
       </div>
     </Group>
-  )
+  );
 }
 
-
 interface FiltersProps {
-  filters: Filters,
-  onChange: (filters: Filters) => void,
+  filters: Filters;
+  onChange: (filters: Filters) => void;
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications)
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes)
+  const [classifications, setClassifications] = useState<Filter[]>(
+    filters.classifications
+  );
+  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
     onChange({
       classifications,
       dataTypes,
-    })
+    });
   }, [classifications, dataTypes, onChange]);
 
   return (
-    <Accordion defaultValue="dataType" variant='separated'>
+    <Accordion defaultValue="dataType" variant="separated">
       <Accordion.Item value="dataType">
         <Accordion.Control>
           <FilterGroup
@@ -604,46 +836,46 @@ function Filters({ filters, onChange }: FiltersProps) {
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
-  )
+  );
 }
-
 
 export default function SearchPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [query, setQuery] = useState(searchParams.get('q') || "")
-  const [dataTypes, setDataTypes] = useState(searchParams.getAll('type'))
-  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [dataTypes, setDataTypes] = useState(searchParams.getAll("type"));
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [_, setPreviousPage] = usePreviousPage();
 
   const [filters, setFilters] = useState<Filters>({
     classifications: [],
-    dataTypes: dataTypes.map(value => ({ filter: "DATA_TYPE", action: "INCLUDE", value, editable: true })),
+    dataTypes: dataTypes.map((value) => ({
+      filter: "DATA_TYPE",
+      action: "INCLUDE",
+      value,
+      editable: true,
+    })),
   });
 
-
-  useEffect(refreshUrl, [query, dataTypes, page, setPreviousPage])
+  useEffect(refreshUrl, [query, dataTypes, page, setPreviousPage]);
 
   function refreshUrl() {
-    let params = new URLSearchParams(searchParams)
-    params.set('q', query);
-    params.set('page', page.toString());
+    let params = new URLSearchParams(searchParams);
+    params.set("q", query);
+    params.set("page", page.toString());
 
-    params.delete('type');
-    dataTypes.forEach(dataType => params.append('type', dataType));
+    params.delete("type");
+    dataTypes.forEach((dataType) => params.append("type", dataType));
 
-    const url = pathname + '?' + params.toString();
-    setPreviousPage({ name: 'search results', url });
-    router.push(url)
+    const url = pathname + "?" + params.toString();
+    setPreviousPage({ name: "search results", url });
+    router.push(url);
   }
 
   function flattenFilters(filters: Filters) {
-    const items = [
-      ...filters.classifications,
-      ...filters.dataTypes,
-    ];
+    const items = [...filters.classifications, ...filters.dataTypes];
 
     return items.filter((item): item is Filter => !!item);
   }
@@ -653,18 +885,20 @@ export default function SearchPage() {
       query,
       page,
       perPage: PAGE_SIZE,
-      filters: flattenFilters(filters).map(intoFilterItem).filter(item => item),
-    }
+      filters: flattenFilters(filters)
+        .map(intoFilterItem)
+        .filter((item) => item),
+    },
   });
 
   function onSearch(searchTerms: string, dataType: string) {
-    setQuery(searchTerms)
-      /* setDataTypes(dataType) */
-    setPage(1)
+    setQuery(searchTerms);
+    /* setDataTypes(dataType) */
+    setPage(1);
   }
 
   function onFilter(all: Filters) {
-    setDataTypes(all.dataTypes.map(dataType => dataType.value))
+    setDataTypes(all.dataTypes.map((dataType) => dataType.value));
     setFilters(all);
   }
 
@@ -680,16 +914,30 @@ export default function SearchPage() {
                 filters={flattenFilters(filters)}
                 title={
                   <Group justify="left" gap={5}>
-                    <Text fz="lg" fw={700}>{data?.search.fullText.total}</Text>
+                    <Text fz="lg" fw={700}>
+                      {data?.search.fullText.total}
+                    </Text>
                     <Text fz="lg">search results found for</Text>
-                    <Text fz="lg" fw={600}>{query}</Text>
+                    <Text fz="lg" fw={600}>
+                      {query}
+                    </Text>
                   </Group>
                 }
               >
                 <Filters filters={filters} onChange={onFilter} />
               </FilterBar>
 
-              { error && <Alert radius="lg" variant="light" color="red" title="Unexpected failure" icon={<ExclamationMark />}><Text c="red">{error.message}</Text></Alert> }
+              {error && (
+                <Alert
+                  radius="lg"
+                  variant="light"
+                  color="red"
+                  title="Unexpected failure"
+                  icon={<IconExclamationMark />}
+                >
+                  <Text c="red">{error.message}</Text>
+                </Alert>
+              )}
               <SearchResults results={data?.search.fullText.records || []} />
               <PaginationBar
                 total={data?.search.fullText.total}

@@ -16,10 +16,11 @@ import {
   Modal,
   useMantineTheme,
   Collapse,
+  Button,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
 import { useState } from "react";
-import { Checklist } from "tabler-icons-react";
+import { IconSortDescending } from "@tabler/icons-react";
 
 const links = [
   { link: "/", label: "APP HOME" },
@@ -52,7 +53,7 @@ export function TopNav() {
         active={active === index}
         className={classes.navlink}
         px={30}
-        pb={40}
+        pb={25}
       />
     </Link>
   ));
@@ -62,7 +63,7 @@ export function TopNav() {
   };
 
   return (
-    <Stack gap="0" h="100%">
+    <Stack gap={40} h="100%">
       <Modal
         opened={savedOpened}
         onClose={savedHandler.close}
@@ -80,22 +81,27 @@ export function TopNav() {
       <Group
         justify="space-between"
         align="center"
-        // px={30}
+        px={25}
         wrap="nowrap"
         h="100%"
       >
         <Link href="/" onClick={() => setActive(0)}>
           <Image
-            // py="50px"
             p="md"
             src="/arga-logo.svg"
             alt="Australian Reference Genome Atlas"
-            width={450}
           />
         </Link>
 
         <Stack h="100%">
-          <Group align="center" justify="end" mr={20} wrap="nowrap" h="100%">
+          <Group
+            align="center"
+            justify="end"
+            mr={20}
+            wrap="nowrap"
+            h="100%"
+            className={classes.cart}
+          >
             <Indicator
               inline
               label={saved?.length}
@@ -104,23 +110,30 @@ export function TopNav() {
               disabled={!saved?.length}
             >
               <Avatar size="lg" onClick={showSaved} component="a" href="#">
-                <Checklist size={30} color="white" />
+                <IconSortDescending
+                  size={35}
+                  color="white"
+                  strokeWidth="1.75"
+                />
               </Avatar>
             </Indicator>
             <Burger
-              hiddenFrom="md"
               opened={opened}
               onClick={toggle}
               size="md"
               color={"white"}
+              className={classes.burgerNav}
             />
           </Group>
-          <Group visibleFrom="md">{items}</Group>
+
+          <Group wrap="nowrap" className={classes.menuItems}>
+            {items}
+          </Group>
         </Stack>
       </Group>
 
-      <Collapse in={opened} hiddenFrom="md">
-        <Stack h="100vh" bg={theme.colors.midnight[8]}>
+      <Collapse in={opened}>
+        <Stack h="100vh" bg={theme.colors.midnight[11]}>
           {items}
         </Stack>
       </Collapse>
