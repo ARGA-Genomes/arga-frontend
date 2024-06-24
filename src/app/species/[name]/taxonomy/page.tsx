@@ -365,7 +365,7 @@ function ExternalLinks(props: ExternalLinksProps) {
           color="gray"
           variant="light"
           size="xs"
-          leftSection={<ExternalLink size="1rem" color="black" />}
+          leftSection={<IconExternalLink size="1rem" color="black" />}
           loading={!matchedTaxon}
           disabled={Array.isArray(matchedTaxon) && matchedTaxon.length === 0}
           href={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`}
@@ -382,7 +382,7 @@ function ExternalLinks(props: ExternalLinksProps) {
             color="gray"
             variant="light"
             size="xs"
-            leftSection={<ExternalLink size="1rem" color="black" />}
+            leftSection={<IconExternalLink size="1rem" color="black" />}
             href={iek.sourceUrl}
             target="_blank"
           >
@@ -395,7 +395,7 @@ function ExternalLinks(props: ExternalLinksProps) {
             radius="md"
             color="midnight"
             size="xs"
-            leftSection={<ExternalLink size="1rem" />}
+            leftSection={<IconExternalLink size="1rem" />}
           >
             View on&nbsp;<b>FrogID</b>
           </Button>
@@ -405,7 +405,7 @@ function ExternalLinks(props: ExternalLinksProps) {
             radius="md"
             color="midnight"
             size="xs"
-            leftSection={<ExternalLink size="1rem" />}
+            leftSection={<IconExternalLink size="1rem" />}
           >
             View on&nbsp;<b>AFD</b>
           </Button>
