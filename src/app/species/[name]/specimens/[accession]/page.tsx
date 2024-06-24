@@ -215,7 +215,7 @@ function Provenance({ entityId }: { entityId: string }) {
       </Table.Thead>
       <Table.Tbody>
         {data?.provenance.specimen.map(op => (
-          <Table.Tr>
+          <Table.Tr key={op.operationId}>
             <Table.Td><Text fz="xs" fw={400}>{DateTime.fromISO(op.loggedAt).toHTTP()}</Text></Table.Td>
             <Table.Td><Text fz="xs" fw={400}>{op.operationId}</Text></Table.Td>
             <Table.Td><Text fz="xs" fw={400}>{op.entityId}</Text></Table.Td>

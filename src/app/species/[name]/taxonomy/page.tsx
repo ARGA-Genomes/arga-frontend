@@ -504,55 +504,55 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   );
 }
 
-
-function HistoryItemHeader({ item }: { item: HistoryItem }) {
-  const [opened, { open, close }] = useDisclosure(false);
-
-  const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
-    variables: { entityId: item.entityId },
-  });
-
-  return (
-    <Stack mt={5}>
-      <Drawer opened={opened} size="70%" position="right" onClose={close} title="Change logs">
-        <Table mt={130}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Td><Text fz="xs" fw={600}>Operation ID</Text></Table.Td>
-              <Table.Td><Text fz="xs" fw={600}>Reference ID</Text></Table.Td>
-              <Table.Td><Text fz="xs" fw={600}>Dataset</Text></Table.Td>
-              <Table.Td><Text fz="xs" fw={600}>Action</Text></Table.Td>
-              <Table.Td><Text fz="xs" fw={600}>Atom</Text></Table.Td>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {data?.provenance.map(op => (
-              <Table.Tr>
-                <Table.Td><Text fz="xs" fw={400}>{op.operationId}</Text></Table.Td>
-                <Table.Td><Text fz="xs" fw={400}>{op.referenceId}</Text></Table.Td>
-                <Table.Td><Text fz="xs" fw={400}>
-                  <Tooltip label={op.dataset.name}>
-                  <Link href={op.dataset.url || "#"}>
-                    {op.dataset.shortName}
-                  </Link>
-                  </Tooltip>
-                </Text></Table.Td>
-                <Table.Td><Text fz="xs" fw={400}>{op.action}</Text></Table.Td>
-                <Table.Td><Text fz="xs" fw={600}>{op.atom.type} </Text><Text fz="xs" fw={400}>{op.atom.value}</Text></Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Drawer>
-
-      { item.publication?.publishedYear
-        ? <Text fz="xs" fw={700} c="dimmed">{item.publication?.publishedYear}</Text>
-        : <Text fz="xs" fw={700} c="dimmed" style={{ fontVariant: "small-caps" }}>no date</Text>
-      }
-      <Button onClick={open}>Change Log</Button>
-    </Stack>
-  )
-}
+/*
+* function HistoryItemHeader({ item }: { item: HistoryItem }) {
+*   const [opened, { open, close }] = useDisclosure(false);
+*
+*   const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
+*     variables: { entityId: item.entityId },
+*   });
+*
+*   return (
+*     <Stack mt={5}>
+*       <Drawer opened={opened} size="70%" position="right" onClose={close} title="Change logs">
+*         <Table mt={130}>
+*           <Table.Thead>
+*             <Table.Tr>
+*               <Table.Td><Text fz="xs" fw={600}>Operation ID</Text></Table.Td>
+*               <Table.Td><Text fz="xs" fw={600}>Reference ID</Text></Table.Td>
+*               <Table.Td><Text fz="xs" fw={600}>Dataset</Text></Table.Td>
+*               <Table.Td><Text fz="xs" fw={600}>Action</Text></Table.Td>
+*               <Table.Td><Text fz="xs" fw={600}>Atom</Text></Table.Td>
+*             </Table.Tr>
+*           </Table.Thead>
+*           <Table.Tbody>
+*             {data?.provenance.map(op => (
+*               <Table.Tr key={op.operation_id}>
+*                 <Table.Td><Text fz="xs" fw={400}>{op.operationId}</Text></Table.Td>
+*                 <Table.Td><Text fz="xs" fw={400}>{op.referenceId}</Text></Table.Td>
+*                 <Table.Td><Text fz="xs" fw={400}>
+*                   <Tooltip label={op.dataset.name}>
+*                   <Link href={op.dataset.url || "#"}>
+*                     {op.dataset.shortName}
+*                   </Link>
+*                   </Tooltip>
+*                 </Text></Table.Td>
+*                 <Table.Td><Text fz="xs" fw={400}>{op.action}</Text></Table.Td>
+*                 <Table.Td><Text fz="xs" fw={600}>{op.atom.type} </Text><Text fz="xs" fw={400}>{op.atom.value}</Text></Table.Td>
+*               </Table.Tr>
+*             ))}
+*           </Table.Tbody>
+*         </Table>
+*       </Drawer>
+*
+*       { item.publication?.publishedYear
+*         ? <Text fz="xs" fw={700} c="dimmed">{item.publication?.publishedYear}</Text>
+*         : <Text fz="xs" fw={700} c="dimmed" style={{ fontVariant: "small-caps" }}>no date</Text>
+*       }
+*       <Button onClick={open}>Change Log</Button>
+*     </Stack>
+*   )
+* } */
 
 function HistoryItemBody({ item }: { item: HistoryItem }) {
   const status = Humanize.capitalize(item.status.toLowerCase().replaceAll("_", " "));
@@ -744,7 +744,7 @@ function NomenclaturalActBody({ item }: { item: NomenclaturalAct }) {
           </Table.Thead>
           <Table.Tbody>
             {items?.map(op => (
-              <Table.Tr>
+              <Table.Tr key={op.operationId}>
                 <Table.Td>
                   <Text fz="xs" fw={600}>{humanize(op.atom.type.toString())}</Text>
                   <Text fz="xs" fw={400}>{op.atom.type.toString() === "NOMENCLATURAL_ACT_TYPE" ? humanize(op.atom.value) : op.atom.value}</Text>
