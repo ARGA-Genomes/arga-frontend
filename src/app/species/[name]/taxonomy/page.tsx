@@ -1,5 +1,7 @@
 "use client";
 
+import classes from '../../../../components/record-list.module.css';
+
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import {
@@ -12,6 +14,14 @@ import {
   Stack,
   Text,
   Image,
+  Timeline,
+  Table,
+  Drawer,
+  Popover,
+  Tooltip,
+  Title,
+  Tabs,
+  ScrollArea,
 } from "@mantine/core";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
@@ -22,6 +32,10 @@ import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { SpeciesImage } from "@/components/species-image";
 import Link from "next/link";
+import { AttributePill, AttributePillValue, DataField } from "@/components/data-fields";
+import { EventTimeline, LineStyle, TimelineDatedIcon, TimelineIcon } from "@/components/event-timeline";
+import { useDisclosure } from "@mantine/hooks";
+import { DateTime } from 'luxon';
 
 
 const GET_TAXON = gql`
@@ -32,6 +46,55 @@ query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
       rank
       depth
     }
+
+    history {
+      entityId
+      scientificName
+      canonicalName
+      authorship
+      rank
+      status
+      citation
+      sourceUrl
+      publication {
+        publishedYear
+        citation
+        sourceUrl
+        typeCitation
+      }
+      dataset {
+        name
+        shortName
+        url
+      }
+    }
+
+    nomenclaturalActs {
+      entityId
+      act
+      sourceUrl
+      publication {
+        citation
+        publishedYear
+        sourceUrl
+      }
+      name {
+        scientificName
+        canonicalName
+        authorship
+        taxa {
+          canonicalName
+          authorship
+          status
+          citation
+        }
+      }
+      actedOn {
+        scientificName
+        canonicalName
+        authorship
+      }
+    }
   }
 }`;
 
@@ -41,11 +104,155 @@ type ClassificationNode = {
   depth: number,
 }
 
+type HistoryItem = {
+  entityId: string,
+  scientificName: string,
+  canonicalName: string,
+  authorship?: string,
+  rank: string,
+  status: string,
+  citation?: string,
+  sourceUrl?: string,
+  publication?: NamePublication,
+  dataset: {
+    name: string,
+    shortName?: string,
+    url?: string,
+  }
+}
+
+type NomenclaturalAct = {
+  entityId: string,
+  act: string,
+  sourceUrl: string,
+  publication: NamePublication,
+  name: {
+    scientificName: string,
+    canonicalName: string,
+    authorship?: string,
+    taxa: {
+      canonicalName: string,
+      authorship?: string,
+      status: string,
+      citation?: string,
+    }[]
+  },
+  actedOn: { scientificName: string, canonicalName: string, authorship?: string }
+}
+
+type NamePublication = {
+  publishedYear?: number,
+  citation?: string,
+  sourceUrl?: string,
+  typeCitation?: string,
+}
+
+
 type TaxonQuery = {
   taxon: {
     hierarchy: ClassificationNode[],
+    history: HistoryItem[],
+    nomenclaturalActs: NomenclaturalAct[],
   },
 };
+
+
+const GET_PROVENANCE = gql`
+query NomenclaturalActProvenance($entityId: String) {
+  provenance {
+    nomenclaturalAct(by: { entityId: $entityId }) {
+      operationId
+      parentId
+      action
+      atom {
+        ... on NomenclaturalActAtomText {
+          type
+          value
+        }
+        ... on NomenclaturalActAtomType {
+          type
+          value
+        }
+        ... on NomenclaturalActAtomDateTime {
+          type
+          value
+        }
+      }
+      datasetVersion {
+        datasetId
+        version
+        createdAt
+        importedAt
+      }
+      dataset {
+        id
+        name
+        shortName
+        rightsHolder
+        citation
+        license
+        description
+        url
+      }
+    }
+  }
+}`;
+
+enum AtomTextType {
+  Empty,
+  ScientificName,
+  ActedOn,
+  Act,
+  SourceUrl,
+  Publication,
+  PublicationDate,
+}
+
+enum AtomType {
+  NomenclaturalActType,
+}
+
+enum AtomDateTimeType {
+  CreatedAt,
+  UpdatedAt,
+}
+
+interface AtomText {
+  type: AtomTextType,
+  value: string,
+}
+
+interface AtomNomenclaturalType {
+  type: AtomType,
+  value: string,
+}
+
+interface AtomDateTime {
+  type: AtomDateTimeType,
+  value: string,
+}
+
+interface Dataset {
+  id: string,
+  name: string,
+  shortName?: string,
+  rightsHolder?: string,
+  citation?: string,
+  license?: string,
+  description?: string,
+  url?: string,
+}
+
+type ProvenanceQuery = {
+  provenance: {
+    nomenclaturalAct: [{
+      operationId: string,
+      action: string,
+      atom: AtomText | AtomNomenclaturalType | AtomDateTime,
+      dataset: Dataset,
+    }]
+  }
+}
 
 
 const GET_SUMMARY = gql`
@@ -150,7 +357,7 @@ function ExternalLinks(props: ExternalLinksProps) {
 
   return (
     <Paper radius={16} p="md" withBorder>
-      <Text fw={700} mb={10} size="lg">External links</Text>
+      <Text fw={600} mb={10} size="lg">External links</Text>
       <Group mt="md" gap="xs">
         <Button
           component="a"
@@ -212,15 +419,14 @@ function ExternalLinks(props: ExternalLinksProps) {
 interface DetailsProps {
   taxonomy: Taxonomy,
   commonNames: VernacularName[],
-  synonyms: Synonym[],
 }
 
-function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
+function Details({ taxonomy, commonNames }: DetailsProps) {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Paper radius={16} p="md" withBorder>
       <Group mb={10} align="baseline">
-        <Text fw={700}  size="lg">Taxonomy</Text>
+        <Text fw={600}  size="lg">Taxonomy</Text>
         <Text fz="sm" fw={300}>
           Source:&nbsp;
           { taxonomy.sourceUrl
@@ -240,13 +446,6 @@ function Details({ taxonomy, commonNames, synonyms }: DetailsProps) {
           </DataTableRow>
           <DataTableRow label="Status">
             <Text fw={600} fz="sm">{taxonomy.status.toLowerCase()}</Text>
-          </DataTableRow>
-          <DataTableRow label="Synonyms">
-            <Stack>
-              { synonyms.map(synonym => (
-                <Text fw={600} fz="sm" key={synonym.scientificName}>{synonym.scientificName}</Text>
-              ))}
-            </Stack>
           </DataTableRow>
         </DataTable>
 
@@ -287,7 +486,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
       <LoadOverlay visible={loading} />
 
       <Group>
-        <Text fw={700} size="lg">Higher classification</Text>
+        <Text fw={600} size="lg">Higher classification</Text>
       </Group>
 
       <Group>
@@ -306,39 +505,266 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
 }
 
 
-interface Badge {
-  icon: string,
-  url: string,
+function HistoryItemHeader({ item }: { item: HistoryItem }) {
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
+    variables: { entityId: item.entityId },
+  });
+
+  return (
+    <Stack mt={5}>
+      <Drawer opened={opened} size="70%" position="right" onClose={close} title="Change logs">
+        <Table mt={130}>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Td><Text fz="xs" fw={600}>Operation ID</Text></Table.Td>
+              <Table.Td><Text fz="xs" fw={600}>Reference ID</Text></Table.Td>
+              <Table.Td><Text fz="xs" fw={600}>Dataset</Text></Table.Td>
+              <Table.Td><Text fz="xs" fw={600}>Action</Text></Table.Td>
+              <Table.Td><Text fz="xs" fw={600}>Atom</Text></Table.Td>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {data?.provenance.map(op => (
+              <Table.Tr>
+                <Table.Td><Text fz="xs" fw={400}>{op.operationId}</Text></Table.Td>
+                <Table.Td><Text fz="xs" fw={400}>{op.referenceId}</Text></Table.Td>
+                <Table.Td><Text fz="xs" fw={400}>
+                  <Tooltip label={op.dataset.name}>
+                  <Link href={op.dataset.url || "#"}>
+                    {op.dataset.shortName}
+                  </Link>
+                  </Tooltip>
+                </Text></Table.Td>
+                <Table.Td><Text fz="xs" fw={400}>{op.action}</Text></Table.Td>
+                <Table.Td><Text fz="xs" fw={600}>{op.atom.type} </Text><Text fz="xs" fw={400}>{op.atom.value}</Text></Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Drawer>
+
+      { item.publication?.publishedYear
+        ? <Text fz="xs" fw={700} c="dimmed">{item.publication?.publishedYear}</Text>
+        : <Text fz="xs" fw={700} c="dimmed" style={{ fontVariant: "small-caps" }}>no date</Text>
+      }
+      <Button onClick={open}>Change Log</Button>
+    </Stack>
+  )
 }
 
-const LICENSE_ICON: Record<string, Badge> = {
-  "cc-by-nc-nd": { icon: "/badges/cc-by-nc-nd.svg", url: "http://creativecommons.org/licenses/by-nc-nd/4.0"},
-  "cc-by-nc-sa": { icon: "/badges/cc-by-nc-sa.svg", url: "http://creativecommons.org/licenses/by-nc-sa/4.0"},
-  "cc-by-nc": { icon: "/badges/cc-by-nc.svg", url: "http://creativecommons.org/licenses/by-nc/4.0"},
-  "cc-by-nd": { icon: "/badges/cc-by-nd.svg", url: "http://creativecommons.org/licenses/by-nd/4.0"},
-  "cc-by-sa": { icon: "/badges/cc-by-sa.svg", url: "http://creativecommons.org/licenses/by-sa/4.0"},
-  "cc-by": { icon: "/badges/cc-by.svg", url: "http://creativecommons.org/licenses/by/4.0"},
-  "cc0": { icon: "/badges/cc-zero.svg", url: "http://creativecommons.org/publicdomain/zero/1.0"},
+function HistoryItemBody({ item }: { item: HistoryItem }) {
+  const status = Humanize.capitalize(item.status.toLowerCase().replaceAll("_", " "));
 
-  "http://creativecommons.org/licenses/by-nc-sa/4.0/": { icon: "/badges/cc-by-nc-sa.svg", url: "http://creativecommons.org/licenses/by-nc-sa/4.0/"},
-  "http://creativecommons.org/licenses/by-nc/4.0/": { icon: "/badges/cc-by-nc.svg", url: "http://creativecommons.org/licenses/by-nc/4.0/"},
-  "http://creativecommons.org/licenses/by/4.0/": { icon: "/badges/cc-by.svg", url: "http://creativecommons.org/licenses/by/4.0/"},
-  "http://creativecommons.org/licenses/by-nc-nd/4.0/": { icon: "/badges/cc-by-nc-nd.svg", url: "http://creativecommons.org/licenses/by-nc-nd/4.0/"},
-
-  "public domain mark": { icon: "/badges/publicdomain.svg", url: "http://creativecommons.org/publicdomain/mark/1.0"},
-  "attribution-noncommercial 4.0 international": { icon: "/badges/cc-by-nc.svg", url: "https://creativecommons.org/licenses/by-nc/4.0/"},
-  "attribution 4.0 international": { icon: "/badges/cc-by.svg", url: "https://creativecommons.org/licenses/by/4.0/"},
+  return (
+    <DataTable mb={30}>
+      <DataTableRow label="Scientific name"><Text fz="sm" fw={700} ml="sm"><i>{item.canonicalName}</i> {item.authorship}</Text></DataTableRow>
+      <DataTableRow label="Publication"><DataField value={item.publication?.citation} href={item.publication?.sourceUrl} /></DataTableRow>
+      <DataTableRow label="Type"><DataField value={item.publication?.typeCitation} /></DataTableRow>
+      <DataTableRow label="Protonym/Basionym"><DataField value={item.canonicalName} /></DataTableRow>
+      <DataTableRow label="Current status"><Group><AttributePillValue value={status} /></Group></DataTableRow>
+      <DataTableRow label="According to"><DataField value={item.citation} href={item.sourceUrl} /></DataTableRow>
+      <DataTableRow label="Source"><DataField value={item.dataset.name} href={item.dataset.url} /></DataTableRow>
+    </DataTable>
+  )
 }
 
-function LicenseIcon({ license }: { license: string }) {
-  const badge = LICENSE_ICON[license.toLowerCase()];
-  return badge
-       ? (
-         <Link href={badge.url} target="_blank">
-           <Image src={badge.icon} h={15} w={80}></Image>
-         </Link>
-       )
-       : <Text fz="sm" c="dimmed">{license}</Text>
+
+const ACT_TYPE_ORDER: Record<string, number> = {
+  "SPECIES_NOVA": 0,
+  "SUBSPECIES_NOVA": 1,
+  "GENUS_SPECIES_NOVA": 2,
+  "COMBINATIO_NOVA": 3,
+  "REVIVED_STATUS": 4,
+  "NAME_USAGE": 5,
+};
+
+const ACT_ICON: Record<string, string> = {
+  "SPECIES_NOVA": "/timeline-icons/original_description.svg",
+  "SUBSPECIES_NOVA": "/timeline-icons/original_description.svg",
+  "GENUS_SPECIES_NOVA": "/timeline-icons/original_description.svg",
+  "COMBINATIO_NOVA": "/timeline-icons/recombination.svg",
+  "REVIVED_STATUS": "/timeline-icons/orignal_description.svg",
+  "NAME_USAGE": "/timeline-icons/name_usage.svg",
+};
+
+// sort by publication year first, then by the type of the act, and lastly by scientific name
+function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
+  let aYear = a.publication.publishedYear;
+  let bYear = b.publication.publishedYear;
+
+  // always return acts with dates first
+  if (aYear && !bYear) return -1;
+  if (bYear && !aYear) return 1;
+  if (!aYear && !bYear) return 0;
+
+  if (aYear && bYear) {
+    if (aYear > bYear) return 1;
+    if (aYear < bYear) return -1;
+
+    let order = ACT_TYPE_ORDER[a.act] - ACT_TYPE_ORDER[b.act];
+    if (order === 0) return a.name.scientificName.localeCompare(b.name.scientificName);
+    return order;
+  }
+
+  return 0;
+}
+
+function History({ taxonomy }: { taxonomy: Taxonomy }) {
+  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+    variables: {
+      rank: taxonomy.rank,
+      canonicalName: taxonomy.canonicalName
+    },
+  });
+
+  const items = data?.taxon.history;
+  if (!items) {
+    return;
+  }
+
+  const acts = data?.taxon.nomenclaturalActs.map(it => it).sort(compareAct);
+  if (!acts) {
+    return;
+  }
+
+  const dates = items.flatMap(item => item.publication?.publishedYear).filter(item => item);
+
+  return (
+    <Paper radius={16} p="md" withBorder>
+      <LoadOverlay visible={loading} />
+      <Stack>
+        { error && <Text>Error : {error.message}</Text> }
+
+        <Text fw={600} size="lg">Taxon History</Text>
+        { items.length === 0 && <Text className={classes.emptyList}>no data</Text> }
+
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              { dates.map(date => (
+                <Table.Td key={date}><Title order={2}>{date}</Title></Table.Td>
+              )) }
+              <Table.Td align="right"><Title order={2}>{DateTime.now().year}</Title></Table.Td>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            { items.map((item, idx) => (
+              <Table.Tr key={idx} style={{ border: "none" }}>
+                <Table.Td colSpan={2}>
+                  <AttributePillValue value={item.canonicalName} color={ item.status === 'ACCEPTED' ? 'moss.3' : 'bushfire.2' } />
+                </Table.Td>
+              </Table.Tr>
+            )) }
+          </Table.Tbody>
+        </Table>
+
+
+        <Text fw={600} size="lg">Nomenclatural timeline</Text>
+        { acts.length === 0 && <Text className={classes.emptyList}>no data</Text> }
+
+        <EventTimeline>
+          { acts.map((act, idx) => (
+            <EventTimeline.Item
+              key={idx}
+              icon={
+                <TimelineIcon
+                  icon={ACT_ICON[act.act]}
+                  lineStyle={idx < acts.length-1 ? LineStyle.Solid : LineStyle.None}
+                />
+              }
+              header={<NomenclaturalActHeader item={act} />}
+              body={<NomenclaturalActBody item={act} />}
+            />
+          )) }
+        </EventTimeline>
+      </Stack>
+    </Paper>
+  )
+}
+
+
+function NomenclaturalActHeader({ item }: { item: NomenclaturalAct }) {
+  return (
+    <Stack mt={5}>
+      { item.publication.publishedYear
+        ? <Text fz="xs" fw={700} c="dimmed">Year {item.publication.publishedYear}</Text>
+        : <Text fz="xs" fw={700} c="dimmed" style={{ fontVariant: "small-caps" }}>no date</Text>
+      }
+    </Stack>
+  )
+}
+
+function NomenclaturalActBody({ item }: { item: NomenclaturalAct }) {
+  const [opened, { open, close }] = useDisclosure(false);
+  const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
+    variables: { entityId: item.entityId },
+  });
+
+  function humanize(text: string) {
+    return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "))
+  }
+
+  const act = humanize(item.act);
+  const items = data?.provenance.nomenclaturalAct.filter(item => item.action !== 'CREATE');
+
+  return (
+    <SimpleGrid cols={2}>
+    <DataTable mt="lg">
+      <DataTableRow label="Scientific name"><Text fz="sm" fw={700} ml="sm"><i>{item.name.canonicalName}</i> {item.name.authorship}</Text></DataTableRow>
+      <DataTableRow label="Nomenclatural act"><Group><AttributePillValue value={act} /></Group></DataTableRow>
+      <DataTableRow label="Publication"><DataField value={item.publication.citation} href={item.publication.sourceUrl} /></DataTableRow>
+      <DataTableRow label="Protonym/Basionym"><Text fz="sm" fw={700} ml="sm"><i>{item.name.canonicalName}</i> {item.name.authorship}</Text></DataTableRow>
+      <DataTableRow label="Current status"><Group><AttributePillValue value={humanize(item.name.taxa[0]?.status)} /></Group></DataTableRow>
+    </DataTable>
+
+    <Tabs
+      defaultValue="history"
+      variant="pills"
+      orientation="vertical"
+      placement="right"
+      color="midnight.5"
+      radius={0}
+      w={800}
+      style={{ background: "#e9eced", borderRadius: "15px 0 0 15px" }}
+    >
+      <Tabs.List bg="#d3d8db">
+        <Tabs.Tab value="history">Record History</Tabs.Tab>
+      </Tabs.List>
+
+      <ScrollArea.Autosize mah={300} mx="auto" type="auto">
+      <Tabs.Panel value="history" p="lg">
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Td><Text fz="xs" fw={600}>Atom</Text></Table.Td>
+              <Table.Td><Text fz="xs" fw={600}>Dataset</Text></Table.Td>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {items?.map(op => (
+              <Table.Tr>
+                <Table.Td>
+                  <Text fz="xs" fw={600}>{humanize(op.atom.type.toString())}</Text>
+                  <Text fz="xs" fw={400}>{op.atom.type.toString() === "NOMENCLATURAL_ACT_TYPE" ? humanize(op.atom.value) : op.atom.value}</Text>
+                </Table.Td>
+                <Table.Td><Text fz="xs" fw={400}>
+                  <Tooltip label={op.dataset.name}>
+                  <Link href={op.dataset.url || "#"}>
+                    {op.dataset.shortName}
+                  </Link>
+                  </Tooltip>
+                </Text></Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Tabs.Panel>
+      </ScrollArea.Autosize>
+    </Tabs>
+    </SimpleGrid>
+  )
 }
 
 
@@ -366,12 +792,12 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
   const taxonomy = data?.species.taxonomy[0];
 
   return (
-    <>
+    <Stack>
       <Grid>
         <Grid.Col span={8}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
-            {species && taxonomy && <Details taxonomy={taxonomy} commonNames={species.vernacularNames} synonyms={species.synonyms} /> }
+            {species && taxonomy && <Details taxonomy={taxonomy} commonNames={species.vernacularNames} /> }
             {taxonomy && <Classification taxonomy={taxonomy} /> }
             <ExternalLinks canonicalName={canonicalName} species={data?.species} />
           </Stack>
@@ -380,6 +806,8 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
           <SpeciesPhoto photo={data?.species.photos[0]} />
         </Grid.Col>
       </Grid>
-    </>
+
+      {taxonomy && <History taxonomy={taxonomy} /> }
+    </Stack>
   );
 }
