@@ -63,7 +63,7 @@ function DataTabs({
   // the fourth component in the path name
   const tab = path?.split("/")[3];
 
-  if (!tab) redirect(`/species/${name}/whole_genomes`, RedirectType.replace);
+  if (!tab) redirect(`/species/${name}/summary`, RedirectType.replace);
   console.log(tab);
 
   return (
@@ -71,13 +71,14 @@ function DataTabs({
       variant="unstyled"
       radius={10}
       mt={40}
-      defaultValue="whole_genomes"
+      defaultValue="summary"
       classNames={classes}
       value={tab}
       onChange={changeTab}
     >
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
+          <Tabs.Tab value="summary">Summary</Tabs.Tab>
           <Tabs.Tab value="whole_genomes">Genome Assemblies</Tabs.Tab>
           <Tabs.Tab value="components">Genomic Components</Tabs.Tab>
           <Tabs.Tab value="markers">Single Loci</Tabs.Tab>
