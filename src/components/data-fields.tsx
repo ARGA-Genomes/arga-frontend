@@ -51,6 +51,11 @@ const BADGE_COLOURS: Record<string, string> = {
   "Contig": "bushfire.3",
   "haploid": "wheat.2",
   "Major": "moss.3",
+  "Accepted": "moss.3",
+  "Nomenclatural synonym": "wheat.2",
+  "Taxonomic synonym": "wheat.2",
+  "Original description": "moss.3",
+  "Synonymisation": "bushfire.3",
 }
 
 interface AttributePillValueProps {
@@ -110,11 +115,13 @@ export function AttributeIcon({ label, icon}: AttributeIconProps) {
 interface DataFieldProps {
   value?: string | number,
   fz?: string | number,
+  href?: string,
 }
 
-export function DataField({ value, fz }: DataFieldProps) {
+export function DataField({ value, fz, href }: DataFieldProps) {
+  let text = href ? <Link href={href} target="_blank">{value}</Link> : value;
   return value
-    ? <Text fz={fz || 'sm'} fw={700} ml="sm">{value}</Text>
+    ? <Text fz={fz || 'sm'} fw={700} ml="sm">{text}</Text>
     : <Text fz={fz || 'sm'} fw={700} ml="sm" c="dimmed">No data</Text>
 }
 
