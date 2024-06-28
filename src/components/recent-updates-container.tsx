@@ -6,10 +6,9 @@ export default function RecentUpdatesContainer() {
   const changelog = updatesData.changelog;
   return (
     <Paper
-      w={400}
+      w={600}
       h={520}
       radius="lg"
-      // shadow="lg"
       withBorder
       className={classes.recentUpdatesContainer}
     >
