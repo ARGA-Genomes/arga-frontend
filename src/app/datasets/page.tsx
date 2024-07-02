@@ -10,12 +10,25 @@ import {
   Stack,
   Container,
   Text,
+  Group,
+  useMantineTheme,
+  Accordion,
+  Center,
+  ScrollArea,
+  Box,
 } from "@mantine/core";
 import Link from "next/link";
 import { DateTime } from "luxon";
 import { AttributePill } from "@/components/data-fields";
-import { IconExternalLink } from "@tabler/icons-react";
+import {
+  IconExternalLink,
+  IconCaretDownFilled,
+  IconEye,
+  IconArrowUpRight,
+} from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
+import classes from "./page.module.css";
+import { IoEye } from "react-icons/io5";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -62,6 +75,11 @@ type Source = {
   datasets: Dataset[];
 };
 
+type ContentType = {
+  name: string;
+  sources?: Source[];
+};
+
 type QueryResults = {
   sources: Source[];
 };
@@ -69,114 +87,231 @@ type QueryResults = {
 interface License {
   name: string;
   url: string;
+  accessRights: string;
 }
 
 const LICENSES: Record<string, License> = {
   "cc-by-nc-nd": {
     name: "(CC-BY-NC)",
     url: "http://creativecommons.org/licenses/by-nc-nd/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-nc-sa": {
     name: "(CC-BY-NC-SA)",
     url: "http://creativecommons.org/licenses/by-nc-sa/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-nc": {
     name: "(CC-BY-NC)",
     url: "http://creativecommons.org/licenses/by-nc/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-nd": {
     name: "(CC-BY-ND)",
     url: "http://creativecommons.org/licenses/by-nd/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-sa": {
     name: "(CC-BY-SA)",
     url: "http://creativecommons.org/licenses/by-sa/4.0",
+    accessRights: "Conditional",
   },
   "cc-by": {
     name: "(CC-BY)",
     url: "http://creativecommons.org/licenses/by/4.0",
+    accessRights: "Conditional",
   },
   cc0: {
     name: "(CC0)",
     url: "http://creativecommons.org/publicdomain/zero/1.0",
+    accessRights: "Open",
   },
 
   "http://creativecommons.org/licenses/by-nc-sa/4.0/": {
     name: "CC-BY-NC-SA",
     url: "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc/4.0/": {
     name: "CC-BY-NC",
     url: "http://creativecommons.org/licenses/by-nc/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by/4.0/": {
     name: "CC-BY",
     url: "http://creativecommons.org/licenses/by/4.0/",
+    accessRights: "Conditional",
+  },
+  "https://creativecommons.org/licenses/by/4.0/": {
+    name: "CC-BY",
+    url: "http://creativecommons.org/licenses/by/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-sa/4.0/": {
     name: "CC-BY-SA",
     url: "http://creativecommons.org/licenses/by-sa/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc-nd/4.0/": {
     name: "CC-BY-NC-ND",
     url: "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+    accessRights: "Conditional",
   },
 
   "http://creativecommons.org/licenses/by-nc-sa/3.0/": {
     name: "CC-BY-NC-SA",
     url: "http://creativecommons.org/licenses/by-nc-sa/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc/3.0/": {
     name: "CC-BY-NC",
     url: "http://creativecommons.org/licenses/by-nc/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by/3.0/": {
     name: "CC-BY",
     url: "http://creativecommons.org/licenses/by/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-sa/3.0/": {
     name: "CC-BY-SA",
     url: "http://creativecommons.org/licenses/by-sa/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc-nd/3.0/": {
     name: "CC-BY-NC-ND",
     url: "http://creativecommons.org/licenses/by-nc-nd/3.0/",
+    accessRights: "Conditional",
   },
 
   "public domain mark": {
     name: "Public Domain",
     url: "http://creativecommons.org/publicdomain/mark/1.0",
+    accessRights: "Open",
   },
   "attribution-noncommercial 4.0 international": {
     name: "(CC-BY-NC)",
     url: "https://creativecommons.org/licenses/by-nc/4.0/",
+    accessRights: "Conditional",
   },
   "attribution 4.0 international": {
     name: "(CC-BY)",
     url: "https://creativecommons.org/licenses/by/4.0/",
+    accessRights: "Conditional",
   },
 };
 
-function DatasetRow({ dataset }: { dataset: Dataset }) {
+const licenseAccessRights = {};
+
+function DatasetRow({
+  dataset,
+  sourceLength,
+  count,
+}: {
+  dataset: Dataset;
+  sourceLength: number;
+  count: number;
+}) {
   const license = dataset.license
     ? LICENSES[dataset.license.toLowerCase()]
     : undefined;
 
   return (
-    <Paper radius="lg" withBorder>
+    <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
       <Grid>
-        <Grid.Col span={4} p="lg">
+        <Grid.Col span={3} p="lg">
           <AttributePill label="Data source name" value={dataset.name} />
         </Grid.Col>
-        <Grid.Col span={3} p="lg">
+        <Grid.Col span={2} p="lg">
           <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill
             label="Access rights"
-            value={license?.name || dataset.license}
+            value={license?.accessRights || dataset.license}
             href={license?.url}
-            color={license ? "moss.3" : undefined}
+            color={
+              license?.accessRights === "Open"
+                ? "moss.3"
+                : license?.accessRights === "Conditional"
+                ? "wheat.3"
+                : undefined
+            }
+          />
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill label="Number of records" value="No data" />
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill
+            label="Last updated"
+            value={DateTime.fromISO(dataset.updatedAt).toLocaleString()}
+          />
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <Link href={dataset.url || "#"} target="_blank">
+            <Button
+              w="100%"
+              h="100%"
+              color="midnight.10"
+              style={{ borderRadius: "0 16px 16px 0" }}
+              disabled={!dataset.url}
+            >
+              <Stack align="center" gap={5}>
+                <IconExternalLink size="30px" strokeWidth={1.5} />
+                <Text fw={650} fz={8.5}>
+                  Go to source
+                </Text>
+              </Stack>
+            </Button>
+          </Link>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  );
+}
+
+function ComponentDatasetRow({
+  dataset,
+  sourceLength,
+  count,
+}: {
+  dataset: Dataset;
+  sourceLength: number;
+  count: number;
+}) {
+  const license = dataset.license
+    ? LICENSES[dataset.license.toLowerCase()]
+    : undefined;
+
+  return (
+    <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
+      <Grid>
+        <Grid.Col span={5} p="lg">
+          <Stack gap={5}>
+            <Text fw={300} size="sm">
+              Component source citation
+            </Text>
+            <Text fw={300} size="xs" pl={10}>
+              {dataset.citation}
+            </Text>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill label="Rights holder" value={dataset.rightsHolder} />
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill
+            label="Access rights"
+            value={license?.accessRights || dataset.license}
+            href={license?.url}
+            color={
+              license?.accessRights === "Open"
+                ? "moss.3"
+                : license?.accessRights === "Conditional"
+                ? "wheat.3"
+                : undefined
+            }
           />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
@@ -190,13 +325,15 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
             <Button
               w="100%"
               h="100%"
-              color="midnight"
+              color="midnight.10"
               style={{ borderRadius: "0 16px 16px 0" }}
               disabled={!dataset.url}
             >
-              <Stack align="center">
-                <IconExternalLink size="30px" />
-                Go to source
+              <Stack align="center" gap={5}>
+                <IconExternalLink size="30px" strokeWidth={1.5} />
+                <Text fw={650} fz={8.5}>
+                  Go to source
+                </Text>
               </Stack>
             </Button>
           </Link>
@@ -206,21 +343,219 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
   );
 }
 
-function SourceRow({ source }: { source: Source }) {
+function SourceListContainer({ source }: { source: Source }) {
+  const theme = useMantineTheme();
+  const license = source.license
+    ? LICENSES[source.license.toLowerCase()]
+    : undefined;
   return (
-    <Stack>
-      <Title order={4}>{source.name}</Title>
-      <Stack>
-        {source.datasets.map((dataset, idx) => (
-          <DatasetRow dataset={dataset} key={idx} />
-        ))}
-      </Stack>
-    </Stack>
+    <Accordion
+      variant="separated"
+      radius="lg"
+      classNames={classes}
+      chevron={
+        <IconCaretDownFilled
+          fill={theme.colors.midnight[10]}
+          color={theme.colors.midnight[10]}
+        />
+      }
+    >
+      <Accordion.Item key={source.name} value={source.name}>
+        <Accordion.Control>
+          <Stack>
+            <Group>
+              <Link
+                href={`/browse/sources/${source.name}`}
+                className={classes.browseSpeciesBtn}
+              >
+                <span className={classes.browseSpeciesSpan}>
+                  <Group gap={15} pt={4.5} pl={5}>
+                    <IoEye size={25} className={classes.browseSpeciesIcon} />
+                    <Text
+                      fw={600}
+                      fz={17}
+                      className={classes.browseSpeciesText}
+                    >
+                      Browse {source.name} list
+                    </Text>
+                  </Group>
+                </span>
+              </Link>
+            </Group>
+            <Group grow align="flex-end" pr={10}>
+              <AttributePill
+                label="Data source name"
+                // color="midnight.10"
+                value={
+                  // <Link href={`/browse/sources/${source.name}`}>
+                  //   <Group gap={5}>
+                  //     <IoEye size={25} color="white" />
+                  //     <Text fw={600} c="white">
+                  //       {source.name}
+                  //     </Text>
+                  //   </Group>
+                  // </Link>
+                  source.name
+                }
+              />
+              <AttributePill
+                label="Rights holder"
+                value={source.rightsHolder}
+              />
+              <AttributePill
+                label="Access rights"
+                value={license?.accessRights || source.license}
+                href={license?.url}
+                color={
+                  license?.accessRights === "Open"
+                    ? "moss.3"
+                    : license?.accessRights === "Conditional"
+                    ? "wheat.3"
+                    : undefined
+                }
+              />
+              <AttributePill label="Number of records" value="No data" />
+              <AttributePill label="Last updated" value="No data" />
+              {/* <Box> */}
+              {/* <Center> */}
+              {/* <Link href={`/browse/sources/${source.name}`} target="_blank">
+                <Button
+                  px={20}
+                  size="xl"
+                  radius="xl"
+                  color="midnight.10"
+                  // fullWidth
+                  justify="center"
+                  leftSection={<IoEye size={55} color="white" />}
+                >
+                  <Stack gap={0}>
+                    <Text fw={600} size="md" truncate c="white">
+                      browse
+                    </Text>
+                    <Text fw={600} size="md" truncate c="white" mt={-7}>
+                      species
+                    </Text>
+                  </Stack> */}
+              {/* <Group wrap="nowrap">
+                  <IoEye size={50} color="white" />
+                  <Stack gap={0}>
+                    <Text fw={600} size="md" truncate c="white">
+                      browse
+                    </Text>
+                    <Text fw={600} size="md" truncate c="white">
+                      species
+                    </Text>
+                  </Stack>
+                </Group> */}
+              {/* </Button> */}
+              {/* </Link> */}
+              {/* </Center> */}
+              {/* </Box> */}
+            </Group>
+          </Stack>
+        </Accordion.Control>
+        <Accordion.Panel>
+          <ScrollArea h={450} type="auto" scrollbars="y" offsetScrollbars>
+            <Box pr={10}>
+              {source.datasets.map((dataset, idx) => (
+                <ComponentDatasetRow
+                  dataset={dataset}
+                  key={idx}
+                  sourceLength={source.datasets.length}
+                  count={idx + 1}
+                />
+              ))}
+            </Box>
+          </ScrollArea>
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+
+function SourceContainer({ source }: { source: Source }) {
+  const theme = useMantineTheme();
+  var isList = false;
+  if (
+    source.name === "ARGA Bushfire Recovery" ||
+    source.name === "ARGA Commercial Species" ||
+    source.name === "ARGA Threatened Species" ||
+    source.name === "ARGA Venomous and Poisonous Species"
+  ) {
+    isList = true;
+  }
+  return (
+    <Accordion.Item key={source.name} value={source.name}>
+      <Accordion.Control>
+        <Text
+          fw={600}
+          fz="var(--mantine-h4-font-size)"
+          c={theme.colors.midnight[10]}
+        >
+          {source.name}
+        </Text>
+      </Accordion.Control>
+      <Accordion.Panel>
+        {isList ? (
+          <SourceListContainer source={source} />
+        ) : (
+          source.datasets.map((dataset, idx) => (
+            <DatasetRow
+              dataset={dataset}
+              key={idx}
+              sourceLength={source.datasets.length}
+              count={idx + 1}
+            />
+          ))
+        )}
+        {/* {source.datasets.map((dataset, idx) => (
+          <DatasetRow
+            dataset={dataset}
+            key={idx}
+            sourceLength={source.datasets.length}
+            count={idx + 1}
+          />
+        ))} */}
+      </Accordion.Panel>
+    </Accordion.Item>
   );
 }
 
 export default function DatasetsPage() {
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
+  const theme = useMantineTheme();
+
+  const sourceContent: { [key: string]: string } = {
+    "ARGA Backbone Taxonomy": "Taxonomic",
+    "ARGA Bushfire Recovery": "Traits and ecological",
+    "ARGA Commercial Species": "Traits and ecological",
+    "ARGA Genomes": "Genomics",
+    "ARGA IEK": "Traits and ecological",
+    "ARGA Threatened Species": "Traits and ecological",
+    "ARGA Venomous and Poisonous Species": "Traits and ecological",
+    OZCAM: "Biological specimens",
+  };
+
+  let contentData: ContentType[] = [
+    { name: "Genomics" },
+    { name: "Biological specimens" },
+    { name: "Taxonomic" },
+    { name: "Traits and ecological" },
+  ];
+
+  contentData = contentData.map((contentItem) => {
+    // Filter sources based on the content type name
+    let correspondingSources =
+      data?.sources.filter((source) => {
+        const contentType = sourceContent[source.name];
+        return contentType && contentType.includes(contentItem.name);
+      }) ?? []; // Default to an empty array if data?.sources is undefined
+    return {
+      ...contentItem,
+      sources:
+        correspondingSources.length > 0 ? correspondingSources : undefined,
+    };
+  });
 
   return (
     <Stack gap="xl" my="xl">
@@ -234,14 +569,25 @@ export default function DatasetsPage() {
 
       <Paper py="lg">
         <Container maw={MAX_WIDTH}>
-          <Paper p="lg" radius="lg" withBorder>
-            <LoadOverlay visible={loading} />
-            <Stack gap={50}>
-              {data?.sources.map((source) => (
-                <SourceRow source={source} key={source.name} />
-              ))}
-            </Stack>
-          </Paper>
+          <LoadOverlay visible={loading} />
+          <Accordion
+            variant="separated"
+            radius="lg"
+            classNames={classes}
+            chevron={
+              <IconCaretDownFilled
+                fill={theme.colors.midnight[10]}
+                color={theme.colors.midnight[10]}
+              />
+            }
+          >
+            {/* {data?.sources.map((source) => (
+              <SourceContainer source={source} key={source.name} />
+            ))} */}
+            {contentData?.map((contentType) => (
+              <Text key={contentType}>{contentType.name} data sources</Text>
+            ))}
+          </Accordion>
         </Container>
       </Paper>
     </Stack>
