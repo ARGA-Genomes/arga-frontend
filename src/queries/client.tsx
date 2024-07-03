@@ -1,18 +1,18 @@
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { createFragmentRegistry } from "@apollo/client/cache";
 
 import { ACCESSION_EVENT, COLLECTION_EVENT, SPECIMEN } from "./specimen";
 import { SUBSAMPLE, SUBSAMPLE_EVENT } from "./subsample";
 import { DNA_EXTRACT, DNA_EXTRACTION_EVENT } from "./dna-extract";
+import { TAXON_TREE_NODE_STATISTICS } from "./stats";
 import {
   ANNOTATIONS_EVENT,
   ASSEMBLY_EVENT,
   DATA_DEPOSITION_EVENT,
   SEQUENCE,
   SEQUENCING_EVENT,
-  SEQUENCING_RUN_EVENT
+  SEQUENCING_RUN_EVENT,
 } from "./sequence";
-
 
 export default function createClient() {
   const fragments = createFragmentRegistry(
@@ -28,6 +28,7 @@ export default function createClient() {
     SEQUENCING_RUN_EVENT,
     ASSEMBLY_EVENT,
     ANNOTATIONS_EVENT,
+    TAXON_TREE_NODE_STATISTICS,
     DATA_DEPOSITION_EVENT,
   );
 
