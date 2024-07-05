@@ -16,6 +16,7 @@ import {
   Center,
   ScrollArea,
   Box,
+  SimpleGrid,
 } from "@mantine/core";
 import Link from "next/link";
 import { DateTime } from "luxon";
@@ -473,6 +474,75 @@ function SourceListContainer({ source }: { source: Source }) {
   );
 }
 
+function CollectionCard({ collection }: { collection: Source }) {
+  const theme = useMantineTheme();
+  const license = collection.license
+    ? LICENSES[collection.license.toLowerCase()]
+    : undefined;
+  return (
+    <Paper radius="lg" withBorder>
+      <Stack>
+        <Group justify="space-between" wrap="nowrap">
+          <Text>Data source name</Text>
+          <Paper
+            py={5}
+            px={15}
+            bg="#d6e4ed"
+            radius="xl"
+            style={{ border: "none" }}
+          >
+            <Center>
+              <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
+                {collection.name}
+              </Text>
+            </Center>
+          </Paper>
+        </Group>
+        <Group justify="space-between" wrap="nowrap">
+          <Text>Access rights</Text>
+          <Paper
+            py={5}
+            px={15}
+            bg="#d6e4ed"
+            radius="xl"
+            style={{ border: "none" }}
+          >
+            <Center>
+              <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
+                {collection.accessRights}
+              </Text>
+            </Center>
+          </Paper>
+        </Group>
+        {/* <AttributePill
+          label="Data source name"
+          value={collection.name}
+          group={true}
+        />
+        <AttributePill
+          label="Rights holder"
+          value={collection.rightsHolder}
+          group={true}
+        />
+        <AttributePill
+          label="Access rights"
+          value={license?.accessRights || collection.license}
+          href={license?.url}
+          color={
+            license?.accessRights === "Open"
+              ? "moss.3"
+              : license?.accessRights === "Conditional"
+              ? "wheat.3"
+              : undefined
+          }
+          group={true}
+        /> */}
+        {/* <AttributePill label="Number of records" value="No data" group={true} /> */}
+      </Stack>
+    </Paper>
+  );
+}
+
 function SourceContainer({ source }: { source: Source }) {
   const theme = useMantineTheme();
   var isList = false;
@@ -516,6 +586,31 @@ function SourceContainer({ source }: { source: Source }) {
             count={idx + 1}
           />
         ))} */}
+      </Accordion.Panel>
+    </Accordion.Item>
+  );
+}
+
+function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
+  const theme = useMantineTheme();
+
+  return (
+    <Accordion.Item key={contentType.name} value={contentType.name}>
+      <Accordion.Control>
+        <Text
+          fw={600}
+          fz="var(--mantine-h4-font-size)"
+          c={theme.colors.midnight[10]}
+        >
+          {contentType.name} data sources
+        </Text>
+      </Accordion.Control>
+      <Accordion.Panel>
+        <SimpleGrid cols={3}>
+          {contentType.sources?.map((collection, idx) => (
+            <CollectionCard collection={collection} key={idx} />
+          ))}
+        </SimpleGrid>
       </Accordion.Panel>
     </Accordion.Item>
   );
@@ -581,12 +676,15 @@ export default function DatasetsPage() {
               />
             }
           >
-            {/* {data?.sources.map((source) => (
+            {data?.sources.map((source) => (
               <SourceContainer source={source} key={source.name} />
-            ))} */}
-            {contentData?.map((contentType) => (
-              <Text key={contentType}>{contentType.name} data sources</Text>
             ))}
+            {/* {contentData?.map((contentType) => (
+              <ContentTypeContainer
+                contentType={contentType}
+                key={contentType.name}
+              />
+            ))} */}
           </Accordion>
         </Container>
       </Paper>
