@@ -236,6 +236,115 @@ type EukaryotaDescendantResults = {
   };
 };
 
+const GET_EUKARYOTA_TREE = gql`
+  query TaxonHierarchy {
+    animaliaTree: stats {
+      taxonBreakdown(
+        taxonRank: KINGDOM
+        taxonCanonicalName: "Animalia"
+        includeRanks: [PHYLUM, CLASS]
+      ) {
+        name: canonicalName
+        rank
+        children {
+          name: canonicalName
+          rank
+          value: species
+        }
+      }
+    }
+
+    plantaeTree: stats {
+      taxonBreakdown(
+        taxonRank: REGNUM
+        taxonCanonicalName: "Plantae"
+        includeRanks: [DIVISION, CLASSIS]
+      ) {
+        name: canonicalName
+        rank
+        children {
+          name: canonicalName
+          rank
+          value: species
+        }
+      }
+    }
+
+    fungiTree: stats {
+      taxonBreakdown(
+        taxonRank: REGNUM
+        taxonCanonicalName: "Fungi"
+        includeRanks: [DIVISION, CLASSIS]
+      ) {
+        name: canonicalName
+        rank
+        children {
+          name: canonicalName
+          rank
+          value: species
+        }
+      }
+    }
+
+    protistaTree: stats {
+      taxonBreakdown(
+        taxonRank: SUPERKINGDOM
+        taxonCanonicalName: "Protista"
+        includeRanks: [PHYLUM, CLASS]
+      ) {
+        name: canonicalName
+        rank
+        children {
+          name: canonicalName
+          rank
+          value: species
+        }
+      }
+    }
+
+    chromistaTree: stats {
+      taxonBreakdown(
+        taxonRank: REGNUM
+        taxonCanonicalName: "Chromista"
+        includeRanks: [DIVISION, CLASSIS]
+      ) {
+        name: canonicalName
+        rank
+        children {
+          name: canonicalName
+          rank
+          value: species
+        }
+      }
+    }
+  }
+`;
+
+type TaxonTreeNode = {
+  name: string;
+  rank: string;
+  value?: number;
+  children?: TaxonTreeNode[];
+};
+
+type EukaryotaTreeResults = {
+  animaliaTree: {
+    taxonBreakdown: TaxonTreeNode[];
+  };
+  plantaeTree: {
+    taxonBreakdown: TaxonTreeNode[];
+  };
+  fungiTree: {
+    taxonBreakdown: TaxonTreeNode[];
+  };
+  protistaTree: {
+    taxonBreakdown: TaxonTreeNode[];
+  };
+  chromistaTree: {
+    taxonBreakdown: TaxonTreeNode[];
+  };
+};
+
 export function ShowStats() {
   const taxonResults = useQuery<TaxonResults>(GET_TAXON);
   const taxon = taxonResults.data?.taxon;
@@ -553,33 +662,45 @@ export function ShowCircularTaxonomy() {
 }
 
 export function ShowSunburstTaxonomy() {
-  const [treeData, setTreeData] = useState<TreeNode>();
-  const { data, loading, error } = useQuery<EukaryotaDescendantResults>(
-    GET_DESCENDANTS,
+  const [treeData, setTreeData] = useState<TaxonTreeNode>();
+
+  const { data, loading, error } = useQuery<EukaryotaTreeResults>(
+    GET_EUKARYOTA_TREE,
     {
       onCompleted: (data) => {
         const kingdomsRegnaTaxa = [
-          data.animaliaTaxon,
-          data.protistaTaxon,
-          data.plantaeTaxon,
-          data.fungiTaxon,
-          data.chromistaTaxon,
+          {
+            name: "Animalia",
+            rank: "KINGDOM",
+            children: data.animaliaTree.taxonBreakdown,
+          },
+          {
+            name: "Plantae",
+            rank: "REGNUM",
+            children: data.plantaeTree.taxonBreakdown,
+          },
+          {
+            name: "Fungi",
+            rank: "REGNUM",
+            children: data.fungiTree.taxonBreakdown,
+          },
+          {
+            name: "Protista",
+            rank: "SUPERKINGDOM",
+            children: data.protistaTree.taxonBreakdown,
+          },
+          {
+            name: "Chromista",
+            rank: "REGNUM",
+            children: data.chromistaTree.taxonBreakdown,
+          },
         ];
-        const tData: TreeNode = {
-          name: data.eukaryotaTaxon.canonicalName,
-          children: kingdomsRegnaTaxa.map((taxon) => {
-            return {
-              name: taxon.canonicalName,
-              children: taxon.descendants.map((descendant) => {
-                return {
-                  name: descendant.canonicalName,
-                  value: descendant.species,
-                };
-              }),
-            };
-          }),
+        const tData: TaxonTreeNode = {
+          name: "Eukaryota",
+          rank: "DOMAIN",
+          children: kingdomsRegnaTaxa,
         };
-        // console.log(tData);
+        console.log(tData);
         setTreeData(tData);
       },
     }
