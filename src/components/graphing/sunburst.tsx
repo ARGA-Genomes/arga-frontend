@@ -53,9 +53,14 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
 
   const customColor = (numCategories: number | undefined) => {
     if (numCategories) {
-      return d3
-        .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), numCategories)
-        .reverse();
+      console.log(d3.interpolateSpectral(0.5));
+      if (numCategories === 1) {
+        return d3.interpolateSpectral(0.5);
+      } else {
+        return d3
+          .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), numCategories)
+          .reverse();
+      }
     } else {
       return [];
     }
