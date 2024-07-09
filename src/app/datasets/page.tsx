@@ -190,7 +190,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
             <Button
               w="100%"
               h="100%"
-              color="midnight"
+              color="midnight.11"
               style={{ borderRadius: "0 16px 16px 0" }}
               disabled={!dataset.url}
             >
