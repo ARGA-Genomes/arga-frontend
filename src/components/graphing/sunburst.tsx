@@ -5,9 +5,11 @@ import { useSpring, animated } from "@react-spring/web";
 import { useState } from "react";
 import { Sunburst, ResponsiveSunburst, ComputedDatum } from "@nivo/sunburst";
 import classes from "./sunburst.module.css";
+import Link from "next/link";
 
 type TreeNode = {
   name: string;
+  rank: string;
   value?: number;
   children?: TreeNode[];
 };
@@ -29,6 +31,11 @@ function flatten(data: TreeNode[] | undefined): TreeNode[] {
   );
 }
 
+function capitaliseFirstLetter(word: string) {
+  if (!word) return word; // handle empty string or undefined
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
 function findObject(data: TreeNode[], name: string): TreeNode | undefined {
   return data.find((item) => item.name === name);
 }
@@ -42,12 +49,18 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
   const [chartData, setChartData] = useState<TreeNode>(data);
   const [parent, setParent] = useState<string | null>(null);
   const [path, setPath] = useState<string[]>(["Eukaryota"]);
+  const [pathRank, setPathRank] = useState<string[]>(["DOMAIN"]);
 
   const customColor = (numCategories: number | undefined) => {
     if (numCategories) {
-      return d3
-        .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), numCategories)
-        .reverse();
+      console.log(d3.interpolateSpectral(0.5));
+      if (numCategories === 1) {
+        return d3.interpolateSpectral(0.5);
+      } else {
+        return d3
+          .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), numCategories)
+          .reverse();
+      }
     } else {
       return [];
     }
@@ -56,19 +69,24 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
   const CenteredValue = ({ centerX, centerY }: CenteredValueProps) => {
     return (
       <animated.g>
-        <text
-          x={centerX}
-          y={centerY}
-          fill="white"
-          textAnchor="middle"
-          dominantBaseline="top"
-          style={{
-            fontSize: "1.2rem",
-            fontWeight: 600,
-          }}
+        <Link
+          href={`/${capitaliseFirstLetter(pathRank[0])}/${path[0]}`}
+          className={classes.sunburstButton}
         >
-          {path[0]}
-        </text>
+          <text
+            x={centerX}
+            y={centerY}
+            fill="white"
+            textAnchor="middle"
+            dominantBaseline="top"
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: 600,
+            }}
+          >
+            {path[0]}
+          </text>
+        </Link>
         {parent && (
           <text
             x={centerX}
@@ -87,7 +105,9 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
                 }
               }
               const tmpPath = path.slice(1);
+              const tmpPathRank = pathRank.slice(1);
               setPath(tmpPath);
+              setPathRank(tmpPathRank);
               setParent(tmpPath[1]);
             }}
             className={classes.sunburstButton}
@@ -128,11 +148,19 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
           flatten(chartData.children),
           clickedDatum.data.name
         );
-        if (foundObject && foundObject.children) {
-          const tmpPath = [clickedDatum.data.name, ...path];
-          setPath(tmpPath);
-          setParent(tmpPath[1]);
-          setChartData(foundObject);
+        if (foundObject) {
+          if (foundObject.children) {
+            const tmpPath = [clickedDatum.data.name, ...path];
+            const tmpPathRank = [clickedDatum.data.rank, ...pathRank];
+            setPath(tmpPath);
+            setPathRank(tmpPathRank);
+            setParent(tmpPath[1]);
+            setChartData(foundObject);
+          } else {
+            window.location.href = `/${capitaliseFirstLetter(
+              foundObject.rank
+            )}/${foundObject.name}`;
+          }
         }
       }}
     />
