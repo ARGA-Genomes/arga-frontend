@@ -145,12 +145,12 @@ export default function HomePage() {
               </Title>
               <ShowSunburstTaxonomy />
             </Stack>
-            {/* <Stack gap={40} className={classes.bottomStack}>
+            <Stack gap={40} align="center">
               <Title order={3} c="moss.5" fz={28}>
                 Recent updates
               </Title>
               <RecentUpdatesContainer />
-            </Stack> */}
+            </Stack>
           </Group>
         </Stack>
       </Box>
