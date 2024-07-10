@@ -77,3 +77,13 @@
         padding-top: 5px;
     }
 }
+
+.cardLayoutViewBtn:hover {
+    fill: var(--mantine-color-midnight-10);
+}
+
+.tableLayoutViewBtn:hover {
+    fill: var(--mantine-color-midnight-10);
+    stroke: white;
+    /* stroke-width: 1.75; */
+}

@@ -28,10 +28,13 @@ import {
   IconEye,
   IconArrowUpRight,
   IconClockHour4,
+  IconTable,
+  IconLayoutGrid,
 } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
 import { IoEye } from "react-icons/io5";
+import { useState } from "react";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -625,23 +628,51 @@ function SourceContainer({ source }: { source: Source }) {
 
 function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
   const theme = useMantineTheme();
+  const [layoutView, setLayoutView] = useState("card");
 
   return (
     <Accordion.Item key={contentType.name} value={contentType.name}>
       <Accordion.Control>
-        <Text
-          fw={600}
-          fz="var(--mantine-h4-font-size)"
-          c={theme.colors.midnight[10]}
-        >
-          {contentType.name} data sources
-        </Text>
+        <Group justify="space-between" pr={30}>
+          <Text
+            fw={600}
+            fz="var(--mantine-h4-font-size)"
+            c={theme.colors.midnight[10]}
+          >
+            {contentType.name} data sources
+          </Text>
+          <Group gap={10}>
+            <UnstyledButton onClick={() => setLayoutView("table")}>
+              <IconTable
+                color={
+                  layoutView === "table" ? "white" : theme.colors.midnight[10]
+                }
+                className={classes.tableLayoutViewBtn}
+                fill={
+                  layoutView === "table" ? theme.colors.midnight[10] : "none"
+                }
+              />
+            </UnstyledButton>
+            <UnstyledButton onClick={() => setLayoutView("card")}>
+              <IconLayoutGrid
+                color={theme.colors.midnight[10]}
+                className={classes.cardLayoutViewBtn}
+                fill={
+                  layoutView === "card" ? theme.colors.midnight[10] : "none"
+                }
+              />
+            </UnstyledButton>
+          </Group>
+        </Group>
       </Accordion.Control>
       <Accordion.Panel>
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-          {contentType.sources?.map((collection, idx) => (
-            <CollectionCard collection={collection} key={idx} />
-          ))}
+          {contentType.sources?.map(
+            (collection, idx) =>
+              layoutView === "card" && (
+                <CollectionCard collection={collection} key={idx} />
+              )
+          )}
         </SimpleGrid>
       </Accordion.Panel>
     </Accordion.Item>
