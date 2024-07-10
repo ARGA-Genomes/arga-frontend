@@ -17,6 +17,7 @@ import {
   ScrollArea,
   Box,
   SimpleGrid,
+  UnstyledButton,
 } from "@mantine/core";
 import Link from "next/link";
 import { DateTime } from "luxon";
@@ -26,6 +27,7 @@ import {
   IconCaretDownFilled,
   IconEye,
   IconArrowUpRight,
+  IconClockHour4,
 } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
@@ -480,66 +482,96 @@ function CollectionCard({ collection }: { collection: Source }) {
     ? LICENSES[collection.license.toLowerCase()]
     : undefined;
   return (
-    <Paper radius="lg" withBorder>
-      <Stack>
-        <Group justify="space-between" wrap="nowrap">
-          <Text>Data source name</Text>
-          <Paper
-            py={5}
-            px={15}
-            bg="#d6e4ed"
-            radius="xl"
-            style={{ border: "none" }}
-          >
-            <Center>
-              <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
-                {collection.name}
-              </Text>
-            </Center>
-          </Paper>
-        </Group>
-        <Group justify="space-between" wrap="nowrap">
-          <Text>Access rights</Text>
-          <Paper
-            py={5}
-            px={15}
-            bg="#d6e4ed"
-            radius="xl"
-            style={{ border: "none" }}
-          >
-            <Center>
-              <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
-                {collection.accessRights}
-              </Text>
-            </Center>
-          </Paper>
-        </Group>
-        {/* <AttributePill
-          label="Data source name"
-          value={collection.name}
-          group={true}
-        />
-        <AttributePill
-          label="Rights holder"
-          value={collection.rightsHolder}
-          group={true}
-        />
-        <AttributePill
-          label="Access rights"
-          value={license?.accessRights || collection.license}
-          href={license?.url}
-          color={
-            license?.accessRights === "Open"
-              ? "moss.3"
-              : license?.accessRights === "Conditional"
-              ? "wheat.3"
-              : undefined
-          }
-          group={true}
-        /> */}
-        {/* <AttributePill label="Number of records" value="No data" group={true} /> */}
-      </Stack>
-    </Paper>
+    <UnstyledButton>
+      <Link href={`/browse/sources/${collection.name}`}>
+        <Paper radius="lg" withBorder className={classes.cardCollectionBtn}>
+          <Stack>
+            <Paper
+              radius="lg"
+              bg="midnight.10"
+              w="100%"
+              style={{ borderRadius: "16px 16px 0 0" }}
+            >
+              <Group justify="space-between" align="flex-start" wrap="nowrap">
+                <Text fw={600} size="md" c="white" p={10}>
+                  {collection.name}
+                </Text>
+
+                <Box className={classes.collectionArrowBtn}>
+                  <IconArrowUpRight color="white" />
+                </Box>
+              </Group>
+            </Paper>
+            <Grid py={10} px={40}>
+              <Grid.Col span={6}>
+                <Text>Rights holder</Text>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Paper
+                  py={5}
+                  px={15}
+                  bg="#d6e4ed"
+                  radius="xl"
+                  style={{ border: "none" }}
+                >
+                  <Center>
+                    <Text
+                      fw={600}
+                      size="sm"
+                      style={{ whiteSpace: "nowrap" }}
+                      truncate
+                    >
+                      {collection.rightsHolder}
+                    </Text>
+                  </Center>
+                </Paper>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Text>Access rights</Text>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Paper
+                  py={5}
+                  px={15}
+                  bg="#d6e4ed"
+                  radius="xl"
+                  style={{ border: "none" }}
+                >
+                  <Center>
+                    <Text
+                      fw={600}
+                      size="sm"
+                      style={{ whiteSpace: "nowrap" }}
+                      truncate
+                    >
+                      {collection.accessRights}
+                    </Text>
+                  </Center>
+                </Paper>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Text>Number of records</Text>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Paper
+                  py={5}
+                  px={15}
+                  bg="#d6e4ed"
+                  radius="xl"
+                  style={{ border: "none" }}
+                >
+                  <Center>
+                    <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
+                      No data
+                    </Text>
+                  </Center>
+                </Paper>
+              </Grid.Col>
+            </Grid>
+          </Stack>
+        </Paper>
+      </Link>
+    </UnstyledButton>
   );
 }
 
@@ -606,7 +638,7 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
         </Text>
       </Accordion.Control>
       <Accordion.Panel>
-        <SimpleGrid cols={3}>
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
           {contentType.sources?.map((collection, idx) => (
             <CollectionCard collection={collection} key={idx} />
           ))}
@@ -676,15 +708,15 @@ export default function DatasetsPage() {
               />
             }
           >
-            {data?.sources.map((source) => (
+            {/* {data?.sources.map((source) => (
               <SourceContainer source={source} key={source.name} />
-            ))}
-            {/* {contentData?.map((contentType) => (
+            ))} */}
+            {contentData?.map((contentType) => (
               <ContentTypeContainer
                 contentType={contentType}
                 key={contentType.name}
               />
-            ))} */}
+            ))}
           </Accordion>
         </Container>
       </Paper>

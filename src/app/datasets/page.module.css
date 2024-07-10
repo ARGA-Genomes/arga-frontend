@@ -62,3 +62,18 @@
 .browseSpeciesText {
     color: var(--mantine-color-midnight-11);
 }
+
+.collectionArrowBtn {
+    padding-right: 10px;
+    padding-top: 10px;
+    transition: all .3s ease;
+}
+
+.cardCollectionBtn:hover {
+    background-color: var(--mantine-color-midnight-0);
+
+    .collectionArrowBtn {
+        padding-right: 5px;
+        padding-top: 5px;
+    }
+}
