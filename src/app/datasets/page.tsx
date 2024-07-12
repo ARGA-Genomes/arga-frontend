@@ -218,6 +218,7 @@ function DatasetRow({
   sourceLength: number;
   count: number;
 }) {
+  const theme = useMantineTheme();
   const license = dataset.license
     ? LICENSES[dataset.license.toLowerCase()]
     : undefined;
@@ -225,9 +226,26 @@ function DatasetRow({
   return (
     <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
       <Grid>
-        <Grid.Col span={3} p="lg">
-          <AttributePill label="Data source name" value={dataset.name} />
+        <Grid.Col span={5} p="lg">
+          <Stack gap={3}>
+            <Text
+              fw={600}
+              size="md"
+              c="midnight.10"
+              // style={{ whiteSpace: "nowrap" }}
+            >
+              {dataset.name}
+            </Text>
+            <Group gap={3}>
+              <IconClockHour4 size={15} color={theme.colors.midnight[1]} />
+              <Text c={theme.colors.midnight[1]} size="xs">
+                Last updated:{" "}
+                {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
+              </Text>
+            </Group>
+          </Stack>
         </Grid.Col>
+        {/* <Grid.Col span={2} p="lg"></Grid.Col> */}
         <Grid.Col span={2} p="lg">
           <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>
@@ -248,12 +266,7 @@ function DatasetRow({
         <Grid.Col span={2} p="lg">
           <AttributePill label="Number of records" value="No data" />
         </Grid.Col>
-        <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Last updated"
-            value={DateTime.fromISO(dataset.updatedAt).toLocaleString()}
-          />
-        </Grid.Col>
+
         <Grid.Col span={1}>
           <Link href={dataset.url || "#"} target="_blank">
             <Button
@@ -578,6 +591,73 @@ function CollectionCard({ collection }: { collection: Source }) {
   );
 }
 
+function CollectionRow({ collection }: { collection: Source }) {
+  const license = collection.license
+    ? LICENSES[collection.license.toLowerCase()]
+    : undefined;
+  return (
+    <Paper radius="lg" withBorder>
+      <Stack>
+        <Paper
+          radius="lg"
+          bg="midnight.10"
+          w="100%"
+          style={{ borderRadius: "16px 16px 0 0" }}
+        >
+          <Grid>
+            <Grid.Col span={3} p="lg">
+              <Text
+                fw={600}
+                size="md"
+                c="white"
+                p={10}
+                style={{ whiteSpace: "nowrap" }}
+              >
+                {collection.name}
+              </Text>
+            </Grid.Col>
+            <Grid.Col span={2} p="lg"></Grid.Col>
+            <Grid.Col span={2} p="lg">
+              <AttributePill
+                label="Rights holder"
+                value={collection.rightsHolder}
+              />
+            </Grid.Col>
+            <Grid.Col span={2} p="lg">
+              <AttributePill
+                label="Access rights"
+                value={license?.accessRights || collection.license}
+                href={license?.url}
+              />
+            </Grid.Col>
+            <Grid.Col span={2} p="lg">
+              {" "}
+              <AttributePill label="Number of records" />
+            </Grid.Col>
+            <Grid.Col span={1}>
+              <Group justify="flex-end" className={classes.collectionArrowBtn}>
+                <IconArrowUpRight color="white" />
+              </Group>
+            </Grid.Col>
+          </Grid>
+        </Paper>
+        <ScrollArea h={350} type="auto" scrollbars="y" offsetScrollbars>
+          <Box p={10}>
+            {collection.datasets.map((dataset, idx) => (
+              <DatasetRow
+                dataset={dataset}
+                key={idx}
+                sourceLength={collection.datasets.length}
+                count={idx + 1}
+              />
+            ))}
+          </Box>
+        </ScrollArea>
+      </Stack>
+    </Paper>
+  );
+}
+
 function SourceContainer({ source }: { source: Source }) {
   const theme = useMantineTheme();
   var isList = false;
@@ -666,14 +746,20 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
         </Group>
       </Accordion.Control>
       <Accordion.Panel>
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-          {contentType.sources?.map(
-            (collection, idx) =>
-              layoutView === "card" && (
-                <CollectionCard collection={collection} key={idx} />
-              )
-          )}
-        </SimpleGrid>
+        {layoutView === "card" && (
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+            {contentType.sources?.map((collection, idx) => (
+              <CollectionCard collection={collection} key={idx} />
+            ))}
+          </SimpleGrid>
+        )}
+        {layoutView === "table" && (
+          <SimpleGrid cols={1}>
+            {contentType.sources?.map((collection, idx) => (
+              <CollectionRow collection={collection} key={idx} />
+            ))}
+          </SimpleGrid>
+        )}
       </Accordion.Panel>
     </Accordion.Item>
   );
