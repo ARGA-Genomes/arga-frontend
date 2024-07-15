@@ -18,6 +18,7 @@ import {
   Box,
   SimpleGrid,
   UnstyledButton,
+  Overlay,
 } from "@mantine/core";
 import Link from "next/link";
 import { DateTime } from "luxon";
@@ -35,6 +36,7 @@ import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
 import { IoEye } from "react-icons/io5";
 import { useState } from "react";
+import { copyFileSync } from "fs";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -498,15 +500,16 @@ function CollectionCard({ collection }: { collection: Source }) {
     ? LICENSES[collection.license.toLowerCase()]
     : undefined;
   return (
-    <UnstyledButton>
-      <Link href={`/browse/sources/${collection.name}`}>
-        <Paper radius="lg" withBorder className={classes.cardCollectionBtn}>
-          <Stack>
+    <Paper radius="lg" withBorder className={classes.collectionCard}>
+      <Stack gap={10}>
+        <UnstyledButton>
+          <Link href={`/browse/sources/${collection.name}`}>
             <Paper
               radius="lg"
-              bg="midnight.10"
+              // bg="midnight.10"
               w="100%"
-              style={{ borderRadius: "16px 16px 0 0" }}
+              // style={{ borderRadius: "16px 16px 0 0" }}
+              className={classes.collectionHeader}
             >
               <Group justify="space-between" align="flex-start" wrap="nowrap">
                 <Text fw={600} size="md" c="white" p={10}>
@@ -518,76 +521,30 @@ function CollectionCard({ collection }: { collection: Source }) {
                 </Box>
               </Group>
             </Paper>
-            <Grid py={10} px={40}>
-              <Grid.Col span={6}>
-                <Text>Rights holder</Text>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Paper
-                  py={5}
-                  px={15}
-                  bg="#d6e4ed"
-                  radius="xl"
-                  style={{ border: "none" }}
-                >
-                  <Center>
-                    <Text
-                      fw={600}
-                      size="sm"
-                      style={{ whiteSpace: "nowrap" }}
-                      truncate
-                    >
-                      {collection.rightsHolder}
-                    </Text>
-                  </Center>
-                </Paper>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Text>Access rights</Text>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Paper
-                  py={5}
-                  px={15}
-                  bg="#d6e4ed"
-                  radius="xl"
-                  style={{ border: "none" }}
-                >
-                  <Center>
-                    <Text
-                      fw={600}
-                      size="sm"
-                      style={{ whiteSpace: "nowrap" }}
-                      truncate
-                    >
-                      {collection.accessRights}
-                    </Text>
-                  </Center>
-                </Paper>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Text>Number of records</Text>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Paper
-                  py={5}
-                  px={15}
-                  bg="#d6e4ed"
-                  radius="xl"
-                  style={{ border: "none" }}
-                >
-                  <Center>
-                    <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
-                      No data
-                    </Text>
-                  </Center>
-                </Paper>
-              </Grid.Col>
-            </Grid>
-          </Stack>
-        </Paper>
-      </Link>
-    </UnstyledButton>
+          </Link>
+        </UnstyledButton>
+        <Grid py={20} px={40} style={{ position: "relative" }}>
+          <Grid.Col span={12}>
+            <AttributePill
+              label="Rights holder"
+              value={collection.rightsHolder}
+              group={true}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <AttributePill
+              label="Access rights"
+              value={license?.accessRights || collection.license}
+              href={license?.url}
+              group={true}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <AttributePill label="Number of records" group={true} />
+          </Grid.Col>
+        </Grid>
+      </Stack>
+    </Paper>
   );
 }
 
@@ -598,50 +555,58 @@ function CollectionRow({ collection }: { collection: Source }) {
   return (
     <Paper radius="lg" withBorder>
       <Stack>
-        <Paper
-          radius="lg"
-          bg="midnight.10"
-          w="100%"
-          style={{ borderRadius: "16px 16px 0 0" }}
+        <UnstyledButton>
+          <Link href={`/browse/sources/${collection.name}`}>
+            <Paper radius="lg" w="100%" className={classes.collectionHeader}>
+              <Grid>
+                <Grid.Col span={5} p="lg">
+                  <Text
+                    fw={600}
+                    size="md"
+                    c="white"
+                    p={10}
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    {collection.name}
+                  </Text>
+                </Grid.Col>
+                <Grid.Col span={2} p="lg">
+                  <AttributePill
+                    label="Rights holder"
+                    labelColor="white"
+                    value={collection.rightsHolder}
+                  />
+                </Grid.Col>
+                <Grid.Col span={2} p="lg">
+                  <AttributePill
+                    label="Access rights"
+                    labelColor="white"
+                    value={license?.accessRights || collection.license}
+                    href={license?.url}
+                  />
+                </Grid.Col>
+                <Grid.Col span={2} p="lg">
+                  {" "}
+                  <AttributePill label="Number of records" labelColor="white" />
+                </Grid.Col>
+                <Grid.Col span={1}>
+                  <Group
+                    justify="flex-end"
+                    className={classes.collectionArrowRowBtn}
+                  >
+                    <IconArrowUpRight color="white" />
+                  </Group>
+                </Grid.Col>
+              </Grid>
+            </Paper>
+          </Link>
+        </UnstyledButton>
+        <ScrollArea.Autosize
+          mah={350}
+          type="auto"
+          scrollbars="y"
+          offsetScrollbars
         >
-          <Grid>
-            <Grid.Col span={3} p="lg">
-              <Text
-                fw={600}
-                size="md"
-                c="white"
-                p={10}
-                style={{ whiteSpace: "nowrap" }}
-              >
-                {collection.name}
-              </Text>
-            </Grid.Col>
-            <Grid.Col span={2} p="lg"></Grid.Col>
-            <Grid.Col span={2} p="lg">
-              <AttributePill
-                label="Rights holder"
-                value={collection.rightsHolder}
-              />
-            </Grid.Col>
-            <Grid.Col span={2} p="lg">
-              <AttributePill
-                label="Access rights"
-                value={license?.accessRights || collection.license}
-                href={license?.url}
-              />
-            </Grid.Col>
-            <Grid.Col span={2} p="lg">
-              {" "}
-              <AttributePill label="Number of records" />
-            </Grid.Col>
-            <Grid.Col span={1}>
-              <Group justify="flex-end" className={classes.collectionArrowBtn}>
-                <IconArrowUpRight color="white" />
-              </Group>
-            </Grid.Col>
-          </Grid>
-        </Paper>
-        <ScrollArea h={350} type="auto" scrollbars="y" offsetScrollbars>
           <Box p={10}>
             {collection.datasets.map((dataset, idx) => (
               <DatasetRow
@@ -652,7 +617,7 @@ function CollectionRow({ collection }: { collection: Source }) {
               />
             ))}
           </Box>
-        </ScrollArea>
+        </ScrollArea.Autosize>
       </Stack>
     </Paper>
   );
@@ -722,7 +687,12 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
             {contentType.name} data sources
           </Text>
           <Group gap={10}>
-            <UnstyledButton onClick={() => setLayoutView("table")}>
+            <UnstyledButton
+              onClick={(e) => {
+                e.stopPropagation();
+                setLayoutView("table");
+              }}
+            >
               <IconTable
                 color={
                   layoutView === "table" ? "white" : theme.colors.midnight[10]
@@ -733,7 +703,12 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
                 }
               />
             </UnstyledButton>
-            <UnstyledButton onClick={() => setLayoutView("card")}>
+            <UnstyledButton
+              onClick={(e) => {
+                e.stopPropagation();
+                setLayoutView("card");
+              }}
+            >
               <IconLayoutGrid
                 color={theme.colors.midnight[10]}
                 className={classes.cardLayoutViewBtn}

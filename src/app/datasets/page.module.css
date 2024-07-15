@@ -69,14 +69,52 @@
     transition: all .3s ease;
 }
 
-.cardCollectionBtn:hover {
-    background-color: var(--mantine-color-midnight-0);
+.collectionArrowRowBtn {
+    padding-right: 10px;
+    padding-top: 5px;
+    transition: all .3s ease;
+}
+
+.collectionHeader {
+    background-color: var(--mantine-color-midnight-10);
+    border-radius: 16px 16px 0 0;
+}
+
+.collectionHeader:hover {
+    background-color: var(--mantine-color-midnight-8);
+    /* transform: scale(1.025); */
+
+    /* .collectionHeader {
+        background-color: var(--mantine-color-midnight-8);
+    } */
 
     .collectionArrowBtn {
         padding-right: 5px;
         padding-top: 5px;
     }
+
+    .collectionArrowRowBtn {
+        padding-right: 5px;
+        padding-top: 0;
+    }
+
+    /* .collectionHeader {
+        background-color: var(--mantine-color-midnight-9);
+    } */
 }
+
+.collectionCard:hover {
+    transform: scale(1.025);
+}
+
+/* .collectionHeader:hover {
+    background-color: var(--mantine-color-midnight-9);
+    
+    .collectionArrowBtn {
+        padding-right: 5px;
+        padding-top: 5px;
+    }
+} */
 
 .cardLayoutViewBtn:hover {
     fill: var(--mantine-color-midnight-10);
