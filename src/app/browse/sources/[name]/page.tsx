@@ -21,6 +21,7 @@ import {
   Avatar,
   useMantineTheme,
   ScrollArea,
+  UnstyledButton,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { PaginationBar } from "@/components/pagination";
@@ -32,6 +33,9 @@ import {
   IconFilter,
   IconClockHour4,
   IconExternalLink,
+  IconDatabase,
+  IconLicense,
+  IconPaw,
 } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
@@ -54,6 +58,10 @@ const GET_DETAILS = gql`
       rightsHolder
       author
       name
+
+      species(page: 1, pageSize: 1) {
+        total
+      }
 
       datasets {
         name
@@ -82,13 +90,17 @@ type Dataset = {
   updatedAt: string;
 };
 
+type SpeciesCount = {
+  total: number;
+};
+
 type Source = {
   license: string;
   accessRights: string;
   rightsHolder: string;
   author: string;
   name: string;
-
+  species: SpeciesCount;
   datasets: Dataset[];
 };
 
@@ -396,17 +408,52 @@ function SourceDetails({
   source: Source;
   loading: boolean;
 }) {
+  const theme = useMantineTheme();
   return (
-    <Stack gap={0}>
-      <LoadOverlay visible={loading} />
+    <Box w="100%">
+      <Stack gap={0}>
+        <LoadOverlay visible={loading} />
 
-      <Text c="dimmed" size="xs">
-        {source.author}
-      </Text>
-      <Text c="dimmed" size="xs">
-        &copy; {source.rightsHolder}
-      </Text>
-    </Stack>
+        <Text c="dimmed" size="xs">
+          {source.author}
+        </Text>
+        <Text c="dimmed" size="xs">
+          &copy; {source.rightsHolder}
+        </Text>
+        <Grid pt={10}>
+          <Grid.Col span={3}>
+            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
+              <Group gap={5} justify="center" wrap="nowrap">
+                <IconDatabase color={theme.colors.midnight[10]} />
+                <Text size="xs" c={theme.colors.midnight[10]}>
+                  <b>{source.datasets.length}</b> datasets
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
+              <Group gap={5} justify="center" wrap="nowrap">
+                <IconPaw color={theme.colors.midnight[10]} />
+                <Text size="xs" c={theme.colors.midnight[10]}>
+                  <b>{source.species.total}</b> species
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
+              <Group gap={5} justify="center" wrap="nowrap">
+                <IconLicense color={theme.colors.midnight[10]} />
+                <Text size="xs" c={theme.colors.midnight[10]}>
+                  <b>Open</b> access
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+        </Grid>
+      </Stack>
+    </Box>
   );
 }
 
@@ -429,21 +476,25 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
     <Stack mt="xl">
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
-          <Group gap={40}>
-            <Text c="dimmed" fw={400}>
-              DATA COLLECTION
-            </Text>
-            <Stack gap={0}>
-              <Text fz={38} fw={700}>
-                {source}
+          <Grid align="center">
+            <Grid.Col span={{ base: 12, md: 2 }}>
+              <Text c="dimmed" fw={400}>
+                DATA COLLECTION
               </Text>
-              {data?.source ? (
-                <SourceDetails source={data?.source} loading={loading} />
-              ) : (
-                error?.message
-              )}
-            </Stack>
-          </Group>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Stack gap={0}>
+                <Text fz={38} fw={700}>
+                  {source}
+                </Text>
+                {data?.source ? (
+                  <SourceDetails source={data?.source} loading={loading} />
+                ) : (
+                  error?.message
+                )}
+              </Stack>
+            </Grid.Col>
+          </Grid>
         </Container>
       </Paper>
 
