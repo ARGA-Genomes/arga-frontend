@@ -19,6 +19,8 @@ import {
   Accordion,
   Badge,
   Avatar,
+  useMantineTheme,
+  ScrollArea,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { PaginationBar } from "@/components/pagination";
@@ -26,10 +28,17 @@ import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { useDisclosure } from "@mantine/hooks";
-import { IconFilter } from "@tabler/icons-react";
+import {
+  IconFilter,
+  IconClockHour4,
+  IconExternalLink,
+} from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { Photo } from "@/app/type";
+import { AttributePill } from "@/components/data-fields";
+import { DateTime } from "luxon";
+import Link from "next/link";
 
 const PAGE_SIZE = 10;
 type Filters = {
@@ -48,6 +57,14 @@ const GET_DETAILS = gql`
 
       datasets {
         name
+        shortName
+        description
+        url
+        citation
+        license
+        rightsHolder
+        createdAt
+        updatedAt
       }
     }
   }
@@ -55,6 +72,14 @@ const GET_DETAILS = gql`
 
 type Dataset = {
   name: string;
+  shortName?: string;
+  description?: string;
+  url?: string;
+  citation?: string;
+  license?: string;
+  rightsHolder?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type Source = {
@@ -286,22 +311,100 @@ function Species({ source }: { source: string }) {
   );
 }
 
-function SourceDetails({ source }: { source: string }) {
-  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-    variables: { name: source },
-  });
+function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
+  return (
+    <Stack>
+      <Title order={5}>Component Datasets</Title>
+      <ScrollArea.Autosize
+        mah={300}
+        type="auto"
+        scrollbars="y"
+        offsetScrollbars
+      >
+        <Box p={10}>
+          {datasets.map((dataset, idx) => {
+            return <DatasetRow key={idx} dataset={dataset} />;
+          })}
+        </Box>
+      </ScrollArea.Autosize>
+    </Stack>
+  );
+}
 
+function DatasetRow({ dataset }: { dataset: Dataset }) {
+  const theme = useMantineTheme();
+
+  return (
+    <Paper radius="lg" withBorder mb={20}>
+      <Grid>
+        <Grid.Col span={5} p="lg">
+          <Stack gap={3}>
+            <Text
+              fw={600}
+              size="md"
+              c="midnight.10"
+              // style={{ whiteSpace: "nowrap" }}
+            >
+              {dataset.name}
+            </Text>
+            <Group gap={3}>
+              <IconClockHour4 size={15} color={theme.colors.midnight[1]} />
+              <Text c={theme.colors.midnight[1]} size="xs">
+                Last updated:{" "}
+                {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
+              </Text>
+            </Group>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill label="Rights holder" value={dataset.rightsHolder} />
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill label="Access rights" value={dataset.license} />
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill label="Number of records" value="No data" />
+        </Grid.Col>
+
+        <Grid.Col span={1}>
+          <Link href={dataset.url || "#"} target="_blank">
+            <Button
+              w="100%"
+              h="100%"
+              color="midnight.10"
+              style={{ borderRadius: "0 16px 16px 0" }}
+              disabled={!dataset.url}
+            >
+              <Stack align="center" gap={5}>
+                <IconExternalLink size="30px" strokeWidth={1.5} />
+                <Text fw={650} fz={8.5}>
+                  Go to source
+                </Text>
+              </Stack>
+            </Button>
+          </Link>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  );
+}
+
+function SourceDetails({
+  source,
+  loading,
+}: {
+  source: Source;
+  loading: boolean;
+}) {
   return (
     <Stack gap={0}>
       <LoadOverlay visible={loading} />
 
-      {error ? <Text>{error.message}</Text> : null}
-
       <Text c="dimmed" size="xs">
-        {data?.source.author}
+        {source.author}
       </Text>
       <Text c="dimmed" size="xs">
-        &copy; {data?.source.rightsHolder}
+        &copy; {source.rightsHolder}
       </Text>
     </Stack>
   );
@@ -310,6 +413,10 @@ function SourceDetails({ source }: { source: string }) {
 export default function BrowseSource({ params }: { params: { name: string } }) {
   const source = decodeURIComponent(params.name).replaceAll("_", " ");
   const [_, setPreviousPage] = usePreviousPage();
+
+  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
+    variables: { name: source },
+  });
 
   useEffect(() => {
     setPreviousPage({
@@ -324,13 +431,17 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
         <Container maw={MAX_WIDTH}>
           <Group gap={40}>
             <Text c="dimmed" fw={400}>
-              SOURCE
+              DATA COLLECTION
             </Text>
             <Stack gap={0}>
               <Text fz={38} fw={700}>
                 {source}
               </Text>
-              <SourceDetails source={source} />
+              {data?.source ? (
+                <SourceDetails source={data?.source} loading={loading} />
+              ) : (
+                error?.message
+              )}
             </Stack>
           </Group>
         </Container>
@@ -339,6 +450,13 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Stack>
+            <Paper p="xl" radius="lg" withBorder>
+              {data?.source.datasets ? (
+                <BrowseComponentDatasets datasets={data?.source.datasets} />
+              ) : (
+                error?.message
+              )}
+            </Paper>
             <Paper p="xl" radius="lg" withBorder>
               <Species source={source} />
             </Paper>
