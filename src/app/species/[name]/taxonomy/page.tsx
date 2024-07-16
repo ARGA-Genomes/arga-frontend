@@ -21,10 +21,19 @@ import {
   Box,
   Badge,
 } from "@mantine/core";
-import { ResponsiveTree } from "@nivo/tree";
+import { useTheme } from "@nivo/core";
+import {
+  LabelComponentProps,
+  Layout,
+  LinkComponentProps,
+  NodeComponentProps,
+  ResponsiveTree,
+  useLinkMouseEventHandlers,
+  useNodeMouseEventHandlers,
+} from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
-import { IconExternalLink } from "@tabler/icons-react";
+import { IconBinaryTree2, IconExternalLink } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
@@ -35,9 +44,10 @@ import {
   LineStyle,
   TimelineIcon,
 } from "@/components/event-timeline";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useListState } from "@mantine/hooks";
 import { DateTime } from "luxon";
 import { TaxonStatTreeNode } from "@/queries/stats";
+import { animated, to } from "@react-spring/web";
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
@@ -352,6 +362,18 @@ const GET_TAXON_TREE_STATS = gql`
             ...TaxonStatTreeNode
             children {
               ...TaxonStatTreeNode
+              children {
+                ...TaxonStatTreeNode
+                children {
+                  ...TaxonStatTreeNode
+                  children {
+                    ...TaxonStatTreeNode
+                    children {
+                      ...TaxonStatTreeNode
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -808,9 +830,17 @@ function NomenclaturalActBody({ item }: { item: NomenclaturalAct }) {
   );
 }
 
-function FamilyTaxonTree({ hierarchy }: { hierarchy: TaxonNode[] }) {
+interface FamilyTaxonTreeProps {
+  hierarchy: TaxonNode[];
+  pin?: string;
+}
+
+function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
+  const [layout, setLayout] = useState<Layout>("top-to-bottom");
+
   const order = hierarchy.find(
     (node) => node.rank === "ORDER" || node.rank === "ORDO",
+    /* (node) => node.rank === "FAMILY" || node.rank === "FAMILIA", */
   );
   const { loading, error, data } = useQuery<TaxonTreeStatsQuery>(
     GET_TAXON_TREE_STATS,
@@ -836,16 +866,37 @@ function FamilyTaxonTree({ hierarchy }: { hierarchy: TaxonNode[] }) {
   );
 
   const treeData = data?.stats.taxonBreakdown[0];
+  const pinned = hierarchy.map((h) => h.canonicalName).concat(pin || "");
 
   return (
     <Paper radius={16} p="md" withBorder>
-      <Text fw={600} mb={10} size="lg">
-        Interactive higher classification
-      </Text>
+      <Group justify="space-between">
+        <Text fw={600} mb={10} size="lg">
+          Interactive higher classification
+        </Text>
+        <Button
+          onClick={() => {
+            const newLayout =
+              layout === "top-to-bottom" ? "right-to-left" : "top-to-bottom";
+            setLayout(newLayout);
+          }}
+        >
+          <IconBinaryTree2
+            style={{
+              transform:
+                layout === "top-to-bottom" ? "rotate(90deg)" : "rotate(0deg)",
+            }}
+          />
+        </Button>
+      </Group>
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      <Box h={800}>{treeData && <TaxonomyTree data={treeData} />}</Box>
+      <Box h={1500}>
+        {treeData && (
+          <TaxonomyTree layout={layout} data={treeData} pinned={pinned} />
+        )}
+      </Box>
     </Paper>
   );
 }
@@ -858,15 +909,83 @@ function StatBadge({ label, stat }: { label: string; stat?: number }) {
   );
 }
 
-function TaxonomyTree({ data }: { data: TaxonStatTreeNode }) {
+type Node = {
+  visible: boolean;
+  expanded: boolean;
+  pinned: boolean;
+  children?: Node[];
+  allChildren?: Node[];
+
+  canonicalName: string;
+  rank: string;
+  loci?: number;
+  genomes?: number;
+  specimens?: number;
+  other?: number;
+  totalGenomic?: number;
+};
+
+function convertToNode(
+  node: TaxonStatTreeNode,
+  expanded?: Node[],
+  pinned?: string[],
+): Node {
+  const shouldExpand =
+    !!expanded?.find((n) => n.canonicalName === node.canonicalName) ||
+    !!pinned?.find((name) => name === node.canonicalName) ||
+    node.rank !== "GENUS";
+
+  return {
+    visible: true,
+    expanded: shouldExpand,
+    pinned: !!pinned?.find((name) => name === node.canonicalName),
+    children: shouldExpand
+      ? node.children?.map((child) => convertToNode(child, expanded, pinned))
+      : [
+          {
+            visible: false,
+            expanded: false,
+            pinned: false,
+            canonicalName: "",
+            rank: "",
+          },
+        ],
+    allChildren: node.children?.map((child) => convertToNode(child, expanded)),
+
+    canonicalName: node.canonicalName,
+    rank: node.rank,
+    loci: node.loci,
+    genomes: node.genomes,
+    specimens: node.specimens,
+    other: node.other,
+    totalGenomic: node.totalGenomic,
+  };
+}
+
+interface TaxonomyTreeProps {
+  layout: Layout;
+  data: TaxonStatTreeNode;
+  pinned?: string[];
+}
+
+function TaxonomyTree({ layout, data, pinned }: TaxonomyTreeProps) {
+  const [expanded, handlers] = useListState<Node>([]);
+  const [root, setRoot] = useState(convertToNode(data, expanded, pinned));
+
+  useEffect(() => {
+    setRoot(convertToNode(data, expanded, pinned));
+  }, [expanded]);
+
   return (
     <ResponsiveTree
-      data={data}
+      layout={layout}
+      mode="tree"
+      data={root}
       identity="canonicalName"
       activeNodeSize={24}
       inactiveNodeSize={12}
       nodeColor={{ scheme: "tableau10" }}
-      fixNodeColorAtDepth={1}
+      fixNodeColorAtDepth={2}
       linkThickness={2}
       activeLinkThickness={8}
       inactiveLinkThickness={2}
@@ -874,29 +993,54 @@ function TaxonomyTree({ data }: { data: TaxonStatTreeNode }) {
         from: "target.color",
         modifiers: [["opacity", 0.4]],
       }}
-      margin={{ top: 90, right: 10, bottom: 200, left: 10 }}
+      margin={{
+        top: layout === "top-to-bottom" ? 100 : 10,
+        bottom: layout === "top-to-bottom" ? 200 : 10,
+        right: layout === "right-to-left" ? 100 : 10,
+        left: layout === "right-to-left" ? 200 : 10,
+      }}
       motionConfig="stiff"
       meshDetectionRadius={80}
-      nodeTooltip={(item) => (
-        <Paper p="md">
-          <Group align="baseline">
-            <Text size="xs">{item.node.data.rank}</Text>
-            <Text fs="italic">{item.node.data.canonicalName}</Text>
-          </Group>
-          <Group justify="center" my="xs">
-            <StatBadge label="Loci" stat={item.node.data.loci} />
-            <StatBadge label="Genomes" stat={item.node.data.genomes} />
-            <StatBadge label="Specimens" stat={item.node.data.specimens} />
-          </Group>
-          <Group justify="center">
-            <StatBadge label="Other" stat={item.node.data.other} />
-            <StatBadge
-              label="Total genomic"
-              stat={item.node.data.totalGenomic}
-            />
-          </Group>
-        </Paper>
-      )}
+      nodeTooltip={(item) =>
+        item.node.data.visible && (
+          <Paper
+            p="md"
+            style={{
+              background: "rgba(255,255,255,0.6)",
+              backdropFilter: "blur(6px)",
+            }}
+          >
+            <Group align="baseline">
+              <Text size="xs">{item.node.data.rank}</Text>
+              <Text fs="italic">{item.node.data.canonicalName}</Text>
+            </Group>
+            <Group justify="center" my="xs">
+              <StatBadge label="Loci" stat={item.node.data.loci} />
+              <StatBadge label="Genomes" stat={item.node.data.genomes} />
+              <StatBadge label="Specimens" stat={item.node.data.specimens} />
+            </Group>
+            <Group justify="center">
+              <StatBadge label="Other" stat={item.node.data.other} />
+              <StatBadge
+                label="Total genomic"
+                stat={item.node.data.totalGenomic}
+              />
+            </Group>
+          </Paper>
+        )
+      }
+      onNodeClick={(item) => {
+        item.data.expanded = !item.data.expanded;
+        if (item.data.expanded) {
+          handlers.append(item.data);
+        } else {
+          handlers.remove(
+            expanded.findIndex(
+              (n) => n.canonicalName == item.data.canonicalName,
+            ),
+          );
+        }
+      }}
       onLinkMouseEnter={() => {}}
       onLinkMouseMove={() => {}}
       onLinkMouseLeave={() => {}}
@@ -904,6 +1048,158 @@ function TaxonomyTree({ data }: { data: TaxonStatTreeNode }) {
       /* @ts-ignore */
       linkTooltip={undefined}
       linkTooltipAnchor={"center"}
+      nodeComponent={CustomNode}
+      linkComponent={CustomLink}
+      labelComponent={CustomLabel}
+      debugMesh={false}
+      isInteractive={true}
+      useMesh={true}
+    />
+  );
+}
+
+function CustomLink({
+  link,
+  linkGenerator,
+  isInteractive,
+  onMouseEnter,
+  onMouseMove,
+  onMouseLeave,
+  onClick,
+  tooltip,
+  tooltipAnchor,
+  animatedProps,
+}: LinkComponentProps<Node>) {
+  const pinned = link.target.data.pinned;
+  const eventHandlers = useLinkMouseEventHandlers<Node>(link, {
+    isInteractive,
+    onMouseEnter,
+    onMouseMove,
+    onMouseLeave,
+    onClick,
+    tooltip,
+    tooltipAnchor,
+  });
+
+  if (!link.target.data.visible) {
+    return;
+  }
+
+  return (
+    <animated.path
+      data-testid={`link.${link.id}`}
+      d={to(
+        [
+          animatedProps.sourceX,
+          animatedProps.sourceY,
+          animatedProps.targetX,
+          animatedProps.targetY,
+        ],
+        (sourceX, sourceY, targetX, targetY) => {
+          return linkGenerator({
+            source: [sourceX, sourceY],
+            target: [targetX, targetY],
+          });
+        },
+      )}
+      fill="none"
+      strokeWidth={pinned ? 8 : animatedProps.thickness}
+      stroke={animatedProps.color}
+      {...eventHandlers}
+    />
+  );
+}
+
+function CustomLabel({ label, animatedProps }: LabelComponentProps<Node>) {
+  const theme = useTheme();
+  const pinned = label.node.data.pinned;
+
+  if (!label.node.data.visible) {
+    return;
+  }
+
+  return (
+    <animated.g
+      data-testid={`label.${label.id}`}
+      transform={to(
+        [animatedProps.x, animatedProps.y],
+        (x, y) => `translate(${x},${y})`,
+      )}
+    >
+      <animated.g
+        transform={animatedProps.rotation.to(
+          (rotation) => `rotate(${rotation})`,
+        )}
+      >
+        {theme.labels.text.outlineWidth > 0 && (
+          <text
+            style={{
+              ...theme.labels.text,
+              fill: theme.labels.text.outlineColor,
+            }}
+            stroke={theme.labels.text.outlineColor}
+            strokeWidth={theme.labels.text.outlineWidth * 2}
+            strokeLinejoin="round"
+            textAnchor={label.textAnchor}
+            dominantBaseline={label.baseline}
+          >
+            {label.label}
+          </text>
+        )}
+        <text
+          data-testid={`label.${label.id}.label`}
+          style={theme.labels.text}
+          textAnchor={label.textAnchor}
+          fontWeight={pinned ? 800 : 500}
+          dominantBaseline={label.baseline}
+        >
+          {label.label}
+        </text>
+      </animated.g>
+    </animated.g>
+  );
+}
+
+function CustomNode({
+  node,
+  isInteractive,
+  onMouseEnter,
+  onMouseMove,
+  onMouseLeave,
+  onClick,
+  setCurrentNode,
+  tooltip,
+  tooltipPosition,
+  tooltipAnchor,
+  margin,
+  animatedProps,
+}: NodeComponentProps<Node>) {
+  const pinned = node.data.pinned;
+  const eventHandlers = useNodeMouseEventHandlers<Node>(node, {
+    isInteractive,
+    onMouseEnter,
+    onMouseMove,
+    onMouseLeave,
+    onClick,
+    setCurrentNode,
+    tooltip,
+    tooltipPosition,
+    tooltipAnchor,
+    margin,
+  });
+
+  if (!node.data.visible) {
+    return;
+  }
+
+  return (
+    <animated.circle
+      data-testid={`node.${node.uid}`}
+      r={pinned ? 12 : animatedProps.size.to((size) => size / 2)}
+      fill={animatedProps.color}
+      cx={animatedProps.x}
+      cy={animatedProps.y}
+      {...eventHandlers}
     />
   );
 }
@@ -938,7 +1234,9 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
           </Stack>
         </Grid.Col>
       </Grid>
-      {hierarchy && <FamilyTaxonTree hierarchy={hierarchy} />}
+      {hierarchy && (
+        <FamilyTaxonTree hierarchy={hierarchy} pin={taxonomy?.canonicalName} />
+      )}
       <ExternalLinks canonicalName={canonicalName} species={data?.species} />
 
       {taxonomy && <History taxonomy={taxonomy} />}
