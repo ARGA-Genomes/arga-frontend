@@ -230,24 +230,18 @@ function DatasetRow({
       <Grid>
         <Grid.Col span={5} p="lg">
           <Stack gap={3}>
-            <Text
-              fw={600}
-              size="md"
-              c="midnight.10"
-              // style={{ whiteSpace: "nowrap" }}
-            >
+            <Text fw={600} size="md" c="midnight.10">
               {dataset.name}
             </Text>
             <Group gap={3}>
-              <IconClockHour4 size={15} color={theme.colors.midnight[1]} />
-              <Text c={theme.colors.midnight[1]} size="xs">
+              <IconClockHour4 size={15} color={theme.colors.gray[6]} />
+              <Text c="dimmed" size="xs">
                 Last updated:{" "}
                 {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
               </Text>
             </Group>
           </Stack>
         </Grid.Col>
-        {/* <Grid.Col span={2} p="lg"></Grid.Col> */}
         <Grid.Col span={2} p="lg">
           <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>

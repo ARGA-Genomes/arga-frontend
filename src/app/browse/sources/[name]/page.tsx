@@ -360,8 +360,8 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
               {dataset.name}
             </Text>
             <Group gap={3}>
-              <IconClockHour4 size={15} color={theme.colors.midnight[1]} />
-              <Text c={theme.colors.midnight[1]} size="xs">
+              <IconClockHour4 size={15} color={theme.colors.gray[6]} />
+              <Text c="dimmed" size="xs">
                 Last updated:{" "}
                 {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
               </Text>
