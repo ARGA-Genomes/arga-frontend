@@ -816,9 +816,21 @@ function FamilyTaxonTree({ hierarchy }: { hierarchy: TaxonNode[] }) {
     GET_TAXON_TREE_STATS,
     {
       variables: {
-        taxonRank: "ORDER",
+        taxonRank: order?.rank || "ORDER",
         taxonCanonicalName: order?.canonicalName,
-        includeRanks: ["ORDER", "FAMILY", "GENUS", "SPECIES"],
+        includeRanks: [
+          "ORDER",
+          "ORDO",
+          /* "SUBORDER", */
+          /* "SUBORDO", */
+          "FAMILY",
+          "FAMILIA",
+          /* "SUBFAMILY", */
+          /* "SUBFAMILIA", */
+          "GENUS",
+          /* "SUBGENUS", */
+          "SPECIES",
+        ],
       },
     },
   );
