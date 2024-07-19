@@ -226,7 +226,7 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
           onChange={(e) => onFilter(Layer.OtherData, e.currentTarget.checked)}
           size="md"
           color="moss.3"
-          label="Other data"
+          label="Genomic components"
           count={filters.other.count}
           total={filters.other.total}
         />
