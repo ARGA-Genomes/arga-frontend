@@ -2,7 +2,7 @@ name: Build image and publish to ghcr.io
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main", "hotfix/distmap-include-genomic-components-as-other"]
 
 jobs:
   build:
@@ -42,7 +42,6 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
           registry: ${{ env.REGISTRY }}
-
 
   notify-arga-ops:
     needs: build
