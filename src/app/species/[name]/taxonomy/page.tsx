@@ -892,7 +892,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      <Box h={1500}>
+      <Box h={800}>
         {treeData && (
           <TaxonomyTree layout={layout} data={treeData} pinned={pinned} />
         )}
