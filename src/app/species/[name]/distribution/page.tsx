@@ -64,6 +64,14 @@ const GET_DISTRIBUTION = gql`
           longitude
         }
       }
+      genomicComponents(page: 1, pageSize: 1000) {
+        total
+        records {
+          recordId
+          latitude
+          longitude
+        }
+      }
     }
   }
 `;
@@ -99,6 +107,10 @@ type QueryResults = {
       records: Specimen[];
     };
     markers: {
+      total: number;
+      records: Specimen[];
+    };
+    genomicComponents: {
       total: number;
       records: Specimen[];
     };
@@ -250,7 +262,7 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
 function toMarker(
   color: [number, number, number, number],
   type: Layer,
-  records?: Specimen[]
+  records?: Specimen[],
 ) {
   if (!records) return [];
   return records.map((r) => {
@@ -288,17 +300,22 @@ export default function DistributionPage({
       ...toMarker(
         [103, 151, 180, 220],
         Layer.Specimens,
-        layers.specimens ? data?.species.specimens.records : undefined
+        layers.specimens ? data?.species.specimens.records : undefined,
       ),
       ...toMarker(
         [123, 161, 63, 220],
         Layer.Loci,
-        layers.loci ? data?.species.markers.records : undefined
+        layers.loci ? data?.species.markers.records : undefined,
       ),
       ...toMarker(
         [243, 117, 36, 220],
         Layer.WholeGenome,
-        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined
+        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined,
+      ),
+      ...toMarker(
+        [243, 117, 36, 220],
+        Layer.OtherData,
+        layers.other ? data?.species.genomicComponents.records : undefined,
       ),
     ];
     // filter out null island as well as specimens without coords
@@ -310,17 +327,19 @@ export default function DistributionPage({
     const specimens = data?.species.specimens;
     const wholeGenomes = data?.species.wholeGenomes;
     const markers = data?.species.markers;
+    const other = data?.species.genomicComponents;
 
     // filter out null island as well as specimens without coords
     const validGenomes = wholeGenomes?.records.filter((s) => s.latitude);
     const validMarkers = markers?.records.filter((s) => s.latitude);
     const validSpecimens = specimens?.records.filter((s) => s.latitude);
+    const validOther = other?.records.filter((s) => s.latitude);
 
     filters = {
       wholeGenomes: { total: wholeGenomes.total, count: validGenomes.length },
       loci: { total: markers.total, count: validMarkers.length },
       specimens: { total: specimens.total, count: validSpecimens.length },
-      other: { total: 0, count: 0 },
+      other: { total: other.total, count: validOther.length },
     };
   }
 
