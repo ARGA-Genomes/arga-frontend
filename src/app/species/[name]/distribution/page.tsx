@@ -313,7 +313,7 @@ export default function DistributionPage({
         layers.wholeGenome ? data?.species.wholeGenomes.records : undefined,
       ),
       ...toMarker(
-        [243, 117, 36, 220],
+        [185, 210, 145, 220],
         Layer.OtherData,
         layers.other ? data?.species.genomicComponents.records : undefined,
       ),
