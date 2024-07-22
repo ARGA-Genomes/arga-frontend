@@ -24,3 +24,17 @@ export type TaxonStatTreeNode = {
   totalGenomic?: number;
   children?: TaxonStatTreeNode[];
 };
+
+
+export function findChildren(root: TaxonStatTreeNode, scientificName: string): TaxonStatTreeNode[] {
+  if (root.scientificName === scientificName) {
+    return root.children || [];
+  }
+
+  for (const child of root.children || []) {
+    const children = findChildren(child, scientificName);
+    if (children.length > 0) return children;
+  }
+
+  return [];
+}
