@@ -15,6 +15,9 @@ import {
 } from "@mantine/core";
 import { IconBrandXFilled, IconBrandGithubFilled } from "@tabler/icons-react";
 import { IconOSF } from "../components/osf-icon";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCreativeCommons } from "@fortawesome/free-brands-svg-icons";
+import { faCreativeCommonsBy } from "@fortawesome/free-brands-svg-icons";
 
 interface FooterLinkParams {
   href: string;
@@ -124,6 +127,26 @@ export function Footer() {
             (NCRIS) through funding from the Atlas of Living Australia,
             Bioplatforms Australia and the Australian Research Data Commons
             (ARDC) (https://doi.org/10.47486/DC011).
+          </Text>
+          <Text c="gray.2" size="sm" maw={930}>
+            <Link href={"https://arga.org.au"}>
+              Australian Reference Genome Atlas (ARGA)
+            </Link>{" "}
+            by &copy; Atlas of Living Australia, Australian BioCommons and
+            Bioplatforms Australia is licensed under{" "}
+            <Link
+              href={
+                "https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+              }
+            >
+              CC BY 4.0
+            </Link>{" "}
+            <FontAwesomeIcon icon={faCreativeCommons} color="white" size="lg" />{" "}
+            <FontAwesomeIcon
+              icon={faCreativeCommonsBy}
+              color="white"
+              size="lg"
+            />
           </Text>
         </Stack>
       </Group>
