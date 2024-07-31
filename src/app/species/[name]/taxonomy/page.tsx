@@ -15,7 +15,6 @@ import {
   Text,
   Table,
   Tooltip,
-  Title,
   Tabs,
   ScrollArea,
   Box,
@@ -32,6 +31,7 @@ import { AttributePillValue, DataField } from "@/components/data-fields";
 import { TaxonomyTree } from "@/components/graphing/taxon-tree";
 import {
   EventTimeline,
+  HorizontalEventTimeline,
   LineStyle,
   TimelineIcon,
 } from "@/components/event-timeline";
@@ -67,6 +67,26 @@ const GET_TAXON = gql`
           name
           shortName
           url
+        }
+      }
+
+      taxonomicActs {
+        entityId
+        act
+        sourceUrl
+        dataCreatedAt
+        dataUpdatedAt
+        taxon {
+          canonicalName
+          authorship
+          status
+          citation
+        }
+        acceptedTaxon {
+          canonicalName
+          authorship
+          status
+          citation
         }
       }
 
@@ -123,6 +143,26 @@ type HistoryItem = {
   };
 };
 
+type TaxonomicAct = {
+  entityId: string;
+  act: string;
+  sourceUrl: string;
+  dataCreatedAt?: string;
+  dataUpdatedAt?: string;
+  taxon: {
+    canonicalName: string;
+    authorship?: string;
+    status: string;
+    citation?: string;
+  };
+  acceptedTaxon: {
+    canonicalName: string;
+    authorship?: string;
+    status: string;
+    citation?: string;
+  };
+};
+
 type NomenclaturalAct = {
   entityId: string;
   act: string;
@@ -157,6 +197,7 @@ type TaxonQuery = {
   taxon: {
     hierarchy: ClassificationNode[];
     history: HistoryItem[];
+    taxonomicActs: TaxonomicAct[];
     nomenclaturalActs: NomenclaturalAct[];
   };
 };
@@ -616,14 +657,21 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
     return;
   }
 
+  const taxonomicActs = data?.taxon.taxonomicActs;
   const acts = data?.taxon.nomenclaturalActs.map((it) => it).sort(compareAct);
   if (!acts) {
     return;
   }
 
-  const dates = items
-    .flatMap((item) => item.publication?.publishedYear)
-    .filter((item) => item);
+  /* const dates = items
+   *   .flatMap((item) => item.publication?.publishedYear)
+   *   .filter((item) => item); */
+
+  const allYears = taxonomicActs
+    .map((act) => act.dataCreatedAt && DateTime.fromISO(act.dataCreatedAt).year)
+    .filter((year): year is number => Number.isInteger(year))
+    .sort();
+  const years = [...new Set(allYears)];
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -634,36 +682,22 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
         <Text fw={600} size="lg">
           Taxon History
         </Text>
-        {items.length === 0 && (
+        {taxonomicActs.length === 0 && (
           <Text className={classes.emptyList}>no data</Text>
         )}
 
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              {dates.map((date) => (
-                <Table.Td key={date}>
-                  <Title order={2}>{date}</Title>
-                </Table.Td>
-              ))}
-              <Table.Td align="right">
-                <Title order={2}>{DateTime.now().year}</Title>
-              </Table.Td>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {items.map((item, idx) => (
-              <Table.Tr key={idx} style={{ border: "none" }}>
-                <Table.Td colSpan={2}>
-                  <AttributePillValue
-                    value={item.canonicalName}
-                    color={item.status === "ACCEPTED" ? "moss.3" : "bushfire.2"}
-                  />
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+        <HorizontalEventTimeline years={years}>
+          {taxonomicActs.map((act, idx) => (
+            <HorizontalEventTimeline.Item key={idx} span={2}>
+              <AttributePillValue
+                value={act.taxon.canonicalName}
+                color={
+                  act.taxon.status === "ACCEPTED" ? "moss.3" : "bushfire.2"
+                }
+              />
+            </HorizontalEventTimeline.Item>
+          ))}
+        </HorizontalEventTimeline>
 
         <Text fw={600} size="lg">
           Nomenclatural timeline
@@ -858,7 +892,9 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
   const treeData = data?.stats.taxonBreakdown[0];
   const pinned = hierarchy.map((h) => h.canonicalName).concat(pin || "");
 
-  const expandedFamily = hierarchy.filter((h) => h.rank === 'FAMILY' || h.rank === 'FAMILIA').map((h) => h.canonicalName);
+  const expandedFamily = hierarchy
+    .filter((h) => h.rank === "FAMILY" || h.rank === "FAMILIA")
+    .map((h) => h.canonicalName);
   const expandedGenera = treeData && findChildren(treeData, expandedFamily[0]);
 
   return (
@@ -887,7 +923,12 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
       <LoadOverlay visible={loading} />
       <Box h={800}>
         {treeData && (
-          <TaxonomyTree layout={layout} data={treeData} pinned={pinned} initialExpanded={expandedGenera} />
+          <TaxonomyTree
+            layout={layout}
+            data={treeData}
+            pinned={pinned}
+            initialExpanded={expandedGenera}
+          />
         )}
       </Box>
     </Paper>
