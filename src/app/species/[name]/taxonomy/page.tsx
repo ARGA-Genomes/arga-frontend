@@ -38,10 +38,38 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { DateTime } from "luxon";
 import { TaxonStatTreeNode, findChildren } from "@/queries/stats";
+import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
+import { Taxon } from "@/queries/taxa";
+
+const GET_TAXA = gql`
+  query TaxaTaxonomyPage($filters: [TaxaFilter]) {
+    taxa(filters: $filters) {
+      records {
+        datasetId
+
+        ...TaxonName
+        ...TaxonSource
+
+        hierarchy {
+          ...TaxonNode
+        }
+      }
+    }
+  }
+`;
+
+type TaxaQuery = {
+  taxa: {
+    records: Taxon[];
+  };
+};
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
     taxon(rank: $rank, canonicalName: $canonicalName) {
+      ...TaxonName
+      ...TaxonSource
+
       hierarchy {
         canonicalName
         rank
@@ -194,7 +222,7 @@ type NamePublication = {
 };
 
 type TaxonQuery = {
-  taxon: {
+  taxon: Taxon & {
     hierarchy: ClassificationNode[];
     history: HistoryItem[];
     taxonomicActs: TaxonomicAct[];
@@ -935,6 +963,8 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
   );
 }
 
+const TAXA_SOURCE_PRIORITIES = ["Australian Living Atlas", "AFD", "APC"];
+
 export default function TaxonomyPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
 
@@ -942,20 +972,47 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
     variables: { canonicalName },
   });
 
+  const results = useQuery<TaxaQuery>(GET_TAXA, {
+    variables: { filters: [{ canonicalName }] },
+  });
+
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
 
+  const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
+    return taxonomy
+      .map((t) => t)
+      .sort((a: Taxonomy, b: Taxonomy): number => {
+        let indexA = TAXA_SOURCE_PRIORITIES.indexOf(a.source || "");
+        let indexB = TAXA_SOURCE_PRIORITIES.indexOf(b.source || "");
+
+        if (indexA == -1) indexA = TAXA_SOURCE_PRIORITIES.length;
+        if (indexB == -1) indexB = TAXA_SOURCE_PRIORITIES.length;
+
+        if (indexA < indexB) return -1;
+        else if (indexA > indexB) return 1;
+        else {
+          const sourceA = a.source || "";
+          const sourceB = b.source || "";
+          return sourceA.localeCompare(sourceB);
+        }
+      });
+  };
+
   const species = data?.species;
-  const taxonomy = data?.species.taxonomy[0];
-  const hierarchy = data?.species.hierarchy;
+  const taxonomy = species && sortTaxaBySources(species.taxonomy)[0];
+  const hierarchy = species?.hierarchy;
 
   return (
     <Stack>
       <Grid>
-        <Grid.Col span={8}>
+        <Grid.Col span={12}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
+            {results.data && (
+              <TaxonomySwitcher taxa={results.data.taxa.records} />
+            )}
             {species && taxonomy && (
               <Details
                 taxonomy={taxonomy}

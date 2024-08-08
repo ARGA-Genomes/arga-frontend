@@ -21,6 +21,7 @@ import { MAX_WIDTH } from "./constants";
 import { Footer } from "./footer";
 import { TraceLoaderProvider } from "@/components/traces/context";
 import Fathom from "@/components/fathom";
+import { SourceProvider } from "./source-provider";
 
 export default function RootLayout({
   children,
@@ -36,9 +37,11 @@ export default function RootLayout({
         <Fathom />
         <ApolloProvider client={client}>
           <MantineProvider theme={theme}>
-            <TraceLoaderProvider>
-              <Shell>{children}</Shell>
-            </TraceLoaderProvider>
+            <SourceProvider>
+              <TraceLoaderProvider>
+                <Shell>{children}</Shell>
+              </TraceLoaderProvider>
+            </SourceProvider>
           </MantineProvider>
         </ApolloProvider>
       </body>
