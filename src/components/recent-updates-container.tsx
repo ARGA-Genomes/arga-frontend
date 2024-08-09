@@ -12,7 +12,7 @@ export default function RecentUpdatesContainer() {
       withBorder
       className={classes.recentUpdatesContainer}
     >
-      <ScrollArea h="100%" offsetScrollbars scrollbars="y">
+      <ScrollArea h="100%" offsetScrollbars type="always">
         <Grid p={30} justify="center" columns={3}>
           {changelog.map((update) => {
             return (

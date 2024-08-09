@@ -235,8 +235,8 @@ function DatasetRow({
               license?.accessRights === "Open"
                 ? "moss.3"
                 : license?.accessRights === "Conditional"
-                ? "wheat.3"
-                : undefined
+                  ? "wheat.3"
+                  : undefined
             }
           />
         </Grid.Col>
@@ -310,8 +310,8 @@ function ComponentDatasetRow({
               license?.accessRights === "Open"
                 ? "moss.3"
                 : license?.accessRights === "Conditional"
-                ? "wheat.3"
-                : undefined
+                  ? "wheat.3"
+                  : undefined
             }
           />
         </Grid.Col>
@@ -411,8 +411,8 @@ function SourceListContainer({ source }: { source: Source }) {
                   license?.accessRights === "Open"
                     ? "moss.3"
                     : license?.accessRights === "Conditional"
-                    ? "wheat.3"
-                    : undefined
+                      ? "wheat.3"
+                      : undefined
                 }
               />
               <AttributePill label="Number of records" value="No data" />
@@ -456,7 +456,7 @@ function SourceListContainer({ source }: { source: Source }) {
           </Stack>
         </Accordion.Control>
         <Accordion.Panel>
-          <ScrollArea h={450} type="auto" scrollbars="y" offsetScrollbars>
+          <ScrollArea h={450} type="auto" offsetScrollbars>
             <Box pr={10}>
               {source.datasets.map((dataset, idx) => (
                 <ComponentDatasetRow
