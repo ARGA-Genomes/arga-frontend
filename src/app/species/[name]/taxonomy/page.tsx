@@ -15,7 +15,6 @@ import {
   Text,
   Table,
   Tooltip,
-  Title,
   Tabs,
   ScrollArea,
   Box,
@@ -32,16 +31,45 @@ import { AttributePillValue, DataField } from "@/components/data-fields";
 import { TaxonomyTree } from "@/components/graphing/taxon-tree";
 import {
   EventTimeline,
+  HorizontalEventTimeline,
   LineStyle,
   TimelineIcon,
 } from "@/components/event-timeline";
 import { useDisclosure } from "@mantine/hooks";
 import { DateTime } from "luxon";
 import { TaxonStatTreeNode, findChildren } from "@/queries/stats";
+import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
+import { Taxon } from "@/queries/taxa";
+
+const GET_TAXA = gql`
+  query TaxaTaxonomyPage($filters: [TaxaFilter]) {
+    taxa(filters: $filters) {
+      records {
+        datasetId
+
+        ...TaxonName
+        ...TaxonSource
+
+        hierarchy {
+          ...TaxonNode
+        }
+      }
+    }
+  }
+`;
+
+type TaxaQuery = {
+  taxa: {
+    records: Taxon[];
+  };
+};
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
     taxon(rank: $rank, canonicalName: $canonicalName) {
+      ...TaxonName
+      ...TaxonSource
+
       hierarchy {
         canonicalName
         rank
@@ -67,6 +95,26 @@ const GET_TAXON = gql`
           name
           shortName
           url
+        }
+      }
+
+      taxonomicActs {
+        entityId
+        act
+        sourceUrl
+        dataCreatedAt
+        dataUpdatedAt
+        taxon {
+          canonicalName
+          authorship
+          status
+          citation
+        }
+        acceptedTaxon {
+          canonicalName
+          authorship
+          status
+          citation
         }
       }
 
@@ -123,6 +171,26 @@ type HistoryItem = {
   };
 };
 
+type TaxonomicAct = {
+  entityId: string;
+  act: string;
+  sourceUrl: string;
+  dataCreatedAt?: string;
+  dataUpdatedAt?: string;
+  taxon: {
+    canonicalName: string;
+    authorship?: string;
+    status: string;
+    citation?: string;
+  };
+  acceptedTaxon: {
+    canonicalName: string;
+    authorship?: string;
+    status: string;
+    citation?: string;
+  };
+};
+
 type NomenclaturalAct = {
   entityId: string;
   act: string;
@@ -154,9 +222,10 @@ type NamePublication = {
 };
 
 type TaxonQuery = {
-  taxon: {
+  taxon: Taxon & {
     hierarchy: ClassificationNode[];
     history: HistoryItem[];
+    taxonomicActs: TaxonomicAct[];
     nomenclaturalActs: NomenclaturalAct[];
   };
 };
@@ -616,14 +685,21 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
     return;
   }
 
+  const taxonomicActs = data?.taxon.taxonomicActs;
   const acts = data?.taxon.nomenclaturalActs.map((it) => it).sort(compareAct);
   if (!acts) {
     return;
   }
 
-  const dates = items
-    .flatMap((item) => item.publication?.publishedYear)
-    .filter((item) => item);
+  /* const dates = items
+   *   .flatMap((item) => item.publication?.publishedYear)
+   *   .filter((item) => item); */
+
+  const allYears = taxonomicActs
+    .map((act) => act.dataCreatedAt && DateTime.fromISO(act.dataCreatedAt).year)
+    .filter((year): year is number => Number.isInteger(year))
+    .sort();
+  const years = [...new Set(allYears)];
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -634,36 +710,22 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
         <Text fw={600} size="lg">
           Taxon History
         </Text>
-        {items.length === 0 && (
+        {taxonomicActs.length === 0 && (
           <Text className={classes.emptyList}>no data</Text>
         )}
 
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              {dates.map((date) => (
-                <Table.Td key={date}>
-                  <Title order={2}>{date}</Title>
-                </Table.Td>
-              ))}
-              <Table.Td align="right">
-                <Title order={2}>{DateTime.now().year}</Title>
-              </Table.Td>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {items.map((item, idx) => (
-              <Table.Tr key={idx} style={{ border: "none" }}>
-                <Table.Td colSpan={2}>
-                  <AttributePillValue
-                    value={item.canonicalName}
-                    color={item.status === "ACCEPTED" ? "moss.3" : "bushfire.2"}
-                  />
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+        <HorizontalEventTimeline years={years}>
+          {taxonomicActs.map((act, idx) => (
+            <HorizontalEventTimeline.Item key={idx} span={2}>
+              <AttributePillValue
+                value={act.taxon.canonicalName}
+                color={
+                  act.taxon.status === "ACCEPTED" ? "moss.3" : "bushfire.2"
+                }
+              />
+            </HorizontalEventTimeline.Item>
+          ))}
+        </HorizontalEventTimeline>
 
         <Text fw={600} size="lg">
           Nomenclatural timeline
@@ -858,7 +920,9 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
   const treeData = data?.stats.taxonBreakdown[0];
   const pinned = hierarchy.map((h) => h.canonicalName).concat(pin || "");
 
-  const expandedFamily = hierarchy.filter((h) => h.rank === 'FAMILY' || h.rank === 'FAMILIA').map((h) => h.canonicalName);
+  const expandedFamily = hierarchy
+    .filter((h) => h.rank === "FAMILY" || h.rank === "FAMILIA")
+    .map((h) => h.canonicalName);
   const expandedGenera = treeData && findChildren(treeData, expandedFamily[0]);
 
   return (
@@ -887,12 +951,19 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
       <LoadOverlay visible={loading} />
       <Box h={800}>
         {treeData && (
-          <TaxonomyTree layout={layout} data={treeData} pinned={pinned} initialExpanded={expandedGenera} />
+          <TaxonomyTree
+            layout={layout}
+            data={treeData}
+            pinned={pinned}
+            initialExpanded={expandedGenera}
+          />
         )}
       </Box>
     </Paper>
   );
 }
+
+const TAXA_SOURCE_PRIORITIES = ["Australian Living Atlas", "AFD", "APC"];
 
 export default function TaxonomyPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
@@ -901,20 +972,47 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
     variables: { canonicalName },
   });
 
+  const results = useQuery<TaxaQuery>(GET_TAXA, {
+    variables: { filters: [{ canonicalName }] },
+  });
+
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
 
+  const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
+    return taxonomy
+      .map((t) => t)
+      .sort((a: Taxonomy, b: Taxonomy): number => {
+        let indexA = TAXA_SOURCE_PRIORITIES.indexOf(a.source || "");
+        let indexB = TAXA_SOURCE_PRIORITIES.indexOf(b.source || "");
+
+        if (indexA == -1) indexA = TAXA_SOURCE_PRIORITIES.length;
+        if (indexB == -1) indexB = TAXA_SOURCE_PRIORITIES.length;
+
+        if (indexA < indexB) return -1;
+        else if (indexA > indexB) return 1;
+        else {
+          const sourceA = a.source || "";
+          const sourceB = b.source || "";
+          return sourceA.localeCompare(sourceB);
+        }
+      });
+  };
+
   const species = data?.species;
-  const taxonomy = data?.species.taxonomy[0];
-  const hierarchy = data?.species.hierarchy;
+  const taxonomy = species && sortTaxaBySources(species.taxonomy)[0];
+  const hierarchy = species?.hierarchy;
 
   return (
     <Stack>
       <Grid>
-        <Grid.Col span={8}>
+        <Grid.Col span={12}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
+            {results.data && (
+              <TaxonomySwitcher taxa={results.data.taxa.records} />
+            )}
             {species && taxonomy && (
               <Details
                 taxonomy={taxonomy}
