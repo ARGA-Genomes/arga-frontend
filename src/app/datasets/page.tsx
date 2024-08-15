@@ -83,6 +83,11 @@ type Source = {
   datasets: Dataset[];
 };
 
+type ContentType = {
+  name: string;
+  sources?: Source[];
+};
+
 type QueryResults = {
   sources: Source[];
 };
@@ -90,93 +95,121 @@ type QueryResults = {
 interface License {
   name: string;
   url: string;
+  accessRights: string;
 }
 
 const LICENSES: Record<string, License> = {
   "cc-by-nc-nd": {
     name: "(CC-BY-NC)",
     url: "http://creativecommons.org/licenses/by-nc-nd/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-nc-sa": {
     name: "(CC-BY-NC-SA)",
     url: "http://creativecommons.org/licenses/by-nc-sa/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-nc": {
     name: "(CC-BY-NC)",
     url: "http://creativecommons.org/licenses/by-nc/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-nd": {
     name: "(CC-BY-ND)",
     url: "http://creativecommons.org/licenses/by-nd/4.0",
+    accessRights: "Conditional",
   },
   "cc-by-sa": {
     name: "(CC-BY-SA)",
     url: "http://creativecommons.org/licenses/by-sa/4.0",
+    accessRights: "Conditional",
   },
   "cc-by": {
     name: "(CC-BY)",
     url: "http://creativecommons.org/licenses/by/4.0",
+    accessRights: "Conditional",
   },
   cc0: {
     name: "(CC0)",
     url: "http://creativecommons.org/publicdomain/zero/1.0",
+    accessRights: "Open",
   },
 
   "http://creativecommons.org/licenses/by-nc-sa/4.0/": {
     name: "CC-BY-NC-SA",
     url: "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc/4.0/": {
     name: "CC-BY-NC",
     url: "http://creativecommons.org/licenses/by-nc/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by/4.0/": {
     name: "CC-BY",
     url: "http://creativecommons.org/licenses/by/4.0/",
+    accessRights: "Conditional",
+  },
+  "https://creativecommons.org/licenses/by/4.0/": {
+    name: "CC-BY",
+    url: "http://creativecommons.org/licenses/by/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-sa/4.0/": {
     name: "CC-BY-SA",
     url: "http://creativecommons.org/licenses/by-sa/4.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc-nd/4.0/": {
     name: "CC-BY-NC-ND",
     url: "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+    accessRights: "Conditional",
   },
 
   "http://creativecommons.org/licenses/by-nc-sa/3.0/": {
     name: "CC-BY-NC-SA",
     url: "http://creativecommons.org/licenses/by-nc-sa/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc/3.0/": {
     name: "CC-BY-NC",
     url: "http://creativecommons.org/licenses/by-nc/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by/3.0/": {
     name: "CC-BY",
     url: "http://creativecommons.org/licenses/by/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-sa/3.0/": {
     name: "CC-BY-SA",
     url: "http://creativecommons.org/licenses/by-sa/3.0/",
+    accessRights: "Conditional",
   },
   "http://creativecommons.org/licenses/by-nc-nd/3.0/": {
     name: "CC-BY-NC-ND",
     url: "http://creativecommons.org/licenses/by-nc-nd/3.0/",
+    accessRights: "Conditional",
   },
 
   "public domain mark": {
     name: "Public Domain",
     url: "http://creativecommons.org/publicdomain/mark/1.0",
+    accessRights: "Open",
   },
   "attribution-noncommercial 4.0 international": {
     name: "(CC-BY-NC)",
     url: "https://creativecommons.org/licenses/by-nc/4.0/",
+    accessRights: "Conditional",
   },
   "attribution 4.0 international": {
     name: "(CC-BY)",
     url: "https://creativecommons.org/licenses/by/4.0/",
+    accessRights: "Conditional",
   },
 };
+
+const licenseAccessRights = {};
 
 function DatasetRow({
   dataset,
@@ -193,7 +226,7 @@ function DatasetRow({
     : undefined;
 
   return (
-    <Paper radius="lg" withBorder>
+    <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
       <Grid>
         <Grid.Col span={5} p="lg">
           <Stack gap={3}>
@@ -209,13 +242,13 @@ function DatasetRow({
             </Group>
           </Stack>
         </Grid.Col>
-        <Grid.Col span={3} p="lg">
+        <Grid.Col span={2} p="lg">
           <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill
             label="Access rights"
-            value={license?.name || dataset.license}
+            value={license?.accessRights || dataset.license}
             href={license?.url}
             color={
               license?.accessRights === "Open"
@@ -307,13 +340,15 @@ function ComponentDatasetRow({
             <Button
               w="100%"
               h="100%"
-              color="midnight.11"
+              color="midnight.10"
               style={{ borderRadius: "0 16px 16px 0" }}
               disabled={!dataset.url}
             >
-              <Stack align="center">
-                <IconExternalLink size="30px" />
-                Go to source
+              <Stack align="center" gap={5}>
+                <IconExternalLink size="30px" strokeWidth={1.5} />
+                <Text fw={650} fz={8.5}>
+                  Go to source
+                </Text>
               </Stack>
             </Button>
           </Link>
@@ -323,7 +358,11 @@ function ComponentDatasetRow({
   );
 }
 
-function SourceRow({ source }: { source: Source }) {
+function SourceListContainer({ source }: { source: Source }) {
+  const theme = useMantineTheme();
+  const license = source.license
+    ? LICENSES[source.license.toLowerCase()]
+    : undefined;
   return (
     <Accordion
       variant="separated"
@@ -697,6 +736,39 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
 
 export default function DatasetsPage() {
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
+  const theme = useMantineTheme();
+
+  const sourceContent: { [key: string]: string } = {
+    "ARGA Backbone Taxonomy": "Taxonomic",
+    "ARGA Bushfire Recovery": "Traits and ecological",
+    "ARGA Commercial Species": "Traits and ecological",
+    "ARGA Genomes": "Genomics",
+    "ARGA IEK": "Traits and ecological",
+    "ARGA Threatened Species": "Traits and ecological",
+    "ARGA Venomous and Poisonous Species": "Traits and ecological",
+    OZCAM: "Biological specimens",
+  };
+
+  let contentData: ContentType[] = [
+    { name: "Genomics" },
+    { name: "Biological specimens" },
+    { name: "Taxonomic" },
+    { name: "Traits and ecological" },
+  ];
+
+  contentData = contentData.map((contentItem) => {
+    // Filter sources based on the content type name
+    let correspondingSources =
+      data?.sources.filter((source) => {
+        const contentType = sourceContent[source.name];
+        return contentType && contentType.includes(contentItem.name);
+      }) ?? []; // Default to an empty array if data?.sources is undefined
+    return {
+      ...contentItem,
+      sources:
+        correspondingSources.length > 0 ? correspondingSources : undefined,
+    };
+  });
 
   return (
     <Stack gap="xl" my="xl">
