@@ -16,9 +16,6 @@ import {
   Title,
   Image,
   Button,
-  Collapse,
-  Table,
-  Tooltip,
 } from "@mantine/core";
 import { AttributePill, DataField } from "@/components/highlight-stack";
 import {
@@ -44,9 +41,6 @@ import {
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { Carousel, Embla } from "@mantine/carousel";
 import React, { useState } from "react";
-import { useDisclosure } from '@mantine/hooks';
-import { DateTime } from 'luxon';
-
 
 const GET_SPECIMEN = gql`
   query SpecimenFullData($recordId: String) {
@@ -139,131 +133,6 @@ type SpecimenQueryResults = {
   sequence: SequenceDetails[];
 };
 
-
-const GET_PROVENANCE = gql`
-query Provenance($entityId: String) {
-  provenance {
-    specimen(by: { entityId: $entityId }) {
-      operationId
-      entityId
-      loggedAt
-      action
-      atom {
-        ... on SpecimenAtomText {
-          type
-          value
-        }
-        ... on SpecimenAtomNumber {
-          type
-          value
-        }
-      }
-      dataset {
-        id
-        name
-        shortName
-        rightsHolder
-        citation
-        license
-        description
-        url
-      }
-    }
-  }
-}`;
-
-enum AtomTextType {
-  Empty,
-  ScientificName,
-  ActedOn,
-  NomenclaturalAct,
-  Publication,
-  SourceUrl,
-}
-
-enum AtomNumberType {
-  CreatedAt,
-  UpdatedAt,
-}
-
-interface AtomText {
-  type: AtomTextType,
-  value: string,
-}
-
-interface AtomNumber {
-  type: AtomNumberType,
-  value: string,
-}
-
-interface Dataset {
-  id: string,
-  name: string,
-  shortName?: string,
-  rightsHolder?: string,
-  citation?: string,
-  license?: string,
-  description?: string,
-  url?: string,
-}
-
-type ProvenanceQuery = {
-  provenance: {
-    specimen: [{
-      operationId: string,
-      entityId: string,
-      action: string,
-      atom: AtomText | AtomNumber,
-      dataset: Dataset,
-      loggedAt: string,
-    }]
-  }
-}
-
-
-function Provenance({ entityId }: { entityId: string }) {
-  const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
-    variables: { entityId },
-  });
-
-  if (loading) return "Loading";
-  if (error) return error.message;
-
-  return (
-    <Table mt={130}>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Td><Text fz="xs" fw={600}>Logged at</Text></Table.Td>
-          <Table.Td><Text fz="xs" fw={600}>Operation ID</Text></Table.Td>
-          <Table.Td><Text fz="xs" fw={600}>Reference ID</Text></Table.Td>
-          <Table.Td><Text fz="xs" fw={600}>Dataset</Text></Table.Td>
-          <Table.Td><Text fz="xs" fw={600}>Action</Text></Table.Td>
-          <Table.Td><Text fz="xs" fw={600}>Atom</Text></Table.Td>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {data?.provenance.specimen.map(op => (
-          <Table.Tr key={op.operationId}>
-            <Table.Td><Text fz="xs" fw={400}>{DateTime.fromISO(op.loggedAt).toHTTP()}</Text></Table.Td>
-            <Table.Td><Text fz="xs" fw={400}>{op.operationId}</Text></Table.Td>
-            <Table.Td><Text fz="xs" fw={400}>{op.entityId}</Text></Table.Td>
-            <Table.Td><Text fz="xs" fw={400}>
-              <Tooltip label={op.dataset.name}>
-                <Link href={op.dataset.url || "#"}>
-                  {op.dataset.shortName}
-                </Link>
-              </Tooltip>
-            </Text></Table.Td>
-            <Table.Td><Text fz="xs" fw={400}>{op.action}</Text></Table.Td>
-            <Table.Td><Text fz="xs" fw={600}>{op.atom.type} </Text><Text fz="xs" fw={400}>{op.atom.value}</Text></Table.Td>
-          </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
-  )
-}
-
-
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   let position: [number, number] | undefined =
     specimen && specimen.latitude && specimen.longitude
@@ -292,15 +161,13 @@ function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
 }
 
 function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  const [opened, { toggle }] = useDisclosure(false);
-
   const collection = specimen?.events.collections[0];
   const coordinates =
     specimen?.latitude && `${specimen.latitude}, ${specimen.longitude}`;
 
   return (
     <Grid>
-      <Grid.Col span={{ base: 4, md: 4, sm: 12 }}>
+      <Grid.Col span={4}>
         <DataTable>
           <DataTableRow label="Field identifier">
             <DataField value={collection?.fieldNumber} />
@@ -345,7 +212,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
         </DataTable>
       </Grid.Col>
 
-      <Grid.Col span={{ base: 4, md: 4, sm: 12 }}>
+      <Grid.Col span={4}>
         <DataTable>
           <DataTableRow label="Collected by">
             <DataField value={specimen?.recordedBy} />
@@ -371,7 +238,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
         </DataTable>
       </Grid.Col>
 
-      <Grid.Col span={{ base: 4, md: 4, sm: 12 }}>
+      <Grid.Col span={4}>
         <DataTable>
           <DataTableRow label="Collection location">
             <DataField value={specimen?.locality} />
@@ -382,17 +249,6 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
         </DataTable>
 
         <SpecimenMap specimen={specimen} />
-      </Grid.Col>
-
-      <Grid.Col span={12}>
-        <Group justify="center" mb={5}>
-          <Button onClick={toggle} variant="subtle" color="midnight.4">View changes</Button>
-        </Group>
-        <Collapse in={opened}>
-          {opened && specimen?.entityId &&
-            <Provenance entityId={specimen.entityId} />
-          }
-        </Collapse>
       </Grid.Col>
     </Grid>
   );

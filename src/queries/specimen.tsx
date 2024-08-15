@@ -3,7 +3,6 @@ import { gql } from "@apollo/client";
 export const SPECIMEN = gql`
   fragment SpecimenDetails on Specimen {
     recordId
-    entityId
     organismId
     materialSampleId
     collectionCode
@@ -34,7 +33,6 @@ export const SPECIMEN = gql`
 
 export type Specimen = {
   recordId: string,
-  entityId?: string,
   organismId?: string,
   materialSampleId?: string,
   collectionCode?: string,

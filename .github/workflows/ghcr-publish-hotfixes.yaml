@@ -1,8 +1,9 @@
-name: Build image and publish to ghcr.io
+name: Build a hotfix image and publish to ghcr.io without deploying
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - "hotfix/**"
 
 jobs:
   build:
@@ -42,34 +43,3 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
           registry: ${{ env.REGISTRY }}
-
-  notify-arga-ops:
-    needs: build
-    runs-on: ubuntu-latest
-
-    env:
-      registry: ghcr.io/arga-genomes
-      image_name: frontend
-      image_tag: ${{ github.sha }}
-      actor: ${{ github.triggering_actor }}
-      repository: ${{ github.repository }}
-      ref: ${{ github.ref }}
-      sha: ${{ github.sha }}
-      workflow: ${{ github.workflow }}
-      workflow_ref: ${{ github.workflow_ref }}
-      workflow_sha: ${{ github.workflow_sha }}
-      run_id: ${{ github.run_id }}
-      run_number: ${{ github.run_number }}
-      run_attempt: ${{ github.run_attempt }}
-
-    steps:
-      - name: Dump payload data
-        run: echo '${{ toJson(env) }}'
-
-      - name: Notify arga-ops about the new version
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.ARGA_OPS_PERSONAL_TOKEN }}
-          repository: arga-genomes/arga-ops
-          event-type: published
-          client-payload: '{"data" : ${{ toJson(env) }} }'

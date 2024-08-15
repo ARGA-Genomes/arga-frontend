@@ -138,7 +138,7 @@ export default function HomePage() {
               <BrowseGrouping />
             </Stack>
           </Stack>
-          <Group gap={140} pb={80} align="flex-start" justify="center">
+          <Group gap={120} pb={80} align="flex-start" justify="center">
             <Stack gap={40} align="center">
               <Title order={3} c="moss.5" fz={28}>
                 Taxonomic coverage
