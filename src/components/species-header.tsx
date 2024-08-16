@@ -32,11 +32,7 @@ const GET_SPECIES = gql`
         source
         rank
       }
-      conservation {
-        status
-        state
-        source
-      }
+
       indigenousEcologicalKnowledge {
         id
         name

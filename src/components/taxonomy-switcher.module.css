@@ -1,0 +1,26 @@
+.switcher {
+    background: #bdc5c9;
+    border-radius: var(--mantine-radius-lg);
+    overflow: clip;
+}
+
+.record {
+    border-radius: var(--mantine-radius-lg);
+    padding: var(--mantine-spacing-md);
+    cursor: pointer;
+
+    .source {
+        width: 200px;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        background: var(--mantine-color-shellfish-5);
+        padding: var(--mantine-spacing-md);
+        border-radius: var(--mantine-radius-lg);
+    }
+
+    .scientificName {
+        color: black;
+        white-space: nowrap;
+    }
+}

@@ -13,6 +13,7 @@ import {
   Popover,
   Stack,
   SimpleGrid,
+  Skeleton,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";

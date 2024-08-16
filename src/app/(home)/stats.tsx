@@ -700,6 +700,7 @@ export function ShowSunburstTaxonomy() {
           rank: "DOMAIN",
           children: kingdomsRegnaTaxa,
         };
+        console.log(tData);
         setTreeData(tData);
       },
     }

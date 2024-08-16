@@ -147,6 +147,31 @@ export function AttributePillValue({
   );
 }
 
+interface AttributePillContainerProps {
+  color?: MantineColor;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export function AttributePillContainer({
+  color,
+  className,
+  children,
+}: AttributePillContainerProps) {
+  return (
+    <Paper
+      py={5}
+      px={15}
+      bg={color || "#d6e4ed"}
+      radius="xl"
+      style={{ border: "none" }}
+      className={className}
+    >
+      <Center>{children}</Center>
+    </Paper>
+  );
+}
+
 interface AttributeIconProps {
   label: string;
   icon: React.ReactNode;
@@ -156,6 +181,9 @@ export function AttributeIcon({ label, icon }: AttributeIconProps) {
   return (
     <Stack gap={0}>
       <Text size="sm">{label}</Text>
+      <Paper py={5} px={15} bg="#f5f5f5" radius="md">
+        <Center>{icon}</Center>
+      </Paper>
       <Paper py={5} px={15} bg="#f5f5f5" radius="md">
         <Center>{icon}</Center>
       </Paper>
