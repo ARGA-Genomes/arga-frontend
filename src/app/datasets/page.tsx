@@ -680,22 +680,27 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
           >
             {contentType.name} data sources
           </Text>
-          <Group gap={10}>
+          <Group gap={10} mt={15}>
             <UnstyledButton
               onClick={(e) => {
                 e.stopPropagation();
                 setLayoutView("table");
               }}
             >
-              <IconTable
-                color={
-                  layoutView === "table" ? "white" : theme.colors.midnight[10]
-                }
-                className={classes.tableLayoutViewBtn}
-                fill={
-                  layoutView === "table" ? theme.colors.midnight[10] : "none"
-                }
-              />
+              <Stack gap={1} align="center">
+                <IconTable
+                  color={
+                    layoutView === "table" ? "white" : theme.colors.midnight[10]
+                  }
+                  className={classes.tableLayoutViewBtn}
+                  fill={
+                    layoutView === "table" ? theme.colors.midnight[10] : "none"
+                  }
+                />
+                <Text size="xs" c={theme.colors.midnight[10]}>
+                  Table
+                </Text>
+              </Stack>
             </UnstyledButton>
             <UnstyledButton
               onClick={(e) => {
@@ -703,13 +708,18 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
                 setLayoutView("card");
               }}
             >
-              <IconLayoutGrid
-                color={theme.colors.midnight[10]}
-                className={classes.cardLayoutViewBtn}
-                fill={
-                  layoutView === "card" ? theme.colors.midnight[10] : "none"
-                }
-              />
+              <Stack gap={1} align="center">
+                <IconLayoutGrid
+                  color={theme.colors.midnight[10]}
+                  className={classes.cardLayoutViewBtn}
+                  fill={
+                    layoutView === "card" ? theme.colors.midnight[10] : "none"
+                  }
+                />
+                <Text size="xs" c={theme.colors.midnight[10]}>
+                  Card
+                </Text>
+              </Stack>
             </UnstyledButton>
           </Group>
         </Group>
