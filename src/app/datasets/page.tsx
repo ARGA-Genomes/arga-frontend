@@ -470,7 +470,7 @@ function SourceListContainer({ source }: { source: Source }) {
           </Stack>
         </Accordion.Control>
         <Accordion.Panel>
-          <ScrollArea h={450} type="auto" scrollbars="y" offsetScrollbars>
+          <ScrollArea h={450} type="auto" offsetScrollbars>
             <Box pr={10}>
               {source.datasets.map((dataset, idx) => (
                 <ComponentDatasetRow
