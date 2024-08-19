@@ -327,12 +327,7 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
   return (
     <Stack>
       <Title order={5}>Component Datasets</Title>
-      <ScrollArea.Autosize
-        mah={300}
-        type="auto"
-        scrollbars="y"
-        offsetScrollbars
-      >
+      <ScrollArea.Autosize mah={300} type="auto" offsetScrollbars>
         <Box p={10}>
           {datasets.map((dataset, idx) => {
             return <DatasetRow key={idx} dataset={dataset} />;
