@@ -595,12 +595,7 @@ function CollectionRow({ collection }: { collection: Source }) {
             </Paper>
           </Link>
         </UnstyledButton>
-        <ScrollArea.Autosize
-          mah={350}
-          type="auto"
-          scrollbars="y"
-          offsetScrollbars
-        >
+        <ScrollArea.Autosize mah={350} type="auto" offsetScrollbars>
           <Box p={10}>
             {collection.datasets.map((dataset, idx) => (
               <DatasetRow
