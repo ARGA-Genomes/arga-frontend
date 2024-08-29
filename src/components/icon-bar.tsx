@@ -247,6 +247,19 @@ const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
   },
 };
 
+const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
+  is_venomous: {
+    image: "/attribute-icons/venomous_and_poisonous.svg",
+    label: "Venomous and poisonous",
+    link: "/browse/sources/ARGA_Venomous_and_Poisonous_Species",
+  },
+  vulnerable_wildfire: {
+    image: "/attribute-icons/bushfire_vulnerable.svg",
+    label: "Fire vulnerable",
+    link: "/browse/sources/ARGA_Bushfire_Recovery",
+  },
+};
+
 function ConservationIcon({
   status,
   source,
@@ -276,6 +289,29 @@ interface VernacularGroupIconProps {
 
 function VernacularGroupIcon({ group, iconLink }: VernacularGroupIconProps) {
   const icon = VERNACULAR_GROUP_ICON[group];
+  if (!icon) return null;
+  if (!iconLink) {
+    iconLink = icon.link;
+  }
+
+  const component = (
+    <Tooltip label={icon.label}>
+      <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
+        <Image src={icon.image} alt={`Icon of ${icon.label}`} w={60} />
+      </ThemeIcon>
+    </Tooltip>
+  );
+
+  return <>{iconLink ? <Link href={iconLink}>{component}</Link> : component}</>;
+}
+
+interface AttributeIconProps {
+  attribute: string;
+  iconLink?: string;
+}
+
+function AttributeGroupIcon({ attribute, iconLink }: AttributeIconProps) {
+  const icon = ATTRIBUTE_GROUP_ICON[attribute];
   if (!icon) return null;
   if (!iconLink) {
     iconLink = icon.link;
@@ -430,19 +466,40 @@ type TaxonQuery = {
   };
 };
 
+type NameAttribute = {
+  name: string;
+  valueBool?: boolean;
+  valueInt?: number;
+  valueDecimal?: number;
+  valueStr?: string;
+};
+
 interface IconBarProps {
   taxonomy: Taxonomy;
   conservation?: Conservation[];
   traits?: IndigenousEcologicalKnowledge[];
+  attributes?: NameAttribute[];
 }
 
 export default function IconBar({
   taxonomy,
   conservation,
   traits,
+  attributes,
 }: IconBarProps) {
-  const headerIcons = [taxonomy.vernacularGroup];
-  isLichen(taxonomy.source) ? headerIcons.push("LICHENS") : undefined;
+  const taxonomyHeaderIcons = [taxonomy.vernacularGroup];
+  isLichen(taxonomy.source) ? taxonomyHeaderIcons.push("LICHENS") : undefined;
+
+  const attributeHeaderIconsRaw = attributes
+    ?.map((nameAttribute) => {
+      if (ATTRIBUTE_GROUP_ICON[nameAttribute.name]) {
+        return nameAttribute.name;
+      }
+    })
+    .filter((item) => item !== undefined);
+  const attributeHeaderIcons = [...new Set(attributeHeaderIconsRaw)];
+
+  const headerIcons = taxonomyHeaderIcons.concat(attributeHeaderIcons);
 
   const [winWidth, setWinWidth] = useState(window.innerWidth);
   const detectResize = () => {
@@ -561,7 +618,7 @@ export default function IconBar({
       align="start"
       loop
     >
-      {headerIcons.map(
+      {taxonomyHeaderIcons.map(
         (icon, index) =>
           icon && (
             <Carousel.Slide pr="5px" pl="5px" key={index}>
@@ -578,6 +635,21 @@ export default function IconBar({
             </Carousel.Slide>
           )
       )}
+      {attributeHeaderIcons &&
+        attributeHeaderIcons?.map(
+          (icon, index) =>
+            icon && (
+              <Carousel.Slide pr="5px" pl="5px" key={index}>
+                <Box
+                  w="100%"
+                  display="flex"
+                  style={{ justifyContent: "center" }}
+                >
+                  <AttributeGroupIcon attribute={icon} />
+                </Box>
+              </Carousel.Slide>
+            )
+        )}
     </Carousel>
   );
 }

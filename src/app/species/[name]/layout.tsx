@@ -64,7 +64,6 @@ function DataTabs({
   const tab = path?.split("/")[3];
 
   if (!tab) redirect(`/species/${name}/summary`, RedirectType.replace);
-  console.log(tab);
 
   return (
     <Tabs

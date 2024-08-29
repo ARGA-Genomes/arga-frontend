@@ -22,6 +22,7 @@ import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
+import { Float, Int } from "@loaders.gl/schema";
 
 const GET_SPECIES = gql`
   query SpeciesWithConservation($canonicalName: String) {
@@ -45,9 +46,24 @@ const GET_SPECIES = gql`
       referenceGenome {
         recordId
       }
+      attributes {
+        name
+        valueBool
+        valueInt
+        valueDecimal
+        valueStr
+      }
     }
   }
 `;
+
+type NameAttribute = {
+  name: string;
+  valueBool?: boolean;
+  valueInt?: number;
+  valueDecimal?: number;
+  valueStr?: string;
+};
 
 type QueryResults = {
   species: {
@@ -55,6 +71,7 @@ type QueryResults = {
     conservation: Conservation[];
     indigenousEcologicalKnowledge: IndigenousEcologicalKnowledge[];
     referenceGenome?: { recordId: string };
+    attributes?: NameAttribute[];
   };
 };
 
@@ -63,6 +80,7 @@ interface HeaderProps {
   conservation?: Conservation[];
   traits?: IndigenousEcologicalKnowledge[];
   referenceGenome?: { recordId: string };
+  attributes?: NameAttribute[];
 }
 
 function Header({
@@ -70,6 +88,7 @@ function Header({
   conservation,
   traits,
   referenceGenome,
+  attributes,
 }: HeaderProps) {
   const theme = useMantineTheme();
   const refGenomeBackground = referenceGenome
@@ -106,6 +125,7 @@ function Header({
           taxonomy={taxonomy[0]}
           conservation={conservation}
           traits={traits}
+          attributes={attributes}
         />
 
         <Group h="100%" wrap="nowrap" gap={5}>
@@ -142,6 +162,7 @@ export default function SpeciesHeader({
   const conservation = data?.species.conservation;
   const traits = data?.species.indigenousEcologicalKnowledge;
   const referenceGenome = data?.species.referenceGenome;
+  const attributes = data?.species.attributes;
 
   return (
     <Paper py={20} pos="relative">
@@ -153,6 +174,7 @@ export default function SpeciesHeader({
             conservation={conservation}
             traits={traits}
             referenceGenome={referenceGenome}
+            attributes={attributes}
           />
         ) : null}
       </Container>
