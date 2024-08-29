@@ -22,7 +22,6 @@ import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
-import { Float, Int } from "@loaders.gl/schema";
 
 const GET_SPECIES = gql`
   query SpeciesWithConservation($canonicalName: String) {
