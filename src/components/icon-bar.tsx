@@ -544,7 +544,7 @@ export default function IconBar({
 
   // The taxonomic groups that make up Conifers and Cycads are disjoint - finds the
   // appropriate taxonomic link for whichever ordo the species is from
-  let coniferCycadLink = "/ordo/";
+  let coniferCycadLink = "/";
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
     skip: taxonomy.vernacularGroup !== "CONIFERS_AND_CYCADS",
     variables: {
@@ -556,9 +556,11 @@ export default function IconBar({
   const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
   hierarchy?.forEach((taxon) => {
     if (
-      taxon.rank === "ORDO" &&
+      (taxon.rank === "ORDO" || taxon.rank === "ORDER") &&
       (taxon.canonicalName === "Pinales" || taxon.canonicalName === "Cycadales")
     ) {
+      coniferCycadLink += taxon.rank.toLowerCase();
+      coniferCycadLink += "/";
       coniferCycadLink += taxon.canonicalName;
     }
   });
