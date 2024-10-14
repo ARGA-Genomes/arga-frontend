@@ -731,7 +731,7 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
         <Text fw={600} size="lg">
           Taxon History
         </Text>
-        {taxonomicActs.length === 0 && (
+        {timelineItems.length === 0 && (
           <Text className={classes.emptyList}>no data</Text>
         )}
 
