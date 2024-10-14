@@ -8,7 +8,6 @@ import {
   Button,
   Grid,
   Group,
-  Modal,
   Paper,
   SimpleGrid,
   Stack,
@@ -31,15 +30,18 @@ import { AttributePillValue, DataField } from "@/components/data-fields";
 import { TaxonomyTree } from "@/components/graphing/taxon-tree";
 import {
   EventTimeline,
-  HorizontalEventTimeline,
   LineStyle,
   TimelineIcon,
 } from "@/components/event-timeline";
 import { useDisclosure } from "@mantine/hooks";
-import { DateTime } from "luxon";
 import { TaxonStatTreeNode, findChildren } from "@/queries/stats";
 import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
 import { Taxon } from "@/queries/taxa";
+import HorizontalTimeline, {
+  TimelineItem,
+  TimelineItemType,
+} from "@/components/graphing/horizontal-timeline";
+import { Publication } from "@/queries/publication";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -123,9 +125,7 @@ const GET_TAXON = gql`
         act
         sourceUrl
         publication {
-          citation
-          publishedYear
-          sourceUrl
+          ...Publication
         }
         name {
           scientificName
@@ -195,7 +195,7 @@ type NomenclaturalAct = {
   entityId: string;
   act: string;
   sourceUrl: string;
-  publication: NamePublication;
+  publication: Publication;
   name: {
     scientificName: string;
     canonicalName: string;
@@ -575,57 +575,49 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
         </Text>
       </Group>
 
-      <SimpleGrid cols={2}>
-        <DataTable>
-          <DataTableRow label="Scientific name">
-            <Group gap={10}>
-              <Text fw={600} fz="sm" fs="italic">
-                {taxonomy.canonicalName}
-              </Text>
+      <SimpleGrid cols={3}>
+        <Paper p="sm">
+          <DataTable>
+            <DataTableRow label="Scientific name">
+              <Group gap={10}>
+                <Text fw={600} fz="sm" fs="italic">
+                  {taxonomy.canonicalName}
+                </Text>
+                <Text fw={600} fz="sm">
+                  {taxonomy.authorship}
+                </Text>
+              </Group>
+            </DataTableRow>
+            <DataTableRow label="Status">
               <Text fw={600} fz="sm">
-                {taxonomy.authorship}
+                {taxonomy.status.toLowerCase()}
               </Text>
-            </Group>
-          </DataTableRow>
-          <DataTableRow label="Status">
-            <Text fw={600} fz="sm">
-              {taxonomy.status.toLowerCase()}
-            </Text>
-          </DataTableRow>
-        </DataTable>
+            </DataTableRow>
+          </DataTable>
+        </Paper>
 
-        <DataTable>
-          <DataTableRow label="Common names">
-            <Group
-              display="block"
-              w={{ xs: 50, sm: 100, md: 150, lg: 200, xl: 270 }}
-            >
-              <Text fw={600} fz="sm" truncate="end">
-                {commonNames.map((r) => r.vernacularName).join(", ")}
-              </Text>
-              <Button
-                onClick={() => setIsOpen(true)}
-                bg="none"
-                c="midnight.4"
-                pl={-5}
-                className="textButton"
-              >
-                Show All
-              </Button>
-            </Group>
-            <Modal
-              opened={isOpen}
-              onClose={() => setIsOpen(false)}
-              className="commonNamesModal"
-              centered
-            >
-              <Text fw={600} fz="sm">
-                {commonNames.map((r) => r.vernacularName).join(", ")}
-              </Text>
-            </Modal>
-          </DataTableRow>
-          <DataTableRow label="Subspecies"></DataTableRow>
-        </DataTable>
+        <Paper p="sm">
+          <Text fw={300} fz="sm">
+            Synonyms
+          </Text>
+        </Paper>
+
+        <Stack>
+          <Paper p="sm">
+            <Text fw={300} fz="sm">
+              Common names
+            </Text>
+            <Text fw={600} fz="sm" truncate="end">
+              {commonNames.map((r) => r.vernacularName).join(", ")}
+            </Text>
+          </Paper>
+
+          <Paper p="sm">
+            <Text fw={300} fz="sm">
+              Subspecies
+            </Text>
+          </Paper>
+        </Stack>
       </SimpleGrid>
     </Paper>
   );
@@ -636,8 +628,9 @@ const ACT_TYPE_ORDER: Record<string, number> = {
   SUBSPECIES_NOVA: 1,
   GENUS_SPECIES_NOVA: 2,
   COMBINATIO_NOVA: 3,
-  REVIVED_STATUS: 4,
-  NAME_USAGE: 5,
+  SUBGENUS_PLACEMENT: 4,
+  REVIVED_STATUS: 5,
+  NAME_USAGE: 6,
 };
 
 const ACT_ICON: Record<string, string> = {
@@ -647,6 +640,17 @@ const ACT_ICON: Record<string, string> = {
   COMBINATIO_NOVA: "/timeline-icons/recombination.svg",
   REVIVED_STATUS: "/timeline-icons/orignal_description.svg",
   NAME_USAGE: "/timeline-icons/name_usage.svg",
+  SUBGENUS_PLACEMENT: "/timeline-icons/recombination.svg",
+};
+
+const ACT_LABEL: Record<string, string> = {
+  SPECIES_NOVA: "new species",
+  SUBSPECIES_NOVA: " new subspecies",
+  GENUS_SPECIES_NOVA: "new genus",
+  COMBINATIO_NOVA: "generic recombination",
+  SUBGENUS_PLACEMENT: "subgenus placement",
+  REVIVED_STATUS: "revived",
+  NAME_USAGE: "name usage",
 };
 
 // sort by publication year first, then by the type of the act, and lastly by scientific name
@@ -672,6 +676,10 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
   return 0;
 }
 
+function HistoryItem({ act }: { act: NomenclaturalAct }) {
+  return <Text>{act.publication.publishedYear}</Text>;
+}
+
 function History({ taxonomy }: { taxonomy: Taxonomy }) {
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
     variables: {
@@ -680,26 +688,39 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
     },
   });
 
-  const items = data?.taxon.history;
-  if (!items) {
+  const taxonomicActs = data?.taxon.taxonomicActs;
+  if (!taxonomicActs) {
     return;
   }
-
-  const taxonomicActs = data?.taxon.taxonomicActs;
   const acts = data?.taxon.nomenclaturalActs.map((it) => it).sort(compareAct);
   if (!acts) {
     return;
   }
 
-  /* const dates = items
-   *   .flatMap((item) => item.publication?.publishedYear)
-   *   .filter((item) => item); */
+  const protonym = acts[0];
 
-  const allYears = taxonomicActs
-    .map((act) => act.dataCreatedAt && DateTime.fromISO(act.dataCreatedAt).year)
-    .filter((year): year is number => Number.isInteger(year))
-    .sort();
-  const years = [...new Set(allYears)];
+  // turn all nomenclatural acts into timeline items
+  let itemSet = new Map<string, TimelineItem>();
+  for (const item of acts) {
+    const date =
+      (item.publication.publishedDate &&
+        new Date(item.publication.publishedDate)) ||
+      new Date(item.publication.publishedYear, 0, 1);
+
+    const key = `${date}-${item.act}-${item.name.canonicalName}`;
+
+    itemSet.set(key, {
+      label: item.name.canonicalName,
+      subtitle: ACT_LABEL[item.act],
+      year: item.publication.publishedYear,
+      act: item.act,
+      date,
+      type: TimelineItemType.Instant,
+    });
+  }
+  let items: TimelineItem[] = [...itemSet.values()];
+
+  const timelineItems = [...items];
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -714,18 +735,7 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
           <Text className={classes.emptyList}>no data</Text>
         )}
 
-        <HorizontalEventTimeline years={years}>
-          {taxonomicActs.map((act, idx) => (
-            <HorizontalEventTimeline.Item key={idx} span={2}>
-              <AttributePillValue
-                value={act.taxon.canonicalName}
-                color={
-                  act.taxon.status === "ACCEPTED" ? "moss.3" : "bushfire.2"
-                }
-              />
-            </HorizontalEventTimeline.Item>
-          ))}
-        </HorizontalEventTimeline>
+        <HorizontalTimeline data={timelineItems} />
 
         <Text fw={600} size="lg">
           Nomenclatural timeline
@@ -747,7 +757,7 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
                 />
               }
               header={<NomenclaturalActHeader item={act} />}
-              body={<NomenclaturalActBody item={act} />}
+              body={<NomenclaturalActBody item={act} protonym={protonym} />}
             />
           ))}
         </EventTimeline>
@@ -772,7 +782,12 @@ function NomenclaturalActHeader({ item }: { item: NomenclaturalAct }) {
   );
 }
 
-function NomenclaturalActBody({ item }: { item: NomenclaturalAct }) {
+interface NomenclaturalActBodyProps {
+  item: NomenclaturalAct;
+  protonym: NomenclaturalAct;
+}
+
+function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
     variables: { entityId: item.entityId },
@@ -803,12 +818,12 @@ function NomenclaturalActBody({ item }: { item: NomenclaturalAct }) {
         <DataTableRow label="Publication">
           <DataField
             value={item.publication.citation}
-            href={item.publication.sourceUrl}
+            href={item.publication.sourceUrls[0]}
           />
         </DataTableRow>
         <DataTableRow label="Protonym/Basionym">
           <Text fz="sm" fw={700} ml="sm">
-            <i>{item.name.canonicalName}</i> {item.name.authorship}
+            <i>{protonym.name.canonicalName}</i> {protonym.name.authorship}
           </Text>
         </DataTableRow>
         <DataTableRow label="Current status">
@@ -1010,14 +1025,14 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
         <Grid.Col span={12}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
-            {results.data && (
-              <TaxonomySwitcher taxa={results.data.taxa.records} />
-            )}
             {species && taxonomy && (
               <Details
                 taxonomy={taxonomy}
                 commonNames={species.vernacularNames}
               />
+            )}
+            {results.data && (
+              <TaxonomySwitcher taxa={results.data.taxa.records} />
             )}
           </Stack>
         </Grid.Col>
