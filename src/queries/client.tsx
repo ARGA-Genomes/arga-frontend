@@ -14,6 +14,7 @@ import {
   SEQUENCING_RUN_EVENT,
 } from "./sequence";
 import { TAXON_NAME, TAXON_SOURCE, TAXON_NODE } from "./taxa";
+import { PUBLICATION } from "./publication";
 
 export default function createClient() {
   const fragments = createFragmentRegistry(
@@ -34,6 +35,7 @@ export default function createClient() {
     TAXON_NAME,
     TAXON_SOURCE,
     TAXON_NODE,
+    PUBLICATION,
   );
 
   // for now just use the memory cache to help reduce the total amount of server requests.
