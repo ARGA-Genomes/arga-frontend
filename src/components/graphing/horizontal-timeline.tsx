@@ -107,8 +107,6 @@ interface HorizontalTimelineProps {
 }
 
 export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
-  if (data.length === 0) return;
-
   const bars = deriveTaxonBars(data);
 
   // sort the items by they're date first and then by the type of item

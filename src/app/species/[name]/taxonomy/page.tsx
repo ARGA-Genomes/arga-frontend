@@ -735,7 +735,9 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
           <Text className={classes.emptyList}>no data</Text>
         )}
 
-        <HorizontalTimeline data={timelineItems} />
+        {timelineItems.length > 0 && (
+          <HorizontalTimeline data={timelineItems} />
+        )}
 
         <Text fw={600} size="lg">
           Nomenclatural timeline
