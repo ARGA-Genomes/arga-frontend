@@ -36,7 +36,7 @@ import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
 import { IoEye } from "react-icons/io5";
 import { useState } from "react";
-import { copyFileSync } from "fs";
+import { access, copyFileSync } from "fs";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -46,6 +46,9 @@ const GET_DATASETS = gql`
       rightsHolder
       accessRights
       license
+      reusePill
+      accessPill
+      contentType
 
       datasets {
         name
@@ -57,6 +60,9 @@ const GET_DATASETS = gql`
         rightsHolder
         createdAt
         updatedAt
+        reusePill
+        accessPill
+        publicationYear
       }
     }
   }
@@ -72,6 +78,9 @@ type Dataset = {
   rightsHolder?: string;
   createdAt: string;
   updatedAt: string;
+  reusePill?: ReusePillType;
+  accessPill?: AccessPillType;
+  publicationYear?: number;
 };
 
 type Source = {
@@ -80,12 +89,20 @@ type Source = {
   rightsHolder: string;
   accessRights: string;
   license: string;
+  reusePill?: ReusePillType;
+  accessPill?: AccessPillType;
+  contentType?: string;
   datasets: Dataset[];
 };
 
 type ContentType = {
   name: string;
   sources?: Source[];
+};
+
+type GroupedSources = {
+  contentType: string;
+  sources: Source[];
 };
 
 type QueryResults = {
@@ -209,6 +226,24 @@ const LICENSES: Record<string, License> = {
   },
 };
 
+type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
+
+const accessPillColours: Record<AccessPillType, string> = {
+  OPEN: "moss.3",
+  RESTRICTED: "red.3",
+  CONDITIONAL: "wheat.3",
+  VARIABLE: "wheat.3",
+};
+
+type ReusePillType = "LIMITED" | "NONE" | "UNLIMITED" | "VARIABLE";
+
+const reusePillColours: Record<ReusePillType, string> = {
+  UNLIMITED: "moss.3",
+  LIMITED: "wheat.3",
+  NONE: "#d6e4ed",
+  VARIABLE: "#d6e4ed",
+};
+
 const licenseAccessRights = {};
 
 function DatasetRow({
@@ -228,7 +263,7 @@ function DatasetRow({
   return (
     <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
       <Grid>
-        <Grid.Col span={5} p="lg">
+        <Grid.Col span={3} p="lg">
           <Stack gap={3}>
             <Text fw={600} size="md" c="midnight.10">
               {dataset.name}
@@ -248,19 +283,34 @@ function DatasetRow({
         <Grid.Col span={2} p="lg">
           <AttributePill
             label="Access rights"
-            value={license?.accessRights || dataset.license}
-            href={license?.url}
+            value={dataset.accessPill?.toLocaleLowerCase() || "No data"}
+            href={dataset.license !== "NONE" ? dataset.license : ""}
             color={
-              license?.accessRights === "Open"
-                ? "moss.3"
-                : license?.accessRights === "Conditional"
-                ? "wheat.3"
-                : undefined
+              dataset.accessPill
+                ? accessPillColours[dataset.accessPill]
+                : "#d6e4ed"
             }
           />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Number of records" value="No data" />
+          <AttributePill
+            label="Data reuse status"
+            value={dataset.reusePill?.toLocaleLowerCase() || "No data"}
+            color={
+              dataset.reusePill
+                ? reusePillColours[dataset.reusePill]
+                : "#d6e4ed"
+            }
+          />
+        </Grid.Col>
+        <Grid.Col span={1} p="lg">
+          <AttributePill label="Records" value="No data" />
+        </Grid.Col>
+        <Grid.Col span={1} p="lg">
+          <AttributePill
+            label="Year"
+            value={dataset.publicationYear || "No data"}
+          />
         </Grid.Col>
 
         <Grid.Col span={1}>
@@ -358,136 +408,6 @@ function ComponentDatasetRow({
   );
 }
 
-function SourceListContainer({ source }: { source: Source }) {
-  const theme = useMantineTheme();
-  const license = source.license
-    ? LICENSES[source.license.toLowerCase()]
-    : undefined;
-  return (
-    <Accordion
-      variant="separated"
-      radius="lg"
-      classNames={classes}
-      chevron={
-        <IconCaretDownFilled
-          fill={theme.colors.midnight[10]}
-          color={theme.colors.midnight[10]}
-        />
-      }
-    >
-      <Accordion.Item key={source.name} value={source.name}>
-        <Accordion.Control>
-          <Stack>
-            <Group>
-              <Link
-                href={`/browse/sources/${source.name}`}
-                className={classes.browseSpeciesBtn}
-              >
-                <span className={classes.browseSpeciesSpan}>
-                  <Group gap={15} pt={4.5} pl={5}>
-                    <IoEye size={25} className={classes.browseSpeciesIcon} />
-                    <Text
-                      fw={600}
-                      fz={17}
-                      className={classes.browseSpeciesText}
-                    >
-                      Browse {source.name} list
-                    </Text>
-                  </Group>
-                </span>
-              </Link>
-            </Group>
-            <Group grow align="flex-end" pr={10}>
-              <AttributePill
-                label="Data source name"
-                // color="midnight.10"
-                value={
-                  // <Link href={`/browse/sources/${source.name}`}>
-                  //   <Group gap={5}>
-                  //     <IoEye size={25} color="white" />
-                  //     <Text fw={600} c="white">
-                  //       {source.name}
-                  //     </Text>
-                  //   </Group>
-                  // </Link>
-                  source.name
-                }
-              />
-              <AttributePill
-                label="Rights holder"
-                value={source.rightsHolder}
-              />
-              <AttributePill
-                label="Access rights"
-                value={license?.accessRights || source.license}
-                href={license?.url}
-                color={
-                  license?.accessRights === "Open"
-                    ? "moss.3"
-                    : license?.accessRights === "Conditional"
-                    ? "wheat.3"
-                    : undefined
-                }
-              />
-              <AttributePill label="Number of records" value="No data" />
-              <AttributePill label="Last updated" value="No data" />
-              {/* <Box> */}
-              {/* <Center> */}
-              {/* <Link href={`/browse/sources/${source.name}`} target="_blank">
-                <Button
-                  px={20}
-                  size="xl"
-                  radius="xl"
-                  color="midnight.10"
-                  // fullWidth
-                  justify="center"
-                  leftSection={<IoEye size={55} color="white" />}
-                >
-                  <Stack gap={0}>
-                    <Text fw={600} size="md" truncate c="white">
-                      browse
-                    </Text>
-                    <Text fw={600} size="md" truncate c="white" mt={-7}>
-                      species
-                    </Text>
-                  </Stack> */}
-              {/* <Group wrap="nowrap">
-                  <IoEye size={50} color="white" />
-                  <Stack gap={0}>
-                    <Text fw={600} size="md" truncate c="white">
-                      browse
-                    </Text>
-                    <Text fw={600} size="md" truncate c="white">
-                      species
-                    </Text>
-                  </Stack>
-                </Group> */}
-              {/* </Button> */}
-              {/* </Link> */}
-              {/* </Center> */}
-              {/* </Box> */}
-            </Group>
-          </Stack>
-        </Accordion.Control>
-        <Accordion.Panel>
-          <ScrollArea h={450} type="auto" offsetScrollbars>
-            <Box pr={10}>
-              {source.datasets.map((dataset, idx) => (
-                <ComponentDatasetRow
-                  dataset={dataset}
-                  key={idx}
-                  sourceLength={source.datasets.length}
-                  count={idx + 1}
-                />
-              ))}
-            </Box>
-          </ScrollArea>
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
-  );
-}
-
 function CollectionCard({ collection }: { collection: Source }) {
   const theme = useMantineTheme();
   const license = collection.license
@@ -528,9 +448,26 @@ function CollectionCard({ collection }: { collection: Source }) {
           <Grid.Col span={12}>
             <AttributePill
               label="Access rights"
-              value={license?.accessRights || collection.license}
-              href={license?.url}
+              value={collection.accessPill?.toLocaleLowerCase() || "No data"}
+              href={collection.license !== "none" ? collection.license : ""}
               group={true}
+              color={
+                collection.accessPill
+                  ? accessPillColours[collection.accessPill]
+                  : "#d6e4ed"
+              }
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <AttributePill
+              label="Data reuse status"
+              value={collection.reusePill?.toLocaleLowerCase() || "No data"}
+              group={true}
+              color={
+                collection.reusePill
+                  ? reusePillColours[collection.reusePill]
+                  : "#d6e4ed"
+              }
             />
           </Grid.Col>
           <Grid.Col span={12}>
@@ -553,14 +490,8 @@ function CollectionRow({ collection }: { collection: Source }) {
           <Link href={`/browse/sources/${collection.name}`}>
             <Paper radius="lg" w="100%" className={classes.collectionHeader}>
               <Grid>
-                <Grid.Col span={5} p="lg">
-                  <Text
-                    fw={600}
-                    size="md"
-                    c="white"
-                    p={10}
-                    style={{ whiteSpace: "nowrap" }}
-                  >
+                <Grid.Col span={3} p="lg">
+                  <Text fw={600} size="md" c="white" p={10}>
                     {collection.name}
                   </Text>
                 </Grid.Col>
@@ -575,8 +506,31 @@ function CollectionRow({ collection }: { collection: Source }) {
                   <AttributePill
                     label="Access rights"
                     labelColor="white"
-                    value={license?.accessRights || collection.license}
-                    href={license?.url}
+                    value={
+                      collection.accessPill?.toLocaleLowerCase() || "No data"
+                    }
+                    href={
+                      collection.license !== "none" ? collection.license : ""
+                    }
+                    color={
+                      collection.accessPill
+                        ? accessPillColours[collection.accessPill]
+                        : "#d6e4ed"
+                    }
+                  />
+                </Grid.Col>
+                <Grid.Col span={2} p="lg">
+                  <AttributePill
+                    label="Data reuse status"
+                    labelColor="white"
+                    value={
+                      collection.reusePill?.toLocaleLowerCase() || "No data"
+                    }
+                    color={
+                      collection.reusePill
+                        ? reusePillColours[collection.reusePill]
+                        : "#d6e4ed"
+                    }
                   />
                 </Grid.Col>
                 <Grid.Col span={2} p="lg">
@@ -612,60 +566,19 @@ function CollectionRow({ collection }: { collection: Source }) {
   );
 }
 
-function SourceContainer({ source }: { source: Source }) {
-  const theme = useMantineTheme();
-  var isList = false;
-  if (
-    source.name === "ARGA Bushfire Recovery" ||
-    source.name === "ARGA Commercial Species" ||
-    source.name === "ARGA Threatened Species" ||
-    source.name === "ARGA Venomous and Poisonous Species"
-  ) {
-    isList = true;
-  }
-  return (
-    <Accordion.Item key={source.name} value={source.name}>
-      <Accordion.Control>
-        <Text
-          fw={600}
-          fz="var(--mantine-h4-font-size)"
-          c={theme.colors.midnight[10]}
-        >
-          {source.name}
-        </Text>
-      </Accordion.Control>
-      <Accordion.Panel>
-        {isList ? (
-          <SourceListContainer source={source} />
-        ) : (
-          source.datasets.map((dataset, idx) => (
-            <DatasetRow
-              dataset={dataset}
-              key={idx}
-              sourceLength={source.datasets.length}
-              count={idx + 1}
-            />
-          ))
-        )}
-        {/* {source.datasets.map((dataset, idx) => (
-          <DatasetRow
-            dataset={dataset}
-            key={idx}
-            sourceLength={source.datasets.length}
-            count={idx + 1}
-          />
-        ))} */}
-      </Accordion.Panel>
-    </Accordion.Item>
-  );
-}
-
-function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
+function ContentTypeContainer({
+  contentType,
+}: {
+  contentType: GroupedSources;
+}) {
   const theme = useMantineTheme();
   const [layoutView, setLayoutView] = useState("card");
 
   return (
-    <Accordion.Item key={contentType.name} value={contentType.name}>
+    <Accordion.Item
+      key={contentType.contentType}
+      value={contentType.contentType}
+    >
       <Accordion.Control>
         <Group justify="space-between" pr={30}>
           <Text
@@ -673,7 +586,12 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
             fz="var(--mantine-h4-font-size)"
             c={theme.colors.midnight[10]}
           >
-            {contentType.name} data sources
+            {contentType.contentType
+              .toLocaleLowerCase()
+              .split("_")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")}{" "}
+            data sources
           </Text>
           <Group gap={10} mt={15}>
             <UnstyledButton
@@ -739,41 +657,45 @@ function ContentTypeContainer({ contentType }: { contentType: ContentType }) {
   );
 }
 
+function groupByContentType(sources?: Source[]): GroupedSources[] {
+  if (sources) {
+    const grouped = sources.reduce(
+      (acc: { [key: string]: Source[] }, source) => {
+        let contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
+        if (contentType === "NONGENOMIC_DATA") {
+          contentType = "Non-genomic";
+        }
+
+        // If this contentType doesn't exist in the accumulator, create a new array
+        if (!acc[contentType]) {
+          acc[contentType] = [];
+        }
+
+        // Push the current source into the corresponding contentType group
+        acc[contentType].push(source);
+
+        return acc;
+      },
+      {}
+    );
+
+    // Convert the object into an array of GroupedSources
+    return Object.keys(grouped).map((contentType) => ({
+      contentType,
+      sources: grouped[contentType],
+    }));
+  } else {
+    return [];
+  }
+}
+
 export default function DatasetsPage() {
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
   const theme = useMantineTheme();
 
-  const sourceContent: { [key: string]: string } = {
-    "ARGA Backbone Taxonomy": "Taxonomic",
-    "ARGA Bushfire Recovery": "Traits and ecological",
-    "ARGA Commercial Species": "Traits and ecological",
-    "ARGA Genomes": "Genomics",
-    "ARGA IEK": "Traits and ecological",
-    "ARGA Threatened Species": "Traits and ecological",
-    "ARGA Venomous and Poisonous Species": "Traits and ecological",
-    OZCAM: "Biological specimens",
-  };
-
-  let contentData: ContentType[] = [
-    { name: "Genomics" },
-    { name: "Biological specimens" },
-    { name: "Taxonomic" },
-    { name: "Traits and ecological" },
-  ];
-
-  contentData = contentData.map((contentItem) => {
-    // Filter sources based on the content type name
-    let correspondingSources =
-      data?.sources.filter((source) => {
-        const contentType = sourceContent[source.name];
-        return contentType && contentType.includes(contentItem.name);
-      }) ?? []; // Default to an empty array if data?.sources is undefined
-    return {
-      ...contentItem,
-      sources:
-        correspondingSources.length > 0 ? correspondingSources : undefined,
-    };
-  });
+  const groupedSources = groupByContentType(data?.sources).filter(
+    (group) => group.contentType !== "Unknown"
+  );
 
   return (
     <Stack gap="xl" my="xl">
@@ -799,13 +721,10 @@ export default function DatasetsPage() {
               />
             }
           >
-            {/* {data?.sources.map((source) => (
-              <SourceContainer source={source} key={source.name} />
-            ))} */}
-            {contentData?.map((contentType) => (
+            {groupedSources?.map((group) => (
               <ContentTypeContainer
-                contentType={contentType}
-                key={contentType.name}
+                contentType={group}
+                key={group.contentType}
               />
             ))}
           </Accordion>
