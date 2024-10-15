@@ -36,6 +36,7 @@ import {
   IconDatabase,
   IconLicense,
   IconPaw,
+  IconRepeat,
 } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
@@ -58,6 +59,8 @@ const GET_DETAILS = gql`
       rightsHolder
       author
       name
+      accessPill
+      reusePill
 
       species(page: 1, pageSize: 1) {
         total
@@ -73,6 +76,9 @@ const GET_DETAILS = gql`
         rightsHolder
         createdAt
         updatedAt
+        accessPill
+        reusePill
+        publicationYear
       }
     }
   }
@@ -88,6 +94,27 @@ type Dataset = {
   rightsHolder?: string;
   createdAt: string;
   updatedAt: string;
+  reusePill?: ReusePillType;
+  accessPill?: AccessPillType;
+  publicationYear?: number;
+};
+
+type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
+
+const accessPillColours: Record<AccessPillType, string> = {
+  OPEN: "moss.3",
+  RESTRICTED: "red.3",
+  CONDITIONAL: "wheat.3",
+  VARIABLE: "wheat.3",
+};
+
+type ReusePillType = "LIMITED" | "NONE" | "UNLIMITED" | "VARIABLE";
+
+const reusePillColours: Record<ReusePillType, string> = {
+  UNLIMITED: "moss.3",
+  LIMITED: "wheat.3",
+  NONE: "#d6e4ed",
+  VARIABLE: "wheat.3",
 };
 
 type SpeciesCount = {
@@ -100,6 +127,8 @@ type Source = {
   rightsHolder: string;
   author: string;
   name: string;
+  reusePill?: ReusePillType;
+  accessPill?: AccessPillType;
   species: SpeciesCount;
   datasets: Dataset[];
 };
@@ -147,7 +176,7 @@ type DataSummary = {
   other: number;
 };
 
-type Record = {
+type SpeciesRecord = {
   taxonomy: { canonicalName: string };
   photo: Photo;
   dataSummary: DataSummary;
@@ -156,7 +185,7 @@ type Record = {
 type SpeciesQueryResults = {
   source: {
     species: {
-      records: Record[];
+      records: SpeciesRecord[];
       total: number;
     };
   };
@@ -344,7 +373,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
   return (
     <Paper radius="lg" withBorder mb={20}>
       <Grid>
-        <Grid.Col span={5} p="lg">
+        <Grid.Col span={3} p="lg">
           <Stack gap={3}>
             <Text
               fw={600}
@@ -367,10 +396,48 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
           <AttributePill label="Rights holder" value={dataset.rightsHolder} />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Access rights" value={dataset.license} />
+          <AttributePill
+            label="Access rights"
+            value={
+              dataset.accessPill
+                ?.toLowerCase()
+                .charAt(0)
+                .toUpperCase()
+                .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
+            }
+            href={dataset.license !== "none" ? dataset.license : ""}
+            color={
+              dataset.accessPill
+                ? accessPillColours[dataset.accessPill]
+                : "#d6e4ed"
+            }
+          />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Number of records" value="No data" />
+          <AttributePill
+            label="Data reuse status"
+            value={
+              dataset.reusePill
+                ?.toLowerCase()
+                .charAt(0)
+                .toUpperCase()
+                .concat(dataset.reusePill?.slice(1).toLowerCase()) || "No data"
+            }
+            color={
+              dataset.reusePill
+                ? reusePillColours[dataset.reusePill]
+                : "#d6e4ed"
+            }
+          />
+        </Grid.Col>
+        <Grid.Col span={1} p="lg">
+          <AttributePill label="Records" value="No data" />
+        </Grid.Col>
+        <Grid.Col span={1} p="lg">
+          <AttributePill
+            label="Year"
+            value={dataset.publicationYear || "No data"}
+          />
         </Grid.Col>
 
         <Grid.Col span={1}>
@@ -437,11 +504,53 @@ function SourceDetails({
             </Paper>
           </Grid.Col>
           <Grid.Col span={3}>
-            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
+            <Paper
+              radius="lg"
+              bg={
+                source.accessPill
+                  ? accessPillColours[source.accessPill]
+                  : "#d6e4ed"
+              }
+              px={10}
+              py={3}
+            >
               <Group gap={5} justify="center" wrap="nowrap">
                 <IconLicense color={theme.colors.midnight[10]} />
                 <Text size="xs" c={theme.colors.midnight[10]}>
-                  <b>Open</b> access
+                  <b>
+                    {source.accessPill
+                      ?.toLowerCase()
+                      .charAt(0)
+                      .toUpperCase()
+                      .concat(source.accessPill?.slice(1).toLowerCase())}
+                  </b>{" "}
+                  access
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper
+              radius="lg"
+              bg={
+                source.reusePill
+                  ? reusePillColours[source.reusePill]
+                  : "#d6e4ed"
+              }
+              px={10}
+              py={3}
+            >
+              <Group gap={5} justify="center" wrap="nowrap">
+                <IconRepeat color={theme.colors.midnight[10]} />
+                <Text size="xs" c={theme.colors.midnight[10]}>
+                  <b>
+                    {source.reusePill
+                      ?.toLowerCase()
+                      .charAt(0)
+                      .toUpperCase()
+                      .concat(source.reusePill?.slice(1).toLowerCase())}
+                  </b>{" "}
+                  reuse
                 </Text>
               </Group>
             </Paper>

@@ -241,7 +241,7 @@ const reusePillColours: Record<ReusePillType, string> = {
   UNLIMITED: "moss.3",
   LIMITED: "wheat.3",
   NONE: "#d6e4ed",
-  VARIABLE: "#d6e4ed",
+  VARIABLE: "wheat.3",
 };
 
 const licenseAccessRights = {};
@@ -283,7 +283,13 @@ function DatasetRow({
         <Grid.Col span={2} p="lg">
           <AttributePill
             label="Access rights"
-            value={dataset.accessPill?.toLocaleLowerCase() || "No data"}
+            value={
+              dataset.accessPill
+                ?.toLowerCase()
+                .charAt(0)
+                .toUpperCase()
+                .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
+            }
             href={dataset.license !== "NONE" ? dataset.license : ""}
             color={
               dataset.accessPill
@@ -295,7 +301,13 @@ function DatasetRow({
         <Grid.Col span={2} p="lg">
           <AttributePill
             label="Data reuse status"
-            value={dataset.reusePill?.toLocaleLowerCase() || "No data"}
+            value={
+              dataset.reusePill
+                ?.toLowerCase()
+                .charAt(0)
+                .toUpperCase()
+                .concat(dataset.reusePill?.slice(1).toLowerCase()) || "No data"
+            }
             color={
               dataset.reusePill
                 ? reusePillColours[dataset.reusePill]
@@ -448,7 +460,14 @@ function CollectionCard({ collection }: { collection: Source }) {
           <Grid.Col span={12}>
             <AttributePill
               label="Access rights"
-              value={collection.accessPill?.toLocaleLowerCase() || "No data"}
+              value={
+                collection.accessPill
+                  ?.toLowerCase()
+                  .charAt(0)
+                  .toUpperCase()
+                  .concat(collection.accessPill?.slice(1).toLowerCase()) ||
+                "No data"
+              }
               href={collection.license !== "none" ? collection.license : ""}
               group={true}
               color={
@@ -461,7 +480,14 @@ function CollectionCard({ collection }: { collection: Source }) {
           <Grid.Col span={12}>
             <AttributePill
               label="Data reuse status"
-              value={collection.reusePill?.toLocaleLowerCase() || "No data"}
+              value={
+                collection.reusePill
+                  ?.toLowerCase()
+                  .charAt(0)
+                  .toUpperCase()
+                  .concat(collection.reusePill?.slice(1).toLowerCase()) ||
+                "No data"
+              }
               group={true}
               color={
                 collection.reusePill
@@ -507,7 +533,13 @@ function CollectionRow({ collection }: { collection: Source }) {
                     label="Access rights"
                     labelColor="white"
                     value={
-                      collection.accessPill?.toLocaleLowerCase() || "No data"
+                      collection.accessPill
+                        ?.toLowerCase()
+                        .charAt(0)
+                        .toUpperCase()
+                        .concat(
+                          collection.accessPill?.slice(1).toLowerCase()
+                        ) || "No data"
                     }
                     href={
                       collection.license !== "none" ? collection.license : ""
@@ -524,7 +556,12 @@ function CollectionRow({ collection }: { collection: Source }) {
                     label="Data reuse status"
                     labelColor="white"
                     value={
-                      collection.reusePill?.toLocaleLowerCase() || "No data"
+                      collection.reusePill
+                        ?.toLowerCase()
+                        .charAt(0)
+                        .toUpperCase()
+                        .concat(collection.reusePill?.slice(1).toLowerCase()) ||
+                      "No data"
                     }
                     color={
                       collection.reusePill
@@ -664,6 +701,8 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
         let contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
         if (contentType === "NONGENOMIC_DATA") {
           contentType = "Non-genomic";
+        } else if (contentType === "GENOMIC_DATA") {
+          contentType = "Genomic";
         }
 
         // If this contentType doesn't exist in the accumulator, create a new array
