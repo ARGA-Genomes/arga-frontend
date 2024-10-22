@@ -78,6 +78,16 @@ const GET_TAXON = gql`
         depth
       }
 
+      taxonomicActs {
+        entityId
+        sourceUrl
+        taxon {
+          canonicalName
+          authorship
+          status
+        }
+      }
+
       nomenclaturalActs {
         entityId
         act
@@ -106,46 +116,35 @@ const GET_TAXON = gql`
   }
 `;
 
+const GET_SYNONYMS = gql`
+  query TaxonSynonyms($rank: TaxonomicRank, $canonicalName: String) {
+    taxon(rank: $rank, canonicalName: $canonicalName) {
+      taxonomicActs {
+        entityId
+        sourceUrl
+        taxon {
+          canonicalName
+          authorship
+          status
+        }
+      }
+    }
+  }
+`;
+
 type ClassificationNode = {
   canonicalName: string;
   rank: string;
   depth: number;
 };
 
-type HistoryItem = {
-  entityId: string;
-  scientificName: string;
-  canonicalName: string;
-  authorship?: string;
-  rank: string;
-  status: string;
-  citation?: string;
-  sourceUrl?: string;
-  publication?: NamePublication;
-  dataset: {
-    name: string;
-    shortName?: string;
-    url?: string;
-  };
-};
-
 type TaxonomicAct = {
   entityId: string;
-  act: string;
   sourceUrl: string;
-  dataCreatedAt?: string;
-  dataUpdatedAt?: string;
   taxon: {
     canonicalName: string;
     authorship?: string;
     status: string;
-    citation?: string;
-  };
-  acceptedTaxon: {
-    canonicalName: string;
-    authorship?: string;
-    status: string;
-    citation?: string;
   };
 };
 
@@ -183,6 +182,12 @@ type TaxonQuery = {
   taxon: Taxon & {
     hierarchy: ClassificationNode[];
     nomenclaturalActs: NomenclaturalAct[];
+  };
+};
+
+type SynonymsQuery = {
+  taxon: {
+    taxonomicActs: TaxonomicAct[];
   };
 };
 
@@ -513,6 +518,20 @@ interface DetailsProps {
 
 function Details({ taxonomy, commonNames }: DetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { loading, error, data } = useQuery<SynonymsQuery>(GET_SYNONYMS, {
+    variables: {
+      rank: taxonomy.rank,
+      canonicalName: taxonomy.canonicalName,
+    },
+  });
+
+  const acts = data?.taxon.taxonomicActs.filter(
+    (act) => act.taxon.status !== "ACCEPTED",
+  );
+
+  const synonyms = Object.groupBy(acts || [], (act) => act.taxon.status);
+
   return (
     <Paper radius={16} p="md" withBorder>
       <Group mb={10} align="baseline">
@@ -553,9 +572,24 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
         </Paper>
 
         <Paper p="sm">
-          <Text fw={300} fz="sm">
-            Synonyms
-          </Text>
+          {Object.entries(synonyms).map(([status, acts]) => (
+            <Stack gap={0} key={status}>
+              <Text fw={300} fz="sm">
+                {Humanize.capitalize(status.toLowerCase().replace("_", " "))}
+              </Text>
+              {acts.map((act) => (
+                <Group key={act.taxon.canonicalName} gap={5}>
+                  <Text fw={600} fz="sm" fs="italic">
+                    {act.taxon.canonicalName}
+                    {act.taxon.authorship && ","}
+                  </Text>
+                  <Text fw={600} fz="sm">
+                    {act.taxon.authorship}
+                  </Text>
+                </Group>
+              ))}
+            </Stack>
+          ))}
         </Paper>
 
         <Stack>
