@@ -78,48 +78,6 @@ const GET_TAXON = gql`
         depth
       }
 
-      history {
-        entityId
-        scientificName
-        canonicalName
-        authorship
-        rank
-        status
-        citation
-        sourceUrl
-        publication {
-          publishedYear
-          citation
-          sourceUrl
-          typeCitation
-        }
-        dataset {
-          name
-          shortName
-          url
-        }
-      }
-
-      taxonomicActs {
-        entityId
-        act
-        sourceUrl
-        dataCreatedAt
-        dataUpdatedAt
-        taxon {
-          canonicalName
-          authorship
-          status
-          citation
-        }
-        acceptedTaxon {
-          canonicalName
-          authorship
-          status
-          citation
-        }
-      }
-
       nomenclaturalActs {
         entityId
         act
@@ -224,8 +182,6 @@ type NamePublication = {
 type TaxonQuery = {
   taxon: Taxon & {
     hierarchy: ClassificationNode[];
-    history: HistoryItem[];
-    taxonomicActs: TaxonomicAct[];
     nomenclaturalActs: NomenclaturalAct[];
   };
 };
@@ -688,10 +644,6 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
     },
   });
 
-  const taxonomicActs = data?.taxon.taxonomicActs;
-  if (!taxonomicActs) {
-    return;
-  }
   const acts = data?.taxon.nomenclaturalActs.map((it) => it).sort(compareAct);
   if (!acts) {
     return;
