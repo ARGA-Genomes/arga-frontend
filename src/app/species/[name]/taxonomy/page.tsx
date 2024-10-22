@@ -530,7 +530,12 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
     (act) => act.taxon.status !== "ACCEPTED",
   );
 
-  const synonyms = Object.groupBy(acts || [], (act) => act.taxon.status);
+  // Object.groupBy is not available for a es2017 target so we manually implement it here
+  let synonyms: Record<string, TaxonomicAct[]> = {};
+  for (const act of acts || []) {
+    synonyms[act.taxon.status] ||= [];
+    synonyms[act.taxon.status].push(act);
+  }
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -578,10 +583,9 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
                 {Humanize.capitalize(status.toLowerCase().replace("_", " "))}
               </Text>
               {acts.map((act) => (
-                <Group key={act.taxon.canonicalName} gap={5}>
+                <Group key={act.taxon.canonicalName} gap={10}>
                   <Text fw={600} fz="sm" fs="italic">
                     {act.taxon.canonicalName}
-                    {act.taxon.authorship && ","}
                   </Text>
                   <Text fw={600} fz="sm">
                     {act.taxon.authorship}
