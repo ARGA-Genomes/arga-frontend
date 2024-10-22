@@ -771,7 +771,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
         </DataTableRow>
         <DataTableRow label="Publication">
           <DataField
-            value={item.publication.citation}
+            value={item.publication.title}
             href={item.publication.sourceUrls[0]}
           />
         </DataTableRow>

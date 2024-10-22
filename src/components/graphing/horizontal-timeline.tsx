@@ -384,7 +384,7 @@ function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
     }
 
     // also add bars for name usages as they represent a taxonomic status
-    if (item.act === "NAME_USAGE") {
+    if (item.act === "NAME_USAGE" && !map.has(item.label)) {
       currentAccepted = {
         ...item,
         type: TimelineItemType.Bar,
