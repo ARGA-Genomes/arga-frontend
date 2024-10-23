@@ -12,7 +12,7 @@ const GET_DETAILS = gql`
   }
 `;
 
-type Dataset = {
+export type Dataset = {
   id: string;
   name: string;
 };

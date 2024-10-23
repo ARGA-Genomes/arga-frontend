@@ -7,12 +7,13 @@ import {
   Stack,
   Text,
   Group,
+  PaperProps,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 
 interface AttributeProps {
-  label: string;
+  label?: string;
   labelColor?: MantineColor;
   children: React.ReactNode;
   group?: boolean;
@@ -28,16 +29,20 @@ export function Attribute({
     <>
       {group ? (
         <Group gap={5} grow>
-          <Text fw={300} size="sm" c={labelColor}>
-            {label}
-          </Text>
+          {label && (
+            <Text fw={300} size="sm" c={labelColor}>
+              {label}
+            </Text>
+          )}
           {children}
         </Group>
       ) : (
         <Stack gap={5}>
-          <Text fw={300} size="sm" c={labelColor}>
-            {label}
-          </Text>
+          {label && (
+            <Text fw={300} size="sm" c={labelColor}>
+              {label}
+            </Text>
+          )}
           {children}
         </Stack>
       )}
@@ -53,6 +58,7 @@ interface AttributePillProps {
   color?: MantineColor;
   labelColor?: MantineColor;
   group?: boolean;
+  miw?: number;
 }
 
 export function AttributePill({
@@ -63,9 +69,10 @@ export function AttributePill({
   color,
   labelColor,
   group,
+  miw,
 }: AttributePillProps) {
   const pill = (
-    <AttributePillValue value={value} italic={italic} color={color} />
+    <AttributePillValue value={value} italic={italic} color={color} miw={miw} />
   );
 
   return (
@@ -97,12 +104,14 @@ interface AttributePillValueProps {
   value?: string | number;
   italic?: boolean;
   color?: MantineColor;
+  miw?: number;
 }
 
 export function AttributePillValue({
   value,
   italic,
   color,
+  miw,
 }: AttributePillValueProps) {
   const [opened, { close, open }] = useDisclosure(false);
 
@@ -123,6 +132,7 @@ export function AttributePillValue({
           px={15}
           bg={bg}
           radius="xl"
+          miw={miw}
           style={{ border: "none" }}
           onMouseEnter={open}
           onMouseLeave={close}
@@ -147,7 +157,7 @@ export function AttributePillValue({
   );
 }
 
-interface AttributePillContainerProps {
+interface AttributePillContainerProps extends PaperProps {
   color?: MantineColor;
   className?: string;
   children?: React.ReactNode;
@@ -157,6 +167,7 @@ export function AttributePillContainer({
   color,
   className,
   children,
+  ...rest
 }: AttributePillContainerProps) {
   return (
     <Paper
@@ -166,6 +177,7 @@ export function AttributePillContainer({
       radius="xl"
       style={{ border: "none" }}
       className={className}
+      {...rest}
     >
       <Center>{children}</Center>
     </Paper>
