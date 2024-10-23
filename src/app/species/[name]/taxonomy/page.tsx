@@ -645,13 +645,13 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
             </DataTableRow>
 
             <DataTableRow label="Original description">
-              <DataField value={null} />
+              <DataField value={undefined} />
             </DataTableRow>
 
             <DataTableRow label="Type material">
               <AttributePillValue value={typeSpecimen?.recordId} />
             </DataTableRow>
-            <DataTableRow label="Type location">
+            <DataTableRow label="Type location (from source)">
               <DataField
                 value={[
                   typeSpecimen?.locality,

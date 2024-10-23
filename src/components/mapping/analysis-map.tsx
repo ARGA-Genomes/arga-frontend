@@ -1,16 +1,22 @@
 "use client";
 
-import 'maplibre-gl/dist/maplibre-gl.css';
-import classes from './analysis-map.module.css';
+import "maplibre-gl/dist/maplibre-gl.css";
+import classes from "./analysis-map.module.css";
 
-import { Map } from 'react-map-gl/maplibre';
-import DeckGL, { BitmapLayer, GeoJsonLayer, MapView, ScatterplotLayer, TileLayer } from 'deck.gl/typed';
-import { useState, useEffect } from 'react';
-import { GeoJSON } from 'geojson';
-import { gql, useQuery } from '@apollo/client';
-import Link from 'next/link';
-import { Text, Paper, Center } from '@mantine/core';
-import { Layer } from '@/app/type';
+import { Map } from "react-map-gl/maplibre";
+import DeckGL, {
+  BitmapLayer,
+  GeoJsonLayer,
+  MapView,
+  ScatterplotLayer,
+  TileLayer,
+} from "deck.gl/typed";
+import { useState, useEffect } from "react";
+import { GeoJSON } from "geojson";
+import { gql, useQuery } from "@apollo/client";
+import Link from "next/link";
+import { Text, Paper, Center } from "@mantine/core";
+import { Layer } from "@/app/type";
 
 // center on Australia by default
 const DEFAULT_POSITION = [-28.30638, 134.3838];
@@ -33,40 +39,54 @@ type QueryResults = {
   };
 };
 
-
 interface Regions {
-  ibra: string[],
-  imcra: string[],
+  ibra: string[];
+  imcra: string[];
 }
 
 export interface Marker {
-  recordId: string,
-  latitude: number,
-  longitude: number,
-  color: [number, number, number, number],
-  type: Layer
+  recordId: string;
+  latitude: number;
+  longitude: number;
+  color: [number, number, number, number];
+  type?: Layer;
 }
-
 
 interface AnalysisMapProps {
-  regions?: Regions,
-  markers?: Marker[],
-  speciesName?: string,
-  children?: React.ReactNode,
-  style?: Partial<CSSStyleDeclaration>,
-  initialPosition?: [number, number],
-  initialZoom?: number,
+  regions?: Regions;
+  markers?: Marker[];
+  speciesName?: string;
+  children?: React.ReactNode;
+  style?: Partial<CSSStyleDeclaration>;
+  initialPosition?: [number, number];
+  initialZoom?: number;
 }
 
-export default function AnalysisMap(this: any, { regions, markers, speciesName, children, style, initialPosition, initialZoom }: AnalysisMapProps) {
+export default function AnalysisMap(
+  this: any,
+  {
+    regions,
+    markers,
+    speciesName,
+    children,
+    style,
+    initialPosition,
+    initialZoom,
+  }: AnalysisMapProps,
+) {
   const [tolerance, setTolerance] = useState(0.01);
-  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined)
-  const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined)
-  const [clickedMarker, setClickedMarker] = useState<string | undefined>(undefined)
-  const [isOpen, setIsOpen] = useState(false)
+  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(
+    undefined,
+  );
+  const [selectedMarker, setSelectedMarker] = useState<string | undefined>(
+    undefined,
+  );
+  const [clickedMarker, setClickedMarker] = useState<string | undefined>(
+    undefined,
+  );
+  const [isOpen, setIsOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  const [popupLink, setPopupLink] = useState(``)
-
+  const [popupLink, setPopupLink] = useState(``);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
     variables: {
@@ -76,22 +96,23 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
   });
 
   const bioRegions = {
-    ibra: data && JSON.parse(data.maps.ibra) as GeoJSON,
-    imcra: data && JSON.parse(data.maps.imcraProvincial) as GeoJSON,
+    ibra: data && (JSON.parse(data.maps.ibra) as GeoJSON),
+    imcra: data && (JSON.parse(data.maps.imcraProvincial) as GeoJSON),
     selected: selectedRegion,
-  }
+  };
 
   const specimens = {
     markers: markers || [],
     selected: selectedMarker,
-  }
+  };
 
   const view = new MapView({ repeat: true });
 
   const useMousePosition = () => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
     useEffect(() => {
-      const setFromEvent = (e: { clientX: any; clientY: any; }) => setPosition({ x: e.clientX, y: e.clientY });
+      const setFromEvent = (e: { clientX: any; clientY: any }) =>
+        setPosition({ x: e.clientX, y: e.clientY });
       window.addEventListener("mousemove", setFromEvent);
 
       return () => {
@@ -107,75 +128,77 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
         html: `${object?.properties?.name || object?.recordId}`,
         style: {
           backgroundColor: `rgba(${object?.color || [0, 0, 0, 256]})`,
-          color: 'white',
-          borderRadius: '5px'
-        }
+          color: "white",
+          borderRadius: "5px",
+        },
       }
     );
-  }
-  const position = useMousePosition()
+  };
+  const position = useMousePosition();
 
   const onHover = ({ object }: { object?: any }) => {
     if (object?.properties) {
       setSelectedRegion(object?.properties?.name);
-    }
-    else if (object?.recordId) {
+    } else if (object?.recordId) {
       setSelectedMarker(object?.recordId);
-    }
-    else {
+    } else {
       setSelectedRegion(undefined);
       setSelectedMarker(undefined);
     }
-  }
+  };
 
   const onClick = ({ object }: { object?: any }) => {
     if (object && object.recordId) {
       setClickedMarker(object?.recordId);
       setIsOpen(true);
-      setPopupPosition(position)
-      getPopUpLink(object.type, speciesName, object?.recordId)
-    }else {
-    setIsOpen(false);
+      setPopupPosition(position);
+      getPopUpLink(object.type, speciesName, object?.recordId);
+    } else {
+      setIsOpen(false);
     }
-  }
+  };
 
-  const closePopup =() => {
+  const closePopup = () => {
     setIsOpen(false);
-  }
+  };
 
-  const getPopUpLink = (type: Layer, speciesName: string | undefined, clickedMarker: string | undefined) => {
+  const getPopUpLink = (
+    type: Layer,
+    speciesName: string | undefined,
+    clickedMarker: string | undefined,
+  ) => {
     if (type === Layer.Specimens) {
-      setPopupLink( `/species/${speciesName}/specimens/${clickedMarker}`)
-    } else if (type ===Layer.Loci) {
-      setPopupLink( `/species/${speciesName}/markers/${clickedMarker}`)
-    } else if(type === Layer.WholeGenome) {
-      setPopupLink( `/species/${speciesName}/whole_genomes/${clickedMarker}`)
+      setPopupLink(`/species/${speciesName}/specimens/${clickedMarker}`);
+    } else if (type === Layer.Loci) {
+      setPopupLink(`/species/${speciesName}/markers/${clickedMarker}`);
+    } else if (type === Layer.WholeGenome) {
+      setPopupLink(`/species/${speciesName}/whole_genomes/${clickedMarker}`);
+    } else {
+      setPopupLink(``);
     }
-    else {setPopupLink(``)}
-  }
+  };
 
   const hasData = markers && markers.length > 0;
 
   return (
     <>
-      { !hasData && (
-      <Paper className={classes.emptyMapOverlay}>
-        <Center>
-          <Text className={classes.emptyMapText}>no data</Text>
-        </Center>
-      </Paper>
+      {!hasData && (
+        <Paper className={classes.emptyMapOverlay}>
+          <Center>
+            <Text className={classes.emptyMapText}>no data</Text>
+          </Center>
+        </Paper>
       )}
       <DeckGL
         views={view}
         initialViewState={{
-          latitude: (initialPosition && initialPosition[0]) || DEFAULT_POSITION[0],
-          longitude: (initialPosition && initialPosition[1]) || DEFAULT_POSITION[1],
+          latitude:
+            (initialPosition && initialPosition[0]) || DEFAULT_POSITION[0],
+          longitude:
+            (initialPosition && initialPosition[1]) || DEFAULT_POSITION[1],
           zoom: initialZoom || 3.1,
         }}
-        layers={[
-          bioRegionLayers(bioRegions),
-          specimenPlotLayer(specimens),
-        ]}
+        layers={[bioRegionLayers(bioRegions), specimenPlotLayer(specimens)]}
         getTooltip={getTooltip}
         onHover={onHover}
         onClick={onClick}
@@ -186,7 +209,7 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
         <Map
           key="map"
           reuseMaps
-          mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+          mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
           id="ausmap"
           initialViewState={{
             latitude: DEFAULT_POSITION[0],
@@ -198,21 +221,33 @@ export default function AnalysisMap(this: any, { regions, markers, speciesName, 
         </Map>
       </DeckGL>
 
-      {isOpen && <Paper h={50} w={300} radius={5} p={10}
-      style={{zIndex:200, display: isOpen? 'table': 'hidden', position: 'fixed', left: popupPosition.x, top: popupPosition.y, alignContent: 'center'}} onClick={closePopup}>
-        View details: &nbsp;
-        <Link href={popupLink}>{clickedMarker}
-        </Link>
-      </Paper>}
+      {isOpen && (
+        <Paper
+          h={50}
+          w={300}
+          radius={5}
+          p={10}
+          style={{
+            zIndex: 200,
+            display: isOpen ? "table" : "hidden",
+            position: "fixed",
+            left: popupPosition.x,
+            top: popupPosition.y,
+            alignContent: "center",
+          }}
+          onClick={closePopup}
+        >
+          View details: &nbsp;
+          <Link href={popupLink}>{clickedMarker}</Link>
+        </Paper>
+      )}
     </>
-
-  )
+  );
 }
-
 
 function tileLayer() {
   return new TileLayer({
-    data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
     maxRequests: 20,
     pickable: true,
     autoHighlight: false,
@@ -220,22 +255,21 @@ function tileLayer() {
     minZoom: 0,
     maxZoom: 19,
     tileSize: 256,
-    renderSubLayers: props => {
+    renderSubLayers: (props) => {
       const [[west, south], [east, north]] = props.tile.boundingBox;
       return new BitmapLayer(props, {
         data: undefined,
         image: props.data,
-        bounds: [west, south, east, north]
-      })
+        bounds: [west, south, east, north],
+      });
     },
   });
 }
 
-
 interface BioRegions {
-  ibra?: GeoJSON,
-  imcra?: GeoJSON,
-  selected?: string
+  ibra?: GeoJSON;
+  imcra?: GeoJSON;
+  selected?: string;
 }
 
 function bioRegionLayers(regions: BioRegions) {
@@ -248,37 +282,38 @@ function bioRegionLayers(regions: BioRegions) {
   const ibra = new GeoJsonLayer({
     id: "ibra-layer",
     data: regions.ibra || [],
-    getFillColor: d => d.properties?.name === regions.selected ? ibraHover : ibraColor,
+    getFillColor: (d) =>
+      d.properties?.name === regions.selected ? ibraHover : ibraColor,
     getLineColor: [254, 195, 55, 200],
     pickable: true,
     filled: true,
-    pointType: 'circle',
+    pointType: "circle",
     lineWidthMinPixels: 1,
   });
 
   const imcra = new GeoJsonLayer({
     id: "imcra-layer",
     data: regions.imcra || [],
-    getFillColor: d => d.properties?.name === regions.selected ? imcraHover : imcraColor,
+    getFillColor: (d) =>
+      d.properties?.name === regions.selected ? imcraHover : imcraColor,
     getLineColor: [88, 163, 157, 200],
     pickable: true,
     filled: true,
-    pointType: 'circle',
+    pointType: "circle",
     lineWidthMinPixels: 1,
   });
 
   return [ibra, imcra];
 }
 
-
 interface Specimens {
-  markers: Marker[],
-  selected?: string,
+  markers: Marker[];
+  selected?: string;
 }
 
 function specimenPlotLayer({ markers, selected }: Specimens) {
   return new ScatterplotLayer({
-    id: 'scatter-plot',
+    id: "scatter-plot",
     data: markers,
     radiusScale: 20,
     radiusMinPixels: 5,
@@ -286,5 +321,5 @@ function specimenPlotLayer({ markers, selected }: Specimens) {
     getFillColor: (d: Marker) => d.color,
     getRadius: 1,
     pickable: true,
-  })
+  });
 }
