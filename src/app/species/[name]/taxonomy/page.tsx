@@ -17,11 +17,16 @@ import {
   Tabs,
   ScrollArea,
   Box,
+  Popover,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
-import { IconBinaryTree2, IconExternalLink } from "@tabler/icons-react";
+import {
+  IconBinaryTree2,
+  IconExternalLink,
+  IconSearch,
+} from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
@@ -42,6 +47,8 @@ import HorizontalTimeline, {
   TimelineItemType,
 } from "@/components/graphing/horizontal-timeline";
 import { Publication } from "@/queries/publication";
+import { Specimen } from "@/queries/specimen";
+import { AnalysisMap } from "@/components/mapping";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -132,6 +139,28 @@ const GET_SYNONYMS = gql`
   }
 `;
 
+const GET_TYPE_SPECIMENS = gql`
+  query TaxonTypeSpecimens($rank: TaxonomicRank, $canonicalName: String) {
+    taxon(rank: $rank, canonicalName: $canonicalName) {
+      typeSpecimens {
+        typeStatus
+        recordId
+        materialSampleId
+        collectionCode
+        institutionCode
+        institutionName
+        recordedBy
+        identifiedBy
+        locality
+        country
+        stateProvince
+        latitude
+        longitude
+      }
+    }
+  }
+`;
+
 type ClassificationNode = {
   canonicalName: string;
   rank: string;
@@ -188,6 +217,12 @@ type TaxonQuery = {
 type SynonymsQuery = {
   taxon: {
     taxonomicActs: TaxonomicAct[];
+  };
+};
+
+type TypeSpecimenQuery = {
+  taxon: {
+    typeSpecimens: Specimen[];
   };
 };
 
@@ -511,14 +546,7 @@ function ExternalLinks(props: ExternalLinksProps) {
   );
 }
 
-interface DetailsProps {
-  taxonomy: Taxonomy;
-  commonNames: VernacularName[];
-}
-
-function Details({ taxonomy, commonNames }: DetailsProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
+function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   const { loading, error, data } = useQuery<SynonymsQuery>(GET_SYNONYMS, {
     variables: {
       rank: taxonomy.rank,
@@ -536,6 +564,50 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
     synonyms[act.taxon.status] ||= [];
     synonyms[act.taxon.status].push(act);
   }
+
+  return (
+    <Paper p="sm">
+      {Object.entries(synonyms).map(([status, acts]) => (
+        <Stack gap={0} key={status}>
+          <Text fw={300} fz="sm">
+            {Humanize.capitalize(status.toLowerCase().replace("_", " "))}
+          </Text>
+          {acts.map((act) => (
+            <Group key={act.taxon.canonicalName} gap={10}>
+              <Text fw={600} fz="sm" fs="italic">
+                {act.taxon.canonicalName}
+              </Text>
+              <Text fw={600} fz="sm">
+                {act.taxon.authorship}
+              </Text>
+            </Group>
+          ))}
+        </Stack>
+      ))}
+    </Paper>
+  );
+}
+
+interface DetailsProps {
+  taxonomy: Taxonomy;
+  commonNames: VernacularName[];
+}
+
+function Details({ taxonomy, commonNames }: DetailsProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { loading, error, data } = useQuery<TypeSpecimenQuery>(
+    GET_TYPE_SPECIMENS,
+    {
+      variables: {
+        rank: taxonomy.rank,
+        canonicalName: taxonomy.canonicalName,
+      },
+    },
+  );
+
+  const specimens = data?.taxon.typeSpecimens;
+  const typeSpecimen = specimens && specimens[0];
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -559,7 +631,7 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
         <Paper p="sm">
           <DataTable>
             <DataTableRow label="Scientific name">
-              <Group gap={10}>
+              <Group gap={10} pl={12}>
                 <Text fw={600} fz="sm" fs="italic">
                   {taxonomy.canonicalName}
                 </Text>
@@ -569,32 +641,81 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
               </Group>
             </DataTableRow>
             <DataTableRow label="Status">
-              <Text fw={600} fz="sm">
-                {taxonomy.status.toLowerCase()}
-              </Text>
+              <AttributePillValue value={taxonomy.status.toLowerCase()} />
             </DataTableRow>
+
+            <DataTableRow label="Original description">
+              <DataField value={undefined} />
+            </DataTableRow>
+
+            <DataTableRow label="Type material">
+              <AttributePillValue value={typeSpecimen?.recordId} />
+            </DataTableRow>
+            <DataTableRow label="Type location (from source)">
+              <DataField
+                value={[
+                  typeSpecimen?.locality,
+                  typeSpecimen?.stateProvince,
+                  typeSpecimen?.country,
+                ]
+                  .filter((t) => t)
+                  .join(", ")}
+              />
+            </DataTableRow>
+            {typeSpecimen &&
+              typeSpecimen.latitude &&
+              typeSpecimen.longitude && (
+                <DataTableRow label="Type location (geo)">
+                  <Group>
+                    <DataField
+                      value={[typeSpecimen?.latitude, typeSpecimen?.longitude]
+                        .filter((t) => t)
+                        .join(", ")}
+                    />
+
+                    <Popover width={500} position="right" withArrow shadow="md">
+                      <Popover.Target>
+                        <Button
+                          variant="subtle"
+                          leftSection={<IconSearch />}
+                          color="shellfish"
+                        >
+                          View map
+                        </Button>
+                      </Popover.Target>
+                      <Popover.Dropdown
+                        p={0}
+                        m={0}
+                        style={{
+                          borderRadius: "var(--mantine-radius-lg)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <Box pos="relative" h="500">
+                          <AnalysisMap
+                            markers={[
+                              {
+                                recordId: typeSpecimen.recordId,
+                                latitude: typeSpecimen.latitude,
+                                longitude: typeSpecimen.longitude,
+                                color: [103, 151, 180, 220],
+                              },
+                            ]}
+                            style={{
+                              borderRadius: "var(--mantine-radius-lg)",
+                              overflow: "hidden",
+                            }}
+                          ></AnalysisMap>
+                        </Box>
+                      </Popover.Dropdown>
+                    </Popover>
+                  </Group>
+                </DataTableRow>
+              )}
           </DataTable>
         </Paper>
 
-        <Paper p="sm">
-          {Object.entries(synonyms).map(([status, acts]) => (
-            <Stack gap={0} key={status}>
-              <Text fw={300} fz="sm">
-                {Humanize.capitalize(status.toLowerCase().replace("_", " "))}
-              </Text>
-              {acts.map((act) => (
-                <Group key={act.taxon.canonicalName} gap={10}>
-                  <Text fw={600} fz="sm" fs="italic">
-                    {act.taxon.canonicalName}
-                  </Text>
-                  <Text fw={600} fz="sm">
-                    {act.taxon.authorship}
-                  </Text>
-                </Group>
-              ))}
-            </Stack>
-          ))}
-        </Paper>
+        <Synonyms taxonomy={taxonomy} />
 
         <Stack>
           <Paper p="sm">
@@ -939,6 +1060,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
           Interactive higher classification
         </Text>
         <Button
+          color="shellfish"
           onClick={() => {
             const newLayout =
               layout === "top-to-bottom" ? "right-to-left" : "top-to-bottom";

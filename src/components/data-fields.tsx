@@ -94,6 +94,7 @@ const BADGE_COLOURS: Record<string, string> = {
   haploid: "wheat.2",
   Major: "moss.3",
   Accepted: "moss.3",
+  accepted: "moss.3",
   "Nomenclatural synonym": "wheat.2",
   "Taxonomic synonym": "wheat.2",
   "Original description": "moss.3",
