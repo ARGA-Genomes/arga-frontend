@@ -1,9 +1,8 @@
 "use client";
 
 import * as Humanize from "humanize-plus";
-import { Accordion, Center, Divider, Group, Stack, Text } from "@mantine/core";
+import { Accordion, Divider, Group, Stack, Text } from "@mantine/core";
 
-import classes from "./taxonomy-switcher.module.css";
 import accClasses from "./taxonomy-switcher-acc.module.css";
 
 import { Taxon } from "@/queries/taxa";
@@ -13,7 +12,8 @@ import {
   AttributePillContainer,
 } from "./data-fields";
 import { Dataset, useDatasets } from "@/app/source-provider";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 type ClassificationNode = {
   canonicalName: string;
@@ -34,12 +34,18 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
   const taxaWithDatasets = mapTaxaDatasets(taxa, datasets);
   const sorted = sortTaxaBySources(taxaWithDatasets);
 
-  const [active, setActive] = useState<string>(
-    (
+  console.log(taxa);
+
+  const first = useMemo(
+    () =>
       sorted.find(
         (taxon) => taxon.dataset?.name === "Atlas of Living Australia"
-      ) || sorted[0]
-    ).datasetId
+      ) || sorted[0],
+    [sorted]
+  );
+
+  const [active, setActive] = useState<string>(
+    `${first.scientificName}-${first.datasetId}`
   );
 
   return (
@@ -53,7 +59,10 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
       {sorted.map((taxon) => {
         const isActive = taxon.datasetId === active;
         return (
-          <Accordion.Item key={taxon.datasetId} value={taxon.datasetId}>
+          <Accordion.Item
+            key={`${taxon.scientificName}-${taxon.datasetId}`}
+            value={`${taxon.scientificName}-${taxon.datasetId}`}
+          >
             <Accordion.Control>
               <Text
                 fw={600}
@@ -65,8 +74,12 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
             </Accordion.Control>
             <Accordion.Panel>
               <Stack>
-                <Hierarchy hierarchy={taxon.hierarchy} />
-                <Divider opacity={0.1} mt="xs" mb="sm" />
+                {taxon.hierarchy.length > 0 && (
+                  <>
+                    <Hierarchy hierarchy={taxon.hierarchy} />
+                    <Divider opacity={0.1} mt="xs" mb="sm" />
+                  </>
+                )}
                 <Group justify="space-between">
                   <Group>
                     <Text c="white" fw={600}>
@@ -107,9 +120,13 @@ function Hierarchy({ hierarchy }: { hierarchy: ClassificationNode[] }) {
           <AttributePill
             key={idx}
             labelColor="white"
+            popoverDisabled
+            hoverColor="midnight.0"
             label={Humanize.capitalize(node.rank.toLowerCase())}
             value={node.canonicalName}
             href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
+            icon={IconArrowUpRight}
+            showIconOnHover
             miw={100}
           />
         ))}

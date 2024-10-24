@@ -10,6 +10,7 @@ import {
   PaperProps,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { Icon, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 
 interface AttributeProps {
@@ -50,38 +51,6 @@ export function Attribute({
   );
 }
 
-interface AttributePillProps {
-  label: string;
-  value?: string | number;
-  href?: string;
-  italic?: boolean;
-  color?: MantineColor;
-  labelColor?: MantineColor;
-  group?: boolean;
-  miw?: number;
-}
-
-export function AttributePill({
-  label,
-  value,
-  href,
-  italic,
-  color,
-  labelColor,
-  group,
-  miw,
-}: AttributePillProps) {
-  const pill = (
-    <AttributePillValue value={value} italic={italic} color={color} miw={miw} />
-  );
-
-  return (
-    <Attribute label={label} group={group} labelColor={labelColor}>
-      {href ? <Link href={href}>{pill}</Link> : pill}
-    </Attribute>
-  );
-}
-
 const BADGE_COLOURS: Record<string, string> = {
   yes: "moss.3",
   no: "bushfire.3",
@@ -103,15 +72,48 @@ const BADGE_COLOURS: Record<string, string> = {
 
 interface AttributePillValueProps {
   value?: string | number;
+  popoverLabel?: string | number;
+  popoverDisabled?: boolean;
   italic?: boolean;
   color?: MantineColor;
+  hoverColor?: MantineColor;
+  icon?: typeof IconInfoCircle;
+  showIconOnHover?: boolean;
   miw?: number;
+}
+
+interface AttributePillProps extends AttributePillValueProps {
+  label: string;
+  href?: string;
+  labelColor?: MantineColor;
+  group?: boolean;
+}
+
+export function AttributePill({
+  label,
+  href,
+  labelColor,
+  group,
+  ...rest
+}: AttributePillProps) {
+  const pill = <AttributePillValue {...rest} />;
+
+  return (
+    <Attribute label={label} group={group} labelColor={labelColor}>
+      {href ? <Link href={href}>{pill}</Link> : pill}
+    </Attribute>
+  );
 }
 
 export function AttributePillValue({
   value,
+  popoverLabel,
+  popoverDisabled = false,
   italic,
   color,
+  hoverColor,
+  icon: Icon,
+  showIconOnHover = false,
   miw,
 }: AttributePillValueProps) {
   const [opened, { close, open }] = useDisclosure(false);
@@ -126,12 +128,13 @@ export function AttributePillValue({
       shadow="md"
       opened={opened}
       radius="md"
+      disabled={popoverDisabled}
     >
       <Popover.Target>
         <Paper
           py={5}
           px={15}
-          bg={bg}
+          bg={opened && hoverColor ? hoverColor : bg}
           radius="xl"
           miw={miw}
           style={{ border: "none" }}
@@ -143,16 +146,32 @@ export function AttributePillValue({
               fw={600}
               size="sm"
               fs={italic ? "italic" : undefined}
-              style={{ whiteSpace: "nowrap" }}
+              style={{
+                whiteSpace: "nowrap",
+                transition: "ease all 250ms",
+                marginLeft: Icon && !opened ? 18 : 0,
+              }}
               truncate
             >
               {value}
             </Text>
+            {Icon && (
+              <Icon
+                size={16}
+                strokeWidth={3}
+                style={{
+                  transition: "ease all 250ms",
+                  marginLeft: showIconOnHover && !opened ? 0 : 18,
+                  transform:
+                    showIconOnHover && !opened ? "scale(0)" : "scale(1)",
+                }}
+              />
+            )}
           </Center>
         </Paper>
       </Popover.Target>
       <Popover.Dropdown bg={bg}>
-        <Text size="xs">{value}</Text>
+        <Text size="xs">{popoverLabel || value}</Text>
       </Popover.Dropdown>
     </Popover>
   );
