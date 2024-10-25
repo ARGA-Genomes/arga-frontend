@@ -2,26 +2,15 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Button,
-  Grid,
-  Group,
-  Modal,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  Image,
-  Flex,
-  Skeleton,
-} from "@mantine/core";
+import { Button, Grid, Group, Paper, Stack, Text } from "@mantine/core";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
-import { Attribute, AttributePill } from "@/components/highlight-stack";
+import { AttributePill as AttributePillStack } from "@/components/highlight-stack";
+import { AttributePill } from "@/components/data-fields";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { SpeciesImage } from "@/components/species-image";
-import Link from "next/link";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
@@ -135,7 +124,7 @@ function SummaryInfo({ label, value }: SummaryInfoProps) {
   return (
     <Group justify="space-between" wrap="nowrap">
       <Text>{label}</Text>
-      <AttributePill value={value} />
+      <AttributePillStack value={value} />
     </Group>
   );
 }
@@ -280,12 +269,12 @@ function ExternalResources(props: ExternalResourcesProps) {
       try {
         const response = await fetch(
           `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            props.canonicalName,
-          )}`,
+            props.canonicalName
+          )}`
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
         );
       } catch (error) {
         setMatchedTaxon([]);
@@ -371,11 +360,17 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
       <Group>
         {error && <Text>{error.message}</Text>}
         {hierarchy?.map((node, idx) => (
-          <Attribute
+          <AttributePill
             key={idx}
+            labelColor="white"
+            popoverDisabled
+            hoverColor="midnight.0"
             label={Humanize.capitalize(node.rank.toLowerCase())}
             value={node.canonicalName}
             href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
+            icon={IconArrowUpRight}
+            showIconOnHover
+            miw={100}
           />
         ))}
       </Group>

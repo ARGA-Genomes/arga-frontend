@@ -49,6 +49,9 @@
   }
   &[data-active] {
     background-color: var(--mantine-color-shellfish-7);
+    & .label {
+      color: white;
+    }
     &:hover {
       cursor: default;
     }
