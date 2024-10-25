@@ -487,8 +487,6 @@ export default function IconBar({
   traits,
   attributes,
 }: IconBarProps) {
-  if (!taxonomy) return null;
-
   const taxonomyHeaderIcons = [taxonomy.vernacularGroup];
   isLichen(taxonomy.source) ? taxonomyHeaderIcons.push("LICHENS") : undefined;
 
