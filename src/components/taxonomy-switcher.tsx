@@ -286,6 +286,7 @@ function mapTaxaDatasets(taxa: Taxon[], datasets: Map<string, Dataset>) {
 export function sortTaxaBySources(taxa: TaxonWithDataset[]) {
   return taxa
     .map((t) => t)
+    .filter((t) => t.status === "ACCEPTED")
     .sort((first, second) => {
       const a = first.dataset?.name || "";
       const b = second.dataset?.name || "";
