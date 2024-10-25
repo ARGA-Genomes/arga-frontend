@@ -13,7 +13,6 @@ import {
   Container,
   Table,
   Group,
-  SegmentedControl,
   Drawer,
   Button,
   Badge,
@@ -448,20 +447,20 @@ interface FiltersProps {
 
 function Filters({ filters, options, onChange }: FiltersProps) {
   const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications,
+    filters.classifications
   );
   const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(
-    filters.vernacularGroup,
+    filters.vernacularGroup
   );
   const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology);
   const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra);
   const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra);
   const [state, setState] = useState<Filter | undefined>(filters.state);
   const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(
-    filters.drainageBasin,
+    filters.drainageBasin
   );
   const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(
-    filters.bushfireRecovery,
+    filters.bushfireRecovery
   );
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
@@ -701,7 +700,7 @@ function Species({
 *   .map(intoFilterItem)
       .filter((item) => item), */
       },
-    },
+    }
   );
 
   if (error) {
@@ -1003,7 +1002,7 @@ function DataSummary({
                 <DataField
                   value={Humanize.formatNumber(
                     taxon?.descendants.filter((d) => d.speciesGenomes > 0)
-                      .length || 0,
+                      .length || 0
                   )}
                 />
               </DataTableRow>
@@ -1011,7 +1010,7 @@ function DataSummary({
             <DataTableRow label="Species with genomes">
               <DataField
                 value={Humanize.formatNumber(
-                  taxon?.summary.speciesGenomes || 0,
+                  taxon?.summary.speciesGenomes || 0
                 )}
               />
             </DataTableRow>
@@ -1022,7 +1021,7 @@ function DataSummary({
                 <DataField
                   value={Humanize.formatNumber(
                     taxon?.descendants.filter((d) => d.speciesData > 0)
-                      .length || 0,
+                      .length || 0
                   )}
                 />
               </DataTableRow>
@@ -1093,7 +1092,7 @@ function EukaryotaDataSummary({
             speciesData: descendant.speciesData,
             speciesGenomes: descendant.speciesGenomes,
           };
-        }),
+        })
     )
     .concat(
       taxon?.superKingdomDescendants.map((descendant) => {
@@ -1104,7 +1103,7 @@ function EukaryotaDataSummary({
           speciesData: descendant.speciesData,
           speciesGenomes: descendant.speciesGenomes,
         };
-      }),
+      })
     );
 
   const rankGenomes = descendants
@@ -1247,8 +1246,7 @@ function EukaryotaDataSummary({
               <DataTableRow label={"Kingdoms/regna with genomes"}>
                 <DataField
                   value={Humanize.formatNumber(
-                    descendants?.filter((d) => d.speciesGenomes > 0).length ||
-                      0,
+                    descendants?.filter((d) => d.speciesGenomes > 0).length || 0
                   )}
                 />
               </DataTableRow>
@@ -1256,7 +1254,7 @@ function EukaryotaDataSummary({
             <DataTableRow label="Species with genomes">
               <DataField
                 value={Humanize.formatNumber(
-                  taxon?.summary.speciesGenomes || 0,
+                  taxon?.summary.speciesGenomes || 0
                 )}
               />
             </DataTableRow>
@@ -1264,7 +1262,7 @@ function EukaryotaDataSummary({
               <DataTableRow label={"Kingdoms/regna with data"}>
                 <DataField
                   value={Humanize.formatNumber(
-                    descendants?.filter((d) => d.speciesData > 0).length || 0,
+                    descendants?.filter((d) => d.speciesData > 0).length || 0
                   )}
                 />
               </DataTableRow>
@@ -1329,7 +1327,7 @@ export default function ClassificationPage({
         kingdomDescendantRank: "KINGDOM",
         regnumDescendantRank: "REGNUM",
       },
-    },
+    }
   );
 
   useEffect(() => {

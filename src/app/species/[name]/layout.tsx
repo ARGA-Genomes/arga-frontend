@@ -9,6 +9,7 @@ import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
+import { PageCitation } from "@/components/page-citation";
 
 const GET_SPECIES_DATA_SUMMARY = gql`
   query SpeciesWithDataSummary($canonicalName: String) {
@@ -116,12 +117,11 @@ export default function SpeciesLayout({
       <Container mb={20} w="100%" maw={MAX_WIDTH}>
         <PreviousPage />
       </Container>
-
       <SpeciesHeader canonicalName={canonicalName} />
-
       <DataTabs name={params.name}>
         <Container maw={MAX_WIDTH}>{children}</Container>
       </DataTabs>
+      <PageCitation />
     </Stack>
   );
 }
