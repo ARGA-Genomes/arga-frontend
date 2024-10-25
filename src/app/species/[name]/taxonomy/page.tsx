@@ -1076,7 +1076,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      {/* <Box h={800}>
+      <Box h={800}>
         {treeData && (
           <TaxonomyTree
             layout={layout}
@@ -1085,7 +1085,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
             initialExpanded={expandedGenera}
           />
         )}
-      </Box> */}
+      </Box>
     </Paper>
   );
 }
