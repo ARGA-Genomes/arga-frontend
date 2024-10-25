@@ -759,6 +759,13 @@ const ACT_ICON: Record<string, string> = {
   REVIVED_STATUS: "/timeline-icons/orignal_description.svg",
   NAME_USAGE: "/timeline-icons/name_usage.svg",
   SUBGENUS_PLACEMENT: "/timeline-icons/recombination.svg",
+  ORIGINAL_DESCRIPTION: "/timeline-icons/original_description.svg",
+  REDESCRIPTION: "/timeline-icons/original_description.svg",
+  DEMOTION: "/timeline-icons/recombination.svg",
+  PROMOTION: "/timeline-icons/recombination.svg",
+  SYNONYMISATION: "/timeline-icons/synonymy.svg",
+  HETEROTYPIC_SYNONYMY: "/timeline-icons/synonymy.svg",
+  HOMOTYPIC_SYNONYMY: "/timeline-icons/synonymy.svg",
 };
 
 const ACT_LABEL: Record<string, string> = {
@@ -769,6 +776,13 @@ const ACT_LABEL: Record<string, string> = {
   SUBGENUS_PLACEMENT: "subgenus placement",
   REVIVED_STATUS: "revived",
   NAME_USAGE: "name usage",
+  ORIGINAL_DESCRIPTION: "original description",
+  REDESCRIPTION: "redescription",
+  DEMOTION: "demotion",
+  PROMOTION: "promotion",
+  SYNONYMISATION: "synonymisation",
+  HETEROTYPIC_SYNONYMY: "heterotypic synonymy",
+  HOMOTYPIC_SYNONYMY: "homotypic synonymy",
 };
 
 // sort by publication year first, then by the type of the act, and lastly by scientific name
