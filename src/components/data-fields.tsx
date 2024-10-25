@@ -10,7 +10,7 @@ import {
   PaperProps,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Icon, IconInfoCircle } from "@tabler/icons-react";
+import { IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 
 interface AttributeProps {
@@ -76,6 +76,7 @@ interface AttributePillValueProps {
   popoverDisabled?: boolean;
   italic?: boolean;
   color?: MantineColor;
+  textColor?: MantineColor;
   hoverColor?: MantineColor;
   icon?: typeof IconInfoCircle;
   showIconOnHover?: boolean;
@@ -112,6 +113,7 @@ export function AttributePillValue({
   italic,
   color,
   hoverColor,
+  textColor,
   icon: Icon,
   showIconOnHover = false,
   miw,
@@ -151,6 +153,7 @@ export function AttributePillValue({
                 transition: "ease all 250ms",
                 marginLeft: Icon && !opened ? 18 : 0,
               }}
+              c={textColor}
               truncate
             >
               {value}

@@ -3,7 +3,7 @@
 import classes from "../../../../components/record-list.module.css";
 
 import * as Humanize from "humanize-plus";
-import { gql, useQuery } from "@apollo/client";
+import { ApolloError, gql, useQuery } from "@apollo/client";
 import {
   Button,
   Grid,
@@ -55,6 +55,7 @@ const GET_TAXA = gql`
     taxa(filters: $filters) {
       records {
         datasetId
+        entityId
 
         ...TaxonName
         ...TaxonSource
@@ -321,7 +322,7 @@ type ProvenanceQuery = {
         action: string;
         atom: AtomText | AtomNomenclaturalType | AtomDateTime;
         dataset: Dataset;
-      },
+      }
     ];
   };
 };
@@ -465,11 +466,13 @@ function ExternalLinks(props: ExternalLinksProps) {
     async function matchTaxon() {
       try {
         const response = await fetch(
-          `https://api.ala.org.au/species/guid/${encodeURIComponent(props.canonicalName)}`,
+          `https://api.ala.org.au/species/guid/${encodeURIComponent(
+            props.canonicalName
+          )}`
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
         );
       } catch (error) {
         setMatchedTaxon([]);
@@ -555,7 +558,7 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   });
 
   const acts = data?.taxon.taxonomicActs.filter(
-    (act) => act.taxon.status !== "ACCEPTED",
+    (act) => act.taxon.status !== "ACCEPTED"
   );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
@@ -603,7 +606,7 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
         rank: taxonomy.rank,
         canonicalName: taxonomy.canonicalName,
       },
-    },
+    }
   );
 
   const specimens = data?.taxon.typeSpecimens;
@@ -791,10 +794,6 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
   return 0;
 }
 
-function HistoryItem({ act }: { act: NomenclaturalAct }) {
-  return <Text>{act.publication.publishedYear}</Text>;
-}
-
 function History({ taxonomy }: { taxonomy: Taxonomy }) {
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
     variables: {
@@ -901,7 +900,6 @@ interface NomenclaturalActBodyProps {
 }
 
 function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
-  const [opened, { open, close }] = useDisclosure(false);
   const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
     variables: { entityId: item.entityId },
   });
@@ -912,7 +910,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 
   const act = humanize(item.act);
   const items = data?.provenance.nomenclaturalAct.filter(
-    (item) => item.action !== "CREATE",
+    (item) => item.action !== "CREATE"
   );
 
   return (
@@ -1019,7 +1017,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
   const [layout, setLayout] = useState<Layout>("top-to-bottom");
 
   const order = hierarchy.find(
-    (node) => node.rank === "ORDER" || node.rank === "ORDO",
+    (node) => node.rank === "ORDER" || node.rank === "ORDO"
     /* (node) => node.rank === "FAMILY" || node.rank === "FAMILIA", */
   );
   const { loading, error, data } = useQuery<TaxonTreeStatsQuery>(
@@ -1042,7 +1040,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
           "SPECIES",
         ],
       },
-    },
+    }
   );
 
   const treeData = data?.stats.taxonBreakdown[0];
@@ -1078,7 +1076,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      <Box h={800}>
+      {/* <Box h={800}>
         {treeData && (
           <TaxonomyTree
             layout={layout}
@@ -1087,12 +1085,32 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
             initialExpanded={expandedGenera}
           />
         )}
-      </Box>
+      </Box> */}
     </Paper>
   );
 }
 
 const TAXA_SOURCE_PRIORITIES = ["Australian Living Atlas", "AFD", "APC"];
+
+const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
+  return taxonomy
+    .map((t) => t)
+    .sort((a: Taxonomy, b: Taxonomy): number => {
+      let indexA = TAXA_SOURCE_PRIORITIES.indexOf(a.source || "");
+      let indexB = TAXA_SOURCE_PRIORITIES.indexOf(b.source || "");
+
+      if (indexA == -1) indexA = TAXA_SOURCE_PRIORITIES.length;
+      if (indexB == -1) indexB = TAXA_SOURCE_PRIORITIES.length;
+
+      if (indexA < indexB) return -1;
+      else if (indexA > indexB) return 1;
+      else {
+        const sourceA = a.source || "";
+        const sourceB = b.source || "";
+        return sourceA.localeCompare(sourceB);
+      }
+    });
+};
 
 export default function TaxonomyPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
@@ -1101,6 +1119,10 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
     variables: { canonicalName },
   });
 
+  const species = data?.species;
+  const taxonomy = species && sortTaxaBySources(species.taxonomy)[0];
+  const hierarchy = species?.hierarchy;
+
   const results = useQuery<TaxaQuery>(GET_TAXA, {
     variables: { filters: [{ canonicalName }] },
   });
@@ -1108,30 +1130,6 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
-
-  const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
-    return taxonomy
-      .map((t) => t)
-      .sort((a: Taxonomy, b: Taxonomy): number => {
-        let indexA = TAXA_SOURCE_PRIORITIES.indexOf(a.source || "");
-        let indexB = TAXA_SOURCE_PRIORITIES.indexOf(b.source || "");
-
-        if (indexA == -1) indexA = TAXA_SOURCE_PRIORITIES.length;
-        if (indexB == -1) indexB = TAXA_SOURCE_PRIORITIES.length;
-
-        if (indexA < indexB) return -1;
-        else if (indexA > indexB) return 1;
-        else {
-          const sourceA = a.source || "";
-          const sourceB = b.source || "";
-          return sourceA.localeCompare(sourceB);
-        }
-      });
-  };
-
-  const species = data?.species;
-  const taxonomy = species && sortTaxaBySources(species.taxonomy)[0];
-  const hierarchy = species?.hierarchy;
 
   return (
     <Stack>
