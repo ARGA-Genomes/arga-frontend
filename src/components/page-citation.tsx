@@ -107,7 +107,7 @@ export function PageCitation() {
                       https://app.arga.org.au{location}
                     </a>{" "}
                     on {date.getDate()}-{date.getMonth() + 1}-
-                    {date.getFullYear()}
+                    {date.getFullYear()}.
                   </Text>
                 </Flex>
               </DataTableRow>
