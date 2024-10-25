@@ -69,13 +69,18 @@ export function PageCitation() {
               <DataTableRow label="Citation">
                 <Text fw={600} fz="sm" c="midnight.7">
                   Australian Reference Genome Atlas {date.getFullYear()},{" "}
-                  {`<i>${taxonomy?.canonicalName} ${taxonomy?.authorship}, Taxonomy</i>`}
+                  <i>
+                    {taxonomy?.canonicalName} {taxonomy?.authorship}, Taxonomy
+                  </i>
                   , The Australian Reference Genome Atlas, accessed{" "}
                   {date.getDate()} {months[date.getMonth()]}{" "}
-                  {date.getFullYear()},
-                  <br />
-                  {"<"}https://app.arga.org.au{location}
-                  {">"}
+                  {date.getFullYear()},{" "}
+                  <a
+                    aria-label="Citation Link"
+                    href={`https://app.arga.org.au${location}`}
+                  >
+                    https://app.arga.org.au{location}
+                  </a>
                 </Text>
               </DataTableRow>
             </DataTable>
