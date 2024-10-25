@@ -374,7 +374,7 @@ function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
       currentAccepted.endDate = item.date;
 
     // we add a new taxon bar for new species
-    if (item.act === "SPECIES_NOVA") {
+    if (item.act === "SPECIES_NOVA" || item.act === "ORIGINAL_DESCRIPTION") {
       currentAccepted = {
         ...item,
         type: TimelineItemType.Bar,
