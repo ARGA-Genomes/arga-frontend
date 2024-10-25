@@ -67,21 +67,19 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
     GET_TAXON_PROVENANCE,
     {
       variables: { entityId },
-    }
+    },
   );
-
-  console.log(data);
 
   const first = useMemo(
     () =>
       sorted.find(
-        (taxon) => taxon.dataset?.name === "Atlas of Living Australia"
+        (taxon) => taxon.dataset?.name === "Atlas of Living Australia",
       ) || sorted[0],
-    [sorted]
+    [sorted],
   );
 
   const [active, setActive] = useState<string>(
-    `${first.scientificName}-${first.datasetId}`
+    `${first.scientificName}-${first.datasetId}`,
   );
 
   return (
@@ -132,7 +130,7 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
                     <Group align="center">
                       <Text size="lg" fw={600} c="midnight.9">
                         {Humanize.capitalize(
-                          taxon.action.toString().toLowerCase()
+                          taxon.action.toString().toLowerCase(),
                         )}
                       </Text>
                       <Badge color="shellfish" variant="light">

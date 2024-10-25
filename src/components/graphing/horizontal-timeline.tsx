@@ -370,8 +370,18 @@ function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
   let currentAccepted = null;
 
   for (const item of items) {
-    if (currentAccepted && currentAccepted.label != item.label)
+    if (
+      currentAccepted &&
+      currentAccepted.label != item.label &&
+      item.act === "NAME_USAGE"
+    ) {
       currentAccepted.endDate = item.date;
+    }
+
+    // we add a new taxon bar for new species
+    if (currentAccepted && item.act === "HETEROTYPIC_SYNONYMY") {
+      currentAccepted.endDate = item.date;
+    }
 
     // we add a new taxon bar for new species
     if (item.act === "SPECIES_NOVA" || item.act === "ORIGINAL_DESCRIPTION") {
@@ -409,7 +419,7 @@ type Domain = {
  * particularly helpful for the visualisation
  */
 function domainDecades(items: TimelineItem[]): Domain[] {
-  let decades = items.map((item) => Math.floor(item.date.getFullYear() / 10));
+  let decades = items.map((item) => Math.floor(item.date.getFullYear() / 40));
   let deduped = new Set(decades);
 
   let starts: number[] = [];
@@ -430,8 +440,8 @@ function domainDecades(items: TimelineItem[]): Domain[] {
 
   // zip of the domain ranges and convert them into dates at the beginning of the decade
   const domains = starts.map((start, idx) => ({
-    start: new Date(start * 10, 0, 1),
-    end: new Date(ends[idx] * 10, 0, 1),
+    start: new Date(start * 40, 0, 1),
+    end: new Date(ends[idx] * 40, 0, 1),
   }));
 
   return domains;
