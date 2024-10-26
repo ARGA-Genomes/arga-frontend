@@ -971,10 +971,10 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
         </DataTableRow>
 
         {item.act == "ORIGINAL_DESCRIPTION" && (
-          <DataTableRow label="Type material">
+          <DataTableRow label="Type material" key={item.entityId}>
             <Group gap={5}>
               {typeSpecimens?.map((specimen) => (
-                <TypeSpecimenPill specimen={specimen} />
+                <TypeSpecimenPill specimen={specimen} key={specimen.entityId} />
               ))}
             </Group>
           </DataTableRow>
