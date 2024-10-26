@@ -28,20 +28,32 @@ export function TimelineBar({ item, width, acceptedWidth }: TimelineBarProps) {
   const itemHeight = 40;
   return (
     <>
-      <rect
-        y={5}
-        width={width}
-        height={itemHeight - 10}
-        fill="#ff5757"
-        rx={10}
-      />
+      {acceptedWidth && (
+        <rect
+          y={5}
+          width={width}
+          height={itemHeight - 10}
+          fill="#ff5757"
+          rx={15}
+        />
+      )}
       <rect
         y={5}
         width={acceptedWidth || width}
         height={itemHeight - 10}
         fill="#b9d291"
-        rx={10}
+        rx={15}
       />
+      <rect y={5} fill="#b9d291" width={20} height={itemHeight - 10} />
+      {acceptedWidth && (
+        <rect
+          y={5}
+          x={acceptedWidth - 20}
+          fill="#b9d291"
+          width={20}
+          height={itemHeight - 10}
+        />
+      )}
       <text
         x={5}
         dominantBaseline="bottom"
@@ -193,7 +205,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
 
   const itemHeight = 80;
   const barHeight = 40;
-  const axisHeight = 60;
+  const axisHeight = 70;
   const graphHeight = groups.length * itemHeight;
   const minHeight = axisHeight + graphHeight;
 
