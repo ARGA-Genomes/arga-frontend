@@ -68,6 +68,7 @@ const BADGE_COLOURS: Record<string, string> = {
   "Taxonomic synonym": "wheat.2",
   "Original description": "moss.3",
   Synonymisation: "bushfire.3",
+  Unaccepted: "#ff5757",
 };
 
 interface AttributePillValueProps {

@@ -322,7 +322,7 @@ type ProvenanceQuery = {
         action: string;
         atom: AtomText | AtomNomenclaturalType | AtomDateTime;
         dataset: Dataset;
-      }
+      },
     ];
   };
 };
@@ -467,12 +467,12 @@ function ExternalLinks(props: ExternalLinksProps) {
       try {
         const response = await fetch(
           `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            props.canonicalName
-          )}`
+            props.canonicalName,
+          )}`,
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
         );
       } catch (error) {
         setMatchedTaxon([]);
@@ -558,7 +558,7 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   });
 
   const acts = data?.taxon.taxonomicActs.filter(
-    (act) => act.taxon.status !== "ACCEPTED"
+    (act) => act.taxon.status !== "ACCEPTED",
   );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
@@ -606,7 +606,7 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
         rank: taxonomy.rank,
         canonicalName: taxonomy.canonicalName,
       },
-    }
+    },
   );
 
   const specimens = data?.taxon.typeSpecimens;
@@ -924,7 +924,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 
   const act = humanize(item.act);
   const items = data?.provenance.nomenclaturalAct.filter(
-    (item) => item.action !== "CREATE"
+    (item) => item.action !== "CREATE",
   );
 
   return (
@@ -953,6 +953,9 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
         </DataTableRow>
         <DataTableRow label="Current status">
           <Group>
+            {item.name.taxa[0]?.status == "SYNONYM" && (
+              <AttributePillValue value="Unaccepted" />
+            )}
             <AttributePillValue value={humanize(item.name.taxa[0]?.status)} />
           </Group>
         </DataTableRow>
@@ -1031,7 +1034,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
   const [layout, setLayout] = useState<Layout>("top-to-bottom");
 
   const order = hierarchy.find(
-    (node) => node.rank === "ORDER" || node.rank === "ORDO"
+    (node) => node.rank === "ORDER" || node.rank === "ORDO",
     /* (node) => node.rank === "FAMILY" || node.rank === "FAMILIA", */
   );
   const { loading, error, data } = useQuery<TaxonTreeStatsQuery>(
@@ -1054,7 +1057,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
           "SPECIES",
         ],
       },
-    }
+    },
   );
 
   const treeData = data?.stats.taxonBreakdown[0];
@@ -1104,7 +1107,10 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
   );
 }
 
-const TAXA_SOURCE_PRIORITIES = ["Australian Living Atlas", "AFD", "APC"];
+const TAXA_SOURCE_PRIORITIES = [
+  "Australian Living Atlas",
+  "Australian Faunal Directory",
+];
 
 const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
   return taxonomy
