@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 export enum TimelineItemType {
   Bar,
@@ -32,16 +33,21 @@ export function TimelineBar({ item, width, acceptedWidth }: TimelineBarProps) {
         width={width}
         height={itemHeight - 10}
         fill="#ff5757"
-        rx={14}
+        rx={10}
       />
       <rect
         y={5}
         width={acceptedWidth || width}
         height={itemHeight - 10}
         fill="#b9d291"
-        rx={14}
+        rx={10}
       />
-      <text x={40} dominantBaseline="bottom" y={(itemHeight + 10) / 2}>
+      <text
+        x={5}
+        dominantBaseline="bottom"
+        y={itemHeight - 40}
+        filter="url(#solid)"
+      >
         <tspan fontWeight={600} fontStyle="italic" fontSize={14}>
           {item.label}
         </tspan>
@@ -52,19 +58,91 @@ export function TimelineBar({ item, width, acceptedWidth }: TimelineBarProps) {
 
 export function TimelineInstant({ item }: { item: TimelineItem }) {
   const itemHeight = 40;
+
+  const hover = {
+    initial: { scale: 1, width: 26 },
+    hover: { scale: 1.4, width: 150 },
+    tapped: {
+      scale: 0.8,
+      borderRadius: "100%",
+    },
+  };
+  const textHover = {
+    initial: { opacity: 0 },
+    hover: { opacity: 1 },
+    tapped: {},
+  };
+
   return (
-    <>
-      <circle r={15} cx={2} cy={20} fill="#febb19" />
+    <g transform={`translate(2, ${itemHeight / 2})`}>
+      <motion.g
+        initial="initial"
+        animate="initial"
+        whileHover="hover"
+        whileTap="tapped"
+      >
+        <motion.rect
+          variants={hover}
+          x={-13}
+          y={-13}
+          width="26"
+          height="26"
+          rx="13"
+          fill="#ffffff"
+          stroke="#febb19"
+          stroke-width={4}
+        />
+
+        <motion.text variants={textHover} dominantBaseline="middle">
+          <tspan fontSize={14} fontWeight={500}>
+            {item.subtitle}
+          </tspan>
+        </motion.text>
+      </motion.g>
+
       <text
         dominantBaseline="middle"
-        y={itemHeight / 2}
-        x={itemHeight / 2}
-        style={{
-          fontSize: "12px",
-        }}
+        y={itemHeight / 2 + 10}
+        x={-10}
+        filter="url(#faded)"
       >
-        {item.subtitle}
+        <tspan fontSize={12}>{item.subtitle}</tspan>
       </text>
+    </g>
+  );
+}
+
+interface TimelineGroupProps {
+  group: ItemGroup;
+  x: d3.ScaleLinear<number, number>;
+  endDate: Date;
+}
+
+export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
+  const right = x(endDate);
+
+  return (
+    <>
+      {group.bars.map((item, idx) => (
+        <g
+          key={`${item.label}-${item.year}-${item.type}-${idx}`}
+          transform={`translate(${x(item.date)}, 0)`}
+        >
+          <TimelineBar
+            item={item}
+            width={right - x(item.date)}
+            acceptedWidth={item.endDate && x(item.endDate) - x(item.date)}
+          />
+        </g>
+      ))}
+      {group.instants.map((item, idx) => (
+        <g
+          key={`${item.label}-${item.year}-${item.type}-${idx}`}
+          transform={`translate(${x(item.date)}, 0)`}
+        >
+          <TimelineInstant item={item} />
+        </g>
+      ))}
     </>
   );
 }
@@ -120,8 +198,11 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
     } else return 1;
   });
 
-  const itemHeight = 40;
-  const axisHeight = 40;
+  const groups = groupItems(items);
+
+  const itemHeight = 80;
+  const barHeight = 40;
+  const axisHeight = 60;
   const graphHeight = (items.length + 1) * itemHeight;
   const minHeight = axisHeight + graphHeight;
 
@@ -145,11 +226,21 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
     [dimension.boundedWidth],
   );
 
-  const right = x(currentYear);
-
   return (
     <div className="timelineWrapper" ref={ref} style={{ height: minHeight }}>
       <svg width={dimension.width} height={dimension.height}>
+        <defs>
+          <filter x="0" y="0" width="1" height="1" id="solid">
+            <feFlood flood-color="rgba(255, 255, 255, 1)" />
+            <feBlend in="SourceGraphic" mode="multiply" />
+          </filter>
+
+          <filter x="0" y="0" width="1" height="1" id="faded">
+            <feFlood flood-color="rgba(255, 255, 255, 1)" />
+            <feBlend in="SourceGraphic" mode="multiply" />
+          </filter>
+        </defs>
+
         <g
           transform={`translate(${dimension.marginLeft}, ${dimension.marginTop})`}
         >
@@ -161,40 +252,28 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
               height={dimension.boundedHeight - axisHeight}
               fill="white"
             />
-            {items.map(
-              (item, idx) =>
-                item.type == TimelineItemType.Instant && (
-                  <g
-                    key={`${item.label}-${item.year}-${idx}-guide`}
-                    transform={`translate(${x(item.date)}, ${idx * itemHeight})`}
-                  >
-                    <TimelineDateGuide
-                      x={0}
-                      top={idx * -itemHeight}
-                      bottom={itemHeight / 2}
-                      value={item.date}
-                    />
-                  </g>
-                ),
+            {groups.map((group, idx) =>
+              group.instants.map((item) => (
+                <g
+                  key={`${group.label}-guide`}
+                  transform={`translate(${x(item.date)}, ${idx * itemHeight})`}
+                >
+                  <TimelineDateGuide
+                    x={0}
+                    top={idx * -itemHeight - axisHeight / 2}
+                    bottom={barHeight / 2}
+                    value={item.date}
+                  />
+                </g>
+              )),
             )}
 
-            {items.map((item, idx) => (
+            {groups.map((group, idx) => (
               <g
-                key={`${item.label}-${item.year}-${idx}`}
-                transform={`translate(${x(item.date)}, ${idx * itemHeight})`}
+                key={`${group.bars[0].label}-${idx}`}
+                transform={`translate(0, ${idx * itemHeight})`}
               >
-                {item.type == TimelineItemType.Bar && (
-                  <TimelineBar
-                    item={item}
-                    width={right - x(item.date)}
-                    acceptedWidth={
-                      item.endDate && x(item.endDate) - x(item.date)
-                    }
-                  />
-                )}
-                {item.type == TimelineItemType.Instant && (
-                  <TimelineInstant item={item} />
-                )}
+                <TimelineGroup group={group} endDate={currentYear} x={x} />
               </g>
             ))}
           </g>
@@ -362,6 +441,27 @@ function combineChartDimensions(
     boundedHeight: Math.max(dim.height - dim.marginTop - dim.marginBottom, 0),
     boundedWidth: Math.max(dim.width - dim.marginLeft - dim.marginRight, 0),
   };
+}
+
+type ItemGroup = {
+  label: string;
+  bars: TimelineItem[];
+  instants: TimelineItem[];
+};
+
+function groupItems(items: TimelineItem[]): ItemGroup[] {
+  let groups: Record<string, ItemGroup> = {};
+
+  for (const item of items) {
+    groups[item.label] ||= { label: item.label, bars: [], instants: [] };
+    if (item.type == TimelineItemType.Bar) {
+      groups[item.label].bars.push(item);
+    } else if (item.type == TimelineItemType.Instant) {
+      groups[item.label].instants.push(item);
+    }
+  }
+
+  return Object.values(groups);
 }
 
 function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
