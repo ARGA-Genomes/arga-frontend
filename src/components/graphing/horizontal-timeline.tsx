@@ -99,15 +99,6 @@ export function TimelineInstant({ item }: { item: TimelineItem }) {
           </tspan>
         </motion.text>
       </motion.g>
-
-      <text
-        dominantBaseline="middle"
-        y={itemHeight / 2 + 10}
-        x={-10}
-        filter="url(#faded)"
-      >
-        <tspan fontSize={12}>{item.subtitle}</tspan>
-      </text>
     </g>
   );
 }
@@ -203,7 +194,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
   const itemHeight = 80;
   const barHeight = 40;
   const axisHeight = 60;
-  const graphHeight = (items.length + 1) * itemHeight;
+  const graphHeight = groups.length * itemHeight;
   const minHeight = axisHeight + graphHeight;
 
   const [ref, dimension] = useChartDimensions<HTMLDivElement>({
