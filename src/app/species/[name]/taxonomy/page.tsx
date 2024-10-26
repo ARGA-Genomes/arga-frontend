@@ -918,6 +918,15 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
     variables: { entityId: item.entityId },
   });
 
+  const specimens = useQuery<TypeSpecimenQuery>(GET_TYPE_SPECIMENS, {
+    variables: {
+      rank: "SPECIES",
+      canonicalName: item.name.canonicalName,
+    },
+  });
+
+  const typeSpecimens = specimens.data?.taxon.typeSpecimens;
+
   function humanize(text: string) {
     return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
   }
@@ -929,6 +938,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 
   return (
     <SimpleGrid cols={2}>
+      <LoadOverlay visible={loading} />
       <DataTable mt="lg">
         <DataTableRow label="Scientific name">
           <Text fz="sm" fw={700} ml="sm">
@@ -959,6 +969,16 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
             <AttributePillValue value={humanize(item.name.taxa[0]?.status)} />
           </Group>
         </DataTableRow>
+
+        {item.act == "ORIGINAL_DESCRIPTION" && (
+          <DataTableRow label="Type material">
+            <Group gap={5}>
+              {typeSpecimens?.map((specimen) => (
+                <TypeSpecimenPill specimen={specimen} />
+              ))}
+            </Group>
+          </DataTableRow>
+        )}
       </DataTable>
 
       <Tabs
@@ -1176,5 +1196,64 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
 
       {taxonomy && <History taxonomy={taxonomy} />}
     </Stack>
+  );
+}
+
+function TypeSpecimenPill({ specimen }: { specimen: Specimen }) {
+  const [opened, { close, open }] = useDisclosure(false);
+  const bg = "#d6e4ed";
+  const popover = "#ecf7fe";
+  const geo =
+    specimen.latitude && `${specimen.latitude}, ${specimen.longitude}`;
+
+  function humanize(text: string) {
+    return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
+  }
+
+  return (
+    <Popover
+      position="bottom"
+      withArrow
+      shadow="md"
+      opened={opened}
+      radius="md"
+    >
+      <Popover.Target>
+        <Paper
+          py={5}
+          px={15}
+          bg={opened ? bg : bg}
+          radius="xl"
+          style={{ border: "none" }}
+          onMouseEnter={open}
+          onMouseLeave={close}
+        >
+          <Group>
+            <Text
+              fw={600}
+              size="sm"
+              style={{
+                whiteSpace: "nowrap",
+                transition: "ease all 250ms",
+              }}
+              truncate
+            >
+              {specimen.recordId}
+            </Text>
+            <Text size="xs">{humanize(specimen.typeStatus || "")}</Text>
+          </Group>
+        </Paper>
+      </Popover.Target>
+      <Popover.Dropdown bg={popover}>
+        <DataTable>
+          <DataTableRow label="Type location (source)">
+            <DataField value={specimen.locality} />
+          </DataTableRow>
+          <DataTableRow label="Type location (geo)">
+            <DataField value={geo} />
+          </DataTableRow>
+        </DataTable>
+      </Popover.Dropdown>
+    </Popover>
   );
 }
