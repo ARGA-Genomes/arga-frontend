@@ -619,14 +619,13 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
   );
 
   const specimens = data?.taxon.typeSpecimens;
-  /* const typeSpecimen = specimens && specimens[0].specimen; */
 
   const typeSpecimens = specimens?.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == taxonomy.scientificName &&
       typeSpecimen.specimen.typeStatus != "no voucher",
   );
-  const typeSpecimen = typeSpecimens && typeSpecimens[0].specimen;
+  const typeSpecimen = typeSpecimens && typeSpecimens[0]?.specimen;
 
   return (
     <Paper radius={16} p="md" withBorder>
