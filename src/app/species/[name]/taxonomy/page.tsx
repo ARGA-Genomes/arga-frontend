@@ -144,19 +144,24 @@ const GET_TYPE_SPECIMENS = gql`
   query TaxonTypeSpecimens($rank: TaxonomicRank, $canonicalName: String) {
     taxon(rank: $rank, canonicalName: $canonicalName) {
       typeSpecimens {
-        typeStatus
-        recordId
-        materialSampleId
-        collectionCode
-        institutionCode
-        institutionName
-        recordedBy
-        identifiedBy
-        locality
-        country
-        stateProvince
-        latitude
-        longitude
+        name {
+          scientificName
+        }
+        specimen {
+          typeStatus
+          recordId
+          materialSampleId
+          collectionCode
+          institutionCode
+          institutionName
+          recordedBy
+          identifiedBy
+          locality
+          country
+          stateProvince
+          latitude
+          longitude
+        }
       }
     }
   }
@@ -223,7 +228,10 @@ type SynonymsQuery = {
 
 type TypeSpecimenQuery = {
   taxon: {
-    typeSpecimens: Specimen[];
+    typeSpecimens: {
+      specimen: Specimen;
+      name: { scientificName: string };
+    }[];
   };
 };
 
@@ -610,7 +618,7 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
   );
 
   const specimens = data?.taxon.typeSpecimens;
-  const typeSpecimen = specimens && specimens[0];
+  const typeSpecimen = specimens && specimens[0].specimen;
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -925,7 +933,11 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
     },
   });
 
-  const typeSpecimens = specimens.data?.taxon.typeSpecimens;
+  const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
+    (typeSpecimen) =>
+      typeSpecimen.name.scientificName == item.name.scientificName &&
+      typeSpecimen.specimen.typeStatus != "no voucher",
+  );
 
   function humanize(text: string) {
     return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
@@ -974,7 +986,10 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
           <DataTableRow label="Type material" key={item.entityId}>
             <Group gap={5}>
               {typeSpecimens?.map((specimen) => (
-                <TypeSpecimenPill specimen={specimen} key={specimen.entityId} />
+                <TypeSpecimenPill
+                  specimen={specimen.specimen}
+                  key={specimen.specimen.entityId}
+                />
               ))}
             </Group>
           </DataTableRow>
