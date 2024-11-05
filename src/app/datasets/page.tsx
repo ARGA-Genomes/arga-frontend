@@ -19,6 +19,7 @@ import {
   SimpleGrid,
   UnstyledButton,
   Overlay,
+  Chip,
 } from "@mantine/core";
 import Link from "next/link";
 import { DateTime } from "luxon";
@@ -31,11 +32,12 @@ import {
   IconClockHour4,
   IconTable,
   IconLayoutGrid,
+  IconArrowsSort,
 } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
 import { IoEye } from "react-icons/io5";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { access, copyFileSync } from "fs";
 
 const GET_DATASETS = gql`
@@ -91,13 +93,9 @@ type Source = {
   license: string;
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
-  contentType?: string;
+  contentType?: ContentType;
   datasets: Dataset[];
-};
-
-type ContentType = {
-  name: string;
-  sources?: Source[];
+  lastUpdated?: string;
 };
 
 type GroupedSources = {
@@ -242,6 +240,31 @@ const reusePillColours: Record<ReusePillType, string> = {
   LIMITED: "wheat.3",
   NONE: "#d6e4ed",
   VARIABLE: "wheat.3",
+};
+
+type ContentType =
+  | "TAXONOMIC_BACKBONE"
+  | "ECOLOGICAL_TRAITS"
+  | "GENOMIC_DATA"
+  | "SPECIMENS"
+  | "NONGENOMIC_DATA"
+  | "MORPHOLOGICAL_TRAITS"
+  | "BIOCHEMICAL_TRAITS"
+  | "MIXED_DATATYPES"
+  | "FUNCTIONAL_TRAITS"
+  | "ETHNOBIOLOGY";
+
+const renameContentType: Record<ContentType, string> = {
+  GENOMIC_DATA: "Genomics sources",
+  ECOLOGICAL_TRAITS: "Ecological traits sources",
+  ETHNOBIOLOGY: "Ethnobiology sources",
+  BIOCHEMICAL_TRAITS: "Biochemical traits sources",
+  SPECIMENS: "Specimens sources",
+  TAXONOMIC_BACKBONE: "Taxonomy sources",
+  NONGENOMIC_DATA: "Other non-genomics sources",
+  MIXED_DATATYPES: "Mixed data types sources",
+  FUNCTIONAL_TRAITS: "Functional traits sources",
+  MORPHOLOGICAL_TRAITS: "Morphological traits sources",
 };
 
 const licenseAccessRights = {};
@@ -438,9 +461,24 @@ function CollectionCard({ collection }: { collection: Source }) {
               className={classes.collectionHeader}
             >
               <Group justify="space-between" align="flex-start" wrap="nowrap">
-                <Text fw={600} size="md" c="white" p={10}>
-                  {collection.name}
-                </Text>
+                <Stack gap={1}>
+                  <Text fw={600} size="md" c="white" pl={10} pt={10} pr={10}>
+                    {collection.name}
+                  </Text>
+                  <Group gap={3} pl={10} pb={10}>
+                    <IconClockHour4 size={15} color={theme.colors.gray[6]} />
+                    {collection.lastUpdated && (
+                      <Text c="dimmed" size="xs">
+                        Last updated:{" "}
+                        {collection.lastUpdated === "01/01/1970"
+                          ? "N/A"
+                          : DateTime.fromISO(
+                              collection.lastUpdated
+                            ).toLocaleString()}
+                      </Text>
+                    )}
+                  </Group>
+                </Stack>
 
                 <Box className={classes.collectionArrowBtn}>
                   <IconArrowUpRight color="white" />
@@ -506,6 +544,7 @@ function CollectionCard({ collection }: { collection: Source }) {
 }
 
 function CollectionRow({ collection }: { collection: Source }) {
+  const theme = useMantineTheme();
   const license = collection.license
     ? LICENSES[collection.license.toLowerCase()]
     : undefined;
@@ -517,9 +556,24 @@ function CollectionRow({ collection }: { collection: Source }) {
             <Paper radius="lg" w="100%" className={classes.collectionHeader}>
               <Grid>
                 <Grid.Col span={3} p="lg">
-                  <Text fw={600} size="md" c="white" p={10}>
-                    {collection.name}
-                  </Text>
+                  <Stack gap={1}>
+                    <Text fw={600} size="md" c="white" pl={10} pt={10} pr={10}>
+                      {collection.name}
+                    </Text>
+                    <Group gap={3} pl={10} pb={10}>
+                      <IconClockHour4 size={15} color={theme.colors.gray[6]} />
+                      {collection.lastUpdated && (
+                        <Text c="dimmed" size="xs">
+                          Last updated:{" "}
+                          {collection.lastUpdated === "01/01/1970"
+                            ? "N/A"
+                            : DateTime.fromISO(
+                                collection.lastUpdated
+                              ).toLocaleString()}
+                        </Text>
+                      )}
+                    </Group>
+                  </Stack>
                 </Grid.Col>
                 <Grid.Col span={2} p="lg">
                   <AttributePill
@@ -603,6 +657,67 @@ function CollectionRow({ collection }: { collection: Source }) {
   );
 }
 
+function DatasetSort({
+  sortBy,
+  setSortBy,
+}: {
+  sortBy: string | null;
+  setSortBy: (value: string | null) => void;
+}) {
+  const theme = useMantineTheme();
+  // const [sortBy, setSortBy] = useState<string | null>("first");
+  const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    if (event.currentTarget.value === sortBy) {
+      setSortBy(null);
+    } else if (event.currentTarget.value === "alphabetical") {
+      console.log("alphabetical sort: to do");
+    } else if (event.currentTarget.value === "date") {
+      console.log("date sort: to do");
+    } else if (event.currentTarget.value === "records") {
+      console.log("records sort: to do");
+    }
+  };
+  return (
+    <Group>
+      <Group gap={5}>
+        <IconArrowsSort />
+        <Text size="xs" c={theme.colors.midnight[10]}>
+          Sort by
+        </Text>
+      </Group>
+      <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
+        <Group>
+          <Chip
+            variant="filled"
+            value="alphabetical"
+            color={theme.colors.wheat[3]}
+            onClick={handleChipClick}
+          >
+            A-Z
+          </Chip>
+          <Chip
+            variant="filled"
+            value="date"
+            color={theme.colors.wheat[3]}
+            onClick={handleChipClick}
+          >
+            Date
+          </Chip>
+          <Chip
+            disabled
+            variant="filled"
+            value="records"
+            color={theme.colors.wheat[3]}
+            onClick={handleChipClick}
+          >
+            Records
+          </Chip>
+        </Group>
+      </Chip.Group>
+    </Group>
+  );
+}
+
 function ContentTypeContainer({
   contentType,
 }: {
@@ -610,6 +725,22 @@ function ContentTypeContainer({
 }) {
   const theme = useMantineTheme();
   const [layoutView, setLayoutView] = useState("card");
+  const [sortBy, setSortBy] = useState<string | null>(null);
+
+  const sortedSources = useMemo(() => {
+    return [...contentType.sources].sort((a, b) => {
+      switch (sortBy) {
+        case "alphabetical":
+          return a.name.localeCompare(b.name);
+        case "date":
+          const dateA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
+          const dateB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
+          return dateB - dateA; // Newest to Oldest
+        default:
+          return 0;
+      }
+    });
+  }, [contentType.sources, sortBy]);
 
   return (
     <Accordion.Item
@@ -623,68 +754,70 @@ function ContentTypeContainer({
             fz="var(--mantine-h4-font-size)"
             c={theme.colors.midnight[10]}
           >
-            {contentType.contentType
-              .toLocaleLowerCase()
-              .split("_")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")}{" "}
-            data sources
+            {renameContentType[contentType.contentType as ContentType]}
           </Text>
-          <Group gap={10} mt={15}>
-            <UnstyledButton
-              onClick={(e) => {
-                e.stopPropagation();
-                setLayoutView("table");
-              }}
-            >
-              <Stack gap={1} align="center">
-                <IconTable
-                  color={
-                    layoutView === "table" ? "white" : theme.colors.midnight[10]
-                  }
-                  className={classes.tableLayoutViewBtn}
-                  fill={
-                    layoutView === "table" ? theme.colors.midnight[10] : "none"
-                  }
-                />
-                <Text size="xs" c={theme.colors.midnight[10]}>
-                  Table
-                </Text>
-              </Stack>
-            </UnstyledButton>
-            <UnstyledButton
-              onClick={(e) => {
-                e.stopPropagation();
-                setLayoutView("card");
-              }}
-            >
-              <Stack gap={1} align="center">
-                <IconLayoutGrid
-                  color={theme.colors.midnight[10]}
-                  className={classes.cardLayoutViewBtn}
-                  fill={
-                    layoutView === "card" ? theme.colors.midnight[10] : "none"
-                  }
-                />
-                <Text size="xs" c={theme.colors.midnight[10]}>
-                  Card
-                </Text>
-              </Stack>
-            </UnstyledButton>
+          <Group mt={15} gap={50} align="center">
+            <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
+            <Group gap={10}>
+              <UnstyledButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLayoutView("table");
+                }}
+              >
+                <Stack gap={1} align="center">
+                  <IconTable
+                    color={
+                      layoutView === "table"
+                        ? "white"
+                        : theme.colors.midnight[10]
+                    }
+                    className={classes.tableLayoutViewBtn}
+                    fill={
+                      layoutView === "table"
+                        ? theme.colors.midnight[10]
+                        : "none"
+                    }
+                  />
+                  <Text size="xs" c={theme.colors.midnight[10]}>
+                    Table
+                  </Text>
+                </Stack>
+              </UnstyledButton>
+              <UnstyledButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLayoutView("card");
+                }}
+              >
+                <Stack gap={1} align="center">
+                  <IconLayoutGrid
+                    color={theme.colors.midnight[10]}
+                    className={classes.cardLayoutViewBtn}
+                    fill={
+                      layoutView === "card" ? theme.colors.midnight[10] : "none"
+                    }
+                  />
+                  <Text size="xs" c={theme.colors.midnight[10]}>
+                    Card
+                  </Text>
+                </Stack>
+              </UnstyledButton>
+            </Group>
           </Group>
         </Group>
       </Accordion.Control>
       <Accordion.Panel>
         {layoutView === "card" && (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-            {contentType.sources?.map((collection, idx) => (
+            {sortedSources?.map((collection, idx) => (
               <CollectionCard collection={collection} key={idx} />
             ))}
           </SimpleGrid>
         )}
         {layoutView === "table" && (
           <SimpleGrid cols={1}>
-            {contentType.sources?.map((collection, idx) => (
+            {sortedSources?.map((collection, idx) => (
               <CollectionRow collection={collection} key={idx} />
             ))}
           </SimpleGrid>
@@ -694,16 +827,43 @@ function ContentTypeContainer({
   );
 }
 
+function findSourceLastUpdated(datasets: Dataset[]): string {
+  // if (!datasets.length) return "01/01/1970";
+  // const sortedDatasets = [...datasets].sort(
+  //   (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  // );
+
+  // sortedDatasets.forEach((d) => {
+  //   if (d.updatedAt) {
+  //     return d.updatedAt;
+  //   }
+  // });
+
+  // return "01/01/1970";
+  return datasets.reduce((latest, d) => {
+    const updatedAt = d.updatedAt ? new Date(d.updatedAt).getTime() : 0;
+    return updatedAt > new Date(latest).getTime() ? d.updatedAt : latest;
+  }, "01/01/1970");
+}
+
 function groupByContentType(sources?: Source[]): GroupedSources[] {
+  const desiredOrder: ContentType[] = [
+    "GENOMIC_DATA",
+    "ECOLOGICAL_TRAITS",
+    "ETHNOBIOLOGY",
+    "BIOCHEMICAL_TRAITS",
+    "SPECIMENS",
+    "TAXONOMIC_BACKBONE",
+    "NONGENOMIC_DATA",
+    "MIXED_DATATYPES",
+    "FUNCTIONAL_TRAITS",
+    "MORPHOLOGICAL_TRAITS",
+  ];
+
   if (sources) {
     const grouped = sources.reduce(
       (acc: { [key: string]: Source[] }, source) => {
         let contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
-        if (contentType === "NONGENOMIC_DATA") {
-          contentType = "Non-genomic";
-        } else if (contentType === "GENOMIC_DATA") {
-          contentType = "Genomic";
-        }
 
         // If this contentType doesn't exist in the accumulator, create a new array
         if (!acc[contentType]) {
@@ -718,11 +878,20 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
       {}
     );
 
-    // Convert the object into an array of GroupedSources
-    return Object.keys(grouped).map((contentType) => ({
-      contentType,
-      sources: grouped[contentType],
-    }));
+    // Convert the object into an array of GroupedSources and sort by the desired order
+    return Object.keys(grouped)
+      .map((contentType) => ({
+        contentType,
+        sources: grouped[contentType],
+      }))
+      .sort((a, b) => {
+        const indexA = desiredOrder.indexOf(a.contentType as ContentType);
+        const indexB = desiredOrder.indexOf(b.contentType as ContentType);
+        return (
+          (indexA !== -1 ? indexA : desiredOrder.length) -
+          (indexB !== -1 ? indexB : desiredOrder.length)
+        );
+      });
   } else {
     return [];
   }
@@ -732,13 +901,20 @@ export default function DatasetsPage() {
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
   const theme = useMantineTheme();
 
-  const groupedSources = groupByContentType(data?.sources).filter(
+  const sourcesWithLastUpdated = data?.sources.map((source) => {
+    return {
+      ...source,
+      lastUpdated: findSourceLastUpdated(source.datasets),
+    };
+  });
+
+  const groupedSources = groupByContentType(sourcesWithLastUpdated).filter(
     (group) => group.contentType !== "Unknown"
   );
 
   return (
     <Stack gap="xl" my="xl">
-      <Paper py={20} pos="relative">
+      <Paper py={5} pos="relative">
         <Container maw={MAX_WIDTH}>
           <Text fz={38} fw={700}>
             Data sources indexed in ARGA
