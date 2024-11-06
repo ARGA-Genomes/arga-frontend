@@ -22,8 +22,9 @@ import {
   useMantineTheme,
   ScrollArea,
   UnstyledButton,
+  Chip,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -37,6 +38,7 @@ import {
   IconLicense,
   IconPaw,
   IconRepeat,
+  IconArrowsSort,
 } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
@@ -352,13 +354,89 @@ function Species({ source }: { source: string }) {
   );
 }
 
+function DatasetSort({
+  sortBy,
+  setSortBy,
+}: {
+  sortBy: string | null;
+  setSortBy: (value: string | null) => void;
+}) {
+  const theme = useMantineTheme();
+  // const [sortBy, setSortBy] = useState<string | null>("first");
+  const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    if (event.currentTarget.value === sortBy) {
+      setSortBy(null);
+    }
+  };
+  return (
+    <Group>
+      <Group gap={5}>
+        <IconArrowsSort />
+        <Text size="xs" c={theme.colors.midnight[10]}>
+          Sort by
+        </Text>
+      </Group>
+      <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
+        <Group>
+          <Chip
+            variant="filled"
+            value="alphabetical"
+            color={theme.colors.wheat[3]}
+            onClick={handleChipClick}
+          >
+            A-Z
+          </Chip>
+          <Chip
+            variant="filled"
+            value="year"
+            color={theme.colors.wheat[3]}
+            onClick={handleChipClick}
+          >
+            Year
+          </Chip>
+          <Chip
+            disabled
+            variant="filled"
+            value="records"
+            color={theme.colors.wheat[3]}
+            onClick={handleChipClick}
+          >
+            Records
+          </Chip>
+        </Group>
+      </Chip.Group>
+    </Group>
+  );
+}
+
 function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
+  const [sortBy, setSortBy] = useState<string | null>(null);
+
+  const sortedDatasets = useMemo(() => {
+    return [...datasets].sort((a, b) => {
+      switch (sortBy) {
+        case "alphabetical":
+          return a.name.localeCompare(b.name);
+        case "year":
+          const yearA = a.publicationYear ? a.publicationYear : 0;
+          const yearB = b.publicationYear ? b.publicationYear : 0;
+          return yearB - yearA; // Newest to Oldest
+        default:
+          return 0;
+      }
+    });
+  }, [datasets, sortBy]);
+
   return (
     <Stack>
-      <Title order={5}>Component Datasets</Title>
+      <Group justify="space-between">
+        <Title order={5}>Component Datasets</Title>
+        <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
+      </Group>
+
       <ScrollArea.Autosize mah={300} type="auto" offsetScrollbars>
         <Box p={10}>
-          {datasets.map((dataset, idx) => {
+          {sortedDatasets.map((dataset, idx) => {
             return <DatasetRow key={idx} dataset={dataset} />;
           })}
         </Box>
