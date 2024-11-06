@@ -669,12 +669,6 @@ function DatasetSort({
   const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
     if (event.currentTarget.value === sortBy) {
       setSortBy(null);
-    } else if (event.currentTarget.value === "alphabetical") {
-      console.log("alphabetical sort: to do");
-    } else if (event.currentTarget.value === "date") {
-      console.log("date sort: to do");
-    } else if (event.currentTarget.value === "records") {
-      console.log("records sort: to do");
     }
   };
   return (
@@ -701,7 +695,7 @@ function DatasetSort({
             color={theme.colors.wheat[3]}
             onClick={handleChipClick}
           >
-            Date
+            Last updated
           </Chip>
           <Chip
             disabled
