@@ -362,7 +362,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
         {hierarchy?.map((node, idx) => (
           <AttributePill
             key={idx}
-            labelColor="white"
+            labelColor="midnight.8"
             popoverDisabled
             hoverColor="midnight.0"
             label={Humanize.capitalize(node.rank.toLowerCase())}

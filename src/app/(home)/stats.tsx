@@ -288,7 +288,7 @@ const GET_EUKARYOTA_TREE = gql`
 
     protistaTree: stats {
       taxonBreakdown(
-        taxonRank: SUPERKINGDOM
+        taxonRank: KINGDOM
         taxonCanonicalName: "Protista"
         includeRanks: [PHYLUM, CLASS]
       ) {
@@ -451,49 +451,6 @@ export function ShowTaxonomicCoverageStats() {
 
   const taxon = taxonResults.data?.taxon;
 
-  // const domainData = [
-  //   { name: "Archaea", value: 1, label: 0 },
-  //   {
-  //     name: "Eukaryota",
-  //     value: 1,
-  //     label: taxon?.summary.species,
-  //     href: "/domain/Eukaryota",
-  //   },
-  //   { name: "Bacteria", value: 1, label: 0 },
-  // ];
-
-  // const kingdomRegnumData = taxon?.kingdomDescendants
-  //   .map((descendant) => {
-  //     return {
-  //       name: descendant.canonicalName,
-  //       value: 1,
-  //       label: descendant.species,
-  //       href: `/kingdom/${descendant.canonicalName}`,
-  //     };
-  //   })
-  //   .concat(
-  //     taxon?.regnumDescendants
-  //       .filter((descendant) => descendant.canonicalName !== "Protista")
-  //       .map((descendant) => {
-  //         return {
-  //           name: descendant.canonicalName,
-  //           value: 1,
-  //           label: descendant.species,
-  //           href: `/regnum/${descendant.canonicalName}`,
-  //         };
-  //       })
-  //   )
-  //   .concat(
-  //     taxon?.superKingdomDescendants.map((descendant) => {
-  //       return {
-  //         name: descendant.canonicalName,
-  //         value: 1,
-  //         label: descendant.species,
-  //         href: `/superkingdom/${descendant.canonicalName}`,
-  //       };
-  //     })
-  //   );
-
   const domainData = [
     { name: "Archaea", value: 1, label: 0 },
     {
@@ -535,40 +492,6 @@ export function ShowTaxonomicCoverageStats() {
     );
 
   return (
-    // <Group gap={40} justify="center">
-    //   <Stack>
-    //     <Skeleton visible={taxonResults.loading}>
-    //       <Center>
-    //         <Title order={4} c="white">
-    //           Domains
-    //         </Title>
-    //       </Center>
-    //     </Skeleton>
-    //     <Skeleton visible={taxonResults.loading} circle>
-    //       <DonutChart h={375} w={375} data={domainData} labelled={true} />
-    //     </Skeleton>
-    //   </Stack>
-    //   <Stack align="center">
-    //     <Skeleton visible={taxonResults.loading}>
-    //       <Center>
-    //         <Title order={4} c="white">
-    //           Kingdoms
-    //         </Title>
-    //       </Center>
-    //     </Skeleton>
-    //     {kingdomRegnumData && (
-    //       <Skeleton visible={taxonResults.loading} circle h={375} w={375}>
-    //         <DonutChart
-    //           h={375}
-    //           w={375}
-    //           data={kingdomRegnumData}
-    //           labelled={true}
-    //         />
-    //       </Skeleton>
-    //     )}
-    //   </Stack>
-    // </Group>
-
     <Group gap={40} justify="center">
       <Stack>
         <Skeleton visible={taxonResults.loading}>
@@ -640,7 +563,6 @@ export function ShowCircularTaxonomy() {
             };
           }),
         };
-        // console.log(tData);
         setTreeData(tData);
       },
     }
@@ -686,7 +608,7 @@ export function ShowSunburstTaxonomy() {
           },
           {
             name: "Protista",
-            rank: "SUPERKINGDOM",
+            rank: "KINGDOM",
             children: data.protistaTree.taxonBreakdown,
           },
           {
@@ -700,7 +622,6 @@ export function ShowSunburstTaxonomy() {
           rank: "DOMAIN",
           children: kingdomsRegnaTaxa,
         };
-        console.log(tData);
         setTreeData(tData);
       },
     }
