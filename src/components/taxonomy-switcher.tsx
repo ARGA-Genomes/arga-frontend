@@ -67,19 +67,19 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
     GET_TAXON_PROVENANCE,
     {
       variables: { entityId },
-    },
+    }
   );
 
   const first = useMemo(
     () =>
       sorted.find(
-        (taxon) => taxon.dataset?.name === "Atlas of Living Australia",
+        (taxon) => taxon.dataset?.name === "Atlas of Living Australia"
       ) || sorted[0],
-    [sorted],
+    [sorted]
   );
 
   const [active, setActive] = useState<string>(
-    `${first.scientificName}-${first.datasetId}`,
+    `${first.scientificName}-${first.datasetId}`
   );
 
   return (
@@ -130,7 +130,7 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
                     <Group align="center">
                       <Text size="lg" fw={600} c="midnight.9">
                         {Humanize.capitalize(
-                          taxon.action.toString().toLowerCase(),
+                          taxon.action.toString().toLowerCase()
                         )}
                       </Text>
                       <Badge color="shellfish" variant="light">
@@ -176,13 +176,20 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
               value={`${taxon.scientificName}-${taxon.datasetId}`}
             >
               <Accordion.Control>
-                <Text
-                  fw={600}
-                  c={isActive ? "white" : undefined}
-                  fz={isActive ? 26 : "lg"}
-                >
-                  {taxon.dataset?.name || "Unknown Dataset"}
-                </Text>
+                <Group justify="space-between" pr="md">
+                  <Text
+                    fw={600}
+                    c={isActive ? "white" : undefined}
+                    fz={isActive ? 26 : "lg"}
+                  >
+                    {taxon.dataset?.name || "Unknown Dataset"}
+                  </Text>
+                  {taxon.dataset?.name !== "Atlas of Living Australia" && (
+                    <Badge variant="white" color="midnight.8">
+                      DIFFERENT
+                    </Badge>
+                  )}
+                </Group>
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack>
@@ -217,7 +224,7 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
                             color="midnight.12"
                             hoverColor="midnight.10"
                             textColor="white"
-                            value="record history"
+                            value="Record history"
                             popoverDisabled
                           />
                         </Attribute>
@@ -258,21 +265,6 @@ function Hierarchy({ hierarchy }: { hierarchy: ClassificationNode[] }) {
   );
 }
 
-const TAXA_SOURCE_PRIORITIES = [
-  "Australian Algae List",
-  "Australian Faunal Directory endemic species",
-  "Australian Faunal Directory: Ecology",
-  "Australian Faunal Directory: Regions",
-  "Australian Faunal Directory: Specimens",
-  "Australian Faunal Directorys",
-  "Australian Fungi List",
-  "Australian Lichen List",
-  "Australian Plant Census",
-  "Australian Plant Census: Australian Bryophyte Census",
-  "Australian Plant Census: Australian Vascular Plants Common Names",
-  "Australian Plant Name Index (APNI): Australian Vascular Plants Names",
-];
-
 function mapTaxaDatasets(taxa: Taxon[], datasets: Map<string, Dataset>) {
   return taxa.map((taxon) => ({
     ...taxon,
@@ -288,19 +280,6 @@ export function sortTaxaBySources(taxa: TaxonWithDataset[]) {
     .sort((first, second) => {
       const a = first.dataset?.name || "";
       const b = second.dataset?.name || "";
-
-      // Get index of each item in the predefined order array
-      const indexA = TAXA_SOURCE_PRIORITIES.indexOf(a);
-      const indexB = TAXA_SOURCE_PRIORITIES.indexOf(b);
-
-      // If both items are in the predefined order, sort by the order
-      if (indexA !== -1 && indexB !== -1) {
-        return indexA - indexB;
-      }
-
-      // If only one item is in the predefined order, that one comes first
-      if (indexA !== -1) return -1;
-      if (indexB !== -1) return 1;
 
       // If neither is in the predefined order, sort alphabetically
       return a.localeCompare(b);
