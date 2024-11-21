@@ -70,7 +70,7 @@ function DataTabs({
     <Tabs
       variant="unstyled"
       radius={10}
-      mt={40}
+      mt="sm"
       defaultValue="summary"
       classNames={classes}
       value={tab}
@@ -81,12 +81,12 @@ function DataTabs({
           <Tabs.Tab value="summary">Summary</Tabs.Tab>
           <Tabs.Tab value="distribution">Data distribution</Tabs.Tab>
           <Tabs.Tab value="whole_genomes">Genome assemblies</Tabs.Tab>
-          <Tabs.Tab value="components">Genetic libraries</Tabs.Tab>
-          <Tabs.Tab value="markers">Single locus data</Tabs.Tab>
-          <Tabs.Tab value="population_genetics">Population genetics</Tabs.Tab>
+          <Tabs.Tab value="components">Gene libraries</Tabs.Tab>
+          <Tabs.Tab value="variants">Variants and population sets</Tabs.Tab>
+          <Tabs.Tab value="organelle">Organelle chromosomes</Tabs.Tab>
+          <Tabs.Tab value="markers">Single loci</Tabs.Tab>
           <Tabs.Tab value="other">Other genetic data</Tabs.Tab>
           {/* <Tabs.Tab value="annotations">Genome annotations</Tabs.Tab> */}
-          {/* <Tabs.Tab value="variants">Variant sets</Tabs.Tab> */}
           {/* <Tabs.Tab value="other">Other genomic data</Tabs.Tab> */}
           {/* <Tabs.Tab value="protocols">Protocols</Tabs.Tab> */}
           <Tabs.Tab value="specimens">Specimens</Tabs.Tab>

@@ -317,7 +317,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
             url={taxonomy.sourceUrl}
             externalLinkName={taxonomy.source}
             outline
-            icon={IconExternalLink}
+            icon={IconArrowUpRight}
           />
         </Group>
       </Group>
@@ -347,7 +347,7 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
   return <SpeciesImage photo={photo} />;
 }
 
-export default function TaxonomyPage({ params }: { params: { name: string } }) {
+export default function SummaryPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
