@@ -184,11 +184,11 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
                   >
                     {taxon.dataset?.name || "Unknown Dataset"}
                   </Text>
-                  {taxon.dataset?.name !== "Atlas of Living Australia" && (
+                  {/* {taxon.dataset?.name !== "Atlas of Living Australia" && (
                     <Badge variant="white" color="midnight.8">
                       DIFFERENT
                     </Badge>
-                  )}
+                  )} */}
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>

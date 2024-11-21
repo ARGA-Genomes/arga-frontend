@@ -830,7 +830,7 @@ function Details({ taxonomy, synonyms, commonNames }: DetailsProps) {
                 No data
               </Text>
             </Paper>
-            <Group justify="space-between" align="center">
+            {/* <Group justify="space-between" align="center">
               <AttributePillValue
                 color="midnight.12"
                 hoverColor="midnight.10"
@@ -838,7 +838,7 @@ function Details({ taxonomy, synonyms, commonNames }: DetailsProps) {
                 value="record history"
                 popoverDisabled
               />
-            </Group>
+            </Group> */}
           </Stack>
         </Grid.Col>
         {/* <Synonyms taxonomy={taxonomy} /> */}
