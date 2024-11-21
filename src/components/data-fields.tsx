@@ -8,13 +8,15 @@ import {
   Text,
   Group,
   PaperProps,
+  MantineStyleProp,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
+import { ReactNode } from "react";
 
 interface AttributeProps {
-  label?: string;
+  label?: ReactNode;
   labelColor?: MantineColor;
   children: React.ReactNode;
   group?: boolean;
@@ -73,7 +75,7 @@ const BADGE_COLOURS: Record<string, string> = {
 
 interface AttributePillValueProps {
   value?: string | number;
-  popoverLabel?: string | number;
+  popoverLabel?: string | number | ReactNode;
   popoverDisabled?: boolean;
   italic?: boolean;
   color?: MantineColor;
@@ -82,10 +84,11 @@ interface AttributePillValueProps {
   icon?: typeof IconInfoCircle;
   showIconOnHover?: boolean;
   miw?: number;
+  style?: MantineStyleProp;
 }
 
 interface AttributePillProps extends AttributePillValueProps {
-  label: string;
+  label: ReactNode;
   href?: string;
   labelColor?: MantineColor;
   group?: boolean;
@@ -117,6 +120,7 @@ export function AttributePillValue({
   textColor,
   icon: Icon,
   showIconOnHover = false,
+  style,
   miw,
 }: AttributePillValueProps) {
   const [opened, { close, open }] = useDisclosure(false);
@@ -140,7 +144,7 @@ export function AttributePillValue({
           bg={opened && hoverColor ? hoverColor : bg}
           radius="xl"
           miw={miw}
-          style={{ border: "none" }}
+          style={{ border: "none", ...style }}
           onMouseEnter={open}
           onMouseLeave={close}
         >
@@ -209,7 +213,7 @@ export function AttributePillContainer({
 }
 
 interface AttributeIconProps {
-  label: string;
+  label: ReactNode;
   icon: React.ReactNode;
 }
 

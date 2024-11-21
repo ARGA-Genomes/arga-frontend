@@ -18,11 +18,13 @@ import {
   ScrollArea,
   Box,
   Popover,
+  Flex,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 
 import {
+  IconArrowUpRight,
   IconBinaryTree2,
   IconExternalLink,
   IconSearch,
@@ -49,6 +51,7 @@ import HorizontalTimeline, {
 import { Publication } from "@/queries/publication";
 import { Specimen } from "@/queries/specimen";
 import { AnalysisMap } from "@/components/mapping";
+import { ExternalLinkButton } from "@/components/button-link-external";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -330,7 +333,7 @@ type ProvenanceQuery = {
         action: string;
         atom: AtomText | AtomNomenclaturalType | AtomDateTime;
         dataset: Dataset;
-      },
+      }
     ];
   };
 };
@@ -476,12 +479,12 @@ function ExternalLinks(props: ExternalLinksProps) {
       try {
         const response = await fetch(
           `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            props.canonicalName,
-          )}`,
+            props.canonicalName
+          )}`
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
         );
       } catch (error) {
         setMatchedTaxon([]);
@@ -498,22 +501,7 @@ function ExternalLinks(props: ExternalLinksProps) {
         External links
       </Text>
       <Group mt="md" gap="xs">
-        <Button
-          component="a"
-          radius="md"
-          color="gray"
-          variant="light"
-          size="xs"
-          leftSection={<IconExternalLink size="1rem" color="black" />}
-          loading={!matchedTaxon}
-          disabled={Array.isArray(matchedTaxon) && matchedTaxon.length === 0}
-          href={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`}
-          target="_blank"
-        >
-          <Text>
-            View on&nbsp;<b>ALA</b>
-          </Text>
-        </Button>
+        <ExternalLinkButton url={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`} externalLinkName="View on ALA" icon={IconArrowUpRight} />
 
         {props.species?.indigenousEcologicalKnowledge?.map((iek) => (
           <Button
@@ -567,7 +555,7 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   });
 
   const acts = data?.taxon.taxonomicActs.filter(
-    (act) => act.taxon.status !== "ACCEPTED",
+    (act) => act.taxon.status !== "ACCEPTED"
   );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
@@ -576,6 +564,8 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
     synonyms[act.taxon.status] ||= [];
     synonyms[act.taxon.status].push(act);
   }
+
+  console.log("synonyms", data);
 
   return (
     <Paper p="sm">
@@ -600,14 +590,32 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   );
 }
 
+interface SourcePillProps {
+  value: string;
+}
+
+function SourcePill({ value }: SourcePillProps) {
+  return (
+    <AttributePillValue
+      color="transparent"
+      value={value}
+      textColor="shellfish"
+      style={{
+        border: "1px solid var(--mantine-color-shellfish-5)",
+        minWidth: 90,
+      }}
+      popoverDisabled
+    />
+  );
+}
+
 interface DetailsProps {
   taxonomy: Taxonomy;
+  synonyms: Synonym[];
   commonNames: VernacularName[];
 }
 
-function Details({ taxonomy, commonNames }: DetailsProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
+function Details({ taxonomy, synonyms, commonNames }: DetailsProps) {
   const { loading, error, data } = useQuery<TypeSpecimenQuery>(
     GET_TYPE_SPECIMENS,
     {
@@ -615,7 +623,7 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
         rank: taxonomy.rank,
         canonicalName: taxonomy.canonicalName,
       },
-    },
+    }
   );
 
   const specimens = data?.taxon.typeSpecimens;
@@ -623,135 +631,203 @@ function Details({ taxonomy, commonNames }: DetailsProps) {
   const typeSpecimens = specimens?.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == taxonomy.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher",
+      typeSpecimen.specimen.typeStatus != "no voucher"
   );
   const typeSpecimen = typeSpecimens && typeSpecimens[0]?.specimen;
+  const groupedSynonyms = Object.entries(
+    synonyms.reduce(
+      (prev, cur) => ({
+        [cur.canonicalName]: [
+          ...(prev[cur.canonicalName] || []),
+          cur.scientificName,
+        ],
+      }),
+      {} as { [key: string]: string[] }
+    )
+  );
 
   return (
     <Paper radius={16} p="md" withBorder>
-      <Group mb={10} align="baseline">
+      <Group justify="space-between" mb={10} align="baseline" gap="xl">
         <Text fw={600} size="lg">
           Taxonomy
         </Text>
-        <Text fz="sm" fw={300}>
-          Source:&nbsp;
-          {taxonomy.sourceUrl ? (
-            <Link href={taxonomy.sourceUrl} target="_blank">
-              {taxonomy.source}
-            </Link>
-          ) : (
-            taxonomy.source
-          )}
-        </Text>
+        <Group>
+          <Text fw={300} size="xs">
+            Source
+          </Text>
+          <ExternalLinkButton
+            url={taxonomy.sourceUrl}
+            externalLinkName={taxonomy.source}
+            outline
+            icon={IconArrowUpRight}
+          />
+        </Group>
       </Group>
+      <Grid>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 6, xl: 5 }}>
+          <Paper radius={16} p="sm" withBorder>
+            <DataTable>
+              <DataTableRow label="Scientific name">
+                <Group gap={10}>
+                  <Text fw={600} fz="sm" fs="italic">
+                    {taxonomy.canonicalName}
+                  </Text>
+                  <Text fw={600} fz="sm">
+                    {taxonomy.authorship}
+                  </Text>
+                </Group>
+              </DataTableRow>
+              <DataTableRow label="Status">
+                <AttributePillValue value={taxonomy.status.toLowerCase()} />
+              </DataTableRow>
+              <DataTableRow label="Original description">
+                <DataField value={undefined} />
+              </DataTableRow>
+              <DataTableRow label="Type material">
+                <AttributePillValue value={typeSpecimen?.recordId} />
+              </DataTableRow>
+              <DataTableRow label="Type location (from source)">
+                <Flex justify="space-between" align="center">
+                  <DataField
+                    value={[
+                      typeSpecimen?.locality,
+                      typeSpecimen?.stateProvince,
+                      typeSpecimen?.country,
+                    ]
+                      .filter((t) => t)
+                      .join(", ")}
+                  />
+                  {typeSpecimen?.locationSource && (
+                    <SourcePill value={typeSpecimen?.locationSource} />
+                  )}
+                </Flex>
+              </DataTableRow>
+              {typeSpecimen &&
+                typeSpecimen.latitude &&
+                typeSpecimen.longitude && (
+                  <DataTableRow label="Type location (geo)">
+                    <Group>
+                      <DataField
+                        value={[typeSpecimen?.latitude, typeSpecimen?.longitude]
+                          .filter((t) => t)
+                          .join(", ")}
+                      />
 
-      <SimpleGrid cols={3}>
-        <Paper p="sm">
-          <DataTable>
-            <DataTableRow label="Scientific name">
-              <Group gap={10} pl={12}>
-                <Text fw={600} fz="sm" fs="italic">
-                  {taxonomy.canonicalName}
-                </Text>
-                <Text fw={600} fz="sm">
-                  {taxonomy.authorship}
-                </Text>
-              </Group>
-            </DataTableRow>
-            <DataTableRow label="Status">
-              <AttributePillValue value={taxonomy.status.toLowerCase()} />
-            </DataTableRow>
-
-            <DataTableRow label="Original description">
-              <DataField value={undefined} />
-            </DataTableRow>
-
-            <DataTableRow label="Type material">
-              <AttributePillValue value={typeSpecimen?.recordId} />
-            </DataTableRow>
-            <DataTableRow label="Type location (from source)">
-              <DataField
-                value={[
-                  typeSpecimen?.locality,
-                  typeSpecimen?.stateProvince,
-                  typeSpecimen?.country,
-                ]
-                  .filter((t) => t)
-                  .join(", ")}
-              />
-            </DataTableRow>
-            {typeSpecimen &&
-              typeSpecimen.latitude &&
-              typeSpecimen.longitude && (
-                <DataTableRow label="Type location (geo)">
-                  <Group>
-                    <DataField
-                      value={[typeSpecimen?.latitude, typeSpecimen?.longitude]
-                        .filter((t) => t)
-                        .join(", ")}
-                    />
-
-                    <Popover width={500} position="right" withArrow shadow="md">
-                      <Popover.Target>
-                        <Button
-                          variant="subtle"
-                          leftSection={<IconSearch />}
-                          color="shellfish"
-                        >
-                          View map
-                        </Button>
-                      </Popover.Target>
-                      <Popover.Dropdown
-                        p={0}
-                        m={0}
-                        style={{
-                          borderRadius: "var(--mantine-radius-lg)",
-                          overflow: "hidden",
-                        }}
+                      <Popover
+                        width={500}
+                        position="right"
+                        withArrow
+                        shadow="md"
                       >
-                        <Box pos="relative" h="500">
-                          <AnalysisMap
-                            markers={[
-                              {
-                                recordId: typeSpecimen.recordId,
-                                latitude: typeSpecimen.latitude,
-                                longitude: typeSpecimen.longitude,
-                                color: [103, 151, 180, 220],
-                              },
-                            ]}
-                            style={{
-                              borderRadius: "var(--mantine-radius-lg)",
-                              overflow: "hidden",
-                            }}
-                          ></AnalysisMap>
-                        </Box>
-                      </Popover.Dropdown>
-                    </Popover>
-                  </Group>
-                </DataTableRow>
-              )}
-          </DataTable>
-        </Paper>
-
-        <Synonyms taxonomy={taxonomy} />
-
-        <Stack>
-          <Paper p="sm">
-            <Text fw={300} fz="sm">
-              Common names
-            </Text>
-            <Text fw={600} fz="sm" truncate="end">
-              {commonNames.map((r) => r.vernacularName).join(", ")}
-            </Text>
+                        <Popover.Target>
+                          <Button
+                            variant="subtle"
+                            leftSection={<IconSearch />}
+                            color="shellfish"
+                          >
+                            View map
+                          </Button>
+                        </Popover.Target>
+                        <Popover.Dropdown
+                          p={0}
+                          m={0}
+                          style={{
+                            borderRadius: "var(--mantine-radius-lg)",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <Box pos="relative" h="500">
+                            <AnalysisMap
+                              markers={[
+                                {
+                                  recordId: typeSpecimen.recordId,
+                                  latitude: typeSpecimen.latitude,
+                                  longitude: typeSpecimen.longitude,
+                                  color: [103, 151, 180, 220],
+                                },
+                              ]}
+                              style={{
+                                borderRadius: "var(--mantine-radius-lg)",
+                                overflow: "hidden",
+                              }}
+                            ></AnalysisMap>
+                          </Box>
+                        </Popover.Dropdown>
+                      </Popover>
+                    </Group>
+                  </DataTableRow>
+                )}
+            </DataTable>
           </Paper>
-
-          <Paper p="sm">
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 6, xl: 3.5 }}>
+          <Paper radius={16} p="sm" h="100%" withBorder>
             <Text fw={300} fz="sm">
-              Subspecies
+              Synonyms
             </Text>
+            {synonyms.length > 0 ? (
+              <Stack pl="sm">
+                {groupedSynonyms.map(([group, synonyms]) => (
+                  <Stack key={group}>
+                    {synonyms.map((synonym) => (
+                      <Text
+                        key={synonym}
+                        fw={600}
+                        fs="italic"
+                        size="sm"
+                        c="midnight.8"
+                      >
+                        {synonym}
+                      </Text>
+                    ))}
+                  </Stack>
+                ))}
+              </Stack>
+            ) : (
+              <Text fz="sm" c="dimmed" fw={700}>
+                No data
+              </Text>
+            )}
           </Paper>
-        </Stack>
-      </SimpleGrid>
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 3.5 }}>
+          <Stack>
+            <Paper radius={16} p="sm" withBorder>
+              <Text fw={300} fz="sm">
+                Common names
+              </Text>
+              <Text fw={600} fz="sm" c="midnight.8" truncate="end">
+                {commonNames.length > 0 ? (
+                  commonNames.map((r) => r.vernacularName).join("; ")
+                ) : (
+                  <Text fw={700} size="sm" c="dimmed">
+                    No data
+                  </Text>
+                )}
+              </Text>
+            </Paper>
+            <Paper radius={16} p="sm" withBorder>
+              <Text fw={300} fz="sm">
+                Subspecies
+              </Text>
+              <Text fw={700} size="sm" c="dimmed">
+                No data
+              </Text>
+            </Paper>
+            {/* <Group justify="space-between" align="center">
+              <AttributePillValue
+                color="midnight.12"
+                hoverColor="midnight.10"
+                textColor="white"
+                value="record history"
+                popoverDisabled
+              />
+            </Group> */}
+          </Stack>
+        </Grid.Col>
+        {/* <Synonyms taxonomy={taxonomy} /> */}
+      </Grid>
     </Paper>
   );
 }
@@ -943,7 +1019,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == item.name.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher",
+      typeSpecimen.specimen.typeStatus != "no voucher"
   );
 
   function humanize(text: string) {
@@ -952,7 +1028,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 
   const act = humanize(item.act);
   const items = data?.provenance.nomenclaturalAct.filter(
-    (item) => item.action !== "CREATE",
+    (item) => item.action !== "CREATE"
   );
 
   return (
@@ -1075,31 +1151,32 @@ interface FamilyTaxonTreeProps {
 function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
   const [layout, setLayout] = useState<Layout>("top-to-bottom");
 
-  const order = hierarchy.find(
-    (node) => node.rank === "ORDER" || node.rank === "ORDO",
-    /* (node) => node.rank === "FAMILY" || node.rank === "FAMILIA", */
+  const subfamily = hierarchy.find(
+    (node) =>
+      node.rank === "SUBFAMILY" ||
+      node.rank === "SUBFAMILIA" ||
+      node.rank === "FAMILY" ||
+      node.rank === "FAMILIA"
   );
+
   const { loading, error, data } = useQuery<TaxonTreeStatsQuery>(
     GET_TAXON_TREE_STATS,
     {
       variables: {
-        taxonRank: order?.rank || "ORDER",
-        taxonCanonicalName: order?.canonicalName,
+        taxonRank: subfamily?.rank || "SUBFAMILY",
+        taxonCanonicalName: subfamily?.canonicalName,
         includeRanks: [
-          "ORDER",
-          "ORDO",
-          /* "SUBORDER", */
-          /* "SUBORDO", */
-          "FAMILY",
-          "FAMILIA",
-          /* "SUBFAMILY", */
-          /* "SUBFAMILIA", */
+          ...(subfamily?.rank.startsWith("FAMIL") ? ["FAMILY", "FAMILIA"] : []),
+          "SUBFAMILY",
+          "SUBFAMILIA",
+          "TRIBE",
+          "SUBTRIBE",
           "GENUS",
-          /* "SUBGENUS", */
+          "SUBGENUS",
           "SPECIES",
         ],
       },
-    },
+    }
   );
 
   const treeData = data?.stats.taxonBreakdown[0];
@@ -1117,7 +1194,8 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
           Interactive higher classification
         </Text>
         <Button
-          color="shellfish"
+          color="midnight.8"
+          radius="md"
           onClick={() => {
             const newLayout =
               layout === "top-to-bottom" ? "right-to-left" : "top-to-bottom";
@@ -1202,6 +1280,7 @@ export default function TaxonomyPage({ params }: { params: { name: string } }) {
             {species && taxonomy && (
               <Details
                 taxonomy={taxonomy}
+                synonyms={species.synonyms}
                 commonNames={species.vernacularNames}
               />
             )}

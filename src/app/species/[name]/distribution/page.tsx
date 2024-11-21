@@ -12,6 +12,9 @@ import {
   Group,
   Switch,
   SwitchProps,
+  ScrollArea,
+  Divider,
+  Flex,
 } from "@mantine/core";
 
 import { LoadOverlay } from "@/components/load-overlay";
@@ -19,8 +22,9 @@ import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Taxonomy } from "@/components/species-card";
 import { Layer } from "@/app/type";
+import { ExternalLinkButton } from "@/components/button-link-external";
+import { IconArrowUpRight, IconExternalLink } from "@tabler/icons-react";
 
 const GET_DISTRIBUTION = gql`
   query SpeciesDistribution($canonicalName: String) {
@@ -123,6 +127,10 @@ interface DistributionAnalysisProps {
   speciesName: string;
 }
 
+const hasRegions = (regions: Regions) => {
+  return regions.ibra.length > 0 || regions.imcra.length > 0;
+};
+
 function DistributionAnalysis({
   regions,
   markers,
@@ -138,7 +146,7 @@ function DistributionAnalysis({
       regions={flattened}
       markers={markers}
       style={{
-        borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+        borderTopLeftRadius: "12px",
         overflow: "hidden",
       }}
       speciesName={speciesName}
@@ -197,72 +205,83 @@ interface SummaryProps {
   regions?: Regions;
   filters: Filters;
   onFilter: (layer: Layer, enabled: boolean) => void;
+  name: string;
 }
 
-function Summary({ regions, filters, onFilter }: SummaryProps) {
+function Summary({ name, regions, filters, onFilter }: SummaryProps) {
   return (
-    <Stack p={10} gap="md">
-      <Title order={3} fw={650}>
-        Indexed data
-      </Title>
-      <Stack gap={5} mb={30}>
-        <MapFilterOption
-          onChange={(e) => onFilter(Layer.WholeGenome, e.currentTarget.checked)}
-          size="md"
-          color="bushfire"
-          label="Whole genomes"
-          count={filters.wholeGenomes.count}
-          total={filters.wholeGenomes.total}
-        />
-        <MapFilterOption
-          onChange={(e) => onFilter(Layer.Loci, e.currentTarget.checked)}
-          size="md"
-          color="moss.7"
-          label="Loci"
-          count={filters.loci.count}
-          total={filters.loci.total}
-        />
-        <MapFilterOption
-          onChange={(e) => onFilter(Layer.OtherData, e.currentTarget.checked)}
-          size="md"
-          color="moss.3"
-          label="Genomic components"
-          count={filters.other.count}
-          total={filters.other.total}
-        />
-        <MapFilterOption
-          onChange={(e) => onFilter(Layer.Specimens, e.currentTarget.checked)}
-          size="md"
-          color="rgba(103, 151, 180, 220)"
-          label="Specimens"
-          count={filters.specimens.count}
-          total={filters.specimens.total}
-        />
-      </Stack>
+    <Flex direction="column" justify="space-between" h="100%">
+      <ScrollArea mah={800}>
+        <Stack gap="md" p="md" pt="xl">
+          <Title order={3} fw={650}>
+            Indexed data
+          </Title>
+          <Stack gap={5} mb={30}>
+            <MapFilterOption
+              onChange={(e) =>
+                onFilter(Layer.WholeGenome, e.currentTarget.checked)
+              }
+              size="md"
+              color="bushfire"
+              label="Whole genomes"
+              count={filters.wholeGenomes.count}
+              total={filters.wholeGenomes.total}
+            />
+            <MapFilterOption
+              onChange={(e) => onFilter(Layer.Loci, e.currentTarget.checked)}
+              size="md"
+              color="moss.7"
+              label="Loci"
+              count={filters.loci.count}
+              total={filters.loci.total}
+            />
+            <MapFilterOption
+              onChange={(e) =>
+                onFilter(Layer.OtherData, e.currentTarget.checked)
+              }
+              size="md"
+              color="moss.3"
+              label="Genomic components"
+              count={filters.other.count}
+              total={filters.other.total}
+            />
+            <MapFilterOption
+              onChange={(e) =>
+                onFilter(Layer.Specimens, e.currentTarget.checked)
+              }
+              size="md"
+              color="rgba(103, 151, 180, 220)"
+              label="Specimens"
+              count={filters.specimens.count}
+              total={filters.specimens.total}
+            />
+          </Stack>
 
-      <Title order={3} fw={650}>
-        Distribution
-      </Title>
-      <Text>
-        {regions?.ibra
-          .map((r) => r.names)
-          .flat()
-          .join(", ")}
-      </Text>
-      <Text>
-        {regions?.imcra
-          .map((r) => r.names)
-          .flat()
-          .join(", ")}
-      </Text>
-    </Stack>
+          <Title order={3} fw={650}>
+            Distribution
+          </Title>
+          <Text>
+            {regions?.ibra
+              .map((r) => r.names)
+              .flat()
+              .join(", ")}
+          </Text>
+          <Text>
+            {regions?.imcra
+              .map((r) => r.names)
+              .flat()
+              .join(", ")}
+          </Text>
+        </Stack>
+      </ScrollArea>
+    </Flex>
   );
 }
 
 function toMarker(
   color: [number, number, number, number],
   type: Layer,
-  records?: Specimen[],
+  records?: Specimen[]
 ) {
   if (!records) return [];
   return records.map((r) => {
@@ -300,22 +319,22 @@ export default function DistributionPage({
       ...toMarker(
         [103, 151, 180, 220],
         Layer.Specimens,
-        layers.specimens ? data?.species.specimens.records : undefined,
+        layers.specimens ? data?.species.specimens.records : undefined
       ),
       ...toMarker(
         [123, 161, 63, 220],
         Layer.Loci,
-        layers.loci ? data?.species.markers.records : undefined,
+        layers.loci ? data?.species.markers.records : undefined
       ),
       ...toMarker(
         [243, 117, 36, 220],
         Layer.WholeGenome,
-        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined,
+        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined
       ),
       ...toMarker(
         [185, 210, 145, 220],
         Layer.OtherData,
-        layers.other ? data?.species.genomicComponents.records : undefined,
+        layers.other ? data?.species.genomicComponents.records : undefined
       ),
     ];
     // filter out null island as well as specimens without coords
@@ -356,16 +375,12 @@ export default function DistributionPage({
     return <Text>Error : {error.message}</Text>;
   }
 
-  const hasRegions = (regions: Regions) => {
-    return regions.ibra.length > 0 || regions.imcra.length > 0;
-  };
-
   return (
     <Paper p="lg" radius="lg" withBorder>
       <Stack gap="lg">
         <Paper radius="lg" withBorder>
           <Grid>
-            <Grid.Col span={9}>
+            <Grid.Col span={{ xl: 9, lg: 8, md: 7, sm: 12, xs: 12 }} pb={0}>
               <Stack gap={20} pos="relative">
                 <LoadOverlay visible={loading} />
                 <Box h={800} pos="relative">
@@ -377,35 +392,42 @@ export default function DistributionPage({
                 </Box>
               </Stack>
             </Grid.Col>
-            <Grid.Col span={3}>
+            <Grid.Col span={{ xl: 3, lg: 4, md: 5, sm: 12, xs: 12 }} pb={0}>
               {filters && (
                 <Summary
                   regions={data?.species.regions}
+                  name={params.name}
                   filters={filters}
                   onFilter={onFilter}
                 />
               )}
+            </Grid.Col>
+            <Grid.Col span={12} py={0}>
+              <Divider />
+            </Grid.Col>
+            <Grid.Col span={12}>
               {data?.species.regions && hasRegions(data.species.regions) && (
-                <Text c="attribute.5">
-                  <b>Source:</b>{" "}
-                  <Link
-                    href={`https://biodiversity.org.au/afd/taxa/${params.name}`}
-                  >
-                    Australian Faunal Directory
-                  </Link>
-                </Text>
+                <Group px="md" pb="lg" pt="sm">
+                  <Text fw={300} size="xs">
+                    Source
+                  </Text>
+                  <ExternalLinkButton
+                    url={`https://biodiversity.org.au/afd/taxa/${params.name}`}
+                    externalLinkName="Australian Faunal Directory"
+                    outline
+                    icon={IconArrowUpRight}
+                  />
+                </Group>
               )}
-              <br />
-              <Text c={"attribute.5"}>
-                <b>Note:</b> location data may be generalised for sensitive
-                species. Location data should be verified from individual data
-                point custodians. Please refer to the specimen page for full
-                details of metadata provenance for specific collection
-                locations.
-              </Text>
             </Grid.Col>
           </Grid>
         </Paper>
+        <Text c={"attribute.5"} pt="sm">
+          <b>Note:</b> location data may be generalised for sensitive species.
+          Location data should be verified from individual data point
+          custodians. Please refer to the specimen page for full details of
+          metadata provenance for specific collection locations.
+        </Text>
       </Stack>
     </Paper>
   );

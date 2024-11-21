@@ -70,7 +70,7 @@ function DataTabs({
     <Tabs
       variant="unstyled"
       radius={10}
-      mt={40}
+      mt="sm"
       defaultValue="summary"
       classNames={classes}
       value={tab}
@@ -80,21 +80,23 @@ function DataTabs({
         <Tabs.List>
           <Tabs.Tab value="summary">Summary</Tabs.Tab>
           <Tabs.Tab value="distribution">Data distribution</Tabs.Tab>
-          <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
           <Tabs.Tab value="whole_genomes">Genome assemblies</Tabs.Tab>
+          <Tabs.Tab value="components">Gene libraries</Tabs.Tab>
+          <Tabs.Tab value="variants">Variants and population sets</Tabs.Tab>
+          <Tabs.Tab value="organelle">Organelle chromosomes</Tabs.Tab>
+          <Tabs.Tab value="markers">Single loci</Tabs.Tab>
+          <Tabs.Tab value="other">Other genetic data</Tabs.Tab>
           {/* <Tabs.Tab value="annotations">Genome annotations</Tabs.Tab> */}
-          <Tabs.Tab value="components">Genomic components</Tabs.Tab>
-          {/* <Tabs.Tab value="variants">Variant sets</Tabs.Tab> */}
-          <Tabs.Tab value="markers">Single locus data</Tabs.Tab>
           {/* <Tabs.Tab value="other">Other genomic data</Tabs.Tab> */}
           {/* <Tabs.Tab value="protocols">Protocols</Tabs.Tab> */}
           <Tabs.Tab value="specimens">Specimens</Tabs.Tab>
           {/* <Tabs.Tab value="gallery">Gallery</Tabs.Tab> */}
           {/* <Tabs.Tab value="publications">Publications</Tabs.Tab> */}
+          <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
         </Tabs.List>
       </Container>
 
-      <Paper pos="relative" py={30}>
+      <Paper pos="relative" py="md">
         {children}
       </Paper>
     </Tabs>

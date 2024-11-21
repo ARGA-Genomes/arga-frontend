@@ -10,7 +10,8 @@ import { AttributePill } from "@/components/data-fields";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { SpeciesImage } from "@/components/species-image";
-import { IconArrowUpRight } from "@tabler/icons-react";
+import { IconArrowUpRight, IconExternalLink } from "@tabler/icons-react";
+import { ExternalLinkButton } from "@/components/button-link-external";
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
@@ -230,31 +231,6 @@ function DataSummary({
   );
 }
 
-interface ExternalLinkButtonProps {
-  url?: string;
-  externalLinkName?: string;
-}
-
-function ExternalLinkButton({
-  url,
-  externalLinkName,
-}: ExternalLinkButtonProps) {
-  return (
-    <Button
-      component="a"
-      radius="xl"
-      color="shellfish.6"
-      size="xs"
-      href={url}
-      target="_blank"
-    >
-      <Text c="white" fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
-        {externalLinkName}
-      </Text>
-    </Button>
-  );
-}
-
 interface ExternalResourcesProps {
   canonicalName: string;
   species?: Species;
@@ -299,6 +275,7 @@ function ExternalResources(props: ExternalResourcesProps) {
               <ExternalLinkButton
                 url={`https://bie.ala.org.au/species/${matchedTaxon?.[0]}`}
                 externalLinkName="ALA"
+                icon={IconArrowUpRight}
               />
             )}
           </Group>
@@ -336,24 +313,12 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
           <Text fw={300} size="xs">
             Source
           </Text>
-          <Button
-            component="a"
-            radius="xl"
-            variant="outline"
-            color="shellfish.6"
-            size="xs"
-            href={taxonomy.sourceUrl}
-            target="_blank"
-          >
-            <Text
-              c="shellfish.6"
-              fw={600}
-              size="sm"
-              style={{ whiteSpace: "nowrap" }}
-            >
-              {taxonomy.source}
-            </Text>
-          </Button>
+          <ExternalLinkButton
+            url={taxonomy.sourceUrl}
+            externalLinkName={taxonomy.source}
+            outline
+            icon={IconArrowUpRight}
+          />
         </Group>
       </Group>
 
@@ -382,7 +347,7 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
   return <SpeciesImage photo={photo} />;
 }
 
-export default function TaxonomyPage({ params }: { params: { name: string } }) {
+export default function SummaryPage({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
