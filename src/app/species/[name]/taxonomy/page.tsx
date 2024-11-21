@@ -501,22 +501,7 @@ function ExternalLinks(props: ExternalLinksProps) {
         External links
       </Text>
       <Group mt="md" gap="xs">
-        <Button
-          component="a"
-          radius="md"
-          color="gray"
-          variant="light"
-          size="xs"
-          leftSection={<IconExternalLink size="1rem" color="black" />}
-          loading={!matchedTaxon}
-          disabled={Array.isArray(matchedTaxon) && matchedTaxon.length === 0}
-          href={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`}
-          target="_blank"
-        >
-          <Text>
-            View on&nbsp;<b>ALA</b>
-          </Text>
-        </Button>
+        <ExternalLinkButton url={`https://bie.ala.org.au/species/${matchedTaxon?.[0] || ""}`} externalLinkName="View on ALA" icon={IconArrowUpRight} />
 
         {props.species?.indigenousEcologicalKnowledge?.map((iek) => (
           <Button
