@@ -746,7 +746,7 @@ function ContentTypeContainer({
           <Text
             fw={600}
             fz="var(--mantine-h4-font-size)"
-            c={theme.colors.midnight[10]}
+            // c={theme.colors.midnight[10]}
           >
             {renameContentType[contentType.contentType as ContentType]}
           </Text>
@@ -822,18 +822,6 @@ function ContentTypeContainer({
 }
 
 function findSourceLastUpdated(datasets: Dataset[]): string {
-  // if (!datasets.length) return "01/01/1970";
-  // const sortedDatasets = [...datasets].sort(
-  //   (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  // );
-
-  // sortedDatasets.forEach((d) => {
-  //   if (d.updatedAt) {
-  //     return d.updatedAt;
-  //   }
-  // });
-
-  // return "01/01/1970";
   return datasets.reduce((latest, d) => {
     const updatedAt = d.updatedAt ? new Date(d.updatedAt).getTime() : 0;
     return updatedAt > new Date(latest).getTime() ? d.updatedAt : latest;
