@@ -21,5 +21,13 @@
     & .label[data-checked]:hover {
       background-color: var(--mantine-color-moss-7); /* Slightly lighter/darker for hover */
     }
-  }
+
+    /* Disabled state */
+    & .label[data-disabled] {
+        background-color: var(--mantine-color-gray-2); /* Light grey for disabled background */
+        color: var(--mantine-color-gray-5); /* Light grey for disabled text */
+        pointer-events: none; /* Prevent interaction */
+        opacity: 0.6; /* Optional, for a "disabled" effect */
+    }
+}
   

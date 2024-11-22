@@ -396,8 +396,12 @@ function DatasetSort({
 function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
   const [sortBy, setSortBy] = useState<string | null>(null);
 
+  const filteredDatasets = datasets.filter(
+    (dataset) => dataset.name.trim() !== ""
+  );
+
   const sortedDatasets = useMemo(() => {
-    return [...datasets].sort((a, b) => {
+    return [...filteredDatasets].sort((a, b) => {
       switch (sortBy) {
         case "alphabetical":
           return a.name.localeCompare(b.name);
@@ -409,7 +413,7 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
           return 0;
       }
     });
-  }, [datasets, sortBy]);
+  }, [filteredDatasets, sortBy]);
 
   return (
     <Stack>
@@ -652,20 +656,6 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
     variables: { name: source },
   });
-
-  // const filteredSource: Source = {
-  //   ...data?.source, // Spread to keep other properties of the source
-  //   license: data?.source.license ?? "",
-  //   accessRights: data?.source.accessRights ?? "",
-  //   rightsHolder: data?.source.rightsHolder ?? "",
-  //   author: data?.source.auth
-  //   datasets: (data?.source.datasets || []).filter(
-  //     (dataset) => dataset.name !== ""
-  //   ), // Filter out datasets with an empty name
-  // };
-
-  // console.log(filteredSource);
-  // console.log(data?.source);
 
   useEffect(() => {
     setPreviousPage({
