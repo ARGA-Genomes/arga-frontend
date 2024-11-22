@@ -1,0 +1,33 @@
+.root {
+    /* Default styles for unchecked chips */
+    & .label {
+      background-color: #d6e4ed;
+      color: var(--mantine-color-midnight-10);
+      transition: background-color 0.3s, color 0.3s;
+    }
+  
+    /* Hover styles for unchecked chips */
+    & .label:hover {
+      background-color: #e2ecf2;
+    }
+  
+    /* Styles for checked chips */
+    & .label[data-checked] {
+      background-color: var(--mantine-color-moss-5);
+      color: white;
+    }
+  
+    /* Hover styles for checked chips */
+    & .label[data-checked]:hover {
+      background-color: var(--mantine-color-moss-7); /* Slightly lighter/darker for hover */
+    }
+
+    /* Disabled state */
+    & .label[data-disabled] {
+        background-color: var(--mantine-color-gray-2); /* Light grey for disabled background */
+        color: var(--mantine-color-gray-5); /* Light grey for disabled text */
+        pointer-events: none; /* Prevent interaction */
+        opacity: 0.6; /* Optional, for a "disabled" effect */
+    }
+}
+  

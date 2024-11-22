@@ -19,17 +19,34 @@ import {
   Accordion,
   Badge,
   Avatar,
+  useMantineTheme,
+  ScrollArea,
+  UnstyledButton,
+  Chip,
+  Center,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { useDisclosure } from "@mantine/hooks";
-import { IconFilter } from "@tabler/icons-react";
+import {
+  IconFilter,
+  IconClockHour4,
+  IconExternalLink,
+  IconArrowUpRight,
+  IconArrowsSort,
+} from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { Photo } from "@/app/type";
+import { AttributePill } from "@/components/data-fields";
+import { DateTime } from "luxon";
+import Link from "next/link";
+import { DataPageCitation } from "@/components/page-citation";
+import { SortChip } from "@/components/sorting/sort-chips";
+import classes from "../../../../components/record-list.module.css";
 
 const PAGE_SIZE = 10;
 type Filters = {
@@ -45,9 +62,26 @@ const GET_DETAILS = gql`
       rightsHolder
       author
       name
+      accessPill
+      reusePill
+
+      species(page: 1, pageSize: 1) {
+        total
+      }
 
       datasets {
         name
+        shortName
+        description
+        url
+        citation
+        license
+        rightsHolder
+        createdAt
+        updatedAt
+        accessPill
+        reusePill
+        publicationYear
       }
     }
   }
@@ -55,6 +89,39 @@ const GET_DETAILS = gql`
 
 type Dataset = {
   name: string;
+  shortName?: string;
+  description?: string;
+  url?: string;
+  citation?: string;
+  license?: string;
+  rightsHolder?: string;
+  createdAt: string;
+  updatedAt: string;
+  reusePill?: ReusePillType;
+  accessPill?: AccessPillType;
+  publicationYear?: number;
+};
+
+type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
+
+const accessPillColours: Record<AccessPillType, string> = {
+  OPEN: "moss.3",
+  RESTRICTED: "red.3",
+  CONDITIONAL: "wheat.3",
+  VARIABLE: "wheat.3",
+};
+
+type ReusePillType = "LIMITED" | "NONE" | "UNLIMITED" | "VARIABLE";
+
+const reusePillColours: Record<ReusePillType, string> = {
+  UNLIMITED: "moss.3",
+  LIMITED: "wheat.3",
+  NONE: "#d6e4ed",
+  VARIABLE: "wheat.3",
+};
+
+type SpeciesCount = {
+  total: number;
 };
 
 type Source = {
@@ -63,7 +130,9 @@ type Source = {
   rightsHolder: string;
   author: string;
   name: string;
-
+  reusePill?: ReusePillType;
+  accessPill?: AccessPillType;
+  species: SpeciesCount;
   datasets: Dataset[];
 };
 
@@ -110,7 +179,7 @@ type DataSummary = {
   other: number;
 };
 
-type Record = {
+type SpeciesRecord = {
   taxonomy: { canonicalName: string };
   photo: Photo;
   dataSummary: DataSummary;
@@ -119,7 +188,7 @@ type Record = {
 type SpeciesQueryResults = {
   source: {
     species: {
-      records: Record[];
+      records: SpeciesRecord[];
       total: number;
     };
   };
@@ -270,6 +339,10 @@ function Species({ source }: { source: string }) {
 
       {error ? <Title order={4}>{error.message}</Title> : null}
 
+      {records.length === 0 && (
+        <Text className={classes.emptyList}>no data</Text>
+      )}
+
       <SimpleGrid cols={5}>
         {records.map((record) => (
           <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
@@ -286,30 +359,299 @@ function Species({ source }: { source: string }) {
   );
 }
 
-function SourceDetails({ source }: { source: string }) {
-  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-    variables: { name: source },
-  });
+function DatasetSort({
+  sortBy,
+  setSortBy,
+}: {
+  sortBy: string | null;
+  setSortBy: (value: string | null) => void;
+}) {
+  const theme = useMantineTheme();
+  const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    if (event.currentTarget.value === sortBy) {
+      setSortBy(null);
+    }
+  };
+  return (
+    <Group>
+      <Group gap={5}>
+        <IconArrowsSort color={theme.colors.midnight[10]} />
+        <Text size="sm" fw={550} c={theme.colors.midnight[10]}>
+          Sort by
+        </Text>
+      </Group>
+      <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
+        <Group>
+          <SortChip value="alphabetical" onClick={handleChipClick}>
+            <b>A-Z</b>
+          </SortChip>
+
+          <SortChip value="date" onClick={handleChipClick}>
+            <b>Last updated</b>
+          </SortChip>
+
+          <SortChip value="records" onClick={handleChipClick} disabled>
+            <b>Records</b>
+          </SortChip>
+        </Group>
+      </Chip.Group>
+    </Group>
+  );
+}
+
+function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
+  const [sortBy, setSortBy] = useState<string | null>(null);
+
+  const filteredDatasets = datasets.filter(
+    (dataset) => dataset.name.trim() !== ""
+  );
+
+  const sortedDatasets = useMemo(() => {
+    return [...filteredDatasets].sort((a, b) => {
+      switch (sortBy) {
+        case "alphabetical":
+          return a.name.localeCompare(b.name);
+        case "year":
+          const yearA = a.publicationYear ? a.publicationYear : 0;
+          const yearB = b.publicationYear ? b.publicationYear : 0;
+          return yearB - yearA; // Newest to Oldest
+        default:
+          return 0;
+      }
+    });
+  }, [filteredDatasets, sortBy]);
 
   return (
-    <Stack gap={0}>
-      <LoadOverlay visible={loading} />
+    <Stack>
+      <Group justify="space-between">
+        <Title order={5}>Component Datasets</Title>
+        <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
+      </Group>
 
-      {error ? <Text>{error.message}</Text> : null}
+      <ScrollArea.Autosize mah={300} type="auto" offsetScrollbars>
+        <Box p={10}>
+          {sortedDatasets.length === 0 && (
+            <Center>
+              <Text className={classes.emptyList}>no data</Text>
+            </Center>
+          )}
 
-      <Text c="dimmed" size="xs">
-        {data?.source.author}
-      </Text>
-      <Text c="dimmed" size="xs">
-        &copy; {data?.source.rightsHolder}
-      </Text>
+          {sortedDatasets.map((dataset, idx) => {
+            return <DatasetRow key={idx} dataset={dataset} />;
+          })}
+        </Box>
+      </ScrollArea.Autosize>
     </Stack>
+  );
+}
+
+function DatasetRow({ dataset }: { dataset: Dataset }) {
+  const theme = useMantineTheme();
+
+  return (
+    <Paper radius="lg" withBorder mb={20}>
+      <Grid>
+        <Grid.Col span={3} p="lg">
+          <Stack gap={3}>
+            <Text fw={600} size="md" c="midnight.10">
+              {dataset.name}
+            </Text>
+            <Group gap={3}>
+              <IconClockHour4 size={15} color={theme.colors.gray[6]} />
+              <Text c="dimmed" size="xs">
+                Last updated:{" "}
+                {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
+              </Text>
+            </Group>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill
+            label="Rights holder"
+            value={dataset.rightsHolder}
+            popoverDisabled
+            textColor="black"
+          />
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill
+            label="Access rights"
+            value={
+              dataset.accessPill
+                ?.toLowerCase()
+                .charAt(0)
+                .toUpperCase()
+                .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
+            }
+            color={
+              dataset.accessPill
+                ? accessPillColours[dataset.accessPill]
+                : "#d6e4ed"
+            }
+            popoverDisabled
+            textColor="black"
+          />
+        </Grid.Col>
+        <Grid.Col span={2} p="lg">
+          <AttributePill
+            label="Data reuse status"
+            value={
+              dataset.reusePill
+                ?.toLowerCase()
+                .charAt(0)
+                .toUpperCase()
+                .concat(dataset.reusePill?.slice(1).toLowerCase()) || "No data"
+            }
+            color={
+              dataset.reusePill
+                ? reusePillColours[dataset.reusePill]
+                : "#d6e4ed"
+            }
+            popoverDisabled
+            textColor="black"
+          />
+        </Grid.Col>
+        <Grid.Col span={1} p="lg">
+          <AttributePill
+            label="Records"
+            value="No data"
+            popoverDisabled
+            textColor="black"
+          />
+        </Grid.Col>
+        <Grid.Col span={1} p="lg">
+          <AttributePill
+            label="Year"
+            value={dataset.publicationYear || "No data"}
+            popoverDisabled
+            textColor="black"
+          />
+        </Grid.Col>
+
+        <Grid.Col span={1}>
+          <Link href={dataset.url || "#"} target="_blank">
+            <Button
+              w="100%"
+              h="100%"
+              color="midnight.10"
+              style={{ borderRadius: "0 16px 16px 0" }}
+              disabled={!dataset.url}
+            >
+              <Stack align="center" gap={5}>
+                <IconExternalLink size="30px" strokeWidth={1.5} />
+                <Text fw={650} fz={8.5}>
+                  Go to source
+                </Text>
+              </Stack>
+            </Button>
+          </Link>
+        </Grid.Col>
+      </Grid>
+    </Paper>
+  );
+}
+
+function SourceDetails({
+  source,
+  loading,
+}: {
+  source: Source;
+  loading: boolean;
+}) {
+  const theme = useMantineTheme();
+  return (
+    <Box w="100%">
+      <Stack gap={0}>
+        <LoadOverlay visible={loading} />
+
+        <Text c="dimmed" size="xs">
+          {source.author}
+        </Text>
+        <Text c="dimmed" size="xs">
+          &copy; {source.rightsHolder}
+        </Text>
+        <Grid pt={10}>
+          <Grid.Col span={3}>
+            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
+              <Group gap={5} justify="center" wrap="nowrap">
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                  <b>{source.datasets.length}</b> datasets
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
+              <Group gap={5} justify="center" wrap="nowrap">
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                  <b>{source.species.total}</b> species
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper
+              radius="lg"
+              bg={
+                source.accessPill
+                  ? accessPillColours[source.accessPill]
+                  : "#d6e4ed"
+              }
+              px={10}
+              py={3}
+            >
+              <Group gap={5} justify="center" wrap="nowrap">
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                  <b>
+                    {source.accessPill
+                      ?.toLowerCase()
+                      .charAt(0)
+                      .toUpperCase()
+                      .concat(source.accessPill?.slice(1).toLowerCase())}
+                  </b>{" "}
+                  access
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper
+              radius="lg"
+              bg={
+                source.reusePill
+                  ? reusePillColours[source.reusePill]
+                  : "#d6e4ed"
+              }
+              px={10}
+              py={3}
+            >
+              <Group gap={5} justify="center" wrap="nowrap">
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                  <b>
+                    {source.reusePill
+                      ?.toLowerCase()
+                      .charAt(0)
+                      .toUpperCase()
+                      .concat(source.reusePill?.slice(1).toLowerCase())}
+                  </b>{" "}
+                  reuse
+                </Text>
+              </Group>
+            </Paper>
+          </Grid.Col>
+        </Grid>
+      </Stack>
+    </Box>
   );
 }
 
 export default function BrowseSource({ params }: { params: { name: string } }) {
   const source = decodeURIComponent(params.name).replaceAll("_", " ");
   const [_, setPreviousPage] = usePreviousPage();
+
+  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
+    variables: { name: source },
+  });
 
   useEffect(() => {
     setPreviousPage({
@@ -322,28 +664,44 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
     <Stack mt="xl">
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
-          <Group gap={40}>
-            <Text c="dimmed" fw={400}>
-              SOURCE
-            </Text>
-            <Stack gap={0}>
-              <Text fz={38} fw={700}>
-                {source}
+          <Grid align="center">
+            <Grid.Col span={{ base: 12, md: 2 }}>
+              <Text c="dimmed" fw={400}>
+                DATA COLLECTION
               </Text>
-              <SourceDetails source={source} />
-            </Stack>
-          </Group>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Stack gap={0}>
+                <Text fz={38} fw={700}>
+                  {source}
+                </Text>
+                {data?.source ? (
+                  <SourceDetails source={data?.source} loading={loading} />
+                ) : (
+                  error?.message
+                )}
+              </Stack>
+            </Grid.Col>
+          </Grid>
         </Container>
       </Paper>
 
       <Paper py={30}>
-        <Container maw={MAX_WIDTH}>
+        <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
+            <Paper p="xl" radius="lg" withBorder>
+              {data?.source.datasets ? (
+                <BrowseComponentDatasets datasets={data?.source.datasets} />
+              ) : (
+                error?.message
+              )}
+            </Paper>
             <Paper p="xl" radius="lg" withBorder>
               <Species source={source} />
             </Paper>
           </Stack>
         </Container>
+        <DataPageCitation />
       </Paper>
     </Stack>
   );
