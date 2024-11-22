@@ -41,6 +41,7 @@ import { IoEye } from "react-icons/io5";
 import { useState, useMemo } from "react";
 import { access, copyFileSync } from "fs";
 import { SortChip } from "@/components/sorting/sort-chips";
+import { DataPageCitation } from "@/components/page-citation";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -683,31 +684,17 @@ function DatasetSort({
       </Group>
       <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
         <Group>
-          <Chip
-            variant="filled"
-            value="alphabetical"
-            color={theme.colors.moss[5]}
-            onClick={handleChipClick}
-          >
+          <SortChip value="alphabetical" onClick={handleChipClick}>
             <b>A-Z</b>
-          </Chip>
-          <Chip
-            variant="filled"
-            value="date"
-            color={theme.colors.moss[5]}
-            onClick={handleChipClick}
-          >
+          </SortChip>
+
+          <SortChip value="date" onClick={handleChipClick}>
             <b>Last updated</b>
-          </Chip>
-          <Chip
-            disabled
-            variant="filled"
-            value="records"
-            color={theme.colors.moss[5]}
-            onClick={handleChipClick}
-          >
+          </SortChip>
+
+          <SortChip value="records" onClick={handleChipClick} disabled>
             <b>Records</b>
-          </Chip>
+          </SortChip>
         </Group>
       </Chip.Group>
     </Group>
@@ -745,7 +732,7 @@ function ContentTypeContainer({
     >
       <Accordion.Control>
         <Group justify="space-between" pr={30}>
-          <Text fw={600} fz="var(--mantine-h4-font-size)" c="black">
+          <Text fw="bold" fz="var(--mantine-h4-font-size)" c="black">
             {renameContentType[contentType.contentType as ContentType]}
           </Text>
           <Group mt={15} gap={50} align="center">
@@ -881,7 +868,12 @@ export default function DatasetsPage() {
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
   const theme = useMantineTheme();
 
-  const sourcesWithLastUpdated = data?.sources.map((source) => {
+  const filteredSources = data?.sources.map((source) => ({
+    ...source,
+    datasets: source.datasets.filter((dataset) => dataset.name !== ""), // Remove datasets with an empty `name`
+  }));
+
+  const sourcesWithLastUpdated = filteredSources?.map((source) => {
     return {
       ...source,
       lastUpdated: findSourceLastUpdated(source.datasets),
@@ -903,7 +895,7 @@ export default function DatasetsPage() {
       </Paper>
 
       <Paper py="lg">
-        <Container maw={MAX_WIDTH}>
+        <Container maw={MAX_WIDTH} pb={16}>
           <LoadOverlay visible={loading} />
           <Accordion
             variant="separated"
@@ -919,6 +911,7 @@ export default function DatasetsPage() {
             ))}
           </Accordion>
         </Container>
+        <DataPageCitation />
       </Paper>
     </Stack>
   );
