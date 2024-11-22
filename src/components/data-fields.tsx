@@ -82,6 +82,7 @@ interface AttributePillValueProps {
   textColor?: MantineColor;
   hoverColor?: MantineColor;
   icon?: typeof IconInfoCircle;
+  iconColor?: MantineColor;
   showIconOnHover?: boolean;
   miw?: number;
   style?: MantineStyleProp;
@@ -119,6 +120,7 @@ export function AttributePillValue({
   hoverColor,
   textColor,
   icon: Icon,
+  iconColor,
   showIconOnHover = false,
   style,
   miw,
@@ -167,6 +169,7 @@ export function AttributePillValue({
               <Icon
                 size={16}
                 strokeWidth={3}
+                color={iconColor}
                 style={{
                   transition: "ease all 250ms",
                   marginLeft: showIconOnHover && !opened ? 0 : 18,

@@ -118,3 +118,57 @@ export function PageCitation() {
     </Paper>
   );
 }
+
+export function DataPageCitation() {
+  const params = useParams();
+  const location = usePathname();
+  const page = Humanize.capitalize(location.split("/").pop() || "");
+  const clipboard = useClipboard({ timeout: 500 });
+  const citation = useRef<HTMLParagraphElement>(null);
+
+  const date = new Date();
+
+  return (
+    <Paper pb="lg">
+      <Container maw={MAX_WIDTH}>
+        <Paper p="md" radius="lg" withBorder>
+          <Stack>
+            <Text size="lg" fw="bold">
+              Page information
+            </Text>
+            <DataTable>
+              <DataTableRow label="Citation">
+                <Flex align="center" gap="sm">
+                  <Tooltip label={clipboard.copied ? "Copied" : "Copy"}>
+                    <ActionIcon
+                      color="midnight.8"
+                      size="sm"
+                      onClick={() =>
+                        clipboard.copy(citation.current?.innerText)
+                      }
+                    >
+                      <IconCopy size={14} />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Text fw={600} fz="sm" c="midnight.7" ref={citation}>
+                    Australian Reference Genome Atlas. {date.getFullYear()}.{" "}
+                    <i>{page}</i>, The Australian Reference Genome Atlas.
+                    Accessed at:{" "}
+                    <a
+                      aria-label="Citation Link"
+                      href={`https://app.arga.org.au${location}`}
+                    >
+                      https://app.arga.org.au{location}
+                    </a>{" "}
+                    on {date.getDate()}-{date.getMonth() + 1}-
+                    {date.getFullYear()}.
+                  </Text>
+                </Flex>
+              </DataTableRow>
+            </DataTable>
+          </Stack>
+        </Paper>
+      </Container>
+    </Paper>
+  );
+}

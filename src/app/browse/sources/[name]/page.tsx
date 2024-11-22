@@ -34,10 +34,7 @@ import {
   IconFilter,
   IconClockHour4,
   IconExternalLink,
-  IconDatabase,
-  IconLicense,
-  IconPaw,
-  IconRepeat,
+  IconArrowUpRight,
   IconArrowsSort,
 } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
@@ -46,6 +43,8 @@ import { Photo } from "@/app/type";
 import { AttributePill } from "@/components/data-fields";
 import { DateTime } from "luxon";
 import Link from "next/link";
+import { DataPageCitation } from "@/components/page-citation";
+import { SortChip } from "@/components/sorting/sort-chips";
 
 const PAGE_SIZE = 10;
 type Filters = {
@@ -362,7 +361,6 @@ function DatasetSort({
   setSortBy: (value: string | null) => void;
 }) {
   const theme = useMantineTheme();
-  // const [sortBy, setSortBy] = useState<string | null>("first");
   const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
     if (event.currentTarget.value === sortBy) {
       setSortBy(null);
@@ -371,38 +369,24 @@ function DatasetSort({
   return (
     <Group>
       <Group gap={5}>
-        <IconArrowsSort />
-        <Text size="xs" c={theme.colors.midnight[10]}>
+        <IconArrowsSort color={theme.colors.midnight[10]} />
+        <Text size="sm" fw={550} c={theme.colors.midnight[10]}>
           Sort by
         </Text>
       </Group>
       <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
         <Group>
-          <Chip
-            variant="filled"
-            value="alphabetical"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            A-Z
-          </Chip>
-          <Chip
-            variant="filled"
-            value="year"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            Year
-          </Chip>
-          <Chip
-            disabled
-            variant="filled"
-            value="records"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            Records
-          </Chip>
+          <SortChip value="alphabetical" onClick={handleChipClick}>
+            <b>A-Z</b>
+          </SortChip>
+
+          <SortChip value="date" onClick={handleChipClick}>
+            <b>Last updated</b>
+          </SortChip>
+
+          <SortChip value="records" onClick={handleChipClick} disabled>
+            <b>Records</b>
+          </SortChip>
         </Group>
       </Chip.Group>
     </Group>
@@ -453,12 +437,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
       <Grid>
         <Grid.Col span={3} p="lg">
           <Stack gap={3}>
-            <Text
-              fw={600}
-              size="md"
-              c="midnight.10"
-              // style={{ whiteSpace: "nowrap" }}
-            >
+            <Text fw={600} size="md" c="midnight.10">
               {dataset.name}
             </Text>
             <Group gap={3}>
@@ -471,7 +450,12 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Rights holder" value={dataset.rightsHolder} />
+          <AttributePill
+            label="Rights holder"
+            value={dataset.rightsHolder}
+            popoverDisabled
+            textColor="black"
+          />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill
@@ -489,6 +473,23 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 ? accessPillColours[dataset.accessPill]
                 : "#d6e4ed"
             }
+            icon={
+              dataset.license !== "NONE" &&
+              dataset.license !== "none" &&
+              dataset.license !== "access via login"
+                ? IconArrowUpRight
+                : undefined
+            }
+            showIconOnHover={
+              dataset.license !== "NONE" &&
+              dataset.license !== "none" &&
+              dataset.license !== "access via login"
+                ? true
+                : false
+            }
+            popoverDisabled
+            textColor="black"
+            iconColor="black"
           />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
@@ -506,15 +507,24 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 ? reusePillColours[dataset.reusePill]
                 : "#d6e4ed"
             }
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
-          <AttributePill label="Records" value="No data" />
+          <AttributePill
+            label="Records"
+            value="No data"
+            popoverDisabled
+            textColor="black"
+          />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
           <AttributePill
             label="Year"
             value={dataset.publicationYear || "No data"}
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
 
@@ -564,7 +574,6 @@ function SourceDetails({
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconDatabase color={theme.colors.midnight[10]} />
                 <Text size="xs" c={theme.colors.midnight[10]}>
                   <b>{source.datasets.length}</b> datasets
                 </Text>
@@ -574,7 +583,6 @@ function SourceDetails({
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconPaw color={theme.colors.midnight[10]} />
                 <Text size="xs" c={theme.colors.midnight[10]}>
                   <b>{source.species.total}</b> species
                 </Text>
@@ -593,7 +601,6 @@ function SourceDetails({
               py={3}
             >
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconLicense color={theme.colors.midnight[10]} />
                 <Text size="xs" c={theme.colors.midnight[10]}>
                   <b>
                     {source.accessPill
@@ -619,7 +626,6 @@ function SourceDetails({
               py={3}
             >
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconRepeat color={theme.colors.midnight[10]} />
                 <Text size="xs" c={theme.colors.midnight[10]}>
                   <b>
                     {source.reusePill
@@ -646,6 +652,20 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
     variables: { name: source },
   });
+
+  // const filteredSource: Source = {
+  //   ...data?.source, // Spread to keep other properties of the source
+  //   license: data?.source.license ?? "",
+  //   accessRights: data?.source.accessRights ?? "",
+  //   rightsHolder: data?.source.rightsHolder ?? "",
+  //   author: data?.source.auth
+  //   datasets: (data?.source.datasets || []).filter(
+  //     (dataset) => dataset.name !== ""
+  //   ), // Filter out datasets with an empty name
+  // };
+
+  // console.log(filteredSource);
+  // console.log(data?.source);
 
   useEffect(() => {
     setPreviousPage({
@@ -681,7 +701,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
       </Paper>
 
       <Paper py={30}>
-        <Container maw={MAX_WIDTH}>
+        <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
             <Paper p="xl" radius="lg" withBorder>
               {data?.source.datasets ? (
@@ -695,6 +715,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
             </Paper>
           </Stack>
         </Container>
+        <DataPageCitation />
       </Paper>
     </Stack>
   );

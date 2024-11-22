@@ -76,12 +76,12 @@
 }
 
 .collectionHeader {
-    background-color: var(--mantine-color-midnight-10);
+    background-color: var(--mantine-color-shellfish-7);
     border-radius: 16px 16px 0 0;
 }
 
 .collectionHeader:hover {
-    background-color: var(--mantine-color-midnight-8);
+    background-color: var(--mantine-color-shellfish-6);
     /* transform: scale(1.025); */
 
     /* .collectionHeader {
