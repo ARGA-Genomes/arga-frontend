@@ -1,4 +1,4 @@
-import DistributionPage from "@/views/species/distribution/page";
+import DistributionPage from "@/views/species/distribution";
 
 interface PageProps {
   params: {

@@ -1,8 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import {
-  Button,
   Grid,
   Stack,
   Text,
@@ -20,8 +20,6 @@ import {
 import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Layer } from "@/app/type";
 import { ExternalLinkButton } from "@/components/button-link-external";
 import { IconArrowUpRight, IconExternalLink } from "@tabler/icons-react";
@@ -308,7 +306,8 @@ export default function DistributionPage({
   });
   const [allSpecimens, setAllSpecimens] = useState<Marker[]>([]);
 
-  const canonicalName = params.name.replaceAll("_", " ");
+  const name = decodeURIComponent(params.name);
+  const canonicalName = name.replaceAll("_", " ");
 
   const { loading, error, data } = useQuery<QueryResults>(GET_DISTRIBUTION, {
     variables: { canonicalName },
@@ -387,7 +386,7 @@ export default function DistributionPage({
                   <DistributionAnalysis
                     regions={data?.species.regions}
                     markers={allSpecimens}
-                    speciesName={params.name}
+                    speciesName={name}
                   />
                 </Box>
               </Stack>
@@ -396,7 +395,7 @@ export default function DistributionPage({
               {filters && (
                 <Summary
                   regions={data?.species.regions}
-                  name={params.name}
+                  name={name}
                   filters={filters}
                   onFilter={onFilter}
                 />
@@ -412,7 +411,7 @@ export default function DistributionPage({
                     Source
                   </Text>
                   <ExternalLinkButton
-                    url={`https://biodiversity.org.au/afd/taxa/${params.name}`}
+                    url={`https://biodiversity.org.au/afd/taxa/${name}`}
                     externalLinkName="Australian Faunal Directory"
                     outline
                     icon={IconArrowUpRight}

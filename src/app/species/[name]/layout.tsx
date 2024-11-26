@@ -112,7 +112,8 @@ export default function SpeciesLayout({
   params,
   children,
 }: SpeciesLayoutProps) {
-  const canonicalName = params.name.replaceAll("_", " ");
+  const name = decodeURIComponent(params.name);
+  const canonicalName = name.replaceAll("_", " ");
 
   return (
     <Stack gap={0} mt="xl">
