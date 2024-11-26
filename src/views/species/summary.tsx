@@ -12,6 +12,7 @@ import { LoadOverlay } from "@/components/load-overlay";
 import { SpeciesImage } from "@/components/species-image";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { ExternalLinkButton } from "@/components/button-link-external";
+import { getCanonicalName } from "@/helpers/getCanonicalName";
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
@@ -348,8 +349,7 @@ function SpeciesPhoto({ photo }: { photo?: Photo }) {
 }
 
 export default function SummaryPage({ params }: { params: { name: string } }) {
-  const name = decodeURIComponent(params.name);
-  const canonicalName = name.replaceAll("_", " ");
+  const canonicalName = getCanonicalName(params);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
     variables: { canonicalName },

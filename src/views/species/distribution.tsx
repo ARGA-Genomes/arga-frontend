@@ -23,6 +23,7 @@ import { Marker } from "@/components/mapping/analysis-map";
 import { Layer } from "@/app/type";
 import { ExternalLinkButton } from "@/components/button-link-external";
 import { IconArrowUpRight, IconExternalLink } from "@tabler/icons-react";
+import { getCanonicalName } from "@/helpers/getCanonicalName";
 
 const GET_DISTRIBUTION = gql`
   query SpeciesDistribution($canonicalName: String) {
@@ -203,10 +204,9 @@ interface SummaryProps {
   regions?: Regions;
   filters: Filters;
   onFilter: (layer: Layer, enabled: boolean) => void;
-  name: string;
 }
 
-function Summary({ name, regions, filters, onFilter }: SummaryProps) {
+function Summary({ regions, filters, onFilter }: SummaryProps) {
   return (
     <Flex direction="column" justify="space-between" h="100%">
       <ScrollArea mah={800}>
@@ -305,9 +305,7 @@ export default function DistributionPage({
     specimens: true,
   });
   const [allSpecimens, setAllSpecimens] = useState<Marker[]>([]);
-
-  const name = decodeURIComponent(params.name);
-  const canonicalName = name.replaceAll("_", " ");
+  const canonicalName = getCanonicalName(params);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_DISTRIBUTION, {
     variables: { canonicalName },
@@ -386,7 +384,7 @@ export default function DistributionPage({
                   <DistributionAnalysis
                     regions={data?.species.regions}
                     markers={allSpecimens}
-                    speciesName={name}
+                    speciesName={canonicalName}
                   />
                 </Box>
               </Stack>
@@ -395,7 +393,6 @@ export default function DistributionPage({
               {filters && (
                 <Summary
                   regions={data?.species.regions}
-                  name={name}
                   filters={filters}
                   onFilter={onFilter}
                 />

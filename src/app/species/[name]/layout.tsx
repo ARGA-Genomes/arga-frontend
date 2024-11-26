@@ -121,7 +121,7 @@ export default function SpeciesLayout({
         <PreviousPage />
       </Container>
       <SpeciesHeader canonicalName={canonicalName} />
-      <DataTabs name={params.name}>
+      <DataTabs name={name}>
         <Container maw={MAX_WIDTH}>{children}</Container>
       </DataTabs>
       <PageCitation />
