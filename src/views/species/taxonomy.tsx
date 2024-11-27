@@ -343,28 +343,26 @@ const GET_SUMMARY = gql`
   query SpeciesSummary($canonicalName: String) {
     species(canonicalName: $canonicalName) {
       taxonomy {
-        scientificName
         canonicalName
         authorship
         status
         rank
         source
         sourceUrl
-      }
-      hierarchy {
-        canonicalName
-        rank
+        __typename
       }
       vernacularNames {
         datasetId
         vernacularName
         citation
         sourceUrl
+        __typename
       }
       synonyms {
         scientificName
         canonicalName
         authorship
+        __typename
       }
       photos {
         url
@@ -372,11 +370,72 @@ const GET_SUMMARY = gql`
         publisher
         license
         rightsHolder
+        __typename
       }
       indigenousEcologicalKnowledge {
         id
         sourceUrl
+        __typename
       }
+      dataSummary {
+        genomes
+        loci
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+
+const GET_SUMMARY_HIERARCHY = gql`
+  query SpeciesSummary($canonicalName: String) {
+    species(canonicalName: $canonicalName) {
+      taxonomy {
+        canonicalName
+        authorship
+        status
+        rank
+        source
+        sourceUrl
+        __typename
+      }
+      hierarchy {
+        canonicalName
+        rank
+        __typename
+      }
+      vernacularNames {
+        datasetId
+        vernacularName
+        citation
+        sourceUrl
+        __typename
+      }
+      synonyms {
+        scientificName
+        canonicalName
+        authorship
+        __typename
+      }
+      photos {
+        url
+        source
+        publisher
+        license
+        rightsHolder
+        __typename
+      }
+      indigenousEcologicalKnowledge {
+        id
+        sourceUrl
+        __typename
+      }
+      dataSummary {
+        genomes
+        loci
+        __typename
+      }
+      __typename
     }
   }
 `;
@@ -1179,6 +1238,7 @@ function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
           "GENUS",
           "SUBGENUS",
           "SPECIES",
+          "SUBSPECIES",
         ],
       },
     }
@@ -1257,12 +1317,21 @@ const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
     });
 };
 
-export default function TaxonomyPage({ params }: { params: { name: string } }) {
+export default function TaxonomyPage({
+  params,
+  isSubspecies,
+}: {
+  params: { name: string };
+  isSubspecies?: boolean;
+}) {
   const canonicalName = getCanonicalName(params);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
-    variables: { canonicalName },
-  });
+  const { loading, error, data } = useQuery<QueryResults>(
+    isSubspecies ? GET_SUMMARY : GET_SUMMARY_HIERARCHY,
+    {
+      variables: { canonicalName },
+    }
+  );
 
   const species = data?.species;
   const taxonomy = species && sortTaxaBySources(species.taxonomy)[0];
