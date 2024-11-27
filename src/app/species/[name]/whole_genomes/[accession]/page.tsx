@@ -41,8 +41,8 @@ import {
 } from "@/queries/sequence";
 import { AnalysisMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
-import { useLocalStorage } from "@mantine/hooks";
 import { Marker } from "@/components/mapping/analysis-map";
+import { useSavedData } from "@/components/DownloadManager";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -85,7 +85,6 @@ const GET_ASSEMBLY = gql`
 `;
 
 type SequenceDetails = Sequence & {
-  id: string;
   events: {
     sequencing: SequencingEvent[];
     sequencingRuns: { id: string } & SequencingRunEvent[];
@@ -127,23 +126,32 @@ function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
   );
 }
 
-function GenomeDetails({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+interface GenomeDetailsProps {
+  canonicalName: string;
+  sequence?: SequenceDetails;
+}
+
+function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
   const assembly = sequence?.events.assemblies[0];
   const annotation = sequence?.events.annotations[0];
   const deposition = sequence?.events.dataDepositions[0];
 
-  const [saved, setSaved] = useLocalStorage<string[]>({
-    key: "save-list",
-    defaultValue: [],
-  });
+  const [saved, setSaved] = useSavedData();
 
   const saveToList = () => {
-    if (deposition?.sourceUri)
-      setSaved([...(saved || []), deposition.sourceUri]);
+    if (sequence && deposition?.sourceUri && deposition.accession) {
+      setSaved([
+        ...(saved || []),
+        {
+          url: deposition.sourceUri,
+          label: deposition.accession,
+          dataType: deposition.dataType || "whole genome",
+          scientificName: canonicalName,
+          datePublished: deposition.eventDate,
+          dataset: { id: "", name: sequence?.datasetName },
+        },
+      ]);
+    }
   };
 
   return (
@@ -447,18 +455,21 @@ function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   );
 }
 
-export default function AssemblyPage({
-  params,
-}: {
-  params: { accession: string };
-}) {
+interface PageParams {
+  params: {
+    name: string;
+    accession: string;
+  };
+}
+
+export default function AssemblyPage({ params }: PageParams) {
   const { loading, error, data } = useQuery<SequenceQueryResults>(
     GET_ASSEMBLY,
     {
       variables: {
         accession: decodeURIComponent(params.accession),
       },
-    }
+    },
   );
 
   if (error) {
@@ -495,7 +506,10 @@ export default function AssemblyPage({
               <Grid.Col span={8}>
                 <LoadPanel visible={loading} h={450}>
                   <Title order={5}>Genome details</Title>
-                  <GenomeDetails sequence={sequence} />
+                  <GenomeDetails
+                    sequence={sequence}
+                    canonicalName={params.name}
+                  />
                 </LoadPanel>
               </Grid.Col>
               <Grid.Col span={4}>

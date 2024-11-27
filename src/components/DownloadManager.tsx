@@ -1,3 +1,6 @@
+"use client";
+
+import { Dataset } from "@/app/source-provider";
 import {
   Button,
   Drawer,
@@ -7,22 +10,26 @@ import {
   ScrollArea,
   Card,
   Group,
-  Badge,
   Image,
   SimpleGrid,
-  Menu,
-  ActionIcon,
   rem,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
-import { IconDots, IconSortDescending, IconTrash } from "@tabler/icons-react";
+import { IconSortDescending, IconTrash } from "@tabler/icons-react";
+import Link from "next/link";
+
+export type SavedItem = {
+  url: string;
+  label: string;
+  dataType: string;
+  scientificName: string;
+  datePublished?: string;
+  dataset: Dataset;
+};
 
 export function SavedDataManagerButton() {
   const [opened, { toggle, close }] = useDisclosure(false);
-  const [saved, _setSaved] = useLocalStorage<string[]>({
-    key: "save-list",
-    defaultValue: [],
-  });
+  const [saved, _setSaved] = useSavedData();
 
   return (
     <>
@@ -55,68 +62,89 @@ export function SavedDataManagerButton() {
 }
 
 function SavedDataManager() {
-  const [saved, setSaved] = useLocalStorage<string[]>({
-    key: "save-list",
-    defaultValue: [],
-  });
+  const [saved, setSaved] = useSavedData();
 
-  function remove(item: string) {
-    const newList = saved?.filter((value) => value != item);
+  function remove(item: SavedItem) {
+    const newList = saved?.filter((value) => value.url != item.url);
     setSaved(newList || []);
   }
 
   return (
-    <SimpleGrid cols={5}>
+    <SimpleGrid cols={4}>
       {saved?.map((item) => (
-        <SavedDataItem key={item} item={item} onRemove={remove} />
+        <SavedDataItem key={item.url} item={item} onRemove={remove} />
       ))}
     </SimpleGrid>
   );
 }
 
 interface SaveDataItemProps {
-  item: string;
-  onRemove: (item: string) => void;
+  item: SavedItem;
+  onRemove: (item: SavedItem) => void;
 }
 
 function SavedDataItem({ item, onRemove }: SaveDataItemProps) {
-  const components = item.split("/");
-  const name = components.length > 0 ? components[components.length - 1] : "";
+  const components = item.url.split("/");
+  const url = `${item.url}/${components[components.length - 1]}_genomic.fna.gz`;
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Card.Section>
-        <Image
-          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
-          height={160}
-          alt="Norway"
-        />
+    <Card shadow="sm" padding="lg" radius="lg" withBorder>
+      <Card.Section withBorder mb="md">
         <Group justify="space-between" ml="lg">
-          <Text fw={500}>{name}</Text>
-          <Group justify="right">
-            <Button
-              color="bushfire"
-              variant="subtle"
-              radius={0}
-              onClick={() => onRemove(item)}
-            >
-              <IconTrash style={{ width: rem(14), height: rem(14) }} />
-            </Button>
+          <Group>
+            <Image
+              src={"/card-icons/type/whole_genomes.svg"}
+              fit="contain"
+              h={80}
+              w={80}
+              alt=""
+            />
+
+            <Stack gap={0}>
+              <Text fw={500} truncate="end">
+                {item.label}
+              </Text>
+              <Text fw={300} fz="xs" style={{ fontVariant: "small-caps" }}>
+                {item.dataType}
+              </Text>
+            </Stack>
           </Group>
+
+          <Button
+            color="red"
+            variant="subtle"
+            radius={0}
+            onClick={() => onRemove(item)}
+            h={100}
+          >
+            <IconTrash style={{ width: rem(35), height: rem(35) }} />
+          </Button>
         </Group>
       </Card.Section>
 
-      <Group justify="space-between" mt="md" mb="xs">
-        <Badge color="pink">Whole genome</Badge>
-      </Group>
+      <Stack gap={0} ml="md">
+        <Text size="sm" c="dimmed">
+          {item.scientificName.replaceAll("_", " ")}
+        </Text>
 
-      <Text size="sm" c="dimmed">
-        {item}
-      </Text>
+        <Text size="sm" c="dimmed">
+          {item.dataset.name}
+        </Text>
 
-      <Button color="moss" fullWidth mt="md" radius="md">
-        Download
-      </Button>
+        <Text size="sm" c="dimmed">
+          {item.datePublished}
+        </Text>
+      </Stack>
+
+      <Link href={url} target="_blank">
+        <Button color="moss" fullWidth mt="md" radius="lg">
+          Download
+        </Button>
+      </Link>
     </Card>
   );
+}
+
+export function useSavedData() {
+  return useLocalStorage<SavedItem[]>({ key: "saved-data", defaultValue: [] });
 }

@@ -102,21 +102,6 @@ export function TopNav() {
             className={classes.cart}
           >
             <SavedDataManagerButton />
-            <Indicator
-              inline
-              label={saved?.length}
-              size={16}
-              color="bushfire"
-              disabled={!saved?.length}
-            >
-              <Avatar size="lg" onClick={showSaved} component="a" href="#">
-                <IconSortDescending
-                  size={35}
-                  color="white"
-                  strokeWidth="1.75"
-                />
-              </Avatar>
-            </Indicator>
             <Burger
               opened={opened}
               onClick={toggle}
