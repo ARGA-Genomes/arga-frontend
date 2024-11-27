@@ -13,9 +13,16 @@ import {
   Image,
   SimpleGrid,
   rem,
+  Menu,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
-import { IconSortDescending, IconTrash } from "@tabler/icons-react";
+import {
+  IconArrowDown,
+  IconChevronDown,
+  IconDownload,
+  IconSortDescending,
+  IconTrash,
+} from "@tabler/icons-react";
 import Link from "next/link";
 
 export type SavedItem = {
@@ -25,6 +32,11 @@ export type SavedItem = {
   scientificName: string;
   datePublished?: string;
   dataset: Dataset;
+};
+
+type DownloadLink = {
+  label: string;
+  url: string;
 };
 
 export function SavedDataManagerButton() {
@@ -136,15 +148,58 @@ function SavedDataItem({ item, onRemove }: SaveDataItemProps) {
         </Text>
       </Stack>
 
-      <Link href={url} target="_blank">
-        <Button color="moss" fullWidth mt="md" radius="lg">
-          Download
-        </Button>
-      </Link>
+      <DownloadButton links={[{ label: "Fasta (.fna.gz)", url }]} />
     </Card>
   );
 }
 
 export function useSavedData() {
   return useLocalStorage<SavedItem[]>({ key: "saved-data", defaultValue: [] });
+}
+
+function DownloadButton({ links }: { links: DownloadLink[] }) {
+  const selected = links[0];
+
+  return (
+    <Group gap={0} grow>
+      <Button
+        color="moss"
+        mt="md"
+        radius={0}
+        rightSection={<IconDownload />}
+        component={Link}
+        href={selected.url}
+        style={{
+          borderTopLeftRadius: "var(--mantine-radius-lg)",
+          borderBottomLeftRadius: "var(--mantine-radius-lg)",
+        }}
+      >
+        Download
+      </Button>
+
+      <Menu shadow="md" width={200}>
+        <Menu.Target>
+          <Button
+            color="moss.7"
+            mt="md"
+            radius={0}
+            rightSection={<IconChevronDown />}
+            style={{
+              borderTopRightRadius: "var(--mantine-radius-lg)",
+              borderBottomRightRadius: "var(--mantine-radius-lg)",
+            }}
+          >
+            {selected.label}
+          </Button>
+        </Menu.Target>
+
+        <Menu.Dropdown>
+          <Menu.Label>Available files</Menu.Label>
+          {links.map((link) => (
+            <Menu.Item>{link.label}</Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
+    </Group>
+  );
 }
