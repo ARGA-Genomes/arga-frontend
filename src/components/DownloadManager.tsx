@@ -196,7 +196,7 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
         <Menu.Dropdown>
           <Menu.Label>Available files</Menu.Label>
           {links.map((link) => (
-            <Menu.Item>{link.label}</Menu.Item>
+            <Menu.Item key={link.url}>{link.label}</Menu.Item>
           ))}
         </Menu.Dropdown>
       </Menu>
