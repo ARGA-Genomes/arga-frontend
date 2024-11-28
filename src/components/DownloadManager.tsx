@@ -14,6 +14,7 @@ import {
   SimpleGrid,
   rem,
   Menu,
+  Table,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
 import {
@@ -103,24 +104,27 @@ function SavedDataItem({ item, onRemove }: SaveDataItemProps) {
     <Card shadow="sm" padding="lg" radius="lg" withBorder>
       <Card.Section withBorder mb="md">
         <Group justify="space-between" ml="lg">
-          <Group>
-            <Image
-              src={"/card-icons/type/whole_genomes.svg"}
-              fit="contain"
-              h={80}
-              w={80}
-              alt=""
-            />
-
-            <Stack gap={0}>
-              <Text fw={500} truncate="end">
-                {item.label}
-              </Text>
-              <Text fw={300} fz="xs" style={{ fontVariant: "small-caps" }}>
-                {item.dataType}
-              </Text>
-            </Stack>
-          </Group>
+          <Link
+            href={`/species/${item.scientificName}/whole_genomes/${item.label}`}
+          >
+            <Group>
+              <Image
+                src={"/card-icons/type/whole_genomes.svg"}
+                fit="contain"
+                h={80}
+                w={80}
+                alt=""
+              />
+              <Stack gap={0}>
+                <Text fw={500} truncate="end">
+                  {item.label}
+                </Text>
+                <Text fw={300} fz="xs" style={{ fontVariant: "small-caps" }}>
+                  {item.dataType}
+                </Text>
+              </Stack>
+            </Group>
+          </Link>
 
           <Button
             color="red"
@@ -134,19 +138,32 @@ function SavedDataItem({ item, onRemove }: SaveDataItemProps) {
         </Group>
       </Card.Section>
 
-      <Stack gap={0} ml="md">
-        <Text size="sm" c="dimmed">
-          {item.scientificName.replaceAll("_", " ")}
-        </Text>
-
-        <Text size="sm" c="dimmed">
-          {item.dataset.name}
-        </Text>
-
-        <Text size="sm" c="dimmed">
-          {item.datePublished}
-        </Text>
-      </Stack>
+      <Table ml="md">
+        <Table.Tr>
+          <Table.Td>Organism</Table.Td>
+          <Table.Td>
+            <Text size="sm" c="dimmed">
+              {item.scientificName.replaceAll("_", " ")}
+            </Text>
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td>Source</Table.Td>
+          <Table.Td>
+            <Text size="sm" c="dimmed">
+              {item.dataset.name}
+            </Text>
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td>Date release</Table.Td>
+          <Table.Td>
+            <Text size="sm" c="dimmed">
+              {item.datePublished}
+            </Text>
+          </Table.Td>
+        </Table.Tr>
+      </Table>
 
       <DownloadButton links={[{ label: "Fasta (.fna.gz)", url }]} />
     </Card>
