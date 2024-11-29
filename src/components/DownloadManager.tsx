@@ -98,12 +98,11 @@ function SavedDataManager() {
   }
 
   useEffect(() => {
+    if (!saved) return;
     for (const item of saved) {
       selectItem(item);
     }
   }, [saved]);
-
-  console.log(selected);
 
   function remove(item: SavedItem) {
     const newList = saved?.filter((value) => value.url != item.url);
