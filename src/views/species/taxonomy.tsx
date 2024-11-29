@@ -57,6 +57,7 @@ import { Specimen } from "@/queries/specimen";
 import { AnalysisMap } from "@/components/mapping";
 import { ExternalLinkButton } from "@/components/button-link-external";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
+import { InternalLinkButton } from "@/components/button-link-internal";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -892,21 +893,19 @@ function Details({
             </Paper>
             {!isSubspecies && (
               <Paper radius={16} p="sm" withBorder>
-                <Text fw={300} fz="sm">
+                <Text fw={300} fz="sm" pb="md">
                   Subspecies
                 </Text>
                 {tree ? (
                   <Stack gap={4}>
                     {subspecies?.map((species, idx) => (
-                      <Text
+                      <InternalLinkButton
                         key={`${species.scientificName}-${idx}`}
-                        fw={600}
-                        fs="italic"
-                        size="sm"
-                        c="midnight.8"
-                      >
-                        {species.scientificName}
-                      </Text>
+                        url={`/subspecies/${species.scientificName}`}
+                        externalLinkName={species.scientificName}
+                        icon={IconArrowUpRight}
+                        outline
+                      />
                     ))}
                   </Stack>
                 ) : (
@@ -1362,7 +1361,7 @@ export default function TaxonomyPage({
 
   const tree = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
     variables: {
-      taxonRank: subfamily?.rank,
+      taxonRank: subfamily?.rank || "SUBFAMILY",
       taxonCanonicalName: subfamily?.canonicalName,
       includeRanks: [
         "FAMILY",
