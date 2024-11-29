@@ -23,6 +23,7 @@ import {
   ScrollArea,
   UnstyledButton,
   Chip,
+  Center,
 } from "@mantine/core";
 import { useEffect, useState, useMemo } from "react";
 import { PaginationBar } from "@/components/pagination";
@@ -34,10 +35,7 @@ import {
   IconFilter,
   IconClockHour4,
   IconExternalLink,
-  IconDatabase,
-  IconLicense,
-  IconPaw,
-  IconRepeat,
+  IconArrowUpRight,
   IconArrowsSort,
 } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
@@ -46,6 +44,9 @@ import { Photo } from "@/app/type";
 import { AttributePill } from "@/components/data-fields";
 import { DateTime } from "luxon";
 import Link from "next/link";
+import { DataPageCitation } from "@/components/page-citation";
+import { SortChip } from "@/components/sorting/sort-chips";
+import classes from "../../../../components/record-list.module.css";
 
 const PAGE_SIZE = 10;
 type Filters = {
@@ -338,6 +339,10 @@ function Species({ source }: { source: string }) {
 
       {error ? <Title order={4}>{error.message}</Title> : null}
 
+      {records.length === 0 && (
+        <Text className={classes.emptyList}>no data</Text>
+      )}
+
       <SimpleGrid cols={5}>
         {records.map((record) => (
           <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
@@ -362,7 +367,6 @@ function DatasetSort({
   setSortBy: (value: string | null) => void;
 }) {
   const theme = useMantineTheme();
-  // const [sortBy, setSortBy] = useState<string | null>("first");
   const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
     if (event.currentTarget.value === sortBy) {
       setSortBy(null);
@@ -371,38 +375,24 @@ function DatasetSort({
   return (
     <Group>
       <Group gap={5}>
-        <IconArrowsSort />
-        <Text size="xs" c={theme.colors.midnight[10]}>
+        <IconArrowsSort color={theme.colors.midnight[10]} />
+        <Text size="sm" fw={550} c={theme.colors.midnight[10]}>
           Sort by
         </Text>
       </Group>
       <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
         <Group>
-          <Chip
-            variant="filled"
-            value="alphabetical"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            A-Z
-          </Chip>
-          <Chip
-            variant="filled"
-            value="year"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            Year
-          </Chip>
-          <Chip
-            disabled
-            variant="filled"
-            value="records"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            Records
-          </Chip>
+          <SortChip value="alphabetical" onClick={handleChipClick}>
+            <b>A-Z</b>
+          </SortChip>
+
+          <SortChip value="date" onClick={handleChipClick}>
+            <b>Last updated</b>
+          </SortChip>
+
+          <SortChip value="records" onClick={handleChipClick} disabled>
+            <b>Records</b>
+          </SortChip>
         </Group>
       </Chip.Group>
     </Group>
@@ -412,8 +402,12 @@ function DatasetSort({
 function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
   const [sortBy, setSortBy] = useState<string | null>(null);
 
+  const filteredDatasets = datasets.filter(
+    (dataset) => dataset.name.trim() !== ""
+  );
+
   const sortedDatasets = useMemo(() => {
-    return [...datasets].sort((a, b) => {
+    return [...filteredDatasets].sort((a, b) => {
       switch (sortBy) {
         case "alphabetical":
           return a.name.localeCompare(b.name);
@@ -425,7 +419,7 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
           return 0;
       }
     });
-  }, [datasets, sortBy]);
+  }, [filteredDatasets, sortBy]);
 
   return (
     <Stack>
@@ -436,6 +430,12 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
 
       <ScrollArea.Autosize mah={300} type="auto" offsetScrollbars>
         <Box p={10}>
+          {sortedDatasets.length === 0 && (
+            <Center>
+              <Text className={classes.emptyList}>no data</Text>
+            </Center>
+          )}
+
           {sortedDatasets.map((dataset, idx) => {
             return <DatasetRow key={idx} dataset={dataset} />;
           })}
@@ -453,12 +453,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
       <Grid>
         <Grid.Col span={3} p="lg">
           <Stack gap={3}>
-            <Text
-              fw={600}
-              size="md"
-              c="midnight.10"
-              // style={{ whiteSpace: "nowrap" }}
-            >
+            <Text fw={600} size="md" c="midnight.10">
               {dataset.name}
             </Text>
             <Group gap={3}>
@@ -471,7 +466,12 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Rights holder" value={dataset.rightsHolder} />
+          <AttributePill
+            label="Rights holder"
+            value={dataset.rightsHolder}
+            popoverDisabled
+            textColor="black"
+          />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill
@@ -483,12 +483,13 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 .toUpperCase()
                 .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
             }
-            href={dataset.license !== "none" ? dataset.license : ""}
             color={
               dataset.accessPill
                 ? accessPillColours[dataset.accessPill]
                 : "#d6e4ed"
             }
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
@@ -506,15 +507,24 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 ? reusePillColours[dataset.reusePill]
                 : "#d6e4ed"
             }
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
-          <AttributePill label="Records" value="No data" />
+          <AttributePill
+            label="Records"
+            value="No data"
+            popoverDisabled
+            textColor="black"
+          />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
           <AttributePill
             label="Year"
             value={dataset.publicationYear || "No data"}
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
 
@@ -564,8 +574,7 @@ function SourceDetails({
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconDatabase color={theme.colors.midnight[10]} />
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>{source.datasets.length}</b> datasets
                 </Text>
               </Group>
@@ -574,8 +583,7 @@ function SourceDetails({
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconPaw color={theme.colors.midnight[10]} />
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>{source.species.total}</b> species
                 </Text>
               </Group>
@@ -593,8 +601,7 @@ function SourceDetails({
               py={3}
             >
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconLicense color={theme.colors.midnight[10]} />
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>
                     {source.accessPill
                       ?.toLowerCase()
@@ -619,8 +626,7 @@ function SourceDetails({
               py={3}
             >
               <Group gap={5} justify="center" wrap="nowrap">
-                <IconRepeat color={theme.colors.midnight[10]} />
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>
                     {source.reusePill
                       ?.toLowerCase()
@@ -681,7 +687,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
       </Paper>
 
       <Paper py={30}>
-        <Container maw={MAX_WIDTH}>
+        <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
             <Paper p="xl" radius="lg" withBorder>
               {data?.source.datasets ? (
@@ -695,6 +701,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
             </Paper>
           </Stack>
         </Container>
+        <DataPageCitation />
       </Paper>
     </Stack>
   );

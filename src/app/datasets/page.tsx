@@ -33,12 +33,16 @@ import {
   IconTable,
   IconLayoutGrid,
   IconArrowsSort,
+  IconChevronDown,
 } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
 import { IoEye } from "react-icons/io5";
 import { useState, useMemo } from "react";
 import { access, copyFileSync } from "fs";
+import { SortChip } from "@/components/sorting/sort-chips";
+import { DataPageCitation } from "@/components/page-citation";
+import styles from "../../components/record-list.module.css";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -228,7 +232,7 @@ type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
 const accessPillColours: Record<AccessPillType, string> = {
   OPEN: "moss.3",
-  RESTRICTED: "red.3",
+  RESTRICTED: "bushfire.4",
   CONDITIONAL: "wheat.3",
   VARIABLE: "wheat.3",
 };
@@ -301,7 +305,12 @@ function DatasetRow({
           </Stack>
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill label="Rights holder" value={dataset.rightsHolder} />
+          <AttributePill
+            label="Rights holder"
+            value={dataset.rightsHolder}
+            popoverDisabled
+            textColor="black"
+          />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill
@@ -313,12 +322,13 @@ function DatasetRow({
                 .toUpperCase()
                 .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
             }
-            href={dataset.license !== "NONE" ? dataset.license : ""}
             color={
               dataset.accessPill
                 ? accessPillColours[dataset.accessPill]
                 : "#d6e4ed"
             }
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
@@ -336,90 +346,27 @@ function DatasetRow({
                 ? reusePillColours[dataset.reusePill]
                 : "#d6e4ed"
             }
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
-          <AttributePill label="Records" value="No data" />
+          <AttributePill
+            label="Records"
+            value="No data"
+            popoverDisabled
+            textColor="black"
+          />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
           <AttributePill
             label="Year"
             value={dataset.publicationYear || "No data"}
+            popoverDisabled
+            textColor="black"
           />
         </Grid.Col>
 
-        <Grid.Col span={1}>
-          <Link href={dataset.url || "#"} target="_blank">
-            <Button
-              w="100%"
-              h="100%"
-              color="midnight.10"
-              style={{ borderRadius: "0 16px 16px 0" }}
-              disabled={!dataset.url}
-            >
-              <Stack align="center" gap={5}>
-                <IconExternalLink size="30px" strokeWidth={1.5} />
-                <Text fw={650} fz={8.5}>
-                  Go to source
-                </Text>
-              </Stack>
-            </Button>
-          </Link>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  );
-}
-
-function ComponentDatasetRow({
-  dataset,
-  sourceLength,
-  count,
-}: {
-  dataset: Dataset;
-  sourceLength: number;
-  count: number;
-}) {
-  const license = dataset.license
-    ? LICENSES[dataset.license.toLowerCase()]
-    : undefined;
-
-  return (
-    <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
-      <Grid>
-        <Grid.Col span={5} p="lg">
-          <Stack gap={5}>
-            <Text fw={300} size="sm">
-              Component source citation
-            </Text>
-            <Text fw={300} size="xs" pl={10}>
-              {dataset.citation}
-            </Text>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={2} p="lg">
-          <AttributePill label="Rights holder" value={dataset.rightsHolder} />
-        </Grid.Col>
-        <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Access rights"
-            value={license?.accessRights || dataset.license}
-            href={license?.url}
-            color={
-              license?.accessRights === "Open"
-                ? "moss.3"
-                : license?.accessRights === "Conditional"
-                ? "wheat.3"
-                : undefined
-            }
-          />
-        </Grid.Col>
-        <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Last updated"
-            value={DateTime.fromISO(dataset.updatedAt).toLocaleString()}
-          />
-        </Grid.Col>
         <Grid.Col span={1}>
           <Link href={dataset.url || "#"} target="_blank">
             <Button
@@ -466,9 +413,9 @@ function CollectionCard({ collection }: { collection: Source }) {
                     {collection.name}
                   </Text>
                   <Group gap={3} pl={10} pb={10}>
-                    <IconClockHour4 size={15} color={theme.colors.gray[6]} />
+                    <IconClockHour4 size={15} color="white" />
                     {collection.lastUpdated && (
-                      <Text c="dimmed" size="xs">
+                      <Text c="white" size="xs">
                         Last updated:{" "}
                         {collection.lastUpdated === "01/01/1970"
                           ? "N/A"
@@ -493,6 +440,8 @@ function CollectionCard({ collection }: { collection: Source }) {
               label="Rights holder"
               value={collection.rightsHolder}
               group={true}
+              popoverDisabled
+              textColor="black"
             />
           </Grid.Col>
           <Grid.Col span={12}>
@@ -506,13 +455,14 @@ function CollectionCard({ collection }: { collection: Source }) {
                   .concat(collection.accessPill?.slice(1).toLowerCase()) ||
                 "No data"
               }
-              href={collection.license !== "none" ? collection.license : ""}
               group={true}
               color={
                 collection.accessPill
                   ? accessPillColours[collection.accessPill]
                   : "#d6e4ed"
               }
+              popoverDisabled
+              textColor="black"
             />
           </Grid.Col>
           <Grid.Col span={12}>
@@ -532,10 +482,17 @@ function CollectionCard({ collection }: { collection: Source }) {
                   ? reusePillColours[collection.reusePill]
                   : "#d6e4ed"
               }
+              popoverDisabled
+              textColor="black"
             />
           </Grid.Col>
           <Grid.Col span={12}>
-            <AttributePill label="Number of records" group={true} />
+            <AttributePill
+              label="Number of records"
+              group={true}
+              popoverDisabled
+              textColor="black"
+            />
           </Grid.Col>
         </Grid>
       </Stack>
@@ -561,9 +518,9 @@ function CollectionRow({ collection }: { collection: Source }) {
                       {collection.name}
                     </Text>
                     <Group gap={3} pl={10} pb={10}>
-                      <IconClockHour4 size={15} color={theme.colors.gray[6]} />
+                      <IconClockHour4 size={15} color="white" />
                       {collection.lastUpdated && (
-                        <Text c="dimmed" size="xs">
+                        <Text c="white" size="xs">
                           Last updated:{" "}
                           {collection.lastUpdated === "01/01/1970"
                             ? "N/A"
@@ -575,14 +532,16 @@ function CollectionRow({ collection }: { collection: Source }) {
                     </Group>
                   </Stack>
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   <AttributePill
                     label="Rights holder"
                     labelColor="white"
                     value={collection.rightsHolder}
+                    popoverDisabled
+                    textColor="black"
                   />
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   <AttributePill
                     label="Access rights"
                     labelColor="white"
@@ -595,17 +554,16 @@ function CollectionRow({ collection }: { collection: Source }) {
                           collection.accessPill?.slice(1).toLowerCase()
                         ) || "No data"
                     }
-                    href={
-                      collection.license !== "none" ? collection.license : ""
-                    }
                     color={
                       collection.accessPill
                         ? accessPillColours[collection.accessPill]
                         : "#d6e4ed"
                     }
+                    popoverDisabled
+                    textColor="black"
                   />
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   <AttributePill
                     label="Data reuse status"
                     labelColor="white"
@@ -622,11 +580,18 @@ function CollectionRow({ collection }: { collection: Source }) {
                         ? reusePillColours[collection.reusePill]
                         : "#d6e4ed"
                     }
+                    popoverDisabled
+                    textColor="black"
                   />
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   {" "}
-                  <AttributePill label="Number of records" labelColor="white" />
+                  <AttributePill
+                    label="Number of records"
+                    labelColor="white"
+                    popoverDisabled
+                    textColor="black"
+                  />
                 </Grid.Col>
                 <Grid.Col span={1}>
                   <Group
@@ -642,6 +607,11 @@ function CollectionRow({ collection }: { collection: Source }) {
         </UnstyledButton>
         <ScrollArea.Autosize mah={350} type="auto" offsetScrollbars>
           <Box p={10}>
+            {collection.datasets.length === 0 && (
+              <Center>
+                <Text className={styles.emptyList}>no data</Text>
+              </Center>
+            )}
             {collection.datasets.map((dataset, idx) => (
               <DatasetRow
                 dataset={dataset}
@@ -665,7 +635,6 @@ function DatasetSort({
   setSortBy: (value: string | null) => void;
 }) {
   const theme = useMantineTheme();
-  // const [sortBy, setSortBy] = useState<string | null>("first");
   const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
     if (event.currentTarget.value === sortBy) {
       setSortBy(null);
@@ -674,38 +643,24 @@ function DatasetSort({
   return (
     <Group>
       <Group gap={5}>
-        <IconArrowsSort />
-        <Text size="xs" c={theme.colors.midnight[10]}>
+        <IconArrowsSort color={theme.colors.midnight[10]} />
+        <Text size="sm" fw={550} c={theme.colors.midnight[10]}>
           Sort by
         </Text>
       </Group>
       <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
         <Group>
-          <Chip
-            variant="filled"
-            value="alphabetical"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            A-Z
-          </Chip>
-          <Chip
-            variant="filled"
-            value="date"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            Last updated
-          </Chip>
-          <Chip
-            disabled
-            variant="filled"
-            value="records"
-            color={theme.colors.wheat[3]}
-            onClick={handleChipClick}
-          >
-            Records
-          </Chip>
+          <SortChip value="alphabetical" onClick={handleChipClick}>
+            <b>A-Z</b>
+          </SortChip>
+
+          <SortChip value="date" onClick={handleChipClick}>
+            <b>Last updated</b>
+          </SortChip>
+
+          <SortChip value="records" onClick={handleChipClick} disabled>
+            <b>Records</b>
+          </SortChip>
         </Group>
       </Chip.Group>
     </Group>
@@ -743,11 +698,7 @@ function ContentTypeContainer({
     >
       <Accordion.Control>
         <Group justify="space-between" pr={30}>
-          <Text
-            fw={600}
-            fz="var(--mantine-h4-font-size)"
-            c={theme.colors.midnight[10]}
-          >
+          <Text fw="bold" fz="var(--mantine-h4-font-size)" c="black">
             {renameContentType[contentType.contentType as ContentType]}
           </Text>
           <Group mt={15} gap={50} align="center">
@@ -773,7 +724,7 @@ function ContentTypeContainer({
                         : "none"
                     }
                   />
-                  <Text size="xs" c={theme.colors.midnight[10]}>
+                  <Text size="xs" fw={550} c={theme.colors.midnight[10]}>
                     Table
                   </Text>
                 </Stack>
@@ -792,7 +743,7 @@ function ContentTypeContainer({
                       layoutView === "card" ? theme.colors.midnight[10] : "none"
                     }
                   />
-                  <Text size="xs" c={theme.colors.midnight[10]}>
+                  <Text size="xs" fw={550} c={theme.colors.midnight[10]}>
                     Card
                   </Text>
                 </Stack>
@@ -822,18 +773,6 @@ function ContentTypeContainer({
 }
 
 function findSourceLastUpdated(datasets: Dataset[]): string {
-  // if (!datasets.length) return "01/01/1970";
-  // const sortedDatasets = [...datasets].sort(
-  //   (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  // );
-
-  // sortedDatasets.forEach((d) => {
-  //   if (d.updatedAt) {
-  //     return d.updatedAt;
-  //   }
-  // });
-
-  // return "01/01/1970";
   return datasets.reduce((latest, d) => {
     const updatedAt = d.updatedAt ? new Date(d.updatedAt).getTime() : 0;
     return updatedAt > new Date(latest).getTime() ? d.updatedAt : latest;
@@ -895,7 +834,12 @@ export default function DatasetsPage() {
   const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
   const theme = useMantineTheme();
 
-  const sourcesWithLastUpdated = data?.sources.map((source) => {
+  const filteredSources = data?.sources.map((source) => ({
+    ...source,
+    datasets: source.datasets.filter((dataset) => dataset.name !== ""), // Remove datasets with an empty `name`
+  }));
+
+  const sourcesWithLastUpdated = filteredSources?.map((source) => {
     return {
       ...source,
       lastUpdated: findSourceLastUpdated(source.datasets),
@@ -917,18 +861,13 @@ export default function DatasetsPage() {
       </Paper>
 
       <Paper py="lg">
-        <Container maw={MAX_WIDTH}>
+        <Container maw={MAX_WIDTH} pb={16}>
           <LoadOverlay visible={loading} />
           <Accordion
             variant="separated"
             radius="lg"
             classNames={classes}
-            chevron={
-              <IconCaretDownFilled
-                fill={theme.colors.midnight[10]}
-                color={theme.colors.midnight[10]}
-              />
-            }
+            chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
           >
             {groupedSources?.map((group) => (
               <ContentTypeContainer
@@ -938,6 +877,7 @@ export default function DatasetsPage() {
             ))}
           </Accordion>
         </Container>
+        <DataPageCitation />
       </Paper>
     </Stack>
   );

@@ -5,7 +5,6 @@ import classes from "./top-nav.module.css";
 import Link from "next/link";
 import {
   Burger,
-  Transition,
   NavLink,
   Group,
   Image,
@@ -16,11 +15,11 @@ import {
   Modal,
   useMantineTheme,
   Collapse,
-  Button,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
 import { useState } from "react";
 import { IconSortDescending } from "@tabler/icons-react";
+import { SavedDataManagerButton } from "@/components/DownloadManager";
 
 const links = [
   { link: "/", label: "APP HOME" },
@@ -102,21 +101,7 @@ export function TopNav() {
             h="100%"
             className={classes.cart}
           >
-            <Indicator
-              inline
-              label={saved?.length}
-              size={16}
-              color="bushfire"
-              disabled={!saved?.length}
-            >
-              <Avatar size="lg" onClick={showSaved} component="a" href="#">
-                <IconSortDescending
-                  size={35}
-                  color="white"
-                  strokeWidth="1.75"
-                />
-              </Avatar>
-            </Indicator>
+            <SavedDataManagerButton />
             <Burger
               opened={opened}
               onClick={toggle}
