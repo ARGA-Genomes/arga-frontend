@@ -49,7 +49,7 @@ function DataTabs({
 
   function changeTab(value: string | null) {
     if (value !== null) {
-      router.replace(`/species/${name}/${value}`);
+      router.replace(`/subspecies/${name}/${value}`);
     }
   }
 
