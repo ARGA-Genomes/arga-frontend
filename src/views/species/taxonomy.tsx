@@ -41,7 +41,11 @@ import {
   TimelineIcon,
 } from "@/components/event-timeline";
 import { useDisclosure } from "@mantine/hooks";
-import { TaxonStatTreeNode, findChildren } from "@/queries/stats";
+import {
+  TaxonStatTreeNode,
+  findChildren,
+  findChildrenCanonical,
+} from "@/queries/stats";
 import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
 import { Taxon } from "@/queries/taxa";
 import HorizontalTimeline, {
@@ -629,8 +633,6 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
     synonyms[act.taxon.status].push(act);
   }
 
-  console.log("synonyms", data);
-
   return (
     <Paper p="sm">
       {Object.entries(synonyms).map(([status, acts]) => (
@@ -677,9 +679,22 @@ interface DetailsProps {
   taxonomy: Taxonomy;
   synonyms: Synonym[];
   commonNames: VernacularName[];
+  tree?: TaxonTreeStatsQuery;
+  isSubspecies?: boolean;
 }
 
-function Details({ taxonomy, synonyms, commonNames }: DetailsProps) {
+function findSubspecies(node: TaxonStatTreeNode[] | TaxonStatTreeNode) {
+  if (Array.isArray(node)) {
+  }
+}
+
+function Details({
+  taxonomy,
+  synonyms,
+  commonNames,
+  tree,
+  isSubspecies,
+}: DetailsProps) {
   const { loading, error, data } = useQuery<TypeSpecimenQuery>(
     GET_TYPE_SPECIMENS,
     {
@@ -709,6 +724,10 @@ function Details({ taxonomy, synonyms, commonNames }: DetailsProps) {
       {} as { [key: string]: string[] }
     )
   );
+
+  const subspecies =
+    tree?.stats.taxonBreakdown[0] &&
+    findChildrenCanonical(tree.stats.taxonBreakdown[0], taxonomy.canonicalName);
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -871,14 +890,32 @@ function Details({ taxonomy, synonyms, commonNames }: DetailsProps) {
                 )}
               </Text>
             </Paper>
-            <Paper radius={16} p="sm" withBorder>
-              <Text fw={300} fz="sm">
-                Subspecies
-              </Text>
-              <Text fw={700} size="sm" c="dimmed">
-                No data
-              </Text>
-            </Paper>
+            {!isSubspecies && (
+              <Paper radius={16} p="sm" withBorder>
+                <Text fw={300} fz="sm">
+                  Subspecies
+                </Text>
+                {tree ? (
+                  <Stack gap={4}>
+                    {subspecies?.map((species, idx) => (
+                      <Text
+                        key={`${species.scientificName}-${idx}`}
+                        fw={600}
+                        fs="italic"
+                        size="sm"
+                        c="midnight.8"
+                      >
+                        {species.scientificName}
+                      </Text>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Text fw={700} size="sm" c="dimmed">
+                    No data
+                  </Text>
+                )}
+              </Paper>
+            )}
             {/* <Group justify="space-between" align="center">
               <AttributePillValue
                 color="midnight.12"
@@ -1210,39 +1247,13 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 interface FamilyTaxonTreeProps {
   hierarchy: TaxonNode[];
   pin?: string;
+  tree: ReturnType<typeof useQuery<TaxonTreeStatsQuery>>;
 }
 
-function FamilyTaxonTree({ hierarchy, pin }: FamilyTaxonTreeProps) {
+function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
   const [layout, setLayout] = useState<Layout>("top-to-bottom");
 
-  const subfamily = hierarchy.find(
-    (node) =>
-      node.rank === "SUBFAMILY" ||
-      node.rank === "SUBFAMILIA" ||
-      node.rank === "FAMILY" ||
-      node.rank === "FAMILIA"
-  );
-
-  const { loading, error, data } = useQuery<TaxonTreeStatsQuery>(
-    GET_TAXON_TREE_STATS,
-    {
-      variables: {
-        taxonRank: subfamily?.rank || "SUBFAMILY",
-        taxonCanonicalName: subfamily?.canonicalName,
-        includeRanks: [
-          ...(subfamily?.rank.startsWith("FAMIL") ? ["FAMILY", "FAMILIA"] : []),
-          "SUBFAMILY",
-          "SUBFAMILIA",
-          "TRIBE",
-          "SUBTRIBE",
-          "GENUS",
-          "SUBGENUS",
-          "SPECIES",
-          "SUBSPECIES",
-        ],
-      },
-    }
-  );
+  const { loading, error, data } = tree;
 
   const treeData = data?.stats.taxonBreakdown[0];
   const pinned = hierarchy.map((h) => h.canonicalName).concat(pin || "");
@@ -1341,9 +1352,39 @@ export default function TaxonomyPage({
     variables: { filters: [{ canonicalName }] },
   });
 
+  const subfamily = hierarchy?.find(
+    (node) =>
+      node.rank === "SUBFAMILY" ||
+      node.rank === "SUBFAMILIA" ||
+      node.rank === "FAMILY" ||
+      node.rank === "FAMILIA"
+  );
+
+  const tree = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
+    variables: {
+      taxonRank: subfamily?.rank,
+      taxonCanonicalName: subfamily?.canonicalName,
+      includeRanks: [
+        "FAMILY",
+        "FAMILIA",
+        "SUBFAMILY",
+        "SUBFAMILIA",
+        "TRIBE",
+        "SUBTRIBE",
+        "GENUS",
+        "SUBGENUS",
+        "SPECIES",
+        "SUBSPECIES",
+      ],
+    },
+    skip: !hierarchy,
+  });
+
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
+
+  console.log(tree.data);
 
   return (
     <Stack>
@@ -1356,6 +1397,8 @@ export default function TaxonomyPage({
                 taxonomy={taxonomy}
                 synonyms={species.synonyms}
                 commonNames={species.vernacularNames}
+                tree={tree.data}
+                isSubspecies={isSubspecies}
               />
             )}
             {results.data && (
@@ -1365,7 +1408,11 @@ export default function TaxonomyPage({
         </Grid.Col>
       </Grid>
       {hierarchy && (
-        <FamilyTaxonTree hierarchy={hierarchy} pin={taxonomy?.canonicalName} />
+        <FamilyTaxonTree
+          hierarchy={hierarchy}
+          pin={taxonomy?.canonicalName}
+          tree={tree}
+        />
       )}
       <ExternalLinks canonicalName={canonicalName} species={data?.species} />
 
