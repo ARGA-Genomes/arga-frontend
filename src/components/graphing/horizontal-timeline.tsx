@@ -102,7 +102,7 @@ export function TimelineInstant({ item }: { item: TimelineItem }) {
           rx="13"
           fill="#ffffff"
           stroke="#febb19"
-          stroke-width={4}
+          strokeWidth={4}
         />
 
         <motion.text variants={textHover} dominantBaseline="middle">
@@ -226,7 +226,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
 
   const x = useMemo(
     () => d3.scaleLinear().domain(domain).range(range),
-    [dimension.boundedWidth],
+    [dimension.boundedWidth]
   );
 
   return (
@@ -234,12 +234,12 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
       <svg width={dimension.width} height={dimension.height}>
         <defs>
           <filter x="0" y="0" width="1" height="1" id="solid">
-            <feFlood flood-color="rgba(255, 255, 255, 1)" />
+            <feFlood floodColor="rgba(255, 255, 255, 1)" />
             <feBlend in="SourceGraphic" mode="multiply" />
           </filter>
 
           <filter x="0" y="0" width="1" height="1" id="faded">
-            <feFlood flood-color="rgba(255, 255, 255, 1)" />
+            <feFlood floodColor="rgba(255, 255, 255, 1)" />
             <feBlend in="SourceGraphic" mode="multiply" />
           </filter>
         </defs>
@@ -256,9 +256,9 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
               fill="white"
             />
             {groups.map((group, idx) =>
-              group.instants.map((item) => (
+              group.instants.map((item, id) => (
                 <g
-                  key={`${group.label}-guide`}
+                  key={`${group.label}-guide-${id}`}
                   transform={`translate(${x(item.date)}, ${idx * itemHeight})`}
                 >
                   <TimelineDateGuide
@@ -268,7 +268,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
                     value={item.date}
                   />
                 </g>
-              )),
+              ))
             )}
 
             {groups.map((group, idx) => (
@@ -394,7 +394,7 @@ interface BoundedChartDimensions extends ChartDimensions {
 
 // derived from https://2019.wattenberger.com/blog/react-and-d3
 export function useChartDimensions<T>(
-  settings: ChartDimensions,
+  settings: ChartDimensions
 ): [RefObject<T>, BoundedChartDimensions] {
   const ref = useRef(null);
   const dimensions = combineChartDimensions(settings);
@@ -427,7 +427,7 @@ export function useChartDimensions<T>(
 }
 
 function combineChartDimensions(
-  dimensions: ChartDimensions,
+  dimensions: ChartDimensions
 ): BoundedChartDimensions {
   const dim = {
     ...dimensions,
@@ -552,7 +552,7 @@ function domainDecades(items: TimelineItem[]): Domain[] {
 
 function rangeYears(domains: Domain[], width: number): number[] {
   const domainYears = domains.map(
-    (domain) => domain.end.getFullYear() - domain.start.getFullYear(),
+    (domain) => domain.end.getFullYear() - domain.start.getFullYear()
   );
 
   const totalYears = domainYears.reduce((acc, val) => acc + val, 0);

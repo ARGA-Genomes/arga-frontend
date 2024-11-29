@@ -64,7 +64,7 @@ function DataTabs({
   // the fourth component in the path name
   const tab = path?.split("/")[3];
 
-  if (!tab) redirect(`/species/${name}/summary`, RedirectType.replace);
+  if (!tab) redirect(`/subspecies/${name}/summary`, RedirectType.replace);
 
   return (
     <Tabs
