@@ -1,6 +1,6 @@
 importScripts(
-  "https:unpkg.com/client-zip/worker.js",
-  "https:unpkg.com/dl-stream/worker.js",
+  "https://unpkg.com/client-zip@2.4.6/worker.js",
+  "https://unpkg.com/dl-stream@1.0.3/worker.js",
 );
 
 self.addEventListener("install", () => {
