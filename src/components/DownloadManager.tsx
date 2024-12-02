@@ -169,17 +169,20 @@ function SavedDataManager() {
       <Grid.Col span={2}>
         <Paper shadow="md" radius="md" withBorder p="xl">
           <Stack>
-            <Tooltip label="Download all selected files and metadata as a single .zip file">
-              <Button
-                fullWidth
-                disabled={selected.length <= 0}
-                color="midnight.8"
-                radius="md"
-                rightSection={<IconFileZip />}
-              >
-                Download selected
-              </Button>
-            </Tooltip>
+            <DownloadSelectedForm items={selected}>
+              <Tooltip label="Download all selected files and metadata as a single .zip file">
+                <Button
+                  fullWidth
+                  disabled={selected.length <= 0}
+                  color="midnight.8"
+                  radius="md"
+                  rightSection={<IconFileZip />}
+                  type="submit"
+                >
+                  Download selected
+                </Button>
+              </Tooltip>
+            </DownloadSelectedForm>
 
             <Tooltip label="Download a metadata file containing metadata for all selected files">
               <Button
@@ -435,6 +438,22 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
         </Menu.Dropdown>
       </Menu>
     </Group>
+  );
+}
+
+interface DownloadSelectedFormProps {
+  items: SavedItem[];
+  children: React.ReactNode;
+}
+
+function DownloadSelectedForm({ items, children }: DownloadSelectedFormProps) {
+  return (
+    <form name="download" action="/downloadZip/ARGA.zip" method="POST">
+      {items.map((item) => (
+        <input type="hidden" name="url" value={item.url} key={item.url} />
+      ))}
+      {children}
+    </form>
   );
 }
 

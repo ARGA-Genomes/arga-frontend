@@ -44,6 +44,8 @@ export default function RootLayout({
             </SourceProvider>
           </MantineProvider>
         </ApolloProvider>
+
+        <script src="/workers.js" async></script>
       </body>
     </html>
   );
