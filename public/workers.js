@@ -7,6 +7,6 @@ if ("serviceWorker" in navigator) {
     .register("/download-worker.js")
     .then((_registration) => {
       // keep-alive for firefox
-      setInterval(fetch, 25000, "downloadZip/keep-alive", { method: "POST" });
+      setInterval(fetch, 25000, "/downloadZip/keep-alive", { method: "POST" });
     });
 }

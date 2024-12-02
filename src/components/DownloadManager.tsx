@@ -43,6 +43,7 @@ import {
   IconTerminal2,
   IconTrash,
 } from "@tabler/icons-react";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -111,8 +112,8 @@ function SavedDataManager() {
     }
 
     if (selected.length > 0) {
-      const file = createMetadataFile(selected);
-      const blobUrl = URL.createObjectURL(file);
+      const blob = createMetadataFile(selected);
+      const blobUrl = URL.createObjectURL(blob);
       setMetadataUrl(blobUrl);
     } else {
       setMetadataUrl(undefined);
@@ -169,7 +170,7 @@ function SavedDataManager() {
       <Grid.Col span={2}>
         <Paper shadow="md" radius="md" withBorder p="xl">
           <Stack>
-            <DownloadSelectedForm items={selected}>
+            <DownloadSelectedForm items={selected} metadata={metadataUrl}>
               <Tooltip label="Download all selected files and metadata as a single .zip file">
                 <Button
                   fullWidth
@@ -443,15 +444,24 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
 
 interface DownloadSelectedFormProps {
   items: SavedItem[];
+  metadata?: string;
   children: React.ReactNode;
 }
 
-function DownloadSelectedForm({ items, children }: DownloadSelectedFormProps) {
+function DownloadSelectedForm({
+  items,
+  metadata,
+  children,
+}: DownloadSelectedFormProps) {
+  const timestamp = DateTime.now().toFormat("yyyy-mm-dd-HHmmss");
+  const filename = `ARGA-${timestamp}.zip`;
   return (
-    <form name="download" action="/downloadZip/ARGA.zip" method="POST">
+    <form name="download" action={`/downloadZip/${filename}`} method="POST">
+      {metadata && <input type="hidden" name="metadataUrl" value={metadata} />}
       {items.map((item) => (
         <input type="hidden" name="url" value={item.url} key={item.url} />
       ))}
+
       {children}
     </form>
   );
@@ -462,11 +472,9 @@ function createMetadataFile(items: SavedItem[]): Blob {
     return `${item.label},${item.datePublished},${item.scientificName},${item.url}`;
   }
 
+  const header = "label,date_published,scientific_name,url";
   const text = items.map(toLine).join("\n");
-  const csv = `
-label,date_published,scientific_name,url
-${text}
-`;
+  const csv = `${header}\n${text}`;
 
   return new Blob([csv], { type: "text/csv;charset=utf-8" });
 }

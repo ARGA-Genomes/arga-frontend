@@ -31,7 +31,26 @@ self.addEventListener("fetch", (event) => {
       event.respondWith(
         event.request
           .formData()
-          .then((data) => downloadZip(new DownloadStream(data.getAll("url"))))
+          .then((data) => {
+            const metadata = data.get("metadataUrl");
+            const files = data.getAll("url");
+            const dlstream = new DownloadStream([metadata, ...files]);
+
+            // we use a generator to rename the metadata file to a consistent name
+            // otherwise it uses the blob id. if name is undefined then it will default
+            // to using the last component in the url
+            async function* namedInput() {
+              for await (const response of dlstream) {
+                yield {
+                  name: response.url == metadata ? "metadata.csv" : undefined,
+                  input: response,
+                  lastModified: response.headers.get("Last-Modified"),
+                };
+              }
+            }
+
+            return downloadZip(namedInput());
+          })
           .catch((err) => new Response(err.message, { status: 500 })),
       );
     }
