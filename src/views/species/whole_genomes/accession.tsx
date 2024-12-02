@@ -41,8 +41,8 @@ import {
 } from "@/queries/sequence";
 import { AnalysisMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
-import { useLocalStorage } from "@mantine/hooks";
 import { Marker } from "@/components/mapping/analysis-map";
+import { useSavedData } from "@/components/DownloadManager";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -127,23 +127,33 @@ function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
   );
 }
 
-function GenomeDetails({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+interface GenomeDetailsProps {
+  canonicalName: string;
+  sequence?: SequenceDetails;
+}
+
+function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
   const assembly = sequence?.events.assemblies[0];
   const annotation = sequence?.events.annotations[0];
   const deposition = sequence?.events.dataDepositions[0];
 
-  const [saved, setSaved] = useLocalStorage<string[]>({
-    key: "save-list",
-    defaultValue: [],
-  });
+  const [saved, setSaved] = useSavedData();
 
   const saveToList = () => {
-    if (deposition?.sourceUri)
-      setSaved([...(saved || []), deposition.sourceUri]);
+    if (sequence && deposition?.sourceUri && deposition.accession) {
+      const components = deposition.sourceUri.split("/");
+      const url = `${deposition?.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
+
+      const item = {
+        url,
+        label: deposition.accession,
+        dataType: deposition.dataType || "whole genome",
+        scientificName: canonicalName,
+        datePublished: deposition.eventDate,
+        dataset: { id: "", name: sequence?.datasetName },
+      };
+      setSaved([...(saved || []), item]);
+    }
   };
 
   return (
@@ -447,18 +457,24 @@ function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   );
 }
 
-export default function AccessionPage({
-  params,
-}: {
-  params: { accession: string };
-}) {
+export interface AccessionPageProps {
+  params: {
+    name: string;
+    accession: string;
+  };
+}
+
+export default function AccessionPage({ params }: AccessionPageProps) {
+  const name = decodeURIComponent(params.name);
+  const canonicalName = name.replaceAll("_", " ");
+
   const { loading, error, data } = useQuery<SequenceQueryResults>(
     GET_ASSEMBLY,
     {
       variables: {
         accession: decodeURIComponent(params.accession),
       },
-    }
+    },
   );
 
   if (error) {
@@ -495,7 +511,10 @@ export default function AccessionPage({
               <Grid.Col span={8}>
                 <LoadPanel visible={loading} h={450}>
                   <Title order={5}>Genome details</Title>
-                  <GenomeDetails sequence={sequence} />
+                  <GenomeDetails
+                    sequence={sequence}
+                    canonicalName={canonicalName}
+                  />
                 </LoadPanel>
               </Grid.Col>
               <Grid.Col span={4}>

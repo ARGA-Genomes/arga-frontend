@@ -203,7 +203,7 @@ function WholeGenomeList({ records }: { records: WholeGenome[] }) {
 
 function toMarker(
   color: [number, number, number, number],
-  records?: WholeGenome[]
+  records?: WholeGenome[],
 ) {
   if (!records) return [];
   return records.map((r) => {
@@ -218,7 +218,7 @@ function toMarker(
 
 function WholeGenomeMap({ records }: { records: WholeGenome[] | undefined }) {
   const markers = toMarker([243, 117, 36, 220], records).filter(
-    (s) => s.latitude
+    (s) => s.latitude,
   ) as Marker[];
 
   return (
@@ -238,7 +238,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
     GET_REFERENCE_GENOME,
     {
       variables: { canonicalName },
-    }
+    },
   );
 
   if (error) {
@@ -347,13 +347,7 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
   );
 }
 
-export default function WholeGenome({
-  params,
-  ...all
-}: {
-  params: { name: string };
-}) {
-  console.log(params, all);
+export default function WholeGenome({ params }: { params: { name: string } }) {
   const name = decodeURIComponent(params.name);
   const canonicalName = name.replaceAll("_", " ");
 

@@ -24,14 +24,13 @@ import {
   Space,
   Paper,
   Tooltip,
-  ActionIcon,
   Divider,
 } from "@mantine/core";
 import {
   useClipboard,
   useDisclosure,
-  useListState,
   useLocalStorage,
+  useSet,
 } from "@mantine/hooks";
 import {
   IconChevronDown,
@@ -96,33 +95,38 @@ export function SavedDataManagerButton() {
 
 function SavedDataManager() {
   const [saved, setSaved] = useSavedData();
-  const [selected, handlers] = useListState<SavedItem>();
+  const selectedSet = useSet<SavedItem>();
+  const [selected, setSelected] = useState<SavedItem[]>([]);
+
   const [metadataUrl, setMetadataUrl] = useState<string | undefined>();
   const clipboard = useClipboard({ timeout: 1000 });
 
-  // TODO: replace this with a proper set when mantine is updated
-  function selectItem(item: SavedItem) {
-    if (selected.indexOf(item) === -1) {
-      handlers.append(item);
-    }
-  }
-
+  // every time the selected files change we need to recreate
+  // the blobs for metadata and manifest files and create a new
+  // URL for each file
   useEffect(() => {
-    if (!saved) return;
-    for (const item of saved) {
-      selectItem(item);
-    }
-  }, [saved]);
-
-  useEffect(() => {
+    // remove the old url. manual cleanup needed for performance
     if (metadataUrl) {
       URL.revokeObjectURL(metadataUrl);
     }
 
-    const file = createMetadataFile(selected);
-    const blobUrl = URL.createObjectURL(file);
-    setMetadataUrl(blobUrl);
+    if (selected.length > 0) {
+      const file = createMetadataFile(selected);
+      const blobUrl = URL.createObjectURL(file);
+      setMetadataUrl(blobUrl);
+    } else {
+      setMetadataUrl(undefined);
+    }
   }, [selected]);
+
+  // auto-select newly saved items
+  useEffect(() => {
+    if (!saved) return;
+    for (const item of saved) {
+      selectedSet.add(item);
+    }
+    setSelected(Array.from(selectedSet));
+  }, [saved]);
 
   function remove(item: SavedItem) {
     const newList = saved?.filter((value) => value.url != item.url);
@@ -130,8 +134,19 @@ function SavedDataManager() {
   }
 
   function copySelected() {
-    const urls = selected.map((item) => item.url).join("\n");
+    const urls = Array.from(selected)
+      .map((item) => item.url)
+      .join("\n");
     clipboard.copy(urls);
+  }
+
+  function selectItem(item: SavedItem) {
+    selectedSet.add(item);
+    setSelected(Array.from(selectedSet));
+  }
+  function deselectItem(item: SavedItem) {
+    selectedSet.delete(item);
+    setSelected(Array.from(selectedSet));
   }
 
   return (
@@ -144,8 +159,8 @@ function SavedDataManager() {
                 key={item.url}
                 item={item}
                 onRemove={remove}
-                onSelected={(item) => selectItem(item)}
-                onDeselected={(item) => handlers.remove(selected.indexOf(item))}
+                onSelected={selectItem}
+                onDeselected={deselectItem}
               />
             ))}
           </SimpleGrid>
@@ -157,6 +172,7 @@ function SavedDataManager() {
             <Tooltip label="Download all selected files and metadata as a single .zip file">
               <Button
                 fullWidth
+                disabled={selected.length <= 0}
                 color="midnight.8"
                 radius="md"
                 rightSection={<IconFileZip />}
@@ -186,6 +202,7 @@ function SavedDataManager() {
             <Tooltip label="Copy the URLs of all selected files into the clipboard">
               <Button
                 fullWidth
+                disabled={selected.length <= 0}
                 variant="light"
                 color="shellfish"
                 radius="md"
@@ -199,6 +216,7 @@ function SavedDataManager() {
             <Tooltip label="Download a text file containing links to all selected files">
               <Button
                 fullWidth
+                disabled={selected.length <= 0}
                 variant="light"
                 color="shellfish"
                 radius="md"
@@ -211,6 +229,7 @@ function SavedDataManager() {
             <Tooltip label="Download a shell script that downloads all selected files">
               <Button
                 fullWidth
+                disabled={selected.length <= 0}
                 variant="light"
                 color="shellfish"
                 radius="md"
@@ -281,9 +300,6 @@ function SavedDataItem({
   onSelected,
   onDeselected,
 }: SaveDataItemProps) {
-  const components = item.url.split("/");
-  const url = `${item.url}/${components[components.length - 1]}_genomic.fna.gz`;
-
   return (
     <Card shadow="sm" padding="lg" radius="lg" withBorder>
       <Card.Section withBorder mb="md">
@@ -358,7 +374,7 @@ function SavedDataItem({
         </Table.Tbody>
       </Table>
 
-      <DownloadButton links={[{ label: "Fasta (.fna.gz)", url }]} />
+      <DownloadButton links={[{ label: "Fasta (.fna.gz)", url: item.url }]} />
     </Card>
   );
 }
