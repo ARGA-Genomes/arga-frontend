@@ -1,0 +1,16 @@
+.icon {
+  transition: ease all 250ms;
+  transform: scale(0);
+}
+
+.button {
+  transition: ease all 250ms;
+  padding-left: 34px;
+  &:hover {
+    padding-left: 16px;
+    & .icon {
+      transform: scale(1);
+      margin-left: 18px;
+    }
+  }
+}

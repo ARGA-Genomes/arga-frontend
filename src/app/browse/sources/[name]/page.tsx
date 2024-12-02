@@ -23,6 +23,7 @@ import {
   ScrollArea,
   UnstyledButton,
   Chip,
+  Center,
 } from "@mantine/core";
 import { useEffect, useState, useMemo } from "react";
 import { PaginationBar } from "@/components/pagination";
@@ -45,6 +46,7 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import { DataPageCitation } from "@/components/page-citation";
 import { SortChip } from "@/components/sorting/sort-chips";
+import classes from "../../../../components/record-list.module.css";
 
 const PAGE_SIZE = 10;
 type Filters = {
@@ -337,6 +339,10 @@ function Species({ source }: { source: string }) {
 
       {error ? <Title order={4}>{error.message}</Title> : null}
 
+      {records.length === 0 && (
+        <Text className={classes.emptyList}>no data</Text>
+      )}
+
       <SimpleGrid cols={5}>
         {records.map((record) => (
           <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
@@ -424,6 +430,12 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
 
       <ScrollArea.Autosize mah={300} type="auto" offsetScrollbars>
         <Box p={10}>
+          {sortedDatasets.length === 0 && (
+            <Center>
+              <Text className={classes.emptyList}>no data</Text>
+            </Center>
+          )}
+
           {sortedDatasets.map((dataset, idx) => {
             return <DatasetRow key={idx} dataset={dataset} />;
           })}
@@ -471,29 +483,13 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 .toUpperCase()
                 .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
             }
-            href={dataset.license !== "none" ? dataset.license : ""}
             color={
               dataset.accessPill
                 ? accessPillColours[dataset.accessPill]
                 : "#d6e4ed"
             }
-            icon={
-              dataset.license !== "NONE" &&
-              dataset.license !== "none" &&
-              dataset.license !== "access via login"
-                ? IconArrowUpRight
-                : undefined
-            }
-            showIconOnHover={
-              dataset.license !== "NONE" &&
-              dataset.license !== "none" &&
-              dataset.license !== "access via login"
-                ? true
-                : false
-            }
             popoverDisabled
             textColor="black"
-            iconColor="black"
           />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
@@ -578,7 +574,7 @@ function SourceDetails({
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>{source.datasets.length}</b> datasets
                 </Text>
               </Group>
@@ -587,7 +583,7 @@ function SourceDetails({
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>{source.species.total}</b> species
                 </Text>
               </Group>
@@ -605,7 +601,7 @@ function SourceDetails({
               py={3}
             >
               <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>
                     {source.accessPill
                       ?.toLowerCase()
@@ -630,7 +626,7 @@ function SourceDetails({
               py={3}
             >
               <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]}>
+                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>
                     {source.reusePill
                       ?.toLowerCase()

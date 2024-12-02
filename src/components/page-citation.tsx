@@ -57,10 +57,11 @@ export function PageCitation() {
   const page = Humanize.capitalize(location.split("/").pop() || "");
   const clipboard = useClipboard({ timeout: 500 });
   const citation = useRef<HTMLParagraphElement>(null);
+  const name = decodeURIComponent(params.name as string);
 
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
-      canonicalName: (params.name as string).replaceAll("_", " "),
+      canonicalName: name.replaceAll("_", " "),
     },
   });
 

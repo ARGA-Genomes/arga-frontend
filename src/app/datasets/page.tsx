@@ -42,6 +42,7 @@ import { useState, useMemo } from "react";
 import { access, copyFileSync } from "fs";
 import { SortChip } from "@/components/sorting/sort-chips";
 import { DataPageCitation } from "@/components/page-citation";
+import styles from "../../components/record-list.module.css";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -321,35 +322,13 @@ function DatasetRow({
                 .toUpperCase()
                 .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
             }
-            href={
-              dataset.license !== "NONE" &&
-              dataset.license !== "none" &&
-              dataset.license !== "access via login"
-                ? dataset.license
-                : ""
-            }
             color={
               dataset.accessPill
                 ? accessPillColours[dataset.accessPill]
                 : "#d6e4ed"
             }
-            icon={
-              dataset.license !== "NONE" &&
-              dataset.license !== "none" &&
-              dataset.license !== "access via login"
-                ? IconArrowUpRight
-                : undefined
-            }
-            showIconOnHover={
-              dataset.license !== "NONE" &&
-              dataset.license !== "none" &&
-              dataset.license !== "access via login"
-                ? true
-                : false
-            }
             popoverDisabled
             textColor="black"
-            iconColor="black"
           />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
@@ -476,20 +455,14 @@ function CollectionCard({ collection }: { collection: Source }) {
                   .concat(collection.accessPill?.slice(1).toLowerCase()) ||
                 "No data"
               }
-              href={collection.license !== "none" ? collection.license : ""}
               group={true}
               color={
                 collection.accessPill
                   ? accessPillColours[collection.accessPill]
                   : "#d6e4ed"
               }
-              icon={
-                collection.license !== "none" ? IconArrowUpRight : undefined
-              }
-              showIconOnHover={collection.license !== "none" ? true : false}
               popoverDisabled
               textColor="black"
-              iconColor="black"
             />
           </Grid.Col>
           <Grid.Col span={12}>
@@ -559,7 +532,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                     </Group>
                   </Stack>
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   <AttributePill
                     label="Rights holder"
                     labelColor="white"
@@ -568,7 +541,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                     textColor="black"
                   />
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   <AttributePill
                     label="Access rights"
                     labelColor="white"
@@ -581,28 +554,16 @@ function CollectionRow({ collection }: { collection: Source }) {
                           collection.accessPill?.slice(1).toLowerCase()
                         ) || "No data"
                     }
-                    href={
-                      collection.license !== "none" ? collection.license : ""
-                    }
                     color={
                       collection.accessPill
                         ? accessPillColours[collection.accessPill]
                         : "#d6e4ed"
                     }
-                    icon={
-                      collection.license !== "none"
-                        ? IconArrowUpRight
-                        : undefined
-                    }
-                    showIconOnHover={
-                      collection.license !== "none" ? true : false
-                    }
                     popoverDisabled
                     textColor="black"
-                    iconColor="black"
                   />
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   <AttributePill
                     label="Data reuse status"
                     labelColor="white"
@@ -623,7 +584,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                     textColor="black"
                   />
                 </Grid.Col>
-                <Grid.Col span={2} p="lg">
+                <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   {" "}
                   <AttributePill
                     label="Number of records"
@@ -646,6 +607,11 @@ function CollectionRow({ collection }: { collection: Source }) {
         </UnstyledButton>
         <ScrollArea.Autosize mah={350} type="auto" offsetScrollbars>
           <Box p={10}>
+            {collection.datasets.length === 0 && (
+              <Center>
+                <Text className={styles.emptyList}>no data</Text>
+              </Center>
+            )}
             {collection.datasets.map((dataset, idx) => (
               <DatasetRow
                 dataset={dataset}
