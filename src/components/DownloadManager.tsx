@@ -24,8 +24,15 @@ import {
   Space,
   Paper,
   Tooltip,
+  ActionIcon,
+  Divider,
 } from "@mantine/core";
-import { useDisclosure, useListState, useLocalStorage } from "@mantine/hooks";
+import {
+  useClipboard,
+  useDisclosure,
+  useListState,
+  useLocalStorage,
+} from "@mantine/hooks";
 import {
   IconChevronDown,
   IconClipboardCopy,
@@ -34,6 +41,7 @@ import {
   IconFileText,
   IconFileZip,
   IconSortDescending,
+  IconTerminal2,
   IconTrash,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -89,6 +97,8 @@ export function SavedDataManagerButton() {
 function SavedDataManager() {
   const [saved, setSaved] = useSavedData();
   const [selected, handlers] = useListState<SavedItem>();
+  const [metadataUrl, setMetadataUrl] = useState<string | undefined>();
+  const clipboard = useClipboard({ timeout: 1000 });
 
   // TODO: replace this with a proper set when mantine is updated
   function selectItem(item: SavedItem) {
@@ -104,9 +114,24 @@ function SavedDataManager() {
     }
   }, [saved]);
 
+  useEffect(() => {
+    if (metadataUrl) {
+      URL.revokeObjectURL(metadataUrl);
+    }
+
+    const file = createMetadataFile(selected);
+    const blobUrl = URL.createObjectURL(file);
+    setMetadataUrl(blobUrl);
+  }, [selected]);
+
   function remove(item: SavedItem) {
     const newList = saved?.filter((value) => value.url != item.url);
     setSaved(newList || []);
+  }
+
+  function copySelected() {
+    const urls = selected.map((item) => item.url).join("\n");
+    clipboard.copy(urls);
   }
 
   return (
@@ -129,20 +154,23 @@ function SavedDataManager() {
       <Grid.Col span={2}>
         <Paper shadow="md" radius="md" withBorder p="xl">
           <Stack>
-            <Tooltip label="Copy the URLs of all selected files into the clipboard">
+            <Tooltip label="Download all selected files and metadata as a single .zip file">
               <Button
                 fullWidth
-                variant="light"
-                color="moss"
+                color="midnight.8"
                 radius="md"
-                rightSection={<IconClipboardCopy />}
+                rightSection={<IconFileZip />}
               >
-                Copy selected to clipboard
+                Download selected
               </Button>
             </Tooltip>
 
             <Tooltip label="Download a metadata file containing metadata for all selected files">
               <Button
+                component="a"
+                href={metadataUrl}
+                download="metadata.csv"
+                disabled={!metadataUrl}
                 fullWidth
                 variant="light"
                 color="shellfish"
@@ -150,6 +178,21 @@ function SavedDataManager() {
                 rightSection={<IconFileInfo />}
               >
                 Download metadata
+              </Button>
+            </Tooltip>
+
+            <Divider mt="md" label="Tools for programmatic access" />
+
+            <Tooltip label="Copy the URLs of all selected files into the clipboard">
+              <Button
+                fullWidth
+                variant="light"
+                color="shellfish"
+                radius="md"
+                rightSection={<IconClipboardCopy />}
+                onClick={copySelected}
+              >
+                {clipboard.copied ? "Copied!" : "Copy URLs to clipboard"}
               </Button>
             </Tooltip>
 
@@ -165,14 +208,15 @@ function SavedDataManager() {
               </Button>
             </Tooltip>
 
-            <Tooltip label="Download all selected files as a single .zip file">
+            <Tooltip label="Download a shell script that downloads all selected files">
               <Button
                 fullWidth
-                color="midnight.8"
+                variant="light"
+                color="shellfish"
                 radius="md"
-                rightSection={<IconFileZip />}
+                rightSection={<IconTerminal2 />}
               >
-                Download selected
+                Download script
               </Button>
             </Tooltip>
           </Stack>
@@ -285,7 +329,7 @@ function SavedDataItem({
         </Group>
       </Card.Section>
 
-      <Table ml="md">
+      <Table mx="md" mb="md">
         <Table.Tbody>
           <Table.Tr>
             <Table.Td>Organism</Table.Td>
@@ -324,13 +368,13 @@ export function useSavedData() {
 }
 
 function DownloadButton({ links }: { links: DownloadLink[] }) {
+  const clipboard = useClipboard({ timeout: 1000 });
   const selected = links[0];
 
   return (
     <Group gap={0} grow>
       <Button
         color="moss"
-        mt="md"
         radius={0}
         rightSection={<IconDownload />}
         component={Link}
@@ -343,11 +387,19 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
         Download
       </Button>
 
+      <Button
+        color="moss.5"
+        radius={0}
+        rightSection={<IconClipboardCopy />}
+        onClick={() => clipboard.copy(selected.url)}
+      >
+        {clipboard.copied ? "Copied!" : "Copy URL"}
+      </Button>
+
       <Menu shadow="md" width={200}>
         <Menu.Target>
           <Button
             color="moss.7"
-            mt="md"
             radius={0}
             rightSection={<IconChevronDown />}
             style={{
@@ -368,4 +420,18 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
       </Menu>
     </Group>
   );
+}
+
+function createMetadataFile(items: SavedItem[]): Blob {
+  function toLine(item: SavedItem) {
+    return `${item.label},${item.datePublished},${item.scientificName},${item.url}`;
+  }
+
+  const text = items.map(toLine).join("\n");
+  const csv = `
+label,date_published,scientific_name,url
+${text}
+`;
+
+  return new Blob([csv], { type: "text/csv;charset=utf-8" });
 }
