@@ -100,6 +100,8 @@ function SavedDataManager() {
   const [selected, setSelected] = useState<SavedItem[]>([]);
 
   const [metadataUrl, setMetadataUrl] = useState<string | undefined>();
+  const [manifestUrl, setManifestUrl] = useState<string | undefined>();
+  const [scriptUrl, setScriptUrl] = useState<string | undefined>();
   const clipboard = useClipboard({ timeout: 1000 });
 
   // every time the selected files change we need to recreate
@@ -107,16 +109,26 @@ function SavedDataManager() {
   // URL for each file
   useEffect(() => {
     // remove the old url. manual cleanup needed for performance
-    if (metadataUrl) {
-      URL.revokeObjectURL(metadataUrl);
-    }
+    if (metadataUrl) URL.revokeObjectURL(metadataUrl);
+    if (manifestUrl) URL.revokeObjectURL(manifestUrl);
+    if (scriptUrl) URL.revokeObjectURL(scriptUrl);
 
     if (selected.length > 0) {
-      const blob = createMetadataFile(selected);
-      const blobUrl = URL.createObjectURL(blob);
-      setMetadataUrl(blobUrl);
+      const metadataBlob = createMetadataFile(selected);
+      const metadataBlobUrl = URL.createObjectURL(metadataBlob);
+      setMetadataUrl(metadataBlobUrl);
+
+      const manifestBlob = createManifestFile(selected);
+      const manifestBlobUrl = URL.createObjectURL(manifestBlob);
+      setManifestUrl(manifestBlobUrl);
+
+      const scriptBlob = createScriptFile(selected);
+      const scriptBlobUrl = URL.createObjectURL(scriptBlob);
+      setScriptUrl(scriptBlobUrl);
     } else {
       setMetadataUrl(undefined);
+      setManifestUrl(undefined);
+      setScriptUrl(undefined);
     }
   }, [selected]);
 
@@ -219,8 +231,11 @@ function SavedDataManager() {
 
             <Tooltip label="Download a text file containing links to all selected files">
               <Button
+                component="a"
+                href={manifestUrl}
+                download="manifest.txt"
+                disabled={!manifestUrl}
                 fullWidth
-                disabled={selected.length <= 0}
                 variant="light"
                 color="shellfish"
                 radius="md"
@@ -232,8 +247,11 @@ function SavedDataManager() {
 
             <Tooltip label="Download a shell script that downloads all selected files">
               <Button
+                component="a"
+                href={scriptUrl}
+                download="arga-download.sh"
+                disabled={!scriptUrl}
                 fullWidth
-                disabled={selected.length <= 0}
                 variant="light"
                 color="shellfish"
                 radius="md"
@@ -477,4 +495,21 @@ function createMetadataFile(items: SavedItem[]): Blob {
   const csv = `${header}\n${text}`;
 
   return new Blob([csv], { type: "text/csv;charset=utf-8" });
+}
+
+function createManifestFile(items: SavedItem[]): Blob {
+  const text = items.map((item) => item.url).join("\n");
+  return new Blob([text], { type: "text/plain;charset=utf-8" });
+}
+
+function createScriptFile(items: SavedItem[]): Blob {
+  function toCurl(item: SavedItem) {
+    return `echo "Downloading ${item.label}"; curl -O -XGET ${item.url};`;
+  }
+
+  const header = "#!/bin/sh";
+  const text = items.map(toCurl).join("\n");
+  const script = `${header}\n\n${text}`;
+
+  return new Blob([script], { type: "text/plain;charset=utf-8" });
 }
