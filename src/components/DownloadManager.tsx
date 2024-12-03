@@ -298,8 +298,8 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
         <MantineProvider theme={theme}>
           <Checkbox
             color="moss"
-            size="xl"
-            radius={0}
+            size="lg"
+            radius="lg"
             checked={checked}
             onChange={(ev) => setChecked(ev.currentTarget.checked)}
           />
@@ -326,7 +326,7 @@ function SavedDataItem({
     <Card shadow="sm" padding="lg" radius="lg" withBorder>
       <Card.Section withBorder mb="md">
         <Group justify="space-between">
-          <Group>
+          <Group gap="xl">
             <HintedCheckbox
               onChange={(checked) =>
                 checked ? onSelected(item) : onDeselected(item)
@@ -412,7 +412,7 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
   return (
     <Group gap={0} grow>
       <Button
-        color="moss"
+        color="moss.4"
         radius={0}
         rightSection={<IconDownload />}
         component={Link}
@@ -426,7 +426,7 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
       </Button>
 
       <Button
-        color="moss.5"
+        color="moss"
         radius={0}
         rightSection={<IconClipboardCopy />}
         onClick={() => clipboard.copy(selected.url)}
