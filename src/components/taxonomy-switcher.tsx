@@ -50,18 +50,133 @@ interface TaxonomySwitcherProps {
   taxa: Taxon[];
 }
 
-interface TaxonWithDataset extends Taxon {
+type TaxonMap = { [key: string]: string };
+
+interface TaxonExtended extends Taxon {
   dataset?: Dataset;
+  originalCanonicalNames?: TaxonMap;
 }
 
-export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
+// Define the rank mapping to standardize rank names
+const rankMapping: TaxonMap = {
+  Regnum: "Kingdom",
+  Division: "Phylum",
+  Classis: "Class",
+  Subclassis: "Subclass",
+  Superordo: "Superorder",
+  Ordo: "Order",
+  Familia: "Family",
+  Genus: "Genus",
+  Subgenus: "Subgenus",
+  Kingdom: "Kingdom",
+  Phylum: "Phylum",
+  Class: "Class",
+  Subclass: "Subclass",
+  Superorder: "Superorder",
+  Order: "Order",
+  Family: "Family",
+};
+
+// Helper function to normalize rank names
+function normalizeRank(rank: string) {
+  return rankMapping[rank] || rank;
+}
+
+function compareTaxons(taxa: TaxonExtended[], baseTaxon: TaxonExtended) {
+  // Create a map of normalized rank to canonicalName for the baseTaxon hierarchy
+  const baseHierarchyMap: TaxonMap = {};
+  baseTaxon.hierarchy.forEach((node) => {
+    const normalizedRank = normalizeRank(node.rank);
+    baseHierarchyMap[normalizedRank] = node.canonicalName;
+  });
+
+  // For each taxon in taxa
+  taxa.forEach((taxon) => {
+    const differingRanks: TaxonMap = {};
+
+    // Create a map of normalized rank to canonicalName for this taxon's hierarchy
+    const taxonHierarchyMap: TaxonMap = {};
+    const taxonRankNames: TaxonMap = {}; // Map normalized rank to the taxon's original rank names
+    taxon.hierarchy.forEach((node) => {
+      const normalizedRank = normalizeRank(node.rank);
+      taxonHierarchyMap[normalizedRank] = node.canonicalName;
+      taxonRankNames[normalizedRank] = node.rank;
+    });
+
+    // Get the set of all normalized ranks to compare
+    const allRanks = new Set([
+      ...Object.keys(baseHierarchyMap),
+      ...Object.keys(taxonHierarchyMap),
+    ]);
+
+    // Compare the canonicalNames for each normalized rank
+    let differenceFound = false;
+    for (const rank of allRanks) {
+      const baseName = baseHierarchyMap[rank];
+      const taxonName = taxonHierarchyMap[rank];
+
+      if (taxonName !== baseName) {
+        differenceFound = true;
+        if (taxonName !== undefined && baseName !== undefined) {
+          // Store the taxon's original rank name and base canonicalName
+          const taxonRankName = taxonRankNames[rank] || rank;
+          differingRanks[taxonRankName] = baseName;
+        }
+      }
+    }
+
+    // If any difference is found, add the field with only differing ranks
+    if (differenceFound && Object.keys(differingRanks).length > 0) {
+      // Add the field to the taxon object
+      taxon.originalCanonicalNames = differingRanks;
+    }
+  });
+}
+
+function mapTaxaDatasets(taxa: Taxon[], datasets: Map<string, Dataset>) {
+  return taxa.map((taxon) => ({
+    ...taxon,
+    dataset: datasets.get(taxon.datasetId),
+  }));
+}
+
+// Function to sort by predefined order and then alphabetically
+export function sortTaxaBySources(taxa: TaxonExtended[]) {
+  return taxa
+    .map((t) => t)
+    .filter((t) => t.status === "ACCEPTED")
+    .sort((first, second) => {
+      const a = first.dataset?.name || "";
+      const b = second.dataset?.name || "";
+
+      if (a === "Atlas of Living Australia") return -1;
+      if (b === "Atlas of Living Australia") return 1;
+
+      // If neither is in the predefined order, sort alphabetically
+      return a.localeCompare(b);
+    });
+}
+
+function processTaxa(taxa: Taxon[], datasets: Map<string, Dataset>) {
+  const taxaWithDatasets = mapTaxaDatasets(taxa, datasets);
+  const sorted = sortTaxaBySources(taxaWithDatasets);
+  compareTaxons(sorted.slice(1), sorted[0]);
+
+  return sorted;
+}
+
+export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [entityId, setEntityId] = useState<string>("");
   const datasets = useDatasets();
   const theme = useMantineTheme();
 
-  const taxaWithDatasets = mapTaxaDatasets(taxa, datasets);
-  const sorted = sortTaxaBySources(taxaWithDatasets);
+  const taxa = useMemo(
+    () => processTaxa(rawTaxa, datasets),
+    [rawTaxa, datasets]
+  );
+
+  console.log(taxa);
 
   const { loading, error, data } = useQuery<ProvenanceQuery>(
     GET_TAXON_PROVENANCE,
@@ -70,16 +185,8 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
     }
   );
 
-  const first = useMemo(
-    () =>
-      sorted.find(
-        (taxon) => taxon.dataset?.name === "Atlas of Living Australia"
-      ) || sorted[0],
-    [sorted]
-  );
-
   const [active, setActive] = useState<string>(
-    `${first.scientificName}-${first.datasetId}`
+    `${taxa[0].scientificName}-${taxa[0].datasetId}`
   );
 
   return (
@@ -166,7 +273,7 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
         classNames={accClasses}
         loop
       >
-        {sorted.map((taxon) => {
+        {taxa.map((taxon) => {
           const isActive =
             `${taxon.scientificName}-${taxon.datasetId}` === active;
 
@@ -184,18 +291,21 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
                   >
                     {taxon.dataset?.name || "Unknown Dataset"}
                   </Text>
-                  {/* {taxon.dataset?.name !== "Atlas of Living Australia" && (
+                  {taxon.originalCanonicalNames && (
                     <Badge variant="white" color="midnight.8">
                       DIFFERENT
                     </Badge>
-                  )} */}
+                  )}
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack>
                   {taxon.hierarchy.length > 0 && (
                     <>
-                      <Hierarchy hierarchy={taxon.hierarchy} />
+                      <Hierarchy
+                        hierarchy={taxon.hierarchy}
+                        originalCanonicalNames={taxon.originalCanonicalNames}
+                      />
                       <Divider opacity={0.1} mt="xs" mb="sm" />
                     </>
                   )}
@@ -241,47 +351,50 @@ export function TaxonomySwitcher({ taxa }: TaxonomySwitcherProps) {
   );
 }
 
-function Hierarchy({ hierarchy }: { hierarchy: ClassificationNode[] }) {
+function Hierarchy({
+  hierarchy,
+  originalCanonicalNames,
+}: {
+  hierarchy: ClassificationNode[];
+  originalCanonicalNames?: TaxonMap;
+}) {
   return (
     <Group gap="lg">
       {hierarchy
         .map((t) => t)
         .reverse()
-        .map((node, idx) => (
-          <AttributePill
-            key={idx}
-            labelColor="white"
-            popoverDisabled
-            hoverColor="midnight.0"
-            label={Humanize.capitalize(node.rank.toLowerCase())}
-            value={node.canonicalName}
-            href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
-            icon={IconArrowUpRight}
-            showIconOnHover
-            miw={100}
-          />
-        ))}
+        .map((node, idx) => {
+          const originalCanonicalName = originalCanonicalNames?.[node.rank];
+          const isDifferent = Boolean(originalCanonicalName);
+
+          return (
+            <AttributePill
+              key={idx}
+              labelColor="white"
+              popoverDisabled={!isDifferent}
+              popoverLabel={
+                isDifferent ? (
+                  <>
+                    <b>ALA: </b> {originalCanonicalName}
+                  </>
+                ) : (
+                  ""
+                )
+              }
+              color={isDifferent ? "white" : undefined}
+              hoverColor="midnight.0"
+              label={
+                Humanize.capitalize(node.rank.toLowerCase()) +
+                (isDifferent ? "*" : "")
+              }
+              value={node.canonicalName}
+              href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
+              icon={IconArrowUpRight}
+              showIconOnHover
+              miw={100}
+            />
+          );
+        })}
     </Group>
   );
-}
-
-function mapTaxaDatasets(taxa: Taxon[], datasets: Map<string, Dataset>) {
-  return taxa.map((taxon) => ({
-    ...taxon,
-    dataset: datasets.get(taxon.datasetId),
-  }));
-}
-
-// Function to sort by predefined order and then alphabetically
-export function sortTaxaBySources(taxa: TaxonWithDataset[]) {
-  return taxa
-    .map((t) => t)
-    .filter((t) => t.status === "ACCEPTED")
-    .sort((first, second) => {
-      const a = first.dataset?.name || "";
-      const b = second.dataset?.name || "";
-
-      // If neither is in the predefined order, sort alphabetically
-      return a.localeCompare(b);
-    });
 }
