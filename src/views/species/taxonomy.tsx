@@ -19,6 +19,7 @@ import {
   Popover,
   Flex,
   Divider,
+  ThemeIcon,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
@@ -632,22 +633,30 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
     synonyms[act.taxon.status].push(act);
   }
 
+  const entries = Object.entries(synonyms);
+
   return (
     <Paper>
-      {Object.entries(synonyms).map(([status, acts]) => (
-        <Stack gap={0} key={status}>
-          {acts.map((act) => (
-            <Group key={act.taxon.canonicalName} gap={10}>
-              <Text fw={600} fz="sm" fs="italic" c="midnight.8">
-                {act.taxon.canonicalName}
-              </Text>
-              <Text fw={600} fz="sm" c="midnight.8">
-                {act.taxon.authorship}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
-      ))}
+      {entries.length > 0 ? (
+        entries.map(([status, acts]) => (
+          <Stack gap={0} key={status}>
+            {acts.map((act) => (
+              <Group key={act.taxon.canonicalName} gap={10}>
+                <Text fw={600} fz="sm" fs="italic" c="midnight.8">
+                  {act.taxon.canonicalName}
+                </Text>
+                <Text fw={600} fz="sm" c="midnight.8">
+                  {act.taxon.authorship}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+        ))
+      ) : (
+        <Text fw={700} size="sm" c="dimmed">
+          No synonyms
+        </Text>
+      )}
     </Paper>
   );
 }
@@ -855,11 +864,15 @@ function Details({
             </Paper>
             {!isSubspecies && (
               <Paper radius={16} p="sm" withBorder>
-                <Text fw={300} fz="sm">
+                <Text
+                  fw={300}
+                  fz="sm"
+                  pb={(subspecies || []).length > 0 ? "sm" : undefined}
+                >
                   Subspecies
                 </Text>
                 {tree ? (
-                  <Stack gap={4}>
+                  <Stack gap={8}>
                     {(subspecies || []).length > 0 ? (
                       subspecies?.map((species, idx) => (
                         <InternalLinkButton
@@ -1125,7 +1138,14 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
         </DataTableRow>
         <DataTableRow label="Publication">
           <DataField
-            value={item.publication.title}
+            value={
+              <Flex gap="sm" align="center">
+                <ThemeIcon color="shellfish.6">
+                  <IconExternalLink size="1rem" />
+                </ThemeIcon>
+                {item.publication.title}
+              </Flex>
+            }
             href={item.publication.sourceUrls[0]}
           />
         </DataTableRow>
