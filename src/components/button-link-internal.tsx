@@ -1,7 +1,7 @@
 import { Button, Text } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 
-import classes from "./button-link-external.module.css";
+import classes from "./button-link-internal.module.css";
 import { useMemo } from "react";
 import Link from "next/link";
 import { Url } from "next/dist/shared/lib/router/router";
