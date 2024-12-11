@@ -85,9 +85,11 @@ function normalizeRank(rank: string) {
 function compareTaxons(taxa: TaxonExtended[], baseTaxon: TaxonExtended) {
   // Create a map of normalized rank to canonicalName for the baseTaxon hierarchy
   const baseHierarchyMap: TaxonMap = {};
+  const baseRankNames: TaxonMap = {};
   baseTaxon.hierarchy.forEach((node) => {
     const normalizedRank = normalizeRank(node.rank);
     baseHierarchyMap[normalizedRank] = node.canonicalName;
+    baseRankNames[normalizedRank] = node.rank;
   });
 
   // For each taxon in taxa
@@ -117,8 +119,19 @@ function compareTaxons(taxa: TaxonExtended[], baseTaxon: TaxonExtended) {
 
       if (taxonName !== baseName) {
         differenceFound = true;
-        if (taxonName !== undefined && baseName !== undefined) {
-          // Store the taxon's original rank name and base canonicalName
+        if (baseName === undefined && taxonName !== undefined) {
+          // Base is missing the rank, taxon has it
+          // Use the taxon's rank name (since taxon has it)
+          const taxonRankName = taxonRankNames[rank] || rank;
+          differingRanks[taxonRankName] = "Missing";
+        } else if (taxonName === undefined && baseName !== undefined) {
+          // Taxon is missing the rank, base has it
+          // Use the base's original rank name (since taxon doesn't have this rank)
+          const baseRankName = baseRankNames[rank] || rank;
+          differingRanks[baseRankName] = "Missing";
+        } else {
+          // Both present but different canonicalNames
+          // Use the taxon's rank name as the key
           const taxonRankName = taxonRankNames[rank] || rank;
           differingRanks[taxonRankName] = baseName;
         }
