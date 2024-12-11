@@ -12,13 +12,12 @@ import {
   Stack,
   Text,
   Timeline,
-  Title,
   UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
 
 import accClasses from "./taxonomy-switcher-acc.module.css";
-import tmlnClasses from "./taxonomy-switcher-tmln.module.css";
+import tmlnClasses from "./record-history.module.css";
 
 import { Taxon } from "@/queries/taxa";
 import {
@@ -39,6 +38,7 @@ import { useQuery } from "@apollo/client";
 import { GET_TAXON_PROVENANCE, ProvenanceQuery } from "@/queries/provenance";
 import { useDisclosure } from "@mantine/hooks";
 import { LoadOverlay } from "./load-overlay";
+import RecordHistory from "./record-history";
 
 type ClassificationNode = {
   canonicalName: string;
@@ -214,57 +214,7 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
       >
         <LoadOverlay visible={loading} />
         <ScrollArea h={400}>
-          <Timeline
-            bulletSize={28}
-            classNames={tmlnClasses}
-            color="midnight.9"
-            active={data?.provenance.taxon.length || 0}
-          >
-            {data?.provenance.taxon.map((taxon, idx) => {
-              return (
-                <Timeline.Item
-                  fz="lg"
-                  fw={700}
-                  bullet={
-                    taxon.action.toString() === "UPDATE" ? (
-                      <IconEdit size={14} />
-                    ) : (
-                      <IconPlus size={14} />
-                    )
-                  }
-                  key={idx}
-                  title={
-                    <Group align="center">
-                      <Text size="lg" fw={600} c="midnight.9">
-                        {Humanize.capitalize(
-                          taxon.action.toString().toLowerCase()
-                        )}
-                      </Text>
-                      <Badge color="shellfish" variant="light">
-                        {taxon.dataset.name}
-                      </Badge>
-                    </Group>
-                  }
-                  c="midnight.7"
-                >
-                  <Stack gap={0}>
-                    {taxon.action.toString() === "UPDATE" && (
-                      <Flex gap="xs">
-                        <Text size="sm" fw={600}>
-                          {taxon.atom.type}
-                        </Text>
-                        <IconArrowRight size={18} />
-                        <Text size="sm">{taxon.atom.value}</Text>
-                      </Flex>
-                    )}
-                    <Text size="sm" c="dimmed">
-                      {new Date(taxon.loggedAt).toLocaleString()}
-                    </Text>
-                  </Stack>
-                </Timeline.Item>
-              );
-            })}
-          </Timeline>
+          <RecordHistory operations={data?.provenance.taxon} />
         </ScrollArea>
       </Modal>
       <Accordion
