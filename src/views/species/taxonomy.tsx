@@ -19,6 +19,7 @@ import {
   Box,
   Popover,
   Flex,
+  Center,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
@@ -339,7 +340,7 @@ type ProvenanceQuery = {
         action: string;
         atom: AtomText | AtomNomenclaturalType | AtomDateTime;
         dataset: Dataset;
-      }
+      },
     ];
   };
 };
@@ -544,12 +545,12 @@ function ExternalLinks({ canonicalName, species }: ExternalLinksProps) {
       try {
         const response = await fetch(
           `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            canonicalName
-          )}`
+            canonicalName,
+          )}`,
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
         );
       } catch (error) {
         setMatchedTaxon([]);
@@ -624,7 +625,7 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   });
 
   const acts = data?.taxon.taxonomicActs.filter(
-    (act) => act.taxon.status !== "ACCEPTED"
+    (act) => act.taxon.status !== "ACCEPTED",
   );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
@@ -703,7 +704,7 @@ function Details({
         rank: taxonomy.rank,
         canonicalName: taxonomy.canonicalName,
       },
-    }
+    },
   );
 
   const specimens = data?.taxon.typeSpecimens;
@@ -711,7 +712,7 @@ function Details({
   const typeSpecimens = specimens?.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == taxonomy.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.specimen.typeStatus != "no voucher",
   );
   const typeSpecimen = typeSpecimens && typeSpecimens[0]?.specimen;
   const groupedSynonyms = Object.entries(
@@ -722,8 +723,8 @@ function Details({
           cur.scientificName,
         ],
       }),
-      {} as { [key: string]: string[] }
-    )
+      {} as { [key: string]: string[] },
+    ),
   );
 
   const subspecies =
@@ -1119,7 +1120,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == item.name.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.specimen.typeStatus != "no voucher",
   );
 
   function humanize(text: string) {
@@ -1128,7 +1129,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 
   const act = humanize(item.act);
   const items = data?.provenance.nomenclaturalAct.filter(
-    (item) => item.action !== "CREATE"
+    (item) => item.action !== "CREATE",
   );
 
   return (
@@ -1288,16 +1289,18 @@ function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      <Box h={800}>
-        {treeData && (
-          <TaxonomyTree
-            layout={layout}
-            data={treeData}
-            pinned={pinned}
-            initialExpanded={expandedGenera}
-          />
-        )}
-      </Box>
+      <ScrollArea.Autosize>
+        <Center>
+          {treeData && (
+            <TaxonomyTree
+              layout={layout}
+              data={treeData}
+              pinned={pinned}
+              initialExpanded={expandedGenera}
+            />
+          )}
+        </Center>
+      </ScrollArea.Autosize>
     </Paper>
   );
 }
@@ -1340,7 +1343,7 @@ export default function TaxonomyPage({
     isSubspecies ? GET_SUMMARY : GET_SUMMARY_HIERARCHY,
     {
       variables: { canonicalName },
-    }
+    },
   );
 
   const species = data?.species;
@@ -1356,12 +1359,12 @@ export default function TaxonomyPage({
       node.rank === "SUBFAMILY" ||
       node.rank === "SUBFAMILIA" ||
       node.rank === "FAMILY" ||
-      node.rank === "FAMILIA"
+      node.rank === "FAMILIA",
   );
 
   const tree = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
     variables: {
-      taxonRank: subfamily?.rank || "SUBFAMILY",
+      taxonRank: subfamily?.rank || "FAMILY",
       taxonCanonicalName: subfamily?.canonicalName,
       includeRanks: [
         "FAMILY",
@@ -1373,7 +1376,7 @@ export default function TaxonomyPage({
         "GENUS",
         "SUBGENUS",
         "SPECIES",
-        "SUBSPECIES",
+        /* "SUBSPECIES", */
       ],
     },
     skip: !hierarchy,
@@ -1382,8 +1385,6 @@ export default function TaxonomyPage({
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
-
-  console.log(tree.data);
 
   return (
     <Stack>

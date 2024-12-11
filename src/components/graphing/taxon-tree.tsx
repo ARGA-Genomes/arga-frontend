@@ -5,7 +5,7 @@ import {
   Layout,
   LinkComponentProps,
   NodeComponentProps,
-  ResponsiveTree,
+  Tree,
   useLinkMouseEventHandlers,
   useNodeMouseEventHandlers,
 } from "@nivo/tree";
@@ -19,6 +19,8 @@ import {
 import { useListState } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
 import { animated, to } from "@react-spring/web";
+
+const NODE_WIDTH = 20;
 
 type Node = {
   visible: boolean;
@@ -81,16 +83,27 @@ interface TaxonomyTreeProps {
   initialExpanded?: TaxonStatTreeNode[];
 }
 
-export function TaxonomyTree({ layout, data, pinned, initialExpanded }: TaxonomyTreeProps) {
-  const [expanded, handlers] = useListState<Node>(initialExpanded?.map(n => convertToNode(n, [])) || []);
+export function TaxonomyTree({
+  layout,
+  data,
+  pinned,
+  initialExpanded,
+}: TaxonomyTreeProps) {
+  const [expanded, handlers] = useListState<Node>(
+    initialExpanded?.map((n) => convertToNode(n, [])) || [],
+  );
   const [root, setRoot] = useState(convertToNode(data, expanded, pinned));
 
   useEffect(() => {
     setRoot(convertToNode(data, expanded, pinned));
   }, [expanded]);
 
+  const minWidth = calculateMinWidth(root);
+
   return (
-    <ResponsiveTree
+    <Tree
+      width={minWidth}
+      height={800}
       layout={layout}
       mode="tree"
       data={root}
@@ -323,4 +336,26 @@ function StatBadge({ label, stat }: { label: string; stat?: number }) {
       {label}: {stat || 0}
     </Badge>
   );
+}
+
+function calculateMinWidth(data: Node): number {
+  const genera = filterToRank("GENUS", data);
+
+  // also get the species that are visible from an expanded genus node
+  const expanded = genera.filter((node) => node.expanded);
+  const visibleSpecies = expanded.flatMap((node) => {
+    let species = filterToRank("SPECIES", node);
+    // because the tree has enough room to show one direct descendant we always pop one
+    // item off to effectively reduce to the overall minimum width
+    species.pop();
+    return species;
+  });
+
+  return (genera.length + visibleSpecies.length) * NODE_WIDTH;
+}
+
+// A recursive filter to pull out all genera no matter how deep they are in the tree
+function filterToRank(rank: string, data: Node): Node[] {
+  if (data.rank == rank) return [data];
+  return data.children?.flatMap((node) => filterToRank(rank, node)) || [];
 }
