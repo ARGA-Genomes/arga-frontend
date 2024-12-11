@@ -16,7 +16,7 @@ import { MAX_WIDTH } from "@/app/constants";
 import * as Humanize from "humanize-plus";
 import { useClipboard } from "@mantine/hooks";
 import { useRef } from "react";
-import { IconCopy } from "@tabler/icons-react";
+import { IconCopy, IconExternalLink } from "@tabler/icons-react";
 
 const months = [
   "Jan",
@@ -108,7 +108,7 @@ export function PageCitation() {
                       https://app.arga.org.au{location}
                     </a>{" "}
                     on {date.getDate()}-{date.getMonth() + 1}-
-                    {date.getFullYear()}.
+                    {date.getFullYear()}. <IconExternalLink size="1rem" />
                   </Text>
                 </Flex>
               </DataTableRow>

@@ -1,0 +1,22 @@
+.list {
+  gap: 6px;
+  &::before {
+    border: none;
+  }
+}
+
+.tab {
+  border: none;
+  border-radius: 17px;
+  color: grey;
+  &[data-active="true"] {
+    color: white;
+    background-color: var(--mantine-color-midnight-9);
+    font-weight: 700;
+  }
+}
+
+.panel {
+  padding-top: var(--mantine-spacing-md);
+  padding-bottom: var(--mantine-spacing-md);
+}

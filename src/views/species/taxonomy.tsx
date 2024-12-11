@@ -1,6 +1,7 @@
 "use client";
 
-import classes from "../../../src/components/record-list.module.css";
+import classes from "../../components/record-list.module.css";
+import tabsClasses from "../../components/event-timeline-tabs.module.css";
 
 import * as Humanize from "humanize-plus";
 import { ApolloError, gql, useQuery } from "@apollo/client";
@@ -12,13 +13,12 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  Table,
-  Tooltip,
   Tabs,
   ScrollArea,
   Box,
   Popover,
   Flex,
+  Divider,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
@@ -27,18 +27,12 @@ import {
   IconArrowUpRight,
   IconBinaryTree2,
   IconExternalLink,
-  IconReceipt,
   IconSearch,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
-import Link from "next/link";
-import {
-  Attribute,
-  AttributePillValue,
-  DataField,
-} from "@/components/data-fields";
+import { AttributePillValue, DataField } from "@/components/data-fields";
 import { TaxonomyTree } from "@/components/graphing/taxon-tree";
 import {
   EventTimeline,
@@ -1068,7 +1062,7 @@ function NomenclaturalActHeader({ item }: { item: NomenclaturalAct }) {
       mt={5}
     >
       {item.publication.publishedYear ? (
-        <Text fz="xs" fw={700} c="dimmed">
+        <Text fz="xs" fw={700} c="dimmed" mt="sm">
           Year {item.publication.publishedYear}
         </Text>
       ) : (
@@ -1116,9 +1110,9 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   );
 
   return (
-    <SimpleGrid cols={2}>
+    <SimpleGrid cols={2} py="md">
       <LoadOverlay visible={loading} />
-      <DataTable mt="lg">
+      <DataTable>
         <DataTableRow label="Scientific name">
           <Text fz="sm" fw={700} ml="sm">
             <i>{item.name.canonicalName}</i> {item.name.authorship}
@@ -1163,9 +1157,23 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
         )}
       </DataTable>
 
-      <ScrollArea.Autosize mah={300} mx="auto" type="auto" py="sm">
-        <RecordHistory operations={items} />
-      </ScrollArea.Autosize>
+      <Paper h={369} pt="md" radius="lg" withBorder>
+        <Tabs classNames={tabsClasses} defaultValue="history">
+          <Tabs.List px="md">
+            <Tabs.Tab value="history">Record history</Tabs.Tab>
+            <Tabs.Tab value="identifiers">Taxon identifiers</Tabs.Tab>
+          </Tabs.List>
+          <Divider mt="md" />
+          <ScrollArea.Autosize h={300} pl="md" type="auto">
+            <Tabs.Panel value="history">
+              <RecordHistory operations={items} />
+            </Tabs.Panel>
+            <Tabs.Panel value="identifiers">
+              <Text>Taxon identifiers here</Text>
+            </Tabs.Panel>
+          </ScrollArea.Autosize>
+        </Tabs>
+      </Paper>
     </SimpleGrid>
   );
 }

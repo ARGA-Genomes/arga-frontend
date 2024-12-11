@@ -23,12 +23,12 @@
       &.itemIcon {
         /* background-color: #d6e4ed; */
         background-color: #d3d8db;
-        padding-left: 15px;
+        padding-left: 70px;
       }
       &.itemHeader {
         /* background-color: #d6e4ed; */
         background-color: #d3d8db;
-        padding-right: 15px;
+        padding-right: 25px;
       }
       &.itemBody {
         border-top: 1px solid #d3d8db;
