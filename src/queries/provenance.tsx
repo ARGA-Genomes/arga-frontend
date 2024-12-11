@@ -157,11 +157,26 @@ export const GET_SPECIMEN_PROVENANCE = gql`
 
 export const GET_NOMENCLATURAL_ACT_PROVENANCE = gql`
   query NomenclaturalActProvenance($entityId: String) {
-    nomenclaturalAct {
-      specimen(by: { entityId: $entityId }) {
+    provenance {
+      nomenclaturalAct(by: { entityId: $entityId }) {
         operationId
         parentId
         action
+        atom {
+          __typename
+          ... on NomenclaturalActAtomText {
+            type
+            value
+          }
+          ... on NomenclaturalActAtomType {
+            type
+            value
+          }
+          ... on NomenclaturalActAtomDateTime {
+            type
+            value
+          }
+        }
         datasetVersion {
           datasetId
           version
@@ -178,6 +193,7 @@ export const GET_NOMENCLATURAL_ACT_PROVENANCE = gql`
           description
           url
         }
+        loggedAt
       }
     }
   }

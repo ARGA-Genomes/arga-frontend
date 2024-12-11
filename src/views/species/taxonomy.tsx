@@ -27,13 +27,18 @@ import {
   IconArrowUpRight,
   IconBinaryTree2,
   IconExternalLink,
+  IconReceipt,
   IconSearch,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import Link from "next/link";
-import { AttributePillValue, DataField } from "@/components/data-fields";
+import {
+  Attribute,
+  AttributePillValue,
+  DataField,
+} from "@/components/data-fields";
 import { TaxonomyTree } from "@/components/graphing/taxon-tree";
 import {
   EventTimeline,
@@ -58,6 +63,12 @@ import { AnalysisMap } from "@/components/mapping";
 import { ExternalLinkButton } from "@/components/button-link-external";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
 import { InternalLinkButton } from "@/components/button-link-internal";
+import RecordHistory from "@/components/record-history";
+import {
+  Action,
+  GET_NOMENCLATURAL_ACT_PROVENANCE,
+  Operation,
+} from "@/queries/provenance";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -333,14 +344,7 @@ interface Dataset {
 
 type ProvenanceQuery = {
   provenance: {
-    nomenclaturalAct: [
-      {
-        operationId: string;
-        action: string;
-        atom: AtomText | AtomNomenclaturalType | AtomDateTime;
-        dataset: Dataset;
-      }
-    ];
+    nomenclaturalAct: Operation[];
   };
 };
 
@@ -635,18 +639,15 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   }
 
   return (
-    <Paper p="sm">
+    <Paper>
       {Object.entries(synonyms).map(([status, acts]) => (
         <Stack gap={0} key={status}>
-          <Text fw={300} fz="sm">
-            {Humanize.capitalize(status.toLowerCase().replace("_", " "))}
-          </Text>
           {acts.map((act) => (
             <Group key={act.taxon.canonicalName} gap={10}>
-              <Text fw={600} fz="sm" fs="italic">
+              <Text fw={600} fz="sm" fs="italic" c="midnight.8">
                 {act.taxon.canonicalName}
               </Text>
-              <Text fw={600} fz="sm">
+              <Text fw={600} fz="sm" c="midnight.8">
                 {act.taxon.authorship}
               </Text>
             </Group>
@@ -714,17 +715,6 @@ function Details({
       typeSpecimen.specimen.typeStatus != "no voucher"
   );
   const typeSpecimen = typeSpecimens && typeSpecimens[0]?.specimen;
-  const groupedSynonyms = Object.entries(
-    synonyms.reduce(
-      (prev, cur) => ({
-        [cur.canonicalName]: [
-          ...(prev[cur.canonicalName] || []),
-          cur.scientificName,
-        ],
-      }),
-      {} as { [key: string]: string[] }
-    )
-  );
 
   const subspecies =
     tree?.stats.taxonBreakdown[0] &&
@@ -750,7 +740,7 @@ function Details({
       </Group>
       <Grid>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 6, xl: 5 }}>
-          <Paper radius={16} p="sm" withBorder>
+          <Paper radius={16} p="sm" h="100%" withBorder>
             <DataTable>
               <DataTableRow label="Scientific name">
                 <Group gap={10}>
@@ -850,29 +840,7 @@ function Details({
             <Text fw={300} fz="sm">
               Synonyms
             </Text>
-            {synonyms.length > 0 ? (
-              <Stack pl="sm">
-                {groupedSynonyms.map(([group, synonyms]) => (
-                  <Stack key={group}>
-                    {synonyms.map((synonym) => (
-                      <Text
-                        key={synonym}
-                        fw={600}
-                        fs="italic"
-                        size="sm"
-                        c="midnight.8"
-                      >
-                        {synonym}
-                      </Text>
-                    ))}
-                  </Stack>
-                ))}
-              </Stack>
-            ) : (
-              <Text fz="sm" c="dimmed" fw={700}>
-                No data
-              </Text>
-            )}
+            <Synonyms taxonomy={taxonomy} />
           </Paper>
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 3.5 }}>
@@ -881,7 +849,7 @@ function Details({
               <Text fw={300} fz="sm">
                 Common names
               </Text>
-              <Text fw={600} fz="sm" c="midnight.8" truncate="end">
+              <Text fw={600} fz="sm" c="midnight.8">
                 {commonNames.length > 0 ? (
                   commonNames.map((r) => r.vernacularName).join("; ")
                 ) : (
@@ -893,24 +861,30 @@ function Details({
             </Paper>
             {!isSubspecies && (
               <Paper radius={16} p="sm" withBorder>
-                <Text fw={300} fz="sm" pb="md">
+                <Text fw={300} fz="sm">
                   Subspecies
                 </Text>
                 {tree ? (
                   <Stack gap={4}>
-                    {subspecies?.map((species, idx) => (
-                      <InternalLinkButton
-                        key={`${species.scientificName}-${idx}`}
-                        url={`/subspecies/${species.scientificName}`}
-                        externalLinkName={species.scientificName}
-                        icon={IconArrowUpRight}
-                        outline
-                      />
-                    ))}
+                    {(subspecies || []).length > 0 ? (
+                      subspecies?.map((species, idx) => (
+                        <InternalLinkButton
+                          key={`${species.scientificName}-${idx}`}
+                          url={`/subspecies/${species.scientificName}`}
+                          externalLinkName={species.scientificName}
+                          icon={IconArrowUpRight}
+                          outline
+                        />
+                      ))
+                    ) : (
+                      <Text fw={700} size="sm" c="dimmed">
+                        No subspecies
+                      </Text>
+                    )}
                   </Stack>
                 ) : (
                   <Text fw={700} size="sm" c="dimmed">
-                    No data
+                    No subspecies
                   </Text>
                 )}
               </Paper>
@@ -926,7 +900,6 @@ function Details({
             </Group> */}
           </Stack>
         </Grid.Col>
-        {/* <Synonyms taxonomy={taxonomy} /> */}
       </Grid>
     </Paper>
   );
@@ -1038,23 +1011,26 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
   const timelineItems = [...items];
 
   return (
-    <Paper radius={16} p="md" withBorder>
+    <>
       <LoadOverlay visible={loading} />
-      <Stack>
-        {error && <Text>Error : {error.message}</Text>}
+      <Paper radius={16} p="md" withBorder>
+        <Stack>
+          {error && <Text>Error : {error.message}</Text>}
 
-        <Text fw={600} size="lg">
-          Taxon History
-        </Text>
-        {timelineItems.length === 0 && (
-          <Text className={classes.emptyList}>no data</Text>
-        )}
+          <Text fw={600} size="lg">
+            Taxon History
+          </Text>
+          {timelineItems.length === 0 && (
+            <Text className={classes.emptyList}>no data</Text>
+          )}
 
-        {timelineItems.length > 0 && (
-          <HorizontalTimeline data={timelineItems} />
-        )}
-
-        <Text fw={600} size="lg">
+          {timelineItems.length > 0 && (
+            <HorizontalTimeline data={timelineItems} />
+          )}
+        </Stack>
+      </Paper>
+      <Paper radius={16} p="md" withBorder>
+        <Text fw={600} size="lg" pb="lg">
           Nomenclatural timeline
         </Text>
         {acts.length === 0 && (
@@ -1078,14 +1054,19 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
             />
           ))}
         </EventTimeline>
-      </Stack>
-    </Paper>
+      </Paper>
+    </>
   );
 }
 
 function NomenclaturalActHeader({ item }: { item: NomenclaturalAct }) {
   return (
-    <Stack mt={5}>
+    <Stack
+      id={`${item.name.canonicalName.replaceAll(" ", "-").toLowerCase()}-${
+        item.publication.publishedYear
+      }`}
+      mt={5}
+    >
       {item.publication.publishedYear ? (
         <Text fz="xs" fw={700} c="dimmed">
           Year {item.publication.publishedYear}
@@ -1105,9 +1086,12 @@ interface NomenclaturalActBodyProps {
 }
 
 function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
-  const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
-    variables: { entityId: item.entityId },
-  });
+  const { loading, error, data } = useQuery<ProvenanceQuery>(
+    GET_NOMENCLATURAL_ACT_PROVENANCE,
+    {
+      variables: { entityId: item.entityId },
+    }
+  );
 
   const specimens = useQuery<TypeSpecimenQuery>(GET_TYPE_SPECIMENS, {
     variables: {
@@ -1128,7 +1112,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 
   const act = humanize(item.act);
   const items = data?.provenance.nomenclaturalAct.filter(
-    (item) => item.action !== "CREATE"
+    (item) => item.action !== Action.CREATE
   );
 
   return (
@@ -1179,66 +1163,9 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
         )}
       </DataTable>
 
-      <Tabs
-        defaultValue="history"
-        variant="pills"
-        orientation="vertical"
-        placement="right"
-        color="midnight.5"
-        radius={0}
-        w={800}
-        style={{ background: "#e9eced", borderRadius: "15px 0 0 15px" }}
-      >
-        <Tabs.List bg="#d3d8db">
-          <Tabs.Tab value="history">Record History</Tabs.Tab>
-        </Tabs.List>
-
-        <ScrollArea.Autosize mah={300} mx="auto" type="auto">
-          <Tabs.Panel value="history" p="lg">
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Td>
-                    <Text fz="xs" fw={600}>
-                      Atom
-                    </Text>
-                  </Table.Td>
-                  <Table.Td>
-                    <Text fz="xs" fw={600}>
-                      Dataset
-                    </Text>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {items?.map((op) => (
-                  <Table.Tr key={op.operationId}>
-                    <Table.Td>
-                      <Text fz="xs" fw={600}>
-                        {humanize(op.atom.type.toString())}
-                      </Text>
-                      <Text fz="xs" fw={400}>
-                        {op.atom.type.toString() === "NOMENCLATURAL_ACT_TYPE"
-                          ? humanize(op.atom.value)
-                          : op.atom.value}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text fz="xs" fw={400}>
-                        <Tooltip label={op.dataset.name}>
-                          <Link href={op.dataset.url || "#"}>
-                            {op.dataset.shortName}
-                          </Link>
-                        </Tooltip>
-                      </Text>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </Tabs.Panel>
-        </ScrollArea.Autosize>
-      </Tabs>
+      <ScrollArea.Autosize mah={300} mx="auto" type="auto" py="sm">
+        <RecordHistory operations={items} />
+      </ScrollArea.Autosize>
     </SimpleGrid>
   );
 }
