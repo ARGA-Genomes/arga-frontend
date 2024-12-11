@@ -235,7 +235,7 @@ export function AttributeIcon({ label, icon }: AttributeIconProps) {
 }
 
 interface DataFieldProps {
-  value?: string | number;
+  value?: string | number | ReactNode;
   fz?: string | number;
   href?: string;
 }
