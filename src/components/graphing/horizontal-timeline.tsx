@@ -103,6 +103,7 @@ export function TimelineInstant({ item }: { item: TimelineItem }) {
           fill="#ffffff"
           stroke="#febb19"
           strokeWidth={4}
+          style={{ cursor: "pointer" }}
           // The rect will accept all pointer events.
         />
 
@@ -130,7 +131,9 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
   const right = x(endDate);
 
   const handleInstantClick = (item: TimelineItem) => {
-    const elementId = `${item.label.replaceAll(' ', '-').toLowerCase()}-${item.year}`;
+    const elementId = `${item.label.replaceAll(" ", "-").toLowerCase()}-${
+      item.year
+    }`;
     const element = document.getElementById(elementId);
     const yOffset = -200;
 
@@ -138,10 +141,10 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
       const y = element.getBoundingClientRect()?.top + window.scrollY + yOffset;
       window.scrollTo({
         top: y,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
-  }
+  };
 
   return (
     <>
