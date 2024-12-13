@@ -18,6 +18,7 @@ import {
   Box,
   Popover,
   Flex,
+  Center,
   Divider,
   ThemeIcon,
   UnstyledButton,
@@ -1248,16 +1249,18 @@ function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      <Box h={800}>
-        {treeData && (
-          <TaxonomyTree
-            layout={layout}
-            data={treeData}
-            pinned={pinned}
-            initialExpanded={expandedGenera}
-          />
-        )}
-      </Box>
+      <ScrollArea.Autosize>
+        <Center>
+          {treeData && (
+            <TaxonomyTree
+              layout={layout}
+              data={treeData}
+              pinned={pinned}
+              initialExpanded={expandedGenera}
+            />
+          )}
+        </Center>
+      </ScrollArea.Autosize>
     </Paper>
   );
 }
@@ -1321,7 +1324,7 @@ export default function TaxonomyPage({
 
   const tree = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
     variables: {
-      taxonRank: subfamily?.rank || "SUBFAMILY",
+      taxonRank: subfamily?.rank || "FAMILY",
       taxonCanonicalName: subfamily?.canonicalName,
       includeRanks: [
         "FAMILY",
@@ -1333,7 +1336,7 @@ export default function TaxonomyPage({
         "GENUS",
         "SUBGENUS",
         "SPECIES",
-        "SUBSPECIES",
+        /* "SUBSPECIES", */
       ],
     },
     skip: !hierarchy,
@@ -1342,8 +1345,6 @@ export default function TaxonomyPage({
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
-
-  console.log(tree.data);
 
   return (
     <Stack>

@@ -27,7 +27,7 @@ export type TaxonStatTreeNode = {
 
 export function findChildren(
   root: TaxonStatTreeNode,
-  scientificName: string
+  scientificName: string,
 ): TaxonStatTreeNode[] {
   if (root.scientificName === scientificName) {
     return root.children || [];
@@ -43,11 +43,8 @@ export function findChildren(
 
 export function findChildrenCanonical(
   root: TaxonStatTreeNode,
-  canonicalName: string
+  canonicalName: string,
 ): TaxonStatTreeNode[] {
-  if (root.scientificName.startsWith("Acacia dealbata")) {
-    console.log(root);
-  }
   if (root.canonicalName === canonicalName) {
     return root.children || [];
   }
