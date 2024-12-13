@@ -881,10 +881,11 @@ function Details({
                         <InternalLinkButton
                           key={`${species.scientificName}-${idx}`}
                           url={`/subspecies/${species.scientificName}`}
-                          externalLinkName={species.scientificName}
                           icon={IconArrowUpRight}
                           outline
-                        />
+                        >
+                          {species.scientificName}
+                        </InternalLinkButton>
                       ))
                     ) : (
                       <Text fw={700} size="sm" c="dimmed">
@@ -1170,13 +1171,10 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
           <DataTableRow label="Type material" key={item.entityId}>
             <Group gap={5}>
               {typeSpecimens?.map((specimen) => (
-                <UnstyledButton
-                  component={Link}
-                  href={`specimens/${specimen.specimen.recordId}`}
+                <TypeSpecimenPill
                   key={specimen.specimen.entityId}
-                >
-                  <TypeSpecimenPill specimen={specimen.specimen} />
-                </UnstyledButton>
+                  specimen={specimen.specimen}
+                />
               ))}
             </Group>
           </DataTableRow>
@@ -1401,30 +1399,17 @@ function TypeSpecimenPill({ specimen }: { specimen: Specimen }) {
       radius="md"
     >
       <Popover.Target>
-        <Paper
-          py={5}
-          px={15}
-          bg={opened ? bg : bg}
-          radius="xl"
-          style={{ border: "none" }}
-          onMouseEnter={open}
-          onMouseLeave={close}
+        <InternalLinkButton
+          url={`specimen/${specimen.recordId}`}
+          icon={IconArrowUpRight}
+          color={bg}
+          textColor="midnight.8"
         >
-          <Group>
-            <Text
-              fw={600}
-              size="sm"
-              style={{
-                whiteSpace: "nowrap",
-                transition: "ease all 250ms",
-              }}
-              truncate
-            >
-              {specimen.recordId}
-            </Text>
-            <Text size="xs">{humanize(specimen.typeStatus || "")}</Text>
-          </Group>
-        </Paper>
+          {specimen.recordId}
+          <span style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>
+            {humanize(specimen.typeStatus || "")}
+          </span>
+        </InternalLinkButton>
       </Popover.Target>
       <Popover.Dropdown bg={popover}>
         <DataTable>
