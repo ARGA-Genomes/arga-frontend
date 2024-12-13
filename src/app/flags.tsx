@@ -1,6 +1,5 @@
 import { AbstractBackend, Types, createFlags } from "flag";
-import React, { ReactNode } from 'react';
-
+import React, { PropsWithChildren, ReactNode } from "react";
 
 export enum FlagOrdering {
   TotalData = "total_data",
@@ -8,13 +7,12 @@ export enum FlagOrdering {
 }
 
 export type Flags = {
-  ordering: FlagOrdering,
+  ordering: FlagOrdering;
 };
 
 const DEFAULT_FLAGS = {
   ordering: FlagOrdering.TotalData,
-}
-
+};
 
 export class MutableBackend extends AbstractBackend<Flags> {
   flags: Flags | null = null;
@@ -24,7 +22,10 @@ export class MutableBackend extends AbstractBackend<Flags> {
     this.flags = flags;
   }
 
-  getSnapshot<KP extends Types.KeyPath<Flags>, T extends Types.GetValueFromKeyPath<Flags, KP>>(keyPath: KP, defaultValue: T): T {
+  getSnapshot<
+    KP extends Types.KeyPath<Flags>,
+    T extends Types.GetValueFromKeyPath<Flags, KP>
+  >(keyPath: KP, defaultValue: T): T {
     if (keyPath === undefined) {
       return defaultValue;
     }
@@ -42,7 +43,10 @@ export class MutableBackend extends AbstractBackend<Flags> {
     return result;
   }
 
-  setFlag<KP extends Types.KeyPath<Flags>, T extends Types.GetValueFromKeyPath<Flags, KP>>(keyPath: KP, value: T) {
+  setFlag<
+    KP extends Types.KeyPath<Flags>,
+    T extends Types.GetValueFromKeyPath<Flags, KP>
+  >(keyPath: KP, value: T) {
     let result: any = this.flags;
 
     for (const key of keyPath as string[]) {
@@ -57,20 +61,16 @@ export class MutableBackend extends AbstractBackend<Flags> {
   }
 }
 
-
 const BACKEND = new MutableBackend(DEFAULT_FLAGS);
 const FeatureFlagContext = React.createContext(BACKEND);
 
-export function FeatureFlagProvider({ children }: { children: ReactNode }) {
+export function FeatureFlagProvider({ children }: { children: any }) {
   return (
     <FeatureFlagContext.Provider value={BACKEND}>
-      <FlagBackendProvider backend={BACKEND}>
-        {children}
-      </FlagBackendProvider>
+      <FlagBackendProvider backend={BACKEND}>{children}</FlagBackendProvider>
     </FeatureFlagContext.Provider>
   );
 }
-
 
 export const useFeatureFlag = () => React.useContext(FeatureFlagContext);
 export const { FlagBackendProvider, Flag, useFlag } = createFlags<Flags>();

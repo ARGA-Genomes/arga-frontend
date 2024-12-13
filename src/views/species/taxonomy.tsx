@@ -21,6 +21,7 @@ import {
   Center,
   Divider,
   ThemeIcon,
+  UnstyledButton,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
@@ -65,6 +66,7 @@ import {
   GET_NOMENCLATURAL_ACT_PROVENANCE,
   Operation,
 } from "@/queries/provenance";
+import Link from "next/link";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -1168,10 +1170,13 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
           <DataTableRow label="Type material" key={item.entityId}>
             <Group gap={5}>
               {typeSpecimens?.map((specimen) => (
-                <TypeSpecimenPill
-                  specimen={specimen.specimen}
+                <UnstyledButton
+                  component={Link}
+                  href={`specimens/${specimen.specimen.recordId}`}
                   key={specimen.specimen.entityId}
-                />
+                >
+                  <TypeSpecimenPill specimen={specimen.specimen} />
+                </UnstyledButton>
               ))}
             </Group>
           </DataTableRow>
