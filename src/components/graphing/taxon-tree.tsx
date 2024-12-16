@@ -77,6 +77,7 @@ function convertToNode(
 }
 
 interface TaxonomyTreeProps {
+  minWidth: number;
   layout: Layout;
   data: TaxonStatTreeNode;
   pinned?: string[];
@@ -84,6 +85,7 @@ interface TaxonomyTreeProps {
 }
 
 export function TaxonomyTree({
+  minWidth,
   layout,
   data,
   pinned,
@@ -98,11 +100,14 @@ export function TaxonomyTree({
     setRoot(convertToNode(data, expanded, pinned));
   }, [expanded]);
 
-  const minWidth = calculateMinWidth(root);
+  // make the tree fill the space available but ensure that it doesn't
+  // squish up by giving a minimum amount of space for each expanded node
+  const minTreeWidth = calculateMinWidth(root);
+  const width = minWidth > minTreeWidth ? minWidth : minTreeWidth;
 
   return (
     <Tree
-      width={minWidth}
+      width={width}
       height={800}
       layout={layout}
       mode="tree"
