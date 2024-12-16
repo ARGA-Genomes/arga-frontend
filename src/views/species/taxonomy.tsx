@@ -1400,7 +1400,7 @@ function TypeSpecimenPill({ specimen }: { specimen: Specimen }) {
     >
       <Popover.Target>
         <InternalLinkButton
-          url={`specimen/${specimen.recordId}`}
+          url={`specimens/${specimen.recordId}`}
           icon={IconArrowUpRight}
           color={bg}
           textColor="midnight.8"
