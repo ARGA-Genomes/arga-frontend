@@ -42,7 +42,7 @@ import {
   LineStyle,
   TimelineIcon,
 } from "@/components/event-timeline";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import {
   TaxonStatTreeNode,
   findChildren,
@@ -491,18 +491,31 @@ const GET_TAXON_TREE_STATS = gql`
         includeRanks: $includeRanks
       ) {
         ...TaxonStatTreeNode
+
+        # family children
         children {
           ...TaxonStatTreeNode
+
+          # subfamily children
           children {
             ...TaxonStatTreeNode
+
+            # genus children
             children {
               ...TaxonStatTreeNode
+
+              # subgenus children
               children {
                 ...TaxonStatTreeNode
+
+                # species children
                 children {
                   ...TaxonStatTreeNode
+
+                  # subspecies children
                   children {
                     ...TaxonStatTreeNode
+
                     children {
                       ...TaxonStatTreeNode
                     }
@@ -518,6 +531,34 @@ const GET_TAXON_TREE_STATS = gql`
 `;
 
 type TaxonTreeStatsQuery = {
+  stats: {
+    taxonBreakdown: TaxonStatTreeNode[];
+  };
+};
+
+// Gets details for the specified taxon and the immediate decendants
+const GET_TAXON_TREE_NODE = gql`
+  query TaxonTreeNode(
+    $taxonRank: TaxonomicRank
+    $taxonCanonicalName: String
+    $descendantRank: TaxonomicRank
+  ) {
+    stats {
+      taxonBreakdown(
+        taxonRank: $taxonRank
+        taxonCanonicalName: $taxonCanonicalName
+        includeRanks: [$taxonRank, $descendantRank]
+      ) {
+        ...TaxonStatTreeNode
+        children {
+          ...TaxonStatTreeNode
+        }
+      }
+    }
+  }
+`;
+
+type TaxonTreeNodeQuery = {
   stats: {
     taxonBreakdown: TaxonStatTreeNode[];
   };
@@ -546,12 +587,12 @@ function ExternalLinks({ canonicalName, species }: ExternalLinksProps) {
       try {
         const response = await fetch(
           `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            canonicalName
-          )}`
+            canonicalName,
+          )}`,
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
         );
       } catch (error) {
         setMatchedTaxon([]);
@@ -626,7 +667,7 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   });
 
   const acts = data?.taxon.taxonomicActs.filter(
-    (act) => act.taxon.status !== "ACCEPTED"
+    (act) => act.taxon.status !== "ACCEPTED",
   );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
@@ -710,7 +751,7 @@ function Details({
         rank: taxonomy.rank,
         canonicalName: taxonomy.canonicalName,
       },
-    }
+    },
   );
 
   const specimens = data?.taxon.typeSpecimens;
@@ -718,7 +759,7 @@ function Details({
   const typeSpecimens = specimens?.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == taxonomy.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.specimen.typeStatus != "no voucher",
   );
   const typeSpecimen = typeSpecimens && typeSpecimens[0]?.specimen;
 
@@ -1101,7 +1142,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
     GET_NOMENCLATURAL_ACT_PROVENANCE,
     {
       variables: { entityId: item.entityId },
-    }
+    },
   );
 
   const specimens = useQuery<TypeSpecimenQuery>(GET_TYPE_SPECIMENS, {
@@ -1114,7 +1155,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == item.name.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.specimen.typeStatus != "no voucher",
   );
 
   function humanize(text: string) {
@@ -1123,7 +1164,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 
   const act = humanize(item.act);
   const items = data?.provenance.nomenclaturalAct.filter(
-    (item) => item.action !== Action.CREATE
+    (item) => item.action !== Action.CREATE,
   );
 
   return (
@@ -1209,6 +1250,7 @@ interface FamilyTaxonTreeProps {
 }
 
 function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
+  const [ref, rect] = useResizeObserver();
   const [layout, setLayout] = useState<Layout>("top-to-bottom");
 
   const { loading, error, data } = tree;
@@ -1247,10 +1289,11 @@ function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      <ScrollArea.Autosize>
+      <ScrollArea.Autosize ref={ref}>
         <Center>
           {treeData && (
             <TaxonomyTree
+              minWidth={rect.width}
               layout={layout}
               data={treeData}
               pinned={pinned}
@@ -1301,7 +1344,7 @@ export default function TaxonomyPage({
     isSubspecies ? GET_SUMMARY : GET_SUMMARY_HIERARCHY,
     {
       variables: { canonicalName },
-    }
+    },
   );
 
   const species = data?.species;
@@ -1317,27 +1360,16 @@ export default function TaxonomyPage({
       node.rank === "SUBFAMILY" ||
       node.rank === "SUBFAMILIA" ||
       node.rank === "FAMILY" ||
-      node.rank === "FAMILIA"
+      node.rank === "FAMILIA",
   );
 
-  const tree = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
+  const tree = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
     variables: {
-      taxonRank: subfamily?.rank || "FAMILY",
+      taxonRank: "FAMILY",
       taxonCanonicalName: subfamily?.canonicalName,
-      includeRanks: [
-        "FAMILY",
-        "FAMILIA",
-        "SUBFAMILY",
-        "SUBFAMILIA",
-        "TRIBE",
-        "SUBTRIBE",
-        "GENUS",
-        "SUBGENUS",
-        "SPECIES",
-        /* "SUBSPECIES", */
-      ],
+      descendantRank: "GENUS",
     },
-    skip: !hierarchy,
+    /* skip: !hierarchy, */
   });
 
   if (error) {

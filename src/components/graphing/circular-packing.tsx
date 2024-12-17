@@ -120,7 +120,6 @@ export function CircularPackingChart({
       zoomedId={zoomedId}
       motionConfig="slow"
       onClick={(node) => {
-        console.log(zoomedId);
         setZoomedId(zoomedId === node.id ? null : node.id);
       }}
     />

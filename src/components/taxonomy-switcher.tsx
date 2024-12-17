@@ -186,20 +186,18 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
 
   const taxa = useMemo(
     () => processTaxa(rawTaxa, datasets),
-    [rawTaxa, datasets]
+    [rawTaxa, datasets],
   );
-
-  console.log(taxa);
 
   const { loading, error, data } = useQuery<ProvenanceQuery>(
     GET_TAXON_PROVENANCE,
     {
       variables: { entityId },
-    }
+    },
   );
 
   const [active, setActive] = useState<string>(
-    `${taxa[0].scientificName}-${taxa[0].datasetId}`
+    `${taxa[0].scientificName}-${taxa[0].datasetId}`,
   );
 
   return (
