@@ -124,7 +124,7 @@ function convertToNode(
 
     // if the node is expanded then we want to convert all the children to nodes as well,
     // otherwise we add a stub node that will load the data when expanded
-    children: shouldExpand ? children : [],
+    children: shouldExpand ? children || [] : [],
   };
 }
 
