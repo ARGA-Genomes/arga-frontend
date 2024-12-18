@@ -1444,11 +1444,10 @@ export default function TaxonomyPage({
 
   const { data: specimens } = useQuery<QueryResults>(GET_SPECIMENS, {
     variables: {
-      canonicalName: taxonomy?.canonicalName,
+      canonicalName: canonicalName,
       page: 1,
       pageSize: 500,
     },
-    skip: !taxonomy,
   });
 
   if (error) {
@@ -1508,7 +1507,6 @@ function TypeSpecimenPill({
   const [opened, { close, open }] = useDisclosure(false);
 
   const hasData = Boolean(records);
-  console.log(records);
 
   return (
     <Popover
