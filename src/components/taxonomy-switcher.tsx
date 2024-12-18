@@ -189,12 +189,11 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
     [rawTaxa, datasets]
   );
 
-  console.log(taxa);
-
   const { loading, error, data } = useQuery<ProvenanceQuery>(
     GET_TAXON_PROVENANCE,
     {
       variables: { entityId },
+      skip: entityId === "",
     }
   );
 

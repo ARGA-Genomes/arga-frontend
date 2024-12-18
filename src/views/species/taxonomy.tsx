@@ -21,7 +21,7 @@ import {
   Center,
   Divider,
   ThemeIcon,
-  UnstyledButton,
+  Indicator,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
@@ -29,10 +29,13 @@ import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
 import {
   IconArrowUpRight,
   IconBinaryTree2,
+  IconDna,
+  IconDna2,
+  IconDnaOff,
   IconExternalLink,
   IconSearch,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { AttributePillValue, DataField } from "@/components/data-fields";
@@ -66,7 +69,6 @@ import {
   GET_NOMENCLATURAL_ACT_PROVENANCE,
   Operation,
 } from "@/queries/provenance";
-import Link from "next/link";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -251,6 +253,12 @@ type TypeSpecimenQuery = {
       name: { scientificName: string };
     }[];
   };
+};
+
+type SpecimenRecordNumbers = {
+  markers: number;
+  sequences: number;
+  wholeGenomes: number;
 };
 
 const GET_PROVENANCE = gql`
@@ -472,6 +480,10 @@ type Species = {
   synonyms: Synonym[];
   photos: Photo[];
   indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[];
+  specimens: {
+    total: number;
+    records: Specimen[];
+  };
 };
 
 type QueryResults = {
@@ -511,6 +523,31 @@ const GET_TAXON_TREE_STATS = gql`
               }
             }
           }
+        }
+      }
+    }
+  }
+`;
+
+const GET_SPECIMENS = gql`
+  query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
+    species(canonicalName: $canonicalName) {
+      specimens(page: $page, pageSize: $pageSize) {
+        total
+        records {
+          id
+          recordId
+          datasetName
+          accession
+          institutionCode
+          typeStatus
+          locality
+          country
+          sequences
+          wholeGenomes
+          markers
+          latitude
+          longitude
         }
       }
     }
@@ -685,22 +722,15 @@ function SourcePill({ value }: SourcePillProps) {
 
 interface DetailsProps {
   taxonomy: Taxonomy;
-  synonyms: Synonym[];
   commonNames: VernacularName[];
-  tree?: TaxonTreeStatsQuery;
+  subspecies?: TaxonStatTreeNode[];
   isSubspecies?: boolean;
-}
-
-function findSubspecies(node: TaxonStatTreeNode[] | TaxonStatTreeNode) {
-  if (Array.isArray(node)) {
-  }
 }
 
 function Details({
   taxonomy,
-  synonyms,
   commonNames,
-  tree,
+  subspecies,
   isSubspecies,
 }: DetailsProps) {
   const { loading, error, data } = useQuery<TypeSpecimenQuery>(
@@ -721,10 +751,6 @@ function Details({
       typeSpecimen.specimen.typeStatus != "no voucher"
   );
   const typeSpecimen = typeSpecimens && typeSpecimens[0]?.specimen;
-
-  const subspecies =
-    tree?.stats.taxonBreakdown[0] &&
-    findChildrenCanonical(tree.stats.taxonBreakdown[0], taxonomy.canonicalName);
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -758,8 +784,14 @@ function Details({
                   </Text>
                 </Group>
               </DataTableRow>
-              <DataTableRow label="Status">
+              <DataTableRow label="Taxonomic status">
                 <AttributePillValue value={taxonomy.status.toLowerCase()} />
+              </DataTableRow>
+              <DataTableRow label="Nomenclatural status">
+                <AttributePillValue value={undefined} />
+              </DataTableRow>
+              <DataTableRow label="Protonym/Basionym">
+                <AttributePillValue value={undefined} />
               </DataTableRow>
               <DataTableRow label="Original description">
                 <DataField value={undefined} />
@@ -844,7 +876,7 @@ function Details({
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 6, xl: 3.5 }}>
           <Paper radius={16} p="sm" h="100%" withBorder>
             <Text fw={300} fz="sm">
-              Synonyms
+              Taxonomic synonyms
             </Text>
             <Synonyms taxonomy={taxonomy} />
           </Paper>
@@ -874,7 +906,7 @@ function Details({
                 >
                   Subspecies
                 </Text>
-                {tree ? (
+                {subspecies ? (
                   <Stack gap={8}>
                     {(subspecies || []).length > 0 ? (
                       subspecies?.map((species, idx) => (
@@ -882,7 +914,8 @@ function Details({
                           key={`${species.scientificName}-${idx}`}
                           url={`/subspecies/${species.scientificName}`}
                           icon={IconArrowUpRight}
-                          outline
+                          color={"#d6e4ed"}
+                          textColor="midnight.8"
                         >
                           {species.scientificName}
                         </InternalLinkButton>
@@ -983,7 +1016,13 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
   return 0;
 }
 
-function History({ taxonomy }: { taxonomy: Taxonomy }) {
+function History({
+  taxonomy,
+  specimens,
+}: {
+  taxonomy: Taxonomy;
+  specimens?: Specimen[];
+}) {
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
     variables: {
       rank: taxonomy.rank,
@@ -992,6 +1031,7 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
   });
 
   const acts = data?.taxon.nomenclaturalActs.map((it) => it).sort(compareAct);
+
   if (!acts) {
     return;
   }
@@ -1061,7 +1101,13 @@ function History({ taxonomy }: { taxonomy: Taxonomy }) {
                 />
               }
               header={<NomenclaturalActHeader item={act} />}
-              body={<NomenclaturalActBody item={act} protonym={protonym} />}
+              body={
+                <NomenclaturalActBody
+                  item={act}
+                  protonym={protonym}
+                  specimensWithData={specimens}
+                />
+              }
             />
           ))}
         </EventTimeline>
@@ -1094,9 +1140,14 @@ function NomenclaturalActHeader({ item }: { item: NomenclaturalAct }) {
 interface NomenclaturalActBodyProps {
   item: NomenclaturalAct;
   protonym: NomenclaturalAct;
+  specimensWithData?: Specimen[];
 }
 
-function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
+function NomenclaturalActBody({
+  item,
+  protonym,
+  specimensWithData,
+}: NomenclaturalActBodyProps) {
   const { loading, error, data } = useQuery<ProvenanceQuery>(
     GET_NOMENCLATURAL_ACT_PROVENANCE,
     {
@@ -1116,6 +1167,38 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
       typeSpecimen.name.scientificName == item.name.scientificName &&
       typeSpecimen.specimen.typeStatus != "no voucher"
   );
+
+  const locality = useMemo(
+    () => typeSpecimens?.find(({ specimen }) => specimen.locality !== null),
+    [typeSpecimens]
+  );
+  const geo = useMemo(
+    () => typeSpecimens?.find(({ specimen }) => specimen.latitude !== null),
+    [typeSpecimens]
+  );
+
+  const specimenMap = useMemo(() => {
+    if (specimensWithData)
+      return specimensWithData
+        .filter(
+          (specimen) =>
+            (specimen.markers || 0) +
+              (specimen.sequences || 0) +
+              (specimen.wholeGenomes || 0) >
+            0
+        )
+        .reduce(
+          (prev, specimen) => ({
+            ...prev,
+            [specimen.recordId]: {
+              markers: specimen.markers,
+              sequences: specimen.sequences,
+              wholeGenomes: specimen.wholeGenomes,
+            },
+          }),
+          {}
+        );
+  }, [specimensWithData]);
 
   function humanize(text: string) {
     return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
@@ -1166,19 +1249,30 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
             <AttributePillValue value={humanize(item.name.taxa[0]?.status)} />
           </Group>
         </DataTableRow>
-
         {item.act == "ORIGINAL_DESCRIPTION" && (
           <DataTableRow label="Type material" key={item.entityId}>
-            <Group gap={5}>
-              {typeSpecimens?.map((specimen) => (
+            <Group gap={12}>
+              {typeSpecimens?.map(({ specimen }) => (
                 <TypeSpecimenPill
-                  key={specimen.specimen.entityId}
-                  specimen={specimen.specimen}
+                  key={specimen.entityId}
+                  specimen={specimen}
+                  records={(specimenMap as any)?.[specimen.recordId]}
                 />
               ))}
             </Group>
           </DataTableRow>
         )}
+        <DataTableRow label="Type location (source)">
+          <DataField value={locality?.specimen.locality} />
+        </DataTableRow>
+        <DataTableRow label="Type location (geo)">
+          <DataField
+            value={
+              geo?.specimen?.latitude &&
+              `${geo?.specimen.latitude}, ${geo?.specimen.longitude}`
+            }
+          />
+        </DataTableRow>
       </DataTable>
 
       <Paper h={369} pt="md" radius="lg" withBorder>
@@ -1334,10 +1428,27 @@ export default function TaxonomyPage({
         "GENUS",
         "SUBGENUS",
         "SPECIES",
-        /* "SUBSPECIES", */
       ],
     },
     skip: !hierarchy,
+  });
+
+  const subspecies = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
+    variables: {
+      taxonRank: "SPECIES",
+      taxonCanonicalName: canonicalName,
+      includeRanks: ["SUBSPECIES"],
+    },
+    skip: isSubspecies,
+  });
+
+  const { data: specimens } = useQuery<QueryResults>(GET_SPECIMENS, {
+    variables: {
+      canonicalName: taxonomy?.canonicalName,
+      page: 1,
+      pageSize: 500,
+    },
+    skip: !taxonomy,
   });
 
   if (error) {
@@ -1353,9 +1464,8 @@ export default function TaxonomyPage({
             {species && taxonomy && (
               <Details
                 taxonomy={taxonomy}
-                synonyms={species.synonyms}
                 commonNames={species.vernacularNames}
-                tree={tree.data}
+                subspecies={subspecies.data?.stats.taxonBreakdown}
                 isSubspecies={isSubspecies}
               />
             )}
@@ -1374,50 +1484,73 @@ export default function TaxonomyPage({
       )}
       <ExternalLinks canonicalName={canonicalName} species={data?.species} />
 
-      {taxonomy && <History taxonomy={taxonomy} />}
+      {taxonomy && (
+        <History
+          taxonomy={taxonomy}
+          specimens={specimens?.species.specimens.records}
+        />
+      )}
     </Stack>
   );
 }
 
-function TypeSpecimenPill({ specimen }: { specimen: Specimen }) {
-  const [opened, { close, open }] = useDisclosure(false);
-  const bg = "#d6e4ed";
-  const popover = "#ecf7fe";
-  const geo =
-    specimen.latitude && `${specimen.latitude}, ${specimen.longitude}`;
+function humanize(text: string) {
+  return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
+}
 
-  function humanize(text: string) {
-    return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
-  }
+function TypeSpecimenPill({
+  specimen,
+  records,
+}: {
+  specimen: Specimen;
+  records?: SpecimenRecordNumbers;
+}) {
+  const [opened, { close, open }] = useDisclosure(false);
+
+  const hasData = Boolean(records);
+  console.log(records);
 
   return (
     <Popover
-      position="bottom"
+      position="right"
       withArrow
       shadow="md"
-      opened={opened}
+      opened={opened && hasData}
       radius="md"
     >
       <Popover.Target>
-        <InternalLinkButton
-          url={`specimens/${specimen.recordId}`}
-          icon={IconArrowUpRight}
-          color={bg}
-          textColor="midnight.8"
+        <Indicator
+          disabled={!hasData}
+          offset={4}
+          label={hasData ? <IconDna size={14} /> : <IconDnaOff size={14} />}
+          size={24}
+          color={hasData ? "moss" : "bushfire"}
         >
-          {specimen.recordId}
-          <span style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>
-            {humanize(specimen.typeStatus || "")}
-          </span>
-        </InternalLinkButton>
+          <InternalLinkButton
+            url={`specimens/${specimen.recordId}`}
+            icon={IconArrowUpRight}
+            color={"#d6e4ed"}
+            textColor="midnight.8"
+            onMouseEnter={hasData ? open : undefined}
+            onMouseLeave={hasData ? close : undefined}
+          >
+            {specimen.recordId}
+            <span style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>
+              {humanize(specimen.typeStatus || "")}
+            </span>
+          </InternalLinkButton>
+        </Indicator>
       </Popover.Target>
-      <Popover.Dropdown bg={popover}>
+      <Popover.Dropdown>
         <DataTable>
-          <DataTableRow label="Type location (source)">
-            <DataField value={specimen.locality} />
+          <DataTableRow label="Markers">
+            <DataField value={records?.markers.toString()} />
           </DataTableRow>
-          <DataTableRow label="Type location (geo)">
-            <DataField value={geo} />
+          <DataTableRow label="Sequences">
+            <DataField value={records?.markers.toString()} />
+          </DataTableRow>
+          <DataTableRow label="Whole genomes">
+            <DataField value={records?.wholeGenomes.toString()} />
           </DataTableRow>
         </DataTable>
       </Popover.Dropdown>
