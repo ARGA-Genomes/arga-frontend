@@ -2,7 +2,6 @@
 
 import classes from "./layout.module.css";
 
-import { gql, useQuery } from "@apollo/client";
 import { Container, Paper, Stack, Tabs } from "@mantine/core";
 import SpeciesHeader from "@/components/species-header";
 import { RedirectType, redirect, usePathname } from "next/navigation";
@@ -10,32 +9,6 @@ import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
-
-const GET_SPECIES_DATA_SUMMARY = gql`
-  query SpeciesWithDataSummary($canonicalName: String) {
-    species(canonicalName: $canonicalName) {
-      dataSummary {
-        genomes
-        loci
-        specimens
-        other
-        totalGenomic
-      }
-    }
-  }
-`;
-
-type QueryResults = {
-  species: {
-    dataSummary: {
-      genomes?: number;
-      loci?: number;
-      specimens?: number;
-      other?: number;
-      totalGenomic?: number;
-    };
-  };
-};
 
 function DataTabs({
   name,
@@ -52,13 +25,6 @@ function DataTabs({
       router.replace(`/subspecies/${name}/${value}`);
     }
   }
-
-  const canonicalName = name.replaceAll("_", " ");
-  const { data } = useQuery<QueryResults>(GET_SPECIES_DATA_SUMMARY, {
-    variables: { canonicalName },
-  });
-
-  const summary = data?.species.dataSummary;
 
   // based on the current url the active tab should always be
   // the fourth component in the path name

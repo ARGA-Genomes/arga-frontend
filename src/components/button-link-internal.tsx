@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonProps,
   DefaultMantineColor,
   getThemeColor,
   Text,
@@ -8,7 +9,7 @@ import {
 import { IconExternalLink } from "@tabler/icons-react";
 
 import classes from "./button-link-internal.module.css";
-import { PropsWithChildren, useMemo } from "react";
+import { MouseEventHandler, PropsWithChildren, useMemo } from "react";
 import Link from "next/link";
 import { Url } from "next/dist/shared/lib/router/router";
 
@@ -19,6 +20,8 @@ interface ExternalLinkButtonProps {
   acronym?: boolean;
   color?: DefaultMantineColor;
   textColor?: DefaultMantineColor;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export function InternalLinkButton({
@@ -28,6 +31,8 @@ export function InternalLinkButton({
   color,
   textColor,
   children,
+  onMouseEnter,
+  onMouseLeave,
 }: PropsWithChildren<ExternalLinkButtonProps>) {
   const theme = useMantineTheme();
 
@@ -40,6 +45,8 @@ export function InternalLinkButton({
       size="xs"
       href={url}
       variant={outline ? "outline" : "filled"}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <Text
         c={textColor || (outline ? color || "midnight.8" : "white")}

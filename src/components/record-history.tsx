@@ -33,7 +33,7 @@ export default function RecordHistory({ operations }: RecordHistoryProps) {
             key={idx}
             title={
               <Group align="center">
-                <Text size="lg" fw={600} c="midnight.9">
+                <Text fw={600} c="midnight.9">
                   {Humanize.capitalize(
                     operation.action.toString().toLowerCase()
                   )}
