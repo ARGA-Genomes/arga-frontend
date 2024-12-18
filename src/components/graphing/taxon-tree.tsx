@@ -1,6 +1,10 @@
-import { Badge, Group, Paper, Text } from "@mantine/core";
+"use client";
+
+import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
+import { Badge, Group, Loader, Paper, Text } from "@mantine/core";
 import { useTheme } from "@nivo/core";
 import {
+  ComputedNode,
   LabelComponentProps,
   Layout,
   LinkComponentProps,
@@ -18,14 +22,46 @@ import {
 } from "@/components/event-timeline";
 import { useListState } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
-import { animated, to } from "@react-spring/web";
+import { animated, to, useSpring } from "@react-spring/web";
 
 const NODE_WIDTH = 20;
 
+// Gets details for the specified taxon and the immediate decendants
+const GET_TAXON_TREE_NODE = gql`
+  query TaxonTreeNode(
+    $taxonRank: TaxonomicRank
+    $taxonCanonicalName: String
+    $descendantRank: TaxonomicRank
+  ) {
+    stats {
+      taxonBreakdown(
+        taxonRank: $taxonRank
+        taxonCanonicalName: $taxonCanonicalName
+        includeRanks: [$taxonRank, $descendantRank]
+      ) {
+        ...TaxonStatTreeNode
+        children {
+          ...TaxonStatTreeNode
+        }
+      }
+    }
+  }
+`;
+
+type TaxonTreeNodeQuery = {
+  stats: {
+    taxonBreakdown: TaxonStatTreeNode[];
+  };
+};
+
+// A node in the tree. This represents the visual node of a taxon and maintains
+// a heirarchy of child tree nodes. It should contain both the data to present as
+// well as transient functional data such as expansion or pinning.
 type Node = {
   visible: boolean;
   expanded: boolean;
   pinned: boolean;
+  loaded: boolean;
   children?: Node[];
   allChildren?: Node[];
 
@@ -37,8 +73,14 @@ type Node = {
   specimens?: number;
   other?: number;
   totalGenomic?: number;
+
+  // whether or not to render a spinner to indicate the node is loading
+  isLoader: boolean;
 };
 
+// Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
+// from the taxon tree statistics query into a presentable tree by injecting and
+// defaulting variables used for tree interaction.
 function convertToNode(
   node: TaxonStatTreeNode,
   expanded?: Node[],
@@ -49,22 +91,28 @@ function convertToNode(
     !!pinned?.find((name) => name === node.canonicalName) ||
     node.rank !== "GENUS";
 
+  const loaded = !!node.children?.length;
+  const children = loaded
+    ? node.children?.map((child) => convertToNode(child, expanded))
+    : node.rank !== "SPECIES" && [
+        {
+          visible: true,
+          expanded: false,
+          pinned: false,
+          loaded: false,
+          isLoader: true,
+          canonicalName: "Loading...",
+          rank: "",
+        },
+      ];
+
   return {
     visible: true,
     expanded: shouldExpand,
     pinned: !!pinned?.find((name) => name === node.canonicalName),
-    children: shouldExpand
-      ? node.children?.map((child) => convertToNode(child, expanded, pinned))
-      : [
-          {
-            visible: false,
-            expanded: false,
-            pinned: false,
-            canonicalName: "",
-            rank: "",
-          },
-        ],
+    loaded: !!node.children?.length,
     allChildren: node.children?.map((child) => convertToNode(child, expanded)),
+    isLoader: false,
 
     canonicalName: node.canonicalName,
     rank: node.rank,
@@ -73,17 +121,27 @@ function convertToNode(
     specimens: node.specimens,
     other: node.other,
     totalGenomic: node.totalGenomic,
+
+    // if the node is expanded then we want to convert all the children to nodes as well,
+    // otherwise we add a stub node that will load the data when expanded
+    children: shouldExpand ? children || [] : [],
   };
 }
 
+// The taxonomy tree properties
 interface TaxonomyTreeProps {
+  minWidth: number;
   layout: Layout;
   data: TaxonStatTreeNode;
   pinned?: string[];
   initialExpanded?: TaxonStatTreeNode[];
 }
 
+// The interactive taxonomy tree. We use a nivo tree as the base but then also make
+// it responsive ourselves since we require certain min-width logic to allow for scrollbars
+// for very large taxon families.
 export function TaxonomyTree({
+  minWidth,
   layout,
   data,
   pinned,
@@ -92,17 +150,55 @@ export function TaxonomyTree({
   const [expanded, handlers] = useListState<Node>(
     initialExpanded?.map((n) => convertToNode(n, [])) || [],
   );
+  const client = useApolloClient();
   const [root, setRoot] = useState(convertToNode(data, expanded, pinned));
 
   useEffect(() => {
     setRoot(convertToNode(data, expanded, pinned));
   }, [expanded]);
 
-  const minWidth = calculateMinWidth(root);
+  // expand and load children when a node is expanded
+  function nodeClicked(item: ComputedNode<Node>) {
+    item.data.expanded = !item.data.expanded;
+    if (item.data.expanded) {
+      handlers.append(item.data);
+
+      const result = client.query<TaxonTreeNodeQuery>({
+        query: GET_TAXON_TREE_NODE,
+        variables: {
+          taxonRank: item.data.rank,
+          taxonCanonicalName: item.data.canonicalName,
+          descendantRank: "SPECIES",
+        },
+      });
+
+      result.then((res) => {
+        const children = res.data.stats.taxonBreakdown[0]?.children || [];
+        const nodes = children.map((n) => convertToNode(n, []));
+
+        const parent = root.children?.find(
+          (node) => node.canonicalName == item.data.canonicalName,
+        );
+        if (parent) {
+          parent.children = nodes;
+          setRoot(root);
+        }
+      });
+    } else {
+      handlers.remove(
+        expanded.findIndex((n) => n.canonicalName == item.data.canonicalName),
+      );
+    }
+  }
+
+  // make the tree fill the space available but ensure that it doesn't
+  // squish up by giving a minimum amount of space for each expanded node
+  const minTreeWidth = calculateMinWidth(root);
+  const width = minWidth > minTreeWidth ? minWidth : minTreeWidth;
 
   return (
     <Tree
-      width={minWidth}
+      width={width}
       height={800}
       layout={layout}
       mode="tree"
@@ -155,18 +251,7 @@ export function TaxonomyTree({
           </Paper>
         )
       }
-      onNodeClick={(item) => {
-        item.data.expanded = !item.data.expanded;
-        if (item.data.expanded) {
-          handlers.append(item.data);
-        } else {
-          handlers.remove(
-            expanded.findIndex(
-              (n) => n.canonicalName == item.data.canonicalName,
-            ),
-          );
-        }
-      }}
+      onNodeClick={nodeClicked}
       onLinkMouseEnter={() => {}}
       onLinkMouseMove={() => {}}
       onLinkMouseLeave={() => {}}
@@ -231,6 +316,7 @@ function CustomLink({
       fill="none"
       strokeWidth={pinned ? 8 : animatedProps.thickness}
       stroke={animatedProps.color}
+      strokeDasharray={link.target.data.isLoader ? "10,10" : undefined}
       {...eventHandlers}
     />
   );
@@ -314,10 +400,20 @@ function CustomNode({
     margin,
   });
 
+  const props = useSpring({
+    to: [
+      { opacity: 1, r: 6 },
+      { opacity: 0.4, r: 3 },
+    ],
+    loop: true,
+  });
+
   if (!node.data.visible) {
     return;
   }
 
+  // to animate the loading node. svg animation is not that performant
+  // style={node.data.isLoader ? props : undefined}
   return (
     <animated.circle
       data-testid={`node.${node.uid}`}

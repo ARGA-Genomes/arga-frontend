@@ -45,7 +45,7 @@ import {
   LineStyle,
   TimelineIcon,
 } from "@/components/event-timeline";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import {
   TaxonStatTreeNode,
   findChildren,
@@ -503,18 +503,31 @@ const GET_TAXON_TREE_STATS = gql`
         includeRanks: $includeRanks
       ) {
         ...TaxonStatTreeNode
+
+        # family children
         children {
           ...TaxonStatTreeNode
+
+          # subfamily children
           children {
             ...TaxonStatTreeNode
+
+            # genus children
             children {
               ...TaxonStatTreeNode
+
+              # subgenus children
               children {
                 ...TaxonStatTreeNode
+
+                # species children
                 children {
                   ...TaxonStatTreeNode
+
+                  # subspecies children
                   children {
                     ...TaxonStatTreeNode
+
                     children {
                       ...TaxonStatTreeNode
                     }
@@ -555,6 +568,34 @@ const GET_SPECIMENS = gql`
 `;
 
 type TaxonTreeStatsQuery = {
+  stats: {
+    taxonBreakdown: TaxonStatTreeNode[];
+  };
+};
+
+// Gets details for the specified taxon and the immediate decendants
+const GET_TAXON_TREE_NODE = gql`
+  query TaxonTreeNode(
+    $taxonRank: TaxonomicRank
+    $taxonCanonicalName: String
+    $descendantRank: TaxonomicRank
+  ) {
+    stats {
+      taxonBreakdown(
+        taxonRank: $taxonRank
+        taxonCanonicalName: $taxonCanonicalName
+        includeRanks: [$taxonRank, $descendantRank]
+      ) {
+        ...TaxonStatTreeNode
+        children {
+          ...TaxonStatTreeNode
+        }
+      }
+    }
+  }
+`;
+
+type TaxonTreeNodeQuery = {
   stats: {
     taxonBreakdown: TaxonStatTreeNode[];
   };
@@ -1303,6 +1344,7 @@ interface FamilyTaxonTreeProps {
 }
 
 function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
+  const [ref, rect] = useResizeObserver();
   const [layout, setLayout] = useState<Layout>("top-to-bottom");
 
   const { loading, error, data } = tree;
@@ -1341,10 +1383,11 @@ function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
 
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
-      <ScrollArea.Autosize>
+      <ScrollArea.Autosize ref={ref}>
         <Center>
           {treeData && (
             <TaxonomyTree
+              minWidth={rect.width}
               layout={layout}
               data={treeData}
               pinned={pinned}
@@ -1414,30 +1457,20 @@ export default function TaxonomyPage({
       node.rank === "FAMILIA"
   );
 
-  const tree = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
+  const tree = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
     variables: {
-      taxonRank: subfamily?.rank || "FAMILY",
+      taxonRank: "FAMILY",
       taxonCanonicalName: subfamily?.canonicalName,
-      includeRanks: [
-        "FAMILY",
-        "FAMILIA",
-        "SUBFAMILY",
-        "SUBFAMILIA",
-        "TRIBE",
-        "SUBTRIBE",
-        "GENUS",
-        "SUBGENUS",
-        "SPECIES",
-      ],
+      descendantRank: "GENUS",
     },
-    skip: !hierarchy,
+    /* skip: !hierarchy, */
   });
 
   const subspecies = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
     variables: {
       taxonRank: "SPECIES",
       taxonCanonicalName: canonicalName,
-      includeRanks: ["SUBSPECIES"],
+      descendantRank: "SUBSPECIES",
     },
     skip: isSubspecies,
   });
