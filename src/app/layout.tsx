@@ -22,6 +22,7 @@ import { Footer } from "./footer";
 import { TraceLoaderProvider } from "@/components/traces/context";
 import Fathom from "@/components/fathom";
 import { SourceProvider } from "./source-provider";
+import { MessagePopup } from "@/components/message-popup";
 
 export default function RootLayout({
   children,
@@ -39,6 +40,7 @@ export default function RootLayout({
           <MantineProvider theme={theme}>
             <SourceProvider>
               <TraceLoaderProvider>
+                <MessagePopup />
                 <Shell>{children}</Shell>
               </TraceLoaderProvider>
             </SourceProvider>
