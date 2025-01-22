@@ -4,11 +4,11 @@ import { createTheme, rem } from "@mantine/core";
 
 import localFont from "next/font/local";
 
-const workSans = localFont({
+export const workSans = localFont({
   src: "../public/fonts/WorkSans-VariableFont_wght.ttf",
 });
 
-const gothamBold = localFont({
+export const gothamBold = localFont({
   src: "../public/fonts/gotham/GothamBold.ttf",
 });
 
