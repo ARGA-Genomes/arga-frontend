@@ -23,23 +23,16 @@ ChartJS.register(
 defaults.font.family = workSans.style.fontFamily;
 defaults.font.weight = "bold";
 
-const labels = [
-  "1 Domain",
-  "5 Kingdoms",
-  "52 Phyla",
-  "153 Classes",
-  "1025 Orders",
-  "5878 Families",
-  "45123 Genera",
-  "175099 Species",
-];
+const labels = ["2010", "2015", "2020", "2025", "2030"];
 
 export const data = {
   labels,
   datasets: [
     {
       label: "Dataset 1",
-      data: labels.map(() => Math.floor(Math.random() * 1000)),
+      data: labels.map(
+        (_, idx) => idx * 1000 + Math.floor(Math.random() * 1000)
+      ),
       borderColor: "#d0e1b6",
       backgroundColor: "#d0e1b6",
     },
