@@ -304,34 +304,36 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
     (a, b) => b.depth - a.depth
   );
 
+  const hierarchy = classification;
+
   // quick fix of plant, fungi and chromist taxon ranks
   // TO-DO: needs to be fixed properly in the backend
-  const taxonRankMappings: Record<string, string> = {
-    KINGDOM: "REGNUM",
-    PHYLUM: "DIVISION",
-    SUBPHYLUM: "SUBDIVISION",
-    CLASS: "CLASSIS",
-    SUBCLASS: "SUBCLASSIS",
-    ORDER: "ORDO",
-    SUPERORDER: "SUPERORDO",
-    FAMILY: "FAMILIA",
-    GENUS: "GENUS",
-    SPECIES: "SPECIES",
-  };
+  // const taxonRankMappings: Record<string, string> = {
+  //   KINGDOM: "REGNUM",
+  //   PHYLUM: "DIVISION",
+  //   SUBPHYLUM: "SUBDIVISION",
+  //   CLASS: "CLASSIS",
+  //   SUBCLASS: "SUBCLASSIS",
+  //   ORDER: "ORDO",
+  //   SUPERORDER: "SUPERORDO",
+  //   FAMILY: "FAMILIA",
+  //   GENUS: "GENUS",
+  //   SPECIES: "SPECIES",
+  // };
 
-  let hierarchy;
+  // let hierarchy;
 
-  if (
-    classification?.[0].canonicalName !== "Animalia" &&
-    classification?.[0].canonicalName !== "Protista"
-  ) {
-    hierarchy = classification?.map((item) => ({
-      ...item,
-      rank: taxonRankMappings[item.rank.toUpperCase()] || item.rank,
-    }));
-  } else {
-    hierarchy = classification;
-  }
+  // if (
+  //   classification?.[0].canonicalName !== "Animalia" &&
+  //   classification?.[0].canonicalName !== "Protista"
+  // ) {
+  //   hierarchy = classification?.map((item) => ({
+  //     ...item,
+  //     rank: taxonRankMappings[item.rank.toUpperCase()] || item.rank,
+  //   }));
+  // } else {
+  //   hierarchy = classification;
+  // }
 
   return (
     <Paper radius={16} p="md" withBorder>
