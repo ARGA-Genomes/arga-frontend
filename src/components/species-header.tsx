@@ -108,7 +108,7 @@ function Header({
         align={{ base: "normal", lg: "center" }}
       >
         <Text c="dimmed" fw={400}>
-          SPECIES
+          {taxonomy[0]?.rank}
         </Text>
         <Text fz={38} fw={700} fs="italic">
           {taxonomy[0]?.canonicalName}

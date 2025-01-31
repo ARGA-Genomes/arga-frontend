@@ -60,6 +60,9 @@ export type Specimen = {
   details?: string;
   remarks?: string;
   identificationRemarks?: string;
+  markers?: number;
+  sequences?: number;
+  wholeGenomes?: number;
 };
 
 export const COLLECTION_EVENT = gql`

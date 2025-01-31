@@ -57,7 +57,7 @@ export function TimelineBar({ item, width, acceptedWidth }: TimelineBarProps) {
       <text
         x={5}
         dominantBaseline="bottom"
-        y={itemHeight - 40}
+        y={itemHeight - 48}
         filter="url(#solid)"
       >
         <tspan fontWeight={600} fontStyle="italic" fontSize={14}>
@@ -97,16 +97,22 @@ export function TimelineInstant({ item }: { item: TimelineItem }) {
           variants={hover}
           x={-13}
           y={-13}
-          width="26"
-          height="26"
-          rx="13"
+          width={26}
+          height={26}
+          rx={13}
           fill="#ffffff"
           stroke="#febb19"
-          stroke-width={4}
+          strokeWidth={4}
+          style={{ cursor: "pointer" }}
+          // The rect will accept all pointer events.
         />
 
-        <motion.text variants={textHover} dominantBaseline="middle">
-          <tspan fontSize={14} fontWeight={500}>
+        <motion.text
+          variants={textHover}
+          dominantBaseline="middle"
+          style={{ pointerEvents: "none" }} // Text won't capture pointer events.
+        >
+          <tspan fontSize={14} fontWeight={500} z={1000}>
             {item.subtitle}
           </tspan>
         </motion.text>
@@ -124,6 +130,22 @@ interface TimelineGroupProps {
 export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
   const right = x(endDate);
 
+  const handleInstantClick = (item: TimelineItem) => {
+    const elementId = `${item.label.replaceAll(" ", "-").toLowerCase()}-${
+      item.year
+    }`;
+    const element = document.getElementById(elementId);
+    const yOffset = -200;
+
+    if (element) {
+      const y = element.getBoundingClientRect()?.top + window.scrollY + yOffset;
+      window.scrollTo({
+        top: y,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <>
       {group.bars.map((item, idx) => (
@@ -138,10 +160,11 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
           />
         </g>
       ))}
-      {group.instants.map((item, idx) => (
+      {group.instants.toReversed().map((item, idx) => (
         <g
           key={`${item.label}-${item.year}-${item.type}-${idx}`}
           transform={`translate(${x(item.date)}, 0)`}
+          onClick={() => handleInstantClick(item)}
         >
           <TimelineInstant item={item} />
         </g>
@@ -226,7 +249,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
 
   const x = useMemo(
     () => d3.scaleLinear().domain(domain).range(range),
-    [dimension.boundedWidth],
+    [dimension.boundedWidth]
   );
 
   return (
@@ -234,12 +257,12 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
       <svg width={dimension.width} height={dimension.height}>
         <defs>
           <filter x="0" y="0" width="1" height="1" id="solid">
-            <feFlood flood-color="rgba(255, 255, 255, 1)" />
+            <feFlood floodColor="rgba(255, 255, 255, 1)" />
             <feBlend in="SourceGraphic" mode="multiply" />
           </filter>
 
           <filter x="0" y="0" width="1" height="1" id="faded">
-            <feFlood flood-color="rgba(255, 255, 255, 1)" />
+            <feFlood floodColor="rgba(255, 255, 255, 1)" />
             <feBlend in="SourceGraphic" mode="multiply" />
           </filter>
         </defs>
@@ -256,9 +279,9 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
               fill="white"
             />
             {groups.map((group, idx) =>
-              group.instants.map((item) => (
+              group.instants.map((item, id) => (
                 <g
-                  key={`${group.label}-guide`}
+                  key={`${group.label}-guide-${id}`}
                   transform={`translate(${x(item.date)}, ${idx * itemHeight})`}
                 >
                   <TimelineDateGuide
@@ -268,7 +291,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
                     value={item.date}
                   />
                 </g>
-              )),
+              ))
             )}
 
             {groups.map((group, idx) => (
@@ -394,7 +417,7 @@ interface BoundedChartDimensions extends ChartDimensions {
 
 // derived from https://2019.wattenberger.com/blog/react-and-d3
 export function useChartDimensions<T>(
-  settings: ChartDimensions,
+  settings: ChartDimensions
 ): [RefObject<T>, BoundedChartDimensions] {
   const ref = useRef(null);
   const dimensions = combineChartDimensions(settings);
@@ -427,7 +450,7 @@ export function useChartDimensions<T>(
 }
 
 function combineChartDimensions(
-  dimensions: ChartDimensions,
+  dimensions: ChartDimensions
 ): BoundedChartDimensions {
   const dim = {
     ...dimensions,
@@ -552,7 +575,7 @@ function domainDecades(items: TimelineItem[]): Domain[] {
 
 function rangeYears(domains: Domain[], width: number): number[] {
   const domainYears = domains.map(
-    (domain) => domain.end.getFullYear() - domain.start.getFullYear(),
+    (domain) => domain.end.getFullYear() - domain.start.getFullYear()
   );
 
   const totalYears = domainYears.reduce((acc, val) => acc + val, 0);

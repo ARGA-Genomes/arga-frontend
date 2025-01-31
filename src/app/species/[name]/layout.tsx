@@ -2,7 +2,6 @@
 
 import classes from "./layout.module.css";
 
-import { gql, useQuery } from "@apollo/client";
 import { Container, Paper, Stack, Tabs } from "@mantine/core";
 import SpeciesHeader from "@/components/species-header";
 import { RedirectType, redirect, usePathname } from "next/navigation";
@@ -10,20 +9,6 @@ import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
-
-const GET_SPECIES_DATA_SUMMARY = gql`
-  query SpeciesWithDataSummary($canonicalName: String) {
-    species(canonicalName: $canonicalName) {
-      dataSummary {
-        genomes
-        loci
-        specimens
-        other
-        totalGenomic
-      }
-    }
-  }
-`;
 
 type QueryResults = {
   species: {
@@ -52,13 +37,6 @@ function DataTabs({
       router.replace(`/species/${name}/${value}`);
     }
   }
-
-  const canonicalName = name.replaceAll("_", " ");
-  const { data } = useQuery<QueryResults>(GET_SPECIES_DATA_SUMMARY, {
-    variables: { canonicalName },
-  });
-
-  const summary = data?.species.dataSummary;
 
   // based on the current url the active tab should always be
   // the fourth component in the path name
@@ -112,7 +90,8 @@ export default function SpeciesLayout({
   params,
   children,
 }: SpeciesLayoutProps) {
-  const canonicalName = params.name.replaceAll("_", " ");
+  const name = decodeURIComponent(params.name);
+  const canonicalName = name.replaceAll("_", " ");
 
   return (
     <Stack gap={0} mt="xl">
@@ -120,7 +99,7 @@ export default function SpeciesLayout({
         <PreviousPage />
       </Container>
       <SpeciesHeader canonicalName={canonicalName} />
-      <DataTabs name={params.name}>
+      <DataTabs name={name}>
         <Container maw={MAX_WIDTH}>{children}</Container>
       </DataTabs>
       <PageCitation />

@@ -25,14 +25,32 @@ export type TaxonStatTreeNode = {
   children?: TaxonStatTreeNode[];
 };
 
-
-export function findChildren(root: TaxonStatTreeNode, scientificName: string): TaxonStatTreeNode[] {
+export function findChildren(
+  root: TaxonStatTreeNode,
+  scientificName: string,
+): TaxonStatTreeNode[] {
   if (root.scientificName === scientificName) {
     return root.children || [];
   }
 
   for (const child of root.children || []) {
     const children = findChildren(child, scientificName);
+    if (children.length > 0) return children;
+  }
+
+  return [];
+}
+
+export function findChildrenCanonical(
+  root: TaxonStatTreeNode,
+  canonicalName: string,
+): TaxonStatTreeNode[] {
+  if (root.canonicalName === canonicalName) {
+    return root.children || [];
+  }
+
+  for (const child of root.children || []) {
+    const children = findChildrenCanonical(child, canonicalName);
     if (children.length > 0) return children;
   }
 
