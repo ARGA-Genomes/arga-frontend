@@ -1,6 +1,5 @@
-"use client";
-
 import {
+  Anchor,
   Box,
   Container,
   Divider,
@@ -8,6 +7,7 @@ import {
   Grid,
   GridCol,
   Group,
+  Image,
   Paper,
   Stack,
   Stepper,
@@ -25,27 +25,11 @@ import { CumulativeTracker } from "./_components/cumulative-tracker";
 import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
-import { SunburstChart } from "./_components/sunburst";
-import { GenomeComposition } from "./_components/genome-composition";
-import { gql, useQuery } from "@apollo/client";
-import { TaxonStatTreeNode } from "@/queries/stats";
 
-const labels = [
-  "1 Domain",
-  "5 Kingdoms",
-  "52 Phyla",
-  "153 Classes",
-  "1025 Orders",
-  "5878 Families",
-  "45123 Genera",
-  "175099 Species",
-];
-
-const DATA = [
+const COMPLETE_GENOME_STEPS = [
   {
     key: "domain",
     label: "Domain",
-    value: 1,
   },
   {
     key: "kingdom",
@@ -56,7 +40,6 @@ const DATA = [
         (or Regnum)
       </>
     ),
-    value: 5,
   },
   {
     key: "phylum",
@@ -67,7 +50,6 @@ const DATA = [
         (or Divison)
       </>
     ),
-    value: 52,
   },
   {
     key: "class",
@@ -78,7 +60,6 @@ const DATA = [
         (or Classis)
       </>
     ),
-    value: 153,
   },
   {
     key: "order",
@@ -89,7 +70,6 @@ const DATA = [
         (or Ordo)
       </>
     ),
-    value: 1025,
   },
   {
     key: "family",
@@ -100,21 +80,16 @@ const DATA = [
         (or Familia)
       </>
     ),
-    value: 5878,
   },
   {
     key: "genus",
     label: "Genus",
-    value: 45123,
   },
   {
     key: "species",
     label: "Species",
-    value: 175099,
   },
 ];
-
-export type SummaryDataType = typeof DATA;
 
 interface ActionButtonProps {
   label: string;
@@ -136,84 +111,7 @@ function ActionButton({ label, icon }: ActionButtonProps) {
   );
 }
 
-const GET_TAXON_TREE_STATS = gql`
-  query TaxonTreeStats(
-    $taxonRank: TaxonomicRank
-    $taxonCanonicalName: String
-    $includeRanks: [TaxonomicRank]
-  ) {
-    stats {
-      taxonBreakdown(
-        taxonRank: $taxonRank
-        taxonCanonicalName: $taxonCanonicalName
-        includeRanks: $includeRanks
-      ) {
-        ...TaxonStatTreeNode
-
-        # family children
-        children {
-          ...TaxonStatTreeNode
-
-          # subfamily children
-          children {
-            ...TaxonStatTreeNode
-
-            # genus children
-            children {
-              ...TaxonStatTreeNode
-
-              # subgenus children
-              children {
-                ...TaxonStatTreeNode
-
-                # species children
-                children {
-                  ...TaxonStatTreeNode
-
-                  # subspecies children
-                  children {
-                    ...TaxonStatTreeNode
-
-                    children {
-                      ...TaxonStatTreeNode
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-type TaxonTreeStatsQuery = {
-  stats: {
-    taxonBreakdown: TaxonStatTreeNode[];
-  };
-};
-
 export default function GenomeTracker() {
-  const { data } = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
-    variables: {
-      taxonRank: "DOMAIN",
-      taxonCanonicalName: "Eukaryota",
-      includeRanks: [
-        "DOMAIN",
-        "KINGDOM",
-        "PHYLUM",
-        "CLASS",
-        "ORDER",
-        "FAMILY",
-        "GENUS",
-        "SPECIES",
-      ],
-    },
-  });
-
-  console.log(data);
-
   return (
     <>
       <Group p="lg">
@@ -232,12 +130,18 @@ export default function GenomeTracker() {
                   <Stack gap="xl">
                     <Grid gutter="xl">
                       <GridCol span={4}>
-                        <Stack h="100%" justify="space-between">
+                        <Stack h="100%" justify="space-between" pb="xl">
                           <Text size="lg" fw="bold">
                             Taxonomic composition of Australia&apos;s
                             biodiversity
                           </Text>
-                          <GenomeComposition data={DATA} />
+                          <Image
+                            fit="contain"
+                            mah={350}
+                            width="auto"
+                            src="/pyramid.png"
+                            alt="Pyramid"
+                          />
                         </Stack>
                       </GridCol>
                       <GridCol span={8}>
@@ -267,7 +171,7 @@ export default function GenomeTracker() {
                             color="moss"
                             active={3}
                           >
-                            {DATA.map((step) => (
+                            {COMPLETE_GENOME_STEPS.map((step) => (
                               <StepperStep
                                 icon={
                                   <IconCircleCheck
@@ -340,15 +244,6 @@ export default function GenomeTracker() {
                     <Box h={500}>
                       <GenomeCompletion />
                     </Box>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack>
-                    <Text size="lg" fw="bold">
-                      Completion of genome sequences for key biodiversity
-                      groupings:
-                    </Text>
-                    <SunburstChart />
                   </Stack>
                 </Paper>
               </Stack>

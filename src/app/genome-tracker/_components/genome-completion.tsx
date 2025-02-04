@@ -30,8 +30,8 @@ export const data = {
   datasets: [
     {
       label: "Dataset 1",
-      data: labels.map((_, idx) =>
-        idx === 0 ? null : idx * 1000 + Math.floor(Math.random() * 1000)
+      data: labels.map(
+        (_, idx) => idx * 1000 + Math.floor(Math.random() * 1000)
       ),
       borderColor: "#d0e1b6",
       backgroundColor: "#d0e1b6",
