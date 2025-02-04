@@ -258,6 +258,125 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
     label: "Fire vulnerable",
     link: "/browse/sources/ARGA_Bushfire_Recovery",
   },
+  native_species_icon: {
+    image: "/attribute-icons/native_species.svg",
+    label: "Native",
+    link: "/browse/sources/ARGA_Native_Species",
+  },
+  edible_wild_species_icon: {
+    image: "/attribute-icons/edible_wild_species.svg",
+    label: "Edible wild",
+    link: "/browse/sources/ARGA_Edible_Species",
+  },
+  crop_wild_relative_icon: {
+    image: "/attribute-icons/crop_wild_relative.svg",
+    label: "Crop wild relative",
+    link: "/browse/sources/ARGA_Crop_Wild_Relatives",
+  },
+  invasives_pests_icon: {
+    image: "/attribute-icons/invasives_pests.svg",
+    label: "Invasive/pest",
+    link: "/browse/sources/ARGA_Exotic_Species",
+  },
+  migratory_species_icon: {
+    image: "/attribute-icons/migratory_species.svg",
+    label: "Migratory",
+    link: "/browse/sources/ARGA_Migratory_Species",
+  },
+  top_110_species_icon: {
+    image: "/attribute-icons/top_110_species.svg",
+    label: "Threatened",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_EX: {
+    image: "/attribute-icons/EPBC_extinct.svg",
+    label: "EPBC Act Status: Extinct",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_EW: {
+    image: "/attribute-icons/EPBC_extinct_in_the_wild.svg",
+    label: "EPBC Act Status: Extinct in the wild",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_CR: {
+    image: "/attribute-icons/EPBC_critically_endangered.svg",
+    label: "EPBC Act Status: Critically endangered",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_EN: {
+    image: "/attribute-icons/EPBC_endangered.svg",
+    label: "EPBC Act Status: Endangered",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_VU: {
+    image: "/attribute-icons/EPBC_vulnerable.svg",
+    label: "EPBC Act Status: Vulnerable",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_cd: {
+    image: "/attribute-icons/EPBC_conservation_dependent.svg",
+    label: "EPBC Act Status: Conservation dependent",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_nt: {
+    image: "/attribute-icons/EPBC_not_threatened.svg",
+    label: "EPBC Act Status: Not threatened",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_lc: {
+    image: "/attribute-icons/EPBC_least_concern.svg",
+    label: "EPBC Act Status: Least concern",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  EPBC_act_category_ul: {
+    image: "/attribute-icons/EPBC_unlisted.svg",
+    label: "EPBC Act Status: Unlisted",
+    link: "/browse/sources/ARGA_Threatened_Species",
+  },
+  is_medicinal_and_bioactive_icon: {
+    image: "/attribute-icons/medicinal_and_bioactive.svg",
+    label: "Medicinal and bioactive",
+  },
+  agriculture: {
+    image: "/attribute-icons/agriculture.svg",
+    label: "Agriculture",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
+  aquaculture: {
+    image: "/attribute-icons/aquaculture.svg",
+    label: "Aquaculture",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
+  "horticultural crop": {
+    image: "/attribute-icons/horticultural_crops.svg",
+    label: "Horticultural crop",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
+  "crops and cereals": {
+    image: "/attribute-icons/crops_and_cereals.svg",
+    label: "Crops and cereals",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
+  forestry: {
+    image: "/attribute-icons/forestry_and_timber.svg",
+    label: "Forestry and timber industry",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
+  livestock: {
+    image: "/attribute-icons/livestock.svg",
+    label: "Livestock industry",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
+  commercial_and_trade_fisheries_icon: {
+    image: "/attribute-icons/commercial_and_trade_fisheries.svg",
+    label: "Commercial and trade fisheries",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
+  managed_fisheries_icon: {
+    image: "/attribute-icons/managed_fisheries.svg",
+    label: "Managed fisheries",
+    link: "/browse/sources/ARGA_Commercial_Species",
+  },
 };
 
 function ConservationIcon({
@@ -492,11 +611,18 @@ export default function IconBar({
 
   const attributeHeaderIconsRaw = attributes
     ?.map((nameAttribute) => {
+      if (
+        nameAttribute.name === "commercial_sector_icon" ||
+        nameAttribute.name === "agricultural_industry_icon"
+      ) {
+        return nameAttribute.valueStr;
+      }
       if (ATTRIBUTE_GROUP_ICON[nameAttribute.name]) {
         return nameAttribute.name;
       }
     })
     .filter((item) => item !== undefined);
+  console.log(attributeHeaderIconsRaw);
   const attributeHeaderIcons = [...new Set(attributeHeaderIconsRaw)];
 
   const headerIcons = taxonomyHeaderIcons.concat(attributeHeaderIcons);
