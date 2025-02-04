@@ -44,6 +44,7 @@
     "change-case": "^4.1.2",
     "chart.js": "^4.4.7",
     "d3": "^7.9.0",
+    "d3-funnel": "^2.1.1",
     "dayjs": "^1.11.13",
     "deck.gl": "^8.9.36",
     "embla-carousel-react": "^7.1.0",
