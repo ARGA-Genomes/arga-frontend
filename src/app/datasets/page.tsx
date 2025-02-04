@@ -400,7 +400,13 @@ function CollectionCard({ collection }: { collection: Source }) {
       <Stack gap={10}>
         <UnstyledButton>
           <Link href={`/browse/sources/${collection.name}`}>
-            <Paper radius="lg" w="100%" className={classes.collectionHeader}>
+            <Paper
+              radius="lg"
+              // bg="midnight.10"
+              w="100%"
+              // style={{ borderRadius: "16px 16px 0 0" }}
+              className={classes.collectionHeader}
+            >
               <Group justify="space-between" align="flex-start" wrap="nowrap">
                 <Stack gap={1}>
                   <Text fw={600} size="md" c="white" pl={10} pt={10} pr={10}>

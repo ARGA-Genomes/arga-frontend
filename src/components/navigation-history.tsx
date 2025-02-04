@@ -1,5 +1,3 @@
-"use client";
-
 import { Group, Text } from "@mantine/core";
 import { useSessionStorage } from "@mantine/hooks";
 import Link from "next/link";
@@ -15,12 +13,13 @@ export function PreviousPage() {
     key: "previous-page",
     defaultValue: undefined,
   });
+  if (!previousPage) return null;
 
   return (
-    <Link href={previousPage?.url || "/"}>
+    <Link href={previousPage.url}>
       <Group gap={5}>
         <IconArrowNarrowLeft />
-        <Text fz={18}>Back to {previousPage?.name || "home"}</Text>
+        <Text fz={18}>Back to {previousPage.name}</Text>
       </Group>
     </Link>
   );
