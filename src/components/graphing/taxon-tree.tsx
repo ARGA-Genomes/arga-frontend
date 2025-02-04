@@ -1,7 +1,7 @@
 "use client";
 
-import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
-import { Badge, Group, Loader, Paper, Text } from "@mantine/core";
+import { gql, useApolloClient } from "@apollo/client";
+import { Badge, Group, Paper, Text } from "@mantine/core";
 import { useTheme } from "@nivo/core";
 import {
   ComputedNode,
@@ -15,11 +15,6 @@ import {
 } from "@nivo/tree";
 
 import { useEffect, useState } from "react";
-import {
-  EventTimeline,
-  LineStyle,
-  TimelineIcon,
-} from "@/components/event-timeline";
 import { useListState } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
 import { animated, to, useSpring } from "@react-spring/web";
@@ -84,7 +79,7 @@ type Node = {
 function convertToNode(
   node: TaxonStatTreeNode,
   expanded?: Node[],
-  pinned?: string[],
+  pinned?: string[]
 ): Node {
   const shouldExpand =
     !!expanded?.find((n) => n.canonicalName === node.canonicalName) ||
@@ -160,7 +155,7 @@ export function TaxonomyTree({
   initialExpanded,
 }: TaxonomyTreeProps) {
   const [expanded, handlers] = useListState<Node>(
-    initialExpanded?.map((n) => convertToNode(n, [])) || [],
+    initialExpanded?.map((n) => convertToNode(n, [])) || []
   );
   const client = useApolloClient();
 
@@ -196,7 +191,7 @@ export function TaxonomyTree({
         // clone the underlying data tree and find the taxon node being loaded
         let newTree = structuredClone(tree);
         let parent = newTree.children?.find(
-          (node) => node.canonicalName == item.data.canonicalName,
+          (node) => node.canonicalName == item.data.canonicalName
         );
 
         // if we found the loaded node we insert the children and reload
@@ -208,7 +203,7 @@ export function TaxonomyTree({
       });
     } else {
       handlers.remove(
-        expanded.findIndex((n) => n.canonicalName == item.data.canonicalName),
+        expanded.findIndex((n) => n.canonicalName == item.data.canonicalName)
       );
     }
   }
@@ -344,7 +339,7 @@ function CustomLink({
             source: [sourceX, sourceY],
             target: [targetX, targetY],
           });
-        },
+        }
       )}
       fill="none"
       strokeWidth={pinned ? 8 : animatedProps.thickness}
@@ -368,12 +363,12 @@ function CustomLabel({ label, animatedProps }: LabelComponentProps<Node>) {
       data-testid={`label.${label.id}`}
       transform={to(
         [animatedProps.x, animatedProps.y],
-        (x, y) => `translate(${x},${y})`,
+        (x, y) => `translate(${x},${y})`
       )}
     >
       <animated.g
         transform={animatedProps.rotation.to(
-          (rotation) => `rotate(${rotation})`,
+          (rotation) => `rotate(${rotation})`
         )}
       >
         {theme.labels.text.outlineWidth > 0 && (
