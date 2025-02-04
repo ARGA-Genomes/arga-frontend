@@ -300,7 +300,24 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
     },
   });
 
-  const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
+  const classification = data?.taxon.hierarchy.toSorted(
+    (a, b) => b.depth - a.depth
+  );
+
+  const taxonRankMappings: Record<string, string> = {
+    KINGDOM: "REGNUM",
+    PHYLUM: "DIVISION",
+    SUBPHYLUM: "SUBDIVISION",
+    CLASS: "CLASSIS",
+    SUBCLASS: "SUBCLASSIS",
+    ORDER: "ORDO",
+    SUPERORDER: "SUPERORDO",
+    FAMILY: "FAMILIA",
+    GENUS: "GENUS",
+    SPECIES: "SPECIES",
+  };
+
+  const isAnimalia = classification?.[1]?.canonicalName === "Animalia";
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -325,20 +342,38 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
 
       <Group>
         {error && <Text>{error.message}</Text>}
-        {hierarchy?.map((node, idx) => (
-          <AttributePill
-            key={idx}
-            labelColor="midnight.8"
-            popoverDisabled
-            hoverColor="midnight.0"
-            label={Humanize.capitalize(node.rank.toLowerCase())}
-            value={node.canonicalName}
-            href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
-            icon={IconArrowUpRight}
-            showIconOnHover
-            miw={100}
-          />
-        ))}
+        {classification?.map((node, idx) =>
+          isAnimalia ? (
+            <AttributePill
+              key={idx}
+              labelColor="midnight.8"
+              popoverDisabled
+              hoverColor="midnight.0"
+              label={Humanize.capitalize(node.rank.toLowerCase())}
+              value={node.canonicalName}
+              href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
+              icon={IconArrowUpRight}
+              showIconOnHover
+              miw={100}
+            />
+          ) : (
+            <AttributePill
+              key={idx}
+              labelColor="midnight.8"
+              popoverDisabled
+              hoverColor="midnight.0"
+              label={Humanize.capitalize(node.rank.toLowerCase())}
+              value={node.canonicalName}
+              href={`/${
+                taxonRankMappings[node.rank.toUpperCase()]?.toLowerCase() ||
+                node.rank.toLowerCase()
+              }/${node.canonicalName}`}
+              icon={IconArrowUpRight}
+              showIconOnHover
+              miw={100}
+            />
+          )
+        )}
       </Group>
     </Paper>
   );

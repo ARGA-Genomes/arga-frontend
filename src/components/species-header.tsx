@@ -94,6 +94,12 @@ function Header({
     ? theme.colors.moss[5]
     : theme.colors.red[5];
 
+  console.log(taxonomy);
+
+  const defaultTaxonomy = taxonomy?.find(
+    (item) => item.source === "Atlas of Living Australia"
+  );
+
   return (
     // Original format
     <Flex
@@ -108,10 +114,10 @@ function Header({
         align={{ base: "normal", lg: "center" }}
       >
         <Text c="dimmed" fw={400}>
-          {taxonomy[0]?.rank}
+          {defaultTaxonomy?.rank}
         </Text>
         <Text fz={38} fw={700} fs="italic">
-          {taxonomy[0]?.canonicalName}
+          {defaultTaxonomy?.canonicalName}
         </Text>
       </Flex>
 
@@ -120,12 +126,14 @@ function Header({
         gap={{ base: "md", lg: "xl" }}
         align={{ base: "normal", lg: "center" }}
       >
-        <IconBar
-          taxonomy={taxonomy[0]}
-          conservation={conservation}
-          traits={traits}
-          attributes={attributes}
-        />
+        {defaultTaxonomy && (
+          <IconBar
+            taxonomy={defaultTaxonomy}
+            conservation={conservation}
+            traits={traits}
+            attributes={attributes}
+          />
+        )}
 
         <Group h="100%" wrap="nowrap" gap={5}>
           <Text fw={700} c="dimmed" style={{ whiteSpace: "nowrap" }}>
