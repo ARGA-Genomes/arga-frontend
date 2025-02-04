@@ -237,7 +237,7 @@ export default function GenomeTracker() {
                             Taxonomic composition of Australia&apos;s
                             biodiversity
                           </Text>
-                          {/* <GenomeComposition data={DATA} /> */}
+                          <GenomeComposition data={DATA} />
                         </Stack>
                       </GridCol>
                       <GridCol span={8}>
