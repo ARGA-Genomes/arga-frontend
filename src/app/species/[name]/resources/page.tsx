@@ -29,11 +29,11 @@ const GET_RESOURCES = gql`
   }
 `;
 
-type QueryResults = {
+interface QueryResults {
   species: {
     data: CommonGenome[];
   };
-};
+}
 
 export default function Resources({ params }: { params: { name: string } }) {
   const canonicalName = params.name.replaceAll("_", " ");

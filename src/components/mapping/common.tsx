@@ -1,5 +1,5 @@
 
-type Coordinates = {
+interface Coordinates {
     latitude: number,
     longitude: number,
 }

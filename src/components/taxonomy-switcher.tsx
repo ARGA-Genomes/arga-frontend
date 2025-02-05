@@ -5,19 +5,16 @@ import {
   Accordion,
   Badge,
   Divider,
-  Flex,
   Group,
   Modal,
   ScrollArea,
   Stack,
   Text,
-  Timeline,
   UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
 
 import accClasses from "./taxonomy-switcher-acc.module.css";
-import tmlnClasses from "./record-history.module.css";
 
 import { Taxon } from "@/queries/taxa";
 import {
@@ -29,10 +26,7 @@ import {
 import { Dataset, useDatasets } from "@/app/source-provider";
 import { useMemo, useState } from "react";
 import {
-  IconArrowRight,
   IconArrowUpRight,
-  IconEdit,
-  IconPlus,
 } from "@tabler/icons-react";
 import { useQuery } from "@apollo/client";
 import { GET_TAXON_PROVENANCE, ProvenanceQuery } from "@/queries/provenance";
@@ -40,17 +34,17 @@ import { useDisclosure } from "@mantine/hooks";
 import { LoadOverlay } from "./load-overlay";
 import RecordHistory from "./record-history";
 
-type ClassificationNode = {
+interface ClassificationNode {
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
 interface TaxonomySwitcherProps {
   taxa: Taxon[];
 }
 
-type TaxonMap = { [key: string]: string };
+type TaxonMap = Record<string, string>;
 
 interface TaxonExtended extends Taxon {
   dataset?: Dataset;
@@ -231,7 +225,7 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
       </Modal>
       <Accordion
         value={active}
-        onChange={(value) => setActive(value || active)}
+        onChange={(value) => { setActive(value || active); }}
         classNames={accClasses}
         loop
       >

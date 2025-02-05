@@ -31,15 +31,14 @@ import { HighlightStack } from "@/components/highlight-stack";
 import { usePreviousPage } from "@/components/navigation-history";
 import { useHover } from "@mantine/hooks";
 import { Filter, intoFilterItem } from "@/components/filtering/common";
-import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { DataTypeFilters } from "@/components/filtering/data-type";
 
-type Filters = {
+interface Filters {
   classifications: Filter[];
   dataTypes: Filter[];
-};
+}
 
-type Classification = {
+interface Classification {
   kingdom?: string;
   phylum?: string;
   class?: string;
@@ -51,17 +50,17 @@ type Classification = {
   classis?: string;
   ordo?: string;
   familia?: string;
-};
+}
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
   totalGenomic: number;
-};
+}
 
-type Item = {
+interface Item {
   type: string;
   score: number;
   status: string;
@@ -89,20 +88,20 @@ type Item = {
   collectionCode?: string;
   recordedBy?: string;
   identifiedBy?: string;
-};
+}
 
-type FullTextResults = {
+interface FullTextResults {
   records: Item[];
   total: number;
-};
+}
 
-type SearchResults = {
+interface SearchResults {
   fullText: FullTextResults;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   search: SearchResults;
-};
+}
 
 const PAGE_SIZE = 10;
 
@@ -192,7 +191,7 @@ const SEARCH_FULLTEXT = gql`
 `;
 
 function TaxonItem({ item }: { item: Item }) {
-  const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const itemLinkName = item.canonicalName.replaceAll(" ", "_");
   const { hovered, ref } = useHover();
 
   return (
@@ -242,7 +241,7 @@ function TaxonItem({ item }: { item: Item }) {
                 {item.canonicalName}
               </Text>
               <Text ml="sm" fz="sm" c="dimmed">
-                {item.synonyms && item.synonyms[0]
+                {item.synonyms?.[0]
                   ? `syn. ${item.synonyms[0]}`
                   : null}
               </Text>
@@ -383,7 +382,7 @@ function TaxonDetails({ item }: { item: Item }) {
 }
 
 function GenomeItem({ item }: { item: Item }) {
-  const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const itemLinkName = item.canonicalName.replaceAll(" ", "_");
   const { hovered, ref } = useHover();
 
   return (
@@ -493,7 +492,7 @@ function GenomeDetails({ item }: { item: Item }) {
 }
 
 function LocusItem({ item }: { item: Item }) {
-  const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const itemLinkName = item.canonicalName.replaceAll(" ", "_");
   const { hovered, ref } = useHover();
 
   return (
@@ -599,7 +598,7 @@ function LocusDetails({ item }: { item: Item }) {
 }
 
 function SpecimenItem({ item }: { item: Item }) {
-  const itemLinkName = item.canonicalName?.replaceAll(" ", "_");
+  const itemLinkName = item.canonicalName.replaceAll(" ", "_");
   const { hovered, ref } = useHover();
 
   return (
@@ -769,7 +768,7 @@ function Search(props: SearchProperties) {
               <TextInput
                 placeholder="e.g. sequence accession, species name"
                 value={value}
-                onChange={(val) => setValue(val.target.value)}
+                onChange={(val) => { setValue(val.target.value); }}
                 leftSectionWidth={60}
                 size="xl"
                 radius={16}
@@ -867,7 +866,7 @@ export default function SearchPage() {
     params.set("page", page.toString());
 
     params.delete("type");
-    dataTypes.forEach((dataType) => params.append("type", dataType));
+    dataTypes.forEach((dataType) => { params.append("type", dataType); });
 
     const url = pathname + "?" + params.toString();
     setPreviousPage({ name: "search results", url });

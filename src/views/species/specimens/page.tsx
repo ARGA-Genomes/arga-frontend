@@ -8,7 +8,7 @@ import { PaginationBar } from "@/components/pagination";
 import { LoadOverlay } from "@/components/load-overlay";
 import { RecordItem, RecordList } from "@/components/record-list";
 import { Attribute } from "@/components/highlight-stack";
-import { AnalysisMap, ArgaMap } from "@/components/mapping";
+import { AnalysisMap } from "@/components/mapping";
 import { usePathname } from "next/navigation";
 import { Marker } from "@/components/mapping/analysis-map";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
@@ -94,7 +94,7 @@ const GET_SPECIMEN = gql`
   }
 `;
 
-type Specimen = {
+interface Specimen {
   id: string;
   recordId: string;
   datasetName: string;
@@ -108,22 +108,22 @@ type Specimen = {
   markers: number;
   latitude?: number;
   longitude?: number;
-};
+}
 
-type Species = {
+interface Species {
   specimens: {
     total: number;
     records: Specimen[];
   };
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: Species;
-};
+}
 
-type SpecimenQueryResults = {
+interface SpecimenQueryResults {
   specimen: SpecimenDetails;
-};
+}
 
 function toMarker(
   color: [number, number, number, number],

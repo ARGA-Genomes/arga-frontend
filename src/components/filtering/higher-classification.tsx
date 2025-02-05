@@ -23,7 +23,7 @@ export function HigherClassificationFilters({
   onChange,
 }: HigherClassificationFiltersProps) {
   const [items, handlers] = useListState<Filter>(filters);
-  useEffect(() => onChange(items), [items, onChange]);
+  useEffect(() => { onChange(items); }, [items, onChange]);
 
   const addFilter = () => {
     handlers.append({
@@ -57,7 +57,7 @@ export function HigherClassificationFilters({
               <Select
                 value={item.filter}
                 disabled={!item.editable}
-                onChange={(value) => filterChanged(idx, value)}
+                onChange={(value) => { filterChanged(idx, value); }}
                 data={CLASSIFICATIONS.map((option) => {
                   return {
                     value: option.value,
@@ -71,14 +71,14 @@ export function HigherClassificationFilters({
               <DebouncedInputFilter
                 initialValue={item.value}
                 disabled={!item.editable}
-                onChange={(value) => valueChanged(idx, value)}
+                onChange={(value) => { valueChanged(idx, value); }}
               />
             </Flex>
           </Grid.Col>
           <Grid.Col span="content">
             <Button
               color="red"
-              onClick={() => removeFilter(idx)}
+              onClick={() => { removeFilter(idx); }}
               disabled={!item.editable}
             >
               <IconMinus />

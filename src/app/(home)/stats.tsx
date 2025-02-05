@@ -1,7 +1,6 @@
 "use client";
 
-import * as d3 from "d3";
-import { Attribute, DataField } from "@/components/highlight-stack";
+import { DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
@@ -14,7 +13,6 @@ import {
   Group,
   Skeleton,
   Center,
-  Box,
 } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart, CircularBarChart } from "@/components/graphing/bar";
@@ -69,13 +67,13 @@ const GET_TAXON = gql`
   }
 `;
 
-type DataBreakdown = {
+interface DataBreakdown {
   name: string;
   genomes: number;
   totalGenomic: number;
-};
+}
 
-type Taxonomy = {
+interface Taxonomy {
   dataSummary: DataBreakdown[];
   speciesSummary: DataBreakdown[];
   speciesGenomeSummary: DataBreakdown[];
@@ -105,11 +103,11 @@ type Taxonomy = {
     speciesData: number;
     speciesGenomes: number;
   }[];
-};
+}
 
-type TaxonResults = {
+interface TaxonResults {
   taxon: Taxonomy;
-};
+}
 
 const GET_DESCENDANTS = gql`
   query DescendantStats {
@@ -177,7 +175,7 @@ const GET_DESCENDANTS = gql`
   }
 `;
 
-type EukaryotaDescendantResults = {
+interface EukaryotaDescendantResults {
   eukaryotaTaxon: {
     canonicalName: string;
     summary: {
@@ -234,7 +232,7 @@ type EukaryotaDescendantResults = {
       species: number;
     }[];
   };
-};
+}
 
 const GET_EUKARYOTA_TREE = gql`
   query TaxonHierarchy {
@@ -320,14 +318,14 @@ const GET_EUKARYOTA_TREE = gql`
   }
 `;
 
-type TaxonTreeNode = {
+interface TaxonTreeNode {
   name: string;
   rank: string;
   value?: number;
   children?: TaxonTreeNode[];
-};
+}
 
-type EukaryotaTreeResults = {
+interface EukaryotaTreeResults {
   animaliaTree: {
     taxonBreakdown: TaxonTreeNode[];
   };
@@ -343,7 +341,7 @@ type EukaryotaTreeResults = {
   chromistaTree: {
     taxonBreakdown: TaxonTreeNode[];
   };
-};
+}
 
 export function ShowStats() {
   const taxonResults = useQuery<TaxonResults>(GET_TAXON);
@@ -471,7 +469,7 @@ export function ShowTaxonomicCoverageStats() {
       };
     })
     .concat(
-      taxon?.regnumDescendants
+      taxon.regnumDescendants
         .filter((descendant) => descendant.canonicalName !== "Protista")
         .map((descendant) => {
           return {
@@ -482,7 +480,7 @@ export function ShowTaxonomicCoverageStats() {
         })
     )
     .concat(
-      taxon?.superKingdomDescendants.map((descendant) => {
+      taxon.superKingdomDescendants.map((descendant) => {
         return {
           name: descendant.canonicalName,
           value: descendant.species,
@@ -528,12 +526,12 @@ export function ShowTaxonomicCoverageStats() {
   );
 }
 
-type TreeNode = {
+interface TreeNode {
   name: string;
   value?: number;
   color?: string;
   children?: TreeNode[];
-};
+}
 
 export function ShowCircularTaxonomy() {
   const [treeData, setTreeData] = useState<TreeNode>();

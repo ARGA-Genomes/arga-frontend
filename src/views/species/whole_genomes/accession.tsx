@@ -95,7 +95,7 @@ type SequenceDetails = Sequence & {
   };
 };
 
-type SpecimenDetails = {
+interface SpecimenDetails {
   recordId: string;
   collectionCode?: string;
   latitude?: number;
@@ -103,12 +103,12 @@ type SpecimenDetails = {
   events: {
     accessions: { id: string }[];
   };
-};
+}
 
-type SequenceQueryResults = {
+interface SequenceQueryResults {
   sequence: SequenceDetails[];
   specimen: SpecimenDetails;
-};
+}
 
 interface LinkButtonProps extends ButtonProps {
   href?: string;
@@ -142,7 +142,7 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
   const saveToList = () => {
     if (sequence && deposition?.sourceUri && deposition.accession) {
       const components = deposition.sourceUri.split("/");
-      const url = `${deposition?.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
+      const url = `${deposition.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
 
       const item = {
         url,
@@ -150,7 +150,7 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
         dataType: deposition.dataType || "whole genome",
         scientificName: canonicalName,
         datePublished: deposition.eventDate,
-        dataset: { id: "", name: sequence?.datasetName },
+        dataset: { id: "", name: sequence.datasetName },
       };
       setSaved([...(saved || []), item]);
     }
@@ -432,7 +432,7 @@ function SpecimenPreview({
 
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   const position: [number, number] | undefined =
-    specimen && specimen.latitude && specimen.longitude
+    specimen?.latitude && specimen.longitude
       ? [Number(specimen.latitude), Number(specimen.longitude)]
       : undefined;
 

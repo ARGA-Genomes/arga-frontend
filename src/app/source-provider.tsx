@@ -12,18 +12,18 @@ const GET_DETAILS = gql`
   }
 `;
 
-export type Dataset = {
+export interface Dataset {
   id: string;
   name: string;
-};
+}
 
-type Source = {
+interface Source {
   datasets: Dataset[];
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   sources: Source[];
-};
+}
 
 const DatasetsContext = React.createContext<Map<string, Dataset>>(new Map());
 

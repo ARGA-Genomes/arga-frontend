@@ -180,7 +180,7 @@ function GenomeDetails({ record }: { record: CommonGenome }) {
       {Object.entries(record).map(([key, value]) => {
         return renderField(key, value);
       })}
-      {record.associatedSequences?.nucleotides && (
+      {record.associatedSequences.nucleotides && (
         <>
           <div style={{ display: "-webkit-flex" }}>
             <Grid.Col span={6}>
@@ -277,11 +277,11 @@ function GenomeRecord(props: GenomeRecordProps) {
     <>
       <tr
         style={{ cursor: "pointer" }}
-        onClick={() => props.onSelected(props.record)}
+        onClick={() => { props.onSelected(props.record); }}
       >
         <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
         <td>
-          {props.record?.type
+          {props.record.type
             ? FORMATTED_TYPE[props.record.type] || props.record.type
             : "Not Supplied"}
         </td>
@@ -338,11 +338,11 @@ export default function GenomeTable({ records }: { records: CommonGenome[] }) {
         </tr>
       </thead>
       <tbody>
-        {records?.map((record, idx) => {
+        {records.map((record, idx) => {
           return (
             <GenomeRecord
               record={record}
-              selected={selected.indexOf(record) >= 0}
+              selected={selected.includes(record)}
               onSelected={toggle}
               key={idx}
             />

@@ -16,7 +16,7 @@ import { MAX_WIDTH } from "@/app/constants";
 import * as Humanize from "humanize-plus";
 import { useClipboard } from "@mantine/hooks";
 import { useRef } from "react";
-import { IconCopy, IconExternalLink } from "@tabler/icons-react";
+import { IconCopy } from "@tabler/icons-react";
 
 const months = [
   "Jan",
@@ -33,11 +33,11 @@ const months = [
   "Dec",
 ];
 
-type QueryResults = {
+interface QueryResults {
   species: {
     taxonomy: Taxonomy[];
   };
-};
+}
 
 const GET_SPECIES = gql`
   query Species($canonicalName: String) {
@@ -89,7 +89,7 @@ export function PageCitation() {
                       color="midnight.8"
                       size="sm"
                       onClick={() =>
-                        clipboard.copy(citation.current?.innerText)
+                        { clipboard.copy(citation.current?.innerText); }
                       }
                     >
                       <IconCopy size={14} />
@@ -145,7 +145,7 @@ export function DataPageCitation() {
                       color="midnight.8"
                       size="sm"
                       onClick={() =>
-                        clipboard.copy(citation.current?.innerText)
+                        { clipboard.copy(citation.current?.innerText); }
                       }
                     >
                       <IconCopy size={14} />

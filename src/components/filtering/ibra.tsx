@@ -10,7 +10,7 @@ interface IbraFiltersProps {
 
 export function IbraFilters({ value, options, onChange }: IbraFiltersProps) {
   const changeFilter = (value: string | null) => {
-    if (!value) return onChange(undefined);
+    if (!value) { onChange(undefined); return; }
 
     onChange({
       filter: "IBRA",

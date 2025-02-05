@@ -10,7 +10,7 @@ import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
 
-type QueryResults = {
+interface QueryResults {
   species: {
     dataSummary: {
       genomes?: number;
@@ -20,7 +20,7 @@ type QueryResults = {
       totalGenomic?: number;
     };
   };
-};
+}
 
 function DataTabs({
   name,
@@ -40,7 +40,7 @@ function DataTabs({
 
   // based on the current url the active tab should always be
   // the fourth component in the path name
-  const tab = path?.split("/")[3];
+  const tab = path.split("/")[3];
 
   if (!tab) redirect(`/species/${name}/summary`, RedirectType.replace);
 

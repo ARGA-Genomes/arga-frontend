@@ -2,7 +2,7 @@
 
 import 'leaflet/dist/leaflet.css';
 
-import { Box, Text, Button } from "@mantine/core";
+import { Box, Text } from "@mantine/core";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { Icon, LatLngBoundsExpression, LatLngExpression } from 'leaflet';
 import { Coordinates } from "@/app/type";
@@ -27,7 +27,7 @@ function PopupMarker({ position, children }: { position: Coordinates, children: 
 }
 
 function MarkersList({ coordinates }: { coordinates: Coordinates[] }) {
-  const markers = coordinates.filter(c => c?.latitude && c?.longitude).map((position, idx) => (
+  const markers = coordinates.filter(c => c.latitude && c.longitude).map((position, idx) => (
     <PopupMarker position={position} key={idx}>
       <Text>Latitude: {position.latitude}</Text>
       <Text>Longitude: {position.longitude}</Text>

@@ -4,7 +4,7 @@ import classes from "../../components/record-list.module.css";
 import tabsClasses from "../../components/event-timeline-tabs.module.css";
 
 import * as Humanize from "humanize-plus";
-import { ApolloError, gql, useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import {
   Button,
   Grid,
@@ -30,7 +30,6 @@ import {
   IconArrowUpRight,
   IconBinaryTree2,
   IconDna,
-  IconDna2,
   IconDnaOff,
   IconExternalLink,
   IconSearch,
@@ -49,7 +48,6 @@ import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import {
   TaxonStatTreeNode,
   findChildren,
-  findChildrenCanonical,
 } from "@/queries/stats";
 import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
 import { Taxon } from "@/queries/taxa";
@@ -88,11 +86,11 @@ const GET_TAXA = gql`
   }
 `;
 
-type TaxaQuery = {
+interface TaxaQuery {
   taxa: {
     records: Taxon[];
   };
-};
+}
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
@@ -187,13 +185,13 @@ const GET_TYPE_SPECIMENS = gql`
   }
 `;
 
-type ClassificationNode = {
+interface ClassificationNode {
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
-type TaxonomicAct = {
+interface TaxonomicAct {
   entityId: string;
   sourceUrl: string;
   taxon: {
@@ -201,9 +199,9 @@ type TaxonomicAct = {
     authorship?: string;
     status: string;
   };
-};
+}
 
-type NomenclaturalAct = {
+interface NomenclaturalAct {
   entityId: string;
   act: string;
   sourceUrl: string;
@@ -224,42 +222,42 @@ type NomenclaturalAct = {
     canonicalName: string;
     authorship?: string;
   };
-};
+}
 
-type NamePublication = {
+interface NamePublication {
   publishedYear?: number;
   citation?: string;
   sourceUrl?: string;
   typeCitation?: string;
-};
+}
 
-type TaxonQuery = {
+interface TaxonQuery {
   taxon: Taxon & {
     hierarchy: ClassificationNode[];
     nomenclaturalActs: NomenclaturalAct[];
   };
-};
+}
 
-type SynonymsQuery = {
+interface SynonymsQuery {
   taxon: {
     taxonomicActs: TaxonomicAct[];
   };
-};
+}
 
-type TypeSpecimenQuery = {
+interface TypeSpecimenQuery {
   taxon: {
     typeSpecimens: {
       specimen: Specimen;
       name: { scientificName: string };
     }[];
   };
-};
+}
 
-type SpecimenRecordNumbers = {
+interface SpecimenRecordNumbers {
   markers: number;
   sequences: number;
   wholeGenomes: number;
-};
+}
 
 const GET_PROVENANCE = gql`
   query NomenclaturalActProvenance($entityId: String) {
@@ -348,11 +346,11 @@ interface Dataset {
   url?: string;
 }
 
-type ProvenanceQuery = {
+interface ProvenanceQuery {
   provenance: {
     nomenclaturalAct: Operation[];
   };
-};
+}
 
 const GET_SUMMARY = gql`
   query SpeciesSummary($canonicalName: String) {
@@ -455,25 +453,25 @@ const GET_SUMMARY_HIERARCHY = gql`
   }
 `;
 
-type VernacularName = {
+interface VernacularName {
   datasetId: string;
   vernacularName: string;
   citation?: string;
   sourceUrl?: string;
-};
+}
 
-type Synonym = {
+interface Synonym {
   scientificName: string;
   canonicalName: string;
   authorship?: string;
-};
+}
 
-type TaxonNode = {
+interface TaxonNode {
   canonicalName: string;
   rank: string;
-};
+}
 
-type Species = {
+interface Species {
   taxonomy: Taxonomy[];
   hierarchy: TaxonNode[];
   vernacularNames: VernacularName[];
@@ -484,11 +482,11 @@ type Species = {
     total: number;
     records: Specimen[];
   };
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: Species;
-};
+}
 
 const GET_TAXON_TREE_STATS = gql`
   query TaxonTreeStats(
@@ -567,11 +565,11 @@ const GET_SPECIMENS = gql`
   }
 `;
 
-type TaxonTreeStatsQuery = {
+interface TaxonTreeStatsQuery {
   stats: {
     taxonBreakdown: TaxonStatTreeNode[];
   };
-};
+}
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
@@ -595,11 +593,11 @@ const GET_TAXON_TREE_NODE = gql`
   }
 `;
 
-type TaxonTreeNodeQuery = {
+interface TaxonTreeNodeQuery {
   stats: {
     taxonBreakdown: TaxonStatTreeNode[];
   };
-};
+}
 
 interface TaxonMatch {
   identifier: string;
@@ -791,7 +789,7 @@ function Details({
       typeSpecimen.name.scientificName == taxonomy.scientificName &&
       typeSpecimen.specimen.typeStatus != "no voucher"
   );
-  const typeSpecimen = typeSpecimens && typeSpecimens[0]?.specimen;
+  const typeSpecimen = typeSpecimens?.[0]?.specimen;
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -852,17 +850,16 @@ function Details({
                       .join(", ")}
                   />
                   {typeSpecimen?.locationSource && (
-                    <SourcePill value={typeSpecimen?.locationSource} />
+                    <SourcePill value={typeSpecimen.locationSource} />
                   )}
                 </Flex>
               </DataTableRow>
-              {typeSpecimen &&
-                typeSpecimen.latitude &&
+              {typeSpecimen?.latitude &&
                 typeSpecimen.longitude && (
                   <DataTableRow label="Type location (geo)">
                     <Group>
                       <DataField
-                        value={[typeSpecimen?.latitude, typeSpecimen?.longitude]
+                        value={[typeSpecimen.latitude, typeSpecimen.longitude]
                           .filter((t) => t)
                           .join(", ")}
                       />
@@ -950,7 +947,7 @@ function Details({
                 {subspecies ? (
                   <Stack gap={8}>
                     {(subspecies || []).length > 0 ? (
-                      subspecies?.map((species, idx) => (
+                      subspecies.map((species, idx) => (
                         <InternalLinkButton
                           key={`${species.scientificName}-${idx}`}
                           url={`/subspecies/${species.scientificName}`}
@@ -1309,8 +1306,8 @@ function NomenclaturalActBody({
         <DataTableRow label="Type location (geo)">
           <DataField
             value={
-              geo?.specimen?.latitude &&
-              `${geo?.specimen.latitude}, ${geo?.specimen.longitude}`
+              geo?.specimen.latitude &&
+              `${geo.specimen.latitude}, ${geo.specimen.longitude}`
             }
           />
         </DataTableRow>

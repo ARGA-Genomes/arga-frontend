@@ -1,7 +1,7 @@
 "use client";
 
-import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
-import { Badge, Group, Loader, Paper, Text } from "@mantine/core";
+import { gql, useApolloClient } from "@apollo/client";
+import { Badge, Group, Paper, Text } from "@mantine/core";
 import { useTheme } from "@nivo/core";
 import {
   ComputedNode,
@@ -15,11 +15,8 @@ import {
 } from "@nivo/tree";
 
 import { useEffect, useState } from "react";
-import {
-  EventTimeline,
-  LineStyle,
-  TimelineIcon,
-} from "@/components/event-timeline";
+
+
 import { useListState } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
 import { animated, to, useSpring } from "@react-spring/web";
@@ -48,16 +45,16 @@ const GET_TAXON_TREE_NODE = gql`
   }
 `;
 
-type TaxonTreeNodeQuery = {
+interface TaxonTreeNodeQuery {
   stats: {
     taxonBreakdown: TaxonStatTreeNode[];
   };
-};
+}
 
 // A node in the tree. This represents the visual node of a taxon and maintains
 // a heirarchy of child tree nodes. It should contain both the data to present as
 // well as transient functional data such as expansion or pinning.
-type Node = {
+interface Node {
   visible: boolean;
   expanded: boolean;
   pinned: boolean;
@@ -76,7 +73,7 @@ type Node = {
 
   // whether or not to render a spinner to indicate the node is loading
   isLoader: boolean;
-};
+}
 
 // Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
 // from the taxon tree statistics query into a presentable tree by injecting and

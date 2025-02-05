@@ -1,24 +1,24 @@
 "use client";
 
 import * as d3 from "d3";
-import { useSpring, animated } from "@react-spring/web";
+import { animated } from "@react-spring/web";
 import { useState } from "react";
-import { Sunburst, ResponsiveSunburst, ComputedDatum } from "@nivo/sunburst";
+import { Sunburst } from "@nivo/sunburst";
 import classes from "./sunburst.module.css";
 import Link from "next/link";
 
-type TreeNode = {
+interface TreeNode {
   name: string;
   rank: string;
   value?: number;
   children?: TreeNode[];
-};
+}
 
-type SunburstChartProps = {
+interface SunburstChartProps {
   data: TreeNode;
   width: number;
   height: number;
-};
+}
 
 function flatten(data: TreeNode[] | undefined): TreeNode[] {
   return (
@@ -40,10 +40,10 @@ function findObject(data: TreeNode[], name: string): TreeNode | undefined {
   return data.find((item) => item.name === name);
 }
 
-type CenteredValueProps = {
+interface CenteredValueProps {
   centerX: number;
   centerY: number;
-};
+}
 
 export function SunburstChart({ data, width, height }: SunburstChartProps) {
   const [chartData, setChartData] = useState<TreeNode>(data);
@@ -99,7 +99,7 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
                 setChartData(data);
               } else {
                 const foundObject = findObject(flatten(data.children), parent);
-                if (foundObject && foundObject.children) {
+                if (foundObject?.children) {
                   setChartData(foundObject);
                 }
               }

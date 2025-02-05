@@ -27,26 +27,26 @@ export const TAXON_NODE = gql`
   }
 `;
 
-export type TaxonName = {
+export interface TaxonName {
   scientificName: string;
   canonicalName: string;
   authorship?: string;
   status: string;
   nomenclaturalCode: string;
-};
+}
 
-export type TaxonSource = {
+export interface TaxonSource {
   citation?: string;
   source?: string;
   sourceUrl?: string;
-};
+}
 
-export type TaxonNode = {
+export interface TaxonNode {
   scientificName: string;
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
 export type Taxon = TaxonName &
   TaxonSource & {

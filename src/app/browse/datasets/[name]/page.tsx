@@ -12,7 +12,6 @@ import {
   Group,
   Stack,
   Container,
-  Grid,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { BarChart } from "@/components/graphing/bar";
@@ -20,7 +19,7 @@ import { TachoChart } from "@/components/graphing/tacho";
 import { PaginationBar } from "@/components/pagination";
 import Link from "next/link";
 import { MAX_WIDTH } from "@/app/constants";
-import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
+import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { Photo } from "@/app/type";
 
@@ -38,17 +37,17 @@ const GET_DATASET = gql`
   }
 `;
 
-type Dataset = {
+interface Dataset {
   citation?: string;
   license?: string;
   rightsHolder?: string;
   url?: string;
   updatedAt: string;
-};
+}
 
-type DetailsQueryResults = {
+interface DetailsQueryResults {
   dataset: Dataset;
-};
+}
 
 const GET_SPECIES = gql`
   query DatasetSpecies($name: String, $page: Int) {
@@ -74,29 +73,29 @@ const GET_SPECIES = gql`
   }
 `;
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
-};
+}
 
-type Record = {
+interface Record {
   taxonomy: { canonicalName: string };
   photo: Photo;
   dataSummary: DataSummary;
-};
+}
 
-type DatasetSpecies = {
+interface DatasetSpecies {
   species: {
     records: Record[];
     total: number;
   };
-};
+}
 
-type SpeciesQueryResults = {
+interface SpeciesQueryResults {
   dataset: DatasetSpecies;
-};
+}
 
 const GET_STATS = gql`
   query DatasetStats($name: String) {
@@ -113,20 +112,20 @@ const GET_STATS = gql`
   }
 `;
 
-type Breakdown = {
+interface Breakdown {
   name: string;
   total: number;
-};
+}
 
-type DatasetStats = {
+interface DatasetStats {
   totalSpecies: number;
   speciesWithData: number;
   breakdown: Breakdown[];
-};
+}
 
-type StatsQueryResults = {
+interface StatsQueryResults {
   stats: { dataset: DatasetStats };
-};
+}
 
 function Species({ dataset }: { dataset: string }) {
   const [page, setPage] = useState(1);
@@ -206,7 +205,7 @@ function DatasetDetails({ dataset }: { dataset: string }) {
       {data?.dataset.url && (
         <Text fw={700} c="dimmed" size="sm">
           Source:{" "}
-          <Link href={data?.dataset.url} target="_blank">
+          <Link href={data.dataset.url} target="_blank">
             ALA Profiles
           </Link>
         </Text>

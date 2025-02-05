@@ -10,15 +10,12 @@ import {
   Image,
   Stack,
   Text,
-  Avatar,
-  Indicator,
   Modal,
   useMantineTheme,
   Collapse,
 } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
 import { useState } from "react";
-import { IconSortDescending } from "@tabler/icons-react";
 import { SavedDataManagerButton } from "@/components/DownloadManager";
 
 const links = [
@@ -70,7 +67,7 @@ export function TopNav() {
         size="auto"
         centered
       >
-        {saved?.map((item, idx) => (
+        {saved.map((item, idx) => (
           <Link href={item} key={idx}>
             <Text>{item}</Text>
           </Link>
@@ -84,7 +81,7 @@ export function TopNav() {
         wrap="nowrap"
         h="100%"
       >
-        <Link href="/" onClick={() => setActive(0)}>
+        <Link href="/" onClick={() => { setActive(0); }}>
           <Image
             p="md"
             src="/arga-logo.svg"

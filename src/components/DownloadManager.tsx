@@ -47,19 +47,19 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export type SavedItem = {
+export interface SavedItem {
   url: string;
   label: string;
   dataType: string;
   scientificName: string;
   datePublished?: string;
   dataset: Dataset;
-};
+}
 
-type DownloadLink = {
+interface DownloadLink {
   label: string;
   url: string;
-};
+}
 
 export function SavedDataManagerButton() {
   const [opened, { toggle, close }] = useDisclosure(false);
@@ -73,10 +73,10 @@ export function SavedDataManagerButton() {
       </Drawer>
       <Indicator
         inline
-        label={saved?.length}
+        label={saved.length}
         size={16}
         color="bushfire"
-        disabled={!saved?.length}
+        disabled={!saved.length}
       >
         <Button
           variant="subtle"
@@ -142,7 +142,7 @@ function SavedDataManager() {
   }, [saved]);
 
   function remove(item: SavedItem) {
-    const newList = saved?.filter((value) => value.url != item.url);
+    const newList = saved.filter((value) => value.url != item.url);
     setSaved(newList || []);
   }
 
@@ -167,7 +167,7 @@ function SavedDataManager() {
       <Grid.Col span={10}>
         <ScrollArea.Autosize>
           <SimpleGrid cols={3}>
-            {saved?.map((item) => (
+            {saved.map((item) => (
               <SavedDataItem
                 key={item.url}
                 item={item}
@@ -290,9 +290,9 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
       w={80}
       bg={hint}
       style={{ cursor: "pointer" }}
-      onMouseOver={() => setHint(checked ? "moss.1" : "moss.0")}
-      onMouseOut={() => setHint(checked ? "moss.0" : "none")}
-      onClick={() => setChecked(!checked)}
+      onMouseOver={() => { setHint(checked ? "moss.1" : "moss.0"); }}
+      onMouseOut={() => { setHint(checked ? "moss.0" : "none"); }}
+      onClick={() => { setChecked(!checked); }}
     >
       <Center h={100}>
         <MantineProvider theme={theme}>
@@ -301,7 +301,7 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
             size="lg"
             radius="lg"
             checked={checked}
-            onChange={(ev) => setChecked(ev.currentTarget.checked)}
+            onChange={(ev) => { setChecked(ev.currentTarget.checked); }}
           />
         </MantineProvider>
       </Center>
@@ -329,7 +329,7 @@ function SavedDataItem({
           <Group gap="xl">
             <HintedCheckbox
               onChange={(checked) =>
-                checked ? onSelected(item) : onDeselected(item)
+                { checked ? onSelected(item) : onDeselected(item); }
               }
             />
             <Link
@@ -359,7 +359,7 @@ function SavedDataItem({
             color="red"
             variant="subtle"
             radius={0}
-            onClick={() => onRemove(item)}
+            onClick={() => { onRemove(item); }}
             h={100}
           >
             <IconTrash style={{ width: rem(35), height: rem(35) }} />
@@ -429,7 +429,7 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
         color="moss"
         radius={0}
         rightSection={<IconClipboardCopy />}
-        onClick={() => clipboard.copy(selected.url)}
+        onClick={() => { clipboard.copy(selected.url); }}
       >
         {clipboard.copied ? "Copied!" : "Copy URL"}
       </Button>

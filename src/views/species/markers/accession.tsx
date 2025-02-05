@@ -92,7 +92,7 @@ type SequenceDetails = Sequence & {
   };
 };
 
-type SpecimenDetails = {
+interface SpecimenDetails {
   recordId: string;
   collectionCode?: string;
   latitude?: number;
@@ -100,12 +100,12 @@ type SpecimenDetails = {
   events: {
     accessions: { id: string }[];
   };
-};
+}
 
-type SequenceQueryResults = {
+interface SequenceQueryResults {
   sequence: SequenceDetails[];
   specimen: SpecimenDetails;
-};
+}
 
 interface LinkButtonProps extends ButtonProps {
   href?: string;
@@ -186,7 +186,7 @@ function MoleculeDetails({
               leftSection={<IconLink />}
               href={
                 deposition?.accession &&
-                `${depositionBase}${deposition?.accession}`
+                `${depositionBase}${deposition.accession}`
               }
             >
               go to source
@@ -369,7 +369,7 @@ function SpecimenPreview({
 
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   const position: [number, number] | undefined =
-    specimen && specimen.latitude && specimen.longitude
+    specimen?.latitude && specimen.longitude
       ? [Number(specimen.latitude), Number(specimen.longitude)]
       : undefined;
 

@@ -21,7 +21,7 @@ export function intoFilterItem(item: Filter): FilterItem | undefined {
 }
 
 
-export type Filter = {
+export interface Filter {
   filter: string,
   action: string,
   value: string,
@@ -45,12 +45,12 @@ export function DebouncedInputFilter({ initialValue, onChange, ...props }: Debou
   const [value, setValue] = useState(initialValue || '');
   const [debounced] = useDebouncedValue(value, 400);
 
-  useEffect(() => onChange(debounced), [debounced])
+  useEffect(() => { onChange(debounced); }, [debounced])
 
   return (
     <Input
       value={value}
-      onChange={el => setValue(el.currentTarget.value)}
+      onChange={el => { setValue(el.currentTarget.value); }}
       {...props}
     />
   )

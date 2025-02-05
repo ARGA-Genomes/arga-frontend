@@ -19,7 +19,7 @@ interface DataTypeFiltersProps {
 
 export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
   const [items, handlers] = useListState<Filter>(filters);
-  useEffect(() => onChange(items), [items, onChange]);
+  useEffect(() => { onChange(items); }, [items, onChange]);
 
   const findFilter = (value: string) => {
     return items.find(item => item.value === value)

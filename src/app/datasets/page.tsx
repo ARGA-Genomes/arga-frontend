@@ -4,7 +4,6 @@ import { LoadOverlay } from "@/components/load-overlay";
 import { gql, useQuery } from "@apollo/client";
 import {
   Grid,
-  Title,
   Paper,
   Button,
   Stack,
@@ -18,7 +17,6 @@ import {
   Box,
   SimpleGrid,
   UnstyledButton,
-  Overlay,
   Chip,
 } from "@mantine/core";
 import Link from "next/link";
@@ -26,8 +24,6 @@ import { DateTime } from "luxon";
 import { AttributePill } from "@/components/data-fields";
 import {
   IconExternalLink,
-  IconCaretDownFilled,
-  IconEye,
   IconArrowUpRight,
   IconClockHour4,
   IconTable,
@@ -37,9 +33,7 @@ import {
 } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
-import { IoEye } from "react-icons/io5";
 import { useState, useMemo } from "react";
-import { access, copyFileSync } from "fs";
 import { SortChip } from "@/components/sorting/sort-chips";
 import { DataPageCitation } from "@/components/page-citation";
 import styles from "../../components/record-list.module.css";
@@ -74,7 +68,7 @@ const GET_DATASETS = gql`
   }
 `;
 
-type Dataset = {
+interface Dataset {
   name: string;
   shortName?: string;
   description?: string;
@@ -87,9 +81,9 @@ type Dataset = {
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   publicationYear?: number;
-};
+}
 
-type Source = {
+interface Source {
   name: string;
   author: string;
   rightsHolder: string;
@@ -100,16 +94,16 @@ type Source = {
   contentType?: ContentType;
   datasets: Dataset[];
   lastUpdated?: string;
-};
+}
 
-type GroupedSources = {
+interface GroupedSources {
   contentType: string;
   sources: Source[];
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   sources: Source[];
-};
+}
 
 interface License {
   name: string;
@@ -320,7 +314,7 @@ function DatasetRow({
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.accessPill.slice(1).toLowerCase()) || "No data"
             }
             color={
               dataset.accessPill
@@ -339,7 +333,7 @@ function DatasetRow({
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.reusePill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.reusePill.slice(1).toLowerCase()) || "No data"
             }
             color={
               dataset.reusePill
@@ -452,7 +446,7 @@ function CollectionCard({ collection }: { collection: Source }) {
                   ?.toLowerCase()
                   .charAt(0)
                   .toUpperCase()
-                  .concat(collection.accessPill?.slice(1).toLowerCase()) ||
+                  .concat(collection.accessPill.slice(1).toLowerCase()) ||
                 "No data"
               }
               group={true}
@@ -473,7 +467,7 @@ function CollectionCard({ collection }: { collection: Source }) {
                   ?.toLowerCase()
                   .charAt(0)
                   .toUpperCase()
-                  .concat(collection.reusePill?.slice(1).toLowerCase()) ||
+                  .concat(collection.reusePill.slice(1).toLowerCase()) ||
                 "No data"
               }
               group={true}
@@ -551,7 +545,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                         .charAt(0)
                         .toUpperCase()
                         .concat(
-                          collection.accessPill?.slice(1).toLowerCase()
+                          collection.accessPill.slice(1).toLowerCase()
                         ) || "No data"
                     }
                     color={
@@ -572,7 +566,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                         ?.toLowerCase()
                         .charAt(0)
                         .toUpperCase()
-                        .concat(collection.reusePill?.slice(1).toLowerCase()) ||
+                        .concat(collection.reusePill.slice(1).toLowerCase()) ||
                       "No data"
                     }
                     color={
@@ -755,14 +749,14 @@ function ContentTypeContainer({
       <Accordion.Panel>
         {layoutView === "card" && (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-            {sortedSources?.map((collection, idx) => (
+            {sortedSources.map((collection, idx) => (
               <CollectionCard collection={collection} key={idx} />
             ))}
           </SimpleGrid>
         )}
         {layoutView === "table" && (
           <SimpleGrid cols={1}>
-            {sortedSources?.map((collection, idx) => (
+            {sortedSources.map((collection, idx) => (
               <CollectionRow collection={collection} key={idx} />
             ))}
           </SimpleGrid>
@@ -795,7 +789,7 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
 
   if (sources) {
     const grouped = sources.reduce(
-      (acc: { [key: string]: Source[] }, source) => {
+      (acc: Record<string, Source[]>, source) => {
         const contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
 
         // If this contentType doesn't exist in the accumulator, create a new array
@@ -869,7 +863,7 @@ export default function DatasetsPage() {
             classNames={classes}
             chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
           >
-            {groupedSources?.map((group) => (
+            {groupedSources.map((group) => (
               <ContentTypeContainer
                 contentType={group}
                 key={group.contentType}

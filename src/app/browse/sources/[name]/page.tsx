@@ -14,14 +14,12 @@ import {
   Drawer,
   Box,
   Grid,
-  SegmentedControl,
   Button,
   Accordion,
   Badge,
   Avatar,
   useMantineTheme,
   ScrollArea,
-  UnstyledButton,
   Chip,
   Center,
 } from "@mantine/core";
@@ -35,7 +33,6 @@ import {
   IconFilter,
   IconClockHour4,
   IconExternalLink,
-  IconArrowUpRight,
   IconArrowsSort,
 } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
@@ -49,10 +46,10 @@ import { SortChip } from "@/components/sorting/sort-chips";
 import classes from "../../../../components/record-list.module.css";
 
 const PAGE_SIZE = 10;
-type Filters = {
+interface Filters {
   classifications: Filter[];
   dataTypes: Filter[];
-};
+}
 
 const GET_DETAILS = gql`
   query SourceDetails($name: String) {
@@ -87,7 +84,7 @@ const GET_DETAILS = gql`
   }
 `;
 
-type Dataset = {
+interface Dataset {
   name: string;
   shortName?: string;
   description?: string;
@@ -100,7 +97,7 @@ type Dataset = {
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   publicationYear?: number;
-};
+}
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
@@ -120,11 +117,11 @@ const reusePillColours: Record<ReusePillType, string> = {
   VARIABLE: "wheat.3",
 };
 
-type SpeciesCount = {
+interface SpeciesCount {
   total: number;
-};
+}
 
-type Source = {
+interface Source {
   license: string;
   accessRights: string;
   rightsHolder: string;
@@ -134,11 +131,11 @@ type Source = {
   accessPill?: AccessPillType;
   species: SpeciesCount;
   datasets: Dataset[];
-};
+}
 
-type DetailsQueryResults = {
+interface DetailsQueryResults {
   source: Source;
-};
+}
 
 const GET_SPECIES = gql`
   query SourceSpecies(
@@ -172,27 +169,27 @@ const GET_SPECIES = gql`
   }
 `;
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
-};
+}
 
-type SpeciesRecord = {
+interface SpeciesRecord {
   taxonomy: { canonicalName: string };
   photo: Photo;
   dataSummary: DataSummary;
-};
+}
 
-type SpeciesQueryResults = {
+interface SpeciesQueryResults {
   source: {
     species: {
       records: SpeciesRecord[];
       total: number;
     };
   };
-};
+}
 
 interface FiltersProps {
   filters: Filters;
@@ -481,7 +478,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.accessPill.slice(1).toLowerCase()) || "No data"
             }
             color={
               dataset.accessPill
@@ -500,7 +497,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.reusePill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.reusePill.slice(1).toLowerCase()) || "No data"
             }
             color={
               dataset.reusePill
@@ -607,7 +604,7 @@ function SourceDetails({
                       ?.toLowerCase()
                       .charAt(0)
                       .toUpperCase()
-                      .concat(source.accessPill?.slice(1).toLowerCase())}
+                      .concat(source.accessPill.slice(1).toLowerCase())}
                   </b>{" "}
                   access
                 </Text>
@@ -632,7 +629,7 @@ function SourceDetails({
                       ?.toLowerCase()
                       .charAt(0)
                       .toUpperCase()
-                      .concat(source.reusePill?.slice(1).toLowerCase())}
+                      .concat(source.reusePill.slice(1).toLowerCase())}
                   </b>{" "}
                   reuse
                 </Text>
@@ -676,7 +673,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
                   {source}
                 </Text>
                 {data?.source ? (
-                  <SourceDetails source={data?.source} loading={loading} />
+                  <SourceDetails source={data.source} loading={loading} />
                 ) : (
                   error?.message
                 )}
@@ -691,7 +688,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
           <Stack>
             <Paper p="xl" radius="lg" withBorder>
               {data?.source.datasets ? (
-                <BrowseComponentDatasets datasets={data?.source.datasets} />
+                <BrowseComponentDatasets datasets={data.source.datasets} />
               ) : (
                 error?.message
               )}

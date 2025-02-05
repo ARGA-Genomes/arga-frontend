@@ -1,14 +1,14 @@
 import { AbstractBackend, Types, createFlags } from "flag";
-import React, { PropsWithChildren, ReactNode } from "react";
+import React from "react";
 
 export enum FlagOrdering {
   TotalData = "total_data",
   Taxonomy = "taxonomy",
 }
 
-export type Flags = {
+export interface Flags {
   ordering: FlagOrdering;
-};
+}
 
 const DEFAULT_FLAGS = {
   ordering: FlagOrdering.TotalData,

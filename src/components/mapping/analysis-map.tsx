@@ -31,13 +31,13 @@ const GET_GEOMETRY = gql`
   }
 `;
 
-type QueryResults = {
+interface QueryResults {
   maps: {
     ibra: string;
     imcraProvincial: string;
     imcraMesoscale: string;
   };
-};
+}
 
 interface Regions {
   ibra: string[];
@@ -112,7 +112,7 @@ export default function AnalysisMap(
     const [position, setPosition] = useState({ x: 0, y: 0 });
     useEffect(() => {
       const setFromEvent = (e: { clientX: any; clientY: any }) =>
-        setPosition({ x: e.clientX, y: e.clientY });
+        { setPosition({ x: e.clientX, y: e.clientY }); };
       window.addEventListener("mousemove", setFromEvent);
 
       return () => {
@@ -148,7 +148,7 @@ export default function AnalysisMap(
   };
 
   const onClick = ({ object }: { object?: any }) => {
-    if (object && object.recordId) {
+    if (object?.recordId) {
       setClickedMarker(object?.recordId);
       setIsOpen(true);
       setPopupPosition(position);
@@ -193,9 +193,9 @@ export default function AnalysisMap(
         views={view}
         initialViewState={{
           latitude:
-            (initialPosition && initialPosition[0]) || DEFAULT_POSITION[0],
+            (initialPosition?.[0]) || DEFAULT_POSITION[0],
           longitude:
-            (initialPosition && initialPosition[1]) || DEFAULT_POSITION[1],
+            (initialPosition?.[1]) || DEFAULT_POSITION[1],
           zoom: initialZoom || 3.1,
         }}
         layers={[bioRegionLayers(bioRegions), specimenPlotLayer(specimens)]}

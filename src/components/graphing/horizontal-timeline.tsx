@@ -138,7 +138,7 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
     const yOffset = -200;
 
     if (element) {
-      const y = element.getBoundingClientRect()?.top + window.scrollY + yOffset;
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({
         top: y,
         behavior: "smooth",
@@ -164,7 +164,7 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
         <g
           key={`${item.label}-${item.year}-${item.type}-${idx}`}
           transform={`translate(${x(item.date)}, 0)`}
-          onClick={() => handleInstantClick(item)}
+          onClick={() => { handleInstantClick(item); }}
         >
           <TimelineInstant item={item} />
         </g>
@@ -469,11 +469,11 @@ function combineChartDimensions(
   };
 }
 
-type ItemGroup = {
+interface ItemGroup {
   label: string;
   bars: TimelineItem[];
   instants: TimelineItem[];
-};
+}
 
 function groupItems(items: TimelineItem[]): ItemGroup[] {
   const groups: Record<string, ItemGroup> = {};
@@ -533,10 +533,10 @@ function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
   return Array.from(map.values());
 }
 
-type Domain = {
+interface Domain {
   start: Date;
   end: Date;
-};
+}
 
 /**
  * Create a domain from the timeline items as decades.

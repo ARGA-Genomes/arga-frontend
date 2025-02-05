@@ -26,17 +26,17 @@ const GET_TAXON = gql`
   }
 `;
 
-type ClassificationNode = {
+interface ClassificationNode {
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
-type TaxonQuery = {
+interface TaxonQuery {
   taxon: {
     hierarchy: ClassificationNode[];
   };
-};
+}
 
 const GET_SUMMARY = gql`
   query SpeciesSummary($canonicalName: String) {
@@ -79,36 +79,36 @@ const GET_SUMMARY = gql`
   }
 `;
 
-type VernacularName = {
+interface VernacularName {
   datasetId: string;
   vernacularName: string;
   citation?: string;
   sourceUrl?: string;
-};
+}
 
-type Synonym = {
+interface Synonym {
   scientificName: string;
   canonicalName: string;
   authorship?: string;
-};
+}
 
-type speciesDataSummary = {
+interface speciesDataSummary {
   genomes: number;
   loci: number;
-};
+}
 
-type Species = {
+interface Species {
   taxonomy: Taxonomy[];
   vernacularNames: VernacularName[];
   synonyms: Synonym[];
   photos: Photo[];
   indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[];
   dataSummary: speciesDataSummary;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: Species;
-};
+}
 
 interface TaxonMatch {
   identifier: string;

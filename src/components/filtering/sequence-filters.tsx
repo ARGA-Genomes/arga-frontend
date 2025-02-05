@@ -4,11 +4,11 @@ import { Accordion, Avatar, Group, Text } from "@mantine/core"
 import { AssemblyFilters } from "./filters/assembly"
 
 
-type SequenceFilters = {
+interface SequenceFilters {
   assembly: Filter[],
 }
 
-type FilterOptions = {
+interface FilterOptions {
   ecology: string[],
   ibra: string[],
   imcra: string[],

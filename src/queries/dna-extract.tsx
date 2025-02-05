@@ -6,9 +6,9 @@ export const DNA_EXTRACT = gql`
   }
 `;
 
-export type DnaExtract = {
+export interface DnaExtract {
   recordId: string,
-};
+}
 
 export const DNA_EXTRACTION_EVENT = gql`
   fragment DnaExtractionEventDetails on DnaExtractionEvent {
@@ -27,7 +27,7 @@ export const DNA_EXTRACTION_EVENT = gql`
   }
 `;
 
-export type DnaExtractionEvent = {
+export interface DnaExtractionEvent {
   eventDate?: string,
   eventTime?: string,
   extractedBy?: string,

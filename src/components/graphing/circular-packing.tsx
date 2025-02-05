@@ -1,21 +1,20 @@
 "use client";
 
-import * as d3 from "d3";
-import { useSpring, animated } from "@react-spring/web";
+import { animated } from "@react-spring/web";
 import { useState } from "react";
 import { CirclePacking, LabelProps } from "@nivo/circle-packing";
 
-type TreeNode = {
+interface TreeNode {
   name: string;
   value?: number;
   children?: TreeNode[];
-};
+}
 
-type CircularPackingChartProps = {
+interface CircularPackingChartProps {
   data: TreeNode;
   width: number;
   height: number;
-};
+}
 
 export function CircularPackingChart({
   data,
@@ -55,7 +54,7 @@ export function CircularPackingChart({
           textAnchor="middle"
           dominantBaseline="central"
           style={{ pointerEvents: "none" }} // Prevent text from intercepting mouse events
-          transform={`translate(${0},${-label.node.radius - 10})`}
+          transform={`translate(0,${-label.node.radius - 10})`}
         >
           {label.node.data.name}
         </animated.text>

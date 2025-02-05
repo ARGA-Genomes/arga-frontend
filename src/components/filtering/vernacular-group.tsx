@@ -194,7 +194,7 @@ export function VernacularGroupFilters({
     .sort((a, b) => a.value.localeCompare(b.value));
 
   const changeFilter = (value: string | null) => {
-    if (!value) return onChange(undefined);
+    if (!value) { onChange(undefined); return; }
 
     onChange({
       filter: "VERNACULAR_GROUP",

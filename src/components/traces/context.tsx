@@ -57,7 +57,7 @@ export function TraceLoaderProvider({ children }: { children: React.ReactNode })
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    init().then(() => setInitialized(true));
+    init().then(() => { setInitialized(true); });
   }, []);
 
   const state = {

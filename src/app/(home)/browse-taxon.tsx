@@ -7,13 +7,13 @@ import { Carousel } from "@mantine/carousel";
 import { Group } from "@mantine/core";
 import "@mantine/carousel/styles.css";
 
-type Overview = {
+interface Overview {
   animals: number;
   plants: number;
   fungi: number;
   protista: number;
   allSpecies: number;
-};
+}
 
 const GET_OVERVIEW = gql`
   query {
@@ -27,9 +27,9 @@ const GET_OVERVIEW = gql`
   }
 `;
 
-type OverviewResults = {
+interface OverviewResults {
   overview: Overview;
-};
+}
 
 export default function BrowseTaxon() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);

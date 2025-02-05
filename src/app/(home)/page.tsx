@@ -1,13 +1,10 @@
 "use client";
 
 import {
-  Paper,
-  Grid,
   Text,
   Title,
   Stack,
   TextInput,
-  Container,
   Flex,
   Box,
   Center,
@@ -19,15 +16,10 @@ import BrowseTaxon from "./browse-taxon";
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
-import { MAX_WIDTH } from "../constants";
 import {
   ShowStats,
-  ShowTaxonomicCoverageStats,
-  ShowCircularTaxonomy,
   ShowSunburstTaxonomy,
 } from "./stats";
-import classes from "./page.module.css";
-import { ScrollArea } from "@mantine/core";
 import RecentUpdatesContainer from "../../components/recent-updates-container";
 
 function Search() {
@@ -49,7 +41,7 @@ function Search() {
       <TextInput
         placeholder="e.g. sequence accession, species name"
         value={value}
-        onChange={(val) => setValue(val.target.value)}
+        onChange={(val) => { setValue(val.target.value); }}
         leftSectionWidth={60}
         size="xl"
         radius="lg"

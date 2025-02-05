@@ -5,7 +5,6 @@ import {
 } from "@/app/type";
 import {
   Box,
-  Group,
   ThemeIcon,
   Image,
   Tooltip,
@@ -13,7 +12,6 @@ import {
   Popover,
   Stack,
   SimpleGrid,
-  Skeleton,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
@@ -275,7 +273,7 @@ function ConservationIcon({
     <Tooltip label={tooltip}>
       <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
         {icon.image && (
-          <Image src={icon?.image} alt={icon.label || status} w={60} />
+          <Image src={icon.image} alt={icon.label || status} w={60} />
         )}
       </ThemeIcon>
     </Tooltip>
@@ -346,7 +344,7 @@ function IndigenousLanguageGroupIcon({
       <Popover.Target>
         <Image
           w={60}
-          src={icon?.image}
+          src={icon.image}
           alt=""
           onMouseEnter={open}
           onMouseLeave={close}
@@ -354,7 +352,7 @@ function IndigenousLanguageGroupIcon({
       </Popover.Target>
       <Popover.Dropdown>
         <Stack>
-          <Text>{icon?.label}</Text>
+          <Text>{icon.label}</Text>
           <Text size="sm">
             <strong>Name:</strong> {trait.name}
           </Text>
@@ -396,7 +394,7 @@ function IndigenousLanguageGroupIcon({
   );
 
   return (
-    <>{icon?.link ? <Link href={icon.link}>{component}</Link> : component}</>
+    <>{icon.link ? <Link href={icon.link}>{component}</Link> : component}</>
   );
 }
 
@@ -454,25 +452,25 @@ const GET_TAXON = gql`
   }
 `;
 
-type ClassificationNode = {
+interface ClassificationNode {
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
-type TaxonQuery = {
+interface TaxonQuery {
   taxon: {
     hierarchy: ClassificationNode[];
   };
-};
+}
 
-type NameAttribute = {
+interface NameAttribute {
   name: string;
   valueBool?: boolean;
   valueInt?: number;
   valueDecimal?: number;
   valueStr?: string;
-};
+}
 
 interface IconBarProps {
   taxonomy: Taxonomy;
@@ -638,7 +636,7 @@ export default function IconBar({
           )
       )}
       {attributeHeaderIcons &&
-        attributeHeaderIcons?.map(
+        attributeHeaderIcons.map(
           (icon, index) =>
             icon && (
               <Carousel.Slide pr="5px" pl="5px" key={index}>

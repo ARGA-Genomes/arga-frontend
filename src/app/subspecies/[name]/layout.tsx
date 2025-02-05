@@ -28,7 +28,7 @@ function DataTabs({
 
   // based on the current url the active tab should always be
   // the fourth component in the path name
-  const tab = path?.split("/")[3];
+  const tab = path.split("/")[3];
 
   if (!tab) redirect(`/subspecies/${name}/summary`, RedirectType.replace);
 

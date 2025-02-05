@@ -14,13 +14,13 @@ const GET_GEOMETRY = gql`
   }
 `;
 
-type QueryResults = {
+interface QueryResults {
   maps: {
     ibra: string;
     imcraProvincial: string;
     imcraMesoscale: string;
   };
-};
+}
 
 
 export function BioRegionLayers({ regions }: { regions: string[] }) {

@@ -3,15 +3,15 @@
 import { gql, useQuery } from "@apollo/client";
 
 import { BrowseCard } from "@/components/browse-card";
-import { Carousel, Embla } from "@mantine/carousel";
+import { Carousel } from "@mantine/carousel";
 import { Group } from "@mantine/core";
 import "@mantine/carousel/styles.css";
 
-type Overview = {
+interface Overview {
   wholeGenomes: number;
   loci: number;
   specimens: number;
-};
+}
 
 const GET_OVERVIEW = gql`
   query {
@@ -23,9 +23,9 @@ const GET_OVERVIEW = gql`
   }
 `;
 
-type OverviewResults = {
+interface OverviewResults {
   overview: Overview;
-};
+}
 
 export default function BrowseType() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);

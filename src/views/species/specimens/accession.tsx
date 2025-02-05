@@ -131,12 +131,12 @@ type SequenceDetails = Sequence & {
   };
 };
 
-type SpecimenQueryResults = {
+interface SpecimenQueryResults {
   specimen: SpecimenDetails;
   subsample: SubsampleDetails;
   dnaExtract: DnaExtractDetails;
   sequence: SequenceDetails[];
-};
+}
 
 const GET_PROVENANCE = gql`
   query Provenance($entityId: String) {
@@ -206,7 +206,7 @@ interface Dataset {
   url?: string;
 }
 
-type ProvenanceQuery = {
+interface ProvenanceQuery {
   provenance: {
     specimen: [
       {
@@ -219,7 +219,7 @@ type ProvenanceQuery = {
       }
     ];
   };
-};
+}
 
 function Provenance({ entityId }: { entityId: string }) {
   const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
@@ -950,7 +950,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -971,7 +971,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -992,7 +992,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -1013,7 +1013,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -1105,7 +1105,7 @@ export default function SpecimenAccession({
 }: {
   params: { accession: string };
 }) {
-  const basePath = usePathname()?.replace(params.accession, "");
+  const basePath = usePathname().replace(params.accession, "");
 
   const { loading, error, data } = useQuery<SpecimenQueryResults>(
     GET_SPECIMEN,

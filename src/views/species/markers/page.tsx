@@ -11,7 +11,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { AnalysisMap, ArgaMap } from "@/components/mapping";
+import { AnalysisMap } from "@/components/mapping";
 
 import React, { useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -46,7 +46,7 @@ const GET_SPECIES = gql`
   }
 `;
 
-type Loci = {
+interface Loci {
   sequenceId: string;
   datasetName: string;
   recordId: string;
@@ -57,16 +57,16 @@ type Loci = {
   releaseDate?: string;
   latitude?: number;
   longitude?: number;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: {
     markers: {
       total: number;
       records: Loci[];
     };
   };
-};
+}
 
 function toMarker(color: [number, number, number, number], records?: Loci[]) {
   if (!records) return [];

@@ -22,7 +22,7 @@ import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { Layer } from "@/app/type";
 import { ExternalLinkButton } from "@/components/button-link-external";
-import { IconArrowUpRight, IconExternalLink } from "@tabler/icons-react";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
 
 const GET_DISTRIBUTION = gql`
@@ -79,26 +79,26 @@ const GET_DISTRIBUTION = gql`
   }
 `;
 
-type RegionDistribution = {
+interface RegionDistribution {
   names: string[];
   dataset: { name: string };
-};
+}
 
-type Regions = {
+interface Regions {
   ibra: RegionDistribution[];
   imcra: RegionDistribution[];
-};
+}
 
-type Specimen = {
+interface Specimen {
   id: string;
   recordId?: string;
   latitude?: number;
   longitude?: number;
   color?: string;
   type: Layer;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: {
     regions: Regions;
     specimens: {
@@ -118,7 +118,7 @@ type QueryResults = {
       records: Specimen[];
     };
   };
-};
+}
 
 interface DistributionAnalysisProps {
   regions?: Regions;
@@ -193,12 +193,12 @@ function MapFilterOption({
   );
 }
 
-type Filters = {
+interface Filters {
   wholeGenomes: { total: number; count: number };
   loci: { total: number; count: number };
   specimens: { total: number; count: number };
   other: { total: number; count: number };
-};
+}
 
 interface SummaryProps {
   regions?: Regions;
@@ -217,7 +217,7 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
           <Stack gap={5} mb={30}>
             <MapFilterOption
               onChange={(e) =>
-                onFilter(Layer.WholeGenome, e.currentTarget.checked)
+                { onFilter(Layer.WholeGenome, e.currentTarget.checked); }
               }
               size="md"
               color="bushfire"
@@ -226,7 +226,7 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
               total={filters.wholeGenomes.total}
             />
             <MapFilterOption
-              onChange={(e) => onFilter(Layer.Loci, e.currentTarget.checked)}
+              onChange={(e) => { onFilter(Layer.Loci, e.currentTarget.checked); }}
               size="md"
               color="moss.7"
               label="Loci"
@@ -235,7 +235,7 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
             />
             <MapFilterOption
               onChange={(e) =>
-                onFilter(Layer.OtherData, e.currentTarget.checked)
+                { onFilter(Layer.OtherData, e.currentTarget.checked); }
               }
               size="md"
               color="moss.3"
@@ -245,7 +245,7 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
             />
             <MapFilterOption
               onChange={(e) =>
-                onFilter(Layer.Specimens, e.currentTarget.checked)
+                { onFilter(Layer.Specimens, e.currentTarget.checked); }
               }
               size="md"
               color="rgba(103, 151, 180, 220)"
@@ -340,16 +340,16 @@ export default function DistributionPage({
 
   let filters = null;
   if (data) {
-    const specimens = data?.species.specimens;
-    const wholeGenomes = data?.species.wholeGenomes;
-    const markers = data?.species.markers;
-    const other = data?.species.genomicComponents;
+    const specimens = data.species.specimens;
+    const wholeGenomes = data.species.wholeGenomes;
+    const markers = data.species.markers;
+    const other = data.species.genomicComponents;
 
     // filter out null island as well as specimens without coords
-    const validGenomes = wholeGenomes?.records.filter((s) => s.latitude);
-    const validMarkers = markers?.records.filter((s) => s.latitude);
-    const validSpecimens = specimens?.records.filter((s) => s.latitude);
-    const validOther = other?.records.filter((s) => s.latitude);
+    const validGenomes = wholeGenomes.records.filter((s) => s.latitude);
+    const validMarkers = markers.records.filter((s) => s.latitude);
+    const validSpecimens = specimens.records.filter((s) => s.latitude);
+    const validOther = other.records.filter((s) => s.latitude);
 
     filters = {
       wholeGenomes: { total: wholeGenomes.total, count: validGenomes.length },

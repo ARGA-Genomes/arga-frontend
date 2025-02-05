@@ -31,7 +31,7 @@ query DatasetsAndSources {
   }
 }`;
 
-type Dataset = {
+interface Dataset {
   globalId: string,
   name: string,
   shortName?: string,
@@ -44,7 +44,7 @@ type Dataset = {
   updatedAt: string,
 }
 
-type Source = {
+interface Source {
   name: string,
   author: string,
   rightsHolder: string,
@@ -53,9 +53,9 @@ type Source = {
   datasets: Dataset[],
 }
 
-type QueryResults = {
+interface QueryResults {
   sources: Source[],
-};
+}
 
 function RecordItemContent({ dataset }: { dataset: Dataset }) {
   return (

@@ -4,9 +4,7 @@ import classes from "./footer.module.css";
 
 import Link from "next/link";
 import {
-  Container,
   Flex,
-  Grid,
   Group,
   Image,
   Stack,
@@ -33,8 +31,8 @@ function FooterLink({ href, children }: FooterLinkParams) {
 }
 
 export function Footer() {
-  const maxWidth: string = "150px";
-  const minWidth: string = "150px";
+  const maxWidth = "150px";
+  const minWidth = "150px";
   const mawImage = {
     base: "50%",
     xs: maxWidth,

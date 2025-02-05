@@ -23,7 +23,7 @@ import {
 import { IconFilter } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
-import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { Filter } from "@/components/filtering/common";
 import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/components/pagination";
@@ -50,7 +50,7 @@ import Link from "next/link";
 
 const PAGE_SIZE = 10;
 
-type Filters = {
+interface Filters {
   classifications: Filter[];
   vernacularGroup?: Filter;
   ecology?: Filter;
@@ -60,7 +60,7 @@ type Filters = {
   drainageBasin?: Filter;
   bushfireRecovery: Filter[];
   dataTypes: Filter[];
-};
+}
 
 const GET_SPECIES = gql`
   query TaxaSpecies(
@@ -212,20 +212,20 @@ const GET_EUKARYOTA_TAXON = gql`
   }
 `;
 
-type DataBreakdown = {
+interface DataBreakdown {
   name: string;
   genomes: number;
   totalGenomic: number;
-};
+}
 
-type ClassificationNode = {
+interface ClassificationNode {
   scientificName: string;
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
-type Taxonomy = {
+interface Taxonomy {
   scientificName: string;
   scientificNameAuthorship: string;
   canonicalName: string;
@@ -248,9 +248,9 @@ type Taxonomy = {
     speciesData: number;
     speciesGenomes: number;
   }[];
-};
+}
 
-type EukaryotaTaxonomy = {
+interface EukaryotaTaxonomy {
   scientificName: string;
   scientificNameAuthorship: string;
   canonicalName: string;
@@ -285,51 +285,51 @@ type EukaryotaTaxonomy = {
     speciesData: number;
     speciesGenomes: number;
   }[];
-};
+}
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
-};
+}
 
-type Species = {
+interface Species {
   taxonomy: {
     scientificName: string;
     canonicalName: string;
   };
   photo?: Photo;
   dataSummary: DataSummary;
-};
+}
 
-type FilterOptions = {
+interface FilterOptions {
   ecology: string[];
   ibra: string[];
   imcra: string[];
   state: string[];
   drainageBasin: string[];
-};
+}
 
-type Taxa = {
+interface Taxa {
   species: {
     records: Species[];
     total: number;
   };
   filterOptions: FilterOptions;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   taxon: Taxa;
-};
+}
 
-type TaxonResults = {
+interface TaxonResults {
   taxon: Taxonomy;
-};
+}
 
-type EukaryotaTaxonResults = {
+interface EukaryotaTaxonResults {
   taxon: EukaryotaTaxonomy;
-};
+}
 
 function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
   return (
@@ -351,8 +351,8 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
           <td>Source</td>
           <td>
             {taxon?.sourceUrl ? (
-              <Link href={taxon?.sourceUrl} target="_blank">
-                <DataField value={taxon?.source} />
+              <Link href={taxon.sourceUrl} target="_blank">
+                <DataField value={taxon.source} />
               </Link>
             ) : (
               <DataField value={taxon?.source} />
@@ -388,8 +388,8 @@ function EukaryotaTaxonomyDetails({
           <td>Source</td>
           <td>
             {taxon?.sourceUrl ? (
-              <Link href={taxon?.sourceUrl} target="_blank">
-                <DataField value={taxon?.source} />
+              <Link href={taxon.sourceUrl} target="_blank">
+                <DataField value={taxon.source} />
               </Link>
             ) : (
               <DataField value={taxon?.source} />
@@ -1036,16 +1036,16 @@ function DataSummary({
           <Stack mx={10} mt={5}>
             <Attribute
               label="Species with most genomes"
-              value={speciesGenomes && speciesGenomes[0]?.name}
+              value={speciesGenomes?.[0]?.name}
               href={`/species/${
-                speciesGenomes && speciesGenomes[0]?.name?.replaceAll(" ", "_")
+                speciesGenomes?.[0]?.name?.replaceAll(" ", "_")
               }/taxonomy`}
             />
             <Attribute
               label="Species with most data"
-              value={speciesOther && speciesOther[0]?.name}
+              value={speciesOther?.[0]?.name}
               href={`/species/${
-                speciesOther && speciesOther[0]?.name.replaceAll(" ", "_")
+                speciesOther?.[0]?.name.replaceAll(" ", "_")
               }/taxonomy`}
             />
           </Stack>
@@ -1082,7 +1082,7 @@ function EukaryotaDataSummary({
       };
     })
     .concat(
-      taxon?.regnumDescendants
+      taxon.regnumDescendants
         .filter((descendant) => descendant.canonicalName !== "Protista")
         .map((descendant) => {
           return {
@@ -1095,7 +1095,7 @@ function EukaryotaDataSummary({
         })
     )
     .concat(
-      taxon?.superKingdomDescendants.map((descendant) => {
+      taxon.superKingdomDescendants.map((descendant) => {
         return {
           rank: "superkingdom",
           canonicalName: descendant.canonicalName,
@@ -1277,16 +1277,16 @@ function EukaryotaDataSummary({
           <Stack mx={10} mt={5}>
             <Attribute
               label="Species with most genomes"
-              value={speciesGenomes && speciesGenomes[0]?.name}
+              value={speciesGenomes?.[0]?.name}
               href={`/species/${
-                speciesGenomes && speciesGenomes[0]?.name?.replaceAll(" ", "_")
+                speciesGenomes?.[0]?.name?.replaceAll(" ", "_")
               }/taxonomy`}
             />
             <Attribute
               label="Species with most data"
-              value={speciesOther && speciesOther[0]?.name}
+              value={speciesOther?.[0]?.name}
               href={`/species/${
-                speciesOther && speciesOther[0]?.name.replaceAll(" ", "_")
+                speciesOther?.[0]?.name.replaceAll(" ", "_")
               }/taxonomy`}
             />
           </Stack>

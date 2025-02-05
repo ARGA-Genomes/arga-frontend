@@ -10,7 +10,7 @@ interface ImcraFiltersProps {
 
 export function ImcraFilters({ value, options, onChange }: ImcraFiltersProps) {
   const changeFilter = (value: string | null) => {
-    if (!value) return onChange(undefined);
+    if (!value) { onChange(undefined); return; }
 
     onChange({
       filter: "IMCRA",

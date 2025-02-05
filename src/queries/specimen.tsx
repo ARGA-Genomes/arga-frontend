@@ -32,7 +32,7 @@ export const SPECIMEN = gql`
   }
 `;
 
-export type Specimen = {
+export interface Specimen {
   recordId: string;
   entityId?: string;
   organismId?: string;
@@ -63,7 +63,7 @@ export type Specimen = {
   markers?: number;
   sequences?: number;
   wholeGenomes?: number;
-};
+}
 
 export const COLLECTION_EVENT = gql`
   fragment CollectionEventDetails on CollectionEvent {
@@ -102,7 +102,7 @@ export const COLLECTION_EVENT = gql`
   }
 `;
 
-export type CollectionEvent = {
+export interface CollectionEvent {
   eventDate?: string;
   eventTime?: string;
   collectedBy?: string;
@@ -135,7 +135,7 @@ export type CollectionEvent = {
   fieldNumber?: string;
   fieldNotes?: string;
   remarks?: string;
-};
+}
 
 export const ACCESSION_EVENT = gql`
   fragment AccessionEventDetails on AccessionEvent {
@@ -150,7 +150,7 @@ export const ACCESSION_EVENT = gql`
   }
 `;
 
-export type AccessionEvent = {
+export interface AccessionEvent {
   eventDate?: string;
   eventTime?: string;
   accession?: string;
@@ -159,4 +159,4 @@ export type AccessionEvent = {
   institutionCode?: string;
   materialSampleId?: string;
   typeStatus?: string;
-};
+}
