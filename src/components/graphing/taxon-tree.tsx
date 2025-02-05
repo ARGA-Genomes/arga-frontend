@@ -194,8 +194,8 @@ export function TaxonomyTree({
         const children = res.data.stats.taxonBreakdown[0]?.children || [];
 
         // clone the underlying data tree and find the taxon node being loaded
-        let newTree = structuredClone(tree);
-        let parent = newTree.children?.find(
+        const newTree = structuredClone(tree);
+        const parent = newTree.children?.find(
           (node) => node.canonicalName == item.data.canonicalName,
         );
 
@@ -474,7 +474,7 @@ function calculateMinWidth(data: Node): number {
   // also get the species that are visible from an expanded genus node
   const expanded = genera.filter((node) => node.expanded);
   const visibleSpecies = expanded.flatMap((node) => {
-    let species = filterToRank("SPECIES", node);
+    const species = filterToRank("SPECIES", node);
     // because the tree has enough room to show one direct descendant we always pop one
     // item off to effectively reduce to the overall minimum width
     species.pop();

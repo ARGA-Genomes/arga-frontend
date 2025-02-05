@@ -862,7 +862,7 @@ export default function SearchPage() {
   useEffect(refreshUrl, [query, dataTypes, page, setPreviousPage]);
 
   function refreshUrl() {
-    let params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
     params.set("q", query);
     params.set("page", page.toString());
 

@@ -313,12 +313,12 @@ function Provenance({ entityId }: { entityId: string }) {
 }
 
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  let position: [number, number] | undefined =
+  const position: [number, number] | undefined =
     specimen && specimen.latitude && specimen.longitude
       ? [Number(specimen.latitude), Number(specimen.longitude)]
       : undefined;
 
-  let marker =
+  const marker =
     position &&
     ({
       recordId: specimen?.recordId,
@@ -1105,7 +1105,7 @@ export default function SpecimenAccession({
 }: {
   params: { accession: string };
 }) {
-  let basePath = usePathname()?.replace(params.accession, "");
+  const basePath = usePathname()?.replace(params.accession, "");
 
   const { loading, error, data } = useQuery<SpecimenQueryResults>(
     GET_SPECIMEN,

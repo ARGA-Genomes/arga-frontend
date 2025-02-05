@@ -165,7 +165,7 @@ function MapFilterOption({
   total,
   ...switchProps
 }: MapFilterOptionProps) {
-  let checkboxStyle = {
+  const checkboxStyle = {
     labelWrapper: { width: "100%" },
   };
 

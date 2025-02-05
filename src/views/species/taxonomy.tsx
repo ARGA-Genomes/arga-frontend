@@ -708,7 +708,7 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
-  let synonyms: Record<string, TaxonomicAct[]> = {};
+  const synonyms: Record<string, TaxonomicAct[]> = {};
   for (const act of acts || []) {
     synonyms[act.taxon.status] ||= [];
     synonyms[act.taxon.status].push(act);
@@ -1036,8 +1036,8 @@ const ACT_LABEL: Record<string, string> = {
 
 // sort by publication year first, then by the type of the act, and lastly by scientific name
 function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
-  let aYear = a.publication.publishedYear;
-  let bYear = b.publication.publishedYear;
+  const aYear = a.publication.publishedYear;
+  const bYear = b.publication.publishedYear;
 
   // always return acts with dates first
   if (aYear && !bYear) return -1;
@@ -1048,7 +1048,7 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
     if (aYear > bYear) return 1;
     if (aYear < bYear) return -1;
 
-    let order = ACT_TYPE_ORDER[a.act] - ACT_TYPE_ORDER[b.act];
+    const order = ACT_TYPE_ORDER[a.act] - ACT_TYPE_ORDER[b.act];
     if (order === 0)
       return a.name.scientificName.localeCompare(b.name.scientificName);
     return order;
@@ -1080,7 +1080,7 @@ function History({
   const protonym = acts[0];
 
   // turn all nomenclatural acts into timeline items
-  let itemSet = new Map<string, TimelineItem>();
+  const itemSet = new Map<string, TimelineItem>();
   for (const item of acts) {
     const date =
       (item.publication.publishedDate &&
@@ -1098,7 +1098,7 @@ function History({
       type: TimelineItemType.Instant,
     });
   }
-  let items: TimelineItem[] = [...itemSet.values()];
+  const items: TimelineItem[] = [...itemSet.values()];
 
   const timelineItems = [...items];
 

@@ -36,7 +36,7 @@ export default function BrowseGrouping() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
   if (error) return <p>Error : {error.message}</p>;
 
-  let sources: Record<string, number> = {};
+  const sources: Record<string, number> = {};
   for (const source of data?.overview.sources || []) {
     sources[source.name] = source.total;
   }

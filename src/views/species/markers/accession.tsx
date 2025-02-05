@@ -368,12 +368,12 @@ function SpecimenPreview({
 }
 
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  let position: [number, number] | undefined =
+  const position: [number, number] | undefined =
     specimen && specimen.latitude && specimen.longitude
       ? [Number(specimen.latitude), Number(specimen.longitude)]
       : undefined;
 
-  let marker =
+  const marker =
     position &&
     ({
       recordId: specimen?.recordId,

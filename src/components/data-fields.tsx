@@ -241,7 +241,7 @@ interface DataFieldProps {
 }
 
 export function DataField({ value, fz, href }: DataFieldProps) {
-  let text = href ? (
+  const text = href ? (
     <Link href={href} target="_blank">
       {value}
     </Link>

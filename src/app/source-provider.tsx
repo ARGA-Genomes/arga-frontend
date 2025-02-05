@@ -29,7 +29,7 @@ const DatasetsContext = React.createContext<Map<string, Dataset>>(new Map());
 
 export function SourceProvider({ children }: { children: ReactNode }) {
   const { data } = useQuery<QueryResults>(GET_DETAILS);
-  let datasets = new Map();
+  const datasets = new Map();
 
   if (data) {
     const records = data.sources.flatMap((s) => s.datasets);

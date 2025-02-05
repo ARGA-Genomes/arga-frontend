@@ -13,7 +13,7 @@ export function AssemblyFilters({ filters, onChange }: AssemblyFiltersProps) {
   const [releaseType, setReleaseType] = useState('any');
 
   useEffect(() => {
-    let filters = [];
+    const filters = [];
 
     if (level !== 'any') {
       filters.push({ filter: "ASSEMBLY_LEVEL", action: "INCLUDE", value: level, editable: true })

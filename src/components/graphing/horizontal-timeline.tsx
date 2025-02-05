@@ -239,11 +239,11 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
   // get the domains from the timeline items and remove any empty decades.
   // we also replace the last date with the current year
   const currentYear = new Date();
-  let domains = domainDecades(data);
+  const domains = domainDecades(data);
   domains[domains.length - 1].end = currentYear;
 
   // flattent the domain for d3
-  let domain = domains.map((domain) => [domain.start, domain.end]).flat();
+  const domain = domains.map((domain) => [domain.start, domain.end]).flat();
   const range = rangeYears(domains, dimension.boundedWidth);
   const dividers = domainContractions(domains);
 
@@ -476,7 +476,7 @@ type ItemGroup = {
 };
 
 function groupItems(items: TimelineItem[]): ItemGroup[] {
-  let groups: Record<string, ItemGroup> = {};
+  const groups: Record<string, ItemGroup> = {};
 
   for (const item of items) {
     groups[item.label] ||= { label: item.label, bars: [], instants: [] };
@@ -491,7 +491,7 @@ function groupItems(items: TimelineItem[]): ItemGroup[] {
 }
 
 function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
-  let map = new Map<string, TimelineItem>();
+  const map = new Map<string, TimelineItem>();
 
   let currentAccepted = null;
 
@@ -545,11 +545,11 @@ type Domain = {
  * particularly helpful for the visualisation
  */
 function domainDecades(items: TimelineItem[]): Domain[] {
-  let decades = items.map((item) => Math.floor(item.date.getFullYear() / 40));
-  let deduped = new Set(decades);
+  const decades = items.map((item) => Math.floor(item.date.getFullYear() / 40));
+  const deduped = new Set(decades);
 
-  let starts: number[] = [];
-  let ends: number[] = [];
+  const starts: number[] = [];
+  const ends: number[] = [];
   for (const decade of deduped) {
     const lastDecade = ends[ends.length - 1];
     // if the current decade isn't consecutive with the last value in the domains array then
@@ -580,7 +580,7 @@ function rangeYears(domains: Domain[], width: number): number[] {
 
   const totalYears = domainYears.reduce((acc, val) => acc + val, 0);
 
-  let range: number[] = [];
+  const range: number[] = [];
   for (const years of domainYears) {
     // the start of the domain should either be 0 or the last
     // range plus the contraction width
@@ -599,8 +599,8 @@ function domainContractions(domains: Domain[]) {
 
   // for dividers the start is the end of a domain, and the end
   // is the start of the next domain
-  let starts: number[] = [];
-  let ends: number[] = [];
+  const starts: number[] = [];
+  const ends: number[] = [];
   for (const domain of domains) {
     starts.push(domain.end.getFullYear());
     ends.push(domain.start.getFullYear());

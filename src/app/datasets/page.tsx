@@ -796,7 +796,7 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
   if (sources) {
     const grouped = sources.reduce(
       (acc: { [key: string]: Source[] }, source) => {
-        let contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
+        const contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
 
         // If this contentType doesn't exist in the accumulator, create a new array
         if (!acc[contentType]) {

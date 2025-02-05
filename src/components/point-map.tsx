@@ -44,7 +44,7 @@ function MapBounds({ coordinates }: { coordinates: Coordinates[] }) {
   let min = coordinates[0];
   let max = coordinates[0];
 
-  for (let coord of coordinates) {
+  for (const coord of coordinates) {
     if (coord.latitude <= min.latitude) {
       min = { latitude: coord.latitude, longitude: min.longitude };
     }
