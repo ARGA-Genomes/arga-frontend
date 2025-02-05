@@ -10,7 +10,7 @@ import DeckGL, {
   MapView,
   ScatterplotLayer,
   TileLayer,
-} from "deck.gl/typed";
+} from "deck.gl";
 import { useState, useEffect } from "react";
 import { GeoJSON } from "geojson";
 import { gql, useQuery } from "@apollo/client";
