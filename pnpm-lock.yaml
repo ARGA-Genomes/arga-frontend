@@ -1412,7 +1412,7 @@ packages:
     dependencies:
       '@nivo/core': 0.87.0(react-dom@18.2.0)(react@18.2.0)
       '@types/d3-color': 3.1.3
-      '@types/d3-scale': 4.0.8
+      '@types/d3-scale': 4.0.9
       '@types/d3-scale-chromatic': 3.1.0
       '@types/prop-types': 15.7.14
       d3-color: 3.1.0
@@ -1500,7 +1500,7 @@ packages:
       '@nivo/voronoi': 0.87.0(react-dom@18.2.0)(react@18.2.0)
       '@react-spring/web': 9.7.5(react-dom@18.2.0)(react@18.2.0)
       '@types/d3-hierarchy': 3.1.7
-      '@types/d3-scale': 4.0.8
+      '@types/d3-scale': 4.0.9
       '@types/d3-shape': 3.1.7
       d3-hierarchy: 3.1.2
       d3-scale: 4.0.2
@@ -1535,7 +1535,7 @@ packages:
       '@nivo/core': 0.87.0(react-dom@18.2.0)(react@18.2.0)
       '@nivo/tooltip': 0.87.0(react-dom@18.2.0)(react@18.2.0)
       '@types/d3-delaunay': 6.0.4
-      '@types/d3-scale': 4.0.8
+      '@types/d3-scale': 4.0.9
       d3-delaunay: 6.0.4
       d3-scale: 4.0.2
       react: 18.2.0
@@ -1803,8 +1803,8 @@ packages:
       '@types/d3-color': 3.1.3
     dev: false
 
-  /@types/d3-path@3.1.0:
-    resolution: {integrity: sha512-P2dlU/q51fkOc/Gfl3Ul9kicV7l+ra934qBFXCFhrZMOL6du1TM0pm1ThYvENukyOn5h9v+yMJ9Fn5JK4QozrQ==}
+  /@types/d3-path@3.1.1:
+    resolution: {integrity: sha512-VMZBYyQvbGmWyWVea0EHs/BwLgxc+MKi1zLDCONksozI4YJMcTt8ZEuIR4Sb1MMTE8MMW49v0IwI5+b7RmfWlg==}
     dev: false
 
   /@types/d3-polygon@3.0.2:
@@ -1823,8 +1823,8 @@ packages:
     resolution: {integrity: sha512-iWMJgwkK7yTRmWqRB5plb1kadXyQ5Sj8V/zYlFGMUBbIPKQScw+Dku9cAAMgJG+z5GYDoMjWGLVOvjghDEFnKQ==}
     dev: false
 
-  /@types/d3-scale@4.0.8:
-    resolution: {integrity: sha512-gkK1VVTr5iNiYJ7vWDI+yUFFlszhNMtVeneJ6lUTKPjprsvLLI9/tgEGiXJOnlINJA8FyA88gfnQsHbybVZrYQ==}
+  /@types/d3-scale@4.0.9:
+    resolution: {integrity: sha512-dLmtwB8zkAeO/juAMfnV+sItKjlsw2lKdZVVy6LRr0cBmegxSABiLEpGVmSJJ8O08i4+sGR6qQtb6WtuwJdvVw==}
     dependencies:
       '@types/d3-time': 3.0.4
     dev: false
@@ -1836,7 +1836,7 @@ packages:
   /@types/d3-shape@3.1.7:
     resolution: {integrity: sha512-VLvUQ33C+3J+8p+Daf+nYSOsjB4GXp19/S/aGo60m9h1v6XaxjiT82lKVWJCfzhtuZ3yD7i/TPeC/fuKLLOSmg==}
     dependencies:
-      '@types/d3-path': 3.1.0
+      '@types/d3-path': 3.1.1
     dev: false
 
   /@types/d3-time-format@4.0.3:
@@ -1884,11 +1884,11 @@ packages:
       '@types/d3-geo': 3.1.0
       '@types/d3-hierarchy': 3.1.7
       '@types/d3-interpolate': 3.0.4
-      '@types/d3-path': 3.1.0
+      '@types/d3-path': 3.1.1
       '@types/d3-polygon': 3.0.2
       '@types/d3-quadtree': 3.0.6
       '@types/d3-random': 3.0.3
-      '@types/d3-scale': 4.0.8
+      '@types/d3-scale': 4.0.9
       '@types/d3-scale-chromatic': 3.1.0
       '@types/d3-selection': 3.0.11
       '@types/d3-shape': 3.1.7
@@ -2372,8 +2372,8 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /caniuse-lite@1.0.30001696:
-    resolution: {integrity: sha512-pDCPkvzfa39ehJtJ+OwGT/2yvT2SbjfHhiIW2LWOAcMQ7BzwxT/XuyUp4OTOd0XFWA6BKw0JalnBHgSi5DGJBQ==}
+  /caniuse-lite@1.0.30001697:
+    resolution: {integrity: sha512-GwNPlWJin8E+d7Gxq96jxM6w0w+VFeyyXRsjU58emtkYqnbwHqXm5uT2uCmO0RQE9htWknOP4xtBlLmM/gWxvQ==}
     dev: false
 
   /capital-case@1.0.4:
@@ -3034,8 +3034,8 @@ packages:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
     dev: false
 
-  /enhanced-resolve@5.18.0:
-    resolution: {integrity: sha512-0/r0MySGYG8YqlayBZ6MuCfECmHFdJ5qyPh8s8wa5Hnm6SaFLSK1VYCbj+NKp090Nm1caZhD+QTnmxO7esYGyQ==}
+  /enhanced-resolve@5.18.1:
+    resolution: {integrity: sha512-ZSW3ma5GkcQBIpwZTSRAI8N71Uuwgs93IezB7mf7R60tC8ZbJideoDNKjHn2O9KIlx6rkGTTEk1xUCK2E1Y2Yg==}
     engines: {node: '>=10.13.0'}
     dependencies:
       graceful-fs: 4.2.11
@@ -3094,7 +3094,7 @@ packages:
       is-typed-array: 1.1.15
       is-weakref: 1.1.1
       math-intrinsics: 1.1.0
-      object-inspect: 1.13.3
+      object-inspect: 1.13.4
       object-keys: 1.1.1
       object.assign: 4.1.7
       own-keys: 1.0.1
@@ -3234,7 +3234,7 @@ packages:
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.0
-      enhanced-resolve: 5.18.0
+      enhanced-resolve: 5.18.1
       eslint: 8.50.0
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0)(eslint-import-resolver-typescript@3.7.0)(eslint@8.50.0)
       fast-glob: 3.3.3
@@ -4016,8 +4016,8 @@ packages:
       has-bigints: 1.1.0
     dev: false
 
-  /is-boolean-object@1.2.1:
-    resolution: {integrity: sha512-l9qO6eFlUETHtuihLcYOaLKByJ1f+N4kthcU9YjHy3N+B3hWv0y/2Nd0mu/7lTFnRQHTrSdXF50HQ3bl5fEnng==}
+  /is-boolean-object@1.2.2:
+    resolution: {integrity: sha512-wa56o2/ElJMYqjCjGkXri7it5FbebW5usLw/nPmCMs5DeZ7eziSYZhSmPRn0txqeW4LnAmQQU7FgqLpsEFKM4A==}
     engines: {node: '>= 0.4'}
     dependencies:
       call-bound: 1.0.3
@@ -4516,7 +4516,7 @@ packages:
       '@next/env': 13.5.3
       '@swc/helpers': 0.5.2
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001696
+      caniuse-lite: 1.0.30001697
       postcss: 8.4.14
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -4550,8 +4550,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /object-inspect@1.13.3:
-    resolution: {integrity: sha512-kDCGIbxkDSXE3euJZZXzc6to7fCrKHNI/hSRQnRuQ+BWjFNzZwiFF8fj/6o2t2G9/jTj8PSIYTfCLelLZEeRpA==}
+  /object-inspect@1.13.4:
+    resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
     engines: {node: '>= 0.4'}
     dev: false
 
@@ -5263,7 +5263,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       es-errors: 1.3.0
-      object-inspect: 1.13.3
+      object-inspect: 1.13.4
     dev: false
 
   /side-channel-map@1.0.1:
@@ -5273,7 +5273,7 @@ packages:
       call-bound: 1.0.3
       es-errors: 1.3.0
       get-intrinsic: 1.2.7
-      object-inspect: 1.13.3
+      object-inspect: 1.13.4
     dev: false
 
   /side-channel-weakmap@1.0.2:
@@ -5283,7 +5283,7 @@ packages:
       call-bound: 1.0.3
       es-errors: 1.3.0
       get-intrinsic: 1.2.7
-      object-inspect: 1.13.3
+      object-inspect: 1.13.4
       side-channel-map: 1.0.1
     dev: false
 
@@ -5292,7 +5292,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       es-errors: 1.3.0
-      object-inspect: 1.13.3
+      object-inspect: 1.13.4
       side-channel-list: 1.0.0
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
@@ -5811,7 +5811,7 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       is-bigint: 1.1.0
-      is-boolean-object: 1.2.1
+      is-boolean-object: 1.2.2
       is-number-object: 1.1.1
       is-string: 1.1.1
       is-symbol: 1.1.1
