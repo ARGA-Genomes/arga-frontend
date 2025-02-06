@@ -10,7 +10,7 @@ import DeckGL, {
   MapView,
   ScatterplotLayer,
   TileLayer,
-} from "deck.gl/typed";
+} from "deck.gl";
 import { useState, useEffect } from "react";
 import { GeoJSON } from "geojson";
 import { gql, useQuery } from "@apollo/client";
@@ -72,17 +72,17 @@ export default function AnalysisMap(
     style,
     initialPosition,
     initialZoom,
-  }: AnalysisMapProps,
+  }: AnalysisMapProps
 ) {
   const [tolerance, setTolerance] = useState(0.01);
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>(
-    undefined,
+    undefined
   );
   const [selectedMarker, setSelectedMarker] = useState<string | undefined>(
-    undefined,
+    undefined
   );
   const [clickedMarker, setClickedMarker] = useState<string | undefined>(
-    undefined,
+    undefined
   );
   const [isOpen, setIsOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -165,7 +165,7 @@ export default function AnalysisMap(
   const getPopUpLink = (
     type: Layer,
     speciesName: string | undefined,
-    clickedMarker: string | undefined,
+    clickedMarker: string | undefined
   ) => {
     if (type === Layer.Specimens) {
       setPopupLink(`/species/${speciesName}/specimens/${clickedMarker}`);
