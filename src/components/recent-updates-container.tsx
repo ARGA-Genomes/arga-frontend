@@ -14,16 +14,16 @@ export default function RecentUpdatesContainer() {
     >
       <ScrollArea h="100%" offsetScrollbars type="always">
         <Grid p={30} justify="center" columns={3}>
-          {changelog.map((update) => {
+          {changelog.map((update, idx) => {
             return (
               <>
-                <Grid.Col key={update.date} span={1}>
+                <Grid.Col key={idx} span={1}>
                   <Text c="shellfish.6">{update.date}</Text>
                 </Grid.Col>
                 <Grid.Col span={2}>
-                  {update.updates.map((updateMsg) => {
+                  {update.updates.map((updateMsg, idx) => {
                     return (
-                      <Text key={update.date} c="midnight.3">
+                      <Text key={idx} c="midnight.3">
                         {updateMsg}
                       </Text>
                     );
