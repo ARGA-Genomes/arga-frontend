@@ -216,7 +216,7 @@ interface ProvenanceQuery {
         atom: AtomText | AtomNumber;
         dataset: Dataset;
         loggedAt: string;
-      }
+      },
     ];
   };
 }
@@ -1107,14 +1107,11 @@ export default function SpecimenAccession({
 }) {
   const basePath = usePathname().replace(params.accession, "");
 
-  const { loading, error, data } = useQuery<SpecimenQueryResults>(
-    GET_SPECIMEN,
-    {
-      variables: {
-        recordId: decodeURIComponent(params.accession),
-      },
-    }
-  );
+  const { error, data } = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {
+    variables: {
+      recordId: decodeURIComponent(params.accession),
+    },
+  });
 
   if (error) {
     return <Text>Error : {error.message}</Text>;

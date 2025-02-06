@@ -111,7 +111,7 @@ interface License {
   accessRights: string;
 }
 
-const LICENSES: Record<string, License> = {
+const _LICENSES: Record<string, License> = {
   "cc-by-nc-nd": {
     name: "(CC-BY-NC)",
     url: "http://creativecommons.org/licenses/by-nc-nd/4.0",
@@ -265,8 +265,6 @@ const renameContentType: Record<ContentType, string> = {
   MORPHOLOGICAL_TRAITS: "Morphological traits sources",
 };
 
-const licenseAccessRights = {};
-
 function DatasetRow({
   dataset,
   sourceLength,
@@ -277,9 +275,6 @@ function DatasetRow({
   count: number;
 }) {
   const theme = useMantineTheme();
-  const license = dataset.license
-    ? LICENSES[dataset.license.toLowerCase()]
-    : undefined;
 
   return (
     <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
@@ -385,10 +380,6 @@ function DatasetRow({
 }
 
 function CollectionCard({ collection }: { collection: Source }) {
-  const theme = useMantineTheme();
-  const license = collection.license
-    ? LICENSES[collection.license.toLowerCase()]
-    : undefined;
   return (
     <Paper radius="lg" withBorder className={classes.collectionCard}>
       <Stack gap={10}>
@@ -414,7 +405,7 @@ function CollectionCard({ collection }: { collection: Source }) {
                         {collection.lastUpdated === "01/01/1970"
                           ? "N/A"
                           : DateTime.fromISO(
-                              collection.lastUpdated
+                              collection.lastUpdated,
                             ).toLocaleString()}
                       </Text>
                     )}
@@ -495,10 +486,6 @@ function CollectionCard({ collection }: { collection: Source }) {
 }
 
 function CollectionRow({ collection }: { collection: Source }) {
-  const theme = useMantineTheme();
-  const license = collection.license
-    ? LICENSES[collection.license.toLowerCase()]
-    : undefined;
   return (
     <Paper radius="lg" withBorder>
       <Stack>
@@ -519,7 +506,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                           {collection.lastUpdated === "01/01/1970"
                             ? "N/A"
                             : DateTime.fromISO(
-                                collection.lastUpdated
+                                collection.lastUpdated,
                               ).toLocaleString()}
                         </Text>
                       )}
@@ -544,9 +531,8 @@ function CollectionRow({ collection }: { collection: Source }) {
                         ?.toLowerCase()
                         .charAt(0)
                         .toUpperCase()
-                        .concat(
-                          collection.accessPill.slice(1).toLowerCase()
-                        ) || "No data"
+                        .concat(collection.accessPill.slice(1).toLowerCase()) ||
+                      "No data"
                     }
                     color={
                       collection.accessPill
@@ -675,10 +661,11 @@ function ContentTypeContainer({
       switch (sortBy) {
         case "alphabetical":
           return a.name.localeCompare(b.name);
-        case "date":
+        case "date": {
           const dateA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
           const dateB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
           return dateB - dateA; // Newest to Oldest
+        }
         default:
           return 0;
       }
@@ -788,22 +775,19 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
   ];
 
   if (sources) {
-    const grouped = sources.reduce(
-      (acc: Record<string, Source[]>, source) => {
-        const contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
+    const grouped = sources.reduce((acc: Record<string, Source[]>, source) => {
+      const contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
 
-        // If this contentType doesn't exist in the accumulator, create a new array
-        if (!acc[contentType]) {
-          acc[contentType] = [];
-        }
+      // If this contentType doesn't exist in the accumulator, create a new array
+      if (!acc[contentType]) {
+        acc[contentType] = [];
+      }
 
-        // Push the current source into the corresponding contentType group
-        acc[contentType].push(source);
+      // Push the current source into the corresponding contentType group
+      acc[contentType].push(source);
 
-        return acc;
-      },
-      {}
-    );
+      return acc;
+    }, {});
 
     // Convert the object into an array of GroupedSources and sort by the desired order
     return Object.keys(grouped)
@@ -825,7 +809,7 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
 }
 
 export default function DatasetsPage() {
-  const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
+  const { loading, data } = useQuery<QueryResults>(GET_DATASETS);
   const theme = useMantineTheme();
 
   const filteredSources = data?.sources.map((source) => ({
@@ -841,7 +825,7 @@ export default function DatasetsPage() {
   });
 
   const groupedSources = groupByContentType(sourcesWithLastUpdated).filter(
-    (group) => group.contentType !== "Unknown"
+    (group) => group.contentType !== "Unknown",
   );
 
   return (

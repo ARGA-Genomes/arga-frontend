@@ -282,7 +282,7 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
   useEffect(() => {
     setHint(!checked ? "moss.1" : "moss.0");
     onChange(checked);
-  }, [checked]);
+  }, [checked, onChange]);
 
   return (
     <Box
@@ -290,9 +290,15 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
       w={80}
       bg={hint}
       style={{ cursor: "pointer" }}
-      onMouseOver={() => { setHint(checked ? "moss.1" : "moss.0"); }}
-      onMouseOut={() => { setHint(checked ? "moss.0" : "none"); }}
-      onClick={() => { setChecked(!checked); }}
+      onMouseOver={() => {
+        setHint(checked ? "moss.1" : "moss.0");
+      }}
+      onMouseOut={() => {
+        setHint(checked ? "moss.0" : "none");
+      }}
+      onClick={() => {
+        setChecked(!checked);
+      }}
     >
       <Center h={100}>
         <MantineProvider theme={theme}>
@@ -301,7 +307,9 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
             size="lg"
             radius="lg"
             checked={checked}
-            onChange={(ev) => { setChecked(ev.currentTarget.checked); }}
+            onChange={(ev) => {
+              setChecked(ev.currentTarget.checked);
+            }}
           />
         </MantineProvider>
       </Center>
@@ -328,9 +336,10 @@ function SavedDataItem({
         <Group justify="space-between">
           <Group gap="xl">
             <HintedCheckbox
-              onChange={(checked) =>
-                { checked ? onSelected(item) : onDeselected(item); }
-              }
+              onChange={(checked) => {
+                if (checked) onSelected(item);
+                else onDeselected(item);
+              }}
             />
             <Link
               href={`/species/${item.scientificName}/whole_genomes/${item.label}`}
@@ -359,7 +368,9 @@ function SavedDataItem({
             color="red"
             variant="subtle"
             radius={0}
-            onClick={() => { onRemove(item); }}
+            onClick={() => {
+              onRemove(item);
+            }}
             h={100}
           >
             <IconTrash style={{ width: rem(35), height: rem(35) }} />
@@ -429,7 +440,9 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
         color="moss"
         radius={0}
         rightSection={<IconClipboardCopy />}
-        onClick={() => { clipboard.copy(selected.url); }}
+        onClick={() => {
+          clipboard.copy(selected.url);
+        }}
       >
         {clipboard.copied ? "Copied!" : "Copy URL"}
       </Button>

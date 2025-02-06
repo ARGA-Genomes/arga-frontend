@@ -10,18 +10,6 @@ import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
 
-interface QueryResults {
-  species: {
-    dataSummary: {
-      genomes?: number;
-      loci?: number;
-      specimens?: number;
-      other?: number;
-      totalGenomic?: number;
-    };
-  };
-}
-
 function DataTabs({
   name,
   children,

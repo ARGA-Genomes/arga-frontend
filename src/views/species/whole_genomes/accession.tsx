@@ -147,12 +147,12 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
       const item = {
         url,
         label: deposition.accession,
-        dataType: deposition.dataType || "whole genome",
+        dataType: deposition.dataType ?? "whole genome",
         scientificName: canonicalName,
         datePublished: deposition.eventDate,
         dataset: { id: "", name: sequence.datasetName },
       };
-      setSaved([...(saved || []), item]);
+      setSaved([...saved, item]);
     }
   };
 
@@ -242,7 +242,7 @@ function AssemblyStats({
         <Table.Td valign="bottom">
           <Attribute
             label="Genome size"
-            value={Humanize.compactInteger(assembly?.genomeSize || 0, 3)}
+            value={Humanize.compactInteger(assembly?.genomeSize ?? 0, 3)}
           />
         </Table.Td>
         <Table.Td valign="bottom">
@@ -411,7 +411,7 @@ function SpecimenPreview({
           </DataTable>
 
           <Center>
-            <Link href={`../specimens/${specimen?.recordId}`}>
+            <Link href={`../specimens/${specimen?.recordId ?? "#"}`}>
               <Button
                 radius="md"
                 color="midnight.10"
@@ -483,7 +483,7 @@ export default function AccessionPage({ params }: AccessionPageProps) {
 
   const sequence = data?.sequence[0];
   const deposition = sequence?.events.dataDepositions[0];
-  const accession = deposition?.accession || sequence?.recordId;
+  const accession = deposition?.accession ?? sequence?.recordId;
 
   return (
     <Stack gap={20}>
@@ -496,7 +496,10 @@ export default function AccessionPage({ params }: AccessionPageProps) {
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${accession}`}</Title>
+          <Title
+            order={3}
+            mb={10}
+          >{`Full data view: ${accession ?? ""}`}</Title>
           <Text fz="sm" c="dimmed">
             Source
           </Text>

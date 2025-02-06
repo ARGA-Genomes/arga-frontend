@@ -1,39 +1,35 @@
-import { useEffect, useState } from "react"
-import { Filter } from "./common"
-import { Accordion, Avatar, Group, Text } from "@mantine/core"
-import { AssemblyFilters } from "./filters/assembly"
-
+import { useEffect, useState } from "react";
+import { Filter } from "./common";
+import { Accordion, Avatar, Group, Text } from "@mantine/core";
+import { AssemblyFilters } from "./filters/assembly";
 
 interface SequenceFilters {
-  assembly: Filter[],
+  assembly: Filter[];
 }
 
 interface FilterOptions {
-  ecology: string[],
-  ibra: string[],
-  imcra: string[],
-  state: string[],
-  drainageBasin: string[],
+  ecology: string[];
+  ibra: string[];
+  imcra: string[];
+  state: string[];
+  drainageBasin: string[];
 }
-
 
 interface SequenceFiltersProps {
-  filters: SequenceFilters,
-  options?: FilterOptions,
-  onChange: (filters: Filter[]) => void,
+  filters: SequenceFilters;
+  options?: FilterOptions;
+  onChange: (filters: Filter[]) => void;
 }
 
-export function SequenceFilters({ filters, options, onChange }: SequenceFiltersProps) {
-  const [assembly, setAssembly] = useState<Filter[]>(filters.assembly)
+export function SequenceFilters({ filters, onChange }: SequenceFiltersProps) {
+  const [assembly, setAssembly] = useState<Filter[]>(filters.assembly);
 
   useEffect(() => {
-    onChange([
-      ...assembly,
-    ])
+    onChange([...assembly]);
   }, [assembly, onChange]);
 
   return (
-    <Accordion defaultValue="assembly" variant='separated'>
+    <Accordion defaultValue="assembly" variant="separated">
       <Accordion.Item value="assembly">
         <Accordion.Control>
           <FilterGroup
@@ -47,14 +43,13 @@ export function SequenceFilters({ filters, options, onChange }: SequenceFiltersP
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
-  )
+  );
 }
 
-
 interface FilterGroupProps {
-  label: string,
-  description: string,
-  image: string,
+  label: string;
+  description: string;
+  image: string;
 }
 
 function FilterGroup({ label, description, image }: FilterGroupProps) {
@@ -68,5 +63,5 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
         </Text>
       </div>
     </Group>
-  )
+  );
 }

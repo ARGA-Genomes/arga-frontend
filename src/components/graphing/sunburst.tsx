@@ -142,10 +142,10 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
       }}
       layers={["arcs", "arcLabels", CenteredValue]}
       // going down one taxonomic level
-      onClick={(clickedDatum, event) => {
+      onClick={(clickedDatum) => {
         const foundObject = findObject(
           flatten(chartData.children),
-          clickedDatum.data.name
+          clickedDatum.data.name,
         );
         if (foundObject) {
           if (foundObject.children) {
@@ -157,7 +157,7 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
             setChartData(foundObject);
           } else {
             window.location.href = `/${capitaliseFirstLetter(
-              foundObject.rank
+              foundObject.rank,
             )}/${foundObject.name}`;
           }
         }

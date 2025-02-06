@@ -17,7 +17,7 @@ export function MessagePopup() {
   useEffect(() => {
     const seen = window.localStorage.getItem("arga-popup-seen") === date;
     if (!seen) open();
-  }, []);
+  });
 
   return (
     <Modal

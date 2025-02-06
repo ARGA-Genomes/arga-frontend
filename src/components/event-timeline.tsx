@@ -87,7 +87,7 @@ export function TimelineIcon({ icon, size, lineStyle }: TimelineIcon) {
     <Stack h="100%" gap={0}>
       <Center>
         <Box w={iconSize} h={iconSize}>
-          {icon && <Image w={iconSize} h={iconSize} src={icon} />}
+          {icon && <Image w={iconSize} h={iconSize} src={icon} alt="" />}
           {/* <svg viewBox={`0 0 ${iconSize} ${iconSize}`} xmlns="http://www.w3.org/2000/svg">
              <circle cx="50%" cy="50%" r="50%" style={{ fill: "#233c4b" }} />
            </svg> */}

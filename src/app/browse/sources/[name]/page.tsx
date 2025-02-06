@@ -198,7 +198,7 @@ interface FiltersProps {
 
 function Filters({ filters, onChange }: FiltersProps) {
   const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications
+    filters.classifications,
   );
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
@@ -400,7 +400,7 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
   const [sortBy, setSortBy] = useState<string | null>(null);
 
   const filteredDatasets = datasets.filter(
-    (dataset) => dataset.name.trim() !== ""
+    (dataset) => dataset.name.trim() !== "",
   );
 
   const sortedDatasets = useMemo(() => {
@@ -408,10 +408,11 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
       switch (sortBy) {
         case "alphabetical":
           return a.name.localeCompare(b.name);
-        case "year":
+        case "year": {
           const yearA = a.publicationYear ? a.publicationYear : 0;
           const yearB = b.publicationYear ? b.publicationYear : 0;
           return yearB - yearA; // Newest to Oldest
+        }
         default:
           return 0;
       }
@@ -655,7 +656,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
       name: `browsing ${source}`,
       url: `/browse/sources/${params.name}`,
     });
-  }, [setPreviousPage]);
+  });
 
   return (
     <Stack mt="xl">

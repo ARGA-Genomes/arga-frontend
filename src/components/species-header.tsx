@@ -86,9 +86,6 @@ function Header({
   attributes,
 }: HeaderProps) {
   const theme = useMantineTheme();
-  const refGenomeBackground = referenceGenome
-    ? theme.colors.moss[5]
-    : theme.colors.red[5];
 
   return (
     // Original format

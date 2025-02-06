@@ -25,9 +25,7 @@ import {
 } from "./data-fields";
 import { Dataset, useDatasets } from "@/app/source-provider";
 import { useMemo, useState } from "react";
-import {
-  IconArrowUpRight,
-} from "@tabler/icons-react";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { useQuery } from "@apollo/client";
 import { GET_TAXON_PROVENANCE, ProvenanceQuery } from "@/queries/provenance";
 import { useDisclosure } from "@mantine/hooks";
@@ -180,19 +178,16 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
 
   const taxa = useMemo(
     () => processTaxa(rawTaxa, datasets),
-    [rawTaxa, datasets]
+    [rawTaxa, datasets],
   );
 
-  const { loading, error, data } = useQuery<ProvenanceQuery>(
-    GET_TAXON_PROVENANCE,
-    {
-      variables: { entityId },
-      skip: entityId === "",
-    }
-  );
+  const { loading, data } = useQuery<ProvenanceQuery>(GET_TAXON_PROVENANCE, {
+    variables: { entityId },
+    skip: entityId === "",
+  });
 
   const [active, setActive] = useState<string>(
-    `${taxa[0].scientificName}-${taxa[0].datasetId}`
+    `${taxa[0].scientificName}-${taxa[0].datasetId}`,
   );
 
   return (
@@ -225,7 +220,9 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
       </Modal>
       <Accordion
         value={active}
-        onChange={(value) => { setActive(value || active); }}
+        onChange={(value) => {
+          setActive(value || active);
+        }}
         classNames={accClasses}
         loop
       >

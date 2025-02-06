@@ -97,36 +97,6 @@ interface SpeciesQueryResults {
   dataset: DatasetSpecies;
 }
 
-const GET_STATS = gql`
-  query DatasetStats($name: String) {
-    stats {
-      dataset(name: $name) {
-        totalSpecies
-        speciesWithData
-        breakdown {
-          name
-          total
-        }
-      }
-    }
-  }
-`;
-
-interface Breakdown {
-  name: string;
-  total: number;
-}
-
-interface DatasetStats {
-  totalSpecies: number;
-  speciesWithData: number;
-  breakdown: Breakdown[];
-}
-
-interface StatsQueryResults {
-  stats: { dataset: DatasetStats };
-}
-
 function Species({ dataset }: { dataset: string }) {
   const [page, setPage] = useState(1);
 
@@ -158,11 +128,7 @@ function Species({ dataset }: { dataset: string }) {
   );
 }
 
-function DataSummary({ dataset }: { dataset: string }) {
-  const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
-    variables: { name: dataset },
-  });
-
+function DataSummary() {
   const sampleData = [
     { name: "data1", value: 30 },
     { name: "data2", value: 78 },
@@ -234,7 +200,7 @@ export default function BrowseDataset({
       name: `browsing ${dataset}`,
       url: "/browse/datasets/${params.name}",
     });
-  }, [setPreviousPage]);
+  });
 
   return (
     <Stack mt="xl">

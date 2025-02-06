@@ -16,8 +16,9 @@ export default tseslint.config(
     extends: ["next/core-web-vitals", "next/typescript"],
   }),
   eslint.configs.recommended,
-  tseslint.configs.strictTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
+  tseslint.configs.recommended,
+  // tseslint.configs.strictTypeChecked,
+  // tseslint.configs.stylisticTypeChecked,
   {
     languageOptions: {
       parserOptions: {

@@ -164,7 +164,9 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
         <g
           key={`${item.label}-${item.year}-${item.type}-${idx}`}
           transform={`translate(${x(item.date)}, 0)`}
-          onClick={() => { handleInstantClick(item); }}
+          onClick={() => {
+            handleInstantClick(item);
+          }}
         >
           <TimelineInstant item={item} />
         </g>
@@ -249,7 +251,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
 
   const x = useMemo(
     () => d3.scaleLinear().domain(domain).range(range),
-    [dimension.boundedWidth]
+    [domain, range],
   );
 
   return (
@@ -291,7 +293,7 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
                     value={item.date}
                   />
                 </g>
-              ))
+              )),
             )}
 
             {groups.map((group, idx) => (
@@ -417,7 +419,7 @@ interface BoundedChartDimensions extends ChartDimensions {
 
 // derived from https://2019.wattenberger.com/blog/react-and-d3
 export function useChartDimensions<T>(
-  settings: ChartDimensions
+  settings: ChartDimensions,
 ): [RefObject<T>, BoundedChartDimensions] {
   const ref = useRef(null);
   const dimensions = combineChartDimensions(settings);
@@ -438,7 +440,7 @@ export function useChartDimensions<T>(
 
     // cleanup
     return () => element && resizeObserver.unobserve(element);
-  }, []);
+  });
 
   const bounded = combineChartDimensions({
     ...dimensions,
@@ -450,7 +452,7 @@ export function useChartDimensions<T>(
 }
 
 function combineChartDimensions(
-  dimensions: ChartDimensions
+  dimensions: ChartDimensions,
 ): BoundedChartDimensions {
   const dim = {
     ...dimensions,
@@ -575,7 +577,7 @@ function domainDecades(items: TimelineItem[]): Domain[] {
 
 function rangeYears(domains: Domain[], width: number): number[] {
   const domainYears = domains.map(
-    (domain) => domain.end.getFullYear() - domain.start.getFullYear()
+    (domain) => domain.end.getFullYear() - domain.start.getFullYear(),
   );
 
   const totalYears = domainYears.reduce((acc, val) => acc + val, 0);

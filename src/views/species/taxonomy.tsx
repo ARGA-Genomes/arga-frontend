@@ -45,10 +45,7 @@ import {
   TimelineIcon,
 } from "@/components/event-timeline";
 import { useDisclosure, useResizeObserver } from "@mantine/hooks";
-import {
-  TaxonStatTreeNode,
-  findChildren,
-} from "@/queries/stats";
+import { TaxonStatTreeNode, findChildren } from "@/queries/stats";
 import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
 import { Taxon } from "@/queries/taxa";
 import HorizontalTimeline, {
@@ -224,13 +221,6 @@ interface NomenclaturalAct {
   };
 }
 
-interface NamePublication {
-  publishedYear?: number;
-  citation?: string;
-  sourceUrl?: string;
-  typeCitation?: string;
-}
-
 interface TaxonQuery {
   taxon: Taxon & {
     hierarchy: ClassificationNode[];
@@ -257,93 +247,6 @@ interface SpecimenRecordNumbers {
   markers: number;
   sequences: number;
   wholeGenomes: number;
-}
-
-const GET_PROVENANCE = gql`
-  query NomenclaturalActProvenance($entityId: String) {
-    provenance {
-      nomenclaturalAct(by: { entityId: $entityId }) {
-        operationId
-        parentId
-        action
-        atom {
-          ... on NomenclaturalActAtomText {
-            type
-            value
-          }
-          ... on NomenclaturalActAtomType {
-            type
-            value
-          }
-          ... on NomenclaturalActAtomDateTime {
-            type
-            value
-          }
-        }
-        datasetVersion {
-          datasetId
-          version
-          createdAt
-          importedAt
-        }
-        dataset {
-          id
-          name
-          shortName
-          rightsHolder
-          citation
-          license
-          description
-          url
-        }
-      }
-    }
-  }
-`;
-
-enum AtomTextType {
-  Empty,
-  ScientificName,
-  ActedOn,
-  Act,
-  SourceUrl,
-  Publication,
-  PublicationDate,
-}
-
-enum AtomType {
-  NomenclaturalActType,
-}
-
-enum AtomDateTimeType {
-  CreatedAt,
-  UpdatedAt,
-}
-
-interface AtomText {
-  type: AtomTextType;
-  value: string;
-}
-
-interface AtomNomenclaturalType {
-  type: AtomType;
-  value: string;
-}
-
-interface AtomDateTime {
-  type: AtomDateTimeType;
-  value: string;
-}
-
-interface Dataset {
-  id: string;
-  name: string;
-  shortName?: string;
-  rightsHolder?: string;
-  citation?: string;
-  license?: string;
-  description?: string;
-  url?: string;
 }
 
 interface ProvenanceQuery {
@@ -622,14 +525,14 @@ function ExternalLinks({ canonicalName, species }: ExternalLinksProps) {
       try {
         const response = await fetch(
           `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            canonicalName
-          )}`
+            canonicalName,
+          )}`,
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
         );
-      } catch (error) {
+      } catch {
         setMatchedTaxon([]);
       }
     }
@@ -694,7 +597,7 @@ function ExternalLinks({ canonicalName, species }: ExternalLinksProps) {
 }
 
 function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
-  const { loading, error, data } = useQuery<SynonymsQuery>(GET_SYNONYMS, {
+  const { data } = useQuery<SynonymsQuery>(GET_SYNONYMS, {
     variables: {
       rank: taxonomy.rank,
       canonicalName: taxonomy.canonicalName,
@@ -702,7 +605,7 @@ function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
   });
 
   const acts = data?.taxon.taxonomicActs.filter(
-    (act) => act.taxon.status !== "ACCEPTED"
+    (act) => act.taxon.status !== "ACCEPTED",
   );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
@@ -772,22 +675,19 @@ function Details({
   subspecies,
   isSubspecies,
 }: DetailsProps) {
-  const { loading, error, data } = useQuery<TypeSpecimenQuery>(
-    GET_TYPE_SPECIMENS,
-    {
-      variables: {
-        rank: taxonomy.rank,
-        canonicalName: taxonomy.canonicalName,
-      },
-    }
-  );
+  const { data } = useQuery<TypeSpecimenQuery>(GET_TYPE_SPECIMENS, {
+    variables: {
+      rank: taxonomy.rank,
+      canonicalName: taxonomy.canonicalName,
+    },
+  });
 
   const specimens = data?.taxon.typeSpecimens;
 
   const typeSpecimens = specimens?.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == taxonomy.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.specimen.typeStatus != "no voucher",
   );
   const typeSpecimen = typeSpecimens?.[0]?.specimen;
 
@@ -854,60 +754,54 @@ function Details({
                   )}
                 </Flex>
               </DataTableRow>
-              {typeSpecimen?.latitude &&
-                typeSpecimen.longitude && (
-                  <DataTableRow label="Type location (geo)">
-                    <Group>
-                      <DataField
-                        value={[typeSpecimen.latitude, typeSpecimen.longitude]
-                          .filter((t) => t)
-                          .join(", ")}
-                      />
+              {typeSpecimen?.latitude && typeSpecimen.longitude && (
+                <DataTableRow label="Type location (geo)">
+                  <Group>
+                    <DataField
+                      value={[typeSpecimen.latitude, typeSpecimen.longitude]
+                        .filter((t) => t)
+                        .join(", ")}
+                    />
 
-                      <Popover
-                        width={500}
-                        position="right"
-                        withArrow
-                        shadow="md"
-                      >
-                        <Popover.Target>
-                          <Button
-                            variant="subtle"
-                            leftSection={<IconSearch />}
-                            color="shellfish"
-                          >
-                            View map
-                          </Button>
-                        </Popover.Target>
-                        <Popover.Dropdown
-                          p={0}
-                          m={0}
-                          style={{
-                            borderRadius: "var(--mantine-radius-lg)",
-                            overflow: "hidden",
-                          }}
+                    <Popover width={500} position="right" withArrow shadow="md">
+                      <Popover.Target>
+                        <Button
+                          variant="subtle"
+                          leftSection={<IconSearch />}
+                          color="shellfish"
                         >
-                          <Box pos="relative" h="500">
-                            <AnalysisMap
-                              markers={[
-                                {
-                                  recordId: typeSpecimen.recordId,
-                                  latitude: typeSpecimen.latitude,
-                                  longitude: typeSpecimen.longitude,
-                                  color: [103, 151, 180, 220],
-                                },
-                              ]}
-                              style={{
-                                borderRadius: "var(--mantine-radius-lg)",
-                                overflow: "hidden",
-                              }}
-                            ></AnalysisMap>
-                          </Box>
-                        </Popover.Dropdown>
-                      </Popover>
-                    </Group>
-                  </DataTableRow>
-                )}
+                          View map
+                        </Button>
+                      </Popover.Target>
+                      <Popover.Dropdown
+                        p={0}
+                        m={0}
+                        style={{
+                          borderRadius: "var(--mantine-radius-lg)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <Box pos="relative" h="500">
+                          <AnalysisMap
+                            markers={[
+                              {
+                                recordId: typeSpecimen.recordId,
+                                latitude: typeSpecimen.latitude,
+                                longitude: typeSpecimen.longitude,
+                                color: [103, 151, 180, 220],
+                              },
+                            ]}
+                            style={{
+                              borderRadius: "var(--mantine-radius-lg)",
+                              overflow: "hidden",
+                            }}
+                          ></AnalysisMap>
+                        </Box>
+                      </Popover.Dropdown>
+                    </Popover>
+                  </Group>
+                </DataTableRow>
+              )}
             </DataTable>
           </Paper>
         </Grid.Col>
@@ -1186,11 +1080,11 @@ function NomenclaturalActBody({
   protonym,
   specimensWithData,
 }: NomenclaturalActBodyProps) {
-  const { loading, error, data } = useQuery<ProvenanceQuery>(
+  const { loading, data } = useQuery<ProvenanceQuery>(
     GET_NOMENCLATURAL_ACT_PROVENANCE,
     {
       variables: { entityId: item.entityId },
-    }
+    },
   );
 
   const specimens = useQuery<TypeSpecimenQuery>(GET_TYPE_SPECIMENS, {
@@ -1203,19 +1097,19 @@ function NomenclaturalActBody({
   const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == item.name.scientificName &&
-      typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.specimen.typeStatus != "no voucher",
   );
 
   const locality = useMemo(
     () => typeSpecimens?.find(({ specimen }) => specimen.locality !== null),
-    [typeSpecimens]
+    [typeSpecimens],
   );
   const geo = useMemo(
     () => typeSpecimens?.find(({ specimen }) => specimen.latitude !== null),
-    [typeSpecimens]
+    [typeSpecimens],
   );
 
-  const specimenMap = useMemo(() => {
+  const specimenMap: Record<string, SpecimenRecordNumbers> = useMemo(() => {
     if (specimensWithData)
       return specimensWithData
         .filter(
@@ -1223,7 +1117,7 @@ function NomenclaturalActBody({
             (specimen.markers || 0) +
               (specimen.sequences || 0) +
               (specimen.wholeGenomes || 0) >
-            0
+            0,
         )
         .reduce(
           (prev, specimen) => ({
@@ -1234,8 +1128,9 @@ function NomenclaturalActBody({
               wholeGenomes: specimen.wholeGenomes,
             },
           }),
-          {}
+          {},
         );
+    return {};
   }, [specimensWithData]);
 
   function humanize(text: string) {
@@ -1244,7 +1139,7 @@ function NomenclaturalActBody({
 
   const act = humanize(item.act);
   const items = data?.provenance.nomenclaturalAct.filter(
-    (item) => item.action !== Action.CREATE
+    (item) => item.action !== Action.CREATE,
   );
 
   return (
@@ -1294,7 +1189,7 @@ function NomenclaturalActBody({
                 <TypeSpecimenPill
                   key={specimen.entityId}
                   specimen={specimen}
-                  records={(specimenMap as any)?.[specimen.recordId]}
+                  records={specimenMap?.[specimen.recordId]}
                 />
               ))}
             </Group>
@@ -1305,10 +1200,7 @@ function NomenclaturalActBody({
         </DataTableRow>
         <DataTableRow label="Type location (geo)">
           <DataField
-            value={
-              geo?.specimen.latitude &&
-              `${geo.specimen.latitude}, ${geo.specimen.longitude}`
-            }
+            value={`${geo?.specimen.latitude}, ${geo?.specimen.longitude}`}
           />
         </DataTableRow>
       </DataTable>
@@ -1347,7 +1239,7 @@ function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
   const { loading, error, data } = tree;
 
   const treeData = data?.stats.taxonBreakdown[0];
-  const pinned = hierarchy.map((h) => h.canonicalName).concat(pin || "");
+  const pinned = hierarchy.map((h) => h.canonicalName).concat(pin ?? "");
 
   const expandedFamily = hierarchy
     .filter((h) => h.rank === "FAMILY" || h.rank === "FAMILIA")
@@ -1406,8 +1298,8 @@ const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
   return taxonomy
     .map((t) => t)
     .sort((a: Taxonomy, b: Taxonomy): number => {
-      let indexA = TAXA_SOURCE_PRIORITIES.indexOf(a.source || "");
-      let indexB = TAXA_SOURCE_PRIORITIES.indexOf(b.source || "");
+      let indexA = TAXA_SOURCE_PRIORITIES.indexOf(a.source ?? "");
+      let indexB = TAXA_SOURCE_PRIORITIES.indexOf(b.source ?? "");
 
       if (indexA == -1) indexA = TAXA_SOURCE_PRIORITIES.length;
       if (indexB == -1) indexB = TAXA_SOURCE_PRIORITIES.length;
@@ -1415,8 +1307,8 @@ const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
       if (indexA < indexB) return -1;
       else if (indexA > indexB) return 1;
       else {
-        const sourceA = a.source || "";
-        const sourceB = b.source || "";
+        const sourceA = a.source ?? "";
+        const sourceB = b.source ?? "";
         return sourceA.localeCompare(sourceB);
       }
     });
@@ -1435,7 +1327,7 @@ export default function TaxonomyPage({
     isSubspecies ? GET_SUMMARY : GET_SUMMARY_HIERARCHY,
     {
       variables: { canonicalName },
-    }
+    },
   );
 
   const species = data?.species;
@@ -1451,7 +1343,7 @@ export default function TaxonomyPage({
       node.rank === "SUBFAMILY" ||
       node.rank === "SUBFAMILIA" ||
       node.rank === "FAMILY" ||
-      node.rank === "FAMILIA"
+      node.rank === "FAMILIA",
   );
 
   const tree = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
@@ -1564,7 +1456,7 @@ function TypeSpecimenPill({
           >
             {specimen.recordId}
             <span style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>
-              {humanize(specimen.typeStatus || "")}
+              {humanize(specimen.typeStatus ?? "")}
             </span>
           </InternalLinkButton>
         </Indicator>

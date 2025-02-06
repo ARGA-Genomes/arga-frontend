@@ -255,7 +255,6 @@ interface Marker {
   shape?: string;
   type?: string;
   version?: string;
-  extraData?: any;
 }
 
 interface SpecimenDetails {
@@ -285,7 +284,6 @@ interface StatsSpecies {
 
 interface TraceFile {
   id: string;
-  metadata: any;
 }
 
 interface IndigenousEcologicalKnowledge {

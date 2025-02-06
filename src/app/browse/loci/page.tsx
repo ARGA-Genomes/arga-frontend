@@ -114,9 +114,9 @@ interface FiltersProps {
   onChange: (filters: Filters) => void;
 }
 
-function Filters({ filters, options, onChange }: FiltersProps) {
+function Filters({ filters, onChange }: FiltersProps) {
   const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications
+    filters.classifications,
   );
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
@@ -217,7 +217,7 @@ function Species() {
           .map(intoFilterItem)
           .filter((item) => item),
       },
-    }
+    },
   );
 
   const records =

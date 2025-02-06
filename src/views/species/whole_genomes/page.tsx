@@ -170,7 +170,7 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
       <Grid.Col span={2}>
         <AttributePill
           label="Genome size"
-          value={Humanize.fileSize(record.genomeSize || 0)}
+          value={Humanize.fileSize(record.genomeSize ?? 0)}
         />
       </Grid.Col>
       <Grid.Col span={2}>
@@ -191,7 +191,7 @@ function WholeGenomeList({ records }: { records: WholeGenome[] }) {
       {records.map((record, idx) => (
         <RecordItem
           key={idx}
-          href={`${path}/${encodeURIComponent(record.accession || "")}`}
+          href={`${path}/${encodeURIComponent(record.accession ?? "")}`}
         >
           <RecordItemContent record={record} />
         </RecordItem>
@@ -280,21 +280,19 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
               </DataTableRow>
             </DataTable>
 
-            {data && (
-              <Link
-                href={`${path}/${data.species.referenceGenome.accession}`}
-              >
-                <Center>
-                  <Button
-                    color="midnight.10"
-                    radius="md"
-                    leftSection={<IconEye />}
-                  >
-                    view
-                  </Button>
-                </Center>
-              </Link>
-            )}
+            <Link
+              href={`${path}/${data.species.referenceGenome.accession ?? "#"}`}
+            >
+              <Center>
+                <Button
+                  color="midnight.10"
+                  radius="md"
+                  leftSection={<IconEye />}
+                >
+                  view
+                </Button>
+              </Center>
+            </Link>
           </Stack>
         </Grid.Col>
         <Grid.Col span={9}>
@@ -317,7 +315,7 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
         <Stack>
           <AttributePill
             label="Genome size"
-            value={Humanize.fileSize(genome?.genomeSize || 0)}
+            value={Humanize.fileSize(genome?.genomeSize ?? 0)}
           />
           <AttributePill label="Ungapped length" value={Humanize.fileSize(0)} />
           <AttributePill label="BUSCO score" value={undefined} />
@@ -410,7 +408,9 @@ export default function WholeGenome({ params }: { params: { name: string } }) {
 
       <Drawer
         opened={mapExpand}
-        onClose={() => { setMapExpand(false); }}
+        onClose={() => {
+          setMapExpand(false);
+        }}
         opacity={0.55}
         zIndex={2000}
         position="right"

@@ -167,10 +167,11 @@ function renderField(key: string, value: string | string[] | object) {
       </Grid.Col>
     );
   } else if (!field && subFields.includes(key) && value !== null) {
-    const subList: any[] = Object.entries(value).map(([k, v]) => {
-      return renderField(k, v);
-    });
-    return subList;
+    const subList: React.JSX.Element[] = Object.entries(value)
+      .map(([k, v]) => renderField(k, v))
+      .filter((el) => !!el);
+
+    return <>{subList.map((el) => el)}</>;
   }
 }
 
@@ -277,7 +278,9 @@ function GenomeRecord(props: GenomeRecordProps) {
     <>
       <tr
         style={{ cursor: "pointer" }}
-        onClick={() => { props.onSelected(props.record); }}
+        onClick={() => {
+          props.onSelected(props.record);
+        }}
       >
         <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
         <td>

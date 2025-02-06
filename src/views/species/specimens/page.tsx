@@ -1,6 +1,5 @@
 "use client";
 
-import { SpecimenDetails } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { useState } from "react";
@@ -40,60 +39,6 @@ const GET_SPECIMENS = gql`
   }
 `;
 
-const GET_SPECIMEN = gql`
-  query SpecimenDetails($specimenId: String) {
-    specimen(specimenId: $specimenId) {
-      id
-      typeStatus
-      catalogNumber
-      collectionCode
-      institutionName
-      institutionCode
-      organismId
-      latitude
-      longitude
-      recordedBy
-      remarks
-
-      events {
-        id
-        eventDate
-        eventId
-        eventRemarks
-        fieldNotes
-        fieldNumber
-        habitat
-        samplingEffort
-        samplingProtocol
-        samplingSizeUnit
-        samplingSizeValue
-
-        events {
-          ... on CollectionEvent {
-            id
-            behavior
-            catalogNumber
-            degreeOfEstablishment
-            establishmentMeans
-            individualCount
-            lifeStage
-            occurrenceStatus
-            organismId
-            organismQuantity
-            organismQuantityType
-            otherCatalogNumbers
-            pathway
-            preparation
-            recordNumber
-            reproductiveCondition
-            sex
-          }
-        }
-      }
-    }
-  }
-`;
-
 interface Specimen {
   id: string;
   recordId: string;
@@ -121,13 +66,9 @@ interface QueryResults {
   species: Species;
 }
 
-interface SpecimenQueryResults {
-  specimen: SpecimenDetails;
-}
-
 function toMarker(
   color: [number, number, number, number],
-  records?: Specimen[]
+  records?: Specimen[],
 ) {
   if (!records) return [];
   return records.map((r) => {
@@ -142,7 +83,7 @@ function toMarker(
 
 function SpecimenMap({ records }: { records: Specimen[] | undefined }) {
   const markers = toMarker([103, 151, 180, 220], records).filter(
-    (s) => s.latitude
+    (s) => s.latitude,
   ) as Marker[];
 
   return (
@@ -226,17 +167,6 @@ export default function Specimens({ params }: { params: { name: string } }) {
       canonicalName,
       page,
       pageSize: PAGE_SIZE,
-    },
-  });
-
-  const records = data?.species.specimens.records;
-  const holotypeId = records?.find(
-    (record) => record.typeStatus == "HOLOTYPE"
-  )?.id;
-
-  const holotype = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {
-    variables: {
-      specimenId: holotypeId,
     },
   });
 

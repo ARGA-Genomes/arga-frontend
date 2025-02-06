@@ -54,10 +54,6 @@ export function TopNav() {
     </Link>
   ));
 
-  const showSaved = () => {
-    savedHandler.open();
-  };
-
   return (
     <Stack gap={40} h="100%">
       <Modal
@@ -81,7 +77,12 @@ export function TopNav() {
         wrap="nowrap"
         h="100%"
       >
-        <Link href="/" onClick={() => { setActive(0); }}>
+        <Link
+          href="/"
+          onClick={() => {
+            setActive(0);
+          }}
+        >
           <Image
             p="md"
             src="/arga-logo.svg"

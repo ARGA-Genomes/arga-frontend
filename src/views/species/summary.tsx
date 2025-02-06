@@ -246,14 +246,14 @@ function ExternalResources(props: ExternalResourcesProps) {
       try {
         const response = await fetch(
           `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            props.canonicalName
-          )}`
+            props.canonicalName,
+          )}`,
         );
         const matches = (await response.json()) as TaxonMatch[];
         setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier)
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
         );
-      } catch (error) {
+      } catch {
         setMatchedTaxon([]);
       }
     }

@@ -3,22 +3,10 @@ import {
   IndigenousEcologicalKnowledge,
   Taxonomy,
 } from "@/app/type";
-import {
-  Box,
-  ThemeIcon,
-  Image,
-  Tooltip,
-  Text,
-  Popover,
-  Stack,
-  SimpleGrid,
-} from "@mantine/core";
+import { Box, ThemeIcon, Image, Tooltip } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
-import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
-import { AttributeIcon } from "./highlight-stack";
 import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 
@@ -227,24 +215,6 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   },
 };
 
-const INDIGENOUS_LANGUAGE_GROUP_ICON: Record<string, IconData> = {
-  "Indigenous Ecological Knowledge: Kamilaroi People": {
-    label: "Indigenous Ecological Knowledge: Kamilaroi People",
-    image: "/species-icons/iek_kamilaroi.svg",
-    link: "/browse/datasets/Indigenous Ecological Knowledge: Kamilaroi People",
-  },
-  "Indigenous Ecological Knowledge: South East Arnhem Land": {
-    label: "Indigenous Ecological Knowledge: South East Arnhem Land",
-    image: "/species-icons/iek_south_east_arnhem_land.svg",
-    link: "/browse/datasets/Indigenous Ecological Knowledge: South East Arnhem Land",
-  },
-  "Indigenous Ecological Knowledge: Noongar Boodjar People": {
-    label: "Indigenous Ecological Knowledge: Noongar Boodjar People",
-    image: "/species-icons/iek_noongar_boodjar.svg",
-    link: "/browse/datasets/Indigenous Ecological Knowledge: Noongar Boodjar People",
-  },
-};
-
 const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   is_venomous: {
     image: "/attribute-icons/venomous_and_poisonous.svg",
@@ -326,79 +296,7 @@ function AttributeGroupIcon({ attribute, iconLink }: AttributeIconProps) {
   return <>{iconLink ? <Link href={iconLink}>{component}</Link> : component}</>;
 }
 
-interface IndigenousLanguageGroupIconProps {
-  group: string;
-  trait: IndigenousEcologicalKnowledge;
-}
-
-function IndigenousLanguageGroupIcon({
-  group,
-  trait,
-}: IndigenousLanguageGroupIconProps) {
-  const [opened, { close, open }] = useDisclosure(false);
-  const extraDimmed = "rgba(134, 142, 150, .3)";
-
-  const icon = INDIGENOUS_LANGUAGE_GROUP_ICON[group];
-  const component = (
-    <Popover position="bottom" withArrow shadow="md" opened={opened}>
-      <Popover.Target>
-        <Image
-          w={60}
-          src={icon.image}
-          alt=""
-          onMouseEnter={open}
-          onMouseLeave={close}
-        />
-      </Popover.Target>
-      <Popover.Dropdown>
-        <Stack>
-          <Text>{icon.label}</Text>
-          <Text size="sm">
-            <strong>Name:</strong> {trait.name}
-          </Text>
-          <SimpleGrid cols={3}>
-            <AttributeIcon
-              label="Food use"
-              icon={
-                trait.foodUse ? (
-                  <IconCircleCheck color="green" />
-                ) : (
-                  <IconCircleX color={extraDimmed} />
-                )
-              }
-            />
-            <AttributeIcon
-              label="Medicinal use"
-              icon={
-                trait.medicinalUse ? (
-                  <IconCircleCheck color="green" />
-                ) : (
-                  <IconCircleX color={extraDimmed} />
-                )
-              }
-            />
-            <AttributeIcon
-              label="Cultural connection"
-              icon={
-                trait.culturalConnection ? (
-                  <IconCircleCheck color="green" />
-                ) : (
-                  <IconCircleX color={extraDimmed} />
-                )
-              }
-            />
-          </SimpleGrid>
-        </Stack>
-      </Popover.Dropdown>
-    </Popover>
-  );
-
-  return (
-    <>{icon.link ? <Link href={icon.link}>{component}</Link> : component}</>
-  );
-}
-
-function DebugIconBar() {
+function _DebugIconBar() {
   return (
     <>
       <VernacularGroupIcon group="bacteria" />
@@ -479,14 +377,12 @@ interface IconBarProps {
   attributes?: NameAttribute[];
 }
 
-export default function IconBar({
-  taxonomy,
-  conservation,
-  traits,
-  attributes,
-}: IconBarProps) {
+export default function IconBar({ taxonomy, attributes }: IconBarProps) {
   const taxonomyHeaderIcons = [taxonomy.vernacularGroup];
-  isLichen(taxonomy.source) ? taxonomyHeaderIcons.push("LICHENS") : undefined;
+
+  if (isLichen(taxonomy.source)) {
+    taxonomyHeaderIcons.push("LICHENS");
+  }
 
   const attributeHeaderIconsRaw = attributes
     ?.map((nameAttribute) => {
@@ -543,7 +439,7 @@ export default function IconBar({
   // The taxonomic groups that make up Conifers and Cycads are disjoint - finds the
   // appropriate taxonomic link for whichever ordo the species is from
   let coniferCycadLink = "/";
-  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+  const { data } = useQuery<TaxonQuery>(GET_TAXON, {
     skip: taxonomy.vernacularGroup !== "CONIFERS_AND_CYCADS",
     variables: {
       rank: taxonomy.rank,
@@ -633,7 +529,7 @@ export default function IconBar({
                 )}
               </Box>
             </Carousel.Slide>
-          )
+          ),
       )}
       {attributeHeaderIcons &&
         attributeHeaderIcons.map(
@@ -648,7 +544,7 @@ export default function IconBar({
                   <AttributeGroupIcon attribute={icon} />
                 </Box>
               </Carousel.Slide>
-            )
+            ),
         )}
     </Carousel>
   );

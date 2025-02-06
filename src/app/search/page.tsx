@@ -241,9 +241,7 @@ function TaxonItem({ item }: { item: Item }) {
                 {item.canonicalName}
               </Text>
               <Text ml="sm" fz="sm" c="dimmed">
-                {item.synonyms?.[0]
-                  ? `syn. ${item.synonyms[0]}`
-                  : null}
+                {item.synonyms?.[0] ? `syn. ${item.synonyms[0]}` : null}
               </Text>
             </Stack>
           </Attribute>
@@ -744,7 +742,7 @@ function Search(props: SearchProperties) {
   const [searchTerms, setSearchTerms] = useState(searchParams.get("q") || "");
   const [dataType, setDataType] = useState(searchParams.get("type") || "all");
 
-  function onFilter(value: string) {
+  function _onFilter(value: string) {
     setDataType(value);
     props.onSearch(searchTerms, value);
   }
@@ -768,7 +766,9 @@ function Search(props: SearchProperties) {
               <TextInput
                 placeholder="e.g. sequence accession, species name"
                 value={value}
-                onChange={(val) => { setValue(val.target.value); }}
+                onChange={(val) => {
+                  setValue(val.target.value);
+                }}
                 leftSectionWidth={60}
                 size="xl"
                 radius={16}
@@ -808,8 +808,8 @@ interface FiltersProps {
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications
+  const [classifications, _setClassifications] = useState<Filter[]>(
+    filters.classifications,
   );
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
@@ -858,7 +858,15 @@ export default function SearchPage() {
     })),
   });
 
-  useEffect(refreshUrl, [query, dataTypes, page, setPreviousPage]);
+  useEffect(refreshUrl, [
+    query,
+    dataTypes,
+    page,
+    setPreviousPage,
+    pathname,
+    router,
+    searchParams,
+  ]);
 
   function refreshUrl() {
     const params = new URLSearchParams(searchParams);
@@ -866,7 +874,9 @@ export default function SearchPage() {
     params.set("page", page.toString());
 
     params.delete("type");
-    dataTypes.forEach((dataType) => { params.append("type", dataType); });
+    dataTypes.forEach((dataType) => {
+      params.append("type", dataType);
+    });
 
     const url = pathname + "?" + params.toString();
     setPreviousPage({ name: "search results", url });
@@ -890,7 +900,7 @@ export default function SearchPage() {
     },
   });
 
-  function onSearch(searchTerms: string, dataType: string) {
+  function onSearch(searchTerms: string, _dataType: string) {
     setQuery(searchTerms);
     /* setDataTypes(dataType) */
     setPage(1);

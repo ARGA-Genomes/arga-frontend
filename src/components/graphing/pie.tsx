@@ -21,16 +21,7 @@ interface ArcProps {
 
 function Arc(props: ArcProps & SVGProps<SVGPathElement>) {
   // unwrap properties for convenience
-  const {
-    data,
-    highlight,
-    onHighlight,
-    startAngle,
-    endAngle,
-    innerRadius,
-    outerRadius,
-    ...rest
-  } = props;
+  const { data, highlight, onHighlight, ...rest } = props;
 
   const anim = useSpring({
     from: { opacity: highlight ? 0.3 : 1 },
@@ -74,7 +65,6 @@ function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
     onHighlight,
     startAngle,
     endAngle,
-    innerRadius,
     outerRadius,
     ...rest
   } = props;
@@ -149,16 +139,7 @@ function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
 
 function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
   // unwrap properties for convenience
-  const {
-    data,
-    highlight,
-    onHighlight,
-    startAngle,
-    endAngle,
-    innerRadius,
-    outerRadius,
-    ...rest
-  } = props;
+  const { data, highlight, onHighlight, ...rest } = props;
 
   const anim = useSpring({
     from: { opacity: highlight ? 0.3 : 1 },
@@ -170,14 +151,6 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
   // get the slice info from the component attrs
   const centroid = arcGenerator.centroid(props);
   const slicePath = arcGenerator(props) || undefined;
-
-  // the label
-  const inflexionInfo = {
-    innerRadius: outerRadius + INFLEXION_PADDING,
-    outerRadius: outerRadius + INFLEXION_PADDING,
-    startAngle: startAngle,
-    endAngle: endAngle,
-  };
 
   const arc = (
     <animated.g style={anim}>
@@ -262,9 +235,9 @@ export function PieChart({
       d3
         .quantize(
           (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length
+          data.length === 1 ? 2 : data.length,
         )
-        .reverse()
+        .reverse(),
     );
 
   return (
@@ -316,9 +289,9 @@ export function DonutChart({
       d3
         .quantize(
           (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length
+          data.length === 1 ? 2 : data.length,
         )
-        .reverse()
+        .reverse(),
     );
 
   return (

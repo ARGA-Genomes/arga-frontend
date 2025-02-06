@@ -89,10 +89,6 @@ interface BarArcProps {
 function BarArc(props: BarArcProps & SVGProps<SVGRectElement>) {
   const {
     data,
-    innerRadius,
-    outerRadius,
-    startAngle,
-    endAngle,
     textAnchor,
     labelTransform,
     labelRotation,
@@ -151,7 +147,14 @@ interface GridLineProps {
   y2: number;
 }
 
-function GridLine({ value, x1, x2, y1, y2, ...rest }: GridLineProps & any) {
+function GridLine({
+  value,
+  x1,
+  x2,
+  y1,
+  y2,
+  ...rest
+}: GridLineProps & { value: number }) {
   return (
     <g>
       <line x1={x1} x2={x2} y1={y1} y2={y2} {...rest} />
@@ -215,9 +218,9 @@ export function BarChart({
       d3
         .quantize(
           (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length
+          data.length === 1 ? 2 : data.length,
         )
-        .reverse()
+        .reverse(),
     );
 
   return (
@@ -305,7 +308,7 @@ export function CircularBarChart({
     .domain(
       data.map(function (d) {
         return d.name;
-      })
+      }),
     );
 
   const yScale = d3
@@ -319,9 +322,9 @@ export function CircularBarChart({
       d3
         .quantize(
           (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length
+          data.length === 1 ? 2 : data.length,
         )
-        .reverse()
+        .reverse(),
     );
 
   return (

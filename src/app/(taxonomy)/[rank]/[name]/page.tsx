@@ -447,20 +447,20 @@ interface FiltersProps {
 
 function Filters({ filters, options, onChange }: FiltersProps) {
   const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications
+    filters.classifications,
   );
   const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(
-    filters.vernacularGroup
+    filters.vernacularGroup,
   );
   const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology);
   const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra);
   const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra);
   const [state, setState] = useState<Filter | undefined>(filters.state);
   const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(
-    filters.drainageBasin
+    filters.drainageBasin,
   );
   const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(
-    filters.bushfireRecovery
+    filters.bushfireRecovery,
   );
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
@@ -700,7 +700,7 @@ function Species({
 *   .map(intoFilterItem)
       .filter((item) => item), */
       },
-    }
+    },
   );
 
   if (error) {
@@ -1002,7 +1002,7 @@ function DataSummary({
                 <DataField
                   value={Humanize.formatNumber(
                     taxon?.descendants.filter((d) => d.speciesGenomes > 0)
-                      .length || 0
+                      .length || 0,
                   )}
                 />
               </DataTableRow>
@@ -1010,7 +1010,7 @@ function DataSummary({
             <DataTableRow label="Species with genomes">
               <DataField
                 value={Humanize.formatNumber(
-                  taxon?.summary.speciesGenomes || 0
+                  taxon?.summary.speciesGenomes || 0,
                 )}
               />
             </DataTableRow>
@@ -1021,7 +1021,7 @@ function DataSummary({
                 <DataField
                   value={Humanize.formatNumber(
                     taxon?.descendants.filter((d) => d.speciesData > 0)
-                      .length || 0
+                      .length || 0,
                   )}
                 />
               </DataTableRow>
@@ -1037,16 +1037,18 @@ function DataSummary({
             <Attribute
               label="Species with most genomes"
               value={speciesGenomes?.[0]?.name}
-              href={`/species/${
-                speciesGenomes?.[0]?.name?.replaceAll(" ", "_")
-              }/taxonomy`}
+              href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(
+                " ",
+                "_",
+              )}/taxonomy`}
             />
             <Attribute
               label="Species with most data"
               value={speciesOther?.[0]?.name}
-              href={`/species/${
-                speciesOther?.[0]?.name.replaceAll(" ", "_")
-              }/taxonomy`}
+              href={`/species/${speciesOther?.[0]?.name.replaceAll(
+                " ",
+                "_",
+              )}/taxonomy`}
             />
           </Stack>
         </Paper>
@@ -1062,9 +1064,6 @@ function EukaryotaDataSummary({
   rank: string;
   taxon: EukaryotaTaxonomy | undefined;
 }) {
-  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
-  const childTaxonLabel = pluralTaxon(childTaxon);
-
   const thresholds = [
     { name: "low", color: "#f47625", start: 0, end: 50 },
     { name: "decent", color: "#febb1e", start: 50, end: 75 },
@@ -1092,7 +1091,7 @@ function EukaryotaDataSummary({
             speciesData: descendant.speciesData,
             speciesGenomes: descendant.speciesGenomes,
           };
-        })
+        }),
     )
     .concat(
       taxon.superKingdomDescendants.map((descendant) => {
@@ -1103,7 +1102,7 @@ function EukaryotaDataSummary({
           speciesData: descendant.speciesData,
           speciesGenomes: descendant.speciesGenomes,
         };
-      })
+      }),
     );
 
   const rankGenomes = descendants
@@ -1246,7 +1245,8 @@ function EukaryotaDataSummary({
               <DataTableRow label={"Kingdoms/regna with genomes"}>
                 <DataField
                   value={Humanize.formatNumber(
-                    descendants?.filter((d) => d.speciesGenomes > 0).length || 0
+                    descendants?.filter((d) => d.speciesGenomes > 0).length ||
+                      0,
                   )}
                 />
               </DataTableRow>
@@ -1254,7 +1254,7 @@ function EukaryotaDataSummary({
             <DataTableRow label="Species with genomes">
               <DataField
                 value={Humanize.formatNumber(
-                  taxon?.summary.speciesGenomes || 0
+                  taxon?.summary.speciesGenomes || 0,
                 )}
               />
             </DataTableRow>
@@ -1262,7 +1262,7 @@ function EukaryotaDataSummary({
               <DataTableRow label={"Kingdoms/regna with data"}>
                 <DataField
                   value={Humanize.formatNumber(
-                    descendants?.filter((d) => d.speciesData > 0).length || 0
+                    descendants?.filter((d) => d.speciesData > 0).length || 0,
                   )}
                 />
               </DataTableRow>
@@ -1278,16 +1278,18 @@ function EukaryotaDataSummary({
             <Attribute
               label="Species with most genomes"
               value={speciesGenomes?.[0]?.name}
-              href={`/species/${
-                speciesGenomes?.[0]?.name?.replaceAll(" ", "_")
-              }/taxonomy`}
+              href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(
+                " ",
+                "_",
+              )}/taxonomy`}
             />
             <Attribute
               label="Species with most data"
               value={speciesOther?.[0]?.name}
-              href={`/species/${
-                speciesOther?.[0]?.name.replaceAll(" ", "_")
-              }/taxonomy`}
+              href={`/species/${speciesOther?.[0]?.name.replaceAll(
+                " ",
+                "_",
+              )}/taxonomy`}
             />
           </Stack>
         </Paper>
@@ -1327,12 +1329,12 @@ export default function ClassificationPage({
         kingdomDescendantRank: "KINGDOM",
         regnumDescendantRank: "REGNUM",
       },
-    }
+    },
   );
 
   useEffect(() => {
     setPreviousPage({ name: `browsing ${params.name}`, url: pathname });
-  }, [setPreviousPage]);
+  });
 
   return (
     <Stack mt={40}>

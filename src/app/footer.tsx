@@ -3,14 +3,7 @@
 import classes from "./footer.module.css";
 
 import Link from "next/link";
-import {
-  Flex,
-  Group,
-  Image,
-  Stack,
-  Text,
-  Box,
-} from "@mantine/core";
+import { Flex, Group, Image, Stack, Text, Box } from "@mantine/core";
 import { IconBrandXFilled, IconBrandGithubFilled } from "@tabler/icons-react";
 import { IconOSF } from "../components/osf-icon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -148,7 +141,7 @@ export function Footer() {
           </Text>
         </Stack>
       </Group>
-      <Image src="/gene-pattern.svg" h={160} />
+      <Image src="/gene-pattern.svg" h={160} alt="" />
     </Box>
   );
 }

@@ -16,10 +16,9 @@ import {
 
 import { useEffect, useState } from "react";
 
-
 import { useListState } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
-import { animated, to, useSpring } from "@react-spring/web";
+import { animated, to } from "@react-spring/web";
 
 const NODE_WIDTH = 20;
 
@@ -169,7 +168,7 @@ export function TaxonomyTree({
 
   useEffect(() => {
     setRoot(convertToNode(tree, expanded, pinned));
-  }, [expanded, tree]);
+  }, [expanded, tree, pinned]);
 
   // expand and load children when a node is expanded
   function nodeClicked(item: ComputedNode<Node>) {
@@ -285,7 +284,7 @@ export function TaxonomyTree({
         onLinkMouseMove={() => {}}
         onLinkMouseLeave={() => {}}
         onLinkClick={() => {}}
-        /* @ts-ignore */
+        /* @ts-expect-error: must specify a LinkTooltip<Node> type */
         linkTooltip={undefined}
         linkTooltipAnchor={"center"}
         nodeComponent={CustomNode}
@@ -429,14 +428,6 @@ function CustomNode({
     tooltipPosition,
     tooltipAnchor,
     margin,
-  });
-
-  const props = useSpring({
-    to: [
-      { opacity: 1, r: 6 },
-      { opacity: 0.4, r: 3 },
-    ],
-    loop: true,
   });
 
   if (!node.data.visible) {
