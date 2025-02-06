@@ -47,7 +47,6 @@
                 "deck.gl": "^9.1.0",
                 "embla-carousel-react": "^8.5.2",
                 "fathom-client": "^3.7.2",
-                "flag": "^5.0.1",
                 "framer-motion": "12.2.0",
                 "graphql": "^16.10.0",
                 "humanize-plus": "^1.8.2",
