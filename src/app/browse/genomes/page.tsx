@@ -41,7 +41,7 @@ type Filters = {
 };
 
 const GET_SPECIES = gql`
-  query TaxaSpecies($page: Int, $perPage: Int, $filters: [TaxaFilter]) {
+  query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
     taxa(filters: $filters) {
       species(page: $page, perPage: $perPage) {
         total
@@ -207,12 +207,6 @@ function Species() {
 
     return items.filter((item): item is Filter => !!item);
   };
-
-  console.log(
-    flattenFilters(filters)
-      .map(intoFilterItem)
-      .filter((item) => item)
-  );
 
   const { loading, error, data, previousData } = useQuery<QueryResults>(
     GET_SPECIES,

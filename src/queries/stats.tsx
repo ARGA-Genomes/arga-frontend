@@ -10,12 +10,6 @@ export const TAXON_TREE_NODE_STATISTICS = gql`
     specimens
     other
     totalGenomic
-    species
-    completeGenomes
-    partialGenomes
-    assemblyChromosomes
-    assemblyScaffolds
-    assemblyContigs
   }
 `;
 
@@ -29,17 +23,11 @@ export type TaxonStatTreeNode = {
   other?: number;
   totalGenomic?: number;
   children?: TaxonStatTreeNode[];
-  species?: number;
-  completeGenomes?: number;
-  partialGenomes?: number;
-  assemblyChromosomes?: number;
-  assemblyScaffolds?: number;
-  assemblyContigs?: number;
 };
 
 export function findChildren(
   root: TaxonStatTreeNode,
-  scientificName: string
+  scientificName: string,
 ): TaxonStatTreeNode[] {
   if (root.scientificName === scientificName) {
     return root.children || [];
@@ -55,7 +43,7 @@ export function findChildren(
 
 export function findChildrenCanonical(
   root: TaxonStatTreeNode,
-  canonicalName: string
+  canonicalName: string,
 ): TaxonStatTreeNode[] {
   if (root.canonicalName === canonicalName) {
     return root.children || [];
