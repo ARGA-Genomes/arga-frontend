@@ -1,5 +1,5 @@
 import Markers from "@/views/species/markers/page";
 
-export default function Page({ params }: { params: { name: string } }) {
-  return <Markers params={params} />;
+export default function Page(props: { params: Promise<{ name: string }> }) {
+  return <Markers {...props} />;
 }

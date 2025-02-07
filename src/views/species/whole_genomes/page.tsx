@@ -15,7 +15,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { useState } from "react";
+import { useState, use } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { PaginationBar } from "@/components/pagination";
 import { AnalysisMap } from "@/components/mapping";
@@ -344,7 +344,8 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
   );
 }
 
-export default function WholeGenome({ params }: { params: { name: string } }) {
+export default function WholeGenome(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const name = decodeURIComponent(params.name);
   const canonicalName = name.replaceAll("_", " ");
 

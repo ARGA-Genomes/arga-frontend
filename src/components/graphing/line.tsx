@@ -3,34 +3,23 @@
 import * as d3 from "d3";
 import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps } from "@mantine/core";
+import { SVGProps } from "react";
 
 const MARGIN = { top: 10, right: 10, bottom: 20, left: 10 };
 
-interface GridLineProps {
+interface GridLineProps extends SVGProps<SVGLineElement> {
   x1: number;
   x2: number;
   y1: number;
   y2: number;
+  value: number;
 }
 
-function GridLine({
-  value,
-  x1,
-  x2,
-  y1,
-  y2,
-  ...rest
-}: GridLineProps & { value: number }) {
+function GridLine({ value, x1, x2, y1, y2, ...rest }: GridLineProps) {
   return (
     <g>
       <line x1={x1} x2={x2} y1={y1} y2={y2} {...rest} />
-      <text
-        x={x1}
-        y={y2 + 10}
-        textAnchor="middle"
-        alignmentBaseline="central"
-        fontSize="10"
-      >
+      <text x={x1} y={y2 + 10} textAnchor="middle" alignmentBaseline="central" fontSize="10">
         {value}
       </text>
     </g>
@@ -74,11 +63,7 @@ export function LineChart({ data, ...rest }: LineChartProps & BoxProps) {
   return (
     <Box my={10} ref={ref} {...rest}>
       <svg width={width} height={height}>
-        <g
-          width={boundsWidth}
-          height={boundsHeight}
-          transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
-        >
+        <g width={boundsWidth} height={boundsHeight} transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}>
           {gridX.map((value, idx) => (
             <GridLine
               key={idx}

@@ -1,4 +1,5 @@
-"use client";
+"use client";;
+import { use } from "react";
 
 import classes from "./layout.module.css";
 
@@ -70,14 +71,17 @@ function DataTabs({
 }
 
 interface SpeciesLayoutProps {
-  params: { name: string };
+  params: Promise<{ name: string }>;
   children: React.ReactNode;
 }
 
-export default function SpeciesLayout({
-  params,
-  children,
-}: SpeciesLayoutProps) {
+export default function SpeciesLayout(props: SpeciesLayoutProps) {
+  const params = use(props.params);
+
+  const {
+    children
+  } = props;
+
   const name = decodeURIComponent(params.name);
   const canonicalName = name.replaceAll("_", " ");
 

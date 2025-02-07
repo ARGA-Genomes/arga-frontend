@@ -23,7 +23,7 @@ import {
   Chip,
   Center,
 } from "@mantine/core";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, use } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -643,7 +643,8 @@ function SourceDetails({
   );
 }
 
-export default function BrowseSource({ params }: { params: { name: string } }) {
+export default function BrowseSource(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const source = decodeURIComponent(params.name).replaceAll("_", " ");
   const [_, setPreviousPage] = usePreviousPage();
 

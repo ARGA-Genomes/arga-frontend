@@ -1,11 +1,11 @@
 "use client";
 
 import * as d3 from "d3";
-import { animated } from "@react-spring/web";
 import { useState } from "react";
 import { Sunburst } from "@nivo/sunburst";
 import classes from "./sunburst.module.css";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 interface TreeNode {
   name: string;
@@ -54,9 +54,7 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
   const customColor = (numCategories: number | undefined) => {
     if (numCategories) {
       if (numCategories > 1) {
-        return d3
-          .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), numCategories)
-          .reverse();
+        return d3.quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), numCategories).reverse();
       } else {
         return d3.interpolateSpectral(0.5);
       }
@@ -67,11 +65,8 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
 
   const CenteredValue = ({ centerX, centerY }: CenteredValueProps) => {
     return (
-      <animated.g>
-        <Link
-          href={`/${capitaliseFirstLetter(pathRank[0])}/${path[0]}`}
-          className={classes.sunburstButton}
-        >
+      <motion.g>
+        <Link href={`/${capitaliseFirstLetter(pathRank[0])}/${path[0]}`} className={classes.sunburstButton}>
           <text
             x={centerX}
             y={centerY}
@@ -114,7 +109,7 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
             Back to {parent}
           </text>
         )}
-      </animated.g>
+      </motion.g>
     );
   };
   return (
@@ -143,10 +138,7 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
       layers={["arcs", "arcLabels", CenteredValue]}
       // going down one taxonomic level
       onClick={(clickedDatum) => {
-        const foundObject = findObject(
-          flatten(chartData.children),
-          clickedDatum.data.name,
-        );
+        const foundObject = findObject(flatten(chartData.children), clickedDatum.data.name);
         if (foundObject) {
           if (foundObject.children) {
             const tmpPath = [clickedDatum.data.name, ...path];
@@ -156,9 +148,7 @@ export function SunburstChart({ data, width, height }: SunburstChartProps) {
             setParent(tmpPath[1]);
             setChartData(foundObject);
           } else {
-            window.location.href = `/${capitaliseFirstLetter(
-              foundObject.rank,
-            )}/${foundObject.name}`;
+            window.location.href = `/${capitaliseFirstLetter(foundObject.rank)}/${foundObject.name}`;
           }
         }
       }}

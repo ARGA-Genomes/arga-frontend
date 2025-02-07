@@ -1,11 +1,12 @@
 "use client";
 
 import * as d3 from "d3";
-import { useSpring, animated } from "@react-spring/web";
+import { useSpring } from "@react-spring/web";
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps, Tooltip } from "@mantine/core";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const MARGIN = { top: 10, right: 10, bottom: 10, left: 10 };
 
@@ -34,7 +35,7 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>) {
   });
 
   const bar = (
-    <animated.g style={anim}>
+    <motion.g initial={{ opacity: highlight ? 1 : 0.3 }} whileHover={{ opacity: highlight ? 0.3 : 1 }}>
       <rect
         x={yAxisWidth}
         y={rect.y}
@@ -63,7 +64,7 @@ function Bar(props: BarProps & SVGProps<SVGRectElement>) {
       >
         {data.name}
       </text>
-    </animated.g>
+    </motion.g>
   );
 
   return (
@@ -87,15 +88,7 @@ interface BarArcProps {
 }
 
 function BarArc(props: BarArcProps & SVGProps<SVGRectElement>) {
-  const {
-    data,
-    textAnchor,
-    labelTransform,
-    labelRotation,
-    highlight,
-    onHighlight,
-    ...rest
-  } = props;
+  const { data, textAnchor, labelTransform, labelRotation, highlight, onHighlight, ...rest } = props;
 
   const anim = useSpring({
     from: { opacity: highlight ? 0.3 : 1 },
@@ -106,7 +99,7 @@ function BarArc(props: BarArcProps & SVGProps<SVGRectElement>) {
   const slicePath = arcGenerator(props) || undefined;
 
   const barArc = (
-    <animated.g style={anim}>
+    <motion.g initial={{ opacity: highlight ? 1 : 0.3 }} whileHover={{ opacity: highlight ? 0.3 : 1 }}>
       <path
         d={slicePath}
         onMouseEnter={() => {
@@ -127,44 +120,29 @@ function BarArc(props: BarArcProps & SVGProps<SVGRectElement>) {
       >
         {data.name}
       </text>
-    </animated.g>
+    </motion.g>
   );
 
   return (
-    <Tooltip.Floating
-      label={`${data.name} - ${data.value} records`}
-      radius="md"
-    >
+    <Tooltip.Floating label={`${data.name} - ${data.value} records`} radius="md">
       {data.href ? <Link href={data.href}>{barArc}</Link> : barArc}
     </Tooltip.Floating>
   );
 }
 
-interface GridLineProps {
+interface GridLineProps extends SVGProps<SVGLineElement> {
   x1: number;
   x2: number;
   y1: number;
   y2: number;
+  value: number;
 }
 
-function GridLine({
-  value,
-  x1,
-  x2,
-  y1,
-  y2,
-  ...rest
-}: GridLineProps & { value: number }) {
+function GridLine({ value, x1, x2, y1, y2, ...rest }: GridLineProps) {
   return (
     <g>
       <line x1={x1} x2={x2} y1={y1} y2={y2} {...rest} />
-      <text
-        x={x1}
-        y={y2 + 10}
-        textAnchor="middle"
-        alignmentBaseline="central"
-        fontSize="10"
-      >
+      <text x={x1} y={y2 + 10} textAnchor="middle" alignmentBaseline="central" fontSize="10">
         {value}
       </text>
     </g>
@@ -183,12 +161,7 @@ interface BarChartProps {
   labelWidth?: number;
 }
 
-export function BarChart({
-  data,
-  spacing,
-  labelWidth,
-  ...rest
-}: BarChartProps & BoxProps) {
+export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps & BoxProps) {
   const { ref, width, height } = useElementSize();
 
   const yAxisWidth = labelWidth || 150;
@@ -214,26 +187,12 @@ export function BarChart({
 
   const color = d3
     .scaleOrdinal()
-    .range(
-      d3
-        .quantize(
-          (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length,
-        )
-        .reverse(),
-    );
+    .range(d3.quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length === 1 ? 2 : data.length).reverse());
 
   return (
     <Box ref={ref} {...rest}>
       <svg width={width} height={height}>
-        <linearGradient
-          gradientUnits="userSpaceOnUse"
-          x1="0"
-          x2={yAxisWidth}
-          y1="0"
-          y2="0"
-          id="truncateText"
-        >
+        <linearGradient gradientUnits="userSpaceOnUse" x1="0" x2={yAxisWidth} y1="0" y2="0" id="truncateText">
           <stop offset="70%" stopOpacity="1" />
           <stop offset="100%" stopOpacity="0" />
         </linearGradient>
@@ -269,9 +228,7 @@ export function BarChart({
               rx={5}
               opacity={0.8}
               fill={color(idx.toString()) as string}
-              highlight={
-                highlighted === undefined || highlighted.name == datum.name
-              }
+              highlight={highlighted === undefined || highlighted.name == datum.name}
               onHighlight={setHighlighted}
             />
           ))}
@@ -286,11 +243,7 @@ interface CircularBarChartProps {
   margin: number;
 }
 
-export function CircularBarChart({
-  data,
-  margin,
-  ...rest
-}: CircularBarChartProps & BoxProps) {
+export function CircularBarChart({ data, margin, ...rest }: CircularBarChartProps & BoxProps) {
   const { ref, width, height } = useElementSize();
   const innerRadius = 50;
   const outerRadius = Math.min(width, height) / 2 - margin;
@@ -311,29 +264,15 @@ export function CircularBarChart({
       }),
     );
 
-  const yScale = d3
-    .scaleRadial()
-    .range([innerRadius, outerRadius])
-    .domain([0, maxValue]);
+  const yScale = d3.scaleRadial().range([innerRadius, outerRadius]).domain([0, maxValue]);
 
   const color = d3
     .scaleOrdinal()
-    .range(
-      d3
-        .quantize(
-          (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length,
-        )
-        .reverse(),
-    );
+    .range(d3.quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length === 1 ? 2 : data.length).reverse());
 
   return (
     <Box ref={ref} {...rest}>
-      <svg
-        width={width}
-        height={height}
-        viewBox={[-width / 2, -height / 2, width, height].join(" ")}
-      >
+      <svg width={width} height={height} viewBox={[-width / 2, -height / 2, width, height].join(" ")}>
         {data.map((datum, idx) => (
           <BarArc
             key={idx}
@@ -343,33 +282,23 @@ export function CircularBarChart({
             startAngle={xScale(datum.name)!}
             endAngle={xScale(datum.name)! + xScale.bandwidth()}
             textAnchor={
-              (xScale(datum.name)! + xScale.bandwidth() / 2 + Math.PI) %
-                (2 * Math.PI) <
-              Math.PI
-                ? "end"
-                : "start"
+              (xScale(datum.name)! + xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"
             }
             labelTransform={
               "rotate(" +
-              (((xScale(datum.name)! + xScale.bandwidth() / 2) * 180) /
-                Math.PI -
-                90) +
+              (((xScale(datum.name)! + xScale.bandwidth() / 2) * 180) / Math.PI - 90) +
               ")" +
               "translate(" +
               (yScale(datum.value) + 10) +
               ",0)"
             }
             labelRotation={
-              (xScale(datum.name)! + xScale.bandwidth() / 2 + Math.PI) %
-                (2 * Math.PI) <
-              Math.PI
+              (xScale(datum.name)! + xScale.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI
                 ? "rotate(180)"
                 : "rotate(0)"
             }
             fill={color(idx.toString()) as string}
-            highlight={
-              highlighted === undefined || highlighted.name == datum.name
-            }
+            highlight={highlighted === undefined || highlighted.name == datum.name}
             onHighlight={setHighlighted}
           />
         ))}

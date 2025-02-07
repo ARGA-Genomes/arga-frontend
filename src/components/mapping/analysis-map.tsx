@@ -3,13 +3,10 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import classes from "./analysis-map.module.css";
 
-import { Map } from "react-map-gl/maplibre";
-import DeckGL, {
-  GeoJsonLayer,
-  MapView,
-  PickingInfo,
-  ScatterplotLayer,
-} from "deck.gl";
+/* import Map from "react-map-gl/maplibre"; */
+import { Map } from "@vis.gl/react-maplibre";
+
+import DeckGL, { GeoJsonLayer, MapView, PickingInfo, ScatterplotLayer } from "deck.gl";
 import { useState, useEffect } from "react";
 import { GeoJSON } from "geojson";
 import { gql, useQuery } from "@apollo/client";
@@ -71,15 +68,9 @@ export default function AnalysisMap({
   initialZoom,
 }: AnalysisMapProps) {
   const [tolerance, _setTolerance] = useState(0.01);
-  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(
-    undefined,
-  );
-  const [selectedMarker, setSelectedMarker] = useState<string | undefined>(
-    undefined,
-  );
-  const [clickedMarker, setClickedMarker] = useState<string | undefined>(
-    undefined,
-  );
+  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined);
+  const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined);
+  const [clickedMarker, setClickedMarker] = useState<string | undefined>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [popupLink, setPopupLink] = useState(``);
@@ -159,11 +150,7 @@ export default function AnalysisMap({
     setIsOpen(false);
   };
 
-  const getPopUpLink = (
-    type: Layer,
-    speciesName: string | undefined,
-    clickedMarker: string | undefined,
-  ) => {
+  const getPopUpLink = (type: Layer, speciesName: string | undefined, clickedMarker: string | undefined) => {
     if (type === Layer.Specimens) {
       setPopupLink(`/species/${speciesName}/specimens/${clickedMarker}`);
     } else if (type === Layer.Loci) {
@@ -256,8 +243,7 @@ function bioRegionLayers(regions: BioRegions) {
   const ibra = new GeoJsonLayer({
     id: "ibra-layer",
     data: regions.ibra || [],
-    getFillColor: (d) =>
-      d.properties?.name === regions.selected ? ibraHover : ibraColor,
+    getFillColor: (d) => (d.properties?.name === regions.selected ? ibraHover : ibraColor),
     getLineColor: [254, 195, 55, 200],
     pickable: true,
     filled: true,
@@ -268,8 +254,7 @@ function bioRegionLayers(regions: BioRegions) {
   const imcra = new GeoJsonLayer({
     id: "imcra-layer",
     data: regions.imcra || [],
-    getFillColor: (d) =>
-      d.properties?.name === regions.selected ? imcraHover : imcraColor,
+    getFillColor: (d) => (d.properties?.name === regions.selected ? imcraHover : imcraColor),
     getLineColor: [88, 163, 157, 200],
     pickable: true,
     filled: true,

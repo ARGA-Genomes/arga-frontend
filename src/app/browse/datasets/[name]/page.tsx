@@ -13,7 +13,7 @@ import {
   Stack,
   Container,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { BarChart } from "@/components/graphing/bar";
 import { TachoChart } from "@/components/graphing/tacho";
 import { PaginationBar } from "@/components/pagination";
@@ -186,11 +186,12 @@ function DatasetDetails({ dataset }: { dataset: string }) {
   );
 }
 
-export default function BrowseDataset({
-  params,
-}: {
-  params: { name: string };
-}) {
+export default function BrowseDataset(
+  props: {
+    params: Promise<{ name: string }>;
+  }
+) {
+  const params = use(props.params);
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
   const [_, setPreviousPage] = usePreviousPage();

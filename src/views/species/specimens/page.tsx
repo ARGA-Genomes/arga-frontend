@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
-import { useState } from "react";
+import { useState, use } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { LoadOverlay } from "@/components/load-overlay";
 import { RecordItem, RecordList } from "@/components/record-list";
@@ -158,7 +158,8 @@ function SpecimenList({ records }: { records: Specimen[] }) {
   );
 }
 
-export default function Specimens({ params }: { params: { name: string } }) {
+export default function Specimens(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const canonicalName = getCanonicalName(params);
   const [page, setPage] = useState(1);
 

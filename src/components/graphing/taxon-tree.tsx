@@ -18,17 +18,13 @@ import { useEffect, useState } from "react";
 
 import { useListState } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
-import { animated, to } from "@react-spring/web";
+import { motion } from "framer-motion";
 
 const NODE_WIDTH = 20;
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
-  query TaxonTreeNode(
-    $taxonRank: TaxonomicRank
-    $taxonCanonicalName: String
-    $descendantRank: TaxonomicRank
-  ) {
+  query TaxonTreeNode($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $descendantRank: TaxonomicRank) {
     stats {
       taxonBreakdown(
         taxonRank: $taxonRank
@@ -77,11 +73,7 @@ interface Node {
 // Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
 // from the taxon tree statistics query into a presentable tree by injecting and
 // defaulting variables used for tree interaction.
-function convertToNode(
-  node: TaxonStatTreeNode,
-  expanded?: Node[],
-  pinned?: string[],
-): Node {
+function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: string[]): Node {
   const shouldExpand =
     !!expanded?.find((n) => n.canonicalName === node.canonicalName) ||
     !!pinned?.find((name) => name === node.canonicalName) ||
@@ -148,16 +140,8 @@ interface TaxonomyTreeProps {
 // The interactive taxonomy tree. We use a nivo tree as the base but then also make
 // it responsive ourselves since we require certain min-width logic to allow for scrollbars
 // for very large taxon families.
-export function TaxonomyTree({
-  minWidth,
-  layout,
-  data,
-  pinned,
-  initialExpanded,
-}: TaxonomyTreeProps) {
-  const [expanded, handlers] = useListState<Node>(
-    initialExpanded?.map((n) => convertToNode(n, [])) || [],
-  );
+export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }: TaxonomyTreeProps) {
+  const [expanded, handlers] = useListState<Node>(initialExpanded?.map((n) => convertToNode(n, [])) || []);
   const client = useApolloClient();
 
   // we maintain two trees for this graph. the graphql results are cached in tree which
@@ -191,9 +175,7 @@ export function TaxonomyTree({
 
         // clone the underlying data tree and find the taxon node being loaded
         const newTree = structuredClone(tree);
-        const parent = newTree.children?.find(
-          (node) => node.canonicalName == item.data.canonicalName,
-        );
+        const parent = newTree.children?.find((node) => node.canonicalName == item.data.canonicalName);
 
         // if we found the loaded node we insert the children and reload
         // both the data cache and the tree root to effect the display changes
@@ -203,9 +185,7 @@ export function TaxonomyTree({
         }
       });
     } else {
-      handlers.remove(
-        expanded.findIndex((n) => n.canonicalName == item.data.canonicalName),
-      );
+      handlers.remove(expanded.findIndex((n) => n.canonicalName == item.data.canonicalName));
     }
   }
 
@@ -271,10 +251,7 @@ export function TaxonomyTree({
               </Group>
               <Group justify="center">
                 <StatBadge label="Other" stat={item.node.data.other} />
-                <StatBadge
-                  label="Total genomic"
-                  stat={item.node.data.totalGenomic}
-                />
+                <StatBadge label="Total genomic" stat={item.node.data.totalGenomic} />
               </Group>
             </Paper>
           )
@@ -326,25 +303,20 @@ function CustomLink({
   }
 
   return (
-    <animated.path
+    <motion.path
       data-testid={`link.${link.id}`}
-      d={to(
-        [
-          animatedProps.sourceX,
-          animatedProps.sourceY,
-          animatedProps.targetX,
-          animatedProps.targetY,
-        ],
-        (sourceX, sourceY, targetX, targetY) => {
-          return linkGenerator({
-            source: [sourceX, sourceY],
-            target: [targetX, targetY],
-          });
-        },
-      )}
+      /* d={to(
+       *   [animatedProps.sourceX, animatedProps.sourceY, animatedProps.targetX, animatedProps.targetY],
+       *   (sourceX, sourceY, targetX, targetY) => {
+       *     return linkGenerator({
+       *       source: [sourceX, sourceY],
+       *       target: [targetX, targetY],
+       *     });
+       *   },
+       * )} */
       fill="none"
-      strokeWidth={pinned ? 8 : animatedProps.thickness}
-      stroke={animatedProps.color}
+      strokeWidth={pinned ? 8 : animatedProps.thickness.goal}
+      stroke={animatedProps.color.goal}
       strokeDasharray={link.target.data.isLoader ? "10,10" : undefined}
       {...eventHandlers}
     />
@@ -359,19 +331,12 @@ function CustomLabel({ label, animatedProps }: LabelComponentProps<Node>) {
     return;
   }
 
+  /* transform={to([animatedProps.x, animatedProps.y], (x, y) => `translate(${x},${y})`)}
+transform={animatedProps.rotation.to((rotation) => `rotate(${rotation})`)} */
+
   return (
-    <animated.g
-      data-testid={`label.${label.id}`}
-      transform={to(
-        [animatedProps.x, animatedProps.y],
-        (x, y) => `translate(${x},${y})`,
-      )}
-    >
-      <animated.g
-        transform={animatedProps.rotation.to(
-          (rotation) => `rotate(${rotation})`,
-        )}
-      >
+    <motion.g data-testid={`label.${label.id}`}>
+      <motion.g>
         {theme.labels.text.outlineWidth > 0 && (
           <text
             style={{
@@ -397,8 +362,8 @@ function CustomLabel({ label, animatedProps }: LabelComponentProps<Node>) {
         >
           {label.label}
         </text>
-      </animated.g>
-    </animated.g>
+      </motion.g>
+    </motion.g>
   );
 }
 
@@ -437,12 +402,12 @@ function CustomNode({
   // to animate the loading node. svg animation is not that performant
   // style={node.data.isLoader ? props : undefined}
   return (
-    <animated.circle
+    <motion.circle
       data-testid={`node.${node.uid}`}
-      r={pinned ? 12 : animatedProps.size.to((size) => size / 2)}
-      fill={animatedProps.color}
-      cx={animatedProps.x}
-      cy={animatedProps.y}
+      /* r={pinned ? 12 : animatedProps.size.to((size) => size / 2)}
+       * fill={animatedProps.color}
+       * cx={animatedProps.x}
+       * cy={animatedProps.y} */
       {...eventHandlers}
     />
   );

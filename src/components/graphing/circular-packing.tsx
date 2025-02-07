@@ -1,8 +1,8 @@
 "use client";
 
-import { animated } from "@react-spring/web";
 import { useState } from "react";
 import { CirclePacking, LabelProps } from "@nivo/circle-packing";
+import { motion } from "framer-motion";
 
 interface TreeNode {
   name: string;
@@ -16,11 +16,7 @@ interface CircularPackingChartProps {
   height: number;
 }
 
-export function CircularPackingChart({
-  data,
-  width,
-  height,
-}: CircularPackingChartProps) {
+export function CircularPackingChart({ data, width, height }: CircularPackingChartProps) {
   const [zoomedId, setZoomedId] = useState<string | null>(null);
 
   const setColors = (canonicalName: string) => {
@@ -40,16 +36,17 @@ export function CircularPackingChart({
       return "";
     }
   };
+
   const CustomLabelComponent = (label: LabelProps<TreeNode>) => {
     const isTopLevel = label.node.height === 2 || label.node.height === 1;
     const color = setColors(label.node.data.name);
 
     if (isTopLevel) {
       return (
-        <animated.text
+        <motion.text
           key={label.node.id}
-          x={label.style.x}
-          y={label.style.y}
+          /* x={label.style.x}
+           * y={label.style.y} */
           fill={label.node.height === 2 ? "white" : color} // Adjust color as needed
           textAnchor="middle"
           dominantBaseline="central"
@@ -57,15 +54,15 @@ export function CircularPackingChart({
           transform={`translate(0,${-label.node.radius - 10})`}
         >
           {label.node.data.name}
-        </animated.text>
+        </motion.text>
       );
     } else {
       return (
-        <animated.text
+        <motion.text
           key={label.node.id}
-          x={label.style.x}
-          y={label.style.y}
-          fill={label.style.textColor}
+          /* x={label.style.x}
+           * y={label.style.y}
+           * fill={label.style.textColor} */
           textAnchor="middle"
           dominantBaseline="central"
           style={{
@@ -73,7 +70,7 @@ export function CircularPackingChart({
           }} // Prevent text from intercepting mouse events
         >
           {label.node.data.name}
-        </animated.text>
+        </motion.text>
       );
     }
   };
@@ -92,9 +89,7 @@ export function CircularPackingChart({
       childColor={{ from: "color", modifiers: [["brighter", 0.5]] }}
       padding={15}
       enableLabels={true}
-      labelsFilter={(label) =>
-        label.node.radius > 32 || label.node.id === "Chromista"
-      }
+      labelsFilter={(label) => label.node.radius > 32 || label.node.id === "Chromista"}
       // labelsFilter={(label) =>
       //   label.node.height > 0 ||
       //   (zoomedId === "Animalia" ||

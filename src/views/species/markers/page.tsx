@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { AnalysisMap } from "@/components/mapping";
 
-import React, { useState } from "react";
+import React, { useState, use } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { Attribute } from "@/components/highlight-stack";
 import { RecordItem, RecordList } from "@/components/record-list";
@@ -153,7 +153,8 @@ function LociList({ records }: { records: Loci[] }) {
   );
 }
 
-export default function Markers({ params }: { params: { name: string } }) {
+export default function Markers(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const canonicalName = getCanonicalName(params);
   const [page, setPage] = useState(1);
 

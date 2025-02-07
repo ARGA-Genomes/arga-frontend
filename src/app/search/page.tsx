@@ -20,7 +20,7 @@ import {
 } from "@mantine/core";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { IconExclamationMark, IconEye, IconSearch } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 import { LoadPanel } from "@/components/load-overlay";
@@ -106,12 +106,7 @@ interface QueryResults {
 const PAGE_SIZE = 10;
 
 const SEARCH_FULLTEXT = gql`
-  query FullTextSearch(
-    $query: String
-    $page: Int
-    $perPage: Int
-    $filters: [FilterItem]
-  ) {
+  query FullTextSearch($query: String, $page: Int, $perPage: Int, $filters: [FilterItem]) {
     search(filters: $filters) {
       fullText(query: $query, page: $page, perPage: $perPage) {
         total
@@ -208,26 +203,13 @@ function TaxonItem({ item }: { item: Item }) {
             bg="moss.4"
             w={180}
             style={{
-              borderRadius:
-                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
               border: "none",
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image
-                src={"card-icons/type/species_report.svg"}
-                fit="contain"
-                h={80}
-                w="auto"
-                alt=""
-              />
-              <Text
-                c="white"
-                fw={600}
-                fz="md"
-                mb="sm"
-                style={{ alignSelf: "end", lineHeight: "normal" }}
-              >
+              <Image src={"card-icons/type/species_report.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Species Report
               </Text>
             </Group>
@@ -263,8 +245,7 @@ function TaxonItem({ item }: { item: Item }) {
               h="100%"
               bg="midnight.10"
               style={{
-                borderRadius:
-                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+                borderRadius: "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
               }}
             >
               <Stack gap={3} align="center">
@@ -284,16 +265,8 @@ function TaxonSummary({ data }: { data: DataSummary }) {
 
   return (
     <SimpleGrid cols={2}>
-      <AttributePill
-        label="Assemblies"
-        color={data.genomes ? "moss.3" : "bushfire.2"}
-        value={data.genomes}
-      />
-      <AttributePill
-        label="Other data"
-        color={other ? "moss.3" : "bushfire.2"}
-        value={other}
-      />
+      <AttributePill label="Assemblies" color={data.genomes ? "moss.3" : "bushfire.2"} value={data.genomes} />
+      <AttributePill label="Other data" color={other ? "moss.3" : "bushfire.2"} value={other} />
     </SimpleGrid>
   );
 }
@@ -305,76 +278,31 @@ function TaxonDetails({ item }: { item: Item }) {
   return (
     <SimpleGrid cols={6}>
       {taxon.regnum ? (
-        <AttributePill
-          label="Regnum"
-          value={taxon.regnum}
-          href={`/regnum/${taxon.regnum}`}
-        />
+        <AttributePill label="Regnum" value={taxon.regnum} href={`/regnum/${taxon.regnum}`} />
       ) : (
-        <AttributePill
-          label="Kingdom"
-          value={taxon.kingdom}
-          href={`/kingdom/${taxon.kingdom}`}
-        />
+        <AttributePill label="Kingdom" value={taxon.kingdom} href={`/kingdom/${taxon.kingdom}`} />
       )}
       {taxon.division ? (
-        <AttributePill
-          label="Division"
-          value={taxon.division}
-          href={`/division/${taxon.division}`}
-        />
+        <AttributePill label="Division" value={taxon.division} href={`/division/${taxon.division}`} />
       ) : (
-        <AttributePill
-          label="Phylum"
-          value={taxon.phylum}
-          href={`/phylum/${taxon.phylum}`}
-        />
+        <AttributePill label="Phylum" value={taxon.phylum} href={`/phylum/${taxon.phylum}`} />
       )}
       {taxon.classis ? (
-        <AttributePill
-          label="Classis"
-          value={taxon.classis}
-          href={`/classis/${taxon.classis}`}
-        />
+        <AttributePill label="Classis" value={taxon.classis} href={`/classis/${taxon.classis}`} />
       ) : (
-        <AttributePill
-          label="Class"
-          value={taxon.class}
-          href={`/class/${taxon.class}`}
-        />
+        <AttributePill label="Class" value={taxon.class} href={`/class/${taxon.class}`} />
       )}
       {taxon.ordo ? (
-        <AttributePill
-          label="Ordo"
-          value={taxon.ordo}
-          href={`/ordo/${taxon.ordo}`}
-        />
+        <AttributePill label="Ordo" value={taxon.ordo} href={`/ordo/${taxon.ordo}`} />
       ) : (
-        <AttributePill
-          label="Order"
-          value={taxon.order}
-          href={`/order/${taxon.order}`}
-        />
+        <AttributePill label="Order" value={taxon.order} href={`/order/${taxon.order}`} />
       )}
       {taxon.familia ? (
-        <AttributePill
-          label="Familia"
-          value={taxon.familia}
-          href={`/familia/${taxon.familia}`}
-        />
+        <AttributePill label="Familia" value={taxon.familia} href={`/familia/${taxon.familia}`} />
       ) : (
-        <AttributePill
-          label="Family"
-          value={taxon.family}
-          href={`/family/${taxon.family}`}
-        />
+        <AttributePill label="Family" value={taxon.family} href={`/family/${taxon.family}`} />
       )}
-      <AttributePill
-        label="Genus"
-        value={taxon.genus}
-        href={`/genus/${taxon.genus}`}
-        italic
-      />
+      <AttributePill label="Genus" value={taxon.genus} href={`/genus/${taxon.genus}`} italic />
     </SimpleGrid>
   );
 }
@@ -397,26 +325,13 @@ function GenomeItem({ item }: { item: Item }) {
             bg="#f47c2e"
             w={180}
             style={{
-              borderRadius:
-                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
               border: "none",
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image
-                src={"card-icons/type/whole_genomes.svg"}
-                fit="contain"
-                h={80}
-                w="auto"
-                alt=""
-              />
-              <Text
-                c="white"
-                fw={600}
-                fz="md"
-                mb="sm"
-                style={{ alignSelf: "end", lineHeight: "normal" }}
-              >
+              <Image src={"card-icons/type/whole_genomes.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Genome Assembly
               </Text>
             </Group>
@@ -440,15 +355,12 @@ function GenomeItem({ item }: { item: Item }) {
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Link
-            href={`/species/${itemLinkName}/whole_genomes/${item.accession}`}
-          >
+          <Link href={`/species/${itemLinkName}/whole_genomes/${item.accession}`}>
             <Button
               h="100%"
               bg="midnight.10"
               style={{
-                borderRadius:
-                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+                borderRadius: "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
               }}
             >
               <Stack gap={3} align="center">
@@ -507,26 +419,13 @@ function LocusItem({ item }: { item: Item }) {
             bg="#58a39d"
             w={180}
             style={{
-              borderRadius:
-                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
               border: "none",
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image
-                src={"card-icons/type/markers.svg"}
-                fit="contain"
-                h={80}
-                w="auto"
-                alt=""
-              />
-              <Text
-                c="white"
-                fw={600}
-                fz="md"
-                mb="sm"
-                style={{ alignSelf: "end", lineHeight: "normal" }}
-              >
+              <Image src={"card-icons/type/markers.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Locus
               </Text>
             </Group>
@@ -555,8 +454,7 @@ function LocusItem({ item }: { item: Item }) {
               h="100%"
               bg="midnight.10"
               style={{
-                borderRadius:
-                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+                borderRadius: "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
               }}
             >
               <Stack gap={3} align="center">
@@ -613,26 +511,13 @@ function SpecimenItem({ item }: { item: Item }) {
             bg="#f47c2e"
             w={180}
             style={{
-              borderRadius:
-                "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+              borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
               border: "none",
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image
-                src={"card-icons/type/specimens.svg"}
-                fit="contain"
-                h={80}
-                w="auto"
-                alt=""
-              />
-              <Text
-                c="white"
-                fw={600}
-                fz="md"
-                mb="sm"
-                style={{ alignSelf: "end", lineHeight: "normal" }}
-              >
+              <Image src={"card-icons/type/specimens.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Specimen
               </Text>
             </Group>
@@ -661,8 +546,7 @@ function SpecimenItem({ item }: { item: Item }) {
               h="100%"
               bg="midnight.10"
               style={{
-                borderRadius:
-                  "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
+                borderRadius: "0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0",
               }}
             >
               <Stack gap={3} align="center">
@@ -720,10 +604,7 @@ function SearchResults({ results }: { results: Item[] }) {
   return (
     <Stack gap="xs">
       {results.map((record) => (
-        <SearchItem
-          item={record}
-          key={`${record.canonicalName}-${record.type}`}
-        />
+        <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
       ))}
     </Stack>
   );
@@ -808,9 +689,7 @@ interface FiltersProps {
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, _setClassifications] = useState<Filter[]>(
-    filters.classifications,
-  );
+  const [classifications, _setClassifications] = useState<Filter[]>(filters.classifications);
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
@@ -838,7 +717,7 @@ function Filters({ filters, onChange }: FiltersProps) {
   );
 }
 
-export default function SearchPage() {
+function SearchPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -858,15 +737,7 @@ export default function SearchPage() {
     })),
   });
 
-  useEffect(refreshUrl, [
-    query,
-    dataTypes,
-    page,
-    setPreviousPage,
-    pathname,
-    router,
-    searchParams,
-  ]);
+  useEffect(refreshUrl, [query, dataTypes, page, setPreviousPage, pathname, router, searchParams]);
 
   function refreshUrl() {
     const params = new URLSearchParams(searchParams);
@@ -948,16 +819,19 @@ export default function SearchPage() {
                 </Alert>
               )}
               <SearchResults results={data?.search.fullText.records || []} />
-              <PaginationBar
-                total={data?.search.fullText.total}
-                page={page}
-                pageSize={PAGE_SIZE}
-                onChange={setPage}
-              />
+              <PaginationBar total={data?.search.fullText.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
             </Stack>
           </LoadPanel>
         </Container>
       </Paper>
     </>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <SearchPage />
+    </Suspense>
   );
 }
