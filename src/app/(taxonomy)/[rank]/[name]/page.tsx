@@ -1148,7 +1148,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
 
   useEffect(() => {
     setPreviousPage({ name: `browsing ${params.name}`, url: pathname });
-  });
+  }, []);
 
   return (
     <Stack mt={40}>

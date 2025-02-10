@@ -26,12 +26,7 @@ import {
   Tooltip,
   Divider,
 } from "@mantine/core";
-import {
-  useClipboard,
-  useDisclosure,
-  useLocalStorage,
-  useSet,
-} from "@mantine/hooks";
+import { useClipboard, useDisclosure, useLocalStorage, useSet } from "@mantine/hooks";
 import {
   IconChevronDown,
   IconClipboardCopy,
@@ -71,21 +66,13 @@ export function SavedDataManagerButton() {
         <Space h={150} />
         <SavedDataManager />
       </Drawer>
-      <Indicator
-        inline
-        label={saved.length}
-        size={16}
-        color="bushfire"
-        disabled={!saved.length}
-      >
+      <Indicator inline label={saved.length} size={16} color="bushfire" disabled={!saved.length}>
         <Button
           variant="subtle"
           color="midnight.2"
           radius="lg"
           onClick={toggle}
-          leftSection={
-            <IconSortDescending size={35} color="white" strokeWidth="1.75" />
-          }
+          leftSection={<IconSortDescending size={35} color="white" strokeWidth="1.75" />}
         >
           Saved data
         </Button>
@@ -282,7 +269,7 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
   useEffect(() => {
     setHint(!checked ? "moss.1" : "moss.0");
     onChange(checked);
-  }, [checked, onChange]);
+  }, [checked]);
 
   return (
     <Box
@@ -324,12 +311,7 @@ interface SaveDataItemProps {
   onDeselected: (item: SavedItem) => void;
 }
 
-function SavedDataItem({
-  item,
-  onRemove,
-  onSelected,
-  onDeselected,
-}: SaveDataItemProps) {
+function SavedDataItem({ item, onRemove, onSelected, onDeselected }: SaveDataItemProps) {
   return (
     <Card shadow="sm" padding="lg" radius="lg" withBorder>
       <Card.Section withBorder mb="md">
@@ -341,17 +323,9 @@ function SavedDataItem({
                 else onDeselected(item);
               }}
             />
-            <Link
-              href={`/species/${item.scientificName}/whole_genomes/${item.label}`}
-            >
+            <Link href={`/species/${item.scientificName}/whole_genomes/${item.label}`}>
               <Group>
-                <Image
-                  src={"/card-icons/type/whole_genomes.svg"}
-                  fit="contain"
-                  h={80}
-                  w={80}
-                  alt=""
-                />
+                <Image src={"/card-icons/type/whole_genomes.svg"} fit="contain" h={80} w={80} alt="" />
                 <Stack gap={0}>
                   <Text fw={500} truncate="end">
                     {item.label}
@@ -479,11 +453,7 @@ interface DownloadSelectedFormProps {
   children: React.ReactNode;
 }
 
-function DownloadSelectedForm({
-  items,
-  metadata,
-  children,
-}: DownloadSelectedFormProps) {
+function DownloadSelectedForm({ items, metadata, children }: DownloadSelectedFormProps) {
   const timestamp = DateTime.now().toFormat("yyyy-mm-dd-HHmmss");
   const filename = `ARGA-${timestamp}.zip`;
   return (

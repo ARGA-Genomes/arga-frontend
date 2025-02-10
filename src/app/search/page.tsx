@@ -697,7 +697,7 @@ function Filters({ filters, onChange }: FiltersProps) {
       classifications,
       dataTypes,
     });
-  }, [classifications, dataTypes, onChange]);
+  }, [classifications, dataTypes]);
 
   return (
     <Accordion defaultValue="dataType" variant="separated">
