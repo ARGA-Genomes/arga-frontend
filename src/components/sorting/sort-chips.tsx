@@ -1,4 +1,4 @@
-import { Chip, ChipProps, useMantineTheme } from "@mantine/core";
+import { Chip, ChipProps } from "@mantine/core";
 import classes from "./sort-chips.module.css";
 
 interface CustomChipProps extends ChipProps {

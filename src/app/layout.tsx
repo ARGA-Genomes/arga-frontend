@@ -9,15 +9,11 @@ import createClient from "../queries/client";
 
 import {
   AppShell,
-  Container,
-  Image,
   MantineProvider,
-  Paper,
 } from "@mantine/core";
 
 import { theme } from "../theme";
 import { TopNav } from "./top-nav";
-import { MAX_WIDTH } from "./constants";
 import { Footer } from "./footer";
 import { TraceLoaderProvider } from "@/components/traces/context";
 import Fathom from "@/components/fathom";

@@ -28,38 +28,11 @@ export function TimelineBar({ item, width, acceptedWidth }: TimelineBarProps) {
   const itemHeight = 40;
   return (
     <>
-      {acceptedWidth && (
-        <rect
-          y={5}
-          width={width}
-          height={itemHeight - 10}
-          fill="#ff5757"
-          rx={15}
-        />
-      )}
-      <rect
-        y={5}
-        width={acceptedWidth || width}
-        height={itemHeight - 10}
-        fill="#b9d291"
-        rx={15}
-      />
+      {acceptedWidth && <rect y={5} width={width} height={itemHeight - 10} fill="#ff5757" rx={15} />}
+      <rect y={5} width={acceptedWidth || width} height={itemHeight - 10} fill="#b9d291" rx={15} />
       <rect y={5} fill="#b9d291" width={20} height={itemHeight - 10} />
-      {acceptedWidth && (
-        <rect
-          y={5}
-          x={acceptedWidth - 20}
-          fill="#b9d291"
-          width={20}
-          height={itemHeight - 10}
-        />
-      )}
-      <text
-        x={5}
-        dominantBaseline="bottom"
-        y={itemHeight - 48}
-        filter="url(#solid)"
-      >
+      {acceptedWidth && <rect y={5} x={acceptedWidth - 20} fill="#b9d291" width={20} height={itemHeight - 10} />}
+      <text x={5} dominantBaseline="bottom" y={itemHeight - 48} filter="url(#solid)">
         <tspan fontWeight={600} fontStyle="italic" fontSize={14}>
           {item.label}
         </tspan>
@@ -87,12 +60,7 @@ export function TimelineInstant({ item }: { item: TimelineItem }) {
 
   return (
     <g transform={`translate(2, ${itemHeight / 2})`}>
-      <motion.g
-        initial="initial"
-        animate="initial"
-        whileHover="hover"
-        whileTap="tapped"
-      >
+      <motion.g initial="initial" animate="initial" whileHover="hover" whileTap="tapped">
         <motion.rect
           variants={hover}
           x={-13}
@@ -131,14 +99,12 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
   const right = x(endDate);
 
   const handleInstantClick = (item: TimelineItem) => {
-    const elementId = `${item.label.replaceAll(" ", "-").toLowerCase()}-${
-      item.year
-    }`;
+    const elementId = `${item.label.replaceAll(" ", "-").toLowerCase()}-${item.year}`;
     const element = document.getElementById(elementId);
     const yOffset = -200;
 
     if (element) {
-      const y = element.getBoundingClientRect()?.top + window.scrollY + yOffset;
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({
         top: y,
         behavior: "smooth",
@@ -149,10 +115,7 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
   return (
     <>
       {group.bars.map((item, idx) => (
-        <g
-          key={`${item.label}-${item.year}-${item.type}-${idx}`}
-          transform={`translate(${x(item.date)}, 0)`}
-        >
+        <g key={`${item.label}-${item.year}-${item.type}-${idx}`} transform={`translate(${x(item.date)}, 0)`}>
           <TimelineBar
             item={item}
             width={right - x(item.date)}
@@ -164,7 +127,9 @@ export function TimelineGroup({ group, x, endDate }: TimelineGroupProps) {
         <g
           key={`${item.label}-${item.year}-${item.type}-${idx}`}
           transform={`translate(${x(item.date)}, 0)`}
-          onClick={() => handleInstantClick(item)}
+          onClick={() => {
+            handleInstantClick(item);
+          }}
         >
           <TimelineInstant item={item} />
         </g>
@@ -180,24 +145,12 @@ interface TimelineDateGuide {
   value: Date;
 }
 
-export function TimelineDateGuide({
-  x,
-  top,
-  bottom,
-  value,
-}: TimelineDateGuide) {
+export function TimelineDateGuide({ x, top, bottom, value }: TimelineDateGuide) {
   const peek = 10;
 
   return (
     <>
-      <line
-        x1={x || 2}
-        y1={bottom}
-        x2={x || 2}
-        y2={top - peek}
-        stroke="currentColor"
-        strokeDasharray="1"
-      />
+      <line x1={x || 2} y1={bottom} x2={x || 2} y2={top - peek} stroke="currentColor" strokeDasharray="1" />
       <circle r={3} cx={x || 2} cy={top - peek} />
       <g transform={`translate(${x || 2}, ${top - peek - 35})`}>
         <TimeAxisDateLabel date={value} />
@@ -239,18 +192,15 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
   // get the domains from the timeline items and remove any empty decades.
   // we also replace the last date with the current year
   const currentYear = new Date();
-  let domains = domainDecades(data);
+  const domains = domainDecades(data);
   domains[domains.length - 1].end = currentYear;
 
   // flattent the domain for d3
-  let domain = domains.map((domain) => [domain.start, domain.end]).flat();
+  const domain = domains.map((domain) => [domain.start, domain.end]).flat();
   const range = rangeYears(domains, dimension.boundedWidth);
   const dividers = domainContractions(domains);
 
-  const x = useMemo(
-    () => d3.scaleLinear().domain(domain).range(range),
-    [dimension.boundedWidth]
-  );
+  const x = useMemo(() => d3.scaleLinear().domain(domain).range(range), [domain, range]);
 
   return (
     <div className="timelineWrapper" ref={ref} style={{ height: minHeight }}>
@@ -267,23 +217,14 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
           </filter>
         </defs>
 
-        <g
-          transform={`translate(${dimension.marginLeft}, ${dimension.marginTop})`}
-        >
+        <g transform={`translate(${dimension.marginLeft}, ${dimension.marginTop})`}>
           <TimeAxis domain={domain} range={x.range()} />
 
           <g transform={`translate(0, ${axisHeight})`}>
-            <rect
-              width={dimension.boundedWidth}
-              height={dimension.boundedHeight - axisHeight}
-              fill="white"
-            />
+            <rect width={dimension.boundedWidth} height={dimension.boundedHeight - axisHeight} fill="white" />
             {groups.map((group, idx) =>
               group.instants.map((item, id) => (
-                <g
-                  key={`${group.label}-guide-${id}`}
-                  transform={`translate(${x(item.date)}, ${idx * itemHeight})`}
-                >
+                <g key={`${group.label}-guide-${id}`} transform={`translate(${x(item.date)}, ${idx * itemHeight})`}>
                   <TimelineDateGuide
                     x={0}
                     top={idx * -itemHeight - axisHeight / 2}
@@ -291,14 +232,11 @@ export default function HorizontalTimeline({ data }: HorizontalTimelineProps) {
                     value={item.date}
                   />
                 </g>
-              ))
+              )),
             )}
 
             {groups.map((group, idx) => (
-              <g
-                key={`${group.bars[0].label}-${idx}`}
-                transform={`translate(0, ${idx * itemHeight})`}
-              >
+              <g key={`${group.bars[0].label}-${idx}`} transform={`translate(0, ${idx * itemHeight})`}>
                 <TimelineGroup group={group} endDate={currentYear} x={x} />
               </g>
             ))}
@@ -327,14 +265,7 @@ export function TimeAxis({ range }: TimeAxisProps) {
   return (
     <svg>
       <circle r={2} cx={range[0]} cy={40} />
-      <line
-        x1={range[0]}
-        y1={40}
-        x2={range[range.length - 1]}
-        y2={40}
-        stroke="currentColor"
-        strokeDasharray={1}
-      />
+      <line x1={range[0]} y1={40} x2={range[range.length - 1]} y2={40} stroke="currentColor" strokeDasharray={1} />
     </svg>
   );
 }
@@ -346,25 +277,13 @@ interface TimeAxisContractionProps {
   highest: Date;
 }
 
-export function TimeAxisContraction({
-  x,
-  height,
-  lowest,
-  highest,
-}: TimeAxisContractionProps) {
+export function TimeAxisContraction({ x, height, lowest, highest }: TimeAxisContractionProps) {
   const strokeColor = "#2F4554";
 
   return (
     <>
       <defs>
-        <pattern
-          id="ContractionPattern"
-          x="0"
-          y="0"
-          width="30"
-          height="40"
-          patternUnits="userSpaceOnUse"
-        >
+        <pattern id="ContractionPattern" x="0" y="0" width="30" height="40" patternUnits="userSpaceOnUse">
           <g fill="transparent" stroke={strokeColor} strokeWidth={2}>
             <path d="M5 0 l10 20 l-10 20 M15 0 l10 20 l-10 20" />
           </g>
@@ -416,9 +335,7 @@ interface BoundedChartDimensions extends ChartDimensions {
 }
 
 // derived from https://2019.wattenberger.com/blog/react-and-d3
-export function useChartDimensions<T>(
-  settings: ChartDimensions
-): [RefObject<T>, BoundedChartDimensions] {
+export function useChartDimensions<T>(settings: ChartDimensions): [RefObject<T | null>, BoundedChartDimensions] {
   const ref = useRef(null);
   const dimensions = combineChartDimensions(settings);
   const [width, setWidth] = useState(0);
@@ -438,7 +355,7 @@ export function useChartDimensions<T>(
 
     // cleanup
     return () => element && resizeObserver.unobserve(element);
-  }, []);
+  });
 
   const bounded = combineChartDimensions({
     ...dimensions,
@@ -449,9 +366,7 @@ export function useChartDimensions<T>(
   return [ref, bounded];
 }
 
-function combineChartDimensions(
-  dimensions: ChartDimensions
-): BoundedChartDimensions {
+function combineChartDimensions(dimensions: ChartDimensions): BoundedChartDimensions {
   const dim = {
     ...dimensions,
     marginTop: dimensions.marginTop || 20,
@@ -469,14 +384,14 @@ function combineChartDimensions(
   };
 }
 
-type ItemGroup = {
+interface ItemGroup {
   label: string;
   bars: TimelineItem[];
   instants: TimelineItem[];
-};
+}
 
 function groupItems(items: TimelineItem[]): ItemGroup[] {
-  let groups: Record<string, ItemGroup> = {};
+  const groups: Record<string, ItemGroup> = {};
 
   for (const item of items) {
     groups[item.label] ||= { label: item.label, bars: [], instants: [] };
@@ -491,16 +406,12 @@ function groupItems(items: TimelineItem[]): ItemGroup[] {
 }
 
 function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
-  let map = new Map<string, TimelineItem>();
+  const map = new Map<string, TimelineItem>();
 
   let currentAccepted = null;
 
   for (const item of items) {
-    if (
-      currentAccepted &&
-      currentAccepted.label != item.label &&
-      item.act === "NAME_USAGE"
-    ) {
+    if (currentAccepted && currentAccepted.label != item.label && item.act === "NAME_USAGE") {
       currentAccepted.endDate = item.date;
     }
 
@@ -533,10 +444,10 @@ function deriveTaxonBars(items: TimelineItem[]): TimelineItem[] {
   return Array.from(map.values());
 }
 
-type Domain = {
+interface Domain {
   start: Date;
   end: Date;
-};
+}
 
 /**
  * Create a domain from the timeline items as decades.
@@ -545,11 +456,11 @@ type Domain = {
  * particularly helpful for the visualisation
  */
 function domainDecades(items: TimelineItem[]): Domain[] {
-  let decades = items.map((item) => Math.floor(item.date.getFullYear() / 40));
-  let deduped = new Set(decades);
+  const decades = items.map((item) => Math.floor(item.date.getFullYear() / 40));
+  const deduped = new Set(decades);
 
-  let starts: number[] = [];
-  let ends: number[] = [];
+  const starts: number[] = [];
+  const ends: number[] = [];
   for (const decade of deduped) {
     const lastDecade = ends[ends.length - 1];
     // if the current decade isn't consecutive with the last value in the domains array then
@@ -574,13 +485,11 @@ function domainDecades(items: TimelineItem[]): Domain[] {
 }
 
 function rangeYears(domains: Domain[], width: number): number[] {
-  const domainYears = domains.map(
-    (domain) => domain.end.getFullYear() - domain.start.getFullYear()
-  );
+  const domainYears = domains.map((domain) => domain.end.getFullYear() - domain.start.getFullYear());
 
   const totalYears = domainYears.reduce((acc, val) => acc + val, 0);
 
-  let range: number[] = [];
+  const range: number[] = [];
   for (const years of domainYears) {
     // the start of the domain should either be 0 or the last
     // range plus the contraction width
@@ -599,8 +508,8 @@ function domainContractions(domains: Domain[]) {
 
   // for dividers the start is the end of a domain, and the end
   // is the start of the next domain
-  let starts: number[] = [];
-  let ends: number[] = [];
+  const starts: number[] = [];
+  const ends: number[] = [];
   for (const domain of domains) {
     starts.push(domain.end.getFullYear());
     ends.push(domain.start.getFullYear());

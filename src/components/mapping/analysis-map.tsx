@@ -3,14 +3,10 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import classes from "./analysis-map.module.css";
 
-import { Map } from "react-map-gl/maplibre";
-import DeckGL, {
-  BitmapLayer,
-  GeoJsonLayer,
-  MapView,
-  ScatterplotLayer,
-  TileLayer,
-} from "deck.gl";
+/* import Map from "react-map-gl/maplibre"; */
+import { Map } from "@vis.gl/react-maplibre";
+
+import DeckGL, { GeoJsonLayer, MapView, PickingInfo, ScatterplotLayer } from "deck.gl";
 import { useState, useEffect } from "react";
 import { GeoJSON } from "geojson";
 import { gql, useQuery } from "@apollo/client";
@@ -31,13 +27,13 @@ const GET_GEOMETRY = gql`
   }
 `;
 
-type QueryResults = {
+interface QueryResults {
   maps: {
     ibra: string;
     imcraProvincial: string;
     imcraMesoscale: string;
   };
-};
+}
 
 interface Regions {
   ibra: string[];
@@ -62,33 +58,24 @@ interface AnalysisMapProps {
   initialZoom?: number;
 }
 
-export default function AnalysisMap(
-  this: any,
-  {
-    regions,
-    markers,
-    speciesName,
-    children,
-    style,
-    initialPosition,
-    initialZoom,
-  }: AnalysisMapProps
-) {
-  const [tolerance, setTolerance] = useState(0.01);
-  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(
-    undefined
-  );
-  const [selectedMarker, setSelectedMarker] = useState<string | undefined>(
-    undefined
-  );
-  const [clickedMarker, setClickedMarker] = useState<string | undefined>(
-    undefined
-  );
+export default function AnalysisMap({
+  regions,
+  markers,
+  speciesName,
+  children,
+  style,
+  initialPosition,
+  initialZoom,
+}: AnalysisMapProps) {
+  const [tolerance, _setTolerance] = useState(0.01);
+  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined);
+  const [selectedMarker, setSelectedMarker] = useState<string | undefined>(undefined);
+  const [clickedMarker, setClickedMarker] = useState<string | undefined>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [popupLink, setPopupLink] = useState(``);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
+  const { data } = useQuery<QueryResults>(GET_GEOMETRY, {
     variables: {
       regions: regions ? [...regions.ibra, ...regions.imcra] : [],
       tolerance: tolerance,
@@ -111,8 +98,9 @@ export default function AnalysisMap(
   const useMousePosition = () => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
     useEffect(() => {
-      const setFromEvent = (e: { clientX: any; clientY: any }) =>
+      const setFromEvent = (e: { clientX: number; clientY: number }) => {
         setPosition({ x: e.clientX, y: e.clientY });
+      };
       window.addEventListener("mousemove", setFromEvent);
 
       return () => {
@@ -122,12 +110,12 @@ export default function AnalysisMap(
     return position;
   };
 
-  const getTooltip = ({ object }: { object?: any }): string => {
+  const getTooltip = (info: PickingInfo): string => {
     return (
-      object && {
-        html: `${object?.properties?.name || object?.recordId}`,
+      info.object && {
+        html: `${info.object.properties?.name || info.object.recordId}`,
         style: {
-          backgroundColor: `rgba(${object?.color || [0, 0, 0, 256]})`,
+          backgroundColor: `rgba(${info.object.color || [0, 0, 0, 256]})`,
           color: "white",
           borderRadius: "5px",
         },
@@ -136,23 +124,23 @@ export default function AnalysisMap(
   };
   const position = useMousePosition();
 
-  const onHover = ({ object }: { object?: any }) => {
-    if (object?.properties) {
-      setSelectedRegion(object?.properties?.name);
-    } else if (object?.recordId) {
-      setSelectedMarker(object?.recordId);
+  const onHover = (info: PickingInfo) => {
+    if (info.object?.properties) {
+      setSelectedRegion(info.object?.properties?.name);
+    } else if (info.object?.recordId) {
+      setSelectedMarker(info.object?.recordId);
     } else {
       setSelectedRegion(undefined);
       setSelectedMarker(undefined);
     }
   };
 
-  const onClick = ({ object }: { object?: any }) => {
-    if (object && object.recordId) {
-      setClickedMarker(object?.recordId);
+  const onClick = (info: PickingInfo) => {
+    if (info.object?.recordId) {
+      setClickedMarker(info.object?.recordId);
       setIsOpen(true);
       setPopupPosition(position);
-      getPopUpLink(object.type, speciesName, object?.recordId);
+      getPopUpLink(info.object.type, speciesName, info.object?.recordId);
     } else {
       setIsOpen(false);
     }
@@ -162,11 +150,7 @@ export default function AnalysisMap(
     setIsOpen(false);
   };
 
-  const getPopUpLink = (
-    type: Layer,
-    speciesName: string | undefined,
-    clickedMarker: string | undefined
-  ) => {
+  const getPopUpLink = (type: Layer, speciesName: string | undefined, clickedMarker: string | undefined) => {
     if (type === Layer.Specimens) {
       setPopupLink(`/species/${speciesName}/specimens/${clickedMarker}`);
     } else if (type === Layer.Loci) {
@@ -192,10 +176,8 @@ export default function AnalysisMap(
       <DeckGL
         views={view}
         initialViewState={{
-          latitude:
-            (initialPosition && initialPosition[0]) || DEFAULT_POSITION[0],
-          longitude:
-            (initialPosition && initialPosition[1]) || DEFAULT_POSITION[1],
+          latitude: initialPosition?.[0] || DEFAULT_POSITION[0],
+          longitude: initialPosition?.[1] || DEFAULT_POSITION[1],
           zoom: initialZoom || 3.1,
         }}
         layers={[bioRegionLayers(bioRegions), specimenPlotLayer(specimens)]}
@@ -245,27 +227,6 @@ export default function AnalysisMap(
   );
 }
 
-function tileLayer() {
-  return new TileLayer({
-    data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    maxRequests: 20,
-    pickable: true,
-    autoHighlight: false,
-    highlightColor: [60, 60, 60, 40],
-    minZoom: 0,
-    maxZoom: 19,
-    tileSize: 256,
-    renderSubLayers: (props) => {
-      const [[west, south], [east, north]] = props.tile.boundingBox;
-      return new BitmapLayer(props, {
-        data: undefined,
-        image: props.data,
-        bounds: [west, south, east, north],
-      });
-    },
-  });
-}
-
 interface BioRegions {
   ibra?: GeoJSON;
   imcra?: GeoJSON;
@@ -282,8 +243,7 @@ function bioRegionLayers(regions: BioRegions) {
   const ibra = new GeoJsonLayer({
     id: "ibra-layer",
     data: regions.ibra || [],
-    getFillColor: (d) =>
-      d.properties?.name === regions.selected ? ibraHover : ibraColor,
+    getFillColor: (d) => (d.properties?.name === regions.selected ? ibraHover : ibraColor),
     getLineColor: [254, 195, 55, 200],
     pickable: true,
     filled: true,
@@ -294,8 +254,7 @@ function bioRegionLayers(regions: BioRegions) {
   const imcra = new GeoJsonLayer({
     id: "imcra-layer",
     data: regions.imcra || [],
-    getFillColor: (d) =>
-      d.properties?.name === regions.selected ? imcraHover : imcraColor,
+    getFillColor: (d) => (d.properties?.name === regions.selected ? imcraHover : imcraColor),
     getLineColor: [88, 163, 157, 200],
     pickable: true,
     filled: true,
@@ -311,7 +270,7 @@ interface Specimens {
   selected?: string;
 }
 
-function specimenPlotLayer({ markers, selected }: Specimens) {
+function specimenPlotLayer({ markers }: Specimens) {
   return new ScatterplotLayer({
     id: "scatter-plot",
     data: markers,

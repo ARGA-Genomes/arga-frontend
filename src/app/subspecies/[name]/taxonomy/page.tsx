@@ -1,5 +1,6 @@
 import Taxonomy from "@/views/species/taxonomy";
 
-export default function Page({ params }: { params: { name: string } }) {
+export default async function Page(props: { params: Promise<{ name: string }> }) {
+  const params = await props.params;
   return <Taxonomy params={params} isSubspecies />;
 }

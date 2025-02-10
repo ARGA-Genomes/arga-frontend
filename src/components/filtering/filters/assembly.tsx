@@ -3,35 +3,52 @@ import { Filter } from "../common";
 import { useEffect, useState } from "react";
 
 interface AssemblyFiltersProps {
-  filters: Filter[],
-  onChange: (items: Filter[]) => void,
+  filters: Filter[];
+  onChange: (items: Filter[]) => void;
 }
 
-export function AssemblyFilters({ filters, onChange }: AssemblyFiltersProps) {
-  const [level, setLevel] = useState('any');
-  const [representation, setRepresentation] = useState('any');
-  const [releaseType, setReleaseType] = useState('any');
+export function AssemblyFilters({ onChange }: AssemblyFiltersProps) {
+  const [level, setLevel] = useState("any");
+  const [representation, setRepresentation] = useState("any");
+  const [releaseType, setReleaseType] = useState("any");
 
   useEffect(() => {
-    let filters = [];
+    const filters = [];
 
-    if (level !== 'any') {
-      filters.push({ filter: "ASSEMBLY_LEVEL", action: "INCLUDE", value: level, editable: true })
+    if (level !== "any") {
+      filters.push({
+        filter: "ASSEMBLY_LEVEL",
+        action: "INCLUDE",
+        value: level,
+        editable: true,
+      });
     }
-    if (representation !== 'any') {
-      filters.push({ filter: "GENOME_REPRESENTATION", action: "INCLUDE", value: representation, editable: true })
+    if (representation !== "any") {
+      filters.push({
+        filter: "GENOME_REPRESENTATION",
+        action: "INCLUDE",
+        value: representation,
+        editable: true,
+      });
     }
-    if (releaseType !== 'any') {
-      filters.push({ filter: "RELEASE_TYPE", action: "INCLUDE", value: releaseType, editable: true })
+    if (releaseType !== "any") {
+      filters.push({
+        filter: "RELEASE_TYPE",
+        action: "INCLUDE",
+        value: releaseType,
+        editable: true,
+      });
     }
 
     onChange(filters);
-  }, [level, representation, releaseType])
+  }, [level, representation, releaseType, onChange]);
 
   return (
     <Stack>
       <Box>
-        <Text fz="sm" fw={300}>Assembly level</Text>
+        <Text fz="sm" fw={300}>
+          Assembly level
+        </Text>
         <SegmentedControl
           fullWidth
           color="bushfire"
@@ -39,16 +56,18 @@ export function AssemblyFilters({ filters, onChange }: AssemblyFiltersProps) {
           value={level}
           onChange={setLevel}
           data={[
-            { label: 'Any', value: 'any' },
-            { label: 'Complete genome', value: 'CompleteGenome' },
-            { label: 'Chromosome', value: 'Chromosome' },
-            { label: 'Scaffold', value: 'Scaffold' },
-            { label: 'Contig', value: 'Contig' },
+            { label: "Any", value: "any" },
+            { label: "Complete genome", value: "CompleteGenome" },
+            { label: "Chromosome", value: "Chromosome" },
+            { label: "Scaffold", value: "Scaffold" },
+            { label: "Contig", value: "Contig" },
           ]}
         />
       </Box>
       <Box>
-        <Text fz="sm" fw={300}>Genome representation</Text>
+        <Text fz="sm" fw={300}>
+          Genome representation
+        </Text>
         <SegmentedControl
           fullWidth
           color="shellfish"
@@ -56,15 +75,17 @@ export function AssemblyFilters({ filters, onChange }: AssemblyFiltersProps) {
           value={representation}
           onChange={setRepresentation}
           data={[
-            { label: 'Any', value: 'any' },
-            { label: 'Complete', value: 'Complete' },
-            { label: 'Full', value: 'Full' },
-            { label: 'Partial', value: 'Partial' },
+            { label: "Any", value: "any" },
+            { label: "Complete", value: "Complete" },
+            { label: "Full", value: "Full" },
+            { label: "Partial", value: "Partial" },
           ]}
         />
       </Box>
       <Box>
-        <Text fz="sm" fw={300}>Release type</Text>
+        <Text fz="sm" fw={300}>
+          Release type
+        </Text>
         <SegmentedControl
           fullWidth
           color="midnight"
@@ -72,14 +93,13 @@ export function AssemblyFilters({ filters, onChange }: AssemblyFiltersProps) {
           value={releaseType}
           onChange={setReleaseType}
           data={[
-            { label: 'Any', value: 'any' },
-            { label: 'Major', value: 'Major' },
-            { label: 'Minor', value: 'Minor' },
-            { label: 'Patch', value: 'Patch' },
+            { label: "Any", value: "any" },
+            { label: "Major", value: "Major" },
+            { label: "Minor", value: "Minor" },
+            { label: "Patch", value: "Patch" },
           ]}
         />
       </Box>
-
     </Stack>
-  )
+  );
 }

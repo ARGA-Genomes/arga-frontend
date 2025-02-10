@@ -13,7 +13,7 @@ export const TAXON_TREE_NODE_STATISTICS = gql`
   }
 `;
 
-export type TaxonStatTreeNode = {
+export interface TaxonStatTreeNode {
   scientificName: string;
   canonicalName: string;
   rank: string;
@@ -23,7 +23,7 @@ export type TaxonStatTreeNode = {
   other?: number;
   totalGenomic?: number;
   children?: TaxonStatTreeNode[];
-};
+}
 
 export function findChildren(
   root: TaxonStatTreeNode,

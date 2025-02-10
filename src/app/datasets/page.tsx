@@ -4,7 +4,6 @@ import { LoadOverlay } from "@/components/load-overlay";
 import { gql, useQuery } from "@apollo/client";
 import {
   Grid,
-  Title,
   Paper,
   Button,
   Stack,
@@ -18,7 +17,6 @@ import {
   Box,
   SimpleGrid,
   UnstyledButton,
-  Overlay,
   Chip,
 } from "@mantine/core";
 import Link from "next/link";
@@ -26,8 +24,6 @@ import { DateTime } from "luxon";
 import { AttributePill } from "@/components/data-fields";
 import {
   IconExternalLink,
-  IconCaretDownFilled,
-  IconEye,
   IconArrowUpRight,
   IconClockHour4,
   IconTable,
@@ -37,9 +33,7 @@ import {
 } from "@tabler/icons-react";
 import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
-import { IoEye } from "react-icons/io5";
 import { useState, useMemo } from "react";
-import { access, copyFileSync } from "fs";
 import { SortChip } from "@/components/sorting/sort-chips";
 import { DataPageCitation } from "@/components/page-citation";
 import styles from "../../components/record-list.module.css";
@@ -74,7 +68,7 @@ const GET_DATASETS = gql`
   }
 `;
 
-type Dataset = {
+interface Dataset {
   name: string;
   shortName?: string;
   description?: string;
@@ -87,9 +81,9 @@ type Dataset = {
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   publicationYear?: number;
-};
+}
 
-type Source = {
+interface Source {
   name: string;
   author: string;
   rightsHolder: string;
@@ -100,16 +94,16 @@ type Source = {
   contentType?: ContentType;
   datasets: Dataset[];
   lastUpdated?: string;
-};
+}
 
-type GroupedSources = {
+interface GroupedSources {
   contentType: string;
   sources: Source[];
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   sources: Source[];
-};
+}
 
 interface License {
   name: string;
@@ -117,7 +111,7 @@ interface License {
   accessRights: string;
 }
 
-const LICENSES: Record<string, License> = {
+const _LICENSES: Record<string, License> = {
   "cc-by-nc-nd": {
     name: "(CC-BY-NC)",
     url: "http://creativecommons.org/licenses/by-nc-nd/4.0",
@@ -271,8 +265,6 @@ const renameContentType: Record<ContentType, string> = {
   MORPHOLOGICAL_TRAITS: "Morphological traits sources",
 };
 
-const licenseAccessRights = {};
-
 function DatasetRow({
   dataset,
   sourceLength,
@@ -283,9 +275,6 @@ function DatasetRow({
   count: number;
 }) {
   const theme = useMantineTheme();
-  const license = dataset.license
-    ? LICENSES[dataset.license.toLowerCase()]
-    : undefined;
 
   return (
     <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
@@ -320,7 +309,7 @@ function DatasetRow({
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.accessPill.slice(1).toLowerCase()) || "No data"
             }
             color={
               dataset.accessPill
@@ -339,7 +328,7 @@ function DatasetRow({
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.reusePill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.reusePill.slice(1).toLowerCase()) || "No data"
             }
             color={
               dataset.reusePill
@@ -391,10 +380,6 @@ function DatasetRow({
 }
 
 function CollectionCard({ collection }: { collection: Source }) {
-  const theme = useMantineTheme();
-  const license = collection.license
-    ? LICENSES[collection.license.toLowerCase()]
-    : undefined;
   return (
     <Paper radius="lg" withBorder className={classes.collectionCard}>
       <Stack gap={10}>
@@ -420,7 +405,7 @@ function CollectionCard({ collection }: { collection: Source }) {
                         {collection.lastUpdated === "01/01/1970"
                           ? "N/A"
                           : DateTime.fromISO(
-                              collection.lastUpdated
+                              collection.lastUpdated,
                             ).toLocaleString()}
                       </Text>
                     )}
@@ -452,7 +437,7 @@ function CollectionCard({ collection }: { collection: Source }) {
                   ?.toLowerCase()
                   .charAt(0)
                   .toUpperCase()
-                  .concat(collection.accessPill?.slice(1).toLowerCase()) ||
+                  .concat(collection.accessPill.slice(1).toLowerCase()) ||
                 "No data"
               }
               group={true}
@@ -473,7 +458,7 @@ function CollectionCard({ collection }: { collection: Source }) {
                   ?.toLowerCase()
                   .charAt(0)
                   .toUpperCase()
-                  .concat(collection.reusePill?.slice(1).toLowerCase()) ||
+                  .concat(collection.reusePill.slice(1).toLowerCase()) ||
                 "No data"
               }
               group={true}
@@ -501,10 +486,6 @@ function CollectionCard({ collection }: { collection: Source }) {
 }
 
 function CollectionRow({ collection }: { collection: Source }) {
-  const theme = useMantineTheme();
-  const license = collection.license
-    ? LICENSES[collection.license.toLowerCase()]
-    : undefined;
   return (
     <Paper radius="lg" withBorder>
       <Stack>
@@ -525,7 +506,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                           {collection.lastUpdated === "01/01/1970"
                             ? "N/A"
                             : DateTime.fromISO(
-                                collection.lastUpdated
+                                collection.lastUpdated,
                               ).toLocaleString()}
                         </Text>
                       )}
@@ -550,9 +531,8 @@ function CollectionRow({ collection }: { collection: Source }) {
                         ?.toLowerCase()
                         .charAt(0)
                         .toUpperCase()
-                        .concat(
-                          collection.accessPill?.slice(1).toLowerCase()
-                        ) || "No data"
+                        .concat(collection.accessPill.slice(1).toLowerCase()) ||
+                      "No data"
                     }
                     color={
                       collection.accessPill
@@ -572,7 +552,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                         ?.toLowerCase()
                         .charAt(0)
                         .toUpperCase()
-                        .concat(collection.reusePill?.slice(1).toLowerCase()) ||
+                        .concat(collection.reusePill.slice(1).toLowerCase()) ||
                       "No data"
                     }
                     color={
@@ -681,10 +661,11 @@ function ContentTypeContainer({
       switch (sortBy) {
         case "alphabetical":
           return a.name.localeCompare(b.name);
-        case "date":
+        case "date": {
           const dateA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
           const dateB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
           return dateB - dateA; // Newest to Oldest
+        }
         default:
           return 0;
       }
@@ -755,14 +736,14 @@ function ContentTypeContainer({
       <Accordion.Panel>
         {layoutView === "card" && (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-            {sortedSources?.map((collection, idx) => (
+            {sortedSources.map((collection, idx) => (
               <CollectionCard collection={collection} key={idx} />
             ))}
           </SimpleGrid>
         )}
         {layoutView === "table" && (
           <SimpleGrid cols={1}>
-            {sortedSources?.map((collection, idx) => (
+            {sortedSources.map((collection, idx) => (
               <CollectionRow collection={collection} key={idx} />
             ))}
           </SimpleGrid>
@@ -794,22 +775,19 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
   ];
 
   if (sources) {
-    const grouped = sources.reduce(
-      (acc: { [key: string]: Source[] }, source) => {
-        let contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
+    const grouped = sources.reduce((acc: Record<string, Source[]>, source) => {
+      const contentType = source.contentType || "Unknown"; // Default to 'Unknown' if contentType is undefined
 
-        // If this contentType doesn't exist in the accumulator, create a new array
-        if (!acc[contentType]) {
-          acc[contentType] = [];
-        }
+      // If this contentType doesn't exist in the accumulator, create a new array
+      if (!acc[contentType]) {
+        acc[contentType] = [];
+      }
 
-        // Push the current source into the corresponding contentType group
-        acc[contentType].push(source);
+      // Push the current source into the corresponding contentType group
+      acc[contentType].push(source);
 
-        return acc;
-      },
-      {}
-    );
+      return acc;
+    }, {});
 
     // Convert the object into an array of GroupedSources and sort by the desired order
     return Object.keys(grouped)
@@ -831,7 +809,7 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
 }
 
 export default function DatasetsPage() {
-  const { loading, error, data } = useQuery<QueryResults>(GET_DATASETS);
+  const { loading, data } = useQuery<QueryResults>(GET_DATASETS);
   const theme = useMantineTheme();
 
   const filteredSources = data?.sources.map((source) => ({
@@ -847,7 +825,7 @@ export default function DatasetsPage() {
   });
 
   const groupedSources = groupByContentType(sourcesWithLastUpdated).filter(
-    (group) => group.contentType !== "Unknown"
+    (group) => group.contentType !== "Unknown",
   );
 
   return (
@@ -869,7 +847,7 @@ export default function DatasetsPage() {
             classNames={classes}
             chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
           >
-            {groupedSources?.map((group) => (
+            {groupedSources.map((group) => (
               <ContentTypeContainer
                 contentType={group}
                 key={group.contentType}

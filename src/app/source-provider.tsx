@@ -12,24 +12,24 @@ const GET_DETAILS = gql`
   }
 `;
 
-export type Dataset = {
+export interface Dataset {
   id: string;
   name: string;
-};
+}
 
-type Source = {
+interface Source {
   datasets: Dataset[];
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   sources: Source[];
-};
+}
 
 const DatasetsContext = React.createContext<Map<string, Dataset>>(new Map());
 
 export function SourceProvider({ children }: { children: ReactNode }) {
   const { data } = useQuery<QueryResults>(GET_DETAILS);
-  let datasets = new Map();
+  const datasets = new Map();
 
   if (data) {
     const records = data.sources.flatMap((s) => s.datasets);

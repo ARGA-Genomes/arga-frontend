@@ -23,7 +23,6 @@ import {
   Grid,
   Group,
   Paper,
-  SegmentedControl,
   SimpleGrid,
   Stack,
   Text,
@@ -35,10 +34,10 @@ import { IconFilter } from "@tabler/icons-react";
 
 const PAGE_SIZE = 10;
 
-type Filters = {
+interface Filters {
   classifications: Filter[];
   dataTypes: Filter[];
-};
+}
 
 const GET_SPECIES = gql`
   query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
@@ -74,40 +73,40 @@ const GET_SPECIES = gql`
   }
 `;
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
-};
+}
 
-type Species = {
+interface Species {
   taxonomy: {
     canonicalName: string;
   };
   photo: Photo;
   dataSummary: DataSummary;
-};
+}
 
-type FilterOptions = {
+interface FilterOptions {
   ecology: string[];
   ibra: string[];
   imcra: string[];
   state: string[];
   drainageBasin: string[];
-};
+}
 
-type Taxa = {
+interface Taxa {
   species: {
     records: Species[];
     total: number;
   };
   filterOptions: FilterOptions;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   taxa: Taxa;
-};
+}
 
 interface FiltersProps {
   filters: Filters;
@@ -115,9 +114,9 @@ interface FiltersProps {
   onChange: (filters: Filters) => void;
 }
 
-function Filters({ filters, options, onChange }: FiltersProps) {
+function Filters({ filters, onChange }: FiltersProps) {
   const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications
+    filters.classifications,
   );
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
@@ -218,7 +217,7 @@ function Species() {
           .map(intoFilterItem)
           .filter((item) => item),
       },
-    }
+    },
   );
 
   const records =

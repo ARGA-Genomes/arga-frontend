@@ -3,15 +3,11 @@
 import { gql, useQuery } from "@apollo/client";
 import {
   Container,
-  Grid,
   Group,
   Paper,
   Text,
   Flex,
   useMantineTheme,
-  Box,
-  Center,
-  Badge,
 } from "@mantine/core";
 import {
   Conservation,
@@ -56,15 +52,15 @@ const GET_SPECIES = gql`
   }
 `;
 
-type NameAttribute = {
+interface NameAttribute {
   name: string;
   valueBool?: boolean;
   valueInt?: number;
   valueDecimal?: number;
   valueStr?: string;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: {
     taxonomy: Taxonomy[];
     conservation: Conservation[];
@@ -72,7 +68,7 @@ type QueryResults = {
     referenceGenome?: { recordId: string };
     attributes?: NameAttribute[];
   };
-};
+}
 
 interface HeaderProps {
   taxonomy: Taxonomy[];
@@ -90,9 +86,6 @@ function Header({
   attributes,
 }: HeaderProps) {
   const theme = useMantineTheme();
-  const refGenomeBackground = referenceGenome
-    ? theme.colors.moss[5]
-    : theme.colors.red[5];
 
   return (
     // Original format

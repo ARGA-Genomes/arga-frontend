@@ -1,4 +1,4 @@
-type Taxonomy = {
+interface Taxonomy {
   scientificName: string;
   canonicalName: string;
   authorship: string;
@@ -15,27 +15,27 @@ type Taxonomy = {
   synonyms: { scientificName: string }[];
   source?: string;
   sourceUrl?: string;
-};
+}
 
-type Photo = {
+interface Photo {
   url: string;
   source?: string;
   publisher?: string;
   license?: string;
   rightsHolder?: string;
-};
+}
 
-type Distribution = {
+interface Distribution {
   locality: string;
   threatStatus: string;
   source: string;
-};
+}
 
-type Region = {
+interface Region {
   name: string;
-};
+}
 
-type GenomicData = {
+interface GenomicData {
   canonicalName: string;
   type: string;
   dataResource: string;
@@ -48,7 +48,7 @@ type GenomicData = {
   refseqCategory: string;
   coordinates: Coordinates;
   associatedSequences: AssociatedSequences;
-};
+}
 
 type WholeGenome = GenomicData & {
   occurrenceYear?: string[];
@@ -64,7 +64,7 @@ type WholeGenome = GenomicData & {
   ncbiReleaseType?: string;
 };
 
-type AssemblyStats = {
+interface AssemblyStats {
   id: string;
   componentCount?: number;
   contigCount?: number;
@@ -83,9 +83,9 @@ type AssemblyStats = {
   totalGapLength?: number;
   spannedGaps?: number;
   unspannedGaps?: number;
-};
+}
 
-type BioSample = {
+interface BioSample {
   id: string;
   accession: string;
   sra?: string;
@@ -95,15 +95,15 @@ type BioSample = {
   title?: string;
   owner?: string;
   attributes?: BioSampleAttribute[];
-};
+}
 
-type BioSampleAttribute = {
+interface BioSampleAttribute {
   name: string;
   harmonized_name: string;
   value: string;
-};
+}
 
-type Assembly = {
+interface Assembly {
   id: string;
   accession: string;
   nuccore: string;
@@ -123,32 +123,32 @@ type Assembly = {
   recordedBy: string;
   geneticAccessionUri: string;
   eventDate: string;
-};
+}
 
-type AssociatedSequences = {
+interface AssociatedSequences {
   sequenceID: string;
   genbankAccession: string;
   markercode: string;
   nucleotides: string;
-};
+}
 
-type Coordinates = {
+interface Coordinates {
   latitude: number;
   longitude: number;
-};
+}
 
-type Regions = {
+interface Regions {
   ibra: Region[];
   imcra: Region[];
-};
+}
 
-type Conservation = {
+interface Conservation {
   status: string;
   state?: string;
   source?: string;
-};
+}
 
-type Species = {
+interface Species {
   taxonomy: Taxonomy;
   photos: Photo[];
   conservation: Conservation[];
@@ -159,9 +159,9 @@ type Species = {
   traceFiles: TraceFile[];
   specimens?: Specimen[];
   indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[];
-};
+}
 
-type Specimen = {
+interface Specimen {
   id: string;
   accession: string;
   typeStatus: string;
@@ -176,9 +176,9 @@ type Specimen = {
   longitude?: number;
   details?: string;
   remarks?: string;
-};
+}
 
-type Event = {
+interface Event {
   id: string;
   eventDate: string;
   eventId: string;
@@ -192,9 +192,9 @@ type Event = {
   samplingSizeValue: string;
 
   events: [CollectionEvent | SequencingEvent];
-};
+}
 
-type CollectionEvent = {
+interface CollectionEvent {
   __typename: string;
   id: string;
   behavior: string;
@@ -213,9 +213,9 @@ type CollectionEvent = {
   recordNumber: string;
   reproductiveCondition: string;
   sex: string;
-};
+}
 
-type SequencingEvent = {
+interface SequencingEvent {
   __typename: string;
   id: string;
   organismId?: string;
@@ -224,9 +224,9 @@ type SequencingEvent = {
   targetGene?: string;
   dnaSequence?: string;
   runs: SequencingRunEvent[];
-};
+}
 
-type SequencingRunEvent = {
+interface SequencingRunEvent {
   id: string;
   traceId: string;
   traceName: string;
@@ -239,9 +239,9 @@ type SequencingRunEvent = {
   pcrPrimerNameReverse: string;
   sequencePrimerForwardName: string;
   sequencePrimerReverseName: string;
-};
+}
 
-type Marker = {
+interface Marker {
   id: string;
   accession: string;
   basepairs?: number;
@@ -255,10 +255,9 @@ type Marker = {
   shape?: string;
   type?: string;
   version?: string;
-  extraData?: any;
-};
+}
 
-type SpecimenDetails = {
+interface SpecimenDetails {
   id: string;
   accession: string;
   typeStatus: string;
@@ -274,21 +273,20 @@ type SpecimenDetails = {
   remarks?: string;
 
   events: Event[];
-};
+}
 
-type StatsSpecies = {
+interface StatsSpecies {
   total: number;
   wholeGenomes: number;
   organelles: number;
   barcodes: number;
-};
+}
 
-type TraceFile = {
+interface TraceFile {
   id: string;
-  metadata: any;
-};
+}
 
-type IndigenousEcologicalKnowledge = {
+interface IndigenousEcologicalKnowledge {
   id: string;
   name: string;
   datasetName: string;
@@ -296,11 +294,11 @@ type IndigenousEcologicalKnowledge = {
   foodUse: boolean;
   medicinalUse: boolean;
   sourceUrl: string;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: Species;
-};
+}
 
 type CommonGenome = GenomicData | WholeGenome;
 

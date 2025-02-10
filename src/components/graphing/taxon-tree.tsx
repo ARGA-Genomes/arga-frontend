@@ -1,7 +1,7 @@
 "use client";
 
-import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
-import { Badge, Group, Loader, Paper, Text } from "@mantine/core";
+import { gql, useApolloClient } from "@apollo/client";
+import { Badge, Group, Paper, Text } from "@mantine/core";
 import { useTheme } from "@nivo/core";
 import {
   ComputedNode,
@@ -15,24 +15,16 @@ import {
 } from "@nivo/tree";
 
 import { useEffect, useState } from "react";
-import {
-  EventTimeline,
-  LineStyle,
-  TimelineIcon,
-} from "@/components/event-timeline";
+
 import { useListState } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
-import { animated, to, useSpring } from "@react-spring/web";
+import { motion } from "framer-motion";
 
 const NODE_WIDTH = 20;
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
-  query TaxonTreeNode(
-    $taxonRank: TaxonomicRank
-    $taxonCanonicalName: String
-    $descendantRank: TaxonomicRank
-  ) {
+  query TaxonTreeNode($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $descendantRank: TaxonomicRank) {
     stats {
       taxonBreakdown(
         taxonRank: $taxonRank
@@ -48,16 +40,16 @@ const GET_TAXON_TREE_NODE = gql`
   }
 `;
 
-type TaxonTreeNodeQuery = {
+interface TaxonTreeNodeQuery {
   stats: {
     taxonBreakdown: TaxonStatTreeNode[];
   };
-};
+}
 
 // A node in the tree. This represents the visual node of a taxon and maintains
 // a heirarchy of child tree nodes. It should contain both the data to present as
 // well as transient functional data such as expansion or pinning.
-type Node = {
+interface Node {
   visible: boolean;
   expanded: boolean;
   pinned: boolean;
@@ -76,16 +68,12 @@ type Node = {
 
   // whether or not to render a spinner to indicate the node is loading
   isLoader: boolean;
-};
+}
 
 // Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
 // from the taxon tree statistics query into a presentable tree by injecting and
 // defaulting variables used for tree interaction.
-function convertToNode(
-  node: TaxonStatTreeNode,
-  expanded?: Node[],
-  pinned?: string[],
-): Node {
+function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: string[]): Node {
   const shouldExpand =
     !!expanded?.find((n) => n.canonicalName === node.canonicalName) ||
     !!pinned?.find((name) => name === node.canonicalName) ||
@@ -152,16 +140,8 @@ interface TaxonomyTreeProps {
 // The interactive taxonomy tree. We use a nivo tree as the base but then also make
 // it responsive ourselves since we require certain min-width logic to allow for scrollbars
 // for very large taxon families.
-export function TaxonomyTree({
-  minWidth,
-  layout,
-  data,
-  pinned,
-  initialExpanded,
-}: TaxonomyTreeProps) {
-  const [expanded, handlers] = useListState<Node>(
-    initialExpanded?.map((n) => convertToNode(n, [])) || [],
-  );
+export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }: TaxonomyTreeProps) {
+  const [expanded, handlers] = useListState<Node>(initialExpanded?.map((n) => convertToNode(n, [])) || []);
   const client = useApolloClient();
 
   // we maintain two trees for this graph. the graphql results are cached in tree which
@@ -172,7 +152,7 @@ export function TaxonomyTree({
 
   useEffect(() => {
     setRoot(convertToNode(tree, expanded, pinned));
-  }, [expanded, tree]);
+  }, [expanded, tree, pinned]);
 
   // expand and load children when a node is expanded
   function nodeClicked(item: ComputedNode<Node>) {
@@ -194,10 +174,8 @@ export function TaxonomyTree({
         const children = res.data.stats.taxonBreakdown[0]?.children || [];
 
         // clone the underlying data tree and find the taxon node being loaded
-        let newTree = structuredClone(tree);
-        let parent = newTree.children?.find(
-          (node) => node.canonicalName == item.data.canonicalName,
-        );
+        const newTree = structuredClone(tree);
+        const parent = newTree.children?.find((node) => node.canonicalName == item.data.canonicalName);
 
         // if we found the loaded node we insert the children and reload
         // both the data cache and the tree root to effect the display changes
@@ -207,9 +185,7 @@ export function TaxonomyTree({
         }
       });
     } else {
-      handlers.remove(
-        expanded.findIndex((n) => n.canonicalName == item.data.canonicalName),
-      );
+      handlers.remove(expanded.findIndex((n) => n.canonicalName == item.data.canonicalName));
     }
   }
 
@@ -275,10 +251,7 @@ export function TaxonomyTree({
               </Group>
               <Group justify="center">
                 <StatBadge label="Other" stat={item.node.data.other} />
-                <StatBadge
-                  label="Total genomic"
-                  stat={item.node.data.totalGenomic}
-                />
+                <StatBadge label="Total genomic" stat={item.node.data.totalGenomic} />
               </Group>
             </Paper>
           )
@@ -288,7 +261,7 @@ export function TaxonomyTree({
         onLinkMouseMove={() => {}}
         onLinkMouseLeave={() => {}}
         onLinkClick={() => {}}
-        /* @ts-ignore */
+        /* @ts-expect-error: must specify a LinkTooltip<Node> type */
         linkTooltip={undefined}
         linkTooltipAnchor={"center"}
         nodeComponent={CustomNode}
@@ -330,25 +303,20 @@ function CustomLink({
   }
 
   return (
-    <animated.path
+    <motion.path
       data-testid={`link.${link.id}`}
-      d={to(
-        [
-          animatedProps.sourceX,
-          animatedProps.sourceY,
-          animatedProps.targetX,
-          animatedProps.targetY,
-        ],
-        (sourceX, sourceY, targetX, targetY) => {
-          return linkGenerator({
-            source: [sourceX, sourceY],
-            target: [targetX, targetY],
-          });
-        },
-      )}
+      /* d={to(
+       *   [animatedProps.sourceX, animatedProps.sourceY, animatedProps.targetX, animatedProps.targetY],
+       *   (sourceX, sourceY, targetX, targetY) => {
+       *     return linkGenerator({
+       *       source: [sourceX, sourceY],
+       *       target: [targetX, targetY],
+       *     });
+       *   },
+       * )} */
       fill="none"
-      strokeWidth={pinned ? 8 : animatedProps.thickness}
-      stroke={animatedProps.color}
+      strokeWidth={pinned ? 8 : animatedProps.thickness.goal}
+      stroke={animatedProps.color.goal}
       strokeDasharray={link.target.data.isLoader ? "10,10" : undefined}
       {...eventHandlers}
     />
@@ -363,19 +331,12 @@ function CustomLabel({ label, animatedProps }: LabelComponentProps<Node>) {
     return;
   }
 
+  /* transform={to([animatedProps.x, animatedProps.y], (x, y) => `translate(${x},${y})`)}
+transform={animatedProps.rotation.to((rotation) => `rotate(${rotation})`)} */
+
   return (
-    <animated.g
-      data-testid={`label.${label.id}`}
-      transform={to(
-        [animatedProps.x, animatedProps.y],
-        (x, y) => `translate(${x},${y})`,
-      )}
-    >
-      <animated.g
-        transform={animatedProps.rotation.to(
-          (rotation) => `rotate(${rotation})`,
-        )}
-      >
+    <motion.g data-testid={`label.${label.id}`}>
+      <motion.g>
         {theme.labels.text.outlineWidth > 0 && (
           <text
             style={{
@@ -401,8 +362,8 @@ function CustomLabel({ label, animatedProps }: LabelComponentProps<Node>) {
         >
           {label.label}
         </text>
-      </animated.g>
-    </animated.g>
+      </motion.g>
+    </motion.g>
   );
 }
 
@@ -434,14 +395,6 @@ function CustomNode({
     margin,
   });
 
-  const props = useSpring({
-    to: [
-      { opacity: 1, r: 6 },
-      { opacity: 0.4, r: 3 },
-    ],
-    loop: true,
-  });
-
   if (!node.data.visible) {
     return;
   }
@@ -449,12 +402,12 @@ function CustomNode({
   // to animate the loading node. svg animation is not that performant
   // style={node.data.isLoader ? props : undefined}
   return (
-    <animated.circle
+    <motion.circle
       data-testid={`node.${node.uid}`}
-      r={pinned ? 12 : animatedProps.size.to((size) => size / 2)}
-      fill={animatedProps.color}
-      cx={animatedProps.x}
-      cy={animatedProps.y}
+      /* r={pinned ? 12 : animatedProps.size.to((size) => size / 2)}
+       * fill={animatedProps.color}
+       * cx={animatedProps.x}
+       * cy={animatedProps.y} */
       {...eventHandlers}
     />
   );
@@ -474,7 +427,7 @@ function calculateMinWidth(data: Node): number {
   // also get the species that are visible from an expanded genus node
   const expanded = genera.filter((node) => node.expanded);
   const visibleSpecies = expanded.flatMap((node) => {
-    let species = filterToRank("SPECIES", node);
+    const species = filterToRank("SPECIES", node);
     // because the tree has enough room to show one direct descendant we always pop one
     // item off to effectively reduce to the overall minimum width
     species.pop();

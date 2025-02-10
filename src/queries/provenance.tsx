@@ -74,14 +74,14 @@ export interface Operation {
   loggedAt: string;
 }
 
-export type ProvenanceQuery = {
+export interface ProvenanceQuery {
   provenance: {
     // TODO: Split out to specimen, taxon & nomenclaturalAct operations
     nomenclaturalAct: Operation[];
     taxon: Operation[];
     specimen: Operation[];
   };
-};
+}
 
 export const GET_TAXON_PROVENANCE = gql`
   query TaxonProvenance($entityId: String) {

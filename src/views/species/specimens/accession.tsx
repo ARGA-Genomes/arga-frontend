@@ -131,12 +131,12 @@ type SequenceDetails = Sequence & {
   };
 };
 
-type SpecimenQueryResults = {
+interface SpecimenQueryResults {
   specimen: SpecimenDetails;
   subsample: SubsampleDetails;
   dnaExtract: DnaExtractDetails;
   sequence: SequenceDetails[];
-};
+}
 
 const GET_PROVENANCE = gql`
   query Provenance($entityId: String) {
@@ -206,7 +206,7 @@ interface Dataset {
   url?: string;
 }
 
-type ProvenanceQuery = {
+interface ProvenanceQuery {
   provenance: {
     specimen: [
       {
@@ -216,10 +216,10 @@ type ProvenanceQuery = {
         atom: AtomText | AtomNumber;
         dataset: Dataset;
         loggedAt: string;
-      }
+      },
     ];
   };
-};
+}
 
 function Provenance({ entityId }: { entityId: string }) {
   const { loading, error, data } = useQuery<ProvenanceQuery>(GET_PROVENANCE, {
@@ -313,12 +313,12 @@ function Provenance({ entityId }: { entityId: string }) {
 }
 
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  let position: [number, number] | undefined =
+  const position: [number, number] | undefined =
     specimen && specimen.latitude && specimen.longitude
       ? [Number(specimen.latitude), Number(specimen.longitude)]
       : undefined;
 
-  let marker =
+  const marker =
     position &&
     ({
       recordId: specimen?.recordId,
@@ -950,7 +950,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -971,7 +971,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -992,7 +992,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -1013,7 +1013,7 @@ function EventTimeline(props: EventTimelineProps) {
               <Text ml={30} fz="xs" fw={300}>
                 Event date
               </Text>
-              <DataField value={event?.eventDate} fz="xs" />
+              <DataField value={event.eventDate} fz="xs" />
             </Group>
           ))}
         </Stack>
@@ -1105,16 +1105,13 @@ export default function SpecimenAccession({
 }: {
   params: { accession: string };
 }) {
-  let basePath = usePathname()?.replace(params.accession, "");
+  const basePath = usePathname().replace(params.accession, "");
 
-  const { loading, error, data } = useQuery<SpecimenQueryResults>(
-    GET_SPECIMEN,
-    {
-      variables: {
-        recordId: decodeURIComponent(params.accession),
-      },
-    }
-  );
+  const { error, data } = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {
+    variables: {
+      recordId: decodeURIComponent(params.accession),
+    },
+  });
 
   if (error) {
     return <Text>Error : {error.message}</Text>;

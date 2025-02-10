@@ -16,28 +16,13 @@ import { MAX_WIDTH } from "@/app/constants";
 import * as Humanize from "humanize-plus";
 import { useClipboard } from "@mantine/hooks";
 import { useRef } from "react";
-import { IconCopy, IconExternalLink } from "@tabler/icons-react";
+import { IconCopy } from "@tabler/icons-react";
 
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-type QueryResults = {
+interface QueryResults {
   species: {
     taxonomy: Taxonomy[];
   };
-};
+}
 
 const GET_SPECIES = gql`
   query Species($canonicalName: String) {
@@ -88,9 +73,9 @@ export function PageCitation() {
                     <ActionIcon
                       color="midnight.8"
                       size="sm"
-                      onClick={() =>
-                        clipboard.copy(citation.current?.innerText)
-                      }
+                      onClick={() => {
+                        clipboard.copy(citation.current?.innerText);
+                      }}
                     >
                       <IconCopy size={14} />
                     </ActionIcon>
@@ -121,7 +106,6 @@ export function PageCitation() {
 }
 
 export function DataPageCitation() {
-  const params = useParams();
   const location = usePathname();
   const page = Humanize.capitalize(location.split("/").pop() || "");
   const clipboard = useClipboard({ timeout: 500 });
@@ -144,9 +128,9 @@ export function DataPageCitation() {
                     <ActionIcon
                       color="midnight.8"
                       size="sm"
-                      onClick={() =>
-                        clipboard.copy(citation.current?.innerText)
-                      }
+                      onClick={() => {
+                        clipboard.copy(citation.current?.innerText);
+                      }}
                     >
                       <IconCopy size={14} />
                     </ActionIcon>

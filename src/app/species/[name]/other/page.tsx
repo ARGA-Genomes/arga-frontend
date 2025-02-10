@@ -1,8 +1,10 @@
-"use client";
+"use client";;
+import { use } from "react";
 
 import { Center, Text } from "@mantine/core";
 
-export default function OtherDataPage({ params }: { params: { name: string } }) {
+export default function OtherDataPage(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
 
   return (
     <Center p='xl' h={300}>

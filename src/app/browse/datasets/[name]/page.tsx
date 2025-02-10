@@ -12,15 +12,14 @@ import {
   Group,
   Stack,
   Container,
-  Grid,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { BarChart } from "@/components/graphing/bar";
 import { TachoChart } from "@/components/graphing/tacho";
 import { PaginationBar } from "@/components/pagination";
 import Link from "next/link";
 import { MAX_WIDTH } from "@/app/constants";
-import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
+import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { Photo } from "@/app/type";
 
@@ -38,17 +37,17 @@ const GET_DATASET = gql`
   }
 `;
 
-type Dataset = {
+interface Dataset {
   citation?: string;
   license?: string;
   rightsHolder?: string;
   url?: string;
   updatedAt: string;
-};
+}
 
-type DetailsQueryResults = {
+interface DetailsQueryResults {
   dataset: Dataset;
-};
+}
 
 const GET_SPECIES = gql`
   query DatasetSpecies($name: String, $page: Int) {
@@ -74,59 +73,29 @@ const GET_SPECIES = gql`
   }
 `;
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
-};
+}
 
-type Record = {
+interface Record {
   taxonomy: { canonicalName: string };
   photo: Photo;
   dataSummary: DataSummary;
-};
+}
 
-type DatasetSpecies = {
+interface DatasetSpecies {
   species: {
     records: Record[];
     total: number;
   };
-};
+}
 
-type SpeciesQueryResults = {
+interface SpeciesQueryResults {
   dataset: DatasetSpecies;
-};
-
-const GET_STATS = gql`
-  query DatasetStats($name: String) {
-    stats {
-      dataset(name: $name) {
-        totalSpecies
-        speciesWithData
-        breakdown {
-          name
-          total
-        }
-      }
-    }
-  }
-`;
-
-type Breakdown = {
-  name: string;
-  total: number;
-};
-
-type DatasetStats = {
-  totalSpecies: number;
-  speciesWithData: number;
-  breakdown: Breakdown[];
-};
-
-type StatsQueryResults = {
-  stats: { dataset: DatasetStats };
-};
+}
 
 function Species({ dataset }: { dataset: string }) {
   const [page, setPage] = useState(1);
@@ -159,11 +128,7 @@ function Species({ dataset }: { dataset: string }) {
   );
 }
 
-function DataSummary({ dataset }: { dataset: string }) {
-  const { loading, error, data } = useQuery<StatsQueryResults>(GET_STATS, {
-    variables: { name: dataset },
-  });
-
+function DataSummary() {
   const sampleData = [
     { name: "data1", value: 30 },
     { name: "data2", value: 78 },
@@ -206,7 +171,7 @@ function DatasetDetails({ dataset }: { dataset: string }) {
       {data?.dataset.url && (
         <Text fw={700} c="dimmed" size="sm">
           Source:{" "}
-          <Link href={data?.dataset.url} target="_blank">
+          <Link href={data.dataset.url} target="_blank">
             ALA Profiles
           </Link>
         </Text>
@@ -221,11 +186,12 @@ function DatasetDetails({ dataset }: { dataset: string }) {
   );
 }
 
-export default function BrowseDataset({
-  params,
-}: {
-  params: { name: string };
-}) {
+export default function BrowseDataset(
+  props: {
+    params: Promise<{ name: string }>;
+  }
+) {
+  const params = use(props.params);
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 
   const [_, setPreviousPage] = usePreviousPage();
@@ -235,7 +201,7 @@ export default function BrowseDataset({
       name: `browsing ${dataset}`,
       url: "/browse/datasets/${params.name}",
     });
-  }, [setPreviousPage]);
+  });
 
   return (
     <Stack mt="xl">

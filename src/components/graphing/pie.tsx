@@ -1,11 +1,12 @@
 "use client";
 
 import * as d3 from "d3";
-import { useSpring, animated } from "@react-spring/web";
+import { useSpring } from "@react-spring/web";
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps, Tooltip } from "@mantine/core";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const INFLEXION_PADDING = 20;
 
@@ -21,16 +22,7 @@ interface ArcProps {
 
 function Arc(props: ArcProps & SVGProps<SVGPathElement>) {
   // unwrap properties for convenience
-  const {
-    data,
-    highlight,
-    onHighlight,
-    startAngle,
-    endAngle,
-    innerRadius,
-    outerRadius,
-    ...rest
-  } = props;
+  const { data, highlight, onHighlight, ...rest } = props;
 
   const anim = useSpring({
     from: { opacity: highlight ? 0.3 : 1 },
@@ -41,7 +33,7 @@ function Arc(props: ArcProps & SVGProps<SVGPathElement>) {
   const slicePath = arcGenerator(props) || undefined;
 
   const arc = (
-    <animated.g style={anim}>
+    <motion.g initial={{ opacity: highlight ? 1 : 0.3 }} whileHover={{ opacity: highlight ? 0.3 : 1 }}>
       <path
         d={slicePath}
         onMouseEnter={() => {
@@ -52,32 +44,17 @@ function Arc(props: ArcProps & SVGProps<SVGPathElement>) {
         }}
         {...rest}
       />
-    </animated.g>
+    </motion.g>
   );
 
-  const label = data.percentage
-    ? `${data.name} - ${data.percentage}`
-    : data.name;
+  const label = data.percentage ? `${data.name} - ${data.percentage}` : data.name;
 
-  return (
-    <Tooltip.Floating label={label}>
-      {data.href ? <Link href={data.href}>{arc}</Link> : arc}
-    </Tooltip.Floating>
-  );
+  return <Tooltip.Floating label={label}>{data.href ? <Link href={data.href}>{arc}</Link> : arc}</Tooltip.Floating>;
 }
 
 function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
   // unwrap properties for convenience
-  const {
-    data,
-    highlight,
-    onHighlight,
-    startAngle,
-    endAngle,
-    innerRadius,
-    outerRadius,
-    ...rest
-  } = props;
+  const { data, highlight, onHighlight, startAngle, endAngle, outerRadius, ...rest } = props;
 
   const anim = useSpring({
     from: { opacity: highlight ? 0.3 : 1 },
@@ -106,7 +83,7 @@ function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
   const label = data.name + " (" + data.value + ")";
 
   return (
-    <animated.g style={anim}>
+    <motion.g initial={{ opacity: highlight ? 1 : 0.3 }} whileHover={{ opacity: highlight ? 0.3 : 1 }}>
       <path
         d={slicePath}
         onMouseEnter={() => {
@@ -143,22 +120,13 @@ function LabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
       >
         {label}
       </text>
-    </animated.g>
+    </motion.g>
   );
 }
 
 function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
   // unwrap properties for convenience
-  const {
-    data,
-    highlight,
-    onHighlight,
-    startAngle,
-    endAngle,
-    innerRadius,
-    outerRadius,
-    ...rest
-  } = props;
+  const { data, highlight, onHighlight, ...rest } = props;
 
   const anim = useSpring({
     from: { opacity: highlight ? 0.3 : 1 },
@@ -171,16 +139,8 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
   const centroid = arcGenerator.centroid(props);
   const slicePath = arcGenerator(props) || undefined;
 
-  // the label
-  const inflexionInfo = {
-    innerRadius: outerRadius + INFLEXION_PADDING,
-    outerRadius: outerRadius + INFLEXION_PADDING,
-    startAngle: startAngle,
-    endAngle: endAngle,
-  };
-
   const arc = (
-    <animated.g style={anim}>
+    <motion.g initial={{ opacity: highlight ? 1 : 0.3 }} whileHover={{ opacity: highlight ? 0.3 : 1 }}>
       <path
         d={slicePath}
         onMouseEnter={() => {
@@ -224,7 +184,7 @@ function CentredLabelledArc(props: ArcProps & SVGProps<SVGPathElement>) {
       >
         records
       </text>
-    </animated.g>
+    </motion.g>
   );
 
   return <>{data.href ? <Link href={data.href}>{arc}</Link> : arc}</>;
@@ -243,11 +203,7 @@ interface PieChartProps {
   labelled?: boolean;
 }
 
-export function PieChart({
-  data,
-  labelled,
-  ...rest
-}: PieChartProps & BoxProps) {
+export function PieChart({ data, labelled, ...rest }: PieChartProps & BoxProps) {
   const { ref, width, height } = useElementSize();
 
   const [highlighted, setHighlighted] = useState<PieDatum | undefined>();
@@ -258,22 +214,11 @@ export function PieChart({
 
   const color = d3
     .scaleOrdinal()
-    .range(
-      d3
-        .quantize(
-          (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length
-        )
-        .reverse()
-    );
+    .range(d3.quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length === 1 ? 2 : data.length).reverse());
 
   return (
     <Box ref={ref} {...rest}>
-      <svg
-        width={width}
-        height={height}
-        viewBox={[-width / 2, -height / 2, width, height].join(" ")}
-      >
+      <svg width={width} height={height} viewBox={[-width / 2, -height / 2, width, height].join(" ")}>
         {arcs.map((arc, idx) => {
           const props = {
             data: arc.data,
@@ -282,26 +227,17 @@ export function PieChart({
             innerRadius: 0,
             outerRadius: radius,
             fill: color(idx.toString()) as string,
-            highlight:
-              highlighted === undefined || highlighted.name == arc.data.name,
+            highlight: highlighted === undefined || highlighted.name == arc.data.name,
             onHighlight: setHighlighted,
           };
-          return labelled ? (
-            <LabelledArc key={idx} {...props} />
-          ) : (
-            <Arc key={idx} {...props} />
-          );
+          return labelled ? <LabelledArc key={idx} {...props} /> : <Arc key={idx} {...props} />;
         })}
       </svg>
     </Box>
   );
 }
 
-export function DonutChart({
-  data,
-  labelled,
-  ...rest
-}: PieChartProps & BoxProps) {
+export function DonutChart({ data, labelled, ...rest }: PieChartProps & BoxProps) {
   const { ref, width, height } = useElementSize();
 
   const [highlighted, setHighlighted] = useState<PieDatum | undefined>();
@@ -312,22 +248,11 @@ export function DonutChart({
 
   const color = d3
     .scaleOrdinal()
-    .range(
-      d3
-        .quantize(
-          (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-          data.length === 1 ? 2 : data.length
-        )
-        .reverse()
-    );
+    .range(d3.quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length === 1 ? 2 : data.length).reverse());
 
   return (
     <Box ref={ref} {...rest}>
-      <svg
-        width={width}
-        height={height}
-        viewBox={[-width / 2, -height / 2, width, height].join(" ")}
-      >
+      <svg width={width} height={height} viewBox={[-width / 2, -height / 2, width, height].join(" ")}>
         {arcs.map((arc, idx) => {
           const props = {
             data: arc.data,
@@ -337,15 +262,10 @@ export function DonutChart({
             innerRadius: 50,
             outerRadius: radius,
             fill: color(idx.toString()) as string,
-            highlight:
-              highlighted === undefined || highlighted.name == arc.data.name,
+            highlight: highlighted === undefined || highlighted.name == arc.data.name,
             onHighlight: setHighlighted,
           };
-          return labelled ? (
-            <CentredLabelledArc key={idx} {...props} />
-          ) : (
-            <Arc key={idx} {...props} />
-          );
+          return labelled ? <CentredLabelledArc key={idx} {...props} /> : <Arc key={idx} {...props} />;
         })}
       </svg>
     </Box>

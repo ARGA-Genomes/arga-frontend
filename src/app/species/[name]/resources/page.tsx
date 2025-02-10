@@ -1,4 +1,5 @@
-"use client";
+"use client";;
+import { use } from "react";
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Paper, Text } from "@mantine/core";
@@ -29,13 +30,14 @@ const GET_RESOURCES = gql`
   }
 `;
 
-type QueryResults = {
+interface QueryResults {
   species: {
     data: CommonGenome[];
   };
-};
+}
 
-export default function Resources({ params }: { params: { name: string } }) {
+export default function Resources(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const canonicalName = params.name.replaceAll("_", " ");
 
   const { loading, error, data } = useQuery<QueryResults>(GET_RESOURCES, {

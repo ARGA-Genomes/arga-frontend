@@ -14,30 +14,22 @@ import {
   Drawer,
   Box,
   Grid,
-  SegmentedControl,
   Button,
   Accordion,
   Badge,
   Avatar,
   useMantineTheme,
   ScrollArea,
-  UnstyledButton,
   Chip,
   Center,
 } from "@mantine/core";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, use } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { useDisclosure } from "@mantine/hooks";
-import {
-  IconFilter,
-  IconClockHour4,
-  IconExternalLink,
-  IconArrowUpRight,
-  IconArrowsSort,
-} from "@tabler/icons-react";
+import { IconFilter, IconClockHour4, IconExternalLink, IconArrowsSort } from "@tabler/icons-react";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { Photo } from "@/app/type";
@@ -49,10 +41,10 @@ import { SortChip } from "@/components/sorting/sort-chips";
 import classes from "../../../../components/record-list.module.css";
 
 const PAGE_SIZE = 10;
-type Filters = {
+interface Filters {
   classifications: Filter[];
   dataTypes: Filter[];
-};
+}
 
 const GET_DETAILS = gql`
   query SourceDetails($name: String) {
@@ -87,7 +79,7 @@ const GET_DETAILS = gql`
   }
 `;
 
-type Dataset = {
+interface Dataset {
   name: string;
   shortName?: string;
   description?: string;
@@ -100,7 +92,7 @@ type Dataset = {
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   publicationYear?: number;
-};
+}
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
@@ -120,11 +112,11 @@ const reusePillColours: Record<ReusePillType, string> = {
   VARIABLE: "wheat.3",
 };
 
-type SpeciesCount = {
+interface SpeciesCount {
   total: number;
-};
+}
 
-type Source = {
+interface Source {
   license: string;
   accessRights: string;
   rightsHolder: string;
@@ -134,19 +126,14 @@ type Source = {
   accessPill?: AccessPillType;
   species: SpeciesCount;
   datasets: Dataset[];
-};
+}
 
-type DetailsQueryResults = {
+interface DetailsQueryResults {
   source: Source;
-};
+}
 
 const GET_SPECIES = gql`
-  query SourceSpecies(
-    $name: String
-    $page: Int
-    $pageSize: Int
-    $filters: [FilterItem]
-  ) {
+  query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
     source(by: { name: $name }, filters: $filters) {
       species(page: $page, pageSize: $pageSize) {
         total
@@ -172,27 +159,27 @@ const GET_SPECIES = gql`
   }
 `;
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
-};
+}
 
-type SpeciesRecord = {
+interface SpeciesRecord {
   taxonomy: { canonicalName: string };
   photo: Photo;
   dataSummary: DataSummary;
-};
+}
 
-type SpeciesQueryResults = {
+interface SpeciesQueryResults {
   source: {
     species: {
       records: SpeciesRecord[];
       total: number;
     };
   };
-};
+}
 
 interface FiltersProps {
   filters: Filters;
@@ -200,9 +187,7 @@ interface FiltersProps {
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications
-  );
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications);
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
@@ -236,10 +221,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <HigherClassificationFilters
-            filters={classifications}
-            onChange={setClassifications}
-          />
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
@@ -300,13 +282,7 @@ function Species({ source }: { source: string }) {
 
   return (
     <Stack>
-      <Drawer
-        opened={opened}
-        onClose={close}
-        withCloseButton={false}
-        position="right"
-        size="xl"
-      >
+      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box pt={200}>
           <Filters filters={filters} onChange={setFilters} />
         </Box>
@@ -339,9 +315,7 @@ function Species({ source }: { source: string }) {
 
       {error ? <Title order={4}>{error.message}</Title> : null}
 
-      {records.length === 0 && (
-        <Text className={classes.emptyList}>no data</Text>
-      )}
+      {records.length === 0 && <Text className={classes.emptyList}>no data</Text>}
 
       <SimpleGrid cols={5}>
         {records.map((record) => (
@@ -349,23 +323,12 @@ function Species({ source }: { source: string }) {
         ))}
       </SimpleGrid>
 
-      <PaginationBar
-        total={data?.source.species.total}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onChange={setPage}
-      />
+      <PaginationBar total={data?.source.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
     </Stack>
   );
 }
 
-function DatasetSort({
-  sortBy,
-  setSortBy,
-}: {
-  sortBy: string | null;
-  setSortBy: (value: string | null) => void;
-}) {
+function DatasetSort({ sortBy, setSortBy }: { sortBy: string | null; setSortBy: (value: string | null) => void }) {
   const theme = useMantineTheme();
   const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
     if (event.currentTarget.value === sortBy) {
@@ -402,19 +365,18 @@ function DatasetSort({
 function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
   const [sortBy, setSortBy] = useState<string | null>(null);
 
-  const filteredDatasets = datasets.filter(
-    (dataset) => dataset.name.trim() !== ""
-  );
+  const filteredDatasets = datasets.filter((dataset) => dataset.name.trim() !== "");
 
   const sortedDatasets = useMemo(() => {
     return [...filteredDatasets].sort((a, b) => {
       switch (sortBy) {
         case "alphabetical":
           return a.name.localeCompare(b.name);
-        case "year":
+        case "year": {
           const yearA = a.publicationYear ? a.publicationYear : 0;
           const yearB = b.publicationYear ? b.publicationYear : 0;
           return yearB - yearA; // Newest to Oldest
+        }
         default:
           return 0;
       }
@@ -459,19 +421,13 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
             <Group gap={3}>
               <IconClockHour4 size={15} color={theme.colors.gray[6]} />
               <Text c="dimmed" size="xs">
-                Last updated:{" "}
-                {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
+                Last updated: {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
               </Text>
             </Group>
           </Stack>
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Rights holder"
-            value={dataset.rightsHolder}
-            popoverDisabled
-            textColor="black"
-          />
+          <AttributePill label="Rights holder" value={dataset.rightsHolder} popoverDisabled textColor="black" />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill
@@ -481,13 +437,9 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.accessPill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.accessPill.slice(1).toLowerCase()) || "No data"
             }
-            color={
-              dataset.accessPill
-                ? accessPillColours[dataset.accessPill]
-                : "#d6e4ed"
-            }
+            color={dataset.accessPill ? accessPillColours[dataset.accessPill] : "#d6e4ed"}
             popoverDisabled
             textColor="black"
           />
@@ -500,32 +452,18 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
                 ?.toLowerCase()
                 .charAt(0)
                 .toUpperCase()
-                .concat(dataset.reusePill?.slice(1).toLowerCase()) || "No data"
+                .concat(dataset.reusePill.slice(1).toLowerCase()) || "No data"
             }
-            color={
-              dataset.reusePill
-                ? reusePillColours[dataset.reusePill]
-                : "#d6e4ed"
-            }
+            color={dataset.reusePill ? reusePillColours[dataset.reusePill] : "#d6e4ed"}
             popoverDisabled
             textColor="black"
           />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
-          <AttributePill
-            label="Records"
-            value="No data"
-            popoverDisabled
-            textColor="black"
-          />
+          <AttributePill label="Records" value="No data" popoverDisabled textColor="black" />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
-          <AttributePill
-            label="Year"
-            value={dataset.publicationYear || "No data"}
-            popoverDisabled
-            textColor="black"
-          />
+          <AttributePill label="Year" value={dataset.publicationYear || "No data"} popoverDisabled textColor="black" />
         </Grid.Col>
 
         <Grid.Col span={1}>
@@ -551,13 +489,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
   );
 }
 
-function SourceDetails({
-  source,
-  loading,
-}: {
-  source: Source;
-  loading: boolean;
-}) {
+function SourceDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
   return (
     <Box w="100%">
@@ -590,16 +522,7 @@ function SourceDetails({
             </Paper>
           </Grid.Col>
           <Grid.Col span={3}>
-            <Paper
-              radius="lg"
-              bg={
-                source.accessPill
-                  ? accessPillColours[source.accessPill]
-                  : "#d6e4ed"
-              }
-              px={10}
-              py={3}
-            >
+            <Paper radius="lg" bg={source.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"} px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
                 <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>
@@ -607,7 +530,7 @@ function SourceDetails({
                       ?.toLowerCase()
                       .charAt(0)
                       .toUpperCase()
-                      .concat(source.accessPill?.slice(1).toLowerCase())}
+                      .concat(source.accessPill.slice(1).toLowerCase())}
                   </b>{" "}
                   access
                 </Text>
@@ -615,16 +538,7 @@ function SourceDetails({
             </Paper>
           </Grid.Col>
           <Grid.Col span={3}>
-            <Paper
-              radius="lg"
-              bg={
-                source.reusePill
-                  ? reusePillColours[source.reusePill]
-                  : "#d6e4ed"
-              }
-              px={10}
-              py={3}
-            >
+            <Paper radius="lg" bg={source.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"} px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
                 <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                   <b>
@@ -632,7 +546,7 @@ function SourceDetails({
                       ?.toLowerCase()
                       .charAt(0)
                       .toUpperCase()
-                      .concat(source.reusePill?.slice(1).toLowerCase())}
+                      .concat(source.reusePill.slice(1).toLowerCase())}
                   </b>{" "}
                   reuse
                 </Text>
@@ -645,7 +559,8 @@ function SourceDetails({
   );
 }
 
-export default function BrowseSource({ params }: { params: { name: string } }) {
+export default function BrowseSource(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const source = decodeURIComponent(params.name).replaceAll("_", " ");
   const [_, setPreviousPage] = usePreviousPage();
 
@@ -675,11 +590,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
                 <Text fz={38} fw={700}>
                   {source}
                 </Text>
-                {data?.source ? (
-                  <SourceDetails source={data?.source} loading={loading} />
-                ) : (
-                  error?.message
-                )}
+                {data?.source ? <SourceDetails source={data.source} loading={loading} /> : error?.message}
               </Stack>
             </Grid.Col>
           </Grid>
@@ -690,11 +601,7 @@ export default function BrowseSource({ params }: { params: { name: string } }) {
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
             <Paper p="xl" radius="lg" withBorder>
-              {data?.source.datasets ? (
-                <BrowseComponentDatasets datasets={data?.source.datasets} />
-              ) : (
-                error?.message
-              )}
+              {data?.source.datasets ? <BrowseComponentDatasets datasets={data.source.datasets} /> : error?.message}
             </Paper>
             <Paper p="xl" radius="lg" withBorder>
               <Species source={source} />

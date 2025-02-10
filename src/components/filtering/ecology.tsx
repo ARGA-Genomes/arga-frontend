@@ -10,7 +10,7 @@ interface EcologyFiltersProps {
 
 export function EcologyFilters({ value, options, onChange }: EcologyFiltersProps) {
   const changeFilter = (value: string | null) => {
-    if (!value) return onChange(undefined);
+    if (!value) { onChange(undefined); return; }
 
     onChange({
       filter: "ECOLOGY",

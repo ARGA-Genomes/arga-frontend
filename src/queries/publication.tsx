@@ -16,7 +16,7 @@ export const PUBLICATION = gql`
   }
 `;
 
-export type Publication = {
+export interface Publication {
   entityId: string;
   title: string;
   authors: string[];
@@ -28,4 +28,4 @@ export type Publication = {
   sourceUrls: string[];
   publicationType?: string;
   citation?: string;
-};
+}

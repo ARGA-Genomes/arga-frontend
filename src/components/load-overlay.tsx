@@ -7,7 +7,7 @@ export function LoadOverlay({ visible }: { visible: boolean }) {
   return (
     <LoadingOverlay
       visible={visible}
-      overlayProps={{ radius: 'lg', blur: 2, color: theme.colors['midnight'][1] }}
+      overlayProps={{ radius: 'lg', blur: 2, color: theme.colors.midnight[1] }}
       transitionProps={{ transition: 'fade', duration: 500 }}
       loaderProps={{ variant: "bars", size: 'xl', color: "moss.5" }}
     />

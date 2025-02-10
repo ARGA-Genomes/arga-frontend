@@ -27,7 +27,7 @@ const FORMATTED_TYPE: Record<string, string> = {
 interface GenomeFieldProps {
   key: string;
   label: string;
-  value?: string | string[] | Object;
+  value?: string | string[] | object;
   icon: React.ReactNode;
 }
 
@@ -139,10 +139,10 @@ function GenomeField(props: GenomeFieldProps) {
   );
 }
 
-function renderField(key: string, value: string | string[] | Object) {
-  let field = fields.filter((field) => field.key == key)[0];
-  let isObject = typeof value === "object" && value !== null;
-  let isArray = Array.isArray(value);
+function renderField(key: string, value: string | string[] | object) {
+  const field = fields.filter((field) => field.key == key)[0];
+  const isObject = typeof value === "object" && value !== null;
+  const isArray = Array.isArray(value);
 
   if (field && !isObject) {
     return (
@@ -167,10 +167,11 @@ function renderField(key: string, value: string | string[] | Object) {
       </Grid.Col>
     );
   } else if (!field && subFields.includes(key) && value !== null) {
-    let subList: any[] = Object.entries(value).map(([k, v]) => {
-      return renderField(k, v);
-    });
-    return subList;
+    const subList: React.JSX.Element[] = Object.entries(value)
+      .map(([k, v]) => renderField(k, v))
+      .filter((el) => !!el);
+
+    return <>{subList.map((el) => el)}</>;
   }
 }
 
@@ -180,7 +181,7 @@ function GenomeDetails({ record }: { record: CommonGenome }) {
       {Object.entries(record).map(([key, value]) => {
         return renderField(key, value);
       })}
-      {record.associatedSequences?.nucleotides && (
+      {record.associatedSequences.nucleotides && (
         <>
           <div style={{ display: "-webkit-flex" }}>
             <Grid.Col span={6}>
@@ -239,12 +240,12 @@ function GetBarcodeColours(param: string) {
 }
 
 function Barcode({ nucleotides }: { nucleotides: string }) {
-  let letters = nucleotides.split("");
+  const letters = nucleotides.split("");
 
   return (
     <div>
       {letters.map((letter, idx) => {
-        let bg = GetBarcodeColours(letter);
+        const bg = GetBarcodeColours(letter);
         return (
           <span key={idx}>
             <div
@@ -277,11 +278,13 @@ function GenomeRecord(props: GenomeRecordProps) {
     <>
       <tr
         style={{ cursor: "pointer" }}
-        onClick={() => props.onSelected(props.record)}
+        onClick={() => {
+          props.onSelected(props.record);
+        }}
       >
         <td style={{ paddingLeft: 25 }}>{props.record.accession}</td>
         <td>
-          {props.record?.type
+          {props.record.type
             ? FORMATTED_TYPE[props.record.type] || props.record.type
             : "Not Supplied"}
         </td>
@@ -318,7 +321,7 @@ export default function GenomeTable({ records }: { records: CommonGenome[] }) {
   const [selected, handler] = useListState<CommonGenome>([]);
 
   function toggle(record: CommonGenome) {
-    let idx = selected.indexOf(record);
+    const idx = selected.indexOf(record);
     if (idx >= 0) {
       handler.remove(idx);
     } else {
@@ -338,11 +341,11 @@ export default function GenomeTable({ records }: { records: CommonGenome[] }) {
         </tr>
       </thead>
       <tbody>
-        {records?.map((record, idx) => {
+        {records.map((record, idx) => {
           return (
             <GenomeRecord
               record={record}
-              selected={selected.indexOf(record) >= 0}
+              selected={selected.includes(record)}
               onSelected={toggle}
               key={idx}
             />

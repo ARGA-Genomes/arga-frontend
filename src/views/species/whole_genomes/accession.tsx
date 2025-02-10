@@ -2,25 +2,9 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Box,
-  Button,
-  ButtonProps,
-  Center,
-  Grid,
-  Group,
-  Paper,
-  Stack,
-  Table,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Box, Button, ButtonProps, Center, Grid, Group, Paper, Stack, Table, Text, Title } from "@mantine/core";
 import { LoadPanel } from "@/components/load-overlay";
-import {
-  AttributePill,
-  Attribute,
-  DataField,
-} from "@/components/highlight-stack";
+import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import {
   IconArrowNarrowLeft,
   IconCircleCheck,
@@ -43,6 +27,7 @@ import { AnalysisMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { Marker } from "@/components/mapping/analysis-map";
 import { useSavedData } from "@/components/DownloadManager";
+import { use } from "react";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -95,7 +80,7 @@ type SequenceDetails = Sequence & {
   };
 };
 
-type SpecimenDetails = {
+interface SpecimenDetails {
   recordId: string;
   collectionCode?: string;
   latitude?: number;
@@ -103,12 +88,12 @@ type SpecimenDetails = {
   events: {
     accessions: { id: string }[];
   };
-};
+}
 
-type SequenceQueryResults = {
+interface SequenceQueryResults {
   sequence: SequenceDetails[];
   specimen: SpecimenDetails;
-};
+}
 
 interface LinkButtonProps extends ButtonProps {
   href?: string;
@@ -142,17 +127,17 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
   const saveToList = () => {
     if (sequence && deposition?.sourceUri && deposition.accession) {
       const components = deposition.sourceUri.split("/");
-      const url = `${deposition?.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
+      const url = `${deposition.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
 
       const item = {
         url,
         label: deposition.accession,
-        dataType: deposition.dataType || "whole genome",
+        dataType: deposition.dataType ?? "whole genome",
         scientificName: canonicalName,
         datePublished: deposition.eventDate,
-        dataset: { id: "", name: sequence?.datasetName },
+        dataset: { id: "", name: sequence.datasetName },
       };
-      setSaved([...(saved || []), item]);
+      setSaved([...saved, item]);
     }
   };
 
@@ -190,36 +175,16 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button
-              color="midnight.10"
-              radius="md"
-              leftSection={<IconCircleCheck />}
-              onClick={saveToList}
-            >
+            <Button color="midnight.10" radius="md" leftSection={<IconCircleCheck />} onClick={saveToList}>
               add to list
             </Button>
-            <LinkButton
-              color="midnight.10"
-              radius="md"
-              leftSection={<IconDownload />}
-              href={deposition?.sourceUri}
-            >
+            <LinkButton color="midnight.10" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>
               get data
             </LinkButton>
-            <LinkButton
-              color="midnight.10"
-              radius="md"
-              leftSection={<IconLink />}
-              href={deposition?.url}
-            >
+            <LinkButton color="midnight.10" radius="md" leftSection={<IconLink />} href={deposition?.url}>
               go to source
             </LinkButton>
-            <Button
-              color="midnight.10"
-              radius="md"
-              leftSection={<IconCloudUpload />}
-              disabled
-            >
+            <Button color="midnight.10" radius="md" leftSection={<IconCloudUpload />} disabled>
               send to Galaxy
             </Button>
           </Stack>
@@ -229,88 +194,74 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
   );
 }
 
-function AssemblyStats({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+function AssemblyStats({ sequence }: { sequence: SequenceDetails | undefined }) {
   const assembly = sequence?.events.assemblies[0];
 
   return (
     <Table withRowBorders={false}>
-      <Table.Tr>
-        <Table.Td valign="bottom">
-          <Attribute
-            label="Genome size"
-            value={Humanize.compactInteger(assembly?.genomeSize || 0, 3)}
-          />
-        </Table.Td>
-        <Table.Td valign="bottom">
-          <Attribute label="Number of chromosomes" value={undefined} />
-        </Table.Td>
-      </Table.Tr>
-      <Table.Tr>
-        <Table.Td valign="bottom">
-          <Attribute
-            label="Ungapped length"
-            value={Humanize.compactInteger(0)}
-          />
-        </Table.Td>
-        <Table.Td valign="bottom">
-          <Attribute label="Number of organelles" value={undefined} />
-        </Table.Td>
-      </Table.Tr>
-      <Table.Tr>
-        <Table.Td valign="bottom">
-          <Attribute label="Assembly level" value={assembly?.quality} />
-        </Table.Td>
-        <Table.Td valign="bottom">
-          <Attribute label="Genome coverage" value={undefined} />
-        </Table.Td>
-      </Table.Tr>
-      <Table.Tr>
-        <Table.Td valign="bottom">
-          <Attribute label="BUSCO score" value={undefined} />
-        </Table.Td>
-        <Table.Td valign="bottom">
-          <Attribute label="GC percentage" value={undefined} />
-        </Table.Td>
-      </Table.Tr>
-      <Table.Tr>
-        <Table.Td valign="bottom">
-          <Attribute label="Number of scaffolds" value={undefined} />
-        </Table.Td>
-        <Table.Td valign="bottom">
-          <Attribute label="Number of contigs" value={undefined} />
-        </Table.Td>
-      </Table.Tr>
-      <Table.Tr>
-        <Table.Td valign="bottom">
-          <Attribute label="Scaffold N50" value={undefined} />
-        </Table.Td>
-        <Table.Td valign="bottom">
-          <Attribute label="Contig N50" value={undefined} />
-        </Table.Td>
-      </Table.Tr>
-      <Table.Tr>
-        <Table.Td valign="bottom">
-          <Attribute label="Scaffold L50" value={undefined} />
-        </Table.Td>
-        <Table.Td valign="bottom">
-          <Attribute label="Contig L50" value={undefined} />
-        </Table.Td>
-      </Table.Tr>
+      <Table.Tbody>
+        <Table.Tr>
+          <Table.Td valign="bottom">
+            <Attribute label="Genome size" value={Humanize.compactInteger(assembly?.genomeSize ?? 0, 3)} />
+          </Table.Td>
+          <Table.Td valign="bottom">
+            <Attribute label="Number of chromosomes" value={undefined} />
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td valign="bottom">
+            <Attribute label="Ungapped length" value={Humanize.compactInteger(0)} />
+          </Table.Td>
+          <Table.Td valign="bottom">
+            <Attribute label="Number of organelles" value={undefined} />
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td valign="bottom">
+            <Attribute label="Assembly level" value={assembly?.quality} />
+          </Table.Td>
+          <Table.Td valign="bottom">
+            <Attribute label="Genome coverage" value={undefined} />
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td valign="bottom">
+            <Attribute label="BUSCO score" value={undefined} />
+          </Table.Td>
+          <Table.Td valign="bottom">
+            <Attribute label="GC percentage" value={undefined} />
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td valign="bottom">
+            <Attribute label="Number of scaffolds" value={undefined} />
+          </Table.Td>
+          <Table.Td valign="bottom">
+            <Attribute label="Number of contigs" value={undefined} />
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td valign="bottom">
+            <Attribute label="Scaffold N50" value={undefined} />
+          </Table.Td>
+          <Table.Td valign="bottom">
+            <Attribute label="Contig N50" value={undefined} />
+          </Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td valign="bottom">
+            <Attribute label="Scaffold L50" value={undefined} />
+          </Table.Td>
+          <Table.Td valign="bottom">
+            <Attribute label="Contig L50" value={undefined} />
+          </Table.Td>
+        </Table.Tr>
+      </Table.Tbody>
     </Table>
   );
 }
 
-function DataAvailabilityItem({
-  value,
-  children,
-}: {
-  value: boolean | undefined;
-  children: React.ReactNode;
-}) {
+function DataAvailabilityItem({ value, children }: { value: boolean | undefined; children: React.ReactNode }) {
   return (
     <Group wrap="nowrap">
       {value ? <IconCircleCheck color="green" /> : <IconCircleX color="red" />}
@@ -334,36 +285,20 @@ function DataAvailability({
 
   return (
     <Stack>
-      <DataAvailabilityItem value={!!sequencing}>
-        Genome data available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!assembly}>
-        Assembly data available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!deposition?.sourceUri}>
-        Assembly source files available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!deposition?.url}>
-        Genome publication available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen}>
-        Specimen collection data available
-      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencing}>Genome data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!assembly}>Assembly data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!deposition?.sourceUri}>Assembly source files available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!deposition?.url}>Genome publication available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!specimen?.events.accessions.length}>
         Specimen voucher accessioned
       </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen?.latitude}>
-        Specimen location available
-      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.latitude}>Specimen location available</DataAvailabilityItem>
     </Stack>
   );
 }
 
-function DataProvenance({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined }) {
   const sequencing = sequence?.events.sequencing[0];
   const assembly = sequence?.events.assemblies[0];
   const annotation = sequence?.events.annotations[0];
@@ -390,11 +325,7 @@ function DataProvenance({
   );
 }
 
-function SpecimenPreview({
-  specimen,
-}: {
-  specimen: SpecimenDetails | undefined;
-}) {
+function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
   return (
     <Grid>
       <Grid.Col span={7}>
@@ -411,12 +342,8 @@ function SpecimenPreview({
           </DataTable>
 
           <Center>
-            <Link href={`../specimens/${specimen?.recordId}`}>
-              <Button
-                radius="md"
-                color="midnight.10"
-                leftSection={<IconMicroscope />}
-              >
+            <Link href={`../specimens/${specimen?.recordId ?? "#"}`}>
+              <Button radius="md" color="midnight.10" leftSection={<IconMicroscope />}>
                 go to specimen
               </Button>
             </Link>
@@ -431,12 +358,10 @@ function SpecimenPreview({
 }
 
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  let position: [number, number] | undefined =
-    specimen && specimen.latitude && specimen.longitude
-      ? [Number(specimen.latitude), Number(specimen.longitude)]
-      : undefined;
+  const position: [number, number] | undefined =
+    specimen?.latitude && specimen.longitude ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
 
-  let marker =
+  const marker =
     position &&
     ({
       recordId: specimen?.recordId,
@@ -458,24 +383,23 @@ function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
 }
 
 export interface AccessionPageProps {
-  params: {
+  params: Promise<{
     name: string;
     accession: string;
-  };
+  }>;
 }
 
-export default function AccessionPage({ params }: AccessionPageProps) {
+export default function AccessionPage(props: AccessionPageProps) {
+  const params = use(props.params);
+
   const name = decodeURIComponent(params.name);
   const canonicalName = name.replaceAll("_", " ");
 
-  const { loading, error, data } = useQuery<SequenceQueryResults>(
-    GET_ASSEMBLY,
-    {
-      variables: {
-        accession: decodeURIComponent(params.accession),
-      },
+  const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
+    variables: {
+      accession: decodeURIComponent(params.accession),
     },
-  );
+  });
 
   if (error) {
     return <Text>Error : {error.message}</Text>;
@@ -483,7 +407,7 @@ export default function AccessionPage({ params }: AccessionPageProps) {
 
   const sequence = data?.sequence[0];
   const deposition = sequence?.events.dataDepositions[0];
-  const accession = deposition?.accession || sequence?.recordId;
+  const accession = deposition?.accession ?? sequence?.recordId;
 
   return (
     <Stack gap={20}>
@@ -496,7 +420,7 @@ export default function AccessionPage({ params }: AccessionPageProps) {
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${accession}`}</Title>
+          <Title order={3} mb={10}>{`Full data view: ${accession ?? ""}`}</Title>
           <Text fz="sm" c="dimmed">
             Source
           </Text>
@@ -511,10 +435,7 @@ export default function AccessionPage({ params }: AccessionPageProps) {
               <Grid.Col span={8}>
                 <LoadPanel visible={loading} h={450}>
                   <Title order={5}>Genome details</Title>
-                  <GenomeDetails
-                    sequence={sequence}
-                    canonicalName={canonicalName}
-                  />
+                  <GenomeDetails sequence={sequence} canonicalName={canonicalName} />
                 </LoadPanel>
               </Grid.Col>
               <Grid.Col span={4}>
@@ -522,10 +443,7 @@ export default function AccessionPage({ params }: AccessionPageProps) {
                   <Title order={5} mb={10}>
                     Data availability
                   </Title>
-                  <DataAvailability
-                    sequence={sequence}
-                    specimen={data?.specimen}
-                  />
+                  <DataAvailability sequence={sequence} specimen={data?.specimen} />
                 </LoadPanel>
               </Grid.Col>
 

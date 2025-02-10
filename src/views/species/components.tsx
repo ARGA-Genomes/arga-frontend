@@ -17,7 +17,6 @@ import { LoadOverlay } from "@/components/load-overlay";
 import { Attribute, AttributePill, DataField } from "@/components/data-fields";
 import { RecordItem, RecordList } from "@/components/record-list";
 import { PaginationBar } from "@/components/pagination";
-import { usePathname } from "next/navigation";
 import { IconExternalLink } from "@tabler/icons-react";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
 
@@ -49,7 +48,7 @@ const GET_SPECIES = gql`
   }
 `;
 
-type GenomicComponent = {
+interface GenomicComponent {
   sequenceId: string;
   datasetName: string;
   recordId: string;
@@ -64,16 +63,16 @@ type GenomicComponent = {
   dataType?: string;
   accessRights?: string;
   sourceUri?: string;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: {
     genomicComponents: {
       total: number;
       records: GenomicComponent[];
     };
   };
-};
+}
 
 function RecordItemContent({ record }: { record: GenomicComponent }) {
   return (

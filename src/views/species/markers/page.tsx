@@ -11,9 +11,9 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { AnalysisMap, ArgaMap } from "@/components/mapping";
+import { AnalysisMap } from "@/components/mapping";
 
-import React, { useState } from "react";
+import React, { useState, use } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { Attribute } from "@/components/highlight-stack";
 import { RecordItem, RecordList } from "@/components/record-list";
@@ -46,7 +46,7 @@ const GET_SPECIES = gql`
   }
 `;
 
-type Loci = {
+interface Loci {
   sequenceId: string;
   datasetName: string;
   recordId: string;
@@ -57,16 +57,16 @@ type Loci = {
   releaseDate?: string;
   latitude?: number;
   longitude?: number;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: {
     markers: {
       total: number;
       records: Loci[];
     };
   };
-};
+}
 
 function toMarker(color: [number, number, number, number], records?: Loci[]) {
   if (!records) return [];
@@ -153,7 +153,8 @@ function LociList({ records }: { records: Loci[] }) {
   );
 }
 
-export default function Markers({ params }: { params: { name: string } }) {
+export default function Markers(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const canonicalName = getCanonicalName(params);
   const [page, setPage] = useState(1);
 

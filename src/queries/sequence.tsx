@@ -7,11 +7,11 @@ export const SEQUENCE = gql`
   }
 `;
 
-export type Sequence = {
+export interface Sequence {
   id: string,
   recordId: string,
   datasetName: string,
-};
+}
 
 export const SEQUENCING_EVENT = gql`
   fragment SequencingEventDetails on SequencingEvent {
@@ -29,7 +29,7 @@ export const SEQUENCING_EVENT = gql`
   }
 `;
 
-export type SequencingEvent = {
+export interface SequencingEvent {
   eventDate?: string,
   eventTime?: string,
   materialSampleId?: string,
@@ -62,14 +62,14 @@ export const SEQUENCING_RUN_EVENT = gql`
   }
 `;
 
-export type Trace = {
+export interface Trace {
   accession: string,
   traceName?: string,
   traceId?: string,
   traceLink?: string,
 }
 
-export type SequencingRunEvent = {
+export interface SequencingRunEvent {
   targetGene?: string,
   sequencingDate?: string,
   sequencingEventId?: string,
@@ -98,7 +98,7 @@ export const ASSEMBLY_EVENT = gql`
   }
 `;
 
-export type AssemblyEvent = {
+export interface AssemblyEvent {
   eventDate?: string,
   eventTime?: string,
   name?: string,
@@ -122,7 +122,7 @@ export const ANNOTATIONS_EVENT = gql`
   }
 `;
 
-export type AnnotationEvent = {
+export interface AnnotationEvent {
   eventDate?: string,
   eventTime?: string,
   representation?: string,
@@ -158,7 +158,7 @@ export const DATA_DEPOSITION_EVENT = gql`
   }
 `;
 
-export type DataDepositionEvent = {
+export interface DataDepositionEvent {
   eventDate?: string,
   eventTime?: string,
   accession?: string,

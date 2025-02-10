@@ -39,7 +39,7 @@ function DataItem({ name, count }: { name: string; count: number }) {
 }
 
 export function SpeciesCard({ species }: { species: Species }) {
-  const itemLinkName = species.taxonomy?.canonicalName?.replaceAll(" ", "_");
+  const itemLinkName = species.taxonomy.canonicalName.replaceAll(" ", "_");
 
   return (
     <Card shadow="sm" radius="lg" withBorder miw={313}>
@@ -54,7 +54,7 @@ export function SpeciesCard({ species }: { species: Species }) {
       <Stack gap={5} mt="sm">
         <Link href={`/species/${itemLinkName}`}>
           <Text fz="sm" fw={700} fs="italic">
-            {species.taxonomy?.canonicalName}
+            {species.taxonomy.canonicalName}
           </Text>
         </Link>
         <SimpleGrid cols={2}>

@@ -2,11 +2,11 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { BrowseCard } from "@/components/browse-card";
-import { Carousel, Embla } from "@mantine/carousel";
+import { Carousel } from "@mantine/carousel";
 import { Group } from "@mantine/core";
 import "@mantine/carousel/styles.css";
 
-type Overview = {
+interface Overview {
   allSpecies: number;
   sources: [
     {
@@ -14,7 +14,7 @@ type Overview = {
       total: number;
     }
   ];
-};
+}
 
 const GET_OVERVIEW = gql`
   query {
@@ -28,15 +28,15 @@ const GET_OVERVIEW = gql`
   }
 `;
 
-type OverviewResults = {
+interface OverviewResults {
   overview: Overview;
-};
+}
 
 export default function BrowseGrouping() {
   const { error, data } = useQuery<OverviewResults>(GET_OVERVIEW);
   if (error) return <p>Error : {error.message}</p>;
 
-  let sources: Record<string, number> = {};
+  const sources: Record<string, number> = {};
   for (const source of data?.overview.sources || []) {
     sources[source.name] = source.total;
   }

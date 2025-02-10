@@ -14,14 +14,13 @@ const GET_GEOMETRY = gql`
   }
 `;
 
-type QueryResults = {
+interface QueryResults {
   maps: {
     ibra: string;
     imcraProvincial: string;
     imcraMesoscale: string;
   };
-};
-
+}
 
 export function BioRegionLayers({ regions }: { regions: string[] }) {
   const [ibra, setIbra] = useState(undefined);
@@ -29,7 +28,7 @@ export function BioRegionLayers({ regions }: { regions: string[] }) {
   const [imcraMesoscale, setImcraMesoscale] = useState(undefined);
   const [tolerance, setTolerance] = useState(0.1);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_GEOMETRY, {
+  const { data } = useQuery<QueryResults>(GET_GEOMETRY, {
     variables: {
       regions: regions,
       tolerance: tolerance,

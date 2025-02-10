@@ -21,9 +21,9 @@ import {
 } from "@mantine/core";
 
 import { IconFilter } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
-import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { Filter } from "@/components/filtering/common";
 import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/components/pagination";
@@ -50,7 +50,7 @@ import Link from "next/link";
 
 const PAGE_SIZE = 10;
 
-type Filters = {
+interface Filters {
   classifications: Filter[];
   vernacularGroup?: Filter;
   ecology?: Filter;
@@ -60,15 +60,10 @@ type Filters = {
   drainageBasin?: Filter;
   bushfireRecovery: Filter[];
   dataTypes: Filter[];
-};
+}
 
 const GET_SPECIES = gql`
-  query TaxaSpecies(
-    $rank: TaxonRank
-    $canonicalName: String
-    $page: Int
-    $perPage: Int
-  ) {
+  query TaxaSpecies($rank: TaxonRank, $canonicalName: String, $page: Int, $perPage: Int) {
     taxon(rank: $rank, canonicalName: $canonicalName) {
       species(page: $page, perPage: $perPage) {
         total
@@ -96,11 +91,7 @@ const GET_SPECIES = gql`
 `;
 
 const GET_TAXON = gql`
-  query TaxonDetails(
-    $rank: TaxonRank
-    $canonicalName: String
-    $descendantRank: TaxonRank
-  ) {
+  query TaxonDetails($rank: TaxonRank, $canonicalName: String, $descendantRank: TaxonRank) {
     taxon(rank: $rank, canonicalName: $canonicalName) {
       scientificName
       canonicalName
@@ -212,20 +203,20 @@ const GET_EUKARYOTA_TAXON = gql`
   }
 `;
 
-type DataBreakdown = {
+interface DataBreakdown {
   name: string;
   genomes: number;
   totalGenomic: number;
-};
+}
 
-type ClassificationNode = {
+interface ClassificationNode {
   scientificName: string;
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
-type Taxonomy = {
+interface Taxonomy {
   scientificName: string;
   scientificNameAuthorship: string;
   canonicalName: string;
@@ -248,9 +239,9 @@ type Taxonomy = {
     speciesData: number;
     speciesGenomes: number;
   }[];
-};
+}
 
-type EukaryotaTaxonomy = {
+interface EukaryotaTaxonomy {
   scientificName: string;
   scientificNameAuthorship: string;
   canonicalName: string;
@@ -285,51 +276,51 @@ type EukaryotaTaxonomy = {
     speciesData: number;
     speciesGenomes: number;
   }[];
-};
+}
 
-type DataSummary = {
+interface DataSummary {
   genomes: number;
   loci: number;
   specimens: number;
   other: number;
-};
+}
 
-type Species = {
+interface Species {
   taxonomy: {
     scientificName: string;
     canonicalName: string;
   };
   photo?: Photo;
   dataSummary: DataSummary;
-};
+}
 
-type FilterOptions = {
+interface FilterOptions {
   ecology: string[];
   ibra: string[];
   imcra: string[];
   state: string[];
   drainageBasin: string[];
-};
+}
 
-type Taxa = {
+interface Taxa {
   species: {
     records: Species[];
     total: number;
   };
   filterOptions: FilterOptions;
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   taxon: Taxa;
-};
+}
 
-type TaxonResults = {
+interface TaxonResults {
   taxon: Taxonomy;
-};
+}
 
-type EukaryotaTaxonResults = {
+interface EukaryotaTaxonResults {
   taxon: EukaryotaTaxonomy;
-};
+}
 
 function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
   return (
@@ -351,8 +342,8 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
           <td>Source</td>
           <td>
             {taxon?.sourceUrl ? (
-              <Link href={taxon?.sourceUrl} target="_blank">
-                <DataField value={taxon?.source} />
+              <Link href={taxon.sourceUrl} target="_blank">
+                <DataField value={taxon.source} />
               </Link>
             ) : (
               <DataField value={taxon?.source} />
@@ -364,11 +355,7 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
   );
 }
 
-function EukaryotaTaxonomyDetails({
-  taxon,
-}: {
-  taxon: EukaryotaTaxonomy | undefined;
-}) {
+function EukaryotaTaxonomyDetails({ taxon }: { taxon: EukaryotaTaxonomy | undefined }) {
   return (
     <Table>
       <tbody>
@@ -388,8 +375,8 @@ function EukaryotaTaxonomyDetails({
           <td>Source</td>
           <td>
             {taxon?.sourceUrl ? (
-              <Link href={taxon?.sourceUrl} target="_blank">
-                <DataField value={taxon?.source} />
+              <Link href={taxon.sourceUrl} target="_blank">
+                <DataField value={taxon.source} />
               </Link>
             ) : (
               <DataField value={taxon?.source} />
@@ -418,11 +405,7 @@ function HigherClassification({ taxon }: { taxon: Taxonomy | undefined }) {
   );
 }
 
-function EukaryotaHigherClassification({
-  taxon,
-}: {
-  taxon: EukaryotaTaxonomy | undefined;
-}) {
+function EukaryotaHigherClassification({ taxon }: { taxon: EukaryotaTaxonomy | undefined }) {
   const hierarchy = taxon?.hierarchy.toSorted((a, b) => b.depth - a.depth);
 
   return (
@@ -446,22 +429,14 @@ interface FiltersProps {
 }
 
 function Filters({ filters, options, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications
-  );
-  const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(
-    filters.vernacularGroup
-  );
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications);
+  const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(filters.vernacularGroup);
   const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology);
   const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra);
   const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra);
   const [state, setState] = useState<Filter | undefined>(filters.state);
-  const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(
-    filters.drainageBasin
-  );
-  const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(
-    filters.bushfireRecovery
-  );
+  const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin);
+  const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(filters.bushfireRecovery);
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
@@ -500,10 +475,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <HigherClassificationFilters
-            filters={classifications}
-            onChange={setClassifications}
-          />
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
         </Accordion.Panel>
       </Accordion.Item>
 
@@ -529,10 +501,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <VernacularGroupFilters
-            value={vernacularGroup?.value}
-            onChange={setVernacularGroup}
-          />
+          <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
         </Accordion.Panel>
       </Accordion.Item>
 
@@ -550,41 +519,25 @@ function Filters({ filters, options, onChange }: FiltersProps) {
               <Text fw={300} fz="sm">
                 Ecology
               </Text>
-              <EcologyFilters
-                value={ecology?.value}
-                options={options?.ecology || []}
-                onChange={setEcology}
-              />
+              <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
             </Box>
             <Box>
               <Text fw={300} fz="sm">
                 Ibra Region
               </Text>
-              <IbraFilters
-                value={ibra?.value}
-                options={options?.ibra || []}
-                onChange={setIbra}
-              />
+              <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
             </Box>
             <Box>
               <Text fw={300} fz="sm">
                 Imcra Region
               </Text>
-              <ImcraFilters
-                value={imcra?.value}
-                options={options?.imcra || []}
-                onChange={setImcra}
-              />
+              <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
             </Box>
             <Box>
               <Text fw={300} fz="sm">
                 State
               </Text>
-              <StateFilters
-                value={state?.value}
-                options={options?.state || []}
-                onChange={setState}
-              />
+              <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
             </Box>
             <Box>
               <Text fw={300} fz="sm">
@@ -610,10 +563,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
         </Accordion.Control>
         <Accordion.Panel>
           <Stack>
-            <BushfireRecoveryFilters
-              filters={bushfireRecovery}
-              onChange={setBushfireRecovery}
-            />
+            <BushfireRecoveryFilters filters={bushfireRecovery} onChange={setBushfireRecovery} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
@@ -649,13 +599,7 @@ function FilterBadge({ filter }: { filter: Filter }) {
   );
 }
 
-function Species({
-  rank,
-  canonicalName,
-}: {
-  rank: string;
-  canonicalName: string;
-}) {
+function Species({ rank, canonicalName }: { rank: string; canonicalName: string }) {
   const [page, setPage] = useState(1);
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -688,37 +632,27 @@ function Species({
     return items.filter((item): item is Filter => !!item);
   };
 
-  const { loading, error, data, previousData } = useQuery<QueryResults>(
-    GET_SPECIES,
-    {
-      variables: {
-        rank,
-        canonicalName,
-        page,
-        perPage: PAGE_SIZE,
-        /* filters: flattenFilters(filters)
+  const { loading, error, data, previousData } = useQuery<QueryResults>(GET_SPECIES, {
+    variables: {
+      rank,
+      canonicalName,
+      page,
+      perPage: PAGE_SIZE,
+      /* filters: flattenFilters(filters)
 *   .map(intoFilterItem)
       .filter((item) => item), */
-      },
-    }
-  );
+    },
+  });
 
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
 
-  const records =
-    data?.taxon.species.records || previousData?.taxon.species.records;
+  const records = data?.taxon.species.records || previousData?.taxon.species.records;
 
   return (
     <Stack>
-      <Drawer
-        opened={opened}
-        onClose={close}
-        withCloseButton={false}
-        position="right"
-        size="xl"
-      >
+      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box pt={200}>
           <Filters filters={filters} onChange={setFilters} />
         </Box>
@@ -748,29 +682,17 @@ function Species({
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button
-            leftSection={<IconFilter />}
-            variant="subtle"
-            onClick={open}
-            color="shellfish.7"
-          >
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open} color="shellfish.7">
             Filter
           </Button>
         </Grid.Col>
       </Grid>
 
       <SimpleGrid cols={5} pt={40}>
-        {records?.map((record) => (
-          <SpeciesCard key={record.taxonomy.scientificName} species={record} />
-        ))}
+        {records?.map((record) => <SpeciesCard key={record.taxonomy.scientificName} species={record} />)}
       </SimpleGrid>
 
-      <PaginationBar
-        total={data?.taxon.species.total}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onChange={setPage}
-      />
+      <PaginationBar total={data?.taxon.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
     </Stack>
   );
 }
@@ -843,13 +765,7 @@ function pluralTaxon(rank: string) {
   else return rank;
 }
 
-function DataSummary({
-  rank,
-  taxon,
-}: {
-  rank: string;
-  taxon: Taxonomy | undefined;
-}) {
+function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefined }) {
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
   const childTaxonLabel = pluralTaxon(childTaxon);
 
@@ -893,10 +809,8 @@ function DataSummary({
     })
     .sort((a, b) => b.value - a.value);
 
-  const genomePercentile =
-    taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
-  const otherPercentile =
-    taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
+  const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
+  const otherPercentile = taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
 
   function collapsable(span: number) {
     return { base: span, xs: 12, sm: 12, md: span, lg: span, xl: span };
@@ -913,13 +827,7 @@ function DataSummary({
                 Percentage of species with genomes
               </Text>
               {taxon && (
-                <TachoChart
-                  mt={10}
-                  h={150}
-                  w={300}
-                  thresholds={thresholds}
-                  value={Math.round(genomePercentile || 0)}
-                />
+                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />
               )}
             </Stack>
           </Grid.Col>
@@ -938,13 +846,7 @@ function DataSummary({
               <Text fz="sm" fw={300}>
                 Species with genomes
               </Text>
-              {speciesGenomes && (
-                <BarChart
-                  h={200}
-                  data={speciesGenomes.slice(0, 8)}
-                  spacing={0.1}
-                />
-              )}
+              {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
             </Stack>
           </Grid.Col>
           <Grid.Col span={collapsable(4)}>
@@ -953,13 +855,7 @@ function DataSummary({
                 Percentage of species with any genetic data
               </Text>
               {taxon && (
-                <TachoChart
-                  mt={10}
-                  h={150}
-                  w={300}
-                  thresholds={thresholds}
-                  value={Math.round(otherPercentile || 0)}
-                />
+                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(otherPercentile || 0)} />
               )}
             </Stack>
           </Grid.Col>
@@ -968,13 +864,7 @@ function DataSummary({
               <Text fz="sm" fw={300}>
                 Species with any genetic data
               </Text>
-              {speciesOther && (
-                <BarChart
-                  h={200}
-                  data={speciesOther.slice(0, 8)}
-                  spacing={0.1}
-                />
-              )}
+              {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} />}
             </Stack>
           </Grid.Col>
         </Grid>
@@ -991,62 +881,40 @@ function DataSummary({
               </DataTableRow>
             )}
             <DataTableRow label="Number of species/OTUs">
-              <DataField
-                value={Humanize.formatNumber(taxon?.summary.species || 0)}
-              />
+              <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
             </DataTableRow>
             {rank !== "GENUS" && (
-              <DataTableRow
-                label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}
-              >
+              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
                 <DataField
-                  value={Humanize.formatNumber(
-                    taxon?.descendants.filter((d) => d.speciesGenomes > 0)
-                      .length || 0
-                  )}
+                  value={Humanize.formatNumber(taxon?.descendants.filter((d) => d.speciesGenomes > 0).length || 0)}
                 />
               </DataTableRow>
             )}
             <DataTableRow label="Species with genomes">
-              <DataField
-                value={Humanize.formatNumber(
-                  taxon?.summary.speciesGenomes || 0
-                )}
-              />
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
             </DataTableRow>
             {rank !== "GENUS" && (
-              <DataTableRow
-                label={`${Humanize.capitalize(childTaxonLabel)} with data`}
-              >
+              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
                 <DataField
-                  value={Humanize.formatNumber(
-                    taxon?.descendants.filter((d) => d.speciesData > 0)
-                      .length || 0
-                  )}
+                  value={Humanize.formatNumber(taxon?.descendants.filter((d) => d.speciesData > 0).length || 0)}
                 />
               </DataTableRow>
             )}
             <DataTableRow label="Species with data">
-              <DataField
-                value={Humanize.formatNumber(taxon?.summary.speciesData || 0)}
-              />
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
             </DataTableRow>
           </DataTable>
 
           <Stack mx={10} mt={5}>
             <Attribute
               label="Species with most genomes"
-              value={speciesGenomes && speciesGenomes[0]?.name}
-              href={`/species/${
-                speciesGenomes && speciesGenomes[0]?.name?.replaceAll(" ", "_")
-              }/taxonomy`}
+              value={speciesGenomes?.[0]?.name}
+              href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(" ", "_")}/taxonomy`}
             />
             <Attribute
               label="Species with most data"
-              value={speciesOther && speciesOther[0]?.name}
-              href={`/species/${
-                speciesOther && speciesOther[0]?.name.replaceAll(" ", "_")
-              }/taxonomy`}
+              value={speciesOther?.[0]?.name}
+              href={`/species/${speciesOther?.[0]?.name.replaceAll(" ", "_")}/taxonomy`}
             />
           </Stack>
         </Paper>
@@ -1055,16 +923,7 @@ function DataSummary({
   );
 }
 
-function EukaryotaDataSummary({
-  rank,
-  taxon,
-}: {
-  rank: string;
-  taxon: EukaryotaTaxonomy | undefined;
-}) {
-  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
-  const childTaxonLabel = pluralTaxon(childTaxon);
-
+function EukaryotaDataSummary({ rank, taxon }: { rank: string; taxon: EukaryotaTaxonomy | undefined }) {
   const thresholds = [
     { name: "low", color: "#f47625", start: 0, end: 50 },
     { name: "decent", color: "#febb1e", start: 50, end: 75 },
@@ -1082,7 +941,7 @@ function EukaryotaDataSummary({
       };
     })
     .concat(
-      taxon?.regnumDescendants
+      taxon.regnumDescendants
         .filter((descendant) => descendant.canonicalName !== "Protista")
         .map((descendant) => {
           return {
@@ -1092,10 +951,10 @@ function EukaryotaDataSummary({
             speciesData: descendant.speciesData,
             speciesGenomes: descendant.speciesGenomes,
           };
-        })
+        }),
     )
     .concat(
-      taxon?.superKingdomDescendants.map((descendant) => {
+      taxon.superKingdomDescendants.map((descendant) => {
         return {
           rank: "superkingdom",
           canonicalName: descendant.canonicalName,
@@ -1103,7 +962,7 @@ function EukaryotaDataSummary({
           speciesData: descendant.speciesData,
           speciesGenomes: descendant.speciesGenomes,
         };
-      })
+      }),
     );
 
   const rankGenomes = descendants
@@ -1140,10 +999,8 @@ function EukaryotaDataSummary({
     })
     .sort((a, b) => b.value - a.value);
 
-  const genomePercentile =
-    taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
-  const otherPercentile =
-    taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
+  const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
+  const otherPercentile = taxon && (taxon.summary.speciesData / taxon.summary.species) * 100;
 
   function collapsable(span: number) {
     return { base: span, xs: 12, sm: 12, md: span, lg: span, xl: span };
@@ -1160,13 +1017,7 @@ function EukaryotaDataSummary({
                 Percentage of species with genomes
               </Text>
               {taxon && (
-                <TachoChart
-                  mt={10}
-                  h={150}
-                  w={300}
-                  thresholds={thresholds}
-                  value={Math.round(genomePercentile || 0)}
-                />
+                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />
               )}
             </Stack>
           </Grid.Col>
@@ -1185,13 +1036,7 @@ function EukaryotaDataSummary({
               <Text fz="sm" fw={300}>
                 Species with genomes
               </Text>
-              {speciesGenomes && (
-                <BarChart
-                  h={200}
-                  data={speciesGenomes.slice(0, 8)}
-                  spacing={0.1}
-                />
-              )}
+              {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
             </Stack>
           </Grid.Col>
           <Grid.Col span={collapsable(4)}>
@@ -1200,13 +1045,7 @@ function EukaryotaDataSummary({
                 Percentage of species with any genetic data
               </Text>
               {taxon && (
-                <TachoChart
-                  mt={10}
-                  h={150}
-                  w={300}
-                  thresholds={thresholds}
-                  value={Math.round(otherPercentile || 0)}
-                />
+                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(otherPercentile || 0)} />
               )}
             </Stack>
           </Grid.Col>
@@ -1215,13 +1054,7 @@ function EukaryotaDataSummary({
               <Text fz="sm" fw={300}>
                 Species with any genetic data
               </Text>
-              {speciesOther && (
-                <BarChart
-                  h={200}
-                  data={speciesOther.slice(0, 8)}
-                  spacing={0.1}
-                />
-              )}
+              {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} />}
             </Stack>
           </Grid.Col>
         </Grid>
@@ -1238,56 +1071,38 @@ function EukaryotaDataSummary({
               </DataTableRow>
             )}
             <DataTableRow label="Number of species/OTUs">
-              <DataField
-                value={Humanize.formatNumber(taxon?.summary.species || 0)}
-              />
+              <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
             </DataTableRow>
             {rank !== "GENUS" && (
               <DataTableRow label={"Kingdoms/regna with genomes"}>
                 <DataField
-                  value={Humanize.formatNumber(
-                    descendants?.filter((d) => d.speciesGenomes > 0).length || 0
-                  )}
+                  value={Humanize.formatNumber(descendants?.filter((d) => d.speciesGenomes > 0).length || 0)}
                 />
               </DataTableRow>
             )}
             <DataTableRow label="Species with genomes">
-              <DataField
-                value={Humanize.formatNumber(
-                  taxon?.summary.speciesGenomes || 0
-                )}
-              />
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
             </DataTableRow>
             {rank !== "GENUS" && (
               <DataTableRow label={"Kingdoms/regna with data"}>
-                <DataField
-                  value={Humanize.formatNumber(
-                    descendants?.filter((d) => d.speciesData > 0).length || 0
-                  )}
-                />
+                <DataField value={Humanize.formatNumber(descendants?.filter((d) => d.speciesData > 0).length || 0)} />
               </DataTableRow>
             )}
             <DataTableRow label="Species with data">
-              <DataField
-                value={Humanize.formatNumber(taxon?.summary.speciesData || 0)}
-              />
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
             </DataTableRow>
           </DataTable>
 
           <Stack mx={10} mt={5}>
             <Attribute
               label="Species with most genomes"
-              value={speciesGenomes && speciesGenomes[0]?.name}
-              href={`/species/${
-                speciesGenomes && speciesGenomes[0]?.name?.replaceAll(" ", "_")
-              }/taxonomy`}
+              value={speciesGenomes?.[0]?.name}
+              href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(" ", "_")}/taxonomy`}
             />
             <Attribute
               label="Species with most data"
-              value={speciesOther && speciesOther[0]?.name}
-              href={`/species/${
-                speciesOther && speciesOther[0]?.name.replaceAll(" ", "_")
-              }/taxonomy`}
+              value={speciesOther?.[0]?.name}
+              href={`/species/${speciesOther?.[0]?.name.replaceAll(" ", "_")}/taxonomy`}
             />
           </Stack>
         </Paper>
@@ -1296,11 +1111,15 @@ function EukaryotaDataSummary({
   );
 }
 
-export default function ClassificationPage({
-  params,
-}: {
-  params: { rank: string; name: string };
-}) {
+interface ClassificationPageProps {
+  params: Promise<{
+    rank: string;
+    name: string;
+  }>;
+}
+
+export default function ClassificationPage(props: ClassificationPageProps) {
+  const params = use(props.params);
   const rank = params.rank.toUpperCase();
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank].toUpperCase() || "";
 
@@ -1317,22 +1136,19 @@ export default function ClassificationPage({
   });
 
   // need a special case/query for when taxon domain === Eukaryota
-  const eukaryotaTaxonResults = useQuery<EukaryotaTaxonResults>(
-    GET_EUKARYOTA_TAXON,
-    {
-      skip: !(rank === "DOMAIN" && params.name === "Eukaryota"),
-      variables: {
-        rank,
-        canonicalName: params.name,
-        kingdomDescendantRank: "KINGDOM",
-        regnumDescendantRank: "REGNUM",
-      },
-    }
-  );
+  const eukaryotaTaxonResults = useQuery<EukaryotaTaxonResults>(GET_EUKARYOTA_TAXON, {
+    skip: !(rank === "DOMAIN" && params.name === "Eukaryota"),
+    variables: {
+      rank,
+      canonicalName: params.name,
+      kingdomDescendantRank: "KINGDOM",
+      regnumDescendantRank: "REGNUM",
+    },
+  });
 
   useEffect(() => {
     setPreviousPage({ name: `browsing ${params.name}`, url: pathname });
-  }, [setPreviousPage]);
+  }, []);
 
   return (
     <Stack mt={40}>
@@ -1356,9 +1172,7 @@ export default function ClassificationPage({
                     <Title pb={10} order={5}>
                       Taxonomy
                     </Title>
-                    <EukaryotaTaxonomyDetails
-                      taxon={eukaryotaTaxonResults.data?.taxon}
-                    />
+                    <EukaryotaTaxonomyDetails taxon={eukaryotaTaxonResults.data?.taxon} />
                   </LoadPanel>
                 )}
               </Grid.Col>
@@ -1376,23 +1190,16 @@ export default function ClassificationPage({
                     <Title pb={10} order={5}>
                       Higher classification
                     </Title>
-                    <EukaryotaHigherClassification
-                      taxon={eukaryotaTaxonResults.data?.taxon}
-                    />
+                    <EukaryotaHigherClassification taxon={eukaryotaTaxonResults.data?.taxon} />
                   </LoadPanel>
                 )}
               </Grid.Col>
             </Grid>
 
             <Paper p="xl" radius="lg" pos="relative" withBorder>
-              {taxonResults.called && (
-                <DataSummary rank={rank} taxon={taxonResults.data?.taxon} />
-              )}
+              {taxonResults.called && <DataSummary rank={rank} taxon={taxonResults.data?.taxon} />}
               {eukaryotaTaxonResults.called && (
-                <EukaryotaDataSummary
-                  rank={rank}
-                  taxon={eukaryotaTaxonResults.data?.taxon}
-                />
+                <EukaryotaDataSummary rank={rank} taxon={eukaryotaTaxonResults.data?.taxon} />
               )}
             </Paper>
 

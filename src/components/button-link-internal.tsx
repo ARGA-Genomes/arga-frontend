@@ -1,6 +1,5 @@
 import {
   Button,
-  ButtonProps,
   DefaultMantineColor,
   getThemeColor,
   Text,
@@ -9,7 +8,7 @@ import {
 import { IconExternalLink } from "@tabler/icons-react";
 
 import classes from "./button-link-internal.module.css";
-import { MouseEventHandler, PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { Url } from "next/dist/shared/lib/router/router";
 

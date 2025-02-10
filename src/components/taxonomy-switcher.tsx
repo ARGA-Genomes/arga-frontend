@@ -5,19 +5,16 @@ import {
   Accordion,
   Badge,
   Divider,
-  Flex,
   Group,
   Modal,
   ScrollArea,
   Stack,
   Text,
-  Timeline,
   UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
 
 import accClasses from "./taxonomy-switcher-acc.module.css";
-import tmlnClasses from "./record-history.module.css";
 
 import { Taxon } from "@/queries/taxa";
 import {
@@ -28,29 +25,24 @@ import {
 } from "./data-fields";
 import { Dataset, useDatasets } from "@/app/source-provider";
 import { useMemo, useState } from "react";
-import {
-  IconArrowRight,
-  IconArrowUpRight,
-  IconEdit,
-  IconPlus,
-} from "@tabler/icons-react";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { useQuery } from "@apollo/client";
 import { GET_TAXON_PROVENANCE, ProvenanceQuery } from "@/queries/provenance";
 import { useDisclosure } from "@mantine/hooks";
 import { LoadOverlay } from "./load-overlay";
 import RecordHistory from "./record-history";
 
-type ClassificationNode = {
+interface ClassificationNode {
   canonicalName: string;
   rank: string;
   depth: number;
-};
+}
 
 interface TaxonomySwitcherProps {
   taxa: Taxon[];
 }
 
-type TaxonMap = { [key: string]: string };
+type TaxonMap = Record<string, string>;
 
 interface TaxonExtended extends Taxon {
   dataset?: Dataset;
@@ -186,19 +178,16 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
 
   const taxa = useMemo(
     () => processTaxa(rawTaxa, datasets),
-    [rawTaxa, datasets]
+    [rawTaxa, datasets],
   );
 
-  const { loading, error, data } = useQuery<ProvenanceQuery>(
-    GET_TAXON_PROVENANCE,
-    {
-      variables: { entityId },
-      skip: entityId === "",
-    }
-  );
+  const { loading, data } = useQuery<ProvenanceQuery>(GET_TAXON_PROVENANCE, {
+    variables: { entityId },
+    skip: entityId === "",
+  });
 
   const [active, setActive] = useState<string>(
-    `${taxa[0].scientificName}-${taxa[0].datasetId}`
+    `${taxa[0].scientificName}-${taxa[0].datasetId}`,
   );
 
   return (
@@ -231,7 +220,9 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
       </Modal>
       <Accordion
         value={active}
-        onChange={(value) => setActive(value || active)}
+        onChange={(value) => {
+          setActive(value || active);
+        }}
         classNames={accClasses}
         loop
       >

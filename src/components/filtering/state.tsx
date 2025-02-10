@@ -10,7 +10,7 @@ interface StateFiltersProps {
 
 export function StateFilters({ value, options, onChange }: StateFiltersProps) {
   const changeFilter = (value: string | null) => {
-    if (!value) return onChange(undefined);
+    if (!value) { onChange(undefined); return; }
 
     onChange({
       filter: "STATE",

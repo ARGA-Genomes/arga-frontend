@@ -5,7 +5,6 @@ import {
   Drawer,
   Grid,
   Group,
-  SegmentedControl,
   Text,
   Title,
 } from "@mantine/core";

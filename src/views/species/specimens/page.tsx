@@ -1,14 +1,13 @@
 "use client";
 
-import { SpecimenDetails } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
-import { useState } from "react";
+import { useState, use } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { LoadOverlay } from "@/components/load-overlay";
 import { RecordItem, RecordList } from "@/components/record-list";
 import { Attribute } from "@/components/highlight-stack";
-import { AnalysisMap, ArgaMap } from "@/components/mapping";
+import { AnalysisMap } from "@/components/mapping";
 import { usePathname } from "next/navigation";
 import { Marker } from "@/components/mapping/analysis-map";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
@@ -40,61 +39,7 @@ const GET_SPECIMENS = gql`
   }
 `;
 
-const GET_SPECIMEN = gql`
-  query SpecimenDetails($specimenId: String) {
-    specimen(specimenId: $specimenId) {
-      id
-      typeStatus
-      catalogNumber
-      collectionCode
-      institutionName
-      institutionCode
-      organismId
-      latitude
-      longitude
-      recordedBy
-      remarks
-
-      events {
-        id
-        eventDate
-        eventId
-        eventRemarks
-        fieldNotes
-        fieldNumber
-        habitat
-        samplingEffort
-        samplingProtocol
-        samplingSizeUnit
-        samplingSizeValue
-
-        events {
-          ... on CollectionEvent {
-            id
-            behavior
-            catalogNumber
-            degreeOfEstablishment
-            establishmentMeans
-            individualCount
-            lifeStage
-            occurrenceStatus
-            organismId
-            organismQuantity
-            organismQuantityType
-            otherCatalogNumbers
-            pathway
-            preparation
-            recordNumber
-            reproductiveCondition
-            sex
-          }
-        }
-      }
-    }
-  }
-`;
-
-type Specimen = {
+interface Specimen {
   id: string;
   recordId: string;
   datasetName: string;
@@ -108,26 +53,22 @@ type Specimen = {
   markers: number;
   latitude?: number;
   longitude?: number;
-};
+}
 
-type Species = {
+interface Species {
   specimens: {
     total: number;
     records: Specimen[];
   };
-};
+}
 
-type QueryResults = {
+interface QueryResults {
   species: Species;
-};
-
-type SpecimenQueryResults = {
-  specimen: SpecimenDetails;
-};
+}
 
 function toMarker(
   color: [number, number, number, number],
-  records?: Specimen[]
+  records?: Specimen[],
 ) {
   if (!records) return [];
   return records.map((r) => {
@@ -142,7 +83,7 @@ function toMarker(
 
 function SpecimenMap({ records }: { records: Specimen[] | undefined }) {
   const markers = toMarker([103, 151, 180, 220], records).filter(
-    (s) => s.latitude
+    (s) => s.latitude,
   ) as Marker[];
 
   return (
@@ -217,7 +158,8 @@ function SpecimenList({ records }: { records: Specimen[] }) {
   );
 }
 
-export default function Specimens({ params }: { params: { name: string } }) {
+export default function Specimens(props: { params: Promise<{ name: string }> }) {
+  const params = use(props.params);
   const canonicalName = getCanonicalName(params);
   const [page, setPage] = useState(1);
 
@@ -226,17 +168,6 @@ export default function Specimens({ params }: { params: { name: string } }) {
       canonicalName,
       page,
       pageSize: PAGE_SIZE,
-    },
-  });
-
-  const records = data?.species.specimens.records;
-  const holotypeId = records?.find(
-    (record) => record.typeStatus == "HOLOTYPE"
-  )?.id;
-
-  const holotype = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {
-    variables: {
-      specimenId: holotypeId,
     },
   });
 
