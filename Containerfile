@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.licenses="AGPL-3.0"
 
 WORKDIR /usr/src/arga-frontend
 COPY . .
-RUN npm install -g pnpm && pnpm install && pnpm build && pnpm --filter arga-frontend --prod deploy pruned
+RUN npm install -g pnpm && pnpm install && pnpm build && pnpm --legacy --filter arga-frontend --prod deploy pruned
 
 
 FROM node:23-alpine
