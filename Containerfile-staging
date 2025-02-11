@@ -1,4 +1,4 @@
-FROM node:18-alpine as builder
+FROM node:23-alpine as builder
 LABEL org.opencontainers.image.source="https://github.com/ARGA-Genomes/arga-frontend"
 LABEL org.opencontainers.image.description="A container image running the frontend server"
 LABEL org.opencontainers.image.licenses="AGPL-3.0"
@@ -8,7 +8,7 @@ COPY . .
 RUN npm install -g pnpm && pnpm install && pnpm build:staging && pnpm --filter arga-frontend --staging deploy pruned
 
 
-FROM node:18-alpine
+FROM node:23-alpine
 WORKDIR /usr/src/arga-frontend
 
 EXPOSE 3000
