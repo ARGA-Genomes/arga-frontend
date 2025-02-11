@@ -40,4 +40,4 @@ next-env.d.ts
 
 .devenv*
 .envrc
-.env.*
+.env.development
