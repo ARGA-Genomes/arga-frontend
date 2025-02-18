@@ -3,16 +3,14 @@
 import { useRef, useEffect, useMemo } from "react";
 import D3Funnel from "d3-funnel";
 import * as Humanize from "humanize-plus";
-import { SummaryDataType } from "../page";
 import { useMantineTheme } from "@mantine/core";
+import { TaxonomicRankStatistic } from "@/queries/stats";
 
 interface GenomeCompositionProps {
-  data: SummaryDataType;
+  data: TaxonomicRankStatistic[];
 }
 
-export const GenomeComposition = ({
-  data: rawData,
-}: GenomeCompositionProps) => {
+export const GenomeComposition = ({ data: rawData }: GenomeCompositionProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const theme = useMantineTheme();
   const colors = useMemo(
@@ -26,13 +24,13 @@ export const GenomeComposition = ({
       theme.colors["bushfire"],
       theme.colors["bushfire"],
     ],
-    [theme.colors]
+    [theme.colors],
   );
 
   useEffect(() => {
-    const data = rawData.map(({ key, value }, idx) => ({
-      label: Humanize.capitalize(key),
-      value,
+    const data = rawData.map(({ rank, children }, idx) => ({
+      label: Humanize.capitalize(rank),
+      value: children,
       backgroundColor: colors[idx][2],
     }));
     const options = {

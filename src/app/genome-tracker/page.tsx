@@ -28,7 +28,7 @@ import { DataPageCitation } from "@/components/page-citation";
 import { SunburstChart } from "./_components/sunburst";
 import { GenomeComposition } from "./_components/genome-composition";
 import { gql, useQuery } from "@apollo/client";
-import { TaxonStatTreeNode } from "@/queries/stats";
+import { TaxonomicRankStatistic, TaxonStatTreeNode } from "@/queries/stats";
 
 const labels = [
   "1 Domain",
@@ -40,6 +40,12 @@ const labels = [
   "45123 Genera",
   "175099 Species",
 ];
+
+interface TaxonComposition {
+  key: string;
+  label: string;
+  value: number;
+}
 
 const DATA = [
   {
@@ -136,83 +142,30 @@ function ActionButton({ label, icon }: ActionButtonProps) {
   );
 }
 
-const GET_TAXON_TREE_STATS = gql`
-  query TaxonTreeStats(
-    $taxonRank: TaxonomicRank
-    $taxonCanonicalName: String
-    $includeRanks: [TaxonomicRank]
-  ) {
+const GET_TAXONOMIC_RANK_STATS = gql`
+  query TaxonTreeStats($ranks: [TaxonomicRank]) {
     stats {
-      taxonBreakdown(
-        taxonRank: $taxonRank
-        taxonCanonicalName: $taxonCanonicalName
-        includeRanks: $includeRanks
-      ) {
-        ...TaxonStatTreeNode
-
-        # family children
-        children {
-          ...TaxonStatTreeNode
-
-          # subfamily children
-          children {
-            ...TaxonStatTreeNode
-
-            # genus children
-            children {
-              ...TaxonStatTreeNode
-
-              # subgenus children
-              children {
-                ...TaxonStatTreeNode
-
-                # species children
-                children {
-                  ...TaxonStatTreeNode
-
-                  # subspecies children
-                  children {
-                    ...TaxonStatTreeNode
-
-                    children {
-                      ...TaxonStatTreeNode
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+      taxonomicRanks(ranks: $ranks) {
+        rank
+        children
+        coverage
       }
     }
   }
 `;
 
-type TaxonTreeStatsQuery = {
+type TaxonomicRankStatsQuery = {
   stats: {
-    taxonBreakdown: TaxonStatTreeNode[];
+    taxonomicRanks: TaxonomicRankStatistic[];
   };
 };
 
 export default function GenomeTracker() {
-  const { data } = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
+  const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
     variables: {
-      taxonRank: "DOMAIN",
-      taxonCanonicalName: "Eukaryota",
-      includeRanks: [
-        "DOMAIN",
-        "KINGDOM",
-        "PHYLUM",
-        "CLASS",
-        "ORDER",
-        "FAMILY",
-        "GENUS",
-        "SPECIES",
-      ],
+      ranks: ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
     },
   });
-
-  console.log(data);
 
   return (
     <>
@@ -223,8 +176,7 @@ export default function GenomeTracker() {
         <Container fluid p="xl">
           <Stack gap="lg">
             <Text c="midnight.11">
-              Track progress towards sequencing the genomes of all of
-              Australia&apos;s biodiversity species
+              Track progress towards sequencing the genomes of all of Australia&apos;s biodiversity species
             </Text>
             <Paper p="md" radius="lg" withBorder>
               <Stack>
@@ -234,10 +186,9 @@ export default function GenomeTracker() {
                       <GridCol span={4}>
                         <Stack h="100%" justify="space-between">
                           <Text size="lg" fw="bold">
-                            Taxonomic composition of Australia&apos;s
-                            biodiversity
+                            Taxonomic composition of Australia&apos;s biodiversity
                           </Text>
-                          <GenomeComposition data={DATA} />
+                          {data && <GenomeComposition data={data.stats.taxonomicRanks} />}
                         </Stack>
                       </GridCol>
                       <GridCol span={8}>
@@ -245,21 +196,16 @@ export default function GenomeTracker() {
                           Cumulative tracker
                         </Text>
                         <Text mb="lg">
-                          Percentage of taxonomic group coverage, where there is
-                          a complete genome for at least one representative
-                          species from each grouping. Statistics based on
-                          records indexed within ARGA; database last updated
-                          dd/mm/yy.
+                          Percentage of taxonomic group coverage, where there is a complete genome for at least one
+                          representative species from each grouping. Statistics based on records indexed within ARGA;
+                          database last updated dd/mm/yy.
                         </Text>
-                        <Box h={390}>
-                          <CumulativeTracker />
-                        </Box>
+                        <Box h={390}>{data && <CumulativeTracker data={data.stats.taxonomicRanks} />}</Box>
                       </GridCol>
                       <GridCol span={12}>
                         <Stack gap="xl">
                           <Text size="xl" fw="bold">
-                            There is a complete genome for at least one
-                            representative species from each:
+                            There is a complete genome for at least one representative species from each:
                           </Text>
                           <Stepper
                             classNames={stepperClasses}
@@ -269,12 +215,7 @@ export default function GenomeTracker() {
                           >
                             {DATA.map((step) => (
                               <StepperStep
-                                icon={
-                                  <IconCircleCheck
-                                    size={36}
-                                    color="lightgrey"
-                                  />
-                                }
+                                icon={<IconCircleCheck size={36} color="lightgrey" />}
                                 key={step.key}
                                 label={step.label}
                               />
@@ -289,42 +230,26 @@ export default function GenomeTracker() {
                               Note:
                             </Text>
                             <Text c="midnight.11" size="sm">
-                              For the purposes of these data summaries, a “whole
-                              genome” is interpreted as being an entire assembly
-                              of the genome, with or without chromosome
-                              assemblies (i.e. assemblies which are at least
-                              represented as “scaffold assemblies” in the NCBI
-                              GenBank Genomes Database).
+                              For the purposes of these data summaries, a “whole genome” is interpreted as being an
+                              entire assembly of the genome, with or without chromosome assemblies (i.e. assemblies
+                              which are at least represented as “scaffold assemblies” in the NCBI GenBank Genomes
+                              Database).
                             </Text>
                             <Text c="midnight.11" size="sm">
-                              The higher classification of Australia&apos;s
-                              biodiversity is driven by the taxonomic system
-                              managed by the Atlas of Living Australia. The
-                              Atlas of Living Australia hosts a record of all of
-                              the species that appear on the Australian National
-                              Species List, and services nationally agreed
-                              nomenclature for these species.
+                              The higher classification of Australia&apos;s biodiversity is driven by the taxonomic
+                              system managed by the Atlas of Living Australia. The Atlas of Living Australia hosts a
+                              record of all of the species that appear on the Australian National Species List, and
+                              services nationally agreed nomenclature for these species.
                             </Text>
                             <Text c="midnight.11" size="sm">
-                              The data used to generate the page statistics and
-                              graphics are accurate to dd/mm/yy. Data and
-                              graphics on this page may be shared under a CC BY
-                              4.0 licence.
+                              The data used to generate the page statistics and graphics are accurate to dd/mm/yy. Data
+                              and graphics on this page may be shared under a CC BY 4.0 licence.
                             </Text>
                             <Divider my="xs" />
                             <Group>
-                              <ActionButton
-                                label="Copy page citation"
-                                icon={<IconCopy size="1rem" />}
-                              />
-                              <ActionButton
-                                label="Download raw data as CSV"
-                                icon={<IconDownload size="1rem" />}
-                              />
-                              <ActionButton
-                                label="Download graphics as PNG file"
-                                icon={<IconDownload size="1rem" />}
-                              />
+                              <ActionButton label="Copy page citation" icon={<IconCopy size="1rem" />} />
+                              <ActionButton label="Download raw data as CSV" icon={<IconDownload size="1rem" />} />
+                              <ActionButton label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
                             </Group>
                           </Stack>
                         </Paper>
@@ -345,8 +270,7 @@ export default function GenomeTracker() {
                 <Paper p="md" radius="lg" withBorder>
                   <Stack>
                     <Text size="lg" fw="bold">
-                      Completion of genome sequences for key biodiversity
-                      groupings:
+                      Completion of genome sequences for key biodiversity groupings:
                     </Text>
                     <SunburstChart />
                   </Stack>

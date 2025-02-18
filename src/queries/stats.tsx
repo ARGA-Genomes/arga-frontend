@@ -25,10 +25,13 @@ export interface TaxonStatTreeNode {
   children?: TaxonStatTreeNode[];
 }
 
-export function findChildren(
-  root: TaxonStatTreeNode,
-  scientificName: string,
-): TaxonStatTreeNode[] {
+export interface TaxonomicRankStatistic {
+  rank: string;
+  children: number;
+  coverage: number;
+}
+
+export function findChildren(root: TaxonStatTreeNode, scientificName: string): TaxonStatTreeNode[] {
   if (root.scientificName === scientificName) {
     return root.children || [];
   }
@@ -41,10 +44,7 @@ export function findChildren(
   return [];
 }
 
-export function findChildrenCanonical(
-  root: TaxonStatTreeNode,
-  canonicalName: string,
-): TaxonStatTreeNode[] {
+export function findChildrenCanonical(root: TaxonStatTreeNode, canonicalName: string): TaxonStatTreeNode[] {
   if (root.canonicalName === canonicalName) {
     return root.children || [];
   }
