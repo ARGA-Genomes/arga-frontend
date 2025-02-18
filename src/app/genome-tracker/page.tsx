@@ -26,26 +26,9 @@ import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
 import { SunburstChart } from "./_components/sunburst";
-import { GenomeComposition } from "./_components/genome-composition";
+/* import { GenomeComposition } from "./_components/genome-composition"; */
 import { gql, useQuery } from "@apollo/client";
-import { TaxonomicRankStatistic, TaxonStatTreeNode } from "@/queries/stats";
-
-const labels = [
-  "1 Domain",
-  "5 Kingdoms",
-  "52 Phyla",
-  "153 Classes",
-  "1025 Orders",
-  "5878 Families",
-  "45123 Genera",
-  "175099 Species",
-];
-
-interface TaxonComposition {
-  key: string;
-  label: string;
-  value: number;
-}
+import { TaxonomicRankStatistic } from "@/queries/stats";
 
 const DATA = [
   {
@@ -188,7 +171,7 @@ export default function GenomeTracker() {
                           <Text size="lg" fw="bold">
                             Taxonomic composition of Australia&apos;s biodiversity
                           </Text>
-                          {data && <GenomeComposition data={data.stats.taxonomicRanks} />}
+                          {/* {data && <GenomeComposition data={data.stats.taxonomicRanks} />} */}
                         </Stack>
                       </GridCol>
                       <GridCol span={8}>
