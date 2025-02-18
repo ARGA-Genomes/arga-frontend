@@ -29,6 +29,7 @@ export interface TaxonomicRankStatistic {
   rank: string;
   children: number;
   coverage: number;
+  atLeastOne: number;
 }
 
 export function findChildren(root: TaxonStatTreeNode, scientificName: string): TaxonStatTreeNode[] {
