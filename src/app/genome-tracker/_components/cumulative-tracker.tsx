@@ -56,7 +56,8 @@ interface CumulativeTrackerProps {
 
 export function CumulativeTracker({ data }: CumulativeTrackerProps) {
   const ranks = data.map((stat) => `${Humanize.formatNumber(stat.children)} ${PLURAL_RANKS[stat.rank]}`);
-  const coverage = data.map((stat) => Math.min(stat.coverage, 1.0) * 100);
+  /* const coverage = data.map((stat) => Math.min(stat.coverage, 1.0) * 100); */
+  const coverage = data.map((stat) => (stat.atLeastOne / stat.children) * 100);
 
   const barData = {
     labels: ranks,

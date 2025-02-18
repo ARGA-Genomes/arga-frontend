@@ -132,6 +132,7 @@ const GET_TAXONOMIC_RANK_STATS = gql`
         rank
         children
         coverage
+        atLeastOne
       }
     }
   }
