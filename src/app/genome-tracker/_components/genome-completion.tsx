@@ -56,8 +56,12 @@ type CompleteGenomesYearStatsQuery = {
 export function GenomeCompletion() {
   const { data } = useQuery<CompleteGenomesYearStatsQuery>(GET_COMPLETE_GENOMES_YEAR_STATS);
 
+  let accum = 0;
   const years = data?.stats.completeGenomesByYear.map((stat) => stat.year);
-  const totals = data?.stats.completeGenomesByYear.map((stat) => stat.total);
+  const totals = data?.stats.completeGenomesByYear.map((stat) => {
+    accum += stat.total;
+    return accum;
+  });
 
   const lineData = {
     labels: years,
@@ -65,6 +69,8 @@ export function GenomeCompletion() {
       {
         label: "Genome completion",
         data: totals,
+        borderColor: "#d0e1b6",
+        backgroundColor: "#d0e1b6",
       },
     ],
   };
@@ -86,7 +92,7 @@ export function GenomeCompletion() {
             ticks: {},
             title: {
               display: true,
-              text: "Number of genomes (log scale)",
+              text: "Number of genomes",
               color: "black",
             },
           },
