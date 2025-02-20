@@ -26,7 +26,7 @@ import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
 import { SunburstChart } from "./_components/sunburst";
-/* import { GenomeComposition } from "./_components/genome-composition"; */
+import { GenomeComposition } from "./_components/genome-composition";
 import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
 
@@ -172,7 +172,7 @@ export default function GenomeTracker() {
                           <Text size="lg" fw="bold">
                             Taxonomic composition of Australia&apos;s biodiversity
                           </Text>
-                          {/* {data && <GenomeComposition data={data.stats.taxonomicRanks} />} */}
+                          {data && <GenomeComposition data={data.stats.taxonomicRanks} />}
                         </Stack>
                       </GridCol>
                       <GridCol span={8}>

@@ -1,57 +1,74 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
-import D3Funnel from "d3-funnel";
+import classes from "./genome-composition.module.css";
+
 import * as Humanize from "humanize-plus";
-import { useMantineTheme } from "@mantine/core";
 import { TaxonomicRankStatistic } from "@/queries/stats";
+import { Polygon } from "@visx/shape";
+import { Group } from "@visx/group";
+
+const LEVEL_HEIGHT = 30;
+const LEVEL_SLANT = 7;
+const LEVEL_EXPANSION = 40;
+
+type Level = {
+  label: string;
+  total: number;
+  points: [number, number][];
+  width: number;
+  className: string;
+};
+
+function fromRankStat(stat: TaxonomicRankStatistic, level: number): Level {
+  const width = LEVEL_EXPANSION * level;
+
+  let className = classes.coverageLow;
+  if (stat.coverage >= 0.25) {
+    className = classes.coverageMiddle;
+  }
+  if (stat.coverage >= 0.75) {
+    className = classes.coverageHigh;
+  }
+
+  return {
+    className: className,
+    label: Humanize.capitalize(stat.rank.toLowerCase()),
+    total: stat.children,
+    width: width,
+    points: [
+      [LEVEL_SLANT, 0],
+      [width - LEVEL_SLANT, 0],
+      [width, LEVEL_HEIGHT - 1],
+      [0, LEVEL_HEIGHT - 1],
+    ],
+  };
+}
 
 interface GenomeCompositionProps {
   data: TaxonomicRankStatistic[];
 }
 
-export const GenomeComposition = ({ data: rawData }: GenomeCompositionProps) => {
-  const chartRef = useRef<HTMLDivElement>(null);
-  const theme = useMantineTheme();
-  const colors = useMemo(
-    () => [
-      theme.colors["moss"],
-      theme.colors["moss"],
-      theme.colors["moss"],
-      theme.colors["wheat"],
-      theme.colors["wheat"],
-      theme.colors["wheat"],
-      theme.colors["bushfire"],
-      theme.colors["bushfire"],
-    ],
-    [theme.colors],
+export const GenomeComposition = ({ data }: GenomeCompositionProps) => {
+  const levels: Level[] = data.map((stat, idx) => fromRankStat(stat, idx + 1));
+  const maxWidth = levels[levels.length - 1].width;
+  const center = maxWidth / 2;
+  const textCenter = LEVEL_HEIGHT / 2;
+
+  return (
+    <svg viewBox={`0 0 ${maxWidth} ${levels.length * LEVEL_HEIGHT}`}>
+      {levels.map((level, idx) => (
+        <Group left={center} top={idx * LEVEL_HEIGHT} key={level.label} className={classes.level}>
+          <Group left={-level.width / 2}>
+            <Polygon points={level.points} className={level.className} />
+          </Group>
+          <text y={textCenter - 2} className={classes.levelText}>
+            {level.label}
+          </text>
+          <text y={textCenter + 5} className={classes.levelText}>
+            {Humanize.formatNumber(level.total)}
+          </text>
+        </Group>
+      ))}
+    </svg>
   );
-
-  useEffect(() => {
-    const data = rawData.map(({ rank, children }, idx) => ({
-      label: Humanize.capitalize(rank),
-      value: children,
-      backgroundColor: colors[idx][2],
-    }));
-    const options = {
-      block: {
-        dynamicHeight: false,
-        minHeight: 15,
-      },
-      chart: {
-        inverted: true,
-        height: 350,
-      },
-      label: {
-        format: "{f}",
-      },
-    };
-
-    const chart = new D3Funnel(chartRef.current);
-    chart.draw(data, options);
-
-    window.onresize = () => chart.draw(data, options);
-  }, [rawData, colors]);
-
-  return <div ref={chartRef} />;
 };
