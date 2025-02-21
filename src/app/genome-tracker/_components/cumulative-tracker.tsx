@@ -64,7 +64,7 @@ function Bars({ width, height, data }: BarsProps) {
   return (
     <>
       {data.map((stat, idx) => (
-        <text y={idx * ROW_HEIGHT + ROW_HEIGHT / 2} className={classes.barLabel}>
+        <text y={idx * ROW_HEIGHT + ROW_HEIGHT / 2} className={classes.barLabel} key={stat.rank}>
           {Humanize.formatNumber(stat.children)} {PLURAL_RANKS[stat.rank]}
         </text>
       ))}
