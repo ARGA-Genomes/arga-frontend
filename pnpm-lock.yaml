@@ -99,9 +99,18 @@ importers:
       '@vis.gl/react-maplibre':
         specifier: ^8.0.1
         version: 8.0.1(maplibre-gl@5.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@visx/axis':
+        specifier: ^3.12.0
+        version: 3.12.0(react@19.0.0)
       '@visx/group':
         specifier: ^3.12.0
         version: 3.12.0(react@19.0.0)
+      '@visx/responsive':
+        specifier: ^3.12.0
+        version: 3.12.0(react@19.0.0)
+      '@visx/scale':
+        specifier: ^3.12.0
+        version: 3.12.0
       '@visx/shape':
         specifier: ^3.12.0
         version: 3.12.0(react@19.0.0)
