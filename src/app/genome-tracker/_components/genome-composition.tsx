@@ -52,7 +52,6 @@ export const GenomeComposition = ({ data }: GenomeCompositionProps) => {
   const levels: Level[] = data.map((stat, idx) => fromRankStat(stat, idx + 1));
   const maxWidth = levels[levels.length - 1].width;
   const center = maxWidth / 2;
-  const textCenter = LEVEL_HEIGHT / 2;
 
   return (
     <svg viewBox={`0 0 ${maxWidth} ${levels.length * LEVEL_HEIGHT}`}>
