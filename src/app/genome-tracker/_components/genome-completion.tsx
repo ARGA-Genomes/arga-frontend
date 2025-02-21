@@ -1,6 +1,5 @@
 "use client";
 
-import classes from "./genome-completion.module.css";
 
 import { gql, useQuery } from "@apollo/client";
 import { LineBarGraph } from "@/components/graphing/LineBarGraph";
