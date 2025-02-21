@@ -1,27 +1,15 @@
 "use client";
 
+import classes from "./cumulative-tracker.module.css";
 import * as Humanize from "humanize-plus";
-import { Chart as ChartJS, BarElement, defaults } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { useMemo } from "react";
 
-import { workSans } from "../../../theme";
 import { TaxonomicRankStatistic } from "@/queries/stats";
-
-ChartJS.register(BarElement);
-
-defaults.font.family = workSans.style.fontFamily;
-defaults.font.weight = "bold";
-
-const labels = [
-  "1 Domain",
-  "5 Kingdoms",
-  "52 Phyla",
-  "153 Classes",
-  "1025 Orders",
-  "5878 Families",
-  "45123 Genera",
-  "175099 Species",
-];
+import { Group } from "@visx/group";
+import { Bar } from "@visx/shape";
+import { ParentSize } from "@visx/responsive";
+import { scaleLinear } from "@visx/scale";
+import { AxisBottom } from "@visx/axis";
 
 const PLURAL_RANKS: Record<string, string> = {
   DOMAIN: "Domains",
@@ -34,75 +22,95 @@ const PLURAL_RANKS: Record<string, string> = {
   SPECIES: "Species",
 };
 
-export const DATA = {
-  labels,
-  datasets: [
-    {
-      label: "Dataset 2",
-      data: labels.map((_, idx) => ((labels.length - idx - 1) / labels.length) * 100),
-      backgroundColor: "#d0e1b6",
-    },
-    {
-      label: "Dataset 1",
-      data: labels.map(() => 100),
-      backgroundColor: "#dfe3e5",
-    },
-  ],
-};
+const BAR_HEIGHT = 45;
+const BAR_MARGIN = 15;
+const ROW_HEIGHT = BAR_HEIGHT + BAR_MARGIN;
+const AXIS_HEIGHT = 30;
+const GRAPH_PADDING = 20;
+const LEFT_AXIS_WIDTH = 200;
+
+interface CoverageBarProps {
+  y: number;
+  width: number;
+  coverage: number;
+}
+
+function CoverageBar({ y, width, coverage }: CoverageBarProps) {
+  return (
+    <Group top={y}>
+      <rect width={width} height={BAR_HEIGHT} className={classes.coverageBarBg} />
+      <Bar width={coverage} height={BAR_HEIGHT} className={classes.coverageBar} />;
+    </Group>
+  );
+}
+
+interface BarsProps {
+  width: number;
+  height: number;
+  data: TaxonomicRankStatistic[];
+}
+
+function Bars({ width, height, data }: BarsProps) {
+  const barWidth = width - LEFT_AXIS_WIDTH;
+  const xScale = useMemo(
+    () =>
+      scaleLinear<number>({
+        range: [0, barWidth],
+        domain: [0, 100],
+      }),
+    [width],
+  );
+
+  return (
+    <>
+      {data.map((stat, idx) => (
+        <text y={idx * ROW_HEIGHT + ROW_HEIGHT / 2} className={classes.barLabel}>
+          {Humanize.formatNumber(stat.children)} {PLURAL_RANKS[stat.rank]}
+        </text>
+      ))}
+      <Group left={LEFT_AXIS_WIDTH}>
+        {data.map((stat, idx) => (
+          <CoverageBar
+            y={idx * ROW_HEIGHT}
+            width={barWidth}
+            coverage={xScale(Math.min(stat.coverage, 1.0) * 100)}
+            key={stat.rank}
+          />
+        ))}
+        <AxisBottom
+          scale={xScale}
+          numTicks={4}
+          tickLength={height}
+          hideAxisLine
+          tickLineProps={{ className: classes.tickLine }}
+          tickValues={[0, 25, 50, 75, 100]}
+        />
+      </Group>
+    </>
+  );
+}
 
 interface CumulativeTrackerProps {
   data: TaxonomicRankStatistic[];
 }
 
 export function CumulativeTracker({ data }: CumulativeTrackerProps) {
-  const ranks = data.map((stat) => `${Humanize.formatNumber(stat.children)} ${PLURAL_RANKS[stat.rank]}`);
-  /* const coverage = data.map((stat) => Math.min(stat.coverage, 1.0) * 100); */
-  const coverage = data.map((stat) => (stat.atLeastOne / stat.children) * 100);
-
-  const barData = {
-    labels: ranks,
-    datasets: [
-      {
-        label: "Genome coverage",
-        data: coverage,
-        backgroundColor: "#d0e1b6",
-      },
-      {
-        label: "Dataset 1",
-        data: labels.map(() => 100),
-        backgroundColor: "#dfe3e5",
-      },
-    ],
-  };
+  const minHeight = data.length * ROW_HEIGHT;
 
   return (
-    <Bar
-      options={{
-        maintainAspectRatio: false,
-        indexAxis: "y" as const,
-        responsive: true,
-        scales: {
-          x: {
-            stacked: false,
-            ticks: {
-              stepSize: 50,
-            },
-          },
-          y: {
-            stacked: true,
-            ticks: {},
-          },
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            enabled: false,
-          },
-        },
+    <ParentSize className={classes.graphContainer}>
+      {(parent) => {
+        const height = parent.height > minHeight ? parent.height : minHeight;
+        const width = parent.width - GRAPH_PADDING * 2;
+
+        return (
+          <svg width={parent.width} height={height + AXIS_HEIGHT}>
+            <Group width={width} left={GRAPH_PADDING / 2}>
+              <Bars width={width} height={height} data={data} />
+            </Group>
+          </svg>
+        );
       }}
-      data={barData}
-    />
+    </ParentSize>
   );
 }

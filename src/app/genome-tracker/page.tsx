@@ -21,7 +21,6 @@ import { PreviousPage } from "@/components/navigation-history";
 
 import stepperClasses from "./stepper.module.css";
 import { IconCircleCheck, IconCopy, IconDownload } from "@tabler/icons-react";
-import { CumulativeTracker } from "./_components/cumulative-tracker";
 import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
@@ -29,6 +28,7 @@ import { SunburstChart } from "./_components/sunburst";
 import { GenomeComposition } from "./_components/genome-composition";
 import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
+import { CumulativeTracker } from "./_components/cumulative-tracker";
 
 const DATA = [
   {

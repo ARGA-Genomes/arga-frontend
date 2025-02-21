@@ -7,7 +7,7 @@ import { TaxonomicRankStatistic } from "@/queries/stats";
 import { Polygon } from "@visx/shape";
 import { Group } from "@visx/group";
 
-const LEVEL_HEIGHT = 30;
+const LEVEL_HEIGHT = 27;
 const LEVEL_SLANT = 7;
 const LEVEL_EXPANSION = 40;
 
@@ -61,12 +61,6 @@ export const GenomeComposition = ({ data }: GenomeCompositionProps) => {
           <Group left={-level.width / 2}>
             <Polygon points={level.points} className={level.className} />
           </Group>
-          <text y={textCenter - 2} className={classes.levelText}>
-            {level.label}
-          </text>
-          <text y={textCenter + 5} className={classes.levelText}>
-            {Humanize.formatNumber(level.total)}
-          </text>
         </Group>
       ))}
     </svg>
