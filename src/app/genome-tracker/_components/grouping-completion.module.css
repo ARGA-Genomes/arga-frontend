@@ -7,6 +7,16 @@
     }
 }
 
+.groupButtonSelected {
+    border-radius: var(--mantine-radius-lg);
+    background-color: var(--mantine-color-shellfish-1);
+
+    &:hover {
+        cursor: pointer;
+        background-color: var(--mantine-color-shellfish-1);
+    }
+}
+
 .groupButtonLabel {
     font-size: 12px;
     font-weight: 600;

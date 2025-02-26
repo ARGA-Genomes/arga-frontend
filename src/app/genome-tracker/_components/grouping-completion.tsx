@@ -121,11 +121,17 @@ export function GroupingCompletion({ group, showGrid, interactive, h }: Grouping
 interface GroupingCompletionButtonProps {
   group: string;
   h: number;
+  onSelected?: (group: string) => void;
+  selected?: string;
 }
 
-export function GroupingCompletionButton({ group, h }: GroupingCompletionButtonProps) {
+export function GroupingCompletionButton({ group, h, onSelected, selected }: GroupingCompletionButtonProps) {
   return (
-    <Paper className={classes.groupButton} withBorder>
+    <Paper
+      className={selected == group ? classes.groupButtonSelected : classes.groupButton}
+      onClick={() => onSelected && onSelected(group)}
+      withBorder
+    >
       <Center>
         <Text className={classes.groupButtonLabel}>{group}</Text>
       </Center>

@@ -2,6 +2,7 @@
 
 import {
   Box,
+  Center,
   Container,
   Divider,
   Flex,
@@ -14,6 +15,7 @@ import {
   StepperStep,
   Text,
   ThemeIcon,
+  Title,
   UnstyledButton,
 } from "@mantine/core";
 
@@ -21,14 +23,14 @@ import { PreviousPage } from "@/components/navigation-history";
 
 import stepperClasses from "./stepper.module.css";
 import { IconCircleCheck, IconCopy, IconDownload } from "@tabler/icons-react";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
 import { GenomeComposition } from "./_components/genome-composition";
 import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
 import { CumulativeTracker } from "./_components/cumulative-tracker";
-import { GroupingCompletionButton } from "./_components/grouping-completion";
+import { GroupingCompletion, GroupingCompletionButton } from "./_components/grouping-completion";
 
 const DATA = [
   {
@@ -145,6 +147,8 @@ type TaxonomicRankStatsQuery = {
 };
 
 export default function GenomeTracker() {
+  const [group, setGroup] = useState("mammals");
+
   const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
     variables: {
       ranks: ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
@@ -251,42 +255,64 @@ export default function GenomeTracker() {
                     </Box>
                   </Stack>
                 </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack>
-                    <Text size="lg" fw="bold">
-                      Completion of genome sequences for key biodiversity groupings:
-                    </Text>
+                <Paper p={0} m={0} radius="lg" withBorder>
+                  <Grid>
+                    <Grid.Col span={8} p="xl">
+                      <Stack>
+                        <Text size="lg" fw="bold">
+                          Completion of genome sequences for key biodiversity groupings:
+                        </Text>
+                        <Grid>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton h={200} group="mammals" onSelected={setGroup} selected={group} />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton h={200} group="birds" onSelected={setGroup} selected={group} />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton h={200} group="reptiles" onSelected={setGroup} selected={group} />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton h={200} group="corals" onSelected={setGroup} selected={group} />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton
+                              h={200}
+                              group="amphibians"
+                              onSelected={setGroup}
+                              selected={group}
+                            />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton h={200} group="insects" onSelected={setGroup} selected={group} />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton h={200} group="molluscs" onSelected={setGroup} selected={group} />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton h={200} group="fungi" onSelected={setGroup} selected={group} />
+                          </GridCol>
+                          <GridCol span={2}>
+                            <GroupingCompletionButton
+                              h={200}
+                              group="flowering-plants"
+                              onSelected={setGroup}
+                              selected={group}
+                            />
+                          </GridCol>
+                        </Grid>
+                      </Stack>
+                    </Grid.Col>
 
-                    <Grid>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="mammals" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="birds" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="reptiles" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="corals" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="amphibians" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="insects" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="molluscs" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="fungi" />
-                      </GridCol>
-                      <GridCol span={2}>
-                        <GroupingCompletionButton h={200} group="flowering-plants" />
-                      </GridCol>
-                    </Grid>
-                  </Stack>
+                    <Grid.Col span={4}>
+                      <Paper bg="#f0f0f0" radius="lg" p="xl">
+                        <Center>
+                          <Title order={4}>{group}</Title>
+                        </Center>
+                        <GroupingCompletion h={600} group={group} showGrid interactive />
+                      </Paper>
+                    </Grid.Col>
+                  </Grid>
                 </Paper>
               </Stack>
             </Paper>
