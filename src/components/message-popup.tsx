@@ -50,8 +50,8 @@ export function MessagePopup() {
           issues with inconsistent information availability.
         </Text>
         <Text>
-          We anticipate a return to normal services in January 2025. Thank you
-          for your patience and understanding while we refactor ARGA to make it
+          We anticipate a return to normal services in March 2025. Thank you for
+          your patience and understanding while we refactor ARGA to make it
           better for you.
         </Text>
         <Text>
@@ -61,7 +61,6 @@ export function MessagePopup() {
             https://arga.org.au/contact/
           </Anchor>
         </Text>
-        <Text>Best wishes for the coming holidays,</Text>
         <Group gap="xs">
           <IconDna />
           <Text>The ARGA Team</Text>
