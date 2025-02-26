@@ -48,7 +48,7 @@
     "deck.gl": "^8.9.36",
     "embla-carousel-react": "^7.1.0",
     "eslint": "9.21.0",
-    "eslint-config-next": "13.5.3",
+    "eslint-config-next": "15.1.7",
     "fathom-client": "^3.7.2",
     "flag": "^5.0.1",
     "framer-motion": "11.3.23-alpha.2",
