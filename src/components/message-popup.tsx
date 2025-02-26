@@ -1,6 +1,6 @@
 "use client";
 
-import { Anchor, Center, Group, Modal, Stack, Text } from "@mantine/core";
+import { Anchor, Group, Modal, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDna } from "@tabler/icons-react";
 import localFont from "next/font/local";
