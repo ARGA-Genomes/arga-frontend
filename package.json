@@ -48,6 +48,7 @@
                 "@visx/responsive": "^3.12.0",
                 "@visx/scale": "^3.12.0",
                 "@visx/shape": "^3.12.0",
+                "@visx/text": "^3.12.0",
                 "@visx/visx": "^3.12.0",
                 "@visx/xychart": "^3.12.0",
                 "change-case": "^5.4.4",
