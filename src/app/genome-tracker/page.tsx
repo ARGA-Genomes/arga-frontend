@@ -24,11 +24,11 @@ import { IconCircleCheck, IconCopy, IconDownload } from "@tabler/icons-react";
 import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
-import { SunburstChart } from "./_components/sunburst";
 import { GenomeComposition } from "./_components/genome-composition";
 import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
 import { CumulativeTracker } from "./_components/cumulative-tracker";
+import { GroupingCompletionButton } from "./_components/grouping-completion";
 
 const DATA = [
   {
@@ -256,7 +256,36 @@ export default function GenomeTracker() {
                     <Text size="lg" fw="bold">
                       Completion of genome sequences for key biodiversity groupings:
                     </Text>
-                    <SunburstChart />
+
+                    <Grid>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="mammals" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="birds" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="reptiles" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="corals" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="amphibians" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="insects" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="molluscs" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="fungi" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="flowering-plants" />
+                      </GridCol>
+                    </Grid>
                   </Stack>
                 </Paper>
               </Stack>
