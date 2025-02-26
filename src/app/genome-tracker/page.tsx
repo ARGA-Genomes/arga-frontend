@@ -259,27 +259,31 @@ export default function GenomeTracker() {
 
                     <Grid>
                       <GridCol span={2}>
-                        <Paper radius="lg" withBorder>
-                          <GroupingCompletionButton h={200} group="mammals" />
-                        </Paper>
+                        <GroupingCompletionButton h={200} group="mammals" />
                       </GridCol>
                       <GridCol span={2}>
-                        <Paper radius="lg" withBorder>
-                          <GroupingCompletionButton h={200} group="birds" />
-                        </Paper>
+                        <GroupingCompletionButton h={200} group="birds" />
                       </GridCol>
                       <GridCol span={2}>
-                        <Paper radius="lg" withBorder>
-                          <GroupingCompletionButton h={200} group="reptiles" />
-                        </Paper>
-                      </GridCol>
-                      <GridCol span={2}>
-                        <Paper radius="lg" withBorder>
-                          <GroupingCompletionButton h={200} group="top-110-threatened" />
-                        </Paper>
+                        <GroupingCompletionButton h={200} group="reptiles" />
                       </GridCol>
                       <GridCol span={2}>
                         <GroupingCompletionButton h={200} group="corals" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="amphibians" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="insects" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="molluscs" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="fungi" />
+                      </GridCol>
+                      <GridCol span={2}>
+                        <GroupingCompletionButton h={200} group="flowering-plants" />
                       </GridCol>
                     </Grid>
                   </Stack>

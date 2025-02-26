@@ -69,6 +69,31 @@ const QUERIES: Record<string, object> = {
     taxonCanonicalName: "Hexacorallia",
     includeRanks: ["SUBCLASS", "ORDER"],
   },
+  amphibians: {
+    taxonRank: "CLASS",
+    taxonCanonicalName: "Amphibia",
+    includeRanks: ["CLASS", "ORDER"],
+  },
+  insects: {
+    taxonRank: "CLASS",
+    taxonCanonicalName: "Insecta",
+    includeRanks: ["CLASS", "ORDER"],
+  },
+  molluscs: {
+    taxonRank: "PHYLUM",
+    taxonCanonicalName: "Mollusca",
+    includeRanks: ["PHYLUM", "CLASS"],
+  },
+  fungi: {
+    taxonRank: "KINGDOM",
+    taxonCanonicalName: "Fungi",
+    includeRanks: ["KINGDOM", "PHYLUM"],
+  },
+  "flowering-plants": {
+    taxonRank: "PHYLUM",
+    taxonCanonicalName: "Charophyta",
+    includeRanks: ["PHYLUM", "CLASS"],
+  },
 };
 
 interface GroupingCompletionProps {
