@@ -42,17 +42,43 @@ export default function BrowseGrouping() {
   }
 
   return (
-    <Carousel
-      slideSize={150}
-      slideGap="sm"
-      slidesToScroll="auto"
-      align="start"
-      withControls={false}
-    >
+    <Carousel slideSize={150} slideGap="sm" slidesToScroll="auto" align="start" withControls={false}>
       <Group justify="center" align="flex-start">
         <Carousel.Slide>
           <BrowseCard
-            total={data && (sources["ARGA Bushfire Recovery"] || 0)}
+            total={data && (sources["ARGA Commercial Species"] || 0)}
+            category="Argiculture"
+            image="/card-icons/dataset/agriculture.svg"
+            link="/browse/sources/ARGA_Commercial_Species"
+          />
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <BrowseCard
+            total={data && (sources["ARGA Commercial Species"] || 0)}
+            category="Aquaculture"
+            image="/card-icons/dataset/aquaculture.svg"
+            link="/browse/sources/ARGA_Commercial_Species"
+          />
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <BrowseCard
+            total={data && (sources["ARGA Commercial Species"] || 0)}
+            category="Terrestrial"
+            image="/card-icons/dataset/terrestrial.svg"
+            link="/browse/sources/ARGA_Commercial_Species"
+          />
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <BrowseCard
+            total={data && (sources["ARGA Threatened Species"] || 0)}
+            category="Threatened"
+            image="/card-icons/dataset/threatened.svg"
+            link="/browse/sources/ARGA_Threatened_Species"
+          />
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <BrowseCard
+            total={data && (sources["ARGA Bushfire Recovery"] || 0)} // is this the same a Fire vulnerable
             category="Bushfire Recovery"
             image="/card-icons/dataset/fire_vulnerable.svg"
             link="/browse/sources/ARGA_Bushfire_Recovery"
@@ -68,9 +94,7 @@ export default function BrowseGrouping() {
         </Carousel.Slide>
         <Carousel.Slide>
           <BrowseCard
-            total={
-              data && (sources["ARGA Venomous and Poisonous Species"] || 0)
-            }
+            total={data && (sources["ARGA Venomous and Poisonous Species"] || 0)}
             category="Venomous and Poisonous"
             image="/card-icons/dataset/venomous_and_poisonous.svg"
             link="/browse/sources/ARGA_Venomous_and_Poisonous_Species"

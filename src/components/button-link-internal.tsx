@@ -1,10 +1,4 @@
-import {
-  Button,
-  DefaultMantineColor,
-  getThemeColor,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
+import { Button, DefaultMantineColor, getThemeColor, MantineSize, Text, useMantineTheme } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 
 import classes from "./button-link-internal.module.css";
@@ -12,13 +6,15 @@ import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { Url } from "next/dist/shared/lib/router/router";
 
-interface ExternalLinkButtonProps {
+interface InternalLinkButtonProps {
   url: Url;
   outline?: boolean;
   icon: typeof IconExternalLink;
   acronym?: boolean;
   color?: DefaultMantineColor;
   textColor?: DefaultMantineColor;
+  textSize?: MantineSize;
+  p?: MantineSize;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }
@@ -29,10 +25,11 @@ export function InternalLinkButton({
   icon: Icon,
   color,
   textColor,
+  textSize,
   children,
   onMouseEnter,
   onMouseLeave,
-}: PropsWithChildren<ExternalLinkButtonProps>) {
+}: PropsWithChildren<InternalLinkButtonProps>) {
   const theme = useMantineTheme();
 
   return (
@@ -50,19 +47,12 @@ export function InternalLinkButton({
       <Text
         c={textColor || (outline ? color || "midnight.8" : "white")}
         fw={600}
-        size="sm"
+        size={textSize || "sm"}
         style={{ whiteSpace: "nowrap" }}
       >
         {children}
       </Text>
-      {Icon && (
-        <Icon
-          color={getThemeColor(textColor, theme)}
-          className={classes.icon}
-          size={16}
-          strokeWidth={3}
-        />
-      )}
+      {Icon && <Icon color={getThemeColor(textColor, theme)} className={classes.icon} size={16} strokeWidth={3} />}
     </Button>
   );
 }

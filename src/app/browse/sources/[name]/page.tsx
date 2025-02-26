@@ -22,6 +22,7 @@ import {
   ScrollArea,
   Chip,
   Center,
+  Anchor,
 } from "@mantine/core";
 import { useEffect, useState, useMemo, use } from "react";
 import { PaginationBar } from "@/components/pagination";
@@ -54,6 +55,7 @@ const GET_DETAILS = gql`
       rightsHolder
       author
       name
+      listsId
       accessPill
       reusePill
 
@@ -122,6 +124,7 @@ interface Source {
   rightsHolder: string;
   author: string;
   name: string;
+  listsId: string | null;
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   species: SpeciesCount;
@@ -491,6 +494,10 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
 
 function SourceDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
+
+  // Gross and hacky and terrible, to fix at a later date
+  const LISTS_URL = location.href.startsWith("https://app") ? "lists.ala.org.au" : "lists.test.ala.org.au";
+
   return (
     <Box w="100%">
       <Stack gap={0}>
@@ -502,7 +509,18 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
         <Text c="dimmed" size="xs">
           &copy; {source.rightsHolder}
         </Text>
-        <Grid pt={10}>
+        {source.listsId && (
+          <Anchor
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
+            target="_blank"
+            size="xs"
+            mt="xs"
+            href={`https://${LISTS_URL}/list/${source.listsId}`}
+          >
+            View on ALA Lists <IconExternalLink size="0.8rem" />
+          </Anchor>
+        )}
+        <Grid pt="xl">
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">

@@ -35,7 +35,7 @@ export default function createClient() {
     TAXON_NAME,
     TAXON_SOURCE,
     TAXON_NODE,
-    PUBLICATION,
+    PUBLICATION
   );
 
   // for now just use the memory cache to help reduce the total amount of server requests.
