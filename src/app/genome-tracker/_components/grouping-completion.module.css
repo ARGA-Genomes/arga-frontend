@@ -21,3 +21,27 @@
     font-size: 12px;
     font-weight: 600;
 }
+
+.text {
+    font-weight: 400;
+    font-size: 8px;
+    text-anchor: middle;
+    dominant-baseline: end;
+}
+
+.radialInner100 {
+    fill: var(--mantine-color-moss-2);
+}
+
+.radialInner75 {
+    fill: var(--mantine-color-wheat-2);
+}
+.radialInner25 {
+    fill: var(--mantine-color-bushfire-2);
+}
+
+.gridCenter {
+    fill: var(--mantine-color-bushfire-2);
+    stroke: var(--mantine-color-bushfire-2);
+    stroke-width: 0px;
+}

@@ -2,9 +2,13 @@
 
 import classes from "./grouping-completion.module.css";
 
-import { RadialGraph } from "@/components/graphing/RadialBar";
+import { RadialBarDatum, RadialGraph } from "@/components/graphing/RadialBar";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Center, Paper, Text } from "@mantine/core";
+import { Box, Center, Paper, SegmentedControl, Stack, Text } from "@mantine/core";
+import { useState } from "react";
+import { Text as SvgText } from "@visx/text";
+import { motion } from "framer-motion";
+import { Circle } from "@visx/shape";
 
 const GET_COVERAGE_STATS = gql`
   query TaxonCoverageStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
@@ -22,6 +26,8 @@ const GET_COVERAGE_STATS = gql`
           species
           completeGenomes
           completeGenomesCoverage
+          assemblyScaffolds
+          assemblyScaffoldsCoverage
         }
       }
     }
@@ -40,6 +46,8 @@ type TaxonCoverage = {
   species: number;
   completeGenomes: number;
   completeGenomesCoverage: number;
+  assemblyScaffolds?: number;
+  assemblyScaffoldsCoverage?: number;
 };
 
 type RootTaxonCoverage = TaxonCoverage & {
@@ -48,9 +56,12 @@ type RootTaxonCoverage = TaxonCoverage & {
 
 const QUERIES: Record<string, object> = {
   mammals: {
-    taxonRank: "CLASS",
-    taxonCanonicalName: "Mammalia",
-    includeRanks: ["CLASS", "ORDER"],
+    taxonRank: "FAMILY",
+    taxonCanonicalName: "Macropodidae",
+    includeRanks: ["FAMILY", "GENUS"],
+    /* taxonRank: "CLASS",
+        xonCanonicalName: "Mammalia",
+        cludeRanks: ["CLASS", "ORDER"], */
   },
   birds: {
     taxonRank: "CLASS",
@@ -99,14 +110,19 @@ const QUERIES: Record<string, object> = {
   },
 };
 
-interface GroupingCompletionProps {
-  group: string;
-  showGrid?: boolean;
-  interactive?: boolean;
-  h: number;
+function asPercentage(data: RadialBarDatum[]) {
+  return data.map((datum) => ({
+    label: datum.label,
+    value: (datum.value / datum.total) * 100 || 0,
+    total: 100,
+  }));
 }
 
-export function GroupingCompletion({ group, showGrid, interactive, h }: GroupingCompletionProps) {
+export function GroupingCompletion() {
+  const [group, setGroup] = useState<string>("mammals");
+  const [showRaw, setShowRaw] = useState<boolean>(false);
+  const [hoverItem, setHoverItem] = useState<RadialBarDatum | null>(null);
+
   const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
     variables: QUERIES[group],
   });
@@ -115,30 +131,60 @@ export function GroupingCompletion({ group, showGrid, interactive, h }: Grouping
   // the first root found in the array
   const coverage = data?.stats.taxonBreakdown[0]?.children.map((taxon) => ({
     label: taxon.canonicalName,
-    value: (taxon.completeGenomesCoverage ?? 0 / taxon.species ?? 0) * 100,
+    value: taxon.assemblyScaffoldsCoverage ?? 0,
+    total: taxon.species,
   }));
 
-  return <Box h={h}>{coverage && <RadialGraph data={coverage} showGrid={showGrid} interactive={interactive} />}</Box>;
-}
+  let radialInner = "radialInner25";
+  if (hoverItem && hoverItem?.value > 25) radialInner = "radialInner75";
+  if (hoverItem && hoverItem?.value > 75) radialInner = "radialInner100";
 
-interface GroupingCompletionButtonProps {
-  group: string;
-  h: number;
-  onSelected?: (group: string) => void;
-  selected?: string;
-}
-
-export function GroupingCompletionButton({ group, h, onSelected, selected }: GroupingCompletionButtonProps) {
   return (
-    <Paper
-      className={selected == group ? classes.groupButtonSelected : classes.groupButton}
-      onClick={() => onSelected && onSelected(group)}
-      withBorder
-    >
+    <Stack>
+      <SegmentedControl
+        fullWidth
+        size="xl"
+        radius="md"
+        data={[
+          { label: "Mammals", value: "mammals" },
+          { label: "Birds", value: "birds" },
+          { label: "Reptiles", value: "reptiles" },
+          { label: "Corals", value: "corals" },
+        ]}
+        defaultValue="mammals"
+        onChange={setGroup}
+      />
+
       <Center>
-        <Text className={classes.groupButtonLabel}>{group}</Text>
+        <SegmentedControl
+          size="md"
+          radius="xl"
+          color="moss.5"
+          data={[
+            { label: "Percentile", value: "percentage" },
+            { label: "Raw numbers", value: "raw" },
+          ]}
+          defaultValue="percentage"
+          onChange={(value) => setShowRaw(value == "raw")}
+        />
       </Center>
-      <GroupingCompletion h={h} group={group} showGrid={false} />
-    </Paper>
+
+      <Box h={600}>
+        {coverage && (
+          <RadialGraph data={showRaw ? coverage : asPercentage(coverage)} onHover={setHoverItem}>
+            {hoverItem && (
+              <motion.g animate={{ scale: 2 }}>
+                <Circle r={40} className={classes[radialInner]} />
+
+                <SvgText className={classes.text}>{hoverItem.label}</SvgText>
+                <SvgText y={10} className={classes.text}>
+                  {showRaw ? `${hoverItem.value} / ${hoverItem.total}` : `${Math.round(hoverItem.value)}%`}
+                </SvgText>
+              </motion.g>
+            )}
+          </RadialGraph>
+        )}
+      </Box>
+    </Stack>
   );
 }

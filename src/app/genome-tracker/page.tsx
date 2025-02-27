@@ -30,7 +30,7 @@ import { GenomeComposition } from "./_components/genome-composition";
 import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
 import { CumulativeTracker } from "./_components/cumulative-tracker";
-import { GroupingCompletion, GroupingCompletionButton } from "./_components/grouping-completion";
+import { GroupingCompletion } from "./_components/grouping-completion";
 
 const DATA = [
   {
@@ -255,64 +255,13 @@ export default function GenomeTracker() {
                     </Box>
                   </Stack>
                 </Paper>
-                <Paper p={0} m={0} radius="lg" withBorder>
-                  <Grid>
-                    <Grid.Col span={8} p="xl">
-                      <Stack>
-                        <Text size="lg" fw="bold">
-                          Completion of genome sequences for key biodiversity groupings:
-                        </Text>
-                        <Grid>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton h={200} group="mammals" onSelected={setGroup} selected={group} />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton h={200} group="birds" onSelected={setGroup} selected={group} />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton h={200} group="reptiles" onSelected={setGroup} selected={group} />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton h={200} group="corals" onSelected={setGroup} selected={group} />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton
-                              h={200}
-                              group="amphibians"
-                              onSelected={setGroup}
-                              selected={group}
-                            />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton h={200} group="insects" onSelected={setGroup} selected={group} />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton h={200} group="molluscs" onSelected={setGroup} selected={group} />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton h={200} group="fungi" onSelected={setGroup} selected={group} />
-                          </GridCol>
-                          <GridCol span={2}>
-                            <GroupingCompletionButton
-                              h={200}
-                              group="flowering-plants"
-                              onSelected={setGroup}
-                              selected={group}
-                            />
-                          </GridCol>
-                        </Grid>
-                      </Stack>
-                    </Grid.Col>
-
-                    <Grid.Col span={4}>
-                      <Paper bg="#f0f0f0" radius="lg" p="xl">
-                        <Center>
-                          <Title order={4}>{group}</Title>
-                        </Center>
-                        <GroupingCompletion h={600} group={group} showGrid interactive />
-                      </Paper>
-                    </Grid.Col>
-                  </Grid>
+                <Paper p="lg" radius="lg" withBorder>
+                  <Stack>
+                    <Text size="lg" fw="bold">
+                      Completion of genome sequences for key biodiversity groupings:
+                    </Text>
+                    <GroupingCompletion />
+                  </Stack>
                 </Paper>
               </Stack>
             </Paper>

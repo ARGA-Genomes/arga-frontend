@@ -8,12 +8,14 @@ import { scaleLinear, scaleBand } from "@visx/scale";
 import { Arc, Circle } from "@visx/shape";
 import { Text } from "@visx/text";
 import { max, min, ScaleLinear } from "d3";
-import { useState } from "react";
 import { ArcProps } from "@visx/shape/lib/shapes/Arc";
+import { CircleClipPath } from "@visx/clip-path";
+import { useId } from "react";
 
 export interface RadialBarDatum {
   label: string;
   value: number;
+  total: number;
 }
 
 /* const toDegrees = (x: number) => (x * 180) / Math.PI; */
@@ -44,7 +46,7 @@ export function ThresholdArc(props: ThresholdArcProps) {
           <Arc
             key={threshold.label}
             {...(props as ArcProps<number>)}
-            cornerRadius={radius < target ? 4 : 0}
+            cornerRadius={radius <= target ? 4 : 0}
             outerRadius={min([target, radius])}
             innerRadius={min([props.innerRadius, minThreshold])}
             className={threshold.altClassName}
@@ -69,9 +71,7 @@ export function ThresholdGrid(props: ThresholdGridProps) {
       {props.thresholds.map((threshold) => (
         <Group key={threshold.label}>
           <Circle r={props.scale(threshold.target)} className={threshold.className} />
-          <Text y={-props.scale(threshold.target) + labelOffset} className={classes.gridLabel}>
-            {threshold.label}
-          </Text>
+          <Text y={-props.scale(threshold.target) + labelOffset} className={classes.gridLabel}></Text>
         </Group>
       ))}
       <Circle r={props.innerRadius} className={classes.gridCenter} />
@@ -81,24 +81,22 @@ export function ThresholdGrid(props: ThresholdGridProps) {
 
 interface RadialGraphProps {
   data: RadialBarDatum[];
-  showGrid?: boolean;
-  interactive?: boolean;
+  onHover?: (item: RadialBarDatum | null) => void;
+  children?: React.ReactNode;
 }
 
-export function RadialGraph({ data, showGrid, interactive }: RadialGraphProps) {
-  const [hoverItem, setHoverItem] = useState<RadialBarDatum | null>(null);
+export function RadialGraph({ data, onHover, children }: RadialGraphProps) {
+  const innerRadiusClipId = useId();
+
   const margin = { top: 20, bottom: 20, left: 20, right: 20 };
-  const maxCount = max(data, (d) => d.value) ?? 0;
+  const maxTotal = max(data, (d) => d.total) ?? 0;
 
   const thresholds = [
-    { label: "100%", target: 100, className: classes.grid100, altClassName: classes.arc100 },
-    { label: "75%", target: 75, className: classes.grid75, altClassName: classes.arc75 },
-    { label: "50%", target: 50, className: classes.grid50, altClassName: classes.arc50 },
-    { label: "25%", target: 25, className: classes.grid25, altClassName: classes.arc25 },
+    { label: "100%", target: maxTotal, className: classes.grid100, altClassName: classes.arc100 },
+    { label: "75%", target: maxTotal * 0.75, className: classes.grid75, altClassName: classes.arc75 },
+    { label: "50%", target: maxTotal * 0.5, className: classes.grid50, altClassName: classes.arc50 },
+    { label: "25%", target: maxTotal * 0.25, className: classes.grid25, altClassName: classes.arc25 },
   ];
-  /* <Text x={textX} y={textY} angle={toDegrees(midAngle)} className={classes.text}>
-                  {d.label}
-                  </Text> */
 
   return (
     <ParentSize>
@@ -120,30 +118,37 @@ export function RadialGraph({ data, showGrid, interactive }: RadialGraphProps) {
 
         const yScale = scaleLinear<number>({
           range: [innerRadius, radiusMax],
-          domain: [-5, maxCount],
+          domain: [0, maxTotal],
         });
 
         return (
           <svg width={width} height={height}>
-            <Group top={yMax / 2 + margin.top} left={xMax / 2 + margin.left}>
-              {showGrid && <ThresholdGrid thresholds={thresholds} scale={yScale} innerRadius={innerRadius} />}
+            <CircleClipPath id={innerRadiusClipId} r={innerRadius} />
 
-              <Text className={classes.text}>{hoverItem?.label}</Text>
-              <Text y={22} className={classes.text}>
-                {hoverItem?.value}
-              </Text>
+            <Group top={yMax / 2 + margin.top} left={xMax / 2 + margin.left}>
+              <Group clipPath={`url(#${innerRadiusClipId})`}>{children}</Group>
 
               {data.map((d) => {
                 const startAngle = xScale(d.label) ?? 0;
                 const endAngle = startAngle + xScale.bandwidth();
+                const outerRadius = yScale(d.total) ?? 0;
 
                 return (
                   <Group
                     key={d.label}
                     className={classes.group}
-                    onMouseOver={() => interactive && setHoverItem(d)}
-                    onMouseOut={() => interactive && setHoverItem(null)}
+                    onMouseOver={() => onHover && onHover(d)}
+                    onMouseOut={() => onHover && onHover(null)}
                   >
+                    <Arc
+                      startAngle={startAngle}
+                      endAngle={endAngle}
+                      innerRadius={innerRadius}
+                      outerRadius={outerRadius}
+                      cornerRadius={4}
+                      className={classes.arc}
+                      fill="url(#radial-lines)"
+                    />
                     <ThresholdArc
                       thresholds={thresholds}
                       value={d.value}

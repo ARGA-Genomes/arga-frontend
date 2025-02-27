@@ -5,6 +5,14 @@
     }
 }
 
+.arc {
+    fill: #a0a0a0;
+}
+
+.arc0 {
+    fill: red;
+}
+
 .arc25 {
     fill: var(--mantine-color-bushfire-5);
 }
@@ -21,17 +29,10 @@
     fill: var(--mantine-color-moss-5);
 }
 
-.text {
-    font-weight: 400;
-    font-size: 20px;
-    text-anchor: middle;
-    dominant-baseline: end;
-}
-
 .gridCenter {
-    fill: white;
+    fill: none;
     stroke: var(--mantine-color-bushfire-2);
-    stroke-width: 2px;
+    stroke-width: 0px;
 }
 
 .gridLabel {
@@ -44,24 +45,28 @@
 .grid25 {
     stroke: var(--mantine-color-bushfire-2);
     stroke-width: 2px;
-    fill: var(--mantine-color-bushfire-1);
+    fill: none;
+    /* fill: var(--mantine-color-bushfire-1); */
 }
 
 .grid50 {
     stroke: var(--mantine-color-wheat-2);
     stroke-width: 2px;
     stroke-dasharray: 5 5;
-    fill: var(--mantine-color-wheat-1);
+    fill: none;
+    /* fill: var(--mantine-color-wheat-1); */
 }
 
 .grid75 {
     stroke: var(--mantine-color-wheat-2);
     stroke-width: 2px;
-    fill: var(--mantine-color-wheat-1);
+    fill: none;
+    /* fill: var(--mantine-color-wheat-1); */
 }
 
 .grid100 {
     stroke: var(--mantine-color-moss-2);
-    stroke-width: 2px;
-    fill: var(--mantine-color-moss-1);
+    stroke-width: 0px;
+    fill: none;
+    /* fill: var(--mantine-color-moss-1); */
 }
