@@ -4,7 +4,7 @@ import classes from "./grouping-completion.module.css";
 
 import { RadialBarDatum, RadialGraph } from "@/components/graphing/RadialBar";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Center, Paper, SegmentedControl, Stack, Text } from "@mantine/core";
+import { Box, Center, SegmentedControl, Stack } from "@mantine/core";
 import { useState } from "react";
 import { Text as SvgText } from "@visx/text";
 import { motion } from "framer-motion";

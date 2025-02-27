@@ -2,7 +2,6 @@
 
 import {
   Box,
-  Center,
   Container,
   Divider,
   Flex,
@@ -15,7 +14,6 @@ import {
   StepperStep,
   Text,
   ThemeIcon,
-  Title,
   UnstyledButton,
 } from "@mantine/core";
 
