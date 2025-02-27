@@ -12,12 +12,14 @@ const GET_COVERAGE_STATS = gql`
       taxonBreakdown(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, includeRanks: $includeRanks) {
         scientificName
         canonicalName
+        species
         completeGenomes
         completeGenomesCoverage
 
         children {
           scientificName
           canonicalName
+          species
           completeGenomes
           completeGenomesCoverage
         }
@@ -35,6 +37,7 @@ type CoverageStatsQuery = {
 type TaxonCoverage = {
   scientificName: string;
   canonicalName: string;
+  species: number;
   completeGenomes: number;
   completeGenomesCoverage: number;
 };
@@ -112,7 +115,7 @@ export function GroupingCompletion({ group, showGrid, interactive, h }: Grouping
   // the first root found in the array
   const coverage = data?.stats.taxonBreakdown[0]?.children.map((taxon) => ({
     label: taxon.canonicalName,
-    value: taxon.completeGenomes,
+    value: (taxon.completeGenomesCoverage ?? 0 / taxon.species ?? 0) * 100,
   }));
 
   return <Box h={h}>{coverage && <RadialGraph data={coverage} showGrid={showGrid} interactive={interactive} />}</Box>;

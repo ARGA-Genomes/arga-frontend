@@ -91,10 +91,10 @@ export function RadialGraph({ data, showGrid, interactive }: RadialGraphProps) {
   const maxCount = max(data, (d) => d.value) ?? 0;
 
   const thresholds = [
-    { label: "100%", target: maxCount, className: classes.grid100, altClassName: classes.arc100 },
-    { label: "75%", target: maxCount * 0.75, className: classes.grid75, altClassName: classes.arc75 },
-    { label: "50%", target: maxCount * 0.5, className: classes.grid50, altClassName: classes.arc50 },
-    { label: "25%", target: maxCount * 0.25, className: classes.grid25, altClassName: classes.arc25 },
+    { label: "100%", target: 100, className: classes.grid100, altClassName: classes.arc100 },
+    { label: "75%", target: 75, className: classes.grid75, altClassName: classes.arc75 },
+    { label: "50%", target: 50, className: classes.grid50, altClassName: classes.arc50 },
+    { label: "25%", target: 25, className: classes.grid25, altClassName: classes.arc25 },
   ];
   /* <Text x={textX} y={textY} angle={toDegrees(midAngle)} className={classes.text}>
                   {d.label}
@@ -120,7 +120,7 @@ export function RadialGraph({ data, showGrid, interactive }: RadialGraphProps) {
 
         const yScale = scaleLinear<number>({
           range: [innerRadius, radiusMax],
-          domain: [-10, maxCount],
+          domain: [-5, maxCount],
         });
 
         return (
