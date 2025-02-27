@@ -131,7 +131,7 @@ export function GroupingCompletion() {
   // the first root found in the array
   const coverage = data?.stats.taxonBreakdown[0]?.children.map((taxon) => ({
     label: taxon.canonicalName,
-    value: taxon.assemblyScaffoldsCoverage ?? 0,
+    value: taxon.completeGenomesCoverage ?? 0,
     total: taxon.species,
   }));
 
