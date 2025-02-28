@@ -4,11 +4,13 @@ import classes from "./grouping-completion.module.css";
 
 import { RadialBarDatum, RadialGraph } from "@/components/graphing/RadialBar";
 import { gql, useQuery } from "@apollo/client";
-import { Box, Center, SegmentedControl, Stack } from "@mantine/core";
+import { Box, Center, Grid, SegmentedControl, Stack } from "@mantine/core";
 import { useState } from "react";
 import { Text as SvgText } from "@visx/text";
 import { motion } from "framer-motion";
 import { Circle } from "@visx/shape";
+import { GenomeCompletion } from "./genome-completion";
+import { CumulativeTracker } from "./cumulative-tracker";
 
 const GET_COVERAGE_STATS = gql`
   query TaxonCoverageStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
@@ -26,8 +28,6 @@ const GET_COVERAGE_STATS = gql`
           species
           completeGenomes
           completeGenomesCoverage
-          assemblyScaffolds
-          assemblyScaffoldsCoverage
         }
       }
     }
@@ -46,67 +46,73 @@ type TaxonCoverage = {
   species: number;
   completeGenomes: number;
   completeGenomesCoverage: number;
-  assemblyScaffolds?: number;
-  assemblyScaffoldsCoverage?: number;
 };
 
 type RootTaxonCoverage = TaxonCoverage & {
   children: TaxonCoverage[];
 };
 
-const QUERIES: Record<string, object> = {
+interface QueryParams {
+  taxonRank: string;
+  taxonCanonicalName: string;
+  includeRanks: string[];
+  rankStats: string[];
+}
+
+const QUERIES: Record<string, QueryParams> = {
   mammals: {
-    taxonRank: "FAMILY",
-    taxonCanonicalName: "Macropodidae",
-    includeRanks: ["FAMILY", "GENUS"],
-    /* taxonRank: "CLASS",
-        xonCanonicalName: "Mammalia",
-        cludeRanks: ["CLASS", "ORDER"], */
+    taxonRank: "CLASS",
+    taxonCanonicalName: "Mammalia",
+    includeRanks: ["CLASS", "ORDER"],
+    rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   birds: {
     taxonRank: "CLASS",
     taxonCanonicalName: "Aves",
     includeRanks: ["CLASS", "ORDER"],
+    rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   reptiles: {
     taxonRank: "CLASS",
     taxonCanonicalName: "Reptilia",
     includeRanks: ["CLASS", "ORDER"],
-  },
-  "top-110-threatened": {
-    taxonRank: "KINGDOM",
-    taxonCanonicalName: "Animalia",
-    includeRanks: ["KINGDOM", "PHYLUM"],
+    rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   corals: {
     taxonRank: "SUBCLASS",
     taxonCanonicalName: "Hexacorallia",
     includeRanks: ["SUBCLASS", "ORDER"],
+    rankStats: ["SUBCLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   amphibians: {
     taxonRank: "CLASS",
     taxonCanonicalName: "Amphibia",
     includeRanks: ["CLASS", "ORDER"],
+    rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   insects: {
     taxonRank: "CLASS",
     taxonCanonicalName: "Insecta",
     includeRanks: ["CLASS", "ORDER"],
+    rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   molluscs: {
     taxonRank: "PHYLUM",
     taxonCanonicalName: "Mollusca",
     includeRanks: ["PHYLUM", "CLASS"],
+    rankStats: ["PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   fungi: {
     taxonRank: "KINGDOM",
     taxonCanonicalName: "Fungi",
     includeRanks: ["KINGDOM", "PHYLUM"],
+    rankStats: ["KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   "flowering-plants": {
     taxonRank: "PHYLUM",
     taxonCanonicalName: "Charophyta",
     includeRanks: ["PHYLUM", "CLASS"],
+    rankStats: ["PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
 };
 
@@ -123,8 +129,14 @@ export function GroupingCompletion() {
   const [showRaw, setShowRaw] = useState<boolean>(false);
   const [hoverItem, setHoverItem] = useState<RadialBarDatum | null>(null);
 
+  const query = QUERIES[group];
+
   const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
-    variables: QUERIES[group],
+    variables: {
+      taxonRank: query.taxonRank,
+      taxonCanonicalName: query.taxonCanonicalName,
+      includeRanks: query.includeRanks,
+    },
   });
 
   // taxon breakdown only returns stats for the default taxonomy right now, so we just grab
@@ -155,36 +167,49 @@ export function GroupingCompletion() {
         onChange={setGroup}
       />
 
-      <Center>
-        <SegmentedControl
-          size="md"
-          radius="xl"
-          color="moss.5"
-          data={[
-            { label: "Percentile", value: "percentage" },
-            { label: "Raw numbers", value: "raw" },
-          ]}
-          defaultValue="percentage"
-          onChange={(value) => setShowRaw(value == "raw")}
-        />
-      </Center>
+      {coverage && (
+        <Grid>
+          <Grid.Col span={6}>
+            <Center>
+              <SegmentedControl
+                size="md"
+                radius="xl"
+                color="moss.5"
+                data={[
+                  { label: "Percentile", value: "percentage" },
+                  { label: "Raw numbers", value: "raw" },
+                ]}
+                defaultValue="percentage"
+                onChange={(value) => setShowRaw(value == "raw")}
+              />
+            </Center>
 
-      <Box h={600}>
-        {coverage && (
-          <RadialGraph data={showRaw ? coverage : asPercentage(coverage)} onHover={setHoverItem}>
-            {hoverItem && (
-              <motion.g animate={{ scale: 2 }}>
-                <Circle r={40} className={classes[radialInner]} />
+            <Box h={600}>
+              <RadialGraph data={showRaw ? coverage : asPercentage(coverage)} onHover={setHoverItem}>
+                {hoverItem && (
+                  <motion.g animate={{ scale: 2 }}>
+                    <Circle r={40} className={classes[radialInner]} />
 
-                <SvgText className={classes.text}>{hoverItem.label}</SvgText>
-                <SvgText y={10} className={classes.text}>
-                  {showRaw ? `${hoverItem.value} / ${hoverItem.total}` : `${Math.round(hoverItem.value)}%`}
-                </SvgText>
-              </motion.g>
-            )}
-          </RadialGraph>
-        )}
-      </Box>
+                    <SvgText className={classes.text}>{hoverItem.label}</SvgText>
+                    <SvgText y={10} className={classes.text}>
+                      {showRaw ? `${hoverItem.value} / ${hoverItem.total}` : `${Math.round(hoverItem.value)}%`}
+                    </SvgText>
+                  </motion.g>
+                )}
+              </RadialGraph>
+            </Box>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Stack>
+              <Box h={300}>
+                <GenomeCompletion />
+              </Box>
+
+              <Box h={300}>{data && <CumulativeTracker ranks={query.rankStats} />}</Box>
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      )}
     </Stack>
   );
 }

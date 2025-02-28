@@ -21,89 +21,12 @@ import { PreviousPage } from "@/components/navigation-history";
 
 import stepperClasses from "./stepper.module.css";
 import { IconCircleCheck, IconCopy, IconDownload } from "@tabler/icons-react";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
 import { GenomeComposition } from "./_components/genome-composition";
-import { gql, useQuery } from "@apollo/client";
-import { TaxonomicRankStatistic } from "@/queries/stats";
 import { CumulativeTracker } from "./_components/cumulative-tracker";
 import { GroupingCompletion } from "./_components/grouping-completion";
-
-const DATA = [
-  {
-    key: "domain",
-    label: "Domain",
-    value: 1,
-  },
-  {
-    key: "kingdom",
-    label: (
-      <>
-        Kingdom
-        <br />
-        (or Regnum)
-      </>
-    ),
-    value: 5,
-  },
-  {
-    key: "phylum",
-    label: (
-      <>
-        Phylum
-        <br />
-        (or Divison)
-      </>
-    ),
-    value: 52,
-  },
-  {
-    key: "class",
-    label: (
-      <>
-        Class
-        <br />
-        (or Classis)
-      </>
-    ),
-    value: 153,
-  },
-  {
-    key: "order",
-    label: (
-      <>
-        Order
-        <br />
-        (or Ordo)
-      </>
-    ),
-    value: 1025,
-  },
-  {
-    key: "family",
-    label: (
-      <>
-        Family
-        <br />
-        (or Familia)
-      </>
-    ),
-    value: 5878,
-  },
-  {
-    key: "genus",
-    label: "Genus",
-    value: 45123,
-  },
-  {
-    key: "species",
-    label: "Species",
-    value: 175099,
-  },
-];
-
-export type SummaryDataType = typeof DATA;
 
 interface ActionButtonProps {
   label: string;
@@ -117,7 +40,7 @@ function ActionButton({ label, icon }: ActionButtonProps) {
         <ThemeIcon radius="md" color="midnight.11">
           {icon}
         </ThemeIcon>
-        <Text size="sm" fw={600} color="midnight.11">
+        <Text size="sm" fw={600} c="midnight.11">
           {label}
         </Text>
       </Flex>
@@ -125,33 +48,8 @@ function ActionButton({ label, icon }: ActionButtonProps) {
   );
 }
 
-const GET_TAXONOMIC_RANK_STATS = gql`
-  query TaxonTreeStats($ranks: [TaxonomicRank]) {
-    stats {
-      taxonomicRanks(ranks: $ranks) {
-        rank
-        children
-        coverage
-        atLeastOne
-      }
-    }
-  }
-`;
-
-type TaxonomicRankStatsQuery = {
-  stats: {
-    taxonomicRanks: TaxonomicRankStatistic[];
-  };
-};
-
 export default function GenomeTracker() {
-  const [group, setGroup] = useState("mammals");
-
-  const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
-    variables: {
-      ranks: ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
-    },
-  });
+  const ranks = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
 
   return (
     <>
@@ -174,7 +72,7 @@ export default function GenomeTracker() {
                           <Text size="lg" fw="bold">
                             Taxonomic composition of Australia&apos;s biodiversity
                           </Text>
-                          {data && <GenomeComposition data={data.stats.taxonomicRanks} />}
+                          <GenomeComposition ranks={ranks} />
                         </Stack>
                       </GridCol>
                       <GridCol span={8}>
@@ -186,7 +84,9 @@ export default function GenomeTracker() {
                           representative species from each grouping. Statistics based on records indexed within ARGA;
                           database last updated dd/mm/yy.
                         </Text>
-                        <Box h={390}>{data && <CumulativeTracker data={data.stats.taxonomicRanks} />}</Box>
+                        <Box h={390}>
+                          <CumulativeTracker ranks={ranks} />
+                        </Box>
                       </GridCol>
                       <GridCol span={12}>
                         <Stack gap="xl">
