@@ -99,13 +99,14 @@ export default function GenomeTracker() {
                             color="moss"
                             active={3}
                           >
-                            {DATA.map((step) => (
-                              <StepperStep
-                                icon={<IconCircleCheck size={36} color="lightgrey" />}
-                                key={step.key}
-                                label={step.label}
-                              />
-                            ))}
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Domain" />
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Kingdom" />
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Phylum" />
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Class" />
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Order" />
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Family" />
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Genus" />
+                            <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Species" />
                           </Stepper>
                         </Stack>
                       </GridCol>
