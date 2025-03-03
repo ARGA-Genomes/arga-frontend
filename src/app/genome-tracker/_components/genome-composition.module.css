@@ -1,0 +1,23 @@
+.coverageHigh {
+    fill: var(--mantine-color-moss-5);
+}
+.coverageMiddle {
+    fill: var(--mantine-color-wheat-5);
+}
+.coverageLow {
+    fill: var(--mantine-color-bushfire-5);
+}
+
+.levelText {
+    font-size: 0.4em;
+    font-weight: 400;
+    text-anchor: middle;
+    font-variant-caps: small-caps;
+}
+
+.level {
+    opacity: 0.5;
+    &:hover {
+        opacity: 1;
+    }
+}

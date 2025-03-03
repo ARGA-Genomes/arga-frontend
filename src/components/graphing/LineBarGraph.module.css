@@ -1,0 +1,19 @@
+.bar {
+    fill: var(--mantine-color-shellfish-5);
+    opacity: 0.4;
+}
+
+.line {
+    stroke: var(--mantine-color-moss-5);
+    stroke-width: 4;
+}
+
+.lineDot {
+    stroke: var(--mantine-color-moss-5);
+    fill: var(--mantine-color-moss-5);
+}
+
+.scaleText {
+    font-weight: 700;
+    font-size: 12px;
+}

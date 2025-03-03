@@ -1,0 +1,25 @@
+.graphContainer {
+    width: auto;
+}
+
+.coverageBar {
+    fill: var(--mantine-color-moss-5);
+    opacity: 0.5;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.coverageBarBg {
+    fill: var(--mantine-color-midnight-1);
+}
+
+.tickLine {
+    stroke-dasharray: 5, 5;
+    opacity: 0.3;
+}
+
+.barLabel {
+    font-weight: 600;
+}

@@ -17,7 +17,7 @@ export function MessagePopup() {
   useEffect(() => {
     const seen = window.localStorage.getItem("arga-popup-seen") === date;
     if (!seen) open();
-  });
+  }, []);
 
   return (
     <Modal
@@ -45,23 +45,19 @@ export function MessagePopup() {
           <Modal.CloseButton />
         </Group>
         <Text>
-          We are currently updating the ARGA database and UI. There may be some
-          disruptions to service during this time, and users may experience
-          issues with inconsistent information availability.
+          We are currently updating the ARGA database and UI. There may be some disruptions to service during this time,
+          and users may experience issues with inconsistent information availability.
         </Text>
         <Text>
-          We anticipate a return to normal services in January 2025. Thank you
-          for your patience and understanding while we refactor ARGA to make it
-          better for you.
+          We anticipate a return to normal services in March 2025. Thank you for your patience and understanding while
+          we refactor ARGA to make it better for you.
         </Text>
         <Text>
-          In the meantime, if you have any comments or queries, please contact
-          us using the contact form:{" "}
+          In the meantime, if you have any comments or queries, please contact us using the contact form:{" "}
           <Anchor href="https://arga.org.au/contact/" target="_blank">
             https://arga.org.au/contact/
           </Anchor>
         </Text>
-        <Text>Best wishes for the coming holidays,</Text>
         <Group gap="xs">
           <IconDna />
           <Text>The ARGA Team</Text>
