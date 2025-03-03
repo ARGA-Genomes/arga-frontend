@@ -3,7 +3,15 @@
 import { Group, Text, Paper, Container, Stack, Grid } from "@mantine/core";
 
 import { PreviousPage } from "@/components/navigation-history";
-import BrowseGrouping from "./browse-grouping";
+import { GroupCard } from "./group-card";
+
+// Data for rendering categories
+import ecosystems from "./_data/ecosystems";
+import commercial from "./_data/commercial";
+import iek from "./_data/iek";
+import phenotypic from "./_data/phenotypic";
+import other from "./_data/other";
+import threatened from "./_data/threatened";
 
 export default function AllGroups() {
   return (
@@ -28,12 +36,41 @@ export default function AllGroups() {
                       <Text fw="bold" c="midnight.9">
                         Ecosystems
                       </Text>
-                      <BrowseGrouping />
+                      <Group align="flex-start">
+                        {ecosystems.map((group) => (
+                          <GroupCard key={group.link} {...group} />
+                        ))}
+                      </Group>
                     </Paper>
                     <Paper p="md" radius="lg" withBorder>
                       <Text fw="bold" c="midnight.9">
                         Commercial applications
                       </Text>
+                      <Group align="flex-start">
+                        {commercial.map((group) => (
+                          <GroupCard key={group.link} {...group} />
+                        ))}
+                      </Group>
+                    </Paper>
+                    <Paper p="md" radius="lg" withBorder>
+                      <Text fw="bold" c="midnight.9">
+                        Indigenous Ecological Knowledge
+                      </Text>
+                      <Group align="flex-start">
+                        {iek.map((group) => (
+                          <GroupCard key={group.link} {...group} />
+                        ))}
+                      </Group>
+                    </Paper>
+                    <Paper p="md" radius="lg" withBorder>
+                      <Text fw="bold" c="midnight.9">
+                        Phenotypic Traits
+                      </Text>
+                      <Group align="flex-start">
+                        {phenotypic.map((group) => (
+                          <GroupCard key={group.link} {...group} />
+                        ))}
+                      </Group>
                     </Paper>
                   </Stack>
                 </Grid.Col>
@@ -42,6 +79,11 @@ export default function AllGroups() {
                     <Text fw="bold" c="midnight.9">
                       Threatened and vulnerable
                     </Text>
+                    <Group align="flex-start">
+                      {threatened.map((group) => (
+                        <GroupCard key={group.link} {...group} />
+                      ))}
+                    </Group>
                   </Paper>
                 </Grid.Col>
                 <Grid.Col span={12}>
@@ -49,6 +91,11 @@ export default function AllGroups() {
                     <Text fw="bold" c="midnight.9">
                       Other traits
                     </Text>
+                    <Group align="flex-start">
+                      {other.map((group) => (
+                        <GroupCard key={group.link} {...group} />
+                      ))}
+                    </Group>
                   </Paper>
                 </Grid.Col>
               </Grid>

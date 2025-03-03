@@ -47,7 +47,7 @@ export default function BrowseGrouping() {
         <Carousel.Slide>
           <BrowseCard
             total={data && (sources["ARGA Commercial Species"] || 0)}
-            category="Argiculture"
+            category="Agriculture"
             image="/card-icons/dataset/agriculture.svg"
             link="/browse/sources/ARGA_Commercial_Species"
           />
