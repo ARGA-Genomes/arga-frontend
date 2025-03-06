@@ -14,9 +14,9 @@ const LEVEL_SLANT = 7;
 const LEVEL_EXPANSION = 40;
 
 const GET_TAXONOMIC_RANK_STATS = gql`
-  query TaxonTreeStats($ranks: [TaxonomicRank]) {
+  query TaxonomicRankStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
     stats {
-      taxonomicRanks(ranks: $ranks) {
+      taxonomicRanks(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, ranks: $ranks) {
         rank
         children
         coverage
@@ -71,7 +71,11 @@ interface GenomeCompositionProps {
 
 export const GenomeComposition = ({ ranks }: GenomeCompositionProps) => {
   const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
-    variables: { ranks },
+    variables: {
+      taxonRank: "DOMAIN",
+      taxonCanonicalName: "Eukaryota",
+      ranks,
+    },
   });
 
   const stats = data?.stats.taxonomicRanks;

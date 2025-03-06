@@ -85,7 +85,7 @@ export default function GenomeTracker() {
                           database last updated dd/mm/yy.
                         </Text>
                         <Box h={390}>
-                          <CumulativeTracker ranks={ranks} />
+                          <CumulativeTracker taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" ranks={ranks} />
                         </Box>
                       </GridCol>
                       <GridCol span={12}>
@@ -150,7 +150,7 @@ export default function GenomeTracker() {
                       Rate of genome completion over time:
                     </Text>
                     <Box h={500}>
-                      <GenomeCompletion />
+                      <GenomeCompletion taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" />
                     </Box>
                   </Stack>
                 </Paper>

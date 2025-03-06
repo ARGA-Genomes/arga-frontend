@@ -1,9 +1,9 @@
 .groupButton {
-    border-radius: var(--mantine-radius-lg);
+    border-radius: var(--mantine-radius-xl);
 
     &:hover {
         cursor: pointer;
-        background-color: var(--mantine-color-shellfish-1);
+        background-color: var(--mantine-color-shellfish-0);
     }
 }
 

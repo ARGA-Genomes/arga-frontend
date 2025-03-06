@@ -32,9 +32,9 @@ const GRAPH_PADDING = 20;
 const LEFT_AXIS_WIDTH = 200;
 
 const GET_TAXONOMIC_RANK_STATS = gql`
-  query TaxonTreeStats($ranks: [TaxonomicRank]) {
+  query TaxonomicRankStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
     stats {
-      taxonomicRanks(ranks: $ranks) {
+      taxonomicRanks(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, ranks: $ranks) {
         rank
         children
         coverage
@@ -112,12 +112,18 @@ function Bars({ width, height, data }: BarsProps) {
 }
 
 interface CumulativeTrackerProps {
+  taxonRank: string;
+  taxonCanonicalName: string;
   ranks: string[];
 }
 
-export function CumulativeTracker({ ranks }: CumulativeTrackerProps) {
+export function CumulativeTracker({ taxonRank, taxonCanonicalName, ranks }: CumulativeTrackerProps) {
   const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
-    variables: { ranks },
+    variables: {
+      taxonRank,
+      taxonCanonicalName,
+      ranks,
+    },
   });
 
   const stats = data?.stats.taxonomicRanks;
