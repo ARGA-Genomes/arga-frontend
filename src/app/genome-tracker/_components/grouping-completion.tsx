@@ -18,6 +18,8 @@ import {
   SimpleGrid,
   Stack,
   Title,
+  useMantineTheme,
+  getThemeColor,
 } from "@mantine/core";
 import { useState } from "react";
 import { Text as SvgText } from "@visx/text";
@@ -25,6 +27,7 @@ import { motion } from "framer-motion";
 import { Circle } from "@visx/shape";
 import { GenomeCompletion } from "./genome-completion";
 import { CumulativeTracker } from "./cumulative-tracker";
+import { TachoChart } from "@/components/graphing/tacho";
 
 const GET_COVERAGE_STATS = gql`
   query TaxonCoverageStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
@@ -216,20 +219,7 @@ function GroupDetailRadial({ group }: GroupDetailProps) {
 
   return (
     coverage && (
-      <>
-        <Center>
-          <SegmentedControl
-            size="md"
-            radius="xl"
-            color="moss.5"
-            data={[
-              { label: "Percentile", value: "percentage" },
-              { label: "Raw numbers", value: "raw" },
-            ]}
-            defaultValue="percentage"
-            onChange={(value) => setShowRaw(value == "raw")}
-          />
-        </Center>
+      <Stack gap="xl">
         <Box h={600}>
           <RadialGraph data={showRaw ? coverage : asPercentage(coverage)} onHover={setHoverItem}>
             {hoverItem && (
@@ -244,9 +234,54 @@ function GroupDetailRadial({ group }: GroupDetailProps) {
             )}
           </RadialGraph>
         </Box>
-      </>
+        <Center>
+          <SegmentedControl
+            size="md"
+            radius="xl"
+            color="moss.5"
+            data={[
+              { label: "Percentile", value: "percentage" },
+              { label: "Raw numbers", value: "raw" },
+            ]}
+            defaultValue="percentage"
+            onChange={(value) => setShowRaw(value == "raw")}
+          />
+        </Center>
+        <Text c="midnight.11" size="sm">
+          Total of species for which a whole genome has been sequenced and made available aggregated by higher
+          classification units.
+        </Text>
+      </Stack>
     )
   );
+}
+
+interface SpeciesCoverageTacho {
+  group: string;
+}
+
+function SpeciesCoverageTacho({ group }: SpeciesCoverageTacho) {
+  const theme = useMantineTheme();
+  const query = QUERIES[group];
+
+  const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
+    variables: {
+      taxonRank: query.taxonRank,
+      taxonCanonicalName: query.taxonCanonicalName,
+      includeRanks: [query.taxonRank],
+    },
+  });
+
+  const stat = data?.stats.taxonBreakdown[0];
+  const value = ((stat?.fullGenomesCoverage || 0) / (stat?.species || 0)) * 100;
+
+  const thresholds = [
+    { name: "", color: getThemeColor("bushfire.5", theme), start: 0, end: 50 },
+    { name: "", color: getThemeColor("wheat.5", theme), start: 50, end: 75 },
+    { name: "", color: getThemeColor("moss.5", theme), start: 75, end: 100 },
+  ];
+
+  return <TachoChart thresholds={thresholds} value={Math.round(value || 0)} h={150} />;
 }
 
 interface GroupDetailExtraProps {
@@ -258,17 +293,42 @@ function GroupDetailExtra({ group }: GroupDetailExtraProps) {
 
   return (
     <Stack>
-      <Box h={300}>
-        <GenomeCompletion taxonRank={query.taxonRank} taxonCanonicalName={query.taxonCanonicalName} />
-      </Box>
+      <Paper radius="lg" p="lg" withBorder>
+        <Stack gap="xl">
+          <SpeciesCoverageTacho group={group} />
+          <Text c="midnight.11" size="sm">
+            Percentage of all species with genomes.
+          </Text>
+        </Stack>
+      </Paper>
 
-      <Box h={300}>
-        <CumulativeTracker
-          taxonRank={query.taxonRank}
-          taxonCanonicalName={query.taxonCanonicalName}
-          ranks={query.rankStats}
-        />
-      </Box>
+      <Paper radius="lg" p="lg" withBorder>
+        <Stack gap="xl">
+          <Box h={300}>
+            <GenomeCompletion taxonRank={query.taxonRank} taxonCanonicalName={query.taxonCanonicalName} />
+          </Box>
+          <Text c="midnight.11" size="sm">
+            Rate of genome completion over time. The first instance of a whole genome sequence for an individual species
+            has been plotted as an accumulated total, shown on a logarithmic scale.
+          </Text>
+        </Stack>
+      </Paper>
+
+      <Paper radius="lg" p="lg" pb="xl" withBorder>
+        <Stack gap="xl">
+          <Box h={300}>
+            <CumulativeTracker
+              taxonRank={query.taxonRank}
+              taxonCanonicalName={query.taxonCanonicalName}
+              ranks={query.rankStats}
+            />
+          </Box>
+          <Text c="midnight.11" size="sm">
+            Percentage of taxonomic group coverage, where there is a complete genome for at least one representative
+            species from each grouping.
+          </Text>
+        </Stack>
+      </Paper>
     </Stack>
   );
 }
@@ -279,21 +339,23 @@ interface GroupDetailProps {
 
 function GroupDetail({ group }: GroupDetailProps) {
   return (
-    <Stack>
-      <Group justify="center" mt={10} ml={10}>
-        <Image w={40} h={40} src={ICONS[group]} alt={group} />
-        <Title order={3}>{Humanize.capitalize(group)}</Title>
-      </Group>
+    <Paper radius="xl" p="lg" withBorder>
+      <Stack>
+        <Group justify="center" mt={10} ml={10}>
+          <Image w={40} h={40} src={ICONS[group]} alt={group} />
+          <Title order={3}>{Humanize.capitalize(group)}</Title>
+        </Group>
 
-      <Grid>
-        <Grid.Col span={6}>
-          <GroupDetailRadial group={group} />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <GroupDetailExtra group={group} />
-        </Grid.Col>
-      </Grid>
-    </Stack>
+        <Grid>
+          <Grid.Col span={6}>
+            <GroupDetailRadial group={group} />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <GroupDetailExtra group={group} />
+          </Grid.Col>
+        </Grid>
+      </Stack>
+    </Paper>
   );
 }
 
