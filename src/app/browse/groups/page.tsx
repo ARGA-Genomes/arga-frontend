@@ -33,40 +33,40 @@ export default function AllGroups() {
                 <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }}>
                   <Stack>
                     <Paper p="md" radius="lg" withBorder>
-                      <Text fw="bold" c="midnight.9">
+                      <Text fw="bold" c="midnight.9" mb="sm">
                         Ecosystems
                       </Text>
-                      <Group align="flex-start">
+                      <Group gap="xs" align="flex-start">
                         {ecosystems.map((group) => (
                           <GroupCard key={group.link} {...group} />
                         ))}
                       </Group>
                     </Paper>
                     <Paper p="md" radius="lg" withBorder>
-                      <Text fw="bold" c="midnight.9">
+                      <Text fw="bold" c="midnight.9" mb="sm">
                         Commercial applications
                       </Text>
-                      <Group align="flex-start">
+                      <Group gap="xs" align="flex-start">
                         {commercial.map((group) => (
                           <GroupCard key={group.link} {...group} />
                         ))}
                       </Group>
                     </Paper>
                     <Paper p="md" radius="lg" withBorder>
-                      <Text fw="bold" c="midnight.9">
+                      <Text fw="bold" c="midnight.9" mb="sm">
                         Indigenous Ecological Knowledge
                       </Text>
-                      <Group align="flex-start">
+                      <Group gap="xs" align="flex-start">
                         {iek.map((group) => (
                           <GroupCard key={group.link} {...group} />
                         ))}
                       </Group>
                     </Paper>
                     <Paper p="md" radius="lg" withBorder>
-                      <Text fw="bold" c="midnight.9">
+                      <Text fw="bold" c="midnight.9" mb="sm">
                         Phenotypic Traits
                       </Text>
-                      <Group align="flex-start">
+                      <Group gap="xs" align="flex-start">
                         {phenotypic.map((group) => (
                           <GroupCard key={group.link} {...group} />
                         ))}
@@ -75,11 +75,11 @@ export default function AllGroups() {
                   </Stack>
                 </Grid.Col>
                 <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }}>
-                  <Paper p="md" radius="lg" withBorder>
-                    <Text fw="bold" c="midnight.9">
+                  <Paper p="md" radius="lg" h="100%" withBorder>
+                    <Text fw="bold" c="midnight.9" mb="sm">
                       Threatened and vulnerable
                     </Text>
-                    <Group align="flex-start">
+                    <Group gap="xs" align="flex-start">
                       {threatened.map((group) => (
                         <GroupCard key={group.link} {...group} />
                       ))}
@@ -88,10 +88,10 @@ export default function AllGroups() {
                 </Grid.Col>
                 <Grid.Col span={12}>
                   <Paper p="md" radius="lg" withBorder>
-                    <Text fw="bold" c="midnight.9">
+                    <Text fw="bold" c="midnight.9" mb="sm">
                       Other traits
                     </Text>
-                    <Group align="flex-start">
+                    <Group gap="xs" align="flex-start">
                       {other.map((group) => (
                         <GroupCard key={group.link} {...group} />
                       ))}
