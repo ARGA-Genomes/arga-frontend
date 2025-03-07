@@ -33,15 +33,15 @@ const GET_COVERAGE_STATS = gql`
         scientificName
         canonicalName
         species
-        completeGenomes
-        completeGenomesCoverage
+        fullGenomes
+        fullGenomesCoverage
 
         children {
           scientificName
           canonicalName
           species
-          completeGenomes
-          completeGenomesCoverage
+          fullGenomes
+          fullGenomesCoverage
         }
       }
     }
@@ -58,8 +58,8 @@ type TaxonCoverage = {
   scientificName: string;
   canonicalName: string;
   species: number;
-  completeGenomes: number;
-  completeGenomesCoverage: number;
+  fullGenomes: number;
+  fullGenomesCoverage: number;
 };
 
 type RootTaxonCoverage = TaxonCoverage & {
@@ -169,7 +169,7 @@ function GroupSelection({ group, onSelected }: GroupSelectionProps) {
   // the first root found in the array
   const coverage = data?.stats.taxonBreakdown[0]?.children.map((taxon) => ({
     label: taxon.canonicalName,
-    value: taxon.completeGenomesCoverage ?? 0,
+    value: taxon.fullGenomesCoverage ?? 0,
     total: taxon.species,
   }));
 
@@ -206,7 +206,7 @@ function GroupDetailRadial({ group }: GroupDetailProps) {
   // the first root found in the array
   const coverage = data?.stats.taxonBreakdown[0]?.children.map((taxon) => ({
     label: taxon.canonicalName,
-    value: taxon.completeGenomesCoverage ?? 0,
+    value: taxon.fullGenomesCoverage ?? 0,
     total: taxon.species,
   }));
 
