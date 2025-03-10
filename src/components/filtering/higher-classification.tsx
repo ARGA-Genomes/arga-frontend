@@ -1,8 +1,6 @@
-import { Button, Stack, Grid, Select, Flex } from "@mantine/core";
-import { useListState } from "@mantine/hooks";
-import { useEffect } from "react";
-import { IconMinus, IconPlus } from "@tabler/icons-react";
-import { DebouncedInputFilter, Filter } from "./common";
+import { Button, Stack, Text } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
+import { Filter } from "./common";
 
 const CLASSIFICATIONS = [
   { value: "KINGDOM", label: "Kingdom" },
@@ -18,77 +16,13 @@ interface HigherClassificationFiltersProps {
   onChange: (items: Filter[]) => void;
 }
 
-export function HigherClassificationFilters({
-  filters,
-  onChange,
-}: HigherClassificationFiltersProps) {
-  const [items, handlers] = useListState<Filter>(filters);
-  useEffect(() => { onChange(items); }, [items, onChange]);
-
-  const addFilter = () => {
-    handlers.append({
-      filter: "",
-      action: "INCLUDE",
-      value: "",
-      editable: true,
-    });
-  };
-
-  const removeFilter = (index: number) => {
-    handlers.remove(index);
-  };
-
-  const filterChanged = (index: number, value: string | null) => {
-    if (value) {
-      handlers.setItemProp(index, "filter", value);
-    }
-  };
-
-  const valueChanged = (index: number, value: string) => {
-    handlers.setItemProp(index, "value", value);
-  };
-
+export function HigherClassificationFilters({ filters, onChange }: HigherClassificationFiltersProps) {
   return (
     <Stack>
-      {items.map((item, idx) => (
-        <Grid key={`classification-filter-${idx}`}>
-          <Grid.Col span="auto">
-            <Flex>
-              <Select
-                value={item.filter}
-                disabled={!item.editable}
-                onChange={(value) => { filterChanged(idx, value); }}
-                data={CLASSIFICATIONS.map((option) => {
-                  return {
-                    value: option.value,
-                    label: option.label,
-                    disabled:
-                      items.findIndex((item) => item.filter == option.value) !==
-                      -1,
-                  };
-                })}
-              />
-              <DebouncedInputFilter
-                initialValue={item.value}
-                disabled={!item.editable}
-                onChange={(value) => { valueChanged(idx, value); }}
-              />
-            </Flex>
-          </Grid.Col>
-          <Grid.Col span="content">
-            <Button
-              color="red"
-              onClick={() => { removeFilter(idx); }}
-              disabled={!item.editable}
-            >
-              <IconMinus />
-            </Button>
-          </Grid.Col>
-        </Grid>
-      ))}
-      <Button color="midnight" leftSection={<IconPlus />} onClick={addFilter}>
+      <Button color="midnight" leftSection={<IconPlus />} onClick={() => alert("To be re-implemented")}>
         Add filter
       </Button>
+      <Text>{JSON.stringify(filters, null, 2)}</Text>
     </Stack>
   );
 }

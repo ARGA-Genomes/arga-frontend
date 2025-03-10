@@ -3,7 +3,7 @@
 import { MAX_WIDTH } from "@/app/constants";
 import { Photo } from "@/app/type";
 import DataTypeHeader from "@/components/data-type-header";
-import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { Filter, FilterKind, intoFilterItem } from "@/components/filtering/common";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -115,9 +115,7 @@ interface FiltersProps {
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications,
-  );
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications);
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
@@ -151,10 +149,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <HigherClassificationFilters
-            filters={classifications}
-            onChange={setClassifications}
-          />
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
@@ -182,7 +177,11 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
 }
 
 function FilterBadge({ filter }: { filter: Filter }) {
-  return <Badge variant="outline">{filter.value}</Badge>;
+  return (
+    <Badge variant="outline">
+      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
+    </Badge>
+  );
 }
 
 function Species() {
@@ -193,9 +192,7 @@ function Species() {
     classifications: [],
     dataTypes: [
       {
-        filter: "HAS_DATA",
-        action: "INCLUDE",
-        value: "Specimen",
+        hasData: FilterKind.Specimens,
         editable: false,
       },
     ],
@@ -207,37 +204,25 @@ function Species() {
     return items.filter((item): item is Filter => !!item);
   };
 
-  const { loading, error, data, previousData } = useQuery<QueryResults>(
-    GET_SPECIES,
-    {
-      variables: {
-        page,
-        perPage: PAGE_SIZE,
-        filters: flattenFilters(filters)
-          .map(intoFilterItem)
-          .filter((item) => item),
-      },
-    },
-  );
+  console.log(filters, flattenFilters(filters), flattenFilters(filters).map(intoFilterItem));
 
-  const records =
-    data?.taxa.species.records || previousData?.taxa.species.records;
+  const { loading, error, data, previousData } = useQuery<QueryResults>(GET_SPECIES, {
+    variables: {
+      page,
+      perPage: PAGE_SIZE,
+      filters: flattenFilters(filters)
+        .map(intoFilterItem)
+        .filter((item) => item),
+    },
+  });
+
+  const records = data?.taxa.species.records || previousData?.taxa.species.records;
 
   return (
     <Stack>
-      <Drawer
-        opened={opened}
-        onClose={close}
-        withCloseButton={false}
-        position="right"
-        size="xl"
-      >
+      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box pt={200}>
-          <Filters
-            filters={filters}
-            options={data?.taxa.filterOptions}
-            onChange={setFilters}
-          />
+          <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
         </Box>
       </Drawer>
 
@@ -254,8 +239,8 @@ function Species() {
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            {flattenFilters(filters).map((filter) => (
-              <FilterBadge filter={filter} key={filter.value} />
+            {flattenFilters(filters).map((filter, idx) => (
+              <FilterBadge key={idx} filter={filter} />
             ))}
           </Group>
         </Grid.Col>
@@ -279,12 +264,7 @@ function Species() {
         ))}
       </SimpleGrid>
 
-      <PaginationBar
-        total={data?.taxa.species.total}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onChange={setPage}
-      />
+      <PaginationBar total={data?.taxa.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
     </Stack>
   );
 }
