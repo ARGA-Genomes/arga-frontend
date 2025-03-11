@@ -143,8 +143,14 @@ export default function GenomeTracker() {
               </Paper>
               <Paper p="md" radius="lg" withBorder>
                 <Stack>
-                  <Text size="lg" fw="bold">
-                    Rate of genome completion over time:
+                  <Text size="xl" fw="bold">
+                    Rate of genome completion for Australian species over time:
+                  </Text>
+                  <Text c="midnight.11" size="sm">
+                    This graph shows the aggregated total of species for which a whole genome has been sequenced and
+                    made available. The first instance of a whole genome sequence for an individual species has been
+                    plotted as an accumulated total, shown on a logarithmic scale. Statistics based on records indexed
+                    within ARGA.
                   </Text>
                   <Box h={500}>
                     <GenomeCompletion taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" />
