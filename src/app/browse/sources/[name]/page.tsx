@@ -207,7 +207,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Data types"
             description="Only show species that have specific types of data"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -220,7 +220,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Higher classification filters"
             description="Limit data based on taxonomy"
-            image="/card-icons/type/higher_taxon_report.svg"
+            image="/icons/data-type/Data type_ Higher taxon report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>

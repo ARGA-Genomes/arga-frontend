@@ -9,7 +9,7 @@ const array = [...commercial, ...ecosystems, ...iek, ...other, ...phenotypic, ..
 const map = array.reduce(
   (prev, group) => ({
     ...prev,
-    [group.category.toLowerCase().replaceAll(" ", "-")]: group,
+    [group.category.toLowerCase().replaceAll(" ", "-").replaceAll("'", "")]: group,
   }),
   {}
 );

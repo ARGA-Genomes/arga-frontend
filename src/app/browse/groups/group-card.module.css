@@ -8,6 +8,7 @@
 }
 
 .card {
+  flex-basis: 100%;
   @mixin hover {
     background-color: var(--mantine-color-midnight-1);
   }

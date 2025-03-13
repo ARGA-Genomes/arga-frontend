@@ -32,19 +32,13 @@ export default function BrowseType() {
   if (error) return <p>Error : {error.message}</p>;
 
   return (
-    <Carousel
-      slideSize={150}
-      slideGap="sm"
-      slidesToScroll="auto"
-      align="start"
-      withControls={false}
-    >
+    <Carousel slideSize={150} slideGap="sm" slidesToScroll="auto" align="start" withControls={false}>
       <Group justify="center" align="flex-start">
         <Carousel.Slide>
           <BrowseCard
             total={data?.overview.wholeGenomes}
             category="Genome assemblies"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
             link="/browse/genomes"
           />
         </Carousel.Slide>
@@ -52,7 +46,7 @@ export default function BrowseType() {
           <BrowseCard
             total={data?.overview.loci}
             category="Single loci"
-            image="/card-icons/type/markers.svg"
+            image="/icons/data-type/Data type_ Markers.svg"
             link="/browse/loci"
           />
         </Carousel.Slide>
@@ -60,7 +54,7 @@ export default function BrowseType() {
           <BrowseCard
             total={data?.overview.specimens}
             category="Specimens"
-            image="/card-icons/type/specimens.svg"
+            image="/icons/data-type/Data type_ Specimen.svg"
             link="/browse/specimens"
           />
         </Carousel.Slide>

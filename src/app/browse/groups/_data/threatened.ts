@@ -1,140 +1,100 @@
 export default [
   {
-    category: "Bushfire Vulnerability",
-    image: "/card-icons/dataset/fire_vulnerable.svg",
-    link: "/browse/sources/ARGA_Bushfire_Recovery",
-    source: "ARGA_Bushfire_Recovery",
+    category: "All Threatened",
+    image: "/icons/list-group/List group_ Threatened species.svg",
+    source: "ARGA Threatened Species",
   },
   {
     category: "Australia's 110 Priority Threatened Species",
-    image: "/card-icons/dataset/threatened_top_110_species.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "top110Species",
-        value: "TRUE",
-      },
-    ],
+    image: "/icons/list-group/List group_ Threatened (= Top 110 Species).svg",
+    source: "ARGA Threatened Species",
+    filters: {
+      top110Species: "TRUE",
+    },
   },
   {
-    category: "Extinct",
-    image: "/card-icons/dataset/epbc_extinct.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_EX",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Extinct in the Wild",
-    image: "/card-icons/dataset/epbc_extinct_in_the_wild.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_EW",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Critically Endangered",
-    image: "/card-icons/dataset/epbc_critically_endangered.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_CR",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Endangered",
-    image: "/card-icons/dataset/epbc_endangered.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_EN",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Vulnerable",
-    image: "/card-icons/dataset/epbc_vulnerable.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_VU",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Conservation Dependent",
-    image: "/card-icons/dataset/epbc_conservation_dependent.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_cd",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Not Threatened",
-    image: "/card-icons/dataset/epbc_not_threatened.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_nt",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Least Concern",
-    image: "/card-icons/dataset/epbc_least_concern.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_lc",
-        value: "TRUE",
-      },
-    ],
-  },
-  {
-    category: "Unlisted Status",
-    image: "/card-icons/dataset/epbc_unlisted.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_ul",
-        value: "TRUE",
-      },
-    ],
+    category: "Bushfire Vulnerability",
+    image: "/icons/list-group/List group_ Bushfire vulnerable.svg",
+    source: "ARGA Bushfire Recovery",
   },
   {
     category: "CITES Listing",
-    image: "/card-icons/dataset/cites.svg",
-    link: "/browse/sources/ARGA_Threatened_Species",
-    source: "ARGA_Threatened_Species",
-    filters: [
-      {
-        key: "EPBC_VU", // TODO: FIX
-        value: "TRUE",
-      },
-    ],
+    image: "/icons/list-group/List group_ CITES.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_VU: "TRUE", // TODO: FIX
+    },
+  },
+  {
+    category: "Extinct",
+    image: "/icons/list-group/List group_ EPBC_ extinct.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_EX: "TRUE",
+    },
+  },
+  {
+    category: "Extinct in the Wild",
+    image: "/icons/list-group/List group_ EPBC_ extinct in the wild.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_EW: "TRUE",
+    },
+  },
+  {
+    category: "Critically Endangered",
+    image: "/icons/list-group/List group_ EPBC_ critically endangered.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_CR: "TRUE",
+    },
+  },
+  {
+    category: "Endangered",
+    image: "/icons/list-group/List group_ EPBC_ endangered.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_EN: "TRUE",
+    },
+  },
+  {
+    category: "Vulnerable",
+    image: "/icons/list-group/List group_ EPBC_ vulnerable.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_VU: "TRUE",
+    },
+  },
+  {
+    category: "Conservation Dependent",
+    image: "/icons/list-group/List group_ EPBC_ conservation dependent.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_cd: "TRUE",
+    },
+  },
+  {
+    category: "Not Threatened",
+    image: "/icons/list-group/List group_ EPBC_ not threatened.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_nt: "TRUE",
+    },
+  },
+  {
+    category: "Least Concern",
+    image: "/icons/list-group/List group_ EPBC_ least concern.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_lc: "TRUE",
+    },
+  },
+  {
+    category: "Unlisted Status",
+    image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      EPBC_ul: "TRUE",
+    },
   },
 ];

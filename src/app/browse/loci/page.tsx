@@ -115,9 +115,7 @@ interface FiltersProps {
 }
 
 function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(
-    filters.classifications,
-  );
+  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications);
   const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
 
   useEffect(() => {
@@ -134,7 +132,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Data types"
             description="Only show species that have specific types of data"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -147,14 +145,11 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Higher classification filters"
             description="Limit data based on taxonomy"
-            image="/card-icons/type/higher_taxon_report.svg"
+            image="/icons/data-type/Data type_ Higher taxon report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <HigherClassificationFilters
-            filters={classifications}
-            onChange={setClassifications}
-          />
+          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
         </Accordion.Panel>
       </Accordion.Item>
     </Accordion>
@@ -207,37 +202,23 @@ function Species() {
     return items.filter((item): item is Filter => !!item);
   };
 
-  const { loading, error, data, previousData } = useQuery<QueryResults>(
-    GET_SPECIES,
-    {
-      variables: {
-        page,
-        perPage: PAGE_SIZE,
-        filters: flattenFilters(filters)
-          .map(intoFilterItem)
-          .filter((item) => item),
-      },
+  const { loading, error, data, previousData } = useQuery<QueryResults>(GET_SPECIES, {
+    variables: {
+      page,
+      perPage: PAGE_SIZE,
+      filters: flattenFilters(filters)
+        .map(intoFilterItem)
+        .filter((item) => item),
     },
-  );
+  });
 
-  const records =
-    data?.taxa.species.records || previousData?.taxa.species.records;
+  const records = data?.taxa.species.records || previousData?.taxa.species.records;
 
   return (
     <Stack>
-      <Drawer
-        opened={opened}
-        onClose={close}
-        withCloseButton={false}
-        position="right"
-        size="xl"
-      >
+      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box pt={200}>
-          <Filters
-            filters={filters}
-            options={data?.taxa.filterOptions}
-            onChange={setFilters}
-          />
+          <Filters filters={filters} options={data?.taxa.filterOptions} onChange={setFilters} />
         </Box>
       </Drawer>
 
@@ -279,12 +260,7 @@ function Species() {
         ))}
       </SimpleGrid>
 
-      <PaginationBar
-        total={data?.taxa.species.total}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onChange={setPage}
-      />
+      <PaginationBar total={data?.taxa.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
     </Stack>
   );
 }

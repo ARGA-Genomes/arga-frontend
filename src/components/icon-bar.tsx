@@ -1,8 +1,4 @@
-import {
-  Conservation,
-  IndigenousEcologicalKnowledge,
-  Taxonomy,
-} from "@/app/type";
+import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import { Box, ThemeIcon, Image, Tooltip } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
@@ -11,205 +7,208 @@ import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 
 interface IconData {
-  label?: string;
-  image?: string;
+  label: string;
+  image: string;
   link?: string;
 }
 
 const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
   native: {
-    image: "native.svg",
+    image: "/icons/list-group/List group_ native.svg",
     label: "Native Species",
   },
   extinct: {
     label: "Extinct Species",
-    image: "/species-icons/epbc_extinct.svg",
+    image: "/icons/list-group/List group_ EPBC_ extinct.svg",
   },
   "extinct in the wild": {
     label: "Extinct in the Wild",
-    image: "/species-icons/epbc_extinct_in_the_wild.svg",
+    image: "/icons/list-group/List group_ EPBC_ extinct in the wild.svg",
   },
   "critically endangered": {
     label: "Critically Endangered",
-    image: "/species-icons/epbc_critically_endangered.svg",
+    image: "/icons/list-group/List group_ EPBC_ critically endangered.svg",
   },
   endangered: {
     label: "Endangered Species",
-    image: "/species-icons/epbc_endangered.svg",
+    image: "/icons/list-group/List group_ EPBC_ endangered.svg",
   },
   vulnerable: {
     label: "Vulnerable Species",
-    image: "/species-icons/epbc_vulnerable.svg",
+    image: "/icons/list-group/List group_ EPBC_ vulnerable.svg",
   },
   "vulnerable (wildfire)": {
     label: "Vulnerable to Wildfire",
-    image: "/species-icons/fire_vulnerable.svg",
+    image: "/icons/list-group/List group_ Bushfire vulnerable.svg",
   },
   threatened: {
     label: "Threatened Species",
+    image: "",
   },
   rare: {
     label: "Rare Species",
+    image: "",
   },
   "near threatened": {
     label: "Near Threatened Species",
+    image: "",
   },
   "least concern": {
     label: "Least concern",
-    image: "/species-icons/epbc_least_concern.svg",
+    image: "/icons/list-group/List group_ EPBC_ least concern.svg",
   },
   unlisted: {
     label: "Unlisted",
-    image: "/species-icons/epbc_unlisted.svg",
+    image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
   },
 };
 
-const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
+export const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   BACTERIA: {
-    image: "/species-icons/bacteria.svg",
+    image: "/icons/taxon/Taxon_ Bacteria (= Prokaryota_Bacteria).svg",
     label: "Bacteria",
     link: "/kingdom/Bacteria",
   },
   PROTISTS_AND_OTHER_UNICELLULAR_ORGANISMS: {
-    image: "/species-icons/protists.svg",
+    image: "/icons/taxon/Taxon_ Protozoa (= Kingdom Protozoa).svg",
     label: "Protists and other unicellular organisms",
     link: "/superkingdom/Protista",
   },
   FUNGI: {
-    image: "/species-icons/fungi.svg",
+    image: "/icons/taxon/Taxon_ Fungi (= Fungi).svg",
     label: "Mushrooms and other fungi",
     link: "/regnum/Fungi",
   },
   MOLLUSCS: {
-    image: "/species-icons/molluscs.svg",
+    image: "/icons/taxon/Taxon_ Molluscs (= Mollusca).svg",
     label: "Molluscs",
     link: "/phylum/Mollusca",
   },
   CRUSTACEANS: {
-    image: "/species-icons/crustaceans.svg",
+    image: "/icons/taxon/Taxon_ Crustaceans (= Crustacea).svg",
     label: "Crustaceans",
     link: "/subphylum/Crustacea",
   },
   INSECTS: {
-    image: "/species-icons/insecta.svg",
+    image: "/icons/taxon/Taxon_ Insects (= Insecta).svg",
     label: "Insects",
     link: "/class/Insecta",
   },
   FROGS_AND_OTHER_AMPHIBIANS: {
-    image: "/species-icons/frogs_updated.svg",
+    image: "/icons/taxon/Taxon_ Frogs and toads (= Anura).svg",
     label: "Frogs and other amphibians",
     link: "/class/Amphibia",
   },
   BIRDS: {
-    image: "/species-icons/birds.svg",
+    image: "/icons/taxon/Taxon_ Birds (= Aves).svg",
     label: "Birds",
     link: "/class/Aves",
   },
   MAMMALS: {
-    image: "/species-icons/mammals.svg",
+    image: "/icons/taxon/Taxon_ Mammals (= Mammalia).svg",
     label: "Mammals",
     link: "/class/Mammalia",
   },
   HIGHER_PLANTS: {
-    image: "/species-icons/plants.svg",
+    image: "/icons/taxon/Taxon_ Plants (=Regnum Plantae).svg",
     label: "Higher plants",
     link: "/regnum/Plantae",
   },
   FLOWERING_PLANTS: {
-    image: "/species-icons/flowering_plants.svg",
+    image: "/icons/taxon/Taxon_ Flowering plants (=Magnoliidae).svg",
     label: "Flowering plants",
     link: "/subclassis/Magnoliidae",
   },
   ANIMALS: {
-    image: "/species-icons/animals.svg",
+    image: "/icons/taxon/Taxon_ Animals (= Kingdom Animalia).svg",
     label: "Animals",
     link: "/kingdom/Animalia",
   },
   BROWN_ALGAE: {
-    image: "/species-icons/brown_algae.svg",
+    image: "/icons/taxon/Taxon_ Brown algae (= Phaeophyceae).svg",
     label: "Brown algae",
     link: "/classis/Phaeophyceae",
   },
   RED_ALGAE: {
-    image: "/species-icons/red_algae.svg",
+    image: "/icons/taxon/Taxon_ Red algae (= Rhodophyta).svg",
     label: "Red algae",
     link: "/division/Rhodophyta",
   },
   GREEN_ALGAE: {
-    image: "/species-icons/green_algae.svg",
+    image: "/icons/taxon/Taxon_ Green algae (= Chlorophyta).svg",
     label: "Green algae",
     link: "/division/Chlorophyta",
   },
   ECHINODERMS: {
-    image: "/species-icons/echinoderms.svg",
+    image: "/icons/taxon/Taxon_ Echinoderms (= Echinodermata).svg",
     label: "Echinoderms",
     link: "/phylum/Echinodermata",
   },
   FIN_FISHES: {
-    image: "/species-icons/finfishes.svg",
+    image: "/icons/taxon/Taxon_ Finfishes (= Actinopterygii).svg",
     label: "Fin fishes",
     link: "/class/Actinopterygii",
   },
   CORALS_AND_JELLYFISHES: {
-    image: "/species-icons/cnidaria.svg",
+    image: "/icons/taxon/Taxon_ Anemones, corals and jellyfishes (= Cnidaria).svg",
     label: "Corals and jellyfishes",
     link: "/phylum/Cnidaria",
   },
   CYANOBACTERIA: {
-    image: "/species-icons/cyanobacteria.svg",
+    image: "/icons/taxon/Taxon_ Blue-green algae (= Cyanobacteria).svg",
     label: "Cyanobacteria",
     link: "/division/Cyanobacteria",
   },
   SHARKS_AND_RAYS: {
-    image: "/species-icons/sharks.svg",
+    image: "/icons/taxon/Taxon_ Sharks and rays (= Subclass Elasmobranchii).svg",
     label: "Sharks and rays",
     link: "/subclass/Elasmobranchii",
   },
   SPIDERS: {
-    image: "/species-icons/spiders.svg",
+    image: "/icons/taxon/Taxon_ Spiders (= Araneae).svg",
     label: "Spiders",
     link: "/order/Araneae",
   },
   REPTILES: {
-    image: "/species-icons/reptiles.svg",
+    image: "/icons/taxon/Taxon_ Reptiles (= Reptilia).svg",
     label: "Reptiles",
     link: "/class/Reptilia",
   },
   MOSSES: {
-    image: "/species-icons/mosses.svg",
+    image: "/icons/taxon/Taxon_ Mosses (= Bryophyta).svg",
     label: "Mosses",
     link: "/classis/Bryopsida",
   },
   LIVERWORTS: {
-    image: "/species-icons/liverworts.svg",
+    image: "/icons/taxon/Taxon_ Liverworts (= Marchantiophyta).svg",
     label: "Liverworts",
     link: "/division/Marchantiophyta",
   },
   HORNWORTS: {
-    image: "/species-icons/hornworts.svg",
+    image: "/icons/taxon/Taxon_ Hornworts (= Anthocerotophyta).svg",
     label: "Hornworts",
     link: "/division/Anthocerotophyta",
   },
   LICHENS: {
-    image: "/species-icons/lichens.svg",
+    image: "/icons/taxon/Taxon_ Lichens.svg",
     label: "Lichens",
   },
   FERNS: {
-    image: "/species-icons/ferns.svg",
+    image: "/icons/taxon/Taxon_ Ferns (= Polypodiidae).svg",
     label: "Ferns",
     link: "/subclassis/Polypodiidae",
   },
   CONIFERS_AND_CYCADS: {
-    image: "/species-icons/conifers_and_cycads.svg",
+    image: "/icons/taxon/Taxon_ Conifers and cycads (= Pinales, Araucariales, Cupressales, Cycadales).svg",
     label: "Conifers and cycads",
   },
   DIATOMS: {
-    image: "/species-icons/diatoms.svg",
+    image: "/icons/taxon/Taxon_ Diatoms (= Bacillariophyta).svg",
     label: "Diatoms",
     link: "/division/Bacillariophyta",
   },
   CHROMISTS: {
-    image: "/species-icons/chromists.svg",
+    image: "/icons/taxon/Taxon_ Chromists (= Chromista).svg",
     label: "Chromists",
     link: "/regnum/Chromista",
   },
@@ -217,153 +216,144 @@ const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
 
 const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   is_venomous: {
-    image: "/attribute-icons/venomous_and_poisonous.svg",
+    image: "/icons/list-group/List group_ Venomous and poisonous.svg",
     label: "Venomous and poisonous",
     link: "/browse/sources/ARGA_Venomous_and_Poisonous_Species",
   },
   vulnerable_wildfire: {
-    image: "/attribute-icons/bushfire_vulnerable.svg",
+    image: "/icons/list-group/List group_ Bushfire vulnerable.svg",
     label: "Fire vulnerable",
     link: "/browse/sources/ARGA_Bushfire_Recovery",
   },
   native_species_icon: {
-    image: "/attribute-icons/native_species.svg",
+    image: "/icons/list-group/List group_ native.svg",
     label: "Native",
     link: "/browse/sources/ARGA_Native_Species",
   },
   edible_wild_species_icon: {
-    image: "/attribute-icons/edible_wild_species.svg",
+    image: "/icons/list-group/List group_ edible wild species.svg",
     label: "Edible wild",
     link: "/browse/sources/ARGA_Edible_Species",
   },
   crop_wild_relative_icon: {
-    image: "/attribute-icons/crop_wild_relative.svg",
+    image: "/icons/list-group/List group_ crop wild relative.svg",
     label: "Crop wild relative",
     link: "/browse/sources/ARGA_Crop_Wild_Relatives",
   },
   invasives_pests_icon: {
-    image: "/attribute-icons/invasives_pests.svg",
+    image: "/icons/list-group/List group_ invasives and pests.svg",
     label: "Invasive/pest",
     link: "/browse/sources/ARGA_Exotic_Species",
   },
   migratory_species_icon: {
-    image: "/attribute-icons/migratory_species.svg",
+    image: "/icons/list-group/List group_ migratory species.svg",
     label: "Migratory",
     link: "/browse/sources/ARGA_Migratory_Species",
   },
   top_110_species_icon: {
-    image: "/attribute-icons/top_110_species.svg",
+    image: "/icons/list-group/List group_ Threatened (= Top 110 Species).svg",
     label: "Threatened",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_EX: {
-    image: "/attribute-icons/EPBC_extinct.svg",
+    image: "/icons/list-group/List group_ EPBC_ extinct.svg",
     label: "EPBC Act Status: Extinct",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_EW: {
-    image: "/attribute-icons/EPBC_extinct_in_the_wild.svg",
+    image: "/icons/list-group/List group_ EPBC_ extinct in the wild.svg",
     label: "EPBC Act Status: Extinct in the wild",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_CR: {
-    image: "/attribute-icons/EPBC_critically_endangered.svg",
+    image: "/icons/list-group/List group_ EPBC_ critically endangered.svg",
     label: "EPBC Act Status: Critically endangered",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_EN: {
-    image: "/attribute-icons/EPBC_endangered.svg",
+    image: "/icons/list-group/List group_ EPBC_ endangered.svg",
     label: "EPBC Act Status: Endangered",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_VU: {
-    image: "/attribute-icons/EPBC_vulnerable.svg",
+    image: "/icons/list-group/List group_ EPBC_ vulnerable.svg",
     label: "EPBC Act Status: Vulnerable",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_cd: {
-    image: "/attribute-icons/EPBC_conservation_dependent.svg",
+    image: "/icons/list-group/List group_ EPBC_ conservation dependent.svg",
     label: "EPBC Act Status: Conservation dependent",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_nt: {
-    image: "/attribute-icons/EPBC_not_threatened.svg",
+    image: "/icons/list-group/List group_ EPBC_ not threatened.svg",
     label: "EPBC Act Status: Not threatened",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_lc: {
-    image: "/attribute-icons/EPBC_least_concern.svg",
+    image: "/icons/list-group/List group_ EPBC_ least concern.svg",
     label: "EPBC Act Status: Least concern",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   EPBC_act_category_ul: {
-    image: "/attribute-icons/EPBC_unlisted.svg",
+    image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
     label: "EPBC Act Status: Unlisted",
     link: "/browse/sources/ARGA_Threatened_Species",
   },
   is_medicinal_and_bioactive_icon: {
-    image: "/attribute-icons/medicinal_and_bioactive.svg",
+    image: "/icons/list-group/List group_ medicinal and bioactive.svg",
     label: "Medicinal and bioactive",
   },
   agriculture: {
-    image: "/attribute-icons/agriculture.svg",
+    image: "/icons/list-group/List group_ Agriculture.svg",
     label: "Agriculture",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   aquaculture: {
-    image: "/attribute-icons/aquaculture.svg",
+    image: "/icons/list-group/List group_ Aquaculture.svg",
     label: "Aquaculture",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   "horticultural crop": {
-    image: "/attribute-icons/horticultural_crops.svg",
+    image: "/icons/list-group/List group_ Horticultural crops.svg",
     label: "Horticultural crop",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   "crops and cereals": {
-    image: "/attribute-icons/crops_and_cereals.svg",
+    image: "/icons/list-group/List group_ Cereals and crops.svg",
     label: "Crops and cereals",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   forestry: {
-    image: "/attribute-icons/forestry_and_timber.svg",
+    image: "/icons/list-group/List group_ Forestry, timber and textiles.svg",
     label: "Forestry and timber industry",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   livestock: {
-    image: "/attribute-icons/livestock.svg",
+    image: "/icons/list-group/List group_ Livestock.svg",
     label: "Livestock industry",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   commercial_and_trade_fisheries_icon: {
-    image: "/attribute-icons/commercial_and_trade_fisheries.svg",
+    image: "/icons/list-group/List group_ Commercial and trade fishes.svg",
     label: "Commercial and trade fisheries",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   managed_fisheries_icon: {
-    image: "/attribute-icons/managed_fisheries.svg",
+    image: "/icons/list-group/List group_ Managed fisheries.svg",
     label: "Managed fisheries",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
 };
 
-function ConservationIcon({
-  status,
-  source,
-}: {
-  status: string;
-  source: string | undefined;
-}) {
-  const icon =
-    CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
+function ConservationIcon({ status, source }: { status: string; source: string | undefined }) {
+  const icon = CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
   const tooltip = `${icon.label || status} | ${source}`;
 
   return (
     <Tooltip label={tooltip}>
       <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
-        {icon.image && (
-          <Image src={icon.image} alt={icon.label || status} w={60} />
-        )}
+        {icon.image && <Image src={icon.image} alt={icon.label || status} w={60} />}
       </ThemeIcon>
     </Tooltip>
   );
@@ -505,10 +495,7 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
 
   const attributeHeaderIconsRaw = attributes
     ?.map((nameAttribute) => {
-      if (
-        nameAttribute.name === "commercial_sector_icon" ||
-        nameAttribute.name === "agricultural_industry_icon"
-      ) {
+      if (nameAttribute.name === "commercial_sector_icon" || nameAttribute.name === "agricultural_industry_icon") {
         return nameAttribute.valueStr;
       }
       if (ATTRIBUTE_GROUP_ICON[nameAttribute.name]) {
@@ -587,40 +574,16 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
   return (
     <Carousel
       slideSize={{
-        base:
-          headerIcons.length <= 3
-            ? (100 / headerIcons.length).toString() + "%"
-            : "33.333333%",
-        xs:
-          headerIcons.length <= 4
-            ? (100 / headerIcons.length).toString() + "%"
-            : "25%",
-        sm:
-          headerIcons.length <= 5
-            ? (100 / headerIcons.length).toString() + "%"
-            : "20%",
-        md:
-          headerIcons.length <= 6
-            ? (100 / headerIcons.length).toString() + "%"
-            : "16.66666666%",
+        base: headerIcons.length <= 3 ? (100 / headerIcons.length).toString() + "%" : "33.333333%",
+        xs: headerIcons.length <= 4 ? (100 / headerIcons.length).toString() + "%" : "25%",
+        sm: headerIcons.length <= 5 ? (100 / headerIcons.length).toString() + "%" : "20%",
+        md: headerIcons.length <= 6 ? (100 / headerIcons.length).toString() + "%" : "16.66666666%",
       }}
       maw={{
-        base:
-          headerIcons.length <= 3
-            ? (70 * headerIcons.length).toString() + "px"
-            : "306px",
-        xs:
-          headerIcons.length <= 4
-            ? (70 * headerIcons.length).toString() + "px"
-            : "376px",
-        sm:
-          headerIcons.length <= 5
-            ? (70 * headerIcons.length).toString() + "px"
-            : "446px",
-        md:
-          headerIcons.length <= 6
-            ? (70 * headerIcons.length).toString() + "px"
-            : "516px",
+        base: headerIcons.length <= 3 ? (70 * headerIcons.length).toString() + "px" : "306px",
+        xs: headerIcons.length <= 4 ? (70 * headerIcons.length).toString() + "px" : "376px",
+        sm: headerIcons.length <= 5 ? (70 * headerIcons.length).toString() + "px" : "446px",
+        md: headerIcons.length <= 6 ? (70 * headerIcons.length).toString() + "px" : "516px",
       }}
       pr={{
         base: headerIcons.length <= 3 ? "0" : "3em",
@@ -645,31 +608,24 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
             <Carousel.Slide pr="5px" pl="5px" key={index}>
               <Box w="100%" display="flex" style={{ justifyContent: "center" }}>
                 {icon === "CONIFERS_AND_CYCADS" ? (
-                  <VernacularGroupIcon
-                    group={icon}
-                    iconLink={coniferCycadLink}
-                  />
+                  <VernacularGroupIcon group={icon} iconLink={coniferCycadLink} />
                 ) : (
                   <VernacularGroupIcon group={icon} />
                 )}
               </Box>
             </Carousel.Slide>
-          ),
+          )
       )}
       {attributeHeaderIcons &&
         attributeHeaderIcons.map(
           (icon, index) =>
             icon && (
               <Carousel.Slide pr="5px" pl="5px" key={index}>
-                <Box
-                  w="100%"
-                  display="flex"
-                  style={{ justifyContent: "center" }}
-                >
+                <Box w="100%" display="flex" style={{ justifyContent: "center" }}>
                   <AttributeGroupIcon attribute={icon} />
                 </Box>
               </Carousel.Slide>
-            ),
+            )
         )}
     </Carousel>
   );

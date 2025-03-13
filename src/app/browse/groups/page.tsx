@@ -38,7 +38,7 @@ export default function AllGroups() {
                       </Text>
                       <Group gap="xs" align="flex-start">
                         {ecosystems.map((group) => (
-                          <GroupCard key={group.link} {...group} />
+                          <GroupCard key={group.category} {...group} />
                         ))}
                       </Group>
                     </Paper>
@@ -48,7 +48,7 @@ export default function AllGroups() {
                       </Text>
                       <Group gap="xs" align="flex-start">
                         {commercial.map((group) => (
-                          <GroupCard key={group.link} {...group} />
+                          <GroupCard key={group.category} {...group} />
                         ))}
                       </Group>
                     </Paper>
@@ -58,7 +58,7 @@ export default function AllGroups() {
                       </Text>
                       <Group gap="xs" align="flex-start">
                         {iek.map((group) => (
-                          <GroupCard key={group.link} {...group} />
+                          <GroupCard key={group.category} {...group} />
                         ))}
                       </Group>
                     </Paper>
@@ -68,7 +68,7 @@ export default function AllGroups() {
                       </Text>
                       <Group gap="xs" align="flex-start">
                         {phenotypic.map((group) => (
-                          <GroupCard key={group.link} {...group} />
+                          <GroupCard key={group.category} {...group} />
                         ))}
                       </Group>
                     </Paper>
@@ -81,7 +81,7 @@ export default function AllGroups() {
                     </Text>
                     <Group gap="xs" align="flex-start">
                       {threatened.map((group) => (
-                        <GroupCard key={group.link} {...group} />
+                        <GroupCard key={group.category} {...group} />
                       ))}
                     </Group>
                   </Paper>
@@ -93,7 +93,7 @@ export default function AllGroups() {
                     </Text>
                     <Group gap="xs" align="flex-start">
                       {other.map((group) => (
-                        <GroupCard key={group.link} {...group} />
+                        <GroupCard key={group.category} {...group} />
                       ))}
                     </Group>
                   </Paper>

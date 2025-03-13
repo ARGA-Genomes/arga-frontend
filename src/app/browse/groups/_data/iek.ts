@@ -1,17 +1,17 @@
 export default [
   {
     category: "Southeast Arnhem Land",
-    image: "/card-icons/dataset/iek_arnhem_land.svg",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    image: "/icons/list-group/List group_ IEK_ Arnhem Land.svg",
+    source: "ARGA Commercial Species",
   },
   {
     category: "Kamilaroi",
-    image: "/card-icons/dataset/iek_kamilaroi.svg",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    image: "/icons/list-group/List group_ IEK_ Kamilaroi.svg",
+    source: "ARGA Commercial Species",
   },
   {
     category: "Noongar",
-    image: "/card-icons/dataset/iek_noongar_boodjar.svg",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    image: "/icons/list-group/List group_ IEK_ Noongar Boodjar.svg",
+    source: "ARGA Commercial Species",
   },
 ];

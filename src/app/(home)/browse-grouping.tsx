@@ -48,7 +48,7 @@ export default function BrowseGrouping() {
           <BrowseCard
             total={data && (sources["ARGA Commercial Species"] || 0)}
             category="Agriculture"
-            image="/card-icons/dataset/agriculture.svg"
+            image="/icons/list-group/List group_ Agriculture.svg"
             link="/browse/sources/ARGA_Commercial_Species"
           />
         </Carousel.Slide>
@@ -56,7 +56,7 @@ export default function BrowseGrouping() {
           <BrowseCard
             total={data && (sources["ARGA Commercial Species"] || 0)}
             category="Aquaculture"
-            image="/card-icons/dataset/aquaculture.svg"
+            image="/icons/list-group/List group_ Aquaculture.svg"
             link="/browse/sources/ARGA_Commercial_Species"
           />
         </Carousel.Slide>
@@ -64,7 +64,7 @@ export default function BrowseGrouping() {
           <BrowseCard
             total={data && (sources["ARGA Commercial Species"] || 0)}
             category="Terrestrial"
-            image="/card-icons/dataset/terrestrial.svg"
+            image="/icons/list-group/List group_ Terrestrial.svg"
             link="/browse/sources/ARGA_Commercial_Species"
           />
         </Carousel.Slide>
@@ -72,7 +72,7 @@ export default function BrowseGrouping() {
           <BrowseCard
             total={data && (sources["ARGA Threatened Species"] || 0)}
             category="Threatened"
-            image="/card-icons/dataset/threatened.svg"
+            image="/icons/list-group/List group_ Threatened species.svg"
             link="/browse/sources/ARGA_Threatened_Species"
           />
         </Carousel.Slide>
@@ -80,7 +80,7 @@ export default function BrowseGrouping() {
           <BrowseCard
             total={data && (sources["ARGA Bushfire Recovery"] || 0)} // is this the same a Fire vulnerable
             category="Bushfire Recovery"
-            image="/card-icons/dataset/fire_vulnerable.svg"
+            image="/icons/list-group/List group_ Bushfire vulnerable.svg"
             link="/browse/sources/ARGA_Bushfire_Recovery"
           />
         </Carousel.Slide>
@@ -88,7 +88,7 @@ export default function BrowseGrouping() {
           <BrowseCard
             total={data && (sources["ARGA Commercial Species"] || 0)}
             category="Commercial"
-            image="/card-icons/dataset/commercial_and_trade_fishes.svg"
+            image="/icons/list-group/List group_ Commercial and trade fishes.svg"
             link="/browse/sources/ARGA_Commercial_Species"
           />
         </Carousel.Slide>
@@ -96,7 +96,7 @@ export default function BrowseGrouping() {
           <BrowseCard
             total={data && (sources["ARGA Venomous and Poisonous Species"] || 0)}
             category="Venomous and Poisonous"
-            image="/card-icons/dataset/venomous_and_poisonous.svg"
+            image="/icons/list-group/List group_ Venomous and poisonous.svg"
             link="/browse/sources/ARGA_Venomous_and_Poisonous_Species"
           />
         </Carousel.Slide>

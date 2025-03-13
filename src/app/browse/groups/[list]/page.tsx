@@ -24,6 +24,7 @@ import {
   Chip,
   Center,
   Anchor,
+  Flex,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconFilter, IconClockHour4, IconExternalLink, IconArrowsSort } from "@tabler/icons-react";
@@ -44,6 +45,9 @@ import { AttributePill } from "@/components/data-fields";
 
 import classes from "../../../../components/record-list.module.css";
 import { map as queryMap } from "../_data/all";
+import { useRouter } from "next/navigation";
+import { LicenseIcons } from "@/components/license-icons";
+import { getLicense } from "@/helpers/getLicense";
 
 const PAGE_SIZE = 10;
 interface Filters {
@@ -211,7 +215,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Data types"
             description="Only show species that have specific types of data"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -224,7 +228,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Higher classification filters"
             description="Limit data based on taxonomy"
-            image="/card-icons/type/higher_taxon_report.svg"
+            image="/icons/data-type/Data type_ Higher taxon report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -256,7 +260,11 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
 }
 
 function FilterBadge({ filter }: { filter: Filter }) {
-  return <Badge variant="outline">{filter.value}</Badge>;
+  return (
+    <Badge variant="outline">
+      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
+    </Badge>
+  );
 }
 
 function Species({ source }: { source: string }) {
@@ -307,8 +315,8 @@ function Species({ source }: { source: string }) {
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            {flattenFilters(filters).map((filter) => (
-              <FilterBadge filter={filter} key={filter.value} />
+            {flattenFilters(filters).map((filter, idx) => (
+              <FilterBadge key={idx} filter={filter} />
             ))}
           </Group>
         </Grid.Col>
@@ -502,16 +510,30 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
   // Gross and hacky and terrible, to fix at a later date
   const LISTS_URL = location.href.startsWith("https://app") ? "lists.ala.org.au" : "lists.test.ala.org.au";
 
+  const license = getLicense(source.license);
+
   return (
     <Box w="100%">
-      <Stack gap={0}>
+      <Stack>
         <LoadOverlay visible={loading} />
-
         <Text c="dimmed" size="xs">
-          {source.author}
+          From <b>{source.name}</b>, {source.author}
         </Text>
+        {license && (
+          <Badge
+            component={Link}
+            color="black"
+            variant="outline"
+            size="lg"
+            href={license.url}
+            rightSection={<IconExternalLink size="1rem" style={{ marginLeft: 4 }} />}
+            style={{ cursor: "pointer" }}
+          >
+            {license.name.substring(1, license.name.length - 1)}
+          </Badge>
+        )}
         <Text c="dimmed" size="xs">
-          &copy; {source.rightsHolder}
+          {source.rightsHolder}
         </Text>
         {source.listsId && (
           <Anchor
@@ -524,58 +546,62 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
             View on ALA Lists <IconExternalLink size="0.8rem" />
           </Anchor>
         )}
-        <Grid pt="xl">
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>{source.datasets.length}</b> datasets
-                </Text>
-              </Group>
-            </Paper>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>{source.species.total}</b> species
-                </Text>
-              </Group>
-            </Paper>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg={source.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"} px={10} py={3}>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>
-                    {source.accessPill
-                      ?.toLowerCase()
-                      .charAt(0)
-                      .toUpperCase()
-                      .concat(source.accessPill.slice(1).toLowerCase())}
-                  </b>{" "}
-                  access
-                </Text>
-              </Group>
-            </Paper>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg={source.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"} px={10} py={3}>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>
-                    {source.reusePill
-                      ?.toLowerCase()
-                      .charAt(0)
-                      .toUpperCase()
-                      .concat(source.reusePill.slice(1).toLowerCase())}
-                  </b>{" "}
-                  reuse
-                </Text>
-              </Group>
-            </Paper>
-          </Grid.Col>
-        </Grid>
+        <Group mt="sm">
+          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>{source.datasets.length}</b> datasets
+              </Text>
+            </Group>
+          </Paper>
+          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>{source.species.total}</b> species
+              </Text>
+            </Group>
+          </Paper>
+          <Paper
+            miw={110}
+            radius="lg"
+            bg={source.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"}
+            px={10}
+            py={3}
+          >
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>
+                  {source.accessPill
+                    ?.toLowerCase()
+                    .charAt(0)
+                    .toUpperCase()
+                    .concat(source.accessPill.slice(1).toLowerCase())}
+                </b>{" "}
+                access
+              </Text>
+            </Group>
+          </Paper>
+          <Paper
+            miw={110}
+            radius="lg"
+            bg={source.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"}
+            px={10}
+            py={3}
+          >
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>
+                  {source.reusePill
+                    ?.toLowerCase()
+                    .charAt(0)
+                    .toUpperCase()
+                    .concat(source.reusePill.slice(1).toLowerCase())}
+                </b>{" "}
+                reuse
+              </Text>
+            </Group>
+          </Paper>
+        </Group>
       </Stack>
     </Box>
   );
@@ -583,59 +609,84 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
 
 export default function BrowseSource(props: { params: Promise<{ list: string }> }) {
   const params = use(props.params);
-  const source = decodeURIComponent(params.list).replaceAll("_", " ");
+  const router = useRouter();
+
+  const group = (queryMap as any)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
-  // const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-  //   variables: { name: source },
-  // });
+  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
+    variables: { name: group?.source.replaceAll("_", " ") || "" },
+    skip: !group,
+  });
 
   useEffect(() => {
-    setPreviousPage({
-      name: `browsing ${source}`,
-      url: `/browse/sources/${params.list}`,
-    });
-  }, [setPreviousPage]);
+    if (group) {
+      setPreviousPage({
+        name: `browsing ${group.category}`,
+        url: `/browse/sources/${params.list}`,
+      });
+    } else {
+      router.replace("/browse/groups");
+    }
+  }, [group, setPreviousPage]);
 
-  const queryDetails = (queryMap as any)[params.list];
+  if (!group) return null;
 
-  return queryDetails ? <Text>{JSON.stringify(queryDetails, null, 2)}</Text> : <Text>None</Text>;
+  return (
+    <Stack mt="xl">
+      <Paper py={30}>
+        <Container maw={MAX_WIDTH}>
+          <Grid align="center">
+            <Grid.Col span={{ base: 12, md: 2 }}>
+              <Text c="dimmed" fw={400}>
+                LIST GROUP
+              </Text>
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <Stack gap={0}>
+                <Text fz={38} fw={700}>
+                  {group.category}
+                </Text>
+                {data?.source ? <SourceDetails source={data.source} loading={loading} /> : error?.message}
+              </Stack>
+            </Grid.Col>
+          </Grid>
+        </Container>
+      </Paper>
 
-  // return (
-  //   <Stack mt="xl">
-  //     <Paper py={30}>
-  //       <Container maw={MAX_WIDTH}>
-  //         <Grid align="center">
-  //           <Grid.Col span={{ base: 12, md: 2 }}>
-  //             <Text c="dimmed" fw={400}>
-  //               DATA COLLECTION
-  //             </Text>
-  //           </Grid.Col>
-  //           <Grid.Col span={{ base: 12, md: 6 }}>
-  //             <Stack gap={0}>
-  //               <Text fz={38} fw={700}>
-  //                 {source}
-  //               </Text>
-  //               {data?.source ? <SourceDetails source={data.source} loading={loading} /> : error?.message}
-  //             </Stack>
-  //           </Grid.Col>
-  //         </Grid>
-  //       </Container>
-  //     </Paper>
-
-  //     <Paper py={30}>
-  //       <Container maw={MAX_WIDTH} pb={16}>
-  //         <Stack>
-  //           <Paper p="xl" radius="lg" withBorder>
-  //             {data?.source.datasets ? <BrowseComponentDatasets datasets={data.source.datasets} /> : error?.message}
-  //           </Paper>
-  //           <Paper p="xl" radius="lg" withBorder>
-  //             <Species source={source} />
-  //           </Paper>
-  //         </Stack>
-  //       </Container>
-  //       <DataPageCitation />
-  //     </Paper>
-  //   </Stack>
-  // );
+      <Paper py={30}>
+        <Container maw={MAX_WIDTH} pb={16}>
+          <Stack>
+            {/** TODO: IMPLEMENT DASHBOARD: ASK GORAN FOR HELP */}
+            {/**
+             * Taxonomic breakdown (Rename to data summary):
+             * - Number of species
+             * - Species with genomes
+             * - Species with data
+             * - Species with most genomes
+             * - Species with most data
+             * Tachometer
+             * - Bushfire: 0-25
+             * - Wheat: 25-75
+             * - Moss: 75-100
+             * We want all excluding phyla with genomes
+             * We also want:
+             * - sunburst from genome tracker
+             * - Accumulation curve
+             * - taxonomic coverage (start at kingdom level)
+             * Artfully arange into an aesthetically pleasing order
+             * - Put the genome content above any genetic data (separate)
+             */}
+            <Paper p="xl" radius="lg" withBorder>
+              <Species source={group.source} />
+            </Paper>
+            <Paper p="xl" radius="lg" withBorder>
+              {data?.source.datasets ? <BrowseComponentDatasets datasets={data.source.datasets} /> : error?.message}
+            </Paper>
+          </Stack>
+        </Container>
+        <DataPageCitation />
+      </Paper>
+    </Stack>
+  );
 }
