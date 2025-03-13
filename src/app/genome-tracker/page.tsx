@@ -149,8 +149,7 @@ export default function GenomeTracker() {
                   <Text c="midnight.11" size="sm">
                     This graph shows the aggregated total of species for which a whole genome has been sequenced and
                     made available. The first instance of a whole genome sequence for an individual species has been
-                    plotted as an accumulated total, shown on a logarithmic scale. Statistics based on records indexed
-                    within ARGA.
+                    plotted as an accumulated total. Statistics based on records indexed within ARGA.
                   </Text>
                   <Box h={500}>
                     <GenomeCompletion taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" />
