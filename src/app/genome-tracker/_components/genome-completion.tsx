@@ -1,13 +1,12 @@
 "use client";
 
-
 import { gql, useQuery } from "@apollo/client";
 import { LineBarGraph } from "@/components/graphing/LineBarGraph";
 
 const GET_COMPLETE_GENOMES_YEAR_STATS = gql`
-  query CompleteGenomesYearStats {
+  query CompleteGenomesYearStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String) {
     stats {
-      completeGenomesByYear {
+      completeGenomesByYear(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName) {
         year
         total
       }
@@ -24,8 +23,18 @@ type CompleteGenomesYearStatsQuery = {
   };
 };
 
-export function GenomeCompletion() {
-  const { data } = useQuery<CompleteGenomesYearStatsQuery>(GET_COMPLETE_GENOMES_YEAR_STATS);
+interface GenomeCompletionProps {
+  taxonRank: string;
+  taxonCanonicalName: string;
+}
+
+export function GenomeCompletion({ taxonRank, taxonCanonicalName }: GenomeCompletionProps) {
+  const { data } = useQuery<CompleteGenomesYearStatsQuery>(GET_COMPLETE_GENOMES_YEAR_STATS, {
+    variables: {
+      taxonRank,
+      taxonCanonicalName,
+    },
+  });
   let accum = 0;
 
   const lineData = data?.stats.completeGenomesByYear.map((stat) => ({

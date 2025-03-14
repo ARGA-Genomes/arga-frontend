@@ -1,9 +1,10 @@
 "use client";
 
 import classes from "./cumulative-tracker.module.css";
+
 import * as Humanize from "humanize-plus";
 import { useMemo } from "react";
-
+import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
 import { Group } from "@visx/group";
 import { Bar } from "@visx/shape";
@@ -16,6 +17,7 @@ const PLURAL_RANKS: Record<string, string> = {
   KINGDOM: "Kingdoms",
   PHYLUM: "Phyla",
   CLASS: "Classes",
+  SUBCLASS: "Subclasses",
   ORDER: "Orders",
   FAMILY: "Families",
   GENUS: "Genera",
@@ -28,6 +30,25 @@ const ROW_HEIGHT = BAR_HEIGHT + BAR_MARGIN;
 const AXIS_HEIGHT = 30;
 const GRAPH_PADDING = 20;
 const LEFT_AXIS_WIDTH = 200;
+
+const GET_TAXONOMIC_RANK_STATS = gql`
+  query TaxonomicRankStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
+    stats {
+      taxonomicRanks(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, ranks: $ranks) {
+        rank
+        children
+        coverage
+        atLeastOne
+      }
+    }
+  }
+`;
+
+type TaxonomicRankStatsQuery = {
+  stats: {
+    taxonomicRanks: TaxonomicRankStatistic[];
+  };
+};
 
 interface CoverageBarProps {
   y: number;
@@ -91,11 +112,22 @@ function Bars({ width, height, data }: BarsProps) {
 }
 
 interface CumulativeTrackerProps {
-  data: TaxonomicRankStatistic[];
+  taxonRank: string;
+  taxonCanonicalName: string;
+  ranks: string[];
 }
 
-export function CumulativeTracker({ data }: CumulativeTrackerProps) {
-  const minHeight = data.length * ROW_HEIGHT;
+export function CumulativeTracker({ taxonRank, taxonCanonicalName, ranks }: CumulativeTrackerProps) {
+  const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
+    variables: {
+      taxonRank,
+      taxonCanonicalName,
+      ranks,
+    },
+  });
+
+  const stats = data?.stats.taxonomicRanks;
+  const minHeight = (stats?.length ?? 0) * ROW_HEIGHT;
 
   return (
     <ParentSize className={classes.graphContainer}>
@@ -104,11 +136,13 @@ export function CumulativeTracker({ data }: CumulativeTrackerProps) {
         const width = parent.width - GRAPH_PADDING * 2;
 
         return (
-          <svg width={parent.width} height={height + AXIS_HEIGHT}>
-            <Group width={width} left={GRAPH_PADDING / 2}>
-              <Bars width={width} height={height} data={data} />
-            </Group>
-          </svg>
+          stats && (
+            <svg width={parent.width} height={height + AXIS_HEIGHT}>
+              <Group width={width} left={GRAPH_PADDING / 2}>
+                <Bars width={width} height={height} data={stats} />
+              </Group>
+            </svg>
+          )
         );
       }}
     </ParentSize>

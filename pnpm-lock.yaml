@@ -102,6 +102,9 @@ importers:
       '@visx/axis':
         specifier: ^3.12.0
         version: 3.12.0(react@19.0.0)
+      '@visx/clip-path':
+        specifier: ^3.12.0
+        version: 3.12.0(react@19.0.0)
       '@visx/curve':
         specifier: ^3.12.0
         version: 3.12.0
@@ -111,6 +114,9 @@ importers:
       '@visx/group':
         specifier: ^3.12.0
         version: 3.12.0(react@19.0.0)
+      '@visx/pattern':
+        specifier: ^3.12.0
+        version: 3.12.0(react@19.0.0)
       '@visx/responsive':
         specifier: ^3.12.0
         version: 3.12.0(react@19.0.0)
@@ -118,6 +124,9 @@ importers:
         specifier: ^3.12.0
         version: 3.12.0
       '@visx/shape':
+        specifier: ^3.12.0
+        version: 3.12.0(react@19.0.0)
+      '@visx/text':
         specifier: ^3.12.0
         version: 3.12.0(react@19.0.0)
       '@visx/visx':

@@ -3,13 +3,34 @@
 import classes from "./genome-composition.module.css";
 
 import * as Humanize from "humanize-plus";
+import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
 import { Polygon } from "@visx/shape";
 import { Group } from "@visx/group";
+import { max } from "d3";
 
 const LEVEL_HEIGHT = 27;
 const LEVEL_SLANT = 7;
 const LEVEL_EXPANSION = 40;
+
+const GET_TAXONOMIC_RANK_STATS = gql`
+  query TaxonomicRankStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
+    stats {
+      taxonomicRanks(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, ranks: $ranks) {
+        rank
+        children
+        coverage
+        atLeastOne
+      }
+    }
+  }
+`;
+
+type TaxonomicRankStatsQuery = {
+  stats: {
+    taxonomicRanks: TaxonomicRankStatistic[];
+  };
+};
 
 type Level = {
   label: string;
@@ -45,12 +66,22 @@ function fromRankStat(stat: TaxonomicRankStatistic, level: number): Level {
 }
 
 interface GenomeCompositionProps {
-  data: TaxonomicRankStatistic[];
+  ranks: string[];
 }
 
-export const GenomeComposition = ({ data }: GenomeCompositionProps) => {
-  const levels: Level[] = data.map((stat, idx) => fromRankStat(stat, idx + 1));
-  const maxWidth = levels[levels.length - 1].width;
+export const GenomeComposition = ({ ranks }: GenomeCompositionProps) => {
+  const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
+    variables: {
+      taxonRank: "DOMAIN",
+      taxonCanonicalName: "Eukaryota",
+      ranks,
+    },
+  });
+
+  const stats = data?.stats.taxonomicRanks;
+
+  const levels: Level[] = stats?.map((stat, idx) => fromRankStat(stat, idx + 1)) ?? [];
+  const maxWidth = max(levels, (levels: Level) => levels.width) ?? 0;
   const center = maxWidth / 2;
 
   return (
