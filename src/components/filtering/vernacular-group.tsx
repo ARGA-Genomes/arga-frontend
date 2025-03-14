@@ -1,7 +1,7 @@
 import { Stack, Select, Group, Avatar, Text } from "@mantine/core";
 import { forwardRef } from "react";
 import { Filter } from "./common";
-import { constantCase, pascalCase } from "change-case";
+import { constantCase } from "change-case";
 import { VERNACULAR_GROUP_ICON } from "../icon-bar";
 
 interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
@@ -40,9 +40,9 @@ export function VernacularGroupFilters({ value, onChange }: VernacularGroupFilte
     }
 
     onChange({
-      filter: "VERNACULAR_GROUP",
-      action: "INCLUDE",
-      value: pascalCase(value),
+      // filter: "VERNACULAR_GROUP",
+      // action: "INCLUDE",
+      // value: pascalCase(value),
       editable: true,
     });
   };

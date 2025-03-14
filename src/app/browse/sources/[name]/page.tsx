@@ -252,7 +252,11 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
 }
 
 function FilterBadge({ filter }: { filter: Filter }) {
-  return <Badge variant="outline">{filter.value}</Badge>;
+  return (
+    <Badge variant="outline">
+      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
+    </Badge>
+  );
 }
 
 function Species({ source }: { source: string }) {
@@ -303,8 +307,8 @@ function Species({ source }: { source: string }) {
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            {flattenFilters(filters).map((filter) => (
-              <FilterBadge filter={filter} key={filter.value} />
+            {flattenFilters(filters).map((filter, idx) => (
+              <FilterBadge key={idx} filter={filter} />
             ))}
           </Group>
         </Grid.Col>
@@ -591,7 +595,7 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
       name: `browsing ${source}`,
       url: `/browse/sources/${params.name}`,
     });
-  }, [setPreviousPage]);
+  }, [source, params.name, setPreviousPage]);
 
   return (
     <Stack mt="xl">

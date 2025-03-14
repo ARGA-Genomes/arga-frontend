@@ -1,4 +1,4 @@
-export default [
+export const iek = [
   {
     category: "Southeast Arnhem Land",
     image: "/icons/list-group/List group_ IEK_ Arnhem Land.svg",

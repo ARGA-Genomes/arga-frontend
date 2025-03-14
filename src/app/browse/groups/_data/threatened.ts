@@ -1,4 +1,4 @@
-export default [
+export const threatened = [
   {
     category: "All Threatened",
     image: "/icons/list-group/List group_ Threatened species.svg",

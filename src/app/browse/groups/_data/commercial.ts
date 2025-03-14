@@ -1,4 +1,4 @@
-export default [
+export const commercial = [
   {
     category: "Agriculture",
     image: "/icons/list-group/List group_ Agriculture.svg",

@@ -6,12 +6,12 @@ import { PreviousPage } from "@/components/navigation-history";
 import { GroupCard } from "./group-card";
 
 // Data for rendering categories
-import ecosystems from "./_data/ecosystems";
-import commercial from "./_data/commercial";
-import iek from "./_data/iek";
-import phenotypic from "./_data/phenotypic";
-import other from "./_data/other";
-import threatened from "./_data/threatened";
+import { ecosystems } from "./_data/ecosystems";
+import { commercial } from "./_data/commercial";
+import { iek } from "./_data/iek";
+import { phenotypic } from "./_data/phenotypic";
+import { other } from "./_data/other";
+import { threatened } from "./_data/threatened";
 
 export default function AllGroups() {
   return (

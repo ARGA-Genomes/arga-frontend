@@ -117,7 +117,7 @@ function SavedDataManager() {
       setManifestUrl(undefined);
       setScriptUrl(undefined);
     }
-  }, [selected]);
+  }, [manifestUrl, metadataUrl, scriptUrl, selected]);
 
   // auto-select newly saved items
   useEffect(() => {
@@ -126,7 +126,7 @@ function SavedDataManager() {
       selectedSet.add(item);
     }
     setSelected(Array.from(selectedSet));
-  }, [saved]);
+  }, [selectedSet, saved]);
 
   function remove(item: SavedItem) {
     const newList = saved.filter((value) => value.url != item.url);
@@ -269,7 +269,7 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
   useEffect(() => {
     setHint(!checked ? "moss.1" : "moss.0");
     onChange(checked);
-  }, [checked]);
+  }, [checked, onChange]);
 
   return (
     <Box

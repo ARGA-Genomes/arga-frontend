@@ -703,7 +703,7 @@ function Filters({ filters, onChange }: FiltersProps) {
       classifications,
       dataTypes,
     });
-  }, [classifications, dataTypes]);
+  }, [classifications, dataTypes, onChange]);
 
   return (
     <Accordion defaultValue="dataType" variant="separated">
@@ -784,7 +784,7 @@ function SearchPage() {
   }
 
   function onFilter(all: Filters) {
-    setDataTypes(all.dataTypes.map((dataType) => dataType.value));
+    // setDataTypes(all.dataTypes.map((dataType) => dataType.)); TODO: FIX
     setFilters(all);
   }
 

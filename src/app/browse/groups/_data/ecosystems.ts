@@ -1,4 +1,4 @@
-export default [
+export const ecosystems = [
   {
     category: "Marine",
     image: "/icons/list-group/List group_ Marine.svg",

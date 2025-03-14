@@ -1,4 +1,4 @@
-export default [
+export const phenotypic = [
   {
     category: "Venomous and Poisonous",
     image: "/icons/list-group/List group_ Venomous and poisonous.svg",
