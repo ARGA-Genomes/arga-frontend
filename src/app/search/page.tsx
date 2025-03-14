@@ -208,7 +208,13 @@ function TaxonItem({ item }: { item: Item }) {
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/species_report.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Image
+                src={"icons/data-type/Data type_ Species (and subspecies) report.svg"}
+                fit="contain"
+                h={80}
+                w="auto"
+                alt=""
+              />
               <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Species Report
               </Text>
@@ -330,7 +336,7 @@ function GenomeItem({ item }: { item: Item }) {
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/whole_genomes.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Image src={"icons/data-type/Data type_ Whole genome.svg"} fit="contain" h={80} w="auto" alt="" />
               <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Genome Assembly
               </Text>
@@ -424,7 +430,7 @@ function LocusItem({ item }: { item: Item }) {
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/markers.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Image src={"icons/data-type/Data type_ Markers.svg"} fit="contain" h={80} w="auto" alt="" />
               <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Locus
               </Text>
@@ -516,7 +522,7 @@ function SpecimenItem({ item }: { item: Item }) {
             }}
           >
             <Group gap="xs" wrap="nowrap">
-              <Image src={"card-icons/type/specimens.svg"} fit="contain" h={80} w="auto" alt="" />
+              <Image src={"icons/data-type/Data type_ Specimen.svg"} fit="contain" h={80} w="auto" alt="" />
               <Text c="white" fw={600} fz="md" mb="sm" style={{ alignSelf: "end", lineHeight: "normal" }}>
                 Specimen
               </Text>
@@ -706,7 +712,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Data types"
             description="Only show records of the specific types enabled"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>

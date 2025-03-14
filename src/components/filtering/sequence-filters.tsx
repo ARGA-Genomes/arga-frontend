@@ -35,7 +35,7 @@ export function SequenceFilters({ filters, onChange }: SequenceFiltersProps) {
           <FilterGroup
             label="Assembly filters"
             description="Sequences with specific assembly properties"
-            image="/timeline-icons/assembly.svg"
+            image="/icons/specimen-listing/Specimen listing_ sequence assembly.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>

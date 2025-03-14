@@ -1,26 +1,16 @@
 "use client";
 
-import {
-  Text,
-  Title,
-  Stack,
-  TextInput,
-  Flex,
-  Box,
-  Center,
-  Group,
-} from "@mantine/core";
+import { Text, Title, Stack, TextInput, Flex, Box, Center, Group, Paper, UnstyledButton } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import BrowseGrouping from "./browse-grouping";
 import BrowseTaxon from "./browse-taxon";
-import { IconSearch } from "@tabler/icons-react";
+import { IconArrowRight, IconArrowRightCircle, IconArrowUpRight, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import BrowseType from "@/app/(home)/browse-type";
-import {
-  ShowStats,
-  ShowSunburstTaxonomy,
-} from "./stats";
+import { ShowStats, ShowSunburstTaxonomy } from "./stats";
 import RecentUpdatesContainer from "../../components/recent-updates-container";
+import classes from "./page.module.css";
+import { InternalLinkButton } from "@/components/button-link-internal";
 
 function Search() {
   const router = useRouter();
@@ -41,7 +31,9 @@ function Search() {
       <TextInput
         placeholder="e.g. sequence accession, species name"
         value={value}
-        onChange={(val) => { setValue(val.target.value); }}
+        onChange={(val) => {
+          setValue(val.target.value);
+        }}
         leftSectionWidth={60}
         size="xl"
         radius="lg"
@@ -66,32 +58,23 @@ export default function HomePage() {
       <Box bg="midnight.9" w="100%">
         <Box m={60}>
           <Center>
-            <Flex
-              direction={{ base: "column", xl: "row" }}
-              gap={{ base: 30, xl: 80 }}
-              align="center"
-            >
+            <Flex direction={{ base: "column", xl: "row" }} gap={{ base: 30, xl: 80 }} align="center">
               <Stack gap={50} w={640}>
                 <Stack gap={30}>
                   <Title order={3} c="wheat.4" fz={24}>
                     deepen discovery — trawl traits — curate collections
                   </Title>
                   <Text c="white" fz={16}>
-                    For plants, animals, microbes and other species endemic or
-                    relevant to Australia, the Australian Reference Genome Atlas
-                    (ARGA) locates and aggregates genomic data, including:
+                    For plants, animals, microbes and other species endemic or relevant to Australia, the Australian
+                    Reference Genome Atlas (ARGA) locates and aggregates genomic data, including:
                   </Text>
                   <Text c="white" fw={700} fz={16}>
-                    &#x2022; reference genome assemblies &#x2022; genome
-                    annotations &#x2022; population and variant sets &#x2022;
-                    DNA barcodes &#x2022; coding and non-coding DNA sequences
-                    &#x2022; raw genomics data
+                    &#x2022; reference genome assemblies &#x2022; genome annotations &#x2022; population and variant
+                    sets &#x2022; DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022; raw genomics data
                   </Text>
                   <Text c="white" fz={16}>
-                    Search by species, higher classification, data type or
-                    ecological and phenotypic traits. Get started by entering
-                    any word in the search bar below, or scroll down to browse
-                    pre-filtered groupings.
+                    Search by species, higher classification, data type or ecological and phenotypic traits. Get started
+                    by entering any word in the search bar below, or scroll down to browse pre-filtered groupings.
                   </Text>
                 </Stack>
                 <Stack gap={5}>
@@ -110,7 +93,7 @@ export default function HomePage() {
       </Box>
       <Box bg="midnight.10" w="100%">
         <Stack mt={80} mx={60} gap={80}>
-          <Stack gap={80}>
+          <Stack className={classes.browseStack} gap="md">
             <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
                 Browse by data type
@@ -123,11 +106,20 @@ export default function HomePage() {
               </Title>
               <BrowseTaxon />
             </Stack>
-            <Stack gap={20} align="center">
+            <Stack gap={20} align="center" pb="xl">
               <Title order={3} c="moss.5" fz={28}>
                 Browse by functional or ecological group
               </Title>
               <BrowseGrouping />
+              <InternalLinkButton
+                url={`/browse/groups`}
+                icon={IconArrowUpRight}
+                textColor="white"
+                textSize="md"
+                outline
+              >
+                View all groups
+              </InternalLinkButton>
             </Stack>
           </Stack>
           <Group gap={140} pb={80} align="flex-start" justify="center">

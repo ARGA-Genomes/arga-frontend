@@ -325,7 +325,7 @@ function SavedDataItem({ item, onRemove, onSelected, onDeselected }: SaveDataIte
             />
             <Link href={`/species/${item.scientificName}/whole_genomes/${item.label}`}>
               <Group>
-                <Image src={"/card-icons/type/whole_genomes.svg"} fit="contain" h={80} w={80} alt="" />
+                <Image src={"/icons/data-type/Data type_ Whole genome.svg"} fit="contain" h={80} w={80} alt="" />
                 <Stack gap={0}>
                   <Text fw={500} truncate="end">
                     {item.label}

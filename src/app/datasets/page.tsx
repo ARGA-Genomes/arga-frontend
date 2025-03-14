@@ -46,6 +46,7 @@ const GET_DATASETS = gql`
       rightsHolder
       accessRights
       license
+      listsId
       reusePill
       accessPill
       contentType
@@ -89,6 +90,7 @@ interface Source {
   rightsHolder: string;
   accessRights: string;
   license: string;
+  listsId: string | null;
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   contentType?: ContentType;
@@ -104,123 +106,6 @@ interface GroupedSources {
 interface QueryResults {
   sources: Source[];
 }
-
-interface License {
-  name: string;
-  url: string;
-  accessRights: string;
-}
-
-const _LICENSES: Record<string, License> = {
-  "cc-by-nc-nd": {
-    name: "(CC-BY-NC)",
-    url: "http://creativecommons.org/licenses/by-nc-nd/4.0",
-    accessRights: "Conditional",
-  },
-  "cc-by-nc-sa": {
-    name: "(CC-BY-NC-SA)",
-    url: "http://creativecommons.org/licenses/by-nc-sa/4.0",
-    accessRights: "Conditional",
-  },
-  "cc-by-nc": {
-    name: "(CC-BY-NC)",
-    url: "http://creativecommons.org/licenses/by-nc/4.0",
-    accessRights: "Conditional",
-  },
-  "cc-by-nd": {
-    name: "(CC-BY-ND)",
-    url: "http://creativecommons.org/licenses/by-nd/4.0",
-    accessRights: "Conditional",
-  },
-  "cc-by-sa": {
-    name: "(CC-BY-SA)",
-    url: "http://creativecommons.org/licenses/by-sa/4.0",
-    accessRights: "Conditional",
-  },
-  "cc-by": {
-    name: "(CC-BY)",
-    url: "http://creativecommons.org/licenses/by/4.0",
-    accessRights: "Conditional",
-  },
-  cc0: {
-    name: "(CC0)",
-    url: "http://creativecommons.org/publicdomain/zero/1.0",
-    accessRights: "Open",
-  },
-
-  "http://creativecommons.org/licenses/by-nc-sa/4.0/": {
-    name: "CC-BY-NC-SA",
-    url: "http://creativecommons.org/licenses/by-nc-sa/4.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by-nc/4.0/": {
-    name: "CC-BY-NC",
-    url: "http://creativecommons.org/licenses/by-nc/4.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by/4.0/": {
-    name: "CC-BY",
-    url: "http://creativecommons.org/licenses/by/4.0/",
-    accessRights: "Conditional",
-  },
-  "https://creativecommons.org/licenses/by/4.0/": {
-    name: "CC-BY",
-    url: "http://creativecommons.org/licenses/by/4.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by-sa/4.0/": {
-    name: "CC-BY-SA",
-    url: "http://creativecommons.org/licenses/by-sa/4.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by-nc-nd/4.0/": {
-    name: "CC-BY-NC-ND",
-    url: "http://creativecommons.org/licenses/by-nc-nd/4.0/",
-    accessRights: "Conditional",
-  },
-
-  "http://creativecommons.org/licenses/by-nc-sa/3.0/": {
-    name: "CC-BY-NC-SA",
-    url: "http://creativecommons.org/licenses/by-nc-sa/3.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by-nc/3.0/": {
-    name: "CC-BY-NC",
-    url: "http://creativecommons.org/licenses/by-nc/3.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by/3.0/": {
-    name: "CC-BY",
-    url: "http://creativecommons.org/licenses/by/3.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by-sa/3.0/": {
-    name: "CC-BY-SA",
-    url: "http://creativecommons.org/licenses/by-sa/3.0/",
-    accessRights: "Conditional",
-  },
-  "http://creativecommons.org/licenses/by-nc-nd/3.0/": {
-    name: "CC-BY-NC-ND",
-    url: "http://creativecommons.org/licenses/by-nc-nd/3.0/",
-    accessRights: "Conditional",
-  },
-
-  "public domain mark": {
-    name: "Public Domain",
-    url: "http://creativecommons.org/publicdomain/mark/1.0",
-    accessRights: "Open",
-  },
-  "attribution-noncommercial 4.0 international": {
-    name: "(CC-BY-NC)",
-    url: "https://creativecommons.org/licenses/by-nc/4.0/",
-    accessRights: "Conditional",
-  },
-  "attribution 4.0 international": {
-    name: "(CC-BY)",
-    url: "https://creativecommons.org/licenses/by/4.0/",
-    accessRights: "Conditional",
-  },
-};
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
@@ -265,15 +150,7 @@ const renameContentType: Record<ContentType, string> = {
   MORPHOLOGICAL_TRAITS: "Morphological traits sources",
 };
 
-function DatasetRow({
-  dataset,
-  sourceLength,
-  count,
-}: {
-  dataset: Dataset;
-  sourceLength: number;
-  count: number;
-}) {
+function DatasetRow({ dataset, sourceLength, count }: { dataset: Dataset; sourceLength: number; count: number }) {
   const theme = useMantineTheme();
 
   return (
@@ -287,19 +164,13 @@ function DatasetRow({
             <Group gap={3}>
               <IconClockHour4 size={15} color={theme.colors.gray[6]} />
               <Text c="dimmed" size="xs">
-                Last updated:{" "}
-                {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
+                Last updated: {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
               </Text>
             </Group>
           </Stack>
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Rights holder"
-            value={dataset.rightsHolder}
-            popoverDisabled
-            textColor="black"
-          />
+          <AttributePill label="Rights holder" value={dataset.rightsHolder} popoverDisabled textColor="black" />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill
@@ -311,11 +182,7 @@ function DatasetRow({
                 .toUpperCase()
                 .concat(dataset.accessPill.slice(1).toLowerCase()) || "No data"
             }
-            color={
-              dataset.accessPill
-                ? accessPillColours[dataset.accessPill]
-                : "#d6e4ed"
-            }
+            color={dataset.accessPill ? accessPillColours[dataset.accessPill] : "#d6e4ed"}
             popoverDisabled
             textColor="black"
           />
@@ -330,30 +197,16 @@ function DatasetRow({
                 .toUpperCase()
                 .concat(dataset.reusePill.slice(1).toLowerCase()) || "No data"
             }
-            color={
-              dataset.reusePill
-                ? reusePillColours[dataset.reusePill]
-                : "#d6e4ed"
-            }
+            color={dataset.reusePill ? reusePillColours[dataset.reusePill] : "#d6e4ed"}
             popoverDisabled
             textColor="black"
           />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
-          <AttributePill
-            label="Records"
-            value="No data"
-            popoverDisabled
-            textColor="black"
-          />
+          <AttributePill label="Records" value="No data" popoverDisabled textColor="black" />
         </Grid.Col>
         <Grid.Col span={1} p="lg">
-          <AttributePill
-            label="Year"
-            value={dataset.publicationYear || "No data"}
-            popoverDisabled
-            textColor="black"
-          />
+          <AttributePill label="Year" value={dataset.publicationYear || "No data"} popoverDisabled textColor="black" />
         </Grid.Col>
 
         <Grid.Col span={1}>
@@ -404,9 +257,7 @@ function CollectionCard({ collection }: { collection: Source }) {
                         Last updated:{" "}
                         {collection.lastUpdated === "01/01/1970"
                           ? "N/A"
-                          : DateTime.fromISO(
-                              collection.lastUpdated,
-                            ).toLocaleString()}
+                          : DateTime.fromISO(collection.lastUpdated).toLocaleString()}
                       </Text>
                     )}
                   </Group>
@@ -437,15 +288,10 @@ function CollectionCard({ collection }: { collection: Source }) {
                   ?.toLowerCase()
                   .charAt(0)
                   .toUpperCase()
-                  .concat(collection.accessPill.slice(1).toLowerCase()) ||
-                "No data"
+                  .concat(collection.accessPill.slice(1).toLowerCase()) || "No data"
               }
               group={true}
-              color={
-                collection.accessPill
-                  ? accessPillColours[collection.accessPill]
-                  : "#d6e4ed"
-              }
+              color={collection.accessPill ? accessPillColours[collection.accessPill] : "#d6e4ed"}
               popoverDisabled
               textColor="black"
             />
@@ -458,26 +304,16 @@ function CollectionCard({ collection }: { collection: Source }) {
                   ?.toLowerCase()
                   .charAt(0)
                   .toUpperCase()
-                  .concat(collection.reusePill.slice(1).toLowerCase()) ||
-                "No data"
+                  .concat(collection.reusePill.slice(1).toLowerCase()) || "No data"
               }
               group={true}
-              color={
-                collection.reusePill
-                  ? reusePillColours[collection.reusePill]
-                  : "#d6e4ed"
-              }
+              color={collection.reusePill ? reusePillColours[collection.reusePill] : "#d6e4ed"}
               popoverDisabled
               textColor="black"
             />
           </Grid.Col>
           <Grid.Col span={12}>
-            <AttributePill
-              label="Number of records"
-              group={true}
-              popoverDisabled
-              textColor="black"
-            />
+            <AttributePill label="Number of records" group={true} popoverDisabled textColor="black" />
           </Grid.Col>
         </Grid>
       </Stack>
@@ -505,9 +341,7 @@ function CollectionRow({ collection }: { collection: Source }) {
                           Last updated:{" "}
                           {collection.lastUpdated === "01/01/1970"
                             ? "N/A"
-                            : DateTime.fromISO(
-                                collection.lastUpdated,
-                              ).toLocaleString()}
+                            : DateTime.fromISO(collection.lastUpdated).toLocaleString()}
                         </Text>
                       )}
                     </Group>
@@ -531,14 +365,9 @@ function CollectionRow({ collection }: { collection: Source }) {
                         ?.toLowerCase()
                         .charAt(0)
                         .toUpperCase()
-                        .concat(collection.accessPill.slice(1).toLowerCase()) ||
-                      "No data"
+                        .concat(collection.accessPill.slice(1).toLowerCase()) || "No data"
                     }
-                    color={
-                      collection.accessPill
-                        ? accessPillColours[collection.accessPill]
-                        : "#d6e4ed"
-                    }
+                    color={collection.accessPill ? accessPillColours[collection.accessPill] : "#d6e4ed"}
                     popoverDisabled
                     textColor="black"
                   />
@@ -552,32 +381,19 @@ function CollectionRow({ collection }: { collection: Source }) {
                         ?.toLowerCase()
                         .charAt(0)
                         .toUpperCase()
-                        .concat(collection.reusePill.slice(1).toLowerCase()) ||
-                      "No data"
+                        .concat(collection.reusePill.slice(1).toLowerCase()) || "No data"
                     }
-                    color={
-                      collection.reusePill
-                        ? reusePillColours[collection.reusePill]
-                        : "#d6e4ed"
-                    }
+                    color={collection.reusePill ? reusePillColours[collection.reusePill] : "#d6e4ed"}
                     popoverDisabled
                     textColor="black"
                   />
                 </Grid.Col>
                 <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
                   {" "}
-                  <AttributePill
-                    label="Number of records"
-                    labelColor="white"
-                    popoverDisabled
-                    textColor="black"
-                  />
+                  <AttributePill label="Number of records" labelColor="white" popoverDisabled textColor="black" />
                 </Grid.Col>
                 <Grid.Col span={1}>
-                  <Group
-                    justify="flex-end"
-                    className={classes.collectionArrowRowBtn}
-                  >
+                  <Group justify="flex-end" className={classes.collectionArrowRowBtn}>
                     <IconArrowUpRight color="white" />
                   </Group>
                 </Grid.Col>
@@ -593,12 +409,7 @@ function CollectionRow({ collection }: { collection: Source }) {
               </Center>
             )}
             {collection.datasets.map((dataset, idx) => (
-              <DatasetRow
-                dataset={dataset}
-                key={idx}
-                sourceLength={collection.datasets.length}
-                count={idx + 1}
-              />
+              <DatasetRow dataset={dataset} key={idx} sourceLength={collection.datasets.length} count={idx + 1} />
             ))}
           </Box>
         </ScrollArea.Autosize>
@@ -607,13 +418,7 @@ function CollectionRow({ collection }: { collection: Source }) {
   );
 }
 
-function DatasetSort({
-  sortBy,
-  setSortBy,
-}: {
-  sortBy: string | null;
-  setSortBy: (value: string | null) => void;
-}) {
+function DatasetSort({ sortBy, setSortBy }: { sortBy: string | null; setSortBy: (value: string | null) => void }) {
   const theme = useMantineTheme();
   const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
     if (event.currentTarget.value === sortBy) {
@@ -647,11 +452,7 @@ function DatasetSort({
   );
 }
 
-function ContentTypeContainer({
-  contentType,
-}: {
-  contentType: GroupedSources;
-}) {
+function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) {
   const theme = useMantineTheme();
   const [layoutView, setLayoutView] = useState("card");
   const [sortBy, setSortBy] = useState<string | null>(null);
@@ -673,10 +474,7 @@ function ContentTypeContainer({
   }, [contentType.sources, sortBy]);
 
   return (
-    <Accordion.Item
-      key={contentType.contentType}
-      value={contentType.contentType}
-    >
+    <Accordion.Item key={contentType.contentType} value={contentType.contentType}>
       <Accordion.Control>
         <Group justify="space-between" pr={30}>
           <Text fw="bold" fz="var(--mantine-h4-font-size)" c="black">
@@ -693,17 +491,9 @@ function ContentTypeContainer({
               >
                 <Stack gap={1} align="center">
                   <IconTable
-                    color={
-                      layoutView === "table"
-                        ? "white"
-                        : theme.colors.midnight[10]
-                    }
+                    color={layoutView === "table" ? "white" : theme.colors.midnight[10]}
                     className={classes.tableLayoutViewBtn}
-                    fill={
-                      layoutView === "table"
-                        ? theme.colors.midnight[10]
-                        : "none"
-                    }
+                    fill={layoutView === "table" ? theme.colors.midnight[10] : "none"}
                   />
                   <Text size="xs" fw={550} c={theme.colors.midnight[10]}>
                     Table
@@ -720,9 +510,7 @@ function ContentTypeContainer({
                   <IconLayoutGrid
                     color={theme.colors.midnight[10]}
                     className={classes.cardLayoutViewBtn}
-                    fill={
-                      layoutView === "card" ? theme.colors.midnight[10] : "none"
-                    }
+                    fill={layoutView === "card" ? theme.colors.midnight[10] : "none"}
                   />
                   <Text size="xs" fw={550} c={theme.colors.midnight[10]}>
                     Card
@@ -798,10 +586,7 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
       .sort((a, b) => {
         const indexA = desiredOrder.indexOf(a.contentType as ContentType);
         const indexB = desiredOrder.indexOf(b.contentType as ContentType);
-        return (
-          (indexA !== -1 ? indexA : desiredOrder.length) -
-          (indexB !== -1 ? indexB : desiredOrder.length)
-        );
+        return (indexA !== -1 ? indexA : desiredOrder.length) - (indexB !== -1 ? indexB : desiredOrder.length);
       });
   } else {
     return [];
@@ -824,9 +609,7 @@ export default function DatasetsPage() {
     };
   });
 
-  const groupedSources = groupByContentType(sourcesWithLastUpdated).filter(
-    (group) => group.contentType !== "Unknown",
-  );
+  const groupedSources = groupByContentType(sourcesWithLastUpdated).filter((group) => group.contentType !== "Unknown");
 
   return (
     <Stack gap="xl" my="xl">
@@ -848,10 +631,7 @@ export default function DatasetsPage() {
             chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
           >
             {groupedSources.map((group) => (
-              <ContentTypeContainer
-                contentType={group}
-                key={group.contentType}
-              />
+              <ContentTypeContainer contentType={group} key={group.contentType} />
             ))}
           </Accordion>
         </Container>

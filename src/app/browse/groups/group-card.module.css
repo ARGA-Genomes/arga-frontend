@@ -1,0 +1,15 @@
+.skeleton {
+  ::before {
+    background: #486471;
+  }
+  ::after {
+    background: #6797b4;
+  }
+}
+
+.card {
+  flex-basis: 100%;
+  @mixin hover {
+    background-color: var(--mantine-color-midnight-1);
+  }
+}

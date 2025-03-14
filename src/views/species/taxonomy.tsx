@@ -640,7 +640,7 @@ function Details({ taxonomy, commonNames, subspecies, isSubspecies }: DetailsPro
 
   const typeSpecimens = specimens?.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.specimen.typeStatus != "no voucher",
+      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.specimen.typeStatus != "no voucher"
   );
   const typeSpecimen = typeSpecimens?.[0]?.specimen;
 
@@ -827,20 +827,20 @@ const ACT_TYPE_ORDER: Record<string, number> = {
 };
 
 const ACT_ICON: Record<string, string> = {
-  SPECIES_NOVA: "/timeline-icons/original_description.svg",
-  SUBSPECIES_NOVA: "/timeline-icons/original_description.svg",
-  GENUS_SPECIES_NOVA: "/timeline-icons/original_description.svg",
-  COMBINATIO_NOVA: "/timeline-icons/recombination.svg",
-  REVIVED_STATUS: "/timeline-icons/orignal_description.svg",
-  NAME_USAGE: "/timeline-icons/name_usage.svg",
-  SUBGENUS_PLACEMENT: "/timeline-icons/recombination.svg",
-  ORIGINAL_DESCRIPTION: "/timeline-icons/original_description.svg",
-  REDESCRIPTION: "/timeline-icons/original_description.svg",
-  DEMOTION: "/timeline-icons/recombination.svg",
-  PROMOTION: "/timeline-icons/recombination.svg",
-  SYNONYMISATION: "/timeline-icons/synonymy.svg",
-  HETEROTYPIC_SYNONYMY: "/timeline-icons/synonymy.svg",
-  HOMOTYPIC_SYNONYMY: "/timeline-icons/synonymy.svg",
+  SPECIES_NOVA: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  SUBSPECIES_NOVA: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  GENUS_SPECIES_NOVA: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  COMBINATIO_NOVA: "/icons/taxonomic-act/Taxonomic act_ recombination.svg",
+  REVIVED_STATUS: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  NAME_USAGE: "/icons/taxonomic-act/Taxonomic act_ name usage.svg",
+  SUBGENUS_PLACEMENT: "/icons/taxonomic-act/Taxonomic act_ subgenus assignment.svg",
+  ORIGINAL_DESCRIPTION: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  REDESCRIPTION: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  DEMOTION: "/icons/taxonomic-act/Taxonomic act_ demotion in rank.svg",
+  PROMOTION: "/icons/taxonomic-act/Taxonomic act_ promotion in rank.svg",
+  SYNONYMISATION: "/icons/taxonomic-act/Taxonomic act_ synonymy.svg",
+  HETEROTYPIC_SYNONYMY: "/icons/taxonomic-act/Taxonomic act_ synonymy.svg",
+  HOMOTYPIC_SYNONYMY: "/icons/taxonomic-act/Taxonomic act_ synonymy.svg",
 };
 
 const ACT_LABEL: Record<string, string> = {
@@ -1000,7 +1000,7 @@ function NomenclaturalActBody({ item, protonym, specimensWithData }: Nomenclatur
 
   const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == item.name.scientificName && typeSpecimen.specimen.typeStatus != "no voucher",
+      typeSpecimen.name.scientificName == item.name.scientificName && typeSpecimen.specimen.typeStatus != "no voucher"
   );
 
   const locality = useMemo(() => typeSpecimens?.find(({ specimen }) => specimen.locality !== null), [typeSpecimens]);
@@ -1019,7 +1019,7 @@ function NomenclaturalActBody({ item, protonym, specimensWithData }: Nomenclatur
               wholeGenomes: specimen.wholeGenomes,
             },
           }),
-          {},
+          {}
         );
     return {};
   }, [specimensWithData]);
@@ -1211,7 +1211,7 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
 
   const subfamily = hierarchy?.find(
     (node) =>
-      node.rank === "SUBFAMILY" || node.rank === "SUBFAMILIA" || node.rank === "FAMILY" || node.rank === "FAMILIA",
+      node.rank === "SUBFAMILY" || node.rank === "SUBFAMILIA" || node.rank === "FAMILY" || node.rank === "FAMILIA"
   );
 
   const tree = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {

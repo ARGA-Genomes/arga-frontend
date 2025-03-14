@@ -471,7 +471,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Higher classification filters"
             description="Limit data based on taxonomy"
-            image="/card-icons/type/higher_taxon_report.svg"
+            image="/icons/data-type/Data type_ Higher taxon report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -484,7 +484,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Data types"
             description="Only show species that have specific types of data"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -497,7 +497,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Vernacular group"
             description="Birds, Flowering plants, Bacteria, etc."
-            image="/card-icons/type/species_report.svg"
+            image="/icons/data-type/Data type_ Species (and subspecies) report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -510,7 +510,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Regions"
             description="Ecological and administrative boundaries"
-            image="/card-icons/dataset/terrestrial.svg"
+            image="/icons/list-group/List group_ Terrestrial.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -558,7 +558,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Bushfire traits"
             description="Bushfire vulnerability and recovery"
-            image="/card-icons/dataset/fire_vulnerable.svg"
+            image="/icons/list-group/List group_ Bushfire vulnerable.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -689,7 +689,9 @@ function Species({ rank, canonicalName }: { rank: string; canonicalName: string 
       </Grid>
 
       <SimpleGrid cols={5} pt={40}>
-        {records?.map((record) => <SpeciesCard key={record.taxonomy.scientificName} species={record} />)}
+        {records?.map((record) => (
+          <SpeciesCard key={record.taxonomy.scientificName} species={record} />
+        ))}
       </SimpleGrid>
 
       <PaginationBar total={data?.taxon.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
@@ -951,7 +953,7 @@ function EukaryotaDataSummary({ rank, taxon }: { rank: string; taxon: EukaryotaT
             speciesData: descendant.speciesData,
             speciesGenomes: descendant.speciesGenomes,
           };
-        }),
+        })
     )
     .concat(
       taxon.superKingdomDescendants.map((descendant) => {
@@ -962,7 +964,7 @@ function EukaryotaDataSummary({ rank, taxon }: { rank: string; taxon: EukaryotaT
           speciesData: descendant.speciesData,
           speciesGenomes: descendant.speciesGenomes,
         };
-      }),
+      })
     );
 
   const rankGenomes = descendants

@@ -1,8 +1,15 @@
 .bottomStack {
-    align-items: stretch;
-  
-    @media (max-width: 1430px) {
-      align-items: center;
-    }
+  align-items: stretch;
+
+  @media (max-width: 1430px) {
+    align-items: center;
   }
-  
+}
+
+.browseStack > div {
+  background: transparent;
+  border: 1px solid var(--mantine-color-midnight-9);
+  border-radius: var(--mantine-radius-xl);
+  padding-top: var(--mantine-spacing-xl);
+  padding-bottom: var(--mantine-spacing-md);
+}

@@ -21,11 +21,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { AttributePill, DataField } from "@/components/highlight-stack";
-import {
-  IconArrowNarrowLeft,
-  IconChevronLeft,
-  IconChevronRight,
-} from "@tabler/icons-react";
+import { IconArrowNarrowLeft, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnalysisMap } from "@/components/mapping";
@@ -216,7 +212,7 @@ interface ProvenanceQuery {
         atom: AtomText | AtomNumber;
         dataset: Dataset;
         loggedAt: string;
-      },
+      }
     ];
   };
 }
@@ -286,9 +282,7 @@ function Provenance({ entityId }: { entityId: string }) {
             <Table.Td>
               <Text fz="xs" fw={400}>
                 <Tooltip label={op.dataset.name}>
-                  <Link href={op.dataset.url || "#"}>
-                    {op.dataset.shortName}
-                  </Link>
+                  <Link href={op.dataset.url || "#"}>{op.dataset.shortName}</Link>
                 </Tooltip>
               </Text>
             </Table.Td>
@@ -343,8 +337,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
   const [opened, { toggle }] = useDisclosure(false);
 
   const collection = specimen?.events.collections[0];
-  const coordinates =
-    specimen?.latitude && `${specimen.latitude}, ${specimen.longitude}`;
+  const coordinates = specimen?.latitude && `${specimen.latitude}, ${specimen.longitude}`;
 
   return (
     <Grid>
@@ -438,11 +431,7 @@ function Collections({ specimen }: { specimen: SpecimenDetails | undefined }) {
             View changes
           </Button>
         </Group>
-        <Collapse in={opened}>
-          {opened && specimen?.entityId && (
-            <Provenance entityId={specimen.entityId} />
-          )}
-        </Collapse>
+        <Collapse in={opened}>{opened && specimen?.entityId && <Provenance entityId={specimen.entityId} />}</Collapse>
       </Grid.Col>
     </Grid>
   );
@@ -501,11 +490,7 @@ function Accessions({ specimen }: { specimen: SpecimenDetails | undefined }) {
   );
 }
 
-function Subsamples({
-  subsample,
-}: {
-  subsample: SubsampleDetails | undefined;
-}) {
+function Subsamples({ subsample }: { subsample: SubsampleDetails | undefined }) {
   const event = subsample?.events.subsamples[0];
 
   return (
@@ -546,11 +531,7 @@ function Subsamples({
   );
 }
 
-function DnaExtracts({
-  dnaExtract,
-}: {
-  dnaExtract: DnaExtractDetails | undefined;
-}) {
+function DnaExtracts({ dnaExtract }: { dnaExtract: DnaExtractDetails | undefined }) {
   const extraction = dnaExtract?.events.dnaExtracts[0];
 
   return (
@@ -847,25 +828,15 @@ function EventTimeline(props: EventTimelineProps) {
   const subsample = props.subsample?.events.subsamples[0];
   const extraction = props.dnaExtract?.events.dnaExtracts[0];
 
-  const sequencing = props.sequences
-    ?.map((seq) => seq.events.sequencing)
-    .flat();
-  const assemblies = props.sequences
-    ?.map((seq) => seq.events.assemblies)
-    .flat();
-  const annotations = props.sequences
-    ?.map((seq) => seq.events.annotations)
-    .flat();
-  const depositions = props.sequences
-    ?.map((seq) => seq.events.dataDepositions)
-    .flat();
+  const sequencing = props.sequences?.map((seq) => seq.events.sequencing).flat();
+  const assemblies = props.sequences?.map((seq) => seq.events.assemblies).flat();
+  const annotations = props.sequences?.map((seq) => seq.events.annotations).flat();
+  const depositions = props.sequences?.map((seq) => seq.events.dataDepositions).flat();
 
   return (
     <Timeline color="midnight" active={8} bulletSize={45} lineWidth={4}>
       <Timeline.Item
-        bullet={
-          <Image alt="Collection" src="/timeline-icons/collection.svg" w={50} />
-        }
+        bullet={<Image alt="Collection" src="/icons/specimen-listing/Specimen listing_ collection.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             Collection
@@ -880,9 +851,7 @@ function EventTimeline(props: EventTimelineProps) {
         </Group>
       </Timeline.Item>
       <Timeline.Item
-        bullet={
-          <Image alt="Accession" src="/timeline-icons/accession.svg" w={50} />
-        }
+        bullet={<Image alt="Accession" src="/icons/specimen-listing/Specimen listing_ accession.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             Accession
@@ -897,13 +866,7 @@ function EventTimeline(props: EventTimelineProps) {
         </Group>
       </Timeline.Item>
       <Timeline.Item
-        bullet={
-          <Image
-            alt="Subsampling"
-            src="/timeline-icons/subsampling.svg"
-            w={50}
-          />
-        }
+        bullet={<Image alt="Subsampling" src="/icons/specimen-listing/Specimen listing_ subsampling.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             Subsampling
@@ -918,9 +881,7 @@ function EventTimeline(props: EventTimelineProps) {
         </Group>
       </Timeline.Item>
       <Timeline.Item
-        bullet={
-          <Image alt="Extraction" src="/timeline-icons/extraction.svg" w={50} />
-        }
+        bullet={<Image alt="Extraction" src="/icons/specimen-listing/Specimen listing_ DNA extraction.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             DNA extraction
@@ -935,9 +896,7 @@ function EventTimeline(props: EventTimelineProps) {
         </Group>
       </Timeline.Item>
       <Timeline.Item
-        bullet={
-          <Image alt="Sequencing" src="/timeline-icons/sequencing.svg" w={50} />
-        }
+        bullet={<Image alt="Sequencing" src="/icons/specimen-listing/Specimen listing_ sequencing.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             Amplification and sequencing
@@ -956,9 +915,7 @@ function EventTimeline(props: EventTimelineProps) {
         </Stack>
       </Timeline.Item>
       <Timeline.Item
-        bullet={
-          <Image alt="Assembly" src="/timeline-icons/assembly.svg" w={50} />
-        }
+        bullet={<Image alt="Assembly" src="/icons/specimen-listing/Specimen listing_ sequence assembly.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             Sequence assembly
@@ -978,7 +935,7 @@ function EventTimeline(props: EventTimelineProps) {
       </Timeline.Item>
       <Timeline.Item
         bullet={
-          <Image alt="Annotation" src="/timeline-icons/annotation.svg" w={50} />
+          <Image alt="Annotation" src="/icons/specimen-listing/Specimen listing_ sequence annotation.svg" w={50} />
         }
         title={
           <Text fz="sm" ml={20} fw={700}>
@@ -998,9 +955,7 @@ function EventTimeline(props: EventTimelineProps) {
         </Stack>
       </Timeline.Item>
       <Timeline.Item
-        bullet={
-          <Image alt="Deposition" src="/timeline-icons/deposition.svg" w={50} />
-        }
+        bullet={<Image alt="Deposition" src="/icons/specimen-listing/Specimen listing_ data deposition.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             Data deposition
@@ -1019,9 +974,7 @@ function EventTimeline(props: EventTimelineProps) {
         </Stack>
       </Timeline.Item>
       <Timeline.Item
-        bullet={
-          <Image alt="Data reuse" src="/timeline-icons/data-reuse.svg" w={50} />
-        }
+        bullet={<Image alt="Data reuse" src="/icons/specimen-listing/Specimen listing_ data reuse.svg" w={50} />}
         title={
           <Text fz="sm" ml={20} fw={700}>
             Data reuse
@@ -1080,11 +1033,7 @@ function EventCarousel({ children }: { children: React.ReactNode }) {
         </Button>
         <Group>
           {React.Children.map(children, (_child, idx) => (
-            <div
-              key={idx}
-              className={classes.indicator}
-              data-active={idx === slide}
-            ></div>
+            <div key={idx} className={classes.indicator} data-active={idx === slide}></div>
           ))}
         </Group>
         <Button
@@ -1100,11 +1049,7 @@ function EventCarousel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function SpecimenAccession({
-  params,
-}: {
-  params: { accession: string };
-}) {
+export default function SpecimenAccession({ params }: { params: { accession: string } }) {
   const basePath = usePathname().replace(params.accession, "");
 
   const { error, data } = useQuery<SpecimenQueryResults>(GET_SPECIMEN, {
@@ -1128,10 +1073,7 @@ export default function SpecimenAccession({
 
       <Paper p={20} radius="lg" withBorder>
         <Group align="inherit">
-          <Title
-            order={3}
-            mb={10}
-          >{`Complete specimen view: ${data?.specimen.recordId}`}</Title>
+          <Title order={3} mb={10}>{`Complete specimen view: ${data?.specimen.recordId}`}</Title>
           <Text fz="sm" c="dimmed">
             Source
           </Text>
@@ -1151,8 +1093,7 @@ export default function SpecimenAccession({
               bg="#d6e4ed"
               h="100%"
               style={{
-                borderRadius:
-                  "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
+                borderRadius: "var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg)",
                 border: "none",
               }}
             >
