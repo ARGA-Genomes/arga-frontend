@@ -2,7 +2,7 @@
 
 import classes from "./group-card.module.css";
 
-import { Image, Stack, Text, Skeleton, Paper } from "@mantine/core";
+import { Image, Stack, Text, Paper } from "@mantine/core";
 import Link from "next/link";
 
 export interface GroupCardProps {

@@ -2,15 +2,6 @@ import { Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Filter } from "./common";
 
-const CLASSIFICATIONS = [
-  { value: "KINGDOM", label: "Kingdom" },
-  { value: "PHYLUM", label: "Phylum" },
-  { value: "CLASS", label: "Class" },
-  { value: "ORDER", label: "Order" },
-  { value: "FAMILY", label: "Family" },
-  { value: "GENUS", label: "Genus" },
-];
-
 interface HigherClassificationFiltersProps {
   filters: Filter[];
   onChange: (items: Filter[]) => void;

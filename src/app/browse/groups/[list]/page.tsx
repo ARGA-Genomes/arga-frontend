@@ -24,7 +24,6 @@ import {
   Chip,
   Center,
   Anchor,
-  Flex,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconFilter, IconClockHour4, IconExternalLink, IconArrowsSort } from "@tabler/icons-react";
@@ -46,7 +45,6 @@ import { AttributePill } from "@/components/data-fields";
 import classes from "../../../../components/record-list.module.css";
 import { map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
-import { LicenseIcons } from "@/components/license-icons";
 import { getLicense } from "@/helpers/getLicense";
 
 const PAGE_SIZE = 10;
@@ -611,6 +609,7 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
   const params = use(props.params);
   const router = useRouter();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const group = (queryMap as any)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
@@ -628,7 +627,7 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
     } else {
       router.replace("/browse/groups");
     }
-  }, [group, setPreviousPage]);
+  }, [group, params.list, router, setPreviousPage]);
 
   if (!group) return null;
 

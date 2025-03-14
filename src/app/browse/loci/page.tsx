@@ -3,7 +3,7 @@
 import { MAX_WIDTH } from "@/app/constants";
 import { Photo } from "@/app/type";
 import DataTypeHeader from "@/components/data-type-header";
-import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { Filter, FilterKind, intoFilterItem } from "@/components/filtering/common";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -177,7 +177,11 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
 }
 
 function FilterBadge({ filter }: { filter: Filter }) {
-  return <Badge variant="outline">{filter.value}</Badge>;
+  return (
+    <Badge variant="outline">
+      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
+    </Badge>
+  );
 }
 
 function Species() {
@@ -188,9 +192,7 @@ function Species() {
     classifications: [],
     dataTypes: [
       {
-        filter: "HAS_DATA",
-        action: "INCLUDE",
-        value: "Locus",
+        hasData: FilterKind.Loci,
         editable: false,
       },
     ],
@@ -235,8 +237,8 @@ function Species() {
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            {flattenFilters(filters).map((filter) => (
-              <FilterBadge filter={filter} key={filter.value} />
+            {flattenFilters(filters).map((filter, idx) => (
+              <FilterBadge key={idx} filter={filter} />
             ))}
           </Group>
         </Grid.Col>

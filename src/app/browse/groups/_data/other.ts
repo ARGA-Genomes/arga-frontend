@@ -1,4 +1,4 @@
-export default [
+export const other = [
   {
     category: "Native Species",
     image: "/icons/list-group/List group_ native.svg",
