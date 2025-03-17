@@ -1,0 +1,33 @@
+.item {
+    fill: var(--mantine-color-wheat-5);
+}
+
+.itemButton {
+    fill: var(--mantine-color-midnight-8);
+}
+
+.text {
+    font-weight: 700;
+    font-size: 14px;
+    fill: var(--mantine-color-midnight-8);
+    text-anchor: start;
+    dominant-baseline: middle;
+}
+
+.buttonText {
+    font-weight: 700;
+    font-size: 14px;
+    fill: var(--mantine-color-midnight-1);
+    text-anchor: start;
+    dominant-baseline: middle;
+}
+
+.bullet {
+    fill: var(--mantine-color-midnight-8);
+}
+
+.line {
+    stroke: var(--mantine-color-midnight-8);
+    stroke-width: 1;
+    stroke-dasharray: 1 1;
+}

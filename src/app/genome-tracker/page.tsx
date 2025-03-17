@@ -27,6 +27,7 @@ import { DataPageCitation } from "@/components/page-citation";
 import { GenomeComposition } from "./_components/genome-composition";
 import { CumulativeTracker } from "./_components/cumulative-tracker";
 import { GroupingCompletion } from "./_components/grouping-completion";
+import { SignificantMilestones } from "./_components/significant-milestones";
 
 interface ActionButtonProps {
   label: string;
@@ -50,6 +51,8 @@ function ActionButton({ label, icon }: ActionButtonProps) {
 
 export default function GenomeTracker() {
   const ranks = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
+  const minDate = new Date("2009-01-01");
+  const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
 
   return (
     <>
@@ -152,8 +155,9 @@ export default function GenomeTracker() {
                     plotted as an accumulated total. Statistics based on records indexed within ARGA.
                   </Text>
                   <Box h={500}>
-                    <GenomeCompletion taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" />
+                    <GenomeCompletion taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" domain={[minDate, maxDate]} />
                   </Box>
+                  <SignificantMilestones domain={[minDate, maxDate]} />
                 </Stack>
               </Paper>
               <Paper p="lg" radius="lg" withBorder>
@@ -161,7 +165,7 @@ export default function GenomeTracker() {
                   <Text size="lg" fw="bold">
                     Completion of genome sequences for key biodiversity groupings:
                   </Text>
-                  <GroupingCompletion />
+                  <GroupingCompletion dateDomain={[minDate, new Date()]} />
                 </Stack>
               </Paper>
             </Stack>
