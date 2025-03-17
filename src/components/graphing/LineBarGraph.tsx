@@ -2,7 +2,6 @@
 
 import classes from "./LineBarGraph.module.css";
 
-import { ParentSize } from "@visx/responsive";
 import { Group } from "@visx/group";
 import { scaleLinear, scaleTime } from "@visx/scale";
 import { AxisBottom, AxisLeft, AxisRight } from "@visx/axis";

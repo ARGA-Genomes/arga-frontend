@@ -3,13 +3,12 @@
 import classes from "./significant-milestones.module.css";
 
 import { gql, useQuery } from "@apollo/client";
-import { Box, Paper, ScrollArea, Stack, Text } from "@mantine/core";
+import { ScrollArea } from "@mantine/core";
 import { Group } from "@visx/group";
 import { ParentSize } from "@visx/responsive";
-import { scaleBand, scaleLinear, scaleTime } from "@visx/scale";
-import { Circle, Line } from "@visx/shape";
+import { scaleLinear, scaleTime } from "@visx/scale";
+import { Circle } from "@visx/shape";
 import { Text as SvgText } from "@visx/text";
-import d3, { max, min } from "d3";
 import { motion } from "framer-motion";
 import { useState } from "react";
 

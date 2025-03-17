@@ -3,7 +3,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { LineBarGraph } from "@/components/graphing/LineBarGraph";
 import { ParentSize } from "@visx/responsive";
-import { SignificantMilestones } from "./significant-milestones";
 
 const GET_COMPLETE_GENOMES_YEAR_STATS = gql`
   query CompleteGenomesYearStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String) {
