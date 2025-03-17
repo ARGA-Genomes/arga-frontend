@@ -4,7 +4,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Agriculture.svg",
     source: "ARGA Commercial Species",
     filter: {
-      commercialSector: "agriculture",
+      name: "commercialSector",
+      value: {
+        string: "agriculture",
+      },
     },
   },
   {
@@ -12,7 +15,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Cereals and crops.svg",
     source: "ARGA Commercial Species",
     filter: {
-      agriculturalIndustry: "agriculture",
+      name: "agriculturalIndustry",
+      value: {
+        string: "agriculture",
+      },
     },
   },
   {
@@ -20,7 +26,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Horticultural crops.svg",
     source: "ARGA Commercial Species",
     filter: {
-      agriculturalIndustry: "horticultural crop",
+      name: "agriculturalIndustry",
+      value: {
+        string: "horticultural crop",
+      },
     },
   },
   {
@@ -28,7 +37,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Livestock.svg",
     source: "ARGA Commercial Species",
     filter: {
-      agriculturalIndustry: "livestock",
+      name: "agriculturalIndustry",
+      value: {
+        string: "livestock",
+      },
     },
   },
   {
@@ -36,7 +48,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Forestry, timber and textiles.svg",
     source: "ARGA Commercial Species",
     filter: {
-      agriculturalIndustry: "forestry",
+      name: "agriculturalIndustry",
+      value: {
+        string: "forestry",
+      },
     },
   },
   {
@@ -44,7 +59,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Aquaculture.svg",
     source: "ARGA Commercial Species",
     filter: {
-      commercialSector: "aquaculture",
+      name: "commercialSector",
+      value: {
+        string: "aquaculture",
+      },
     },
   },
   {
@@ -52,7 +70,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Commercial and trade fishes.svg",
     source: "ARGA Commercial Species",
     filter: {
-      commercialAndTradeFisheries: "commercial and trade fisheries",
+      name: "commercialAndTradeFisheries",
+      value: {
+        string: "commercial and trade fisheries",
+      },
     },
   },
   {
@@ -60,7 +81,10 @@ export const commercial = [
     image: "/icons/list-group/List group_ Managed fisheries.svg",
     source: "ARGA Commercial Species",
     filter: {
-      managedFisheries: "managed fisheries",
+      name: "managedFisheries",
+      value: {
+        string: "managed fisheries",
+      },
     },
   },
 ];

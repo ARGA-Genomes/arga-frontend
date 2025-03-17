@@ -53,6 +53,11 @@ interface Filters {
   dataTypes: Filter[];
 }
 
+interface NameAttributeFilter {
+  name: string;
+  value: string | boolean | number;
+}
+
 const GET_DETAILS = gql`
   query SourceDetails($name: String) {
     source(by: { name: $name }) {
@@ -102,6 +107,20 @@ interface Dataset {
   publicationYear?: number;
 }
 
+interface ListGroup {
+  category: string;
+  image: string;
+  source: string;
+  filter: {
+    name: string;
+    value: {
+      string?: string;
+      bool?: boolean;
+      int?: number;
+    };
+  };
+}
+
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
 const accessPillColours: Record<AccessPillType, string> = {
@@ -142,9 +161,9 @@ interface DetailsQueryResults {
 }
 
 const GET_SPECIES = gql`
-  query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
+  query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem], $attributes: NameAttributeFilter) {
     source(by: { name: $name }, filters: $filters) {
-      species(page: $page, pageSize: $pageSize) {
+      species(page: $page, pageSize: $pageSize, attributes: $attributes) {
         total
         records {
           taxonomy {
@@ -265,7 +284,7 @@ function FilterBadge({ filter }: { filter: Filter }) {
   );
 }
 
-function Species({ source }: { source: string }) {
+function Species({ group }: { group: ListGroup }) {
   const [page, setPage] = useState(1);
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -284,10 +303,11 @@ function Species({ source }: { source: string }) {
     variables: {
       page,
       pageSize: PAGE_SIZE,
-      name: source,
+      name: group.source,
       filters: flattenFilters(filters)
         .map(intoFilterItem)
         .filter((item) => item),
+      attributes: group.filter || null
     },
   });
 
@@ -610,7 +630,7 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
   const router = useRouter();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const group = (queryMap as any)[params.list];
+  const group = (queryMap as Record<string, ListGroup>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
@@ -677,7 +697,7 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
              * - Put the genome content above any genetic data (separate)
              */}
             <Paper p="xl" radius="lg" withBorder>
-              <Species source={group.source} />
+              <Species group={group} />
             </Paper>
             <Paper p="xl" radius="lg" withBorder>
               {data?.source.datasets ? <BrowseComponentDatasets datasets={data.source.datasets} /> : error?.message}
