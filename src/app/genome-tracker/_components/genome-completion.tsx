@@ -2,6 +2,8 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { LineBarGraph } from "@/components/graphing/LineBarGraph";
+import { ParentSize } from "@visx/responsive";
+import { SignificantMilestones } from "./significant-milestones";
 
 const GET_COMPLETE_GENOMES_YEAR_STATS = gql`
   query CompleteGenomesYearStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String) {
@@ -26,9 +28,11 @@ type CompleteGenomesYearStatsQuery = {
 interface GenomeCompletionProps {
   taxonRank: string;
   taxonCanonicalName: string;
+  domain: [Date, Date];
+  milestones?: [];
 }
 
-export function GenomeCompletion({ taxonRank, taxonCanonicalName }: GenomeCompletionProps) {
+export function GenomeCompletion({ taxonRank, taxonCanonicalName, domain }: GenomeCompletionProps) {
   const { data } = useQuery<CompleteGenomesYearStatsQuery>(GET_COMPLETE_GENOMES_YEAR_STATS, {
     variables: {
       taxonRank,
@@ -37,15 +41,36 @@ export function GenomeCompletion({ taxonRank, taxonCanonicalName }: GenomeComple
   });
   let accum = 0;
 
-  const lineData = data?.stats.completeGenomesByYear.map((stat) => ({
-    x: stat.year,
+  const stats = data?.stats.completeGenomesByYear.filter(
+    (stat) => stat.year >= domain[0].getFullYear() && stat.year <= domain[1].getFullYear(),
+  );
+
+  const lineData = stats?.map((stat) => ({
+    x: new Date(`${stat.year}-01-01`),
     y: (accum += stat.total),
   }));
 
-  const barData = data?.stats.completeGenomesByYear.map((stat) => ({
-    x: stat.year,
+  const barData = stats?.map((stat) => ({
+    x1: new Date(`${stat.year}-01-01`),
+    x2: new Date(`${stat.year + 1}-01-01`),
     y: stat.total,
   }));
 
-  return <LineBarGraph lineData={lineData ?? []} barData={barData ?? []} />;
+  return (
+    <ParentSize>
+      {(parent) => (
+        <>
+          <svg width={parent.width} height={parent.height}>
+            <LineBarGraph
+              width={parent.width}
+              height={parent.height}
+              lineData={lineData ?? []}
+              barData={barData ?? []}
+              dateDomain={domain}
+            />
+          </svg>
+        </>
+      )}
+    </ParentSize>
+  );
 }
