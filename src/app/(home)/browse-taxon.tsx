@@ -42,7 +42,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.animals}
             category="Animals"
-            image="/icons/taxon/Taxon_ Animals (= Kingdom Animalia).svg"
+            image="/icons/taxon/Taxon_ Animals (Kingdom Animalia).svg"
             link="/kingdom/Animalia"
           />
         </Carousel.Slide>
@@ -50,7 +50,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.plants}
             category="Plants"
-            image="/icons/taxon/Taxon_ Plants (=Regnum Plantae).svg"
+            image="/icons/taxon/Taxon_ Plants (Regnum Plantae).svg"
             link="/regnum/Plantae"
           />
         </Carousel.Slide>
@@ -58,7 +58,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.fungi}
             category="Fungi"
-            image="/icons/taxon/Taxon_ Fungi (= Fungi).svg"
+            image="/icons/taxon/Taxon_ Fungi (Fungi).svg"
             link="/regnum/Fungi"
           />
         </Carousel.Slide>
@@ -66,7 +66,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.protista}
             category="Protista"
-            image="/icons/taxon/Taxon_ Protozoa (= Kingdom Protozoa).svg"
+            image="/icons/taxon/Taxon_ Protozoa (Kingdom Protozoa).svg"
             link="/superkingdom/Protista"
           />
         </Carousel.Slide>
@@ -74,7 +74,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.allSpecies}
             category="All species"
-            image="/icons/taxon/Taxon_ All eukaryote species (= Eukaryota).svg"
+            image="/icons/taxon/Taxon_ All eukaryote species (Eukaryota).svg"
             link="/domain/Eukaryota"
           />
         </Carousel.Slide>

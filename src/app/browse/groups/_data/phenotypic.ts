@@ -14,7 +14,10 @@ export const phenotypic = [
     image: "/icons/list-group/List group_ medicinal and bioactive.svg",
     source: "ARGA Useful Species", // TODO: MISSING
     filter: {
-      isMedicinalAndBioactive: "TRUE",
+      name: "isMedicinalAndBioactive",
+      value: {
+        bool: true,
+      },
     },
   },
 ];

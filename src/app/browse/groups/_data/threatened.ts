@@ -6,10 +6,13 @@ export const threatened = [
   },
   {
     category: "Australia's 110 Priority Threatened Species",
-    image: "/icons/list-group/List group_ Threatened (= Top 110 Species).svg",
+    image: "/icons/list-group/List group_ Threatened (Top 110 Species).svg",
     source: "ARGA Threatened Species",
     filters: {
-      top110Species: "TRUE",
+      name: "top110Species",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -22,7 +25,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ CITES.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_VU: "TRUE", // TODO: FIX
+      name: "EPBC_act_category_VU", // TODO: FIX
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -30,7 +36,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ extinct.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_EX: "TRUE",
+      name: "EPBC_act_category_EX",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -38,7 +47,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ extinct in the wild.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_EW: "TRUE",
+      name: "EPBC_act_category_EW",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -46,7 +58,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ critically endangered.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_CR: "TRUE",
+      name: "EPBC_act_category_CR",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -54,7 +69,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ endangered.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_EN: "TRUE",
+      name: "EPBC_act_category_EN",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -62,7 +80,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ vulnerable.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_VU: "TRUE",
+      name: "EPBC_act_category_VU",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -70,7 +91,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ conservation dependent.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_cd: "TRUE",
+      name: "EPBC_act_category_cd",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -78,7 +102,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ not threatened.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_nt: "TRUE",
+      name: "EPBC_act_category_nt",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -86,7 +113,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ least concern.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_lc: "TRUE",
+      name: "EPBC_act_category_lc",
+      value: {
+        bool: true,
+      },
     },
   },
   {
@@ -94,7 +124,10 @@ export const threatened = [
     image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
     source: "ARGA Threatened Species",
     filter: {
-      EPBC_ul: "TRUE",
+      name: "EPBC_act_category_ul",
+      value: {
+        bool: true,
+      },
     },
   },
 ];
