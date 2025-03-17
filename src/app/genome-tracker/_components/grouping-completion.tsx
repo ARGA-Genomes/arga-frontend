@@ -187,11 +187,11 @@ function GroupSelection({ group, onSelected }: GroupSelectionProps) {
   );
 }
 
-interface GroupDetailProps {
+interface GroupDetailRadialProps {
   group: string;
 }
 
-function GroupDetailRadial({ group }: GroupDetailProps) {
+function GroupDetailRadial({ group }: GroupDetailRadialProps) {
   const [showRaw, setShowRaw] = useState<boolean>(false);
   const [hoverItem, setHoverItem] = useState<RadialBarDatum | null>(null);
 
