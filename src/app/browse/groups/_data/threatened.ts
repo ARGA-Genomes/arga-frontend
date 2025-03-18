@@ -9,7 +9,7 @@ export const threatened = [
     image: "/icons/list-group/List group_ Threatened (Top 110 Species).svg",
     source: "ARGA Threatened Species",
     filters: {
-      name: "top110Species",
+      name: "top_110_species_icon",
       value: {
         bool: true,
       },

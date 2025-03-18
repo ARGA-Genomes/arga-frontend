@@ -45,7 +45,7 @@ export const commercial = [
   },
   {
     category: "Forestry and Timber",
-    image: "/icons/list-group/List group_ Forestry, timber and textiles.svg",
+    image: "/icons/list-group/List group_ Forestry timber and textiles.svg",
     source: "ARGA Commercial Species",
     filter: {
       name: "agriculturalIndustry",

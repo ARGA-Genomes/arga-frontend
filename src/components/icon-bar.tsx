@@ -325,7 +325,7 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
     link: "/browse/sources/ARGA_Commercial_Species",
   },
   forestry: {
-    image: "/icons/list-group/List group_ Forestry, timber and textiles.svg",
+    image: "/icons/list-group/List group_ Forestry timber and textiles.svg",
     label: "Forestry and timber industry",
     link: "/browse/sources/ARGA_Commercial_Species",
   },
