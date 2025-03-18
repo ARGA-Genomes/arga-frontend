@@ -276,8 +276,8 @@ function SpeciesCoverageTacho({ group }: SpeciesCoverageTacho) {
   const value = ((stat?.fullGenomesCoverage || 0) / (stat?.species || 0)) * 100;
 
   const thresholds = [
-    { name: "", color: getThemeColor("bushfire.5", theme), start: 0, end: 50 },
-    { name: "", color: getThemeColor("wheat.5", theme), start: 50, end: 75 },
+    { name: "", color: getThemeColor("bushfire.5", theme), start: 0, end: 25 },
+    { name: "", color: getThemeColor("wheat.5", theme), start: 25, end: 75 },
     { name: "", color: getThemeColor("moss.5", theme), start: 75, end: 100 },
   ];
 

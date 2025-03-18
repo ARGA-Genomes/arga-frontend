@@ -684,10 +684,6 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
              * - Species with data
              * - Species with most genomes
              * - Species with most data
-             * Tachometer
-             * - Bushfire: 0-25
-             * - Wheat: 25-75
-             * - Moss: 75-100
              * We want all excluding phyla with genomes
              * We also want:
              * - sunburst from genome tracker
