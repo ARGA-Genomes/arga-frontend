@@ -25,9 +25,9 @@ import { useState } from "react";
 import { Text as SvgText } from "@visx/text";
 import { motion } from "framer-motion";
 import { Circle } from "@visx/shape";
-import { GenomeCompletion } from "./genome-completion";
 import { CumulativeTracker } from "./cumulative-tracker";
 import { TachoChart } from "@/components/graphing/tacho";
+import { GenomeCompletion } from "./genome-completion";
 
 const GET_COVERAGE_STATS = gql`
   query TaxonCoverageStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
@@ -187,11 +187,11 @@ function GroupSelection({ group, onSelected }: GroupSelectionProps) {
   );
 }
 
-interface GroupDetailProps {
+interface GroupDetailRadialProps {
   group: string;
 }
 
-function GroupDetailRadial({ group }: GroupDetailProps) {
+function GroupDetailRadial({ group }: GroupDetailRadialProps) {
   const [showRaw, setShowRaw] = useState<boolean>(false);
   const [hoverItem, setHoverItem] = useState<RadialBarDatum | null>(null);
 
@@ -286,9 +286,10 @@ function SpeciesCoverageTacho({ group }: SpeciesCoverageTacho) {
 
 interface GroupDetailExtraProps {
   group: string;
+  domain: [Date, Date];
 }
 
-function GroupDetailExtra({ group }: GroupDetailExtraProps) {
+function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
   const query = QUERIES[group];
 
   return (
@@ -305,7 +306,11 @@ function GroupDetailExtra({ group }: GroupDetailExtraProps) {
       <Paper radius="lg" p="lg" withBorder>
         <Stack gap="xl">
           <Box h={300}>
-            <GenomeCompletion taxonRank={query.taxonRank} taxonCanonicalName={query.taxonCanonicalName} />
+            <GenomeCompletion
+              taxonRank={query.taxonRank}
+              taxonCanonicalName={query.taxonCanonicalName}
+              domain={domain}
+            />
           </Box>
           <Text c="midnight.11" size="sm">
             Rate of genome completion over time. The first instance of a whole genome sequence for an individual species
@@ -335,9 +340,10 @@ function GroupDetailExtra({ group }: GroupDetailExtraProps) {
 
 interface GroupDetailProps {
   group: string;
+  domain: [Date, Date];
 }
 
-function GroupDetail({ group }: GroupDetailProps) {
+function GroupDetail({ group, domain }: GroupDetailProps) {
   return (
     <Paper radius="xl" p="lg" withBorder>
       <Stack>
@@ -351,7 +357,7 @@ function GroupDetail({ group }: GroupDetailProps) {
             <GroupDetailRadial group={group} />
           </Grid.Col>
           <Grid.Col span={6}>
-            <GroupDetailExtra group={group} />
+            <GroupDetailExtra group={group} domain={domain} />
           </Grid.Col>
         </Grid>
       </Stack>
@@ -359,7 +365,11 @@ function GroupDetail({ group }: GroupDetailProps) {
   );
 }
 
-export function GroupingCompletion() {
+interface GroupingCompletionProps {
+  dateDomain: [Date, Date];
+}
+
+export function GroupingCompletion({ dateDomain }: GroupingCompletionProps) {
   const [group, setGroup] = useState<string>("mammals");
 
   return (
@@ -378,7 +388,7 @@ export function GroupingCompletion() {
           </SimpleGrid>
         </Grid.Col>
         <Grid.Col span={8}>
-          <GroupDetail group={group} />
+          <GroupDetail group={group} domain={dateDomain} />
         </Grid.Col>
       </Grid>
     </Stack>

@@ -1,6 +1,10 @@
 .bar {
     fill: var(--mantine-color-shellfish-5);
     opacity: 0.4;
+
+    &:hover {
+        opacity: 1;
+    }
 }
 
 .line {
@@ -11,6 +15,10 @@
 .lineDot {
     stroke: var(--mantine-color-moss-5);
     fill: var(--mantine-color-moss-5);
+
+    &:hover {
+        stroke: var(--mantine-color-moss-8);
+    }
 }
 
 .scaleText {
