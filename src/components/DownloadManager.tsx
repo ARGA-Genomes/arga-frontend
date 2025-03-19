@@ -117,7 +117,7 @@ function SavedDataManager() {
       setManifestUrl(undefined);
       setScriptUrl(undefined);
     }
-  }, [selected]);
+  }, [manifestUrl, metadataUrl, scriptUrl, selected]);
 
   // auto-select newly saved items
   useEffect(() => {
@@ -126,7 +126,7 @@ function SavedDataManager() {
       selectedSet.add(item);
     }
     setSelected(Array.from(selectedSet));
-  }, [saved]);
+  }, [selectedSet, saved]);
 
   function remove(item: SavedItem) {
     const newList = saved.filter((value) => value.url != item.url);
@@ -269,7 +269,7 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
   useEffect(() => {
     setHint(!checked ? "moss.1" : "moss.0");
     onChange(checked);
-  }, [checked]);
+  }, [checked, onChange]);
 
   return (
     <Box
@@ -325,7 +325,7 @@ function SavedDataItem({ item, onRemove, onSelected, onDeselected }: SaveDataIte
             />
             <Link href={`/species/${item.scientificName}/whole_genomes/${item.label}`}>
               <Group>
-                <Image src={"/card-icons/type/whole_genomes.svg"} fit="contain" h={80} w={80} alt="" />
+                <Image src={"/icons/data-type/Data type_ Whole genome.svg"} fit="contain" h={80} w={80} alt="" />
                 <Stack gap={0}>
                   <Text fw={500} truncate="end">
                     {item.label}

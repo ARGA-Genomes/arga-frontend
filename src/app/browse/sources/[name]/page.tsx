@@ -22,6 +22,7 @@ import {
   ScrollArea,
   Chip,
   Center,
+  Anchor,
 } from "@mantine/core";
 import { useEffect, useState, useMemo, use } from "react";
 import { PaginationBar } from "@/components/pagination";
@@ -54,6 +55,7 @@ const GET_DETAILS = gql`
       rightsHolder
       author
       name
+      listsId
       accessPill
       reusePill
 
@@ -122,6 +124,7 @@ interface Source {
   rightsHolder: string;
   author: string;
   name: string;
+  listsId: string | null;
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   species: SpeciesCount;
@@ -204,7 +207,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Data types"
             description="Only show species that have specific types of data"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -217,7 +220,7 @@ function Filters({ filters, onChange }: FiltersProps) {
           <FilterGroup
             label="Higher classification filters"
             description="Limit data based on taxonomy"
-            image="/card-icons/type/higher_taxon_report.svg"
+            image="/icons/data-type/Data type_ Higher taxon report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -249,7 +252,11 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
 }
 
 function FilterBadge({ filter }: { filter: Filter }) {
-  return <Badge variant="outline">{filter.value}</Badge>;
+  return (
+    <Badge variant="outline">
+      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
+    </Badge>
+  );
 }
 
 function Species({ source }: { source: string }) {
@@ -300,8 +307,8 @@ function Species({ source }: { source: string }) {
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            {flattenFilters(filters).map((filter) => (
-              <FilterBadge filter={filter} key={filter.value} />
+            {flattenFilters(filters).map((filter, idx) => (
+              <FilterBadge key={idx} filter={filter} />
             ))}
           </Group>
         </Grid.Col>
@@ -491,6 +498,10 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
 
 function SourceDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
+
+  // Gross and hacky and terrible, to fix at a later date
+  const LISTS_URL = location.href.startsWith("https://app") ? "lists.ala.org.au" : "lists.test.ala.org.au";
+
   return (
     <Box w="100%">
       <Stack gap={0}>
@@ -502,7 +513,18 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
         <Text c="dimmed" size="xs">
           &copy; {source.rightsHolder}
         </Text>
-        <Grid pt={10}>
+        {source.listsId && (
+          <Anchor
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
+            target="_blank"
+            size="xs"
+            mt="xs"
+            href={`https://${LISTS_URL}/list/${source.listsId}`}
+          >
+            View on ALA Lists <IconExternalLink size="0.8rem" />
+          </Anchor>
+        )}
+        <Grid pt="xl">
           <Grid.Col span={3}>
             <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
               <Group gap={5} justify="center" wrap="nowrap">
@@ -573,7 +595,7 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
       name: `browsing ${source}`,
       url: `/browse/sources/${params.name}`,
     });
-  }, [setPreviousPage]);
+  }, [source, params.name, setPreviousPage]);
 
   return (
     <Stack mt="xl">

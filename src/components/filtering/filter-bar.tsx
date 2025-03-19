@@ -1,13 +1,4 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Drawer,
-  Grid,
-  Group,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Badge, Box, Button, Drawer, Grid, Group, Text, Title } from "@mantine/core";
 import { IconFilter } from "@tabler/icons-react";
 import { Filter } from "./common";
 import { useDisclosure } from "@mantine/hooks";
@@ -23,23 +14,13 @@ export function FilterBar(props: FilterBarProps) {
 
   return (
     <>
-      <Drawer
-        opened={opened}
-        onClose={close}
-        withCloseButton={false}
-        position="right"
-        size="xl"
-      >
+      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
         <Box pt={200}>{props.children}</Box>
       </Drawer>
 
       <Grid gutter={50} align="baseline">
         <Grid.Col span="content">
-          {typeof props.title === "string" ? (
-            <Title order={5}>{props.title}</Title>
-          ) : (
-            props.title
-          )}
+          {typeof props.title === "string" ? <Title order={5}>{props.title}</Title> : props.title}
         </Grid.Col>
 
         <Grid.Col span="auto">
@@ -52,19 +33,14 @@ export function FilterBar(props: FilterBarProps) {
                 None
               </Text>
             )}
-            {props.filters.map((filter) => (
-              <FilterBadge filter={filter} key={filter.value} />
+            {props.filters.map((filter, idx) => (
+              <FilterBadge key={idx} filter={filter} />
             ))}
           </Group>
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button
-            leftSection={<IconFilter />}
-            variant="subtle"
-            onClick={open}
-            color="shellfish.7"
-          >
+          <Button leftSection={<IconFilter />} variant="subtle" onClick={open} color="shellfish.7">
             Filter
           </Button>
         </Grid.Col>
@@ -75,8 +51,8 @@ export function FilterBar(props: FilterBarProps) {
 
 function FilterBadge({ filter }: { filter: Filter }) {
   return (
-    <Badge variant="outline" color="shellfish.7">
-      {filter.value}
+    <Badge variant="outline">
+      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
     </Badge>
   );
 }

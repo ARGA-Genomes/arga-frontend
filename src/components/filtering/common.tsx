@@ -2,28 +2,32 @@ import { Input, InputProps } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 
-export interface FilterItem {
-  filter: string;
-  action: string;
-  value: string;
-}
-
-export function intoFilterItem(item: Filter): FilterItem | undefined {
-  if (item.filter && item.action && item.value) {
-    return {
-      filter: item.filter,
-      action: item.action,
-      value: item.value,
-    };
-  }
-  return undefined;
+export enum FilterKind {
+  Genomes = "GENOME",
+  Loci = "LOCUS",
+  Specimens = "SPECIMEN",
+  Other = "OTHER",
 }
 
 export interface Filter {
-  filter: string;
-  action: string;
-  value: string;
+  scientificName?: string;
+  canonicalName?: string;
+  vernacularGroup?: string;
+  hasData?: FilterKind;
   editable: boolean;
+}
+
+export type FilterItem = Omit<Filter, "editable">;
+
+export function intoFilterItem(item: Filter): FilterItem | undefined {
+  if (!item.scientificName && !item.canonicalName && !item.vernacularGroup && !item.hasData) return undefined;
+
+  return {
+    scientificName: item.scientificName,
+    canonicalName: item.canonicalName,
+    vernacularGroup: item.vernacularGroup,
+    hasData: item.hasData,
+  };
 }
 
 export interface CommonFiltersProps {
@@ -38,11 +42,7 @@ interface DebouncedInputFilterProps {
   onChange: (value: string) => void;
 }
 
-export function DebouncedInputFilter({
-  initialValue,
-  onChange,
-  ...props
-}: DebouncedInputFilterProps & InputProps) {
+export function DebouncedInputFilter({ initialValue, onChange, ...props }: DebouncedInputFilterProps & InputProps) {
   const [value, setValue] = useState(initialValue || "");
   const [debounced] = useDebouncedValue(value, 400);
 

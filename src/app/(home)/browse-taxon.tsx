@@ -36,19 +36,13 @@ export default function BrowseTaxon() {
   if (error) return <p>Error : {error.message}</p>;
 
   return (
-    <Carousel
-      slideSize={150}
-      slideGap="sm"
-      slidesToScroll="auto"
-      align="start"
-      withControls={false}
-    >
+    <Carousel slideSize={150} slideGap="sm" slidesToScroll="auto" align="start" withControls={false}>
       <Group justify="center" align="flex-start">
         <Carousel.Slide>
           <BrowseCard
             total={data?.overview.animals}
             category="Animals"
-            image="/card-icons/taxon/animals.svg"
+            image="/icons/taxon/Taxon_ Animals (Kingdom Animalia).svg"
             link="/kingdom/Animalia"
           />
         </Carousel.Slide>
@@ -56,7 +50,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.plants}
             category="Plants"
-            image="/card-icons/taxon/plants.svg"
+            image="/icons/taxon/Taxon_ Plants (Regnum Plantae).svg"
             link="/regnum/Plantae"
           />
         </Carousel.Slide>
@@ -64,7 +58,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.fungi}
             category="Fungi"
-            image="/card-icons/taxon/fungi.svg"
+            image="/icons/taxon/Taxon_ Fungi (Fungi).svg"
             link="/regnum/Fungi"
           />
         </Carousel.Slide>
@@ -72,7 +66,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.protista}
             category="Protista"
-            image="/card-icons/taxon/protista.svg"
+            image="/icons/taxon/Taxon_ Protozoa (Kingdom Protozoa).svg"
             link="/superkingdom/Protista"
           />
         </Carousel.Slide>
@@ -80,7 +74,7 @@ export default function BrowseTaxon() {
           <BrowseCard
             total={data?.overview.allSpecies}
             category="All species"
-            image="/card-icons/taxon/eukaryota.svg"
+            image="/icons/taxon/Taxon_ All eukaryote species (Eukaryota).svg"
             link="/domain/Eukaryota"
           />
         </Carousel.Slide>

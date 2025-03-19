@@ -134,14 +134,14 @@ const QUERIES: Record<string, QueryParams> = {
 };
 
 const ICONS: Record<string, string> = {
-  mammals: "/species-icons/mammals.svg",
-  birds: "/species-icons/birds.svg",
-  reptiles: "/species-icons/reptiles.svg",
-  amphibians: "/species-icons/frogs.svg",
-  "flowering plants": "/species-icons/flowering_plants.svg",
-  fungi: "/species-icons/fungi.svg",
-  insects: "/species-icons/insecta.svg",
-  corals: "/species-icons/corals.svg",
+  mammals: "/icons/taxon/Taxon_ Mammals (Mammalia).svg",
+  birds: "/icons/taxon/Taxon_ Birds (Aves).svg",
+  reptiles: "/icons/taxon/Taxon_ Reptiles (Reptilia).svg",
+  amphibians: "/icons/taxon/Taxon_ Frogs and toads (Anura).svg",
+  "flowering-plants": "/icons/taxon/Taxon_ Flowering plants (Magnoliidae).svg",
+  fungi: "/icons/taxon/Taxon_ Fungi (Fungi).svg",
+  insects: "/icons/taxon/Taxon_ Insects (Insecta).svg",
+  corals: "/icons/taxon/Taxon_ Hard corals (Order Scleractinia).svg",
 };
 
 function asPercentage(data: RadialBarDatum[]) {

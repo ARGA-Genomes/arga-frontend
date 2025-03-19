@@ -31,11 +31,11 @@ import { Attribute, DataField } from "@/components/highlight-stack";
 import { useDisclosure } from "@mantine/hooks";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { VernacularGroupFilters } from "@/components/filtering/vernacular-group";
-import { EcologyFilters } from "@/components/filtering/ecology";
-import { IbraFilters } from "@/components/filtering/ibra";
-import { ImcraFilters } from "@/components/filtering/imcra";
-import { StateFilters } from "@/components/filtering/state";
-import { DrainageBasinFilters } from "@/components/filtering/drainage-basin";
+// import { EcologyFilters } from "@/components/filtering/ecology";
+// import { IbraFilters } from "@/components/filtering/ibra";
+// import { ImcraFilters } from "@/components/filtering/imcra";
+// import { StateFilters } from "@/components/filtering/state";
+// import { DrainageBasinFilters } from "@/components/filtering/drainage-basin";
 import { TachoChart } from "@/components/graphing/tacho";
 import { PieChart } from "@/components/graphing/pie";
 import { BarChart } from "@/components/graphing/bar";
@@ -471,7 +471,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Higher classification filters"
             description="Limit data based on taxonomy"
-            image="/card-icons/type/higher_taxon_report.svg"
+            image="/icons/data-type/Data type_ Higher taxon report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -484,7 +484,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Data types"
             description="Only show species that have specific types of data"
-            image="/card-icons/type/whole_genomes.svg"
+            image="/icons/data-type/Data type_ Whole genome.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -497,11 +497,11 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Vernacular group"
             description="Birds, Flowering plants, Bacteria, etc."
-            image="/card-icons/type/species_report.svg"
+            image="/icons/data-type/Data type_ Species (and subspecies) report.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <VernacularGroupFilters value={vernacularGroup?.value} onChange={setVernacularGroup} />
+          <VernacularGroupFilters value={vernacularGroup?.vernacularGroup} onChange={setVernacularGroup} />
         </Accordion.Panel>
       </Accordion.Item>
 
@@ -510,16 +510,16 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Regions"
             description="Ecological and administrative boundaries"
-            image="/card-icons/dataset/terrestrial.svg"
+            image="/icons/list-group/List group_ Terrestrial.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
-          <Stack>
+          {/* <Stack>
             <Box>
               <Text fw={300} fz="sm">
                 Ecology
               </Text>
-              <EcologyFilters value={ecology?.value} options={options?.ecology || []} onChange={setEcology} />
+              <EcologyFilters value={ecology?.} options={options?.ecology || []} onChange={setEcology} />
             </Box>
             <Box>
               <Text fw={300} fz="sm">
@@ -549,7 +549,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
                 onChange={setDrainageBasin}
               />
             </Box>
-          </Stack>
+          </Stack> */}
         </Accordion.Panel>
       </Accordion.Item>
 
@@ -558,7 +558,7 @@ function Filters({ filters, options, onChange }: FiltersProps) {
           <FilterGroup
             label="Bushfire traits"
             description="Bushfire vulnerability and recovery"
-            image="/card-icons/dataset/fire_vulnerable.svg"
+            image="/icons/list-group/List group_ Bushfire vulnerable.svg"
           />
         </Accordion.Control>
         <Accordion.Panel>
@@ -593,8 +593,8 @@ function FilterGroup({ label, description, image }: FilterGroupProps) {
 
 function FilterBadge({ filter }: { filter: Filter }) {
   return (
-    <Badge variant="outline" color="shellfish.7">
-      {filter.value}
+    <Badge variant="outline">
+      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
     </Badge>
   );
 }
@@ -606,9 +606,7 @@ function Species({ rank, canonicalName }: { rank: string; canonicalName: string 
   const [filters, setFilters] = useState<Filters>({
     classifications: [
       {
-        filter: rank,
-        action: "INCLUDE",
-        value: canonicalName,
+        canonicalName,
         editable: false,
       },
     ],
@@ -675,8 +673,8 @@ function Species({ rank, canonicalName }: { rank: string; canonicalName: string 
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            {flattenFilters(filters).map((filter) => (
-              <FilterBadge filter={filter} key={filter.value} />
+            {flattenFilters(filters).map((filter, idx) => (
+              <FilterBadge key={idx} filter={filter} />
             ))}
           </Group>
         </Grid.Col>
@@ -689,7 +687,9 @@ function Species({ rank, canonicalName }: { rank: string; canonicalName: string 
       </Grid>
 
       <SimpleGrid cols={5} pt={40}>
-        {records?.map((record) => <SpeciesCard key={record.taxonomy.scientificName} species={record} />)}
+        {records?.map((record) => (
+          <SpeciesCard key={record.taxonomy.scientificName} species={record} />
+        ))}
       </SimpleGrid>
 
       <PaginationBar total={data?.taxon.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
@@ -951,7 +951,7 @@ function EukaryotaDataSummary({ rank, taxon }: { rank: string; taxon: EukaryotaT
             speciesData: descendant.speciesData,
             speciesGenomes: descendant.speciesGenomes,
           };
-        }),
+        })
     )
     .concat(
       taxon.superKingdomDescendants.map((descendant) => {
@@ -962,7 +962,7 @@ function EukaryotaDataSummary({ rank, taxon }: { rank: string; taxon: EukaryotaT
           speciesData: descendant.speciesData,
           speciesGenomes: descendant.speciesGenomes,
         };
-      }),
+      })
     );
 
   const rankGenomes = descendants
@@ -1148,7 +1148,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
 
   useEffect(() => {
     setPreviousPage({ name: `browsing ${params.name}`, url: pathname });
-  }, []);
+  }, [params.name, pathname, setPreviousPage]);
 
   return (
     <Stack mt={40}>

@@ -79,7 +79,7 @@ function Bars({ width, height, data }: BarsProps) {
         range: [0, barWidth],
         domain: [0, 100],
       }),
-    [width],
+    [barWidth]
   );
 
   return (
