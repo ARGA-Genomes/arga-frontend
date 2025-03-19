@@ -96,10 +96,10 @@ const QUERIES: Record<string, QueryParams> = {
     rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   corals: {
-    taxonRank: "SUBCLASS",
-    taxonCanonicalName: "Hexacorallia",
-    includeRanks: ["SUBCLASS", "ORDER"],
-    rankStats: ["SUBCLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
+    taxonRank: "ORDER",
+    taxonCanonicalName: "Scleractinia",
+    includeRanks: ["ORDER", "FAMILY"],
+    rankStats: ["ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
   amphibians: {
     taxonRank: "CLASS",
@@ -125,11 +125,11 @@ const QUERIES: Record<string, QueryParams> = {
     includeRanks: ["KINGDOM", "PHYLUM"],
     rankStats: ["KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
-  "flowering-plants": {
-    taxonRank: "PHYLUM",
-    taxonCanonicalName: "Charophyta",
-    includeRanks: ["PHYLUM", "CLASS"],
-    rankStats: ["PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
+  "flowering plants": {
+    taxonRank: "CLASS",
+    taxonCanonicalName: "Equisetopsida",
+    includeRanks: ["CLASS", "ORDER"],
+    rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
 };
 
@@ -138,7 +138,7 @@ const ICONS: Record<string, string> = {
   birds: "/species-icons/birds.svg",
   reptiles: "/species-icons/reptiles.svg",
   amphibians: "/species-icons/frogs.svg",
-  "flowering-plants": "/species-icons/flowering_plants.svg",
+  "flowering plants": "/species-icons/flowering_plants.svg",
   fungi: "/species-icons/fungi.svg",
   insects: "/species-icons/insecta.svg",
   corals: "/species-icons/corals.svg",
@@ -381,7 +381,7 @@ export function GroupingCompletion({ dateDomain }: GroupingCompletionProps) {
             <GroupSelection onSelected={setGroup} group="birds" />
             <GroupSelection onSelected={setGroup} group="reptiles" />
             <GroupSelection onSelected={setGroup} group="amphibians" />
-            <GroupSelection onSelected={setGroup} group="flowering-plants" />
+            <GroupSelection onSelected={setGroup} group="flowering plants" />
             <GroupSelection onSelected={setGroup} group="fungi" />
             <GroupSelection onSelected={setGroup} group="insects" />
             <GroupSelection onSelected={setGroup} group="corals" />
