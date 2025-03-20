@@ -40,6 +40,7 @@ import Link from "next/link";
 import { DataPageCitation } from "@/components/page-citation";
 import { SortChip } from "@/components/sorting/sort-chips";
 import classes from "../../../../components/record-list.module.css";
+import { getLicense } from "@/helpers/getLicense";
 
 const PAGE_SIZE = 10;
 interface Filters {
@@ -502,12 +503,13 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
   // Gross and hacky and terrible, to fix at a later date
   const LISTS_URL = location.href.startsWith("https://app") ? "lists.ala.org.au" : "lists.test.ala.org.au";
 
+  const license = getLicense(source.license);
+
   return (
     <Box w="100%">
-      <Stack gap={0}>
+      <Stack gap={4}>
         <LoadOverlay visible={loading} />
-
-        <Text c="dimmed" size="xs">
+        <Text fw="bold" c="dimmed" size="xs">
           {source.author}
         </Text>
         <Text c="dimmed" size="xs">
@@ -518,64 +520,78 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
             style={{ display: "flex", alignItems: "center", gap: 8 }}
             target="_blank"
             size="xs"
-            mt="xs"
             href={`https://${LISTS_URL}/list/${source.listsId}`}
+            mt="sm"
           >
             View on ALA Lists <IconExternalLink size="0.8rem" />
           </Anchor>
         )}
-        <Grid pt="xl">
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
+        <Group mt="lg">
+          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>{source.datasets.length}</b> datasets
+              </Text>
+            </Group>
+          </Paper>
+          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>{source.species.total}</b> species
+              </Text>
+            </Group>
+          </Paper>
+          <Paper
+            miw={110}
+            radius="lg"
+            bg={source.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"}
+            px={10}
+            py={3}
+          >
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>
+                  {source.accessPill
+                    ?.toLowerCase()
+                    .charAt(0)
+                    .toUpperCase()
+                    .concat(source.accessPill.slice(1).toLowerCase())}
+                </b>{" "}
+                access
+              </Text>
+            </Group>
+          </Paper>
+          <Paper
+            miw={110}
+            radius="lg"
+            bg={source.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"}
+            px={10}
+            py={3}
+          >
+            <Group gap={5} justify="center" wrap="nowrap">
+              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                <b>
+                  {source.reusePill
+                    ?.toLowerCase()
+                    .charAt(0)
+                    .toUpperCase()
+                    .concat(source.reusePill.slice(1).toLowerCase())}
+                </b>{" "}
+                reuse
+              </Text>
+            </Group>
+          </Paper>
+          {license && (
+            <Paper component={Link} href={license.url} target="_blank" miw={110} radius="lg" px={10} py={3} withBorder>
               <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>{source.datasets.length}</b> datasets
+                <IconExternalLink size="0.8rem" />
+                <Text fw="bold" size="xs" c={theme.colors.midnight[10]} p={4}>
+                  {license.name.substring(1, license.name.length - 1)}
                 </Text>
               </Group>
             </Paper>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg="#d6e4ed" px={10} py={3}>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>{source.species.total}</b> species
-                </Text>
-              </Group>
-            </Paper>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg={source.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"} px={10} py={3}>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>
-                    {source.accessPill
-                      ?.toLowerCase()
-                      .charAt(0)
-                      .toUpperCase()
-                      .concat(source.accessPill.slice(1).toLowerCase())}
-                  </b>{" "}
-                  access
-                </Text>
-              </Group>
-            </Paper>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Paper radius="lg" bg={source.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"} px={10} py={3}>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                  <b>
-                    {source.reusePill
-                      ?.toLowerCase()
-                      .charAt(0)
-                      .toUpperCase()
-                      .concat(source.reusePill.slice(1).toLowerCase())}
-                  </b>{" "}
-                  reuse
-                </Text>
-              </Group>
-            </Paper>
-          </Grid.Col>
-        </Grid>
+          )}
+        </Group>
       </Stack>
     </Box>
   );

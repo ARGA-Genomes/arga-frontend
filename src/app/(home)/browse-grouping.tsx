@@ -19,7 +19,7 @@ interface Overview {
 const GET_OVERVIEW = gql`
   query {
     overview {
-      allSpecies
+      allSpecies: classification(by: { domain: "Eukaryota" })
       sources {
         name
         total

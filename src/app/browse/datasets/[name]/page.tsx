@@ -3,16 +3,7 @@
 import { SpeciesCard } from "@/components/species-card";
 import { PieChart } from "@/components/graphing/pie";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Box,
-  Paper,
-  SimpleGrid,
-  Text,
-  Title,
-  Group,
-  Stack,
-  Container,
-} from "@mantine/core";
+import { Box, Paper, SimpleGrid, Text, Title, Group, Stack, Container } from "@mantine/core";
 import { useEffect, useState, use } from "react";
 import { BarChart } from "@/components/graphing/bar";
 import { TachoChart } from "@/components/graphing/tacho";
@@ -118,12 +109,7 @@ function Species({ dataset }: { dataset: string }) {
         ))}
       </SimpleGrid>
 
-      <PaginationBar
-        total={data?.dataset.species.total}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onChange={setPage}
-      />
+      <PaginationBar total={data?.dataset.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
     </>
   );
 }
@@ -137,8 +123,8 @@ function DataSummary() {
   ];
 
   const sampleGauge = [
-    { name: "bad", color: "#f47625", start: 0, end: 50 },
-    { name: "decent", color: "#febb1e", start: 50, end: 75 },
+    { name: "bad", color: "#f47625", start: 0, end: 25 },
+    { name: "decent", color: "#febb1e", start: 25, end: 75 },
     { name: "great", color: "#97bc5d", start: 75, end: 100 },
   ];
 
@@ -186,11 +172,7 @@ function DatasetDetails({ dataset }: { dataset: string }) {
   );
 }
 
-export default function BrowseDataset(
-  props: {
-    params: Promise<{ name: string }>;
-  }
-) {
+export default function BrowseDataset(props: { params: Promise<{ name: string }> }) {
   const params = use(props.params);
   const dataset = decodeURIComponent(params.name).replaceAll("_", " ");
 

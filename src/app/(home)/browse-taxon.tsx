@@ -12,17 +12,19 @@ interface Overview {
   plants: number;
   fungi: number;
   protista: number;
+  chromista: number;
   allSpecies: number;
 }
 
 const GET_OVERVIEW = gql`
   query {
     overview {
-      animals
-      plants
-      fungi
-      protista
-      allSpecies
+      animals: classification(by: { regnum: "Plantae" })
+      plants: classification(by: { kingdom: "Animalia" })
+      fungi: classification(by: { kingdom: "Fungi" })
+      protista: classification(by: { kingdom: "Protista" })
+      chromista: classification(by: { kingdom: "Chromista" })
+      allSpecies: classification(by: { domain: "Eukaryota" })
     }
   }
 `;
@@ -51,7 +53,7 @@ export default function BrowseTaxon() {
             total={data?.overview.plants}
             category="Plants"
             image="/icons/taxon/Taxon_ Plants (Regnum Plantae).svg"
-            link="/regnum/Plantae"
+            link="/kingdom/Plantae"
           />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -59,7 +61,7 @@ export default function BrowseTaxon() {
             total={data?.overview.fungi}
             category="Fungi"
             image="/icons/taxon/Taxon_ Fungi (Fungi).svg"
-            link="/regnum/Fungi"
+            link="/kingdom/Fungi"
           />
         </Carousel.Slide>
         <Carousel.Slide>
@@ -67,7 +69,15 @@ export default function BrowseTaxon() {
             total={data?.overview.protista}
             category="Protista"
             image="/icons/taxon/Taxon_ Protozoa (Kingdom Protozoa).svg"
-            link="/superkingdom/Protista"
+            link="/kingdom/Protista"
+          />
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <BrowseCard
+            total={data?.overview.chromista}
+            category="Chromista"
+            image="/icons/taxon/Taxon_ Chromists (Chromista).svg"
+            link="/kingdom/Chromista"
           />
         </Carousel.Slide>
         <Carousel.Slide>

@@ -20,15 +20,12 @@ import {
   Badge,
   Avatar,
   useMantineTheme,
-  ScrollArea,
-  Chip,
-  Center,
   Anchor,
+  Image,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconFilter, IconClockHour4, IconExternalLink, IconArrowsSort } from "@tabler/icons-react";
 import { Photo } from "@/app/type";
-import { DateTime } from "luxon";
 import Link from "next/link";
 
 // App components & constants
@@ -36,11 +33,9 @@ import { MAX_WIDTH } from "@/app/constants";
 import { PaginationBar } from "@/components/pagination";
 import { DataPageCitation } from "@/components/page-citation";
 import { LoadOverlay } from "@/components/load-overlay";
-import { SortChip } from "@/components/sorting/sort-chips";
 import { usePreviousPage } from "@/components/navigation-history";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
-import { AttributePill } from "@/components/data-fields";
 
 import classes from "../../../../components/record-list.module.css";
 import { map as queryMap } from "../_data/all";
@@ -51,11 +46,6 @@ const PAGE_SIZE = 10;
 interface Filters {
   classifications: Filter[];
   dataTypes: Filter[];
-}
-
-interface NameAttributeFilter {
-  name: string;
-  value: string | boolean | number;
 }
 
 const GET_DETAILS = gql`
@@ -161,9 +151,15 @@ interface DetailsQueryResults {
 }
 
 const GET_SPECIES = gql`
-  query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem], $attributes: NameAttributeFilter) {
-    source(by: { name: $name }, filters: $filters) {
-      species(page: $page, pageSize: $pageSize, attributes: $attributes) {
+  query SourceSpecies(
+    $name: String
+    $page: Int
+    $pageSize: Int
+    $filters: [FilterItem]
+    $speciesAttribute: NameAttributeFilter
+  ) {
+    source(by: { name: $name }, filters: $filters, speciesAttribute: $speciesAttribute) {
+      species(page: $page, pageSize: $pageSize) {
         total
         records {
           taxonomy {
@@ -307,7 +303,7 @@ function Species({ group }: { group: ListGroup }) {
       filters: flattenFilters(filters)
         .map(intoFilterItem)
         .filter((item) => item),
-      attributes: group.filter || null
+      speciesAttribute: group.filter || null,
     },
   });
 
@@ -361,167 +357,6 @@ function Species({ group }: { group: ListGroup }) {
   );
 }
 
-function DatasetSort({ sortBy, setSortBy }: { sortBy: string | null; setSortBy: (value: string | null) => void }) {
-  const theme = useMantineTheme();
-  const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
-    if (event.currentTarget.value === sortBy) {
-      setSortBy(null);
-    }
-  };
-  return (
-    <Group>
-      <Group gap={5}>
-        <IconArrowsSort color={theme.colors.midnight[10]} />
-        <Text size="sm" fw={550} c={theme.colors.midnight[10]}>
-          Sort by
-        </Text>
-      </Group>
-      <Chip.Group multiple={false} value={sortBy} onChange={setSortBy}>
-        <Group>
-          <SortChip value="alphabetical" onClick={handleChipClick}>
-            <b>A-Z</b>
-          </SortChip>
-
-          <SortChip value="date" onClick={handleChipClick}>
-            <b>Last updated</b>
-          </SortChip>
-
-          <SortChip value="records" onClick={handleChipClick} disabled>
-            <b>Records</b>
-          </SortChip>
-        </Group>
-      </Chip.Group>
-    </Group>
-  );
-}
-
-function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
-  const [sortBy, setSortBy] = useState<string | null>(null);
-
-  const filteredDatasets = datasets.filter((dataset) => dataset.name.trim() !== "");
-
-  const sortedDatasets = useMemo(() => {
-    return [...filteredDatasets].sort((a, b) => {
-      switch (sortBy) {
-        case "alphabetical":
-          return a.name.localeCompare(b.name);
-        case "year": {
-          const yearA = a.publicationYear ? a.publicationYear : 0;
-          const yearB = b.publicationYear ? b.publicationYear : 0;
-          return yearB - yearA; // Newest to Oldest
-        }
-        default:
-          return 0;
-      }
-    });
-  }, [filteredDatasets, sortBy]);
-
-  return (
-    <Stack>
-      <Group justify="space-between">
-        <Title order={5}>Component Datasets</Title>
-        <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
-      </Group>
-
-      <ScrollArea.Autosize mah={300} type="auto" offsetScrollbars>
-        <Box p={10}>
-          {sortedDatasets.length === 0 && (
-            <Center>
-              <Text className={classes.emptyList}>no data</Text>
-            </Center>
-          )}
-
-          {sortedDatasets.map((dataset, idx) => {
-            return <DatasetRow key={idx} dataset={dataset} />;
-          })}
-        </Box>
-      </ScrollArea.Autosize>
-    </Stack>
-  );
-}
-
-function DatasetRow({ dataset }: { dataset: Dataset }) {
-  const theme = useMantineTheme();
-
-  return (
-    <Paper radius="lg" withBorder mb={20}>
-      <Grid>
-        <Grid.Col span={3} p="lg">
-          <Stack gap={3}>
-            <Text fw={600} size="md" c="midnight.10">
-              {dataset.name}
-            </Text>
-            <Group gap={3}>
-              <IconClockHour4 size={15} color={theme.colors.gray[6]} />
-              <Text c="dimmed" size="xs">
-                Last updated: {DateTime.fromISO(dataset.updatedAt).toLocaleString()}
-              </Text>
-            </Group>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={2} p="lg">
-          <AttributePill label="Rights holder" value={dataset.rightsHolder} popoverDisabled textColor="black" />
-        </Grid.Col>
-        <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Access rights"
-            value={
-              dataset.accessPill
-                ?.toLowerCase()
-                .charAt(0)
-                .toUpperCase()
-                .concat(dataset.accessPill.slice(1).toLowerCase()) || "No data"
-            }
-            color={dataset.accessPill ? accessPillColours[dataset.accessPill] : "#d6e4ed"}
-            popoverDisabled
-            textColor="black"
-          />
-        </Grid.Col>
-        <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Data reuse status"
-            value={
-              dataset.reusePill
-                ?.toLowerCase()
-                .charAt(0)
-                .toUpperCase()
-                .concat(dataset.reusePill.slice(1).toLowerCase()) || "No data"
-            }
-            color={dataset.reusePill ? reusePillColours[dataset.reusePill] : "#d6e4ed"}
-            popoverDisabled
-            textColor="black"
-          />
-        </Grid.Col>
-        <Grid.Col span={1} p="lg">
-          <AttributePill label="Records" value="No data" popoverDisabled textColor="black" />
-        </Grid.Col>
-        <Grid.Col span={1} p="lg">
-          <AttributePill label="Year" value={dataset.publicationYear || "No data"} popoverDisabled textColor="black" />
-        </Grid.Col>
-
-        <Grid.Col span={1}>
-          <Link href={dataset.url || "#"} target="_blank">
-            <Button
-              w="100%"
-              h="100%"
-              color="midnight.10"
-              style={{ borderRadius: "0 16px 16px 0" }}
-              disabled={!dataset.url}
-            >
-              <Stack align="center" gap={5}>
-                <IconExternalLink size="30px" strokeWidth={1.5} />
-                <Text fw={650} fz={8.5}>
-                  Go to source
-                </Text>
-              </Stack>
-            </Button>
-          </Link>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  );
-}
-
 function SourceDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
 
@@ -532,47 +367,38 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
 
   return (
     <Box w="100%">
-      <Stack>
+      <Stack gap={4}>
         <LoadOverlay visible={loading} />
         <Text c="dimmed" size="xs">
-          From <b>{source.name}</b>, {source.author}
+          From{" "}
+          <Anchor fw="bold" component={Link} href={`/browse/sources/${encodeURIComponent(source.name)}`}>
+            {source.name}
+          </Anchor>
+          , {source.author}
         </Text>
-        {license && (
-          <Badge
-            component={Link}
-            color="black"
-            variant="outline"
-            size="lg"
-            href={license.url}
-            rightSection={<IconExternalLink size="1rem" style={{ marginLeft: 4 }} />}
-            style={{ cursor: "pointer" }}
-          >
-            {license.name.substring(1, license.name.length - 1)}
-          </Badge>
-        )}
         <Text c="dimmed" size="xs">
-          {source.rightsHolder}
+          &copy; {source.rightsHolder}
         </Text>
         {source.listsId && (
           <Anchor
             style={{ display: "flex", alignItems: "center", gap: 8 }}
             target="_blank"
             size="xs"
-            mt="xs"
             href={`https://${LISTS_URL}/list/${source.listsId}`}
+            mt="sm"
           >
             View on ALA Lists <IconExternalLink size="0.8rem" />
           </Anchor>
         )}
-        <Group mt="sm">
-          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+        <Group mt="lg">
+          <Paper miw={150} radius="lg" bg="#d6e4ed" px={10} py={3}>
             <Group gap={5} justify="center" wrap="nowrap">
               <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                <b>{source.datasets.length}</b> datasets
+                <b>{source.datasets.length}</b> source datasets
               </Text>
             </Group>
           </Paper>
-          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+          <Paper miw={150} radius="lg" bg="#d6e4ed" px={10} py={3}>
             <Group gap={5} justify="center" wrap="nowrap">
               <Text size="xs" c={theme.colors.midnight[10]} p={4}>
                 <b>{source.species.total}</b> species
@@ -580,7 +406,7 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
             </Group>
           </Paper>
           <Paper
-            miw={110}
+            miw={150}
             radius="lg"
             bg={source.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"}
             px={10}
@@ -600,7 +426,7 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
             </Group>
           </Paper>
           <Paper
-            miw={110}
+            miw={150}
             radius="lg"
             bg={source.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"}
             px={10}
@@ -619,6 +445,16 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
               </Text>
             </Group>
           </Paper>
+          {license && (
+            <Paper component={Link} href={license.url} target="_blank" miw={150} radius="lg" px={10} py={3} withBorder>
+              <Group gap={5} justify="center" wrap="nowrap">
+                <IconExternalLink size="0.8rem" />
+                <Text fw="bold" size="xs" c={theme.colors.midnight[10]} p={4}>
+                  {license.name.substring(1, license.name.length - 1)}
+                </Text>
+              </Group>
+            </Paper>
+          )}
         </Group>
       </Stack>
     </Box>
@@ -669,6 +505,9 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
                 {data?.source ? <SourceDetails source={data.source} loading={loading} /> : error?.message}
               </Stack>
             </Grid.Col>
+            <Grid.Col span="content">
+              <Image maw={125} alt={`${group.category} icon`} src={group.image} />
+            </Grid.Col>
           </Grid>
         </Container>
       </Paper>
@@ -694,9 +533,6 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
              */}
             <Paper p="xl" radius="lg" withBorder>
               <Species group={group} />
-            </Paper>
-            <Paper p="xl" radius="lg" withBorder>
-              {data?.source.datasets ? <BrowseComponentDatasets datasets={data.source.datasets} /> : error?.message}
             </Paper>
           </Stack>
         </Container>
