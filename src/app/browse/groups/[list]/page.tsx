@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, use } from "react";
+import { useEffect, useState, use } from "react";
 import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
@@ -24,7 +24,7 @@ import {
   Image,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconFilter, IconClockHour4, IconExternalLink, IconArrowsSort } from "@tabler/icons-react";
+import { IconFilter, IconExternalLink } from "@tabler/icons-react";
 import { Photo } from "@/app/type";
 import Link from "next/link";
 
