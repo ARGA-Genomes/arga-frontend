@@ -10,8 +10,6 @@ import {
   Group,
   Paper,
   Stack,
-  Stepper,
-  StepperStep,
   Text,
   ThemeIcon,
   UnstyledButton,
@@ -19,8 +17,7 @@ import {
 
 import { PreviousPage } from "@/components/navigation-history";
 
-import stepperClasses from "./stepper.module.css";
-import { IconCircleCheck, IconCopy, IconDownload } from "@tabler/icons-react";
+import { IconCopy, IconDownload } from "@tabler/icons-react";
 import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
