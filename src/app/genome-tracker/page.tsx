@@ -10,8 +10,6 @@ import {
   Group,
   Paper,
   Stack,
-  Stepper,
-  StepperStep,
   Text,
   ThemeIcon,
   UnstyledButton,
@@ -19,8 +17,7 @@ import {
 
 import { PreviousPage } from "@/components/navigation-history";
 
-import stepperClasses from "./stepper.module.css";
-import { IconCircleCheck, IconCopy, IconDownload } from "@tabler/icons-react";
+import { IconCopy, IconDownload } from "@tabler/icons-react";
 import { ReactElement } from "react";
 import { GenomeCompletion } from "./_components/genome-completion";
 import { DataPageCitation } from "@/components/page-citation";
@@ -28,6 +25,7 @@ import { GenomeComposition } from "./_components/genome-composition";
 import { CumulativeTracker } from "./_components/cumulative-tracker";
 import { GroupingCompletion } from "./_components/grouping-completion";
 import { SignificantMilestones } from "./_components/significant-milestones";
+import { CompletionStepper } from "./_components/completion-stepper";
 
 interface ActionButtonProps {
   label: string;
@@ -124,21 +122,7 @@ export default function GenomeTracker() {
                         <Text size="xl" fw="bold">
                           There is a complete genome for at least one representative species from each:
                         </Text>
-                        <Stepper
-                          classNames={stepperClasses}
-                          completedIcon={<IconCircleCheck size={32} />}
-                          color="moss"
-                          active={3}
-                        >
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Domain" />
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Kingdom" />
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Phylum" />
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Class" />
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Order" />
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Family" />
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Genus" />
-                          <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Species" />
-                        </Stepper>
+                        <CompletionStepper />
                       </Stack>
                     </GridCol>
                   </Grid>

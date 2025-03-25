@@ -79,7 +79,7 @@ function Bars({ width, height, data }: BarsProps) {
         range: [0, barWidth],
         domain: [0, 100],
       }),
-    [barWidth]
+    [barWidth],
   );
 
   return (
@@ -94,7 +94,7 @@ function Bars({ width, height, data }: BarsProps) {
           <CoverageBar
             y={idx * ROW_HEIGHT}
             width={barWidth}
-            coverage={xScale(Math.min(stat.coverage, 1.0) * 100)}
+            coverage={xScale(Math.min(stat.atLeastOne / stat.children, 1.0) * 100)}
             key={stat.rank}
           />
         ))}

@@ -42,12 +42,13 @@ type Level = {
 
 function fromRankStat(stat: TaxonomicRankStatistic, level: number): Level {
   const width = LEVEL_EXPANSION * level;
+  const atLeastOneCoverage = stat.atLeastOne / stat.children;
 
   let className = classes.coverageLow;
-  if (stat.coverage >= 0.25) {
+  if (atLeastOneCoverage >= 0.25) {
     className = classes.coverageMiddle;
   }
-  if (stat.coverage >= 0.75) {
+  if (atLeastOneCoverage >= 0.75) {
     className = classes.coverageHigh;
   }
 
