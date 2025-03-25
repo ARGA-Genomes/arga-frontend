@@ -17,6 +17,7 @@ export interface BrowseItem {
 
 interface BrowseProps {
   items: BrowseItem[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
   error?: ApolloError;
 }

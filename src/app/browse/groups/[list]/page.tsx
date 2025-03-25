@@ -41,7 +41,6 @@ import classes from "../../../../components/record-list.module.css";
 import { map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
-import { GroupingCompletion } from "@/app/genome-tracker/_components/grouping-completion";
 
 const PAGE_SIZE = 10;
 interface Filters {
@@ -118,6 +117,7 @@ interface Source {
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   species: SpeciesCount;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   datasets: any[];
 }
 
