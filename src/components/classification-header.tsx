@@ -1,37 +1,44 @@
-'use client';
+"use client";
 
-import { Container, Grid, Group, Paper, Text } from "@mantine/core";
+import { useMemo } from "react";
+import { Container, Grid, Group, Image, Paper, Stack, Text } from "@mantine/core";
 import { MAX_WIDTH } from "../app/constants";
 
+import { taxon as taxonOptions } from "../app/(home)/_data";
 
-interface HeaderProps {
-  rank: string,
-  classification: string,
-}
+export default function ClassificationHeader({ rank, classification }: { rank: string; classification: string }) {
+  const taxon = useMemo(
+    () =>
+      taxonOptions.find((item) => {
+        const [itemRank, itemClassification] = item.link.substring(1).split("/");
+        return itemRank.toUpperCase() === rank && itemClassification === classification;
+      }),
+    [rank, classification]
+  );
 
-function Header({ rank, classification }: HeaderProps) {
-  return (
-    <Grid>
-      <Grid.Col span="auto">
-        <Group gap={40}>
-          <Text c="dimmed" fw={400}>{rank}</Text>
-          <Text fz={38} fw={700} fs={rank === 'GENUS' ? 'italic' : ''}>{classification}</Text>
-        </Group>
-      </Grid.Col>
-      <Grid.Col span="content">
-              {/* <IconBar taxonomy={taxonomy} /> */}
-      </Grid.Col>
-    </Grid>
-  )
-}
-
-
-export default function ClassificationHeader({ rank, classification }: { rank: string, classification: string }) {
   return (
     <Paper py={20} pos="relative">
       <Container maw={MAX_WIDTH}>
-        <Header rank={rank} classification={classification} />
+        <Grid>
+          <Grid.Col span="auto">
+            <Stack h="100%" justify="center">
+              <Group gap={40}>
+                <Text c="dimmed" fw={400}>
+                  {rank}
+                </Text>
+                <Text fz={38} fw={700} fs={rank === "GENUS" ? "italic" : ""}>
+                  {classification}
+                </Text>
+              </Group>
+            </Stack>
+          </Grid.Col>
+          {taxon && (
+            <Grid.Col span="content">
+              <Image mr="xl" maw={180} alt={`${rank} ${classification} icon`} src={taxon.image} />
+            </Grid.Col>
+          )}
+        </Grid>
       </Container>
     </Paper>
-  )
+  );
 }

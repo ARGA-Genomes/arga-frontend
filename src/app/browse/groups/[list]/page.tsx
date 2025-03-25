@@ -41,6 +41,7 @@ import classes from "../../../../components/record-list.module.css";
 import { map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
+import { GroupingCompletion } from "@/app/genome-tracker/_components/grouping-completion";
 
 const PAGE_SIZE = 10;
 interface Filters {
@@ -49,8 +50,8 @@ interface Filters {
 }
 
 const GET_DETAILS = gql`
-  query SourceDetails($name: String) {
-    source(by: { name: $name }) {
+  query SourceDetails($name: String, $speciesAttribute: NameAttributeFilter) {
+    source(by: { name: $name }, speciesAttribute: $speciesAttribute) {
       license
       accessRights
       rightsHolder
@@ -66,36 +67,10 @@ const GET_DETAILS = gql`
 
       datasets {
         name
-        shortName
-        description
-        url
-        citation
-        license
-        rightsHolder
-        createdAt
-        updatedAt
-        accessPill
-        reusePill
-        publicationYear
       }
     }
   }
 `;
-
-interface Dataset {
-  name: string;
-  shortName?: string;
-  description?: string;
-  url?: string;
-  citation?: string;
-  license?: string;
-  rightsHolder?: string;
-  createdAt: string;
-  updatedAt: string;
-  reusePill?: ReusePillType;
-  accessPill?: AccessPillType;
-  publicationYear?: number;
-}
 
 interface ListGroup {
   category: string;
@@ -143,7 +118,7 @@ interface Source {
   reusePill?: ReusePillType;
   accessPill?: AccessPillType;
   species: SpeciesCount;
-  datasets: Dataset[];
+  datasets: any[];
 }
 
 interface DetailsQueryResults {
@@ -357,7 +332,7 @@ function Species({ group }: { group: ListGroup }) {
   );
 }
 
-function SourceDetails({ source, loading }: { source: Source; loading: boolean }) {
+function GroupDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
 
   // Gross and hacky and terrible, to fix at a later date
@@ -461,16 +436,19 @@ function SourceDetails({ source, loading }: { source: Source; loading: boolean }
   );
 }
 
-export default function BrowseSource(props: { params: Promise<{ list: string }> }) {
+export default function BrowseGroup(props: { params: Promise<{ list: string }> }) {
   const params = use(props.params);
   const router = useRouter();
+
+  const minDate = new Date("2009-01-01");
+  const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const group = (queryMap as Record<string, ListGroup>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-    variables: { name: group?.source.replaceAll("_", " ") || "" },
+    variables: { name: group?.source.replaceAll("_", " ") || "", speciesAttribute: group.filter || null },
     skip: !group,
   });
 
@@ -502,20 +480,18 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
                 <Text fz={38} fw={700}>
                   {group.category}
                 </Text>
-                {data?.source ? <SourceDetails source={data.source} loading={loading} /> : error?.message}
+                {data?.source ? <GroupDetails source={data.source} loading={loading} /> : error?.message}
               </Stack>
             </Grid.Col>
             <Grid.Col span="content">
-              <Image maw={125} alt={`${group.category} icon`} src={group.image} />
+              <Image mr="xl" maw={180} alt={`${group.category} icon`} src={group.image} />
             </Grid.Col>
           </Grid>
         </Container>
       </Paper>
-
       <Paper py={30}>
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
-            {/** TODO: IMPLEMENT DASHBOARD: ASK GORAN FOR HELP */}
             {/**
              * Taxonomic breakdown (Rename to data summary):
              * - Number of species
@@ -526,6 +502,7 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
              * We want all excluding phyla with genomes
              * We also want:
              * - sunburst from genome tracker
+             *   - mammals, birds, frogs & reptiles, plants
              * - Accumulation curve
              * - taxonomic coverage (start at kingdom level)
              * Artfully arange into an aesthetically pleasing order
