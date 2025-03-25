@@ -1,16 +1,60 @@
 "use client";
 
-import { Text, Title, Stack, TextInput, Flex, Box, Center, Group } from "@mantine/core";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import BrowseGrouping from "./browse-grouping";
-import BrowseTaxon from "./browse-taxon";
+import { Text, Title, Stack, TextInput, Flex, Box, Center, Group } from "@mantine/core";
 import { IconArrowUpRight, IconSearch } from "@tabler/icons-react";
-import { useState } from "react";
-import BrowseType from "@/app/(home)/browse-type";
 import { ShowStats, ShowSunburstTaxonomy } from "./stats";
-import RecentUpdatesContainer from "../../components/recent-updates-container";
-import classes from "./page.module.css";
+import { gql, useQuery } from "@apollo/client";
+
+// Project components
 import { InternalLinkButton } from "@/components/button-link-internal";
+
+// Local components
+import RecentUpdatesContainer from "../../components/recent-updates-container";
+import Browse from "./browse";
+import classes from "./page.module.css";
+
+// Browse data
+import { grouping, taxon, type } from "./_data";
+
+interface Counts {
+  animals: number;
+  plants: number;
+  fungi: number;
+  protista: number;
+  chromista: number;
+  allSpecies: number;
+  wholeGenomes: number;
+  loci: number;
+  specimens: number;
+  sources: [
+    {
+      name: string;
+      total: number;
+    }
+  ];
+}
+
+const GET_COUNTS = gql`
+  query {
+    overview {
+      animals: classification(by: { kingdom: "Animalia" })
+      plants: classification(by: { kingdom: "Plantae" })
+      fungi: classification(by: { kingdom: "Fungi" })
+      protista: classification(by: { kingdom: "Protista" })
+      chromista: classification(by: { kingdom: "Chromista" })
+      allSpecies: classification(by: { domain: "Eukaryota" })
+      wholeGenomes
+      loci
+      specimens
+      sources {
+        name
+        total
+      }
+    }
+  }
+`;
 
 function Search() {
   const router = useRouter();
@@ -53,6 +97,26 @@ function Search() {
 }
 
 export default function HomePage() {
+  const { error, data } = useQuery<{ overview: Counts }>(GET_COUNTS);
+
+  // Format the data
+  const formattedData = useMemo(() => {
+    return data
+      ? {
+          ...data.overview,
+          sources: data.overview.sources.reduce(
+            (prev, cur) => ({
+              ...prev,
+              [cur.name.replaceAll(" ", "_")]: cur.total,
+            }),
+            { ARGA_Threatened_Species: 0 }
+          ),
+        }
+      : null;
+  }, [data]);
+
+  console.log(data, formattedData);
+
   return (
     <Stack gap={0}>
       <Box bg="midnight.9" w="100%">
@@ -98,19 +162,19 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Browse by data type
               </Title>
-              <BrowseType />
+              <Browse items={type} data={formattedData} error={error} />
             </Stack>
             <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
                 Browse by taxonomic group
               </Title>
-              <BrowseTaxon />
+              <Browse items={taxon} data={formattedData} error={error} />
             </Stack>
             <Stack gap={20} align="center" pb="xl">
               <Title order={3} c="moss.5" fz={28}>
                 Browse by functional or ecological group
               </Title>
-              <BrowseGrouping />
+              <Browse items={grouping} data={formattedData} error={error} />
               <InternalLinkButton
                 url={`/browse/groups`}
                 icon={IconArrowUpRight}

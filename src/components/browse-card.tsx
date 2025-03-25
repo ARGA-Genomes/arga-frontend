@@ -7,7 +7,7 @@ import { Image, Stack, Text, Skeleton, Paper } from "@mantine/core";
 import Link from "next/link";
 
 export interface BrowseCardProps {
-  total?: number;
+  total?: number | null;
   category: string;
   image: string;
   link: string;
@@ -30,23 +30,20 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
             miw={imageSize}
             mih={imageSize}
           >
-            <Image
-              src={image}
-              height={imageSize}
-              width={imageSize}
-              alt={category}
-            />
+            <Image src={image} height={imageSize} width={imageSize} alt={category} />
           </Skeleton>
-          <Skeleton className={classes.skeleton} visible={loading}>
+          <Skeleton className={classes.skeleton} visible={loading} mt="xs">
             <Text size="md" fw={450} ta={"center"} c="white">
               {category}
             </Text>
           </Skeleton>
-          <Skeleton className={classes.skeleton} visible={loading}>
-            <Text size="sm" fw={400} ta={"center"} c="attribute">
-              {Humanize.compactInteger(total || 0, 2)} records
-            </Text>
-          </Skeleton>
+          {total !== null && (
+            <Skeleton className={classes.skeleton} visible={loading}>
+              <Text size="sm" fw={400} ta={"center"} c="attribute">
+                {Humanize.compactInteger(total || 0, 2)} records
+              </Text>
+            </Skeleton>
+          )}
         </Stack>
       </Link>
     </Paper>

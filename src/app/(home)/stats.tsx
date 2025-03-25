@@ -4,16 +4,7 @@ import { DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Grid,
-  Paper,
-  Stack,
-  Title,
-  Text,
-  Group,
-  Skeleton,
-  Center,
-} from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Group, Skeleton, Center } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart, CircularBarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -237,11 +228,7 @@ interface EukaryotaDescendantResults {
 const GET_EUKARYOTA_TREE = gql`
   query TaxonHierarchy {
     animaliaTree: stats {
-      taxonBreakdown(
-        taxonRank: KINGDOM
-        taxonCanonicalName: "Animalia"
-        includeRanks: [PHYLUM, CLASS]
-      ) {
+      taxonBreakdown(taxonRank: KINGDOM, taxonCanonicalName: "Animalia", includeRanks: [PHYLUM, CLASS]) {
         name: canonicalName
         rank
         children {
@@ -253,11 +240,7 @@ const GET_EUKARYOTA_TREE = gql`
     }
 
     plantaeTree: stats {
-      taxonBreakdown(
-        taxonRank: REGNUM
-        taxonCanonicalName: "Plantae"
-        includeRanks: [DIVISION, CLASSIS]
-      ) {
+      taxonBreakdown(taxonRank: REGNUM, taxonCanonicalName: "Plantae", includeRanks: [DIVISION, CLASSIS]) {
         name: canonicalName
         rank
         children {
@@ -269,11 +252,7 @@ const GET_EUKARYOTA_TREE = gql`
     }
 
     fungiTree: stats {
-      taxonBreakdown(
-        taxonRank: REGNUM
-        taxonCanonicalName: "Fungi"
-        includeRanks: [DIVISION, CLASSIS]
-      ) {
+      taxonBreakdown(taxonRank: REGNUM, taxonCanonicalName: "Fungi", includeRanks: [DIVISION, CLASSIS]) {
         name: canonicalName
         rank
         children {
@@ -285,11 +264,7 @@ const GET_EUKARYOTA_TREE = gql`
     }
 
     protistaTree: stats {
-      taxonBreakdown(
-        taxonRank: KINGDOM
-        taxonCanonicalName: "Protista"
-        includeRanks: [PHYLUM, CLASS]
-      ) {
+      taxonBreakdown(taxonRank: KINGDOM, taxonCanonicalName: "Protista", includeRanks: [PHYLUM, CLASS]) {
         name: canonicalName
         rank
         children {
@@ -301,11 +276,7 @@ const GET_EUKARYOTA_TREE = gql`
     }
 
     chromistaTree: stats {
-      taxonBreakdown(
-        taxonRank: REGNUM
-        taxonCanonicalName: "Chromista"
-        includeRanks: [DIVISION, CLASSIS]
-      ) {
+      taxonBreakdown(taxonRank: REGNUM, taxonCanonicalName: "Chromista", includeRanks: [DIVISION, CLASSIS]) {
         name: canonicalName
         rank
         children {
@@ -348,8 +319,8 @@ export function ShowStats() {
   const taxon = taxonResults.data?.taxon;
 
   const thresholds = [
-    { name: "low", color: "#f47625", start: 0, end: 50 },
-    { name: "decent", color: "#febb1e", start: 50, end: 75 },
+    { name: "low", color: "#f47625", start: 0, end: 25 },
+    { name: "decent", color: "#febb1e", start: 25, end: 75 },
     { name: "great", color: "#97bc5d", start: 75, end: 100 },
   ];
 
@@ -365,8 +336,7 @@ export function ShowStats() {
     })
     .sort((a, b) => b.value - a.value);
 
-  const genomePercentile =
-    taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
+  const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
 
   return (
     <Paper radius="lg" style={{ top: 200, right: 0, width: 640 }}>
@@ -378,13 +348,7 @@ export function ShowStats() {
         <Grid.Col span={6} mb={10}>
           <Stack gap="sm">
             <Title order={6}>Percentage of species with genomes</Title>
-            {taxon && (
-              <TachoChart
-                h={115}
-                thresholds={thresholds}
-                value={Math.round(genomePercentile || 0)}
-              />
-            )}
+            {taxon && <TachoChart h={115} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />}
           </Stack>
         </Grid.Col>
 
@@ -394,23 +358,15 @@ export function ShowStats() {
 
             <DataTable my={2}>
               <DataTableRow label="Number of species/OTUs">
-                <DataField
-                  value={Humanize.formatNumber(taxon?.summary.species || 0)}
-                />
+                <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
               </DataTableRow>
 
               <DataTableRow label="Species with genomes">
-                <DataField
-                  value={Humanize.formatNumber(
-                    taxon?.summary.speciesGenomes || 0,
-                  )}
-                />
+                <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
               </DataTableRow>
 
               <DataTableRow label="Species with data">
-                <DataField
-                  value={Humanize.formatNumber(taxon?.summary.speciesData || 0)}
-                />
+                <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
               </DataTableRow>
             </DataTable>
           </Stack>
@@ -419,23 +375,14 @@ export function ShowStats() {
         <Grid.Col span={12} pt={10}>
           <Stack>
             <Title order={6}>Species with genomes</Title>
-            {speciesGenomes && (
-              <BarChart
-                h={250}
-                data={speciesGenomes.slice(0, 10)}
-                spacing={0.1}
-                labelWidth={200}
-              />
-            )}
+            {speciesGenomes && <BarChart h={250} data={speciesGenomes.slice(0, 10)} spacing={0.1} labelWidth={200} />}
           </Stack>
         </Grid.Col>
         <Grid.Col span={12}>
           <Text fz={10} c="midnight.6">
-            Note: these statistics summarise the content indexed within ARGA.
-            The values relate to the species deemed relevant to Australia
-            (either by endemicity or economic and social value), and for
-            repositories that are indexed by ARGA. The values may not be
-            indicative of global values for all research.
+            Note: these statistics summarise the content indexed within ARGA. The values relate to the species deemed
+            relevant to Australia (either by endemicity or economic and social value), and for repositories that are
+            indexed by ARGA. The values may not be indicative of global values for all research.
           </Text>
         </Grid.Col>
       </Grid>
@@ -477,7 +424,7 @@ export function ShowTaxonomicCoverageStats() {
             value: descendant.species,
             href: `/regnum/${descendant.canonicalName}`,
           };
-        }),
+        })
     )
     .concat(
       taxon.superKingdomDescendants.map((descendant) => {
@@ -486,7 +433,7 @@ export function ShowTaxonomicCoverageStats() {
           value: descendant.species,
           href: `/superkingdom/${descendant.canonicalName}`,
         };
-      }),
+      })
     );
 
   return (
@@ -513,12 +460,7 @@ export function ShowTaxonomicCoverageStats() {
         </Skeleton>
         {kingdomRegnumData && (
           <Skeleton visible={taxonResults.loading} circle h={375} w={375}>
-            <CircularBarChart
-              h={400}
-              w={400}
-              margin={30}
-              data={kingdomRegnumData}
-            />
+            <CircularBarChart h={400} w={400} margin={30} data={kingdomRegnumData} />
           </Skeleton>
         )}
       </Stack>

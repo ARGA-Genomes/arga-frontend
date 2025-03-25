@@ -770,8 +770,8 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
   const childTaxonLabel = pluralTaxon(childTaxon);
 
   const thresholds = [
-    { name: "low", color: "#f47625", start: 0, end: 50 },
-    { name: "decent", color: "#febb1e", start: 50, end: 75 },
+    { name: "low", color: "#f47625", start: 0, end: 25 },
+    { name: "decent", color: "#febb1e", start: 25, end: 75 },
     { name: "great", color: "#97bc5d", start: 75, end: 100 },
   ];
 
