@@ -6,6 +6,7 @@ import { gql, useQuery } from "@apollo/client";
 import { TaxonomicRankStatistic } from "@/queries/stats";
 import { Stepper, StepperStep } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
+import * as Humanize from "humanize-plus";
 
 const GET_TAXONOMIC_RANK_STATS = gql`
   query TaxonomicRankStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
@@ -26,12 +27,21 @@ type TaxonomicRankStatsQuery = {
   };
 };
 
-export function CompletionStepper() {
+interface CompletionStepperProps {
+  rank?: string;
+  canonicalName?: string;
+}
+
+const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
+
+export function CompletionStepper({ rank, canonicalName }: CompletionStepperProps) {
+  const ranks = rank ? ALL_RANKS.slice(ALL_RANKS.indexOf(rank)) : ALL_RANKS;
+
   const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
     variables: {
-      taxonRank: "DOMAIN",
-      taxonCanonicalName: "Eukaryota",
-      ranks: ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
+      taxonRank: rank || "DOMAIN",
+      taxonCanonicalName: canonicalName || "Eukaryota",
+      ranks,
     },
   });
 
@@ -40,14 +50,13 @@ export function CompletionStepper() {
 
   return (
     <Stepper classNames={classes} completedIcon={<IconCircleCheck size={32} />} color="moss" active={completed ?? 0}>
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Domain" />
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Kingdom" />
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Phylum" />
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Class" />
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Order" />
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Family" />
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Genus" />
-      <StepperStep icon={<IconCircleCheck size={36} color="lightgrey" />} label="Species" />
+      {ranks.map((rank) => (
+        <StepperStep
+          key={rank}
+          icon={<IconCircleCheck size={36} color="lightgrey" />}
+          label={Humanize.capitalize(rank.toLowerCase())}
+        />
+      ))}
     </Stepper>
   );
 }

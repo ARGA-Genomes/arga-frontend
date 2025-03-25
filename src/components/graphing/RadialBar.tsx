@@ -79,6 +79,14 @@ export function ThresholdGrid(props: ThresholdGridProps) {
   );
 }
 
+export function asPercentage(data: RadialBarDatum[]) {
+  return data.map((datum) => ({
+    label: datum.label,
+    value: (datum.value / datum.total) * 100 || 0,
+    total: 100,
+  }));
+}
+
 interface RadialGraphProps {
   data: RadialBarDatum[];
   onHover?: (item: RadialBarDatum | null) => void;

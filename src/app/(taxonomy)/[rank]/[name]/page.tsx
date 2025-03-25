@@ -47,6 +47,10 @@ import { usePathname } from "next/navigation";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { Photo } from "@/app/type";
 import Link from "next/link";
+import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
+import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-completion";
+import { CumulativeTracker } from "@/app/genome-tracker/_components/cumulative-tracker";
+import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-completion";
 
 const PAGE_SIZE = 10;
 
@@ -769,6 +773,9 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
   const childTaxonLabel = pluralTaxon(childTaxon);
 
+  const minDate = new Date("2009-01-01");
+  const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
+
   const thresholds = [
     { name: "low", color: "#f47625", start: 0, end: 25 },
     { name: "decent", color: "#febb1e", start: 25, end: 75 },
@@ -818,9 +825,97 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
 
   return (
     <Grid>
-      <Grid.Col span="auto">
+      <Grid.Col span={12}>
         <Title order={5}>Data summary</Title>
-        <Grid>
+      </Grid.Col>
+      <Grid.Col span="content">
+        <Paper px="lg" pb="lg" w={430} h={480} radius="lg" withBorder>
+          <GroupDetailRadial
+            height={400}
+            radial={25}
+            query={{
+              taxonRank: rank,
+              taxonCanonicalName: taxon?.canonicalName || "",
+              includeRanks: [rank, ALL_RANKS[ALL_RANKS.indexOf(rank) + 1]],
+              rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(rank) + 1),
+            }}
+            fontSize={7}
+            switcherGap="sm"
+            switcherSize="sm"
+            hideDescription
+          />
+        </Paper>
+      </Grid.Col>
+      <Grid.Col span="auto">
+        <Paper h={480} p="lg" radius="lg" withBorder>
+          <GenomeCompletion
+            taxonRank={rank}
+            taxonCanonicalName={taxon?.canonicalName || ""}
+            domain={[minDate, maxDate]}
+          />
+        </Paper>
+      </Grid.Col>
+      <Grid.Col span="content">
+        <Paper h={480} p="xl" radius="lg" withBorder>
+          <Title order={5}>Taxonomic breakdown</Title>
+
+          <DataTable my={8}>
+            {rank !== "GENUS" && (
+              <DataTableRow label={`Number of ${childTaxonLabel}`}>
+                <DataField value={taxon?.descendants.length}></DataField>
+              </DataTableRow>
+            )}
+            <DataTableRow label="Number of species/OTUs">
+              <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
+            </DataTableRow>
+            {rank !== "GENUS" && (
+              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
+                <DataField
+                  value={Humanize.formatNumber(taxon?.descendants.filter((d) => d.speciesGenomes > 0).length || 0)}
+                />
+              </DataTableRow>
+            )}
+            <DataTableRow label="Species with genomes">
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
+            </DataTableRow>
+            {rank !== "GENUS" && (
+              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
+                <DataField
+                  value={Humanize.formatNumber(taxon?.descendants.filter((d) => d.speciesData > 0).length || 0)}
+                />
+              </DataTableRow>
+            )}
+            <DataTableRow label="Species with data">
+              <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
+            </DataTableRow>
+          </DataTable>
+
+          <Stack mx={10} mt={5}>
+            <Attribute
+              label="Species with most genomes"
+              value={speciesGenomes?.[0]?.name}
+              href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(" ", "_")}/taxonomy`}
+            />
+            <Attribute
+              label="Species with most data"
+              value={speciesOther?.[0]?.name}
+              href={`/species/${speciesOther?.[0]?.name.replaceAll(" ", "_")}/taxonomy`}
+            />
+          </Stack>
+        </Paper>
+      </Grid.Col>
+      <Grid.Col span={12}>
+        <Grid mt="xl">
+          <Grid.Col span={12}>
+            <Stack>
+              <Text fz="sm" fw={300}>
+                Complete genome for at least one representative species from each:
+              </Text>
+              <Group grow px="lg">
+                <CompletionStepper rank={rank} canonicalName={taxon?.canonicalName} />
+              </Group>
+            </Stack>
+          </Grid.Col>
           <Grid.Col span={collapsable(4)}>
             <Stack>
               <Text fz="sm" fw={300}>
@@ -868,56 +963,6 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
             </Stack>
           </Grid.Col>
         </Grid>
-      </Grid.Col>
-
-      <Grid.Col span="content">
-        <Paper p="xl" radius="lg" withBorder>
-          <Title order={5}>Taxonomic breakdown</Title>
-
-          <DataTable my={8}>
-            {rank !== "GENUS" && (
-              <DataTableRow label={`Number of ${childTaxonLabel}`}>
-                <DataField value={taxon?.descendants.length}></DataField>
-              </DataTableRow>
-            )}
-            <DataTableRow label="Number of species/OTUs">
-              <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
-            </DataTableRow>
-            {rank !== "GENUS" && (
-              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
-                <DataField
-                  value={Humanize.formatNumber(taxon?.descendants.filter((d) => d.speciesGenomes > 0).length || 0)}
-                />
-              </DataTableRow>
-            )}
-            <DataTableRow label="Species with genomes">
-              <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
-            </DataTableRow>
-            {rank !== "GENUS" && (
-              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
-                <DataField
-                  value={Humanize.formatNumber(taxon?.descendants.filter((d) => d.speciesData > 0).length || 0)}
-                />
-              </DataTableRow>
-            )}
-            <DataTableRow label="Species with data">
-              <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
-            </DataTableRow>
-          </DataTable>
-
-          <Stack mx={10} mt={5}>
-            <Attribute
-              label="Species with most genomes"
-              value={speciesGenomes?.[0]?.name}
-              href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(" ", "_")}/taxonomy`}
-            />
-            <Attribute
-              label="Species with most data"
-              value={speciesOther?.[0]?.name}
-              href={`/species/${speciesOther?.[0]?.name.replaceAll(" ", "_")}/taxonomy`}
-            />
-          </Stack>
-        </Paper>
       </Grid.Col>
     </Grid>
   );
@@ -1111,6 +1156,28 @@ function EukaryotaDataSummary({ rank, taxon }: { rank: string; taxon: EukaryotaT
   );
 }
 
+const GET_COVERAGE_STATS = gql`
+  query TaxonCoverageStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
+    stats {
+      taxonBreakdown(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, includeRanks: $includeRanks) {
+        scientificName
+        canonicalName
+        species
+        fullGenomes
+        fullGenomesCoverage
+
+        children {
+          scientificName
+          canonicalName
+          species
+          fullGenomes
+          fullGenomesCoverage
+        }
+      }
+    }
+  }
+`;
+
 interface ClassificationPageProps {
   params: Promise<{
     rank: string;
@@ -1118,16 +1185,19 @@ interface ClassificationPageProps {
   }>;
 }
 
+const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
+
 export default function ClassificationPage(props: ClassificationPageProps) {
   const params = use(props.params);
   const rank = params.rank.toUpperCase();
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank].toUpperCase() || "";
+  const isEukaryota = rank === "DOMAIN" && params.name === "Eukaryota";
 
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
 
   const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
-    skip: rank === "DOMAIN" && params.name === "Eukaryota",
+    skip: isEukaryota,
     variables: {
       rank,
       canonicalName: params.name,
@@ -1137,7 +1207,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
 
   // need a special case/query for when taxon domain === Eukaryota
   const eukaryotaTaxonResults = useQuery<EukaryotaTaxonResults>(GET_EUKARYOTA_TAXON, {
-    skip: !(rank === "DOMAIN" && params.name === "Eukaryota"),
+    skip: !isEukaryota,
     variables: {
       rank,
       canonicalName: params.name,
