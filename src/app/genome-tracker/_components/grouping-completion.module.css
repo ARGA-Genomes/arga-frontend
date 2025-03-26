@@ -1,47 +1,46 @@
 .groupButton {
-    border-radius: var(--mantine-radius-xl);
+  border-radius: var(--mantine-radius-xl);
 
-    &:hover {
-        cursor: pointer;
-        background-color: var(--mantine-color-shellfish-0);
-    }
+  &:hover {
+    cursor: pointer;
+    background-color: var(--mantine-color-shellfish-0);
+  }
 }
 
 .groupButtonSelected {
-    border-radius: var(--mantine-radius-lg);
-    background-color: var(--mantine-color-shellfish-1);
+  border-radius: var(--mantine-radius-lg);
+  background-color: var(--mantine-color-shellfish-1);
 
-    &:hover {
-        cursor: pointer;
-        background-color: var(--mantine-color-shellfish-1);
-    }
+  &:hover {
+    cursor: pointer;
+    background-color: var(--mantine-color-shellfish-1);
+  }
 }
 
 .groupButtonLabel {
-    font-size: 12px;
-    font-weight: 600;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .text {
-    font-weight: 400;
-    font-size: 8px;
-    text-anchor: middle;
-    dominant-baseline: end;
+  font-weight: 400;
+  text-anchor: middle;
+  dominant-baseline: end;
 }
 
 .radialInner100 {
-    fill: var(--mantine-color-moss-2);
+  fill: var(--mantine-color-moss-2);
 }
 
 .radialInner75 {
-    fill: var(--mantine-color-wheat-2);
+  fill: var(--mantine-color-wheat-2);
 }
 .radialInner25 {
-    fill: var(--mantine-color-bushfire-2);
+  fill: var(--mantine-color-bushfire-2);
 }
 
 .gridCenter {
-    fill: var(--mantine-color-bushfire-2);
-    stroke: var(--mantine-color-bushfire-2);
-    stroke-width: 0px;
+  fill: var(--mantine-color-bushfire-2);
+  stroke: var(--mantine-color-bushfire-2);
+  stroke-width: 0px;
 }

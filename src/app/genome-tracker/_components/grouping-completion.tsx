@@ -4,7 +4,7 @@ import classes from "./grouping-completion.module.css";
 
 import * as Humanize from "humanize-plus";
 
-import { RadialBarDatum, RadialGraph } from "@/components/graphing/RadialBar";
+import { asPercentage, RadialBarDatum, RadialGraph } from "@/components/graphing/RadialBar";
 import { gql, useQuery } from "@apollo/client";
 import {
   Text,
@@ -20,6 +20,7 @@ import {
   Title,
   useMantineTheme,
   getThemeColor,
+  MantineSize,
 } from "@mantine/core";
 import { useState } from "react";
 import { Text as SvgText } from "@visx/text";
@@ -144,14 +145,6 @@ const ICONS: Record<string, string> = {
   corals: "/icons/taxon/Taxon_ Hard corals (Order Scleractinia).svg",
 };
 
-function asPercentage(data: RadialBarDatum[]) {
-  return data.map((datum) => ({
-    label: datum.label,
-    value: (datum.value / datum.total) * 100 || 0,
-    total: 100,
-  }));
-}
-
 interface GroupSelectionProps {
   group: string;
   onSelected: (group: string) => void;
@@ -188,14 +181,26 @@ function GroupSelection({ group, onSelected }: GroupSelectionProps) {
 }
 
 interface GroupDetailRadialProps {
-  group: string;
+  query: QueryParams;
+  height?: number;
+  radial?: number;
+  fontSize?: number;
+  hideDescription?: boolean;
+  switcherGap?: MantineSize;
+  switcherSize?: MantineSize;
 }
 
-function GroupDetailRadial({ group }: GroupDetailRadialProps) {
+export function GroupDetailRadial({
+  fontSize,
+  switcherSize,
+  switcherGap,
+  hideDescription,
+  height,
+  radial,
+  query,
+}: GroupDetailRadialProps) {
   const [showRaw, setShowRaw] = useState<boolean>(false);
   const [hoverItem, setHoverItem] = useState<RadialBarDatum | null>(null);
-
-  const query = QUERIES[group];
 
   const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
     variables: {
@@ -219,15 +224,17 @@ function GroupDetailRadial({ group }: GroupDetailRadialProps) {
 
   return (
     coverage && (
-      <Stack gap="xl">
-        <Box h={600}>
+      <Stack gap={switcherGap || "xl"}>
+        <Box h={height || 600}>
           <RadialGraph data={showRaw ? coverage : asPercentage(coverage)} onHover={setHoverItem}>
             {hoverItem && (
               <motion.g animate={{ scale: 2 }}>
-                <Circle r={40} className={classes[radialInner]} />
+                <Circle r={radial || 40} className={classes[radialInner]} />
 
-                <SvgText className={classes.text}>{hoverItem.label}</SvgText>
-                <SvgText y={10} className={classes.text}>
+                <SvgText fontSize={fontSize || 8} className={classes.text}>
+                  {hoverItem.label}
+                </SvgText>
+                <SvgText fontSize={fontSize || 8} y={10} className={classes.text}>
                   {showRaw ? `${hoverItem.value} / ${hoverItem.total}` : `${Math.round(hoverItem.value)}%`}
                 </SvgText>
               </motion.g>
@@ -236,7 +243,7 @@ function GroupDetailRadial({ group }: GroupDetailRadialProps) {
         </Box>
         <Center>
           <SegmentedControl
-            size="md"
+            size={switcherSize || "md"}
             radius="xl"
             color="moss.5"
             data={[
@@ -247,10 +254,12 @@ function GroupDetailRadial({ group }: GroupDetailRadialProps) {
             onChange={(value) => setShowRaw(value == "raw")}
           />
         </Center>
-        <Text c="midnight.11" size="sm">
-          Total of species for which a whole genome has been sequenced and made available aggregated by higher
-          classification units.
-        </Text>
+        {!hideDescription && (
+          <Text c="midnight.11" size="sm">
+            Total of species for which a whole genome has been sequenced and made available aggregated by higher
+            classification units.
+          </Text>
+        )}
       </Stack>
     )
   );
@@ -354,7 +363,7 @@ function GroupDetail({ group, domain }: GroupDetailProps) {
 
         <Grid>
           <Grid.Col span={6}>
-            <GroupDetailRadial group={group} />
+            <GroupDetailRadial query={QUERIES[group]} />
           </Grid.Col>
           <Grid.Col span={6}>
             <GroupDetailExtra group={group} domain={domain} />
