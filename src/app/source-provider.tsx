@@ -25,24 +25,30 @@ interface QueryResults {
   sources: Source[];
 }
 
-const DatasetsContext = React.createContext<Map<string, Dataset>>(new Map());
+interface DatasetContextValue {
+  ids: Map<string, Dataset>;
+  names: Map<string, Dataset>;
+}
+
+const DatasetsContext = React.createContext<DatasetContextValue>({ ids: new Map(), names: new Map() });
 
 export function SourceProvider({ children }: { children: ReactNode }) {
   const { data } = useQuery<QueryResults>(GET_DETAILS);
-  const datasets = new Map();
+
+  const context = {
+    ids: new Map(),
+    names: new Map(),
+  };
 
   if (data) {
     const records = data.sources.flatMap((s) => s.datasets);
     for (const dataset of records) {
-      datasets.set(dataset.id, dataset);
+      context.ids.set(dataset.id, dataset);
+      context.names.set(dataset.name, dataset);
     }
   }
 
-  return (
-    <DatasetsContext.Provider value={datasets}>
-      {children}
-    </DatasetsContext.Provider>
-  );
+  return <DatasetsContext.Provider value={context}>{children}</DatasetsContext.Provider>;
 }
 
 export const useDatasets = () => React.useContext(DatasetsContext);

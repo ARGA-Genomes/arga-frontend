@@ -17,12 +17,7 @@ import {
 import accClasses from "./taxonomy-switcher-acc.module.css";
 
 import { Taxon } from "@/queries/taxa";
-import {
-  Attribute,
-  AttributePill,
-  AttributePillContainer,
-  AttributePillValue,
-} from "./data-fields";
+import { Attribute, AttributePill, AttributePillContainer, AttributePillValue } from "./data-fields";
 import { Dataset, useDatasets } from "@/app/source-provider";
 import { useMemo, useState } from "react";
 import { IconArrowUpRight } from "@tabler/icons-react";
@@ -98,10 +93,7 @@ function compareTaxons(taxa: TaxonExtended[], baseTaxon: TaxonExtended) {
     });
 
     // Get the set of all normalized ranks to compare
-    const allRanks = new Set([
-      ...Object.keys(baseHierarchyMap),
-      ...Object.keys(taxonHierarchyMap),
-    ]);
+    const allRanks = new Set([...Object.keys(baseHierarchyMap), ...Object.keys(taxonHierarchyMap)]);
 
     // Compare the canonicalNames for each normalized rank
     let differenceFound = false;
@@ -173,22 +165,17 @@ function processTaxa(taxa: Taxon[], datasets: Map<string, Dataset>) {
 export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [entityId, setEntityId] = useState<string>("");
-  const datasets = useDatasets();
+  const { ids } = useDatasets();
   const theme = useMantineTheme();
 
-  const taxa = useMemo(
-    () => processTaxa(rawTaxa, datasets),
-    [rawTaxa, datasets],
-  );
+  const taxa = useMemo(() => processTaxa(rawTaxa, ids), [rawTaxa, ids]);
 
   const { loading, data } = useQuery<ProvenanceQuery>(GET_TAXON_PROVENANCE, {
     variables: { entityId },
     skip: entityId === "",
   });
 
-  const [active, setActive] = useState<string>(
-    `${taxa[0].scientificName}-${taxa[0].datasetId}`,
-  );
+  const [active, setActive] = useState<string>(`${taxa[0].scientificName}-${taxa[0].datasetId}`);
 
   return (
     <>
@@ -227,8 +214,7 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
         loop
       >
         {taxa.map((taxon) => {
-          const isActive =
-            `${taxon.scientificName}-${taxon.datasetId}` === active;
+          const isActive = `${taxon.scientificName}-${taxon.datasetId}` === active;
 
           return (
             <Accordion.Item
@@ -237,11 +223,7 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
             >
               <Accordion.Control>
                 <Group justify="space-between" pr="md">
-                  <Text
-                    fw={600}
-                    c={isActive ? "white" : undefined}
-                    fz={isActive ? 26 : "lg"}
-                  >
+                  <Text fw={600} c={isActive ? "white" : undefined} fz={isActive ? 26 : "lg"}>
                     {taxon.dataset?.name || "Unknown Dataset"}
                   </Text>
                   {taxon.originalCanonicalNames && (
@@ -255,10 +237,7 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
                 <Stack>
                   {taxon.hierarchy.length > 0 && (
                     <>
-                      <Hierarchy
-                        hierarchy={taxon.hierarchy}
-                        originalCanonicalNames={taxon.originalCanonicalNames}
-                      />
+                      <Hierarchy hierarchy={taxon.hierarchy} originalCanonicalNames={taxon.originalCanonicalNames} />
                       <Divider opacity={0.1} mt="xs" mb="sm" />
                     </>
                   )}
@@ -336,10 +315,7 @@ function Hierarchy({
               }
               color={isDifferent ? "white" : undefined}
               hoverColor="midnight.0"
-              label={
-                Humanize.capitalize(node.rank.toLowerCase()) +
-                (isDifferent ? "*" : "")
-              }
+              label={Humanize.capitalize(node.rank.toLowerCase()) + (isDifferent ? "*" : "")}
               value={node.canonicalName}
               href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
               icon={IconArrowUpRight}
