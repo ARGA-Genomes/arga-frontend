@@ -829,34 +829,49 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
         <Title order={5}>Data summary</Title>
       </Grid.Col>
       <Grid.Col span="content">
-        <Paper px="lg" pb="lg" w={430} h={480} radius="lg" withBorder>
-          <GroupDetailRadial
-            height={400}
-            radial={25}
-            query={{
-              taxonRank: rank,
-              taxonCanonicalName: taxon?.canonicalName || "",
-              includeRanks: [rank, ALL_RANKS[ALL_RANKS.indexOf(rank) + 1]],
-              rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(rank) + 1),
-            }}
-            fontSize={7}
-            switcherGap="sm"
-            switcherSize="sm"
-            hideDescription
-          />
+        <Paper px="lg" pb="lg" w={430} h={560} radius="lg" withBorder>
+          <Stack h="100%" justify="space-between">
+            <GroupDetailRadial
+              height={400}
+              radial={25}
+              query={{
+                taxonRank: rank,
+                taxonCanonicalName: taxon?.canonicalName || "",
+                includeRanks: [rank, ALL_RANKS[ALL_RANKS.indexOf(rank) + 1]],
+                rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(rank) + 1),
+              }}
+              fontSize={7}
+              switcherGap="sm"
+              switcherSize="sm"
+              hideDescription
+            />
+            <Text fw={300} size="sm">
+              Total of species for which a whole genome has been sequenced and made available aggregated by higher
+              classification units.
+            </Text>
+          </Stack>
         </Paper>
       </Grid.Col>
       <Grid.Col span="auto">
-        <Paper h={480} p="lg" radius="lg" withBorder>
-          <GenomeCompletion
-            taxonRank={rank}
-            taxonCanonicalName={taxon?.canonicalName || ""}
-            domain={[minDate, maxDate]}
-          />
+        <Paper h={560} p="lg" radius="lg" withBorder>
+          <Stack h="100%" justify="space-between">
+            <Box h={400}>
+              <GenomeCompletion
+                taxonRank={rank}
+                taxonCanonicalName={taxon?.canonicalName || ""}
+                domain={[minDate, maxDate]}
+              />
+            </Box>
+            <Text fw={300} size="sm">
+              This graph shows the aggregated total of species for which a whole genome has been sequenced and made
+              available. The first instance of a whole genome sequence for an individual species has been plotted as an
+              accumulated total. Statistics based on records indexed within ARGA.
+            </Text>
+          </Stack>
         </Paper>
       </Grid.Col>
       <Grid.Col span="content">
-        <Paper h={480} p="xl" radius="lg" withBorder>
+        <Paper h={560} p="xl" radius="lg" withBorder>
           <Title order={5}>Taxonomic breakdown</Title>
 
           <DataTable my={8}>
