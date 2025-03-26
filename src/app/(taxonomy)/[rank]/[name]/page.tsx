@@ -47,6 +47,9 @@ import { HasDataFilters } from "@/components/filtering/has-data";
 import { Photo } from "@/app/type";
 import Link from "next/link";
 import { useDatasets } from "@/app/source-provider";
+import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-completion";
+import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-completion";
+import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
 
 const PAGE_SIZE = 10;
 
@@ -546,7 +549,9 @@ function Species({ rank, canonicalName, datasetId }: SpeciesProps) {
       </Grid>
 
       <SimpleGrid cols={5} pt={40}>
-        {records?.map((record) => <SpeciesCard key={record.taxonomy.scientificName} species={record} />)}
+        {records?.map((record) => (
+          <SpeciesCard key={record.taxonomy.scientificName} species={record} />
+        ))}
       </SimpleGrid>
 
       <PaginationBar total={data?.taxon.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
@@ -626,6 +631,9 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
   const childTaxonLabel = pluralTaxon(childTaxon);
 
+  const minDate = new Date("2009-01-01");
+  const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
+
   const thresholds = [
     { name: "low", color: "#f47625", start: 0, end: 25 },
     { name: "decent", color: "#febb1e", start: 25, end: 75 },
@@ -665,50 +673,54 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
 
   return (
     <Grid>
-      <Grid.Col span="auto">
+      <Grid.Col span={12}>
         <Title order={5}>Data summary</Title>
-        <Grid>
-          <Grid.Col span={collapsable(4)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Percentage of species with genomes
-              </Text>
-              {taxon && (
-                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />
-              )}
-            </Stack>
-          </Grid.Col>
-          <Grid.Col span={collapsable(8)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Species with genomes
-              </Text>
-              {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
-            </Stack>
-          </Grid.Col>
-          <Grid.Col span={collapsable(4)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Percentage of species with any genetic data
-              </Text>
-              {taxon && (
-                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(otherPercentile || 0)} />
-              )}
-            </Stack>
-          </Grid.Col>
-          <Grid.Col span={collapsable(8)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Species with any genetic data
-              </Text>
-              {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} />}
-            </Stack>
-          </Grid.Col>
-        </Grid>
+      </Grid.Col>
+      <Grid.Col span="content">
+        <Paper px="lg" pb="lg" w={430} h={560} radius="lg" withBorder>
+          <Stack h="100%" justify="space-between">
+            <GroupDetailRadial
+              height={400}
+              radial={25}
+              query={{
+                taxonRank: rank,
+                taxonCanonicalName: taxon?.canonicalName || "",
+                includeRanks: [rank, ALL_RANKS[ALL_RANKS.indexOf(rank) + 1]],
+                rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(rank) + 1),
+              }}
+              fontSize={7}
+              switcherGap="sm"
+              switcherSize="sm"
+              hideDescription
+            />
+            <Text fw={300} size="sm">
+              Total of species for which a whole genome has been sequenced and made available aggregated by higher
+              classification units.
+            </Text>
+          </Stack>
+        </Paper>
+      </Grid.Col>
+      <Grid.Col span="auto">
+        <Paper h={560} p="lg" radius="lg" withBorder>
+          <Stack h="100%" justify="space-between">
+            <Box h={400}>
+              <GenomeCompletion
+                taxonRank={rank}
+                taxonCanonicalName={taxon?.canonicalName || ""}
+                domain={[minDate, maxDate]}
+              />
+            </Box>
+            <Text fw={300} size="sm">
+              This graph shows the aggregated total of species for which a whole genome has been sequenced and made
+              available. The first instance of a whole genome sequence for an individual species has been plotted as an
+              accumulated total. Statistics based on records indexed within ARGA.
+            </Text>
+          </Stack>
+        </Paper>
       </Grid.Col>
 
       <Grid.Col span="content">
-        <Paper p="xl" radius="lg" withBorder>
+        <Paper h={560} p="xl" radius="lg" withBorder>
           <Title order={5}>Taxonomic breakdown</Title>
 
           <DataTable my={8}>
@@ -751,6 +763,56 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
           </Stack>
         </Paper>
       </Grid.Col>
+      <Grid.Col span={12}>
+        <Grid mt="xl">
+          <Grid.Col span={12}>
+            <Stack>
+              <Text fz="sm" fw={300}>
+                Complete genome for at least one representative species from each:
+              </Text>
+              <Group grow px="lg">
+                <CompletionStepper rank={rank} canonicalName={taxon?.canonicalName} />
+              </Group>
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={collapsable(4)}>
+            <Stack>
+              <Text fz="sm" fw={300}>
+                Percentage of species with genomes
+              </Text>
+              {taxon && (
+                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />
+              )}
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={collapsable(8)}>
+            <Stack>
+              <Text fz="sm" fw={300}>
+                Species with genomes
+              </Text>
+              {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={collapsable(4)}>
+            <Stack>
+              <Text fz="sm" fw={300}>
+                Percentage of species with any genetic data
+              </Text>
+              {taxon && (
+                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(otherPercentile || 0)} />
+              )}
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={collapsable(8)}>
+            <Stack>
+              <Text fz="sm" fw={300}>
+                Species with any genetic data
+              </Text>
+              {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} />}
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Grid.Col>
     </Grid>
   );
 }
@@ -761,6 +823,8 @@ interface ClassificationPageProps {
     name: string;
   }>;
 }
+
+const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
 
 export default function ClassificationPage(props: ClassificationPageProps) {
   const params = use(props.params);
