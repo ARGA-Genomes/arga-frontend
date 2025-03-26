@@ -629,7 +629,7 @@ export default function BrowseSource(props: { params: Promise<{ list: string }> 
   const params = use(props.params);
   const router = useRouter();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const group = (queryMap as Record<string, ListGroup>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
