@@ -11,7 +11,6 @@ import {
   Stack,
   Grid,
   Container,
-  Table,
   Group,
   Drawer,
   Button,
@@ -22,7 +21,7 @@ import {
 
 import { IconFilter } from "@tabler/icons-react";
 import { useEffect, useState, use } from "react";
-import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
+import { LoadOverlay } from "@/components/load-overlay";
 import { Filter } from "@/components/filtering/common";
 import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";

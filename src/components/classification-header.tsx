@@ -8,7 +8,6 @@ import * as Humanize from "humanize-plus";
 import { Taxonomy } from "@/app/(taxonomy)/[rank]/[name]/page";
 import { taxon as taxonOptions } from "../app/(home)/_data";
 import { AttributePill, AttributePillValue } from "./data-fields";
-import { Attribute } from "./highlight-stack";
 import { IconArrowUpRight } from "@tabler/icons-react";
 
 interface ClassificationHeaderProps {
@@ -45,14 +44,14 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
                 </Text>
                 <Group mt="xs">
                   <Group>
-                    <Skeleton h={31} visible={!Boolean(taxon)} radius="xl">
+                    <Skeleton h={31} visible={!taxon} radius="xl">
                       <Group>
                         <AttributePillValue value={taxon?.status.toLocaleLowerCase() || "Accepted"} />
                       </Group>
                     </Skeleton>
                   </Group>
                   <Group>
-                    <Skeleton h={31} style={{ display: "flex", alignItems: "center" }} visible={!Boolean(taxon)}>
+                    <Skeleton h={31} style={{ display: "flex", alignItems: "center" }} visible={!taxon}>
                       <Text fs="italic" fw={400}>
                         {taxon?.scientificName || classification}
                       </Text>
