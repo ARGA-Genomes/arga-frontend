@@ -9,6 +9,7 @@ import {
   Group,
   PaperProps,
   MantineStyleProp,
+  Skeleton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -20,31 +21,31 @@ interface AttributeProps {
   labelColor?: MantineColor;
   children: React.ReactNode;
   group?: boolean;
+  loading?: boolean;
 }
 
-export function Attribute({
-  label,
-  labelColor,
-  children,
-  group,
-}: AttributeProps) {
+export function Attribute({ label, labelColor, loading, children, group }: AttributeProps) {
   return (
     <>
       {group ? (
         <Group gap={5} grow>
           {label && (
-            <Text fw={300} size="sm" c={labelColor}>
-              {label}
-            </Text>
+            <Skeleton visible={Boolean(loading)}>
+              <Text fw={300} size="sm" c={labelColor}>
+                {label}
+              </Text>
+            </Skeleton>
           )}
           {children}
         </Group>
       ) : (
-        <Stack gap={5}>
+        <Stack gap={8}>
           {label && (
-            <Text fw={300} size="sm" c={labelColor}>
-              {label}
-            </Text>
+            <Skeleton visible={Boolean(loading)}>
+              <Text fw={300} size="sm" c={labelColor}>
+                {label}
+              </Text>
+            </Skeleton>
           )}
           {children}
         </Stack>
@@ -86,6 +87,7 @@ interface AttributePillValueProps {
   showIconOnHover?: boolean;
   miw?: number;
   style?: MantineStyleProp;
+  loading?: boolean;
 }
 
 interface AttributePillProps extends AttributePillValueProps {
@@ -95,17 +97,11 @@ interface AttributePillProps extends AttributePillValueProps {
   group?: boolean;
 }
 
-export function AttributePill({
-  label,
-  href,
-  labelColor,
-  group,
-  ...rest
-}: AttributePillProps) {
-  const pill = <AttributePillValue {...rest} />;
+export function AttributePill({ label, href, labelColor, group, loading, ...rest }: AttributePillProps) {
+  const pill = <AttributePillValue loading={loading} {...rest} />;
 
   return (
-    <Attribute label={label} group={group} labelColor={labelColor}>
+    <Attribute label={label} group={group} labelColor={labelColor} loading={loading}>
       {href ? <Link href={href}>{pill}</Link> : pill}
     </Attribute>
   );
@@ -124,6 +120,7 @@ export function AttributePillValue({
   showIconOnHover = false,
   style,
   miw,
+  loading,
 }: AttributePillValueProps) {
   const [opened, { close, open }] = useDisclosure(false);
 
@@ -131,55 +128,49 @@ export function AttributePillValue({
   const bg = color || BADGE_COLOURS[value] || "#d6e4ed";
 
   return (
-    <Popover
-      position="bottom"
-      withArrow
-      shadow="md"
-      opened={opened}
-      radius="md"
-      disabled={popoverDisabled}
-    >
+    <Popover position="bottom" withArrow shadow="md" opened={opened} radius="md" disabled={popoverDisabled || loading}>
       <Popover.Target>
-        <Paper
-          py={5}
-          px={15}
-          bg={opened && hoverColor ? hoverColor : bg}
-          radius="xl"
-          miw={miw}
-          style={{ border: "none", ...style }}
-          onMouseEnter={open}
-          onMouseLeave={close}
-        >
-          <Center>
-            <Text
-              fw={600}
-              size="sm"
-              fs={italic ? "italic" : undefined}
-              style={{
-                whiteSpace: "nowrap",
-                transition: "ease all 250ms",
-                marginLeft: Icon && !opened ? 18 : 0,
-              }}
-              c={textColor}
-              truncate
-            >
-              {value}
-            </Text>
-            {Icon && (
-              <Icon
-                size={16}
-                strokeWidth={3}
-                color={iconColor}
+        <Skeleton radius="xl" visible={Boolean(loading)}>
+          <Paper
+            py={5}
+            px={15}
+            bg={opened && hoverColor ? hoverColor : bg}
+            radius="xl"
+            miw={miw}
+            style={{ border: "none", ...style }}
+            onMouseEnter={open}
+            onMouseLeave={close}
+          >
+            <Center>
+              <Text
+                fw={600}
+                size="sm"
+                fs={italic ? "italic" : undefined}
                 style={{
+                  whiteSpace: "nowrap",
                   transition: "ease all 250ms",
-                  marginLeft: showIconOnHover && !opened ? 0 : 18,
-                  transform:
-                    showIconOnHover && !opened ? "scale(0)" : "scale(1)",
+                  marginLeft: Icon && !opened ? 18 : 0,
                 }}
-              />
-            )}
-          </Center>
-        </Paper>
+                c={textColor}
+                truncate
+              >
+                {value}
+              </Text>
+              {Icon && (
+                <Icon
+                  size={16}
+                  strokeWidth={3}
+                  color={iconColor}
+                  style={{
+                    transition: "ease all 250ms",
+                    marginLeft: showIconOnHover && !opened ? 0 : 18,
+                    transform: showIconOnHover && !opened ? "scale(0)" : "scale(1)",
+                  }}
+                />
+              )}
+            </Center>
+          </Paper>
+        </Skeleton>
       </Popover.Target>
       <Popover.Dropdown bg={bg}>
         <Text size="xs">{popoverLabel || value}</Text>
@@ -194,12 +185,7 @@ interface AttributePillContainerProps extends PaperProps {
   children?: React.ReactNode;
 }
 
-export function AttributePillContainer({
-  color,
-  className,
-  children,
-  ...rest
-}: AttributePillContainerProps) {
+export function AttributePillContainer({ color, className, children, ...rest }: AttributePillContainerProps) {
   return (
     <Paper
       py={5}

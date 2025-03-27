@@ -5,19 +5,19 @@ export const grouping: BrowseItem[] = [
     total: "sources.ARGA_Commercial_Species",
     category: "Agriculture",
     image: "/icons/list-group/List group_ Agriculture.svg",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/groups/agriculture",
   },
   {
     total: "sources.ARGA_Commercial_Species",
     category: "Aquaculture",
     image: "/icons/list-group/List group_ Aquaculture.svg",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/groups/aquaculture",
   },
   {
     total: "sources.ARGA_Commercial_Species",
     category: "Terrestrial",
     image: "/icons/list-group/List group_ Terrestrial.svg",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/groups/terrestrial",
   },
   {
     total: "sources.ARGA_Threatened_Species",

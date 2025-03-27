@@ -5,7 +5,19 @@ import { other } from "./other";
 import { phenotypic } from "./phenotypic";
 import { threatened } from "./threatened";
 
-const array = [...commercial, ...ecosystems, ...iek, ...other, ...phenotypic, ...threatened];
+interface GroupItem {
+  category: string;
+  image: string;
+  source: string;
+  filter?: {
+    name: string;
+    value: {
+      string: string;
+    };
+  };
+}
+
+const array: GroupItem[] = [...commercial, ...ecosystems, ...iek, ...other, ...phenotypic, ...threatened];
 const map = array.reduce(
   (prev, group) => ({
     ...prev,

@@ -23,6 +23,7 @@ import {
   Chip,
   Center,
   Anchor,
+  Image,
 } from "@mantine/core";
 import { useEffect, useState, useMemo, use } from "react";
 import { PaginationBar } from "@/components/pagination";
@@ -41,6 +42,10 @@ import { DataPageCitation } from "@/components/page-citation";
 import { SortChip } from "@/components/sorting/sort-chips";
 import classes from "../../../../components/record-list.module.css";
 import { getLicense } from "@/helpers/getLicense";
+
+// Icons data
+import { array as groupingExtra } from "../../../browse/groups/_data/all";
+import { grouping as groupingData } from "../../../(home)/_data";
 
 const PAGE_SIZE = 10;
 interface Filters {
@@ -602,6 +607,25 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
   const source = decodeURIComponent(params.name).replaceAll("_", " ");
   const [_, setPreviousPage] = usePreviousPage();
 
+  const names = [params.name, decodeURIComponent(params.name), decodeURIComponent(params.name).replaceAll(" ", "_")];
+
+  const sourceIcon = useMemo(
+    () =>
+      [
+        ...groupingData,
+        ...groupingExtra
+          .filter((item) => !item.filter)
+          .map((item) => ({
+            image: item.image,
+            link: `/${item.source}`,
+          })),
+      ].find((item) => {
+        const link = item.link.substring(item.link.lastIndexOf("/") + 1);
+        return names.includes(link);
+      })?.image,
+    [params.name]
+  );
+
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
     variables: { name: source },
   });
@@ -618,19 +642,22 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Grid align="center">
-            <Grid.Col span={{ base: 12, md: 2 }}>
-              <Text c="dimmed" fw={400}>
-                DATA COLLECTION
-              </Text>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span="auto">
               <Stack gap={0}>
+                <Text c="dimmed" fw={400}>
+                  DATA COLLECTION
+                </Text>
                 <Text fz={38} fw={700}>
                   {source}
                 </Text>
                 {data?.source ? <SourceDetails source={data.source} loading={loading} /> : error?.message}
               </Stack>
             </Grid.Col>
+            {sourceIcon && (
+              <Grid.Col span="content">
+                <Image mr="xl" maw={180} alt={`${sourceIcon} icon`} src={sourceIcon} />
+              </Grid.Col>
+            )}
           </Grid>
         </Container>
       </Paper>

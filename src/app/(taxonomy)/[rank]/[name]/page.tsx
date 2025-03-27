@@ -152,7 +152,7 @@ interface ClassificationNode {
   depth: number;
 }
 
-interface Taxonomy {
+export interface Taxonomy {
   scientificName: string;
   scientificNameAuthorship: string;
   canonicalName: string;
@@ -229,7 +229,7 @@ interface TaxonResults {
 
 function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
   return (
-    <Table>
+    <table>
       <tbody>
         <tr>
           <td>Scientific name</td>
@@ -256,7 +256,7 @@ function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
           </td>
         </tr>
       </tbody>
-    </Table>
+    </table>
   );
 }
 
@@ -852,12 +852,12 @@ export default function ClassificationPage(props: ClassificationPageProps) {
 
   return (
     <Stack mt={40}>
-      <ClassificationHeader rank={rank} classification={params.name} />
+      <ClassificationHeader rank={rank} classification={params.name} taxon={taxonResults.data?.taxon} />
 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Stack>
-            <Grid>
+            {/* <Grid>
               <Grid.Col span={3}>
                 <LoadPanel visible={taxonResults.loading} h={180}>
                   <Title pb={10} order={5}>
@@ -866,7 +866,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
                   <TaxonomyDetails taxon={taxonResults.data?.taxon} />
                 </LoadPanel>
               </Grid.Col>
-              <Grid.Col span={9}>
+              <Grid.Col span={12}>
                 <LoadPanel visible={taxonResults.loading} h={180}>
                   <Title pb={10} order={5}>
                     Higher classification
@@ -874,7 +874,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
                   <HigherClassification taxon={taxonResults.data?.taxon} />
                 </LoadPanel>
               </Grid.Col>
-            </Grid>
+            </Grid> */}
 
             <Paper p="xl" radius="lg" pos="relative" withBorder>
               {taxonResults.called && <DataSummary rank={rank} taxon={taxonResults.data?.taxon} />}
