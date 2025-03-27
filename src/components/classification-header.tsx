@@ -59,31 +59,35 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
                   </Group>
                 </Group>
               </Stack>
-              <Divider mt="sm" mb={4} />
-              <Group>
-                {hierarchy
-                  ? hierarchy.map((node, idx) => (
-                      <AttributePill
-                        key={idx}
-                        label={Humanize.capitalize(node.rank.toLowerCase())}
-                        value={node.canonicalName}
-                        href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
-                        icon={IconArrowUpRight}
-                        popoverDisabled
-                        showIconOnHover
-                      />
-                    ))
-                  : ALL_RANKS.slice(0, ALL_RANKS.indexOf(rank) + 1).map((skeletonRank) => (
-                      <AttributePill
-                        loading
-                        key={skeletonRank}
-                        label={Humanize.capitalize(skeletonRank)}
-                        value="Placeholder"
-                        icon={IconArrowUpRight}
-                        showIconOnHover
-                      />
-                    ))}
-              </Group>
+              {rank !== "DOMAIN" && (
+                <>
+                  <Divider mt="sm" mb={4} />
+                  <Group>
+                    {hierarchy
+                      ? hierarchy.map((node, idx) => (
+                          <AttributePill
+                            key={idx}
+                            label={Humanize.capitalize(node.rank.toLowerCase())}
+                            value={node.canonicalName}
+                            href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
+                            icon={IconArrowUpRight}
+                            popoverDisabled
+                            showIconOnHover
+                          />
+                        ))
+                      : ALL_RANKS.slice(0, ALL_RANKS.indexOf(rank) + 1).map((skeletonRank) => (
+                          <AttributePill
+                            loading
+                            key={skeletonRank}
+                            label={Humanize.capitalize(skeletonRank)}
+                            value="Placeholder"
+                            icon={IconArrowUpRight}
+                            showIconOnHover
+                          />
+                        ))}
+                  </Group>
+                </>
+              )}
             </Stack>
           </Grid.Col>
           {taxonIcon && (
