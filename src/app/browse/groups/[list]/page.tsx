@@ -470,13 +470,11 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Grid align="center">
-            <Grid.Col span={{ base: 12, md: 2 }}>
-              <Text c="dimmed" fw={400}>
-                LIST GROUP
-              </Text>
-            </Grid.Col>
             <Grid.Col span="auto">
               <Stack gap={0}>
+                <Text c="dimmed" fw={400}>
+                  LIST GROUP
+                </Text>
                 <Text fz={38} fw={700}>
                   {group.category}
                 </Text>

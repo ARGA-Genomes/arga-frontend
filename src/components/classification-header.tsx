@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Container, Divider, Grid, Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
+import { Container, Grid, Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
 import { MAX_WIDTH } from "../app/constants";
 import * as Humanize from "humanize-plus";
 
@@ -18,6 +18,25 @@ interface ClassificationHeaderProps {
 
 const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
 
+interface SourcePillProps {
+  value: string;
+}
+
+function SourcePill({ value }: SourcePillProps) {
+  return (
+    <AttributePillValue
+      color="transparent"
+      value={value}
+      textColor="shellfish"
+      style={{
+        border: "1px solid var(--mantine-color-shellfish-5)",
+        minWidth: 90,
+      }}
+      popoverDisabled
+    />
+  );
+}
+
 export default function ClassificationHeader({ rank, classification, taxon }: ClassificationHeaderProps) {
   const hierarchy = taxon?.hierarchy.toSorted((a, b) => b.depth - a.depth);
   const taxonIcon = useMemo(
@@ -28,6 +47,8 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
       })?.image,
     [rank, classification]
   );
+
+  console.log(taxon);
 
   return (
     <Paper py={30} pos="relative">
@@ -60,8 +81,7 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
                 </Group>
               </Stack>
               {rank !== "DOMAIN" && (
-                <>
-                  <Divider mt="sm" mb={4} />
+                <Group justify="space-between" align="flex-end" mt="sm">
                   <Group>
                     {hierarchy
                       ? hierarchy.map((node, idx) => (
@@ -75,7 +95,7 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
                             showIconOnHover
                           />
                         ))
-                      : ALL_RANKS.slice(0, ALL_RANKS.indexOf(rank) + 1).map((skeletonRank) => (
+                      : ALL_RANKS.slice(0, ALL_RANKS.indexOf(rank) + 2).map((skeletonRank) => (
                           <AttributePill
                             loading
                             key={skeletonRank}
@@ -86,7 +106,13 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
                           />
                         ))}
                   </Group>
-                </>
+                  <Group>
+                    <Text size="sm">Source</Text>
+                    <Group>
+                      <SourcePill value="Atlas of Living Australia" />
+                    </Group>
+                  </Group>
+                </Group>
               )}
             </Stack>
           </Grid.Col>

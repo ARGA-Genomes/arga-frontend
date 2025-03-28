@@ -109,11 +109,11 @@ export default function GenomeTracker() {
                             and graphics on this page may be shared under a CC BY 4.0 licence.
                           </Text>
                           <Divider my="xs" />
-                          <Group>
+                          <Stack>
                             <ActionButton label="Copy page citation" icon={<IconCopy size="1rem" />} />
                             <ActionButton label="Download raw data as CSV" icon={<IconDownload size="1rem" />} />
                             <ActionButton label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
-                          </Group>
+                          </Stack>
                         </Stack>
                       </Paper>
                     </GridCol>
