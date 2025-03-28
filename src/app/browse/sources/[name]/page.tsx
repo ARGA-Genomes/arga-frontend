@@ -655,7 +655,7 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
             </Grid.Col>
             {sourceIcon && (
               <Grid.Col span="content">
-                <Image mr="xl" maw={180} alt={`${sourceIcon} icon`} src={sourceIcon} />
+                <Image maw={180} alt={`${sourceIcon} icon`} src={sourceIcon} />
               </Grid.Col>
             )}
           </Grid>

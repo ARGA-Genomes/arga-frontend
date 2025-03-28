@@ -80,47 +80,49 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
                   </Group>
                 </Group>
               </Stack>
-              {rank !== "DOMAIN" && (
-                <Group justify="space-between" align="flex-end" mt="sm">
-                  <Group>
-                    {hierarchy
-                      ? hierarchy.map((node, idx) => (
-                          <AttributePill
-                            key={idx}
-                            label={Humanize.capitalize(node.rank.toLowerCase())}
-                            value={node.canonicalName}
-                            href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
-                            icon={IconArrowUpRight}
-                            popoverDisabled
-                            showIconOnHover
-                          />
-                        ))
-                      : ALL_RANKS.slice(0, ALL_RANKS.indexOf(rank) + 2).map((skeletonRank) => (
-                          <AttributePill
-                            loading
-                            key={skeletonRank}
-                            label={Humanize.capitalize(skeletonRank)}
-                            value="Placeholder"
-                            icon={IconArrowUpRight}
-                            showIconOnHover
-                          />
-                        ))}
-                  </Group>
-                  <Group>
-                    <Text size="sm">Source</Text>
-                    <Group>
-                      <SourcePill value="Atlas of Living Australia" />
-                    </Group>
-                  </Group>
-                </Group>
-              )}
             </Stack>
           </Grid.Col>
           {taxonIcon && (
             <Grid.Col span="content">
-              <Image mr="xl" maw={180} alt={`${rank} ${classification} icon`} src={taxonIcon} />
+              <Image maw={180} alt={`${rank} ${classification} icon`} src={taxonIcon} />
             </Grid.Col>
           )}
+          <Grid.Col span={12}>
+            {rank !== "DOMAIN" && (
+              <Group justify="space-between" align="flex-end">
+                <Group>
+                  {hierarchy
+                    ? hierarchy.map((node, idx) => (
+                        <AttributePill
+                          key={idx}
+                          label={Humanize.capitalize(node.rank.toLowerCase())}
+                          value={node.canonicalName}
+                          href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
+                          icon={IconArrowUpRight}
+                          popoverDisabled
+                          showIconOnHover
+                        />
+                      ))
+                    : ALL_RANKS.slice(0, ALL_RANKS.indexOf(rank) + 2).map((skeletonRank) => (
+                        <AttributePill
+                          loading
+                          key={skeletonRank}
+                          label={Humanize.capitalize(skeletonRank)}
+                          value="Placeholder"
+                          icon={IconArrowUpRight}
+                          showIconOnHover
+                        />
+                      ))}
+                </Group>
+                <Group>
+                  <Text size="sm">Source</Text>
+                  <Group>
+                    <SourcePill value="Atlas of Living Australia" />
+                  </Group>
+                </Group>
+              </Group>
+            )}
+          </Grid.Col>
         </Grid>
       </Container>
     </Paper>

@@ -482,7 +482,7 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
               </Stack>
             </Grid.Col>
             <Grid.Col span="content">
-              <Image mr="xl" maw={180} alt={`${group.category} icon`} src={group.image} />
+              <Image maw={180} alt={`${group.category} icon`} src={group.image} />
             </Grid.Col>
           </Grid>
         </Container>
