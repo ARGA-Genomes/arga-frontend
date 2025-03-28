@@ -17,10 +17,14 @@ import {
   Badge,
   Accordion,
   Avatar,
+  Divider,
+  UnstyledButton,
+  Flex,
+  ThemeIcon,
 } from "@mantine/core";
 
-import { IconFilter } from "@tabler/icons-react";
-import { useEffect, useState, use } from "react";
+import { IconCopy, IconDownload, IconFilter } from "@tabler/icons-react";
+import { useEffect, useState, use, ReactElement } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { Filter } from "@/components/filtering/common";
 import ClassificationHeader from "@/components/classification-header";
@@ -44,7 +48,6 @@ import { usePreviousPage } from "@/components/navigation-history";
 import { usePathname } from "next/navigation";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { Photo } from "@/app/type";
-import Link from "next/link";
 import { useDatasets } from "@/app/source-provider";
 import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-completion";
 import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-completion";
@@ -224,56 +227,6 @@ interface QueryResults {
 
 interface TaxonResults {
   taxon: Taxonomy;
-}
-
-function TaxonomyDetails({ taxon }: { taxon: Taxonomy | undefined }) {
-  return (
-    <table>
-      <tbody>
-        <tr>
-          <td>Scientific name</td>
-          <td>
-            <DataField value={taxon?.scientificName} />
-          </td>
-        </tr>
-        <tr>
-          <td>Status</td>
-          <td>
-            <DataField value={taxon?.status.toLocaleLowerCase()} />
-          </td>
-        </tr>
-        <tr>
-          <td>Source</td>
-          <td>
-            {taxon?.sourceUrl ? (
-              <Link href={taxon.sourceUrl} target="_blank">
-                <DataField value={taxon.source} />
-              </Link>
-            ) : (
-              <DataField value={taxon?.source} />
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  );
-}
-
-function HigherClassification({ taxon }: { taxon: Taxonomy | undefined }) {
-  const hierarchy = taxon?.hierarchy.toSorted((a, b) => b.depth - a.depth);
-
-  return (
-    <Group>
-      {hierarchy?.map((node, idx) => (
-        <Attribute
-          key={idx}
-          label={Humanize.capitalize(node.rank.toLowerCase())}
-          value={node.canonicalName}
-          href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
-        />
-      ))}
-    </Group>
-  );
 }
 
 interface FiltersProps {
@@ -626,6 +579,26 @@ function pluralTaxon(rank: string) {
   else return rank;
 }
 
+interface ActionButtonProps {
+  label: string;
+  icon: ReactElement;
+}
+
+function ActionButton({ label, icon }: ActionButtonProps) {
+  return (
+    <UnstyledButton>
+      <Flex gap={12} align="center">
+        <ThemeIcon radius="md" color="midnight.11">
+          {icon}
+        </ThemeIcon>
+        <Text size="sm" fw={600} c="midnight.11">
+          {label}
+        </Text>
+      </Flex>
+    </UnstyledButton>
+  );
+}
+
 function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefined }) {
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
   const childTaxonLabel = pluralTaxon(childTaxon);
@@ -774,41 +747,87 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
               </Group>
             </Stack>
           </Grid.Col>
-          <Grid.Col span={collapsable(4)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Percentage of species with genomes
-              </Text>
-              {taxon && (
-                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(genomePercentile || 0)} />
-              )}
-            </Stack>
+          <Grid.Col span={{ xs: 12, sm: 12, md: 8, lg: 9, xl: 10 }}>
+            <Grid>
+              <Grid.Col span={collapsable(4)}>
+                <Stack>
+                  <Text fz="sm" fw={300}>
+                    Percentage of species with genomes
+                  </Text>
+                  {taxon && (
+                    <TachoChart
+                      mt={10}
+                      h={150}
+                      w={300}
+                      thresholds={thresholds}
+                      value={Math.round(genomePercentile || 0)}
+                    />
+                  )}
+                </Stack>
+              </Grid.Col>
+              <Grid.Col span={collapsable(8)}>
+                <Stack>
+                  <Text fz="sm" fw={300}>
+                    Species with genomes
+                  </Text>
+                  {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
+                </Stack>
+              </Grid.Col>
+              <Grid.Col span={collapsable(4)}>
+                <Stack>
+                  <Text fz="sm" fw={300}>
+                    Percentage of species with any genetic data
+                  </Text>
+                  {taxon && (
+                    <TachoChart
+                      mt={10}
+                      h={150}
+                      w={300}
+                      thresholds={thresholds}
+                      value={Math.round(otherPercentile || 0)}
+                    />
+                  )}
+                </Stack>
+              </Grid.Col>
+              <Grid.Col span={collapsable(8)}>
+                <Stack>
+                  <Text fz="sm" fw={300}>
+                    Species with any genetic data
+                  </Text>
+                  {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} />}
+                </Stack>
+              </Grid.Col>
+            </Grid>
           </Grid.Col>
-          <Grid.Col span={collapsable(8)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Species with genomes
-              </Text>
-              {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
-            </Stack>
-          </Grid.Col>
-          <Grid.Col span={collapsable(4)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Percentage of species with any genetic data
-              </Text>
-              {taxon && (
-                <TachoChart mt={10} h={150} w={300} thresholds={thresholds} value={Math.round(otherPercentile || 0)} />
-              )}
-            </Stack>
-          </Grid.Col>
-          <Grid.Col span={collapsable(8)}>
-            <Stack>
-              <Text fz="sm" fw={300}>
-                Species with any genetic data
-              </Text>
-              {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} />}
-            </Stack>
+          <Grid.Col span={{ xs: 12, sm: 12, md: 4, lg: 3, xl: 2 }}>
+            <Paper radius="lg" p="md" h="100%" withBorder>
+              <Stack>
+                <Text c="midnight.9" size="xs" fw="bold">
+                  Note:
+                </Text>
+                <Text c="midnight.11" size="xs">
+                  For the purposes of these data summaries, a “whole genome” is interpreted as being an entire assembly
+                  of the genome, with or without chromosome assemblies (i.e. assemblies which are at least represented
+                  as “scaffold assemblies” in the NCBI GenBank Genomes Database).
+                </Text>
+                <Text c="midnight.11" size="xs">
+                  The higher classification of Australia&apos;s biodiversity is driven by the taxonomic system managed
+                  by the Atlas of Living Australia. The Atlas of Living Australia hosts a record of all of the species
+                  that appear on the Australian National Species List, and services nationally agreed nomenclature for
+                  these species.
+                </Text>
+                <Text c="midnight.11" size="xs">
+                  The data used to generate the page statistics and graphics are accurate to dd/mm/yy. Data and graphics
+                  on this page may be shared under a CC BY 4.0 licence.
+                </Text>
+                <Divider my="xs" />
+                <Stack>
+                  <ActionButton label="Copy page citation" icon={<IconCopy size="1rem" />} />
+                  <ActionButton label="Download raw data as CSV" icon={<IconDownload size="1rem" />} />
+                  <ActionButton label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
+                </Stack>
+              </Stack>
+            </Paper>
           </Grid.Col>
         </Grid>
       </Grid.Col>
