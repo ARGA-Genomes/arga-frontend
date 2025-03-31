@@ -3,14 +3,13 @@
 import classes from "./significant-milestones.module.css";
 
 import { gql, useQuery } from "@apollo/client";
-import { ScrollArea } from "@mantine/core";
-import { Group } from "@visx/group";
-import { ParentSize } from "@visx/responsive";
-import { scaleLinear, scaleTime } from "@visx/scale";
-import { Circle } from "@visx/shape";
-import { Text as SvgText } from "@visx/text";
+import { Center, Paper, ScrollArea, Stack } from "@mantine/core";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Group, Text } from "@mantine/core";
+import { GroupedTimeline } from "@/components/grouped-timeline";
+import { IconArrowRight } from "@tabler/icons-react";
+import Link from "next/link";
 
 const GET_SIGNIFICANT_MILESTONES = gql`
   query SignificantMilestones {
@@ -48,15 +47,8 @@ interface Attribute {
 type Milestone = {
   canonicalName: string;
   accession?: string;
-  date?: Date;
+  date: Date;
 };
-
-interface MilestoneItemProps {
-  milestone: Milestone;
-  x: number;
-  y: number;
-  height: number;
-}
 
 function getAccession(attrs: Attribute[]): string | undefined {
   return attrs.find((attr) => attr.name == "milestone_assembly_accession")?.value;
@@ -67,83 +59,64 @@ function getReleaseDate(attrs: Attribute[]): Date | undefined {
   return value ? new Date(value) : undefined;
 }
 
-function MilestoneItem({ milestone, x, y, height }: MilestoneItemProps) {
-  const [hovered, setHovered] = useState<boolean>(false);
+interface MilestoneItemProps {
+  milestone: Milestone;
+  inverted?: boolean;
+}
 
-  const bulletOffset = { x: 30, y: height / 2 };
-  /* const text = `${milestone.date?.getFullYear()}: ${milestone.canonicalName} - ${milestone.accession}`; */
-  const text = `${milestone.canonicalName}`;
-  const textFull = `${milestone.date?.getFullYear()}: ${milestone.canonicalName} - ${milestone.accession}`;
+function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
+  const [hovered, setHovered] = useState<boolean>(false);
+  const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/whole_genomes/${milestone.accession}`;
 
   const variants = {
     expanded: {
-      width: textFull.length * 10 + bulletOffset.x,
       opacity: 1.0,
+      height: 130,
     },
     compact: {
-      width: text.length * 10 + bulletOffset.x,
-      opacity: 0.5,
+      opacity: 0.7,
+      height: 80,
     },
     visible: {
       opacity: 1.0,
+      scale: 1.0,
     },
     invisible: {
       opacity: 0.0,
+      scale: 0.0,
     },
   };
 
   return (
-    <Group left={x - bulletOffset.x} top={y} onMouseOver={() => setHovered(true)} onMouseOut={() => setHovered(false)}>
-      <motion.rect
+    <Center>
+      <Paper
+        component={motion.div}
         className={classes.item}
-        height={height}
-        ry={20}
         animate={hovered ? "expanded" : "compact"}
         variants={variants}
-      />
-      <Group left={bulletOffset.x} top={bulletOffset.y}>
-        <Circle r={6} className={classes.bullet} />
+        onMouseOver={() => setHovered(true)}
+        onMouseOut={() => setHovered(false)}
+      >
+        <Link href={genomeHref}>
+          <Stack px="sm" pt="md" pb="xs" justify="space-between" h={130}>
+            <Text className={classes.text}>
+              <i>{milestone.canonicalName}</i>
+            </Text>
 
-        <motion.g animate={hovered ? "invisible" : "visible"} variants={variants}>
-          <SvgText x={30} className={classes.text}>
-            {text}
-          </SvgText>
-        </motion.g>
-
-        <motion.g animate={hovered ? "visible" : "invisible"} variants={variants}>
-          <SvgText x={30} className={classes.text}>
-            {textFull}
-          </SvgText>
-        </motion.g>
-      </Group>
-
-      <Group left={textFull.length * 10 + bulletOffset.x + 10}>
-        <motion.rect
-          ry={20}
-          height={height}
-          width={80}
-          className={classes.itemButton}
-          animate={hovered ? "visible" : "invisible"}
-          variants={variants}
-        />
-        <motion.g animate={hovered ? "visible" : "invisible"} variants={variants}>
-          <SvgText x={23} y={height / 3} className={classes.buttonText}>
-            view
-          </SvgText>
-          <SvgText x={13} y={(height / 3) * 2} className={classes.buttonText}>
-            genome
-          </SvgText>
-        </motion.g>
-      </Group>
-    </Group>
+            <motion.div animate={hovered ? "visible" : "invisible"} variants={variants}>
+              <Group component={motion.span} justify="space-around" wrap="nowrap">
+                <Text className={classes.buttonText}>view genome</Text>
+                <IconArrowRight className={classes.buttonText} />
+              </Group>
+            </motion.div>
+          </Stack>
+        </Link>
+      </Paper>
+    </Center>
   );
 }
 
-interface SignificantMilestonesProps {
-  domain: [Date, Date];
-}
-
-export function SignificantMilestones({ domain }: SignificantMilestonesProps) {
+export function SignificantMilestones() {
   const { data } = useQuery<SignificantMilestonesQuery>(GET_SIGNIFICANT_MILESTONES);
 
   const milestones = data?.source.species.records
@@ -152,35 +125,17 @@ export function SignificantMilestones({ domain }: SignificantMilestonesProps) {
       accession: getAccession(record.taxonomy.attributes),
       date: getReleaseDate(record.taxonomy.attributes) || new Date(),
     }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .reverse();
-
-  const maxY = milestones?.length ?? 0;
-  const height = 40;
-  const yScale = scaleLinear({ range: [0, maxY * (height + 10)], domain: [0, maxY] });
-  const totalHeight = yScale(maxY);
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
-    <ScrollArea h={300}>
-      <ParentSize>
-        {(parent) => {
-          const xScale = scaleTime({ range: [0, parent.width], domain });
-
-          return (
-            <svg height={totalHeight} width={parent.width} overflow="visible">
-              {milestones?.map((milestone, idx) => (
-                <MilestoneItem
-                  key={milestone.canonicalName}
-                  milestone={milestone}
-                  x={xScale(milestone.date)}
-                  y={yScale(milestones.length - idx)}
-                  height={height}
-                />
-              ))}
-            </svg>
-          );
-        }}
-      </ParentSize>
-    </ScrollArea>
+    <ScrollArea.Autosize>
+      <GroupedTimeline height={500}>
+        {milestones?.map((milestone) => (
+          <GroupedTimeline.Item width={200} height={150} date={milestone.date}>
+            <MilestoneItem milestone={milestone} />
+          </GroupedTimeline.Item>
+        ))}
+      </GroupedTimeline>
+    </ScrollArea.Autosize>
   );
 }

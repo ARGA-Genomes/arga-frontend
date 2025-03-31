@@ -1,10 +1,5 @@
-.item {
-    cursor: pointer;
-    background-color: white;
-    border-radius: var(--mantine-radius-lg);
-    margin-top: var(--mantine-spacing-sm);
-    margin-bottom: var(--mantine-spacing-sm);
-    box-shadow: var(--mantine-shadow-sm);
+.group {
+    fill: #edf5f4;
 }
 
 .itemYear {
@@ -26,9 +21,9 @@
 }
 
 .buttonText {
-    font-weight: 600;
-    font-size: var(--mantine-font-size-sm);
-    color: var(--mantine-color-midnight-8);
+    font-weight: 700;
+    font-size: 14px;
+    fill: var(--mantine-color-midnight-1);
     text-anchor: start;
     dominant-baseline: middle;
 }
@@ -38,7 +33,13 @@
 }
 
 .line {
-    stroke: var(--mantine-color-midnight-8);
-    stroke-width: 1;
-    stroke-dasharray: 1 1;
+    stroke: var(--mantine-color-bushfire-5);
+    stroke-width: 10;
+    fill: none;
+}
+
+.lineNotch {
+    stroke: var(--mantine-color-wheat-5);
+    stroke-width: 10;
+    fill: white;
 }
