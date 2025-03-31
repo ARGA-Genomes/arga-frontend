@@ -440,9 +440,6 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
   const params = use(props.params);
   const router = useRouter();
 
-  const minDate = new Date("2009-01-01");
-  const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const group = (queryMap as Record<string, ListGroup>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
@@ -456,7 +453,7 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
     if (group) {
       setPreviousPage({
         name: `browsing ${group.category}`,
-        url: `/browse/sources/${params.list}`,
+        url: `/browse/groups/${params.list}`,
       });
     } else {
       router.replace("/browse/groups");
@@ -490,22 +487,6 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
       <Paper py={30}>
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
-            {/**
-             * Taxonomic breakdown (Rename to data summary):
-             * - Number of species
-             * - Species with genomes
-             * - Species with data
-             * - Species with most genomes
-             * - Species with most data
-             * We want all excluding phyla with genomes
-             * We also want:
-             * - sunburst from genome tracker
-             *   - mammals, birds, frogs & reptiles, plants
-             * - Accumulation curve
-             * - taxonomic coverage (start at kingdom level)
-             * Artfully arange into an aesthetically pleasing order
-             * - Put the genome content above any genetic data (separate)
-             */}
             <Paper p="xl" radius="lg" withBorder>
               <Species group={group} />
             </Paper>
