@@ -34,12 +34,12 @@
 
 .line {
     stroke: var(--mantine-color-bushfire-5);
-    stroke-width: 10;
+    stroke-width: 7;
     fill: none;
 }
 
 .lineNotch {
     stroke: var(--mantine-color-wheat-5);
-    stroke-width: 10;
+    stroke-width: 7;
     fill: white;
 }

@@ -3,7 +3,7 @@
 import classes from "./grouped-timeline.module.css";
 
 import { Group } from "@visx/group";
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, useState } from "react";
 
 const GROUP_GAP = 15;
 
@@ -33,15 +33,34 @@ interface GroupedTimelineYearProps {
 }
 
 function GroupedTimelineYear({ width, height, startInverted, header, children }: GroupedTimelineYearProps) {
+  const [hovered, setHovered] = useState<boolean>(false);
+
   // the line notches are about 90px
   const centerY = height / 2;
-  const bottom = centerY + 90;
-  const top = centerY - 90;
+  const bottom = centerY + 60;
+  const top = centerY - 60;
 
   const offset = width / (children.length + 1);
 
+  const variants = {
+    expanded: {
+      width: width,
+    },
+    compact: {
+      width: 300,
+    },
+    visible: {
+      scale: 1,
+      opacity: 1,
+    },
+    invisible: {
+      scale: 0,
+      opacity: 0,
+    },
+  };
+
   return (
-    <>
+    <Group onMouseOver={() => setHovered(true)} onMouseOut={() => setHovered(false)}>
       <rect height={height} width={width} className={classes.group} rx={50} />
       {children.map((child, idx) => {
         const inverted = idx % 2 == (startInverted ? 1 : 0);
@@ -60,7 +79,7 @@ function GroupedTimelineYear({ width, height, startInverted, header, children }:
       <foreignObject x={50} y={startInverted ? 50 : height - 120} width={100} height={100}>
         {header}
       </foreignObject>
-    </>
+    </Group>
   );
 }
 
@@ -85,15 +104,15 @@ function Line({ groups }: LineProps) {
     cursor += distance + GROUP_GAP;
   }
 
-  const lineNotchDown = "q 20,0 20,20 v 40 v -40 q 0,-20, 20,-20";
-  const lineNotchUp = "q 20,0 20,-20 v -40 v 40 q 0,20, 20,20";
+  const lineNotchDown = "q 20,0 20,20 v 20 v -20 q 0,-20, 20,-20";
+  const lineNotchUp = "q 20,0 20,-20 v -20 v 20 q 0,20, 20,20";
   const linePath = points.map((point, idx) => `L ${point - 20} 0 ${idx % 2 ? lineNotchUp : lineNotchDown}`).join(" ");
 
   return (
     <>
       <path d={`M 0 0 ${linePath}`} className={classes.line} />
       {points.map((point, idx) => (
-        <circle key={point} cx={point} cy={idx % 2 ? -60 : 60} r={25} className={classes.lineNotch} />
+        <circle key={point} cx={point} cy={idx % 2 ? -40 : 40} r={15} className={classes.lineNotch} />
       ))}
     </>
   );

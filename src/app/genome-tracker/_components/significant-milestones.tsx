@@ -48,15 +48,33 @@ type Milestone = {
   canonicalName: string;
   accession?: string;
   date: Date;
+  publicationDoi?: string;
+  vernacularName?: string;
 };
 
+function getAttrString(attrs: Attribute[], name: string): string | undefined {
+  return attrs.find((attr) => attr.name == name)?.value;
+}
+
+function getAttrDate(attrs: Attribute[], name: string): Date | undefined {
+  const value = attrs.find((attr) => attr.name == name)?.value;
+  return value ? new Date(value) : undefined;
+}
+
 function getAccession(attrs: Attribute[]): string | undefined {
-  return attrs.find((attr) => attr.name == "milestone_assembly_accession")?.value;
+  return getAttrString(attrs, "milestone_assembly_accession");
+}
+
+function getPublicationDOI(attrs: Attribute[]): string | undefined {
+  return getAttrString(attrs, "publication_doi");
+}
+
+function getVernacularName(attrs: Attribute[]): string | undefined {
+  return getAttrString(attrs, "vernacular_name");
 }
 
 function getReleaseDate(attrs: Attribute[]): Date | undefined {
-  const value = attrs.find((attr) => attr.name == "milestone_assembly_release_date")?.value;
-  return value ? new Date(value) : undefined;
+  return getAttrDate(attrs, "milestone_assembly_release_date");
 }
 
 interface MilestoneItemProps {
@@ -71,11 +89,9 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
   const variants = {
     expanded: {
       opacity: 1.0,
-      height: 130,
     },
     compact: {
       opacity: 0.7,
-      height: 80,
     },
     visible: {
       opacity: 1.0,
@@ -100,7 +116,7 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
         <Link href={genomeHref}>
           <Stack px="sm" pt="md" pb="xs" justify="space-between" h={130}>
             <Text className={classes.text}>
-              <i>{milestone.canonicalName}</i>
+              {milestone.vernacularName} (<i>{milestone.canonicalName}</i>) genome published
             </Text>
 
             <motion.div animate={hovered ? "visible" : "invisible"} variants={variants}>
@@ -124,14 +140,16 @@ export function SignificantMilestones() {
       canonicalName: record.taxonomy.canonicalName,
       accession: getAccession(record.taxonomy.attributes),
       date: getReleaseDate(record.taxonomy.attributes) || new Date(),
+      publicationDoi: getPublicationDOI(record.taxonomy.attributes),
+      vernacularName: getVernacularName(record.taxonomy.attributes),
     }))
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
     <ScrollArea.Autosize>
-      <GroupedTimeline height={500}>
+      <GroupedTimeline height={450}>
         {milestones?.map((milestone) => (
-          <GroupedTimeline.Item width={200} height={150} date={milestone.date} key={milestone.accession}>
+          <GroupedTimeline.Item width={250} height={150} date={milestone.date} key={milestone.accession}>
             <MilestoneItem milestone={milestone} />
           </GroupedTimeline.Item>
         ))}
