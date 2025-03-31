@@ -443,7 +443,7 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
   const minDate = new Date("2009-01-01");
   const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const group = (queryMap as Record<string, ListGroup>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 

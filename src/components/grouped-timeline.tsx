@@ -51,7 +51,7 @@ function GroupedTimelineYear({ width, height, startInverted, header, children }:
         const left = childOffset - childCenter;
 
         return (
-          <Group left={left} top={inverted ? top - child.props.height : bottom}>
+          <Group key={child.props.date.toString()} left={left} top={inverted ? top - child.props.height : bottom}>
             {child}
           </Group>
         );
@@ -93,7 +93,7 @@ function Line({ groups }: LineProps) {
     <>
       <path d={`M 0 0 ${linePath}`} className={classes.line} />
       {points.map((point, idx) => (
-        <circle cx={point} cy={idx % 2 ? -60 : 60} r={25} className={classes.lineNotch} />
+        <circle key={point} cx={point} cy={idx % 2 ? -60 : 60} r={25} className={classes.lineNotch} />
       ))}
     </>
   );
@@ -140,7 +140,7 @@ export function GroupedTimeline({ height, children }: GroupedTimelineProps) {
         childrenAccumulator += group.children.length;
 
         return (
-          <Group left={left}>
+          <Group key={year} left={left}>
             <GroupedTimelineYear
               width={group.width}
               height={height}

@@ -131,7 +131,7 @@ export function SignificantMilestones() {
     <ScrollArea.Autosize>
       <GroupedTimeline height={500}>
         {milestones?.map((milestone) => (
-          <GroupedTimeline.Item width={200} height={150} date={milestone.date}>
+          <GroupedTimeline.Item width={200} height={150} date={milestone.date} key={milestone.accession}>
             <MilestoneItem milestone={milestone} />
           </GroupedTimeline.Item>
         ))}

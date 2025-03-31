@@ -144,7 +144,7 @@ export default function GenomeTracker() {
                 </Stack>
                 <Stack my="xl" gap="xl">
                   <Text size="xl" fw="bold">
-                    Significant milestones in the genome sequencing of Australia's biodiversity
+                    Significant milestones in the genome sequencing of Australia&apos;s biodiversity
                   </Text>
                   <SignificantMilestones />
                 </Stack>
