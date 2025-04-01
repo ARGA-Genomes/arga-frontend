@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
 import {
@@ -12,19 +11,13 @@ import {
   Group,
   Stack,
   Container,
-  Drawer,
   Box,
   Grid,
-  Button,
-  Accordion,
-  Badge,
-  Avatar,
   useMantineTheme,
   Anchor,
   Image,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconFilter, IconExternalLink } from "@tabler/icons-react";
+import { IconExternalLink } from "@tabler/icons-react";
 import { Photo } from "@/app/type";
 import Link from "next/link";
 
@@ -34,19 +27,16 @@ import { PaginationBar } from "@/components/pagination";
 import { DataPageCitation } from "@/components/page-citation";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
-import { HasDataFilters } from "@/components/filtering/has-data";
-import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 
 import classes from "../../../../components/record-list.module.css";
 import { map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
+import { FiltersDrawer } from "@/components/filtering-redux/drawer";
+import { DataTypeFilter, DataTypeFilters, DEFAULT_FILTERS, toQuery } from "@/components/filtering-redux/data-type";
+import { BoolFilterChips } from "@/components/filtering-redux/_filters/bool";
 
 const PAGE_SIZE = 10;
-interface Filters {
-  classifications: Filter[];
-  dataTypes: Filter[];
-}
 
 const GET_DETAILS = gql`
   query SourceDetails($name: String, $speciesAttribute: NameAttributeFilter) {
@@ -180,104 +170,17 @@ interface SpeciesQueryResults {
   };
 }
 
-interface FiltersProps {
-  filters: Filters;
-  onChange: (filters: Filters) => void;
-}
-
-function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications);
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
-
-  useEffect(() => {
-    onChange({
-      classifications,
-      dataTypes,
-    });
-  }, [classifications, dataTypes, onChange]);
-
-  return (
-    <Accordion defaultValue="hasData" variant="separated">
-      <Accordion.Item value="hasData">
-        <Accordion.Control>
-          <FilterGroup
-            label="Data types"
-            description="Only show species that have specific types of data"
-            image="/icons/data-type/Data type_ Whole genome.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <HasDataFilters filters={dataTypes} onChange={setDataTypes} />
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="classification">
-        <Accordion.Control>
-          <FilterGroup
-            label="Higher classification filters"
-            description="Limit data based on taxonomy"
-            image="/icons/data-type/Data type_ Higher taxon report.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
-  );
-}
-
-interface FilterGroupProps {
-  label: string;
-  description: string;
-  image: string;
-}
-
-function FilterGroup({ label, description, image }: FilterGroupProps) {
-  return (
-    <Group wrap="nowrap">
-      <Avatar src={image} size="lg" />
-      <div>
-        <Text>{label}</Text>
-        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
-          {description}
-        </Text>
-      </div>
-    </Group>
-  );
-}
-
-function FilterBadge({ filter }: { filter: Filter }) {
-  return (
-    <Badge variant="outline">
-      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
-    </Badge>
-  );
-}
-
 function Species({ group }: { group: ListGroup }) {
   const [page, setPage] = useState(1);
-  const [opened, { open, close }] = useDisclosure(false);
 
-  const [filters, setFilters] = useState<Filters>({
-    classifications: [],
-    dataTypes: [],
-  });
-
-  const flattenFilters = (filters: Filters) => {
-    const items = [...filters.classifications, ...filters.dataTypes];
-
-    return items.filter((item): item is Filter => !!item);
-  };
+  const [filters, setFilters] = useState<DataTypeFilter[]>(DEFAULT_FILTERS);
 
   const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
     variables: {
       page,
       pageSize: PAGE_SIZE,
       name: group.source,
-      filters: flattenFilters(filters)
-        .map(intoFilterItem)
-        .filter((item) => item),
+      filters: toQuery(filters),
       speciesAttribute: group.filter || null,
     },
   });
@@ -286,12 +189,6 @@ function Species({ group }: { group: ListGroup }) {
 
   return (
     <Stack>
-      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
-        <Box pt={200}>
-          <Filters filters={filters} onChange={setFilters} />
-        </Box>
-      </Drawer>
-
       <LoadOverlay visible={loading} />
 
       <Grid gutter={50} align="baseline">
@@ -304,16 +201,14 @@ function Species({ group }: { group: ListGroup }) {
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            {flattenFilters(filters).map((filter, idx) => (
-              <FilterBadge key={idx} filter={filter} />
-            ))}
+            <BoolFilterChips filters={filters} onRemove={setFilters} />
           </Group>
         </Grid.Col>
 
         <Grid.Col span="content">
-          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>
-            Filter
-          </Button>
+          <FiltersDrawer>
+            <DataTypeFilters filters={filters} onChange={setFilters} />
+          </FiltersDrawer>
         </Grid.Col>
       </Grid>
 
