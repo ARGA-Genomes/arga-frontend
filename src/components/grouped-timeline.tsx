@@ -3,6 +3,7 @@
 import classes from "./grouped-timeline.module.css";
 
 import { Group } from "@visx/group";
+import { motion } from "framer-motion";
 import { ReactElement, ReactNode, useState } from "react";
 
 const GROUP_GAP = 15;
@@ -17,7 +18,7 @@ interface GroupedTimelineItemProps {
 function GroupedTimelineItem({ width, height, children }: GroupedTimelineItemProps) {
   return (
     <Group>
-      <foreignObject width={width} height={height}>
+      <foreignObject width={width} height={height} overflow="invisible">
         {children}
       </foreignObject>
     </Group>
@@ -43,43 +44,39 @@ function GroupedTimelineYear({ width, height, startInverted, header, children }:
   const offset = width / (children.length + 1);
 
   const variants = {
-    expanded: {
-      width: width,
-    },
-    compact: {
-      width: 300,
-    },
-    visible: {
-      scale: 1,
+    hovered: {
       opacity: 1,
+      scale: 1,
     },
-    invisible: {
-      scale: 0,
-      opacity: 0,
+    unhovered: {
+      opacity: 0.8,
+      scale: 0.9,
     },
   };
 
   return (
-    <Group onMouseOver={() => setHovered(true)} onMouseOut={() => setHovered(false)}>
-      <rect height={height} width={width} className={classes.group} rx={50} />
-      {children.map((child, idx) => {
-        const inverted = idx % 2 == (startInverted ? 1 : 0);
+    <motion.g animate={hovered ? "hovered" : "unhovered"}>
+      <Group onMouseOver={() => setHovered(true)} onMouseOut={() => setHovered(false)}>
+        <rect height={height} width={width} className={classes.group} rx={50} />
+        {children.map((child, idx) => {
+          const inverted = idx % 2 == (startInverted ? 1 : 0);
 
-        const childOffset = offset * (idx + 1);
-        const childCenter = child.props.width / 2;
-        const left = childOffset - childCenter;
+          const childOffset = offset * (idx + 1);
+          const childCenter = child.props.width / 2;
+          const left = childOffset - childCenter;
 
-        return (
-          <Group key={child.props.date.toString()} left={left} top={inverted ? top - child.props.height : bottom}>
-            {child}
-          </Group>
-        );
-      })}
+          return (
+            <Group key={child.props.date.toString()} left={left} top={inverted ? top - child.props.height : bottom}>
+              {child}
+            </Group>
+          );
+        })}
 
-      <foreignObject x={50} y={startInverted ? 50 : height - 120} width={100} height={100}>
-        {header}
-      </foreignObject>
-    </Group>
+        <foreignObject x={50} y={startInverted ? 50 : height - 120} width={100} height={100}>
+          {header}
+        </foreignObject>
+      </Group>
+    </motion.g>
   );
 }
 
@@ -171,6 +168,7 @@ export function GroupedTimeline({ height, children }: GroupedTimelineProps) {
           </Group>
         );
       })}
+
       <Group top={height / 2}>
         <Line groups={years} />
       </Group>

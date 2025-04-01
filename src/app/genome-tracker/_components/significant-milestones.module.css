@@ -2,9 +2,15 @@
     cursor: pointer;
     background-color: white;
     border-radius: var(--mantine-radius-lg);
-    margin-top: var(--mantine-spacing-sm);
-    margin-bottom: var(--mantine-spacing-sm);
     box-shadow: var(--mantine-shadow-sm);
+    overflow: hidden;
+}
+
+.itemDetails {
+    cursor: pointer;
+    background-color: var(--mantine-color-gray-2);
+    padding-left: var(--mantine-spacing-md);
+    padding-right: var(--mantine-spacing-md);
 }
 
 .itemYear {
@@ -20,9 +26,15 @@
 
 .text {
     font-weight: 700;
-    font-size: 14px;
+    font-size: var(--mantine-font-size-sm);
     color: var(--mantine-color-midnight-8);
     text-align: center;
+}
+
+.detailsText {
+    font-weight: 500;
+    font-size: var(--mantine-font-size-xs);
+    color: var(--mantine-color-midnight-8);
 }
 
 .buttonText {
