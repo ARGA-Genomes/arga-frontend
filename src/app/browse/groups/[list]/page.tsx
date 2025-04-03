@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, ReactElement } from "react";
 import { SpeciesCard } from "@/components/species-card";
 import { gql, useQuery } from "@apollo/client";
 import {
@@ -33,8 +33,7 @@ import { map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
 import { FiltersDrawer } from "@/components/filtering-redux/drawer";
-import { DataTypeFilter, DataTypeFilters, DEFAULT_FILTERS, toQuery } from "@/components/filtering-redux/data-type";
-import { BoolFilterChips } from "@/components/filtering-redux/_filters/bool";
+import { FilterItem } from "@/components/filtering-redux/filters/common";
 
 const PAGE_SIZE = 10;
 
@@ -173,14 +172,15 @@ interface SpeciesQueryResults {
 function Species({ group }: { group: ListGroup }) {
   const [page, setPage] = useState(1);
 
-  const [filters, setFilters] = useState<DataTypeFilter[]>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<FilterItem[]>([]);
+  const [filterChips, setFilterChips] = useState<ReactElement[] | null>(null);
 
   const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
     variables: {
       page,
       pageSize: PAGE_SIZE,
       name: group.source,
-      filters: toQuery(filters),
+      filters: filters,
       speciesAttribute: group.filter || null,
     },
   });
@@ -201,14 +201,12 @@ function Species({ group }: { group: ListGroup }) {
             <Text fz="sm" fw={300}>
               Filters
             </Text>
-            <BoolFilterChips filters={filters} onRemove={setFilters} />
+            <Group gap="xs">{filterChips}</Group>
           </Group>
         </Grid.Col>
 
         <Grid.Col span="content">
-          <FiltersDrawer>
-            <DataTypeFilters filters={filters} onChange={setFilters} />
-          </FiltersDrawer>
+          <FiltersDrawer types={["dataType", "classification"]} onFilter={setFilters} onFilterChips={setFilterChips} />
         </Grid.Col>
       </Grid>
 

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { FilterGroup } from "./group";
+import { useEffect } from "react";
+import { FilterGroup } from "../group";
 
-import { FilterType, FilterItem } from "./_filters/common";
-import { BoolFilter } from "./_filters/bool";
+import { FilterType, FilterItem } from "../filters/common";
+import { BoolFilter } from "../filters/bool";
 
 export interface DataTypeFilter {
   value: string;
@@ -11,7 +11,7 @@ export interface DataTypeFilter {
   disabled: boolean;
 }
 
-export const toQuery = (filters: DataTypeFilter[]): FilterItem[] =>
+export const dataTypeFiltersToQuery = (filters: DataTypeFilter[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
     .map(({ include, value }) => ({
@@ -39,7 +39,7 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
       )
     );
 
-  const handleActionToggle = (value: string, include: boolean) =>
+  const handleIncludeToggle = (value: string, include: boolean) =>
     onChange(
       filters.map((newFilter) =>
         newFilter.value === value
@@ -65,14 +65,14 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
           key={filter.value}
           {...filter}
           onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
-          onIncludeToggle={(include) => handleActionToggle(filter.value, include)}
+          onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
         />
       ))}
     </FilterGroup>
   );
 }
 
-export const DEFAULT_FILTERS = ["Genome", "Locus", "Specimen", "Other"].map((value) => ({
+export const DEFAULT_DATA_TYPE_FILTERS = ["Genome", "Locus", "Specimen", "Other"].map((value) => ({
   value,
   active: false,
   disabled: false,

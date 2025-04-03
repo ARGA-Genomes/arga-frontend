@@ -1,0 +1,7 @@
+.option {
+  border-radius: var(--mantine-radius-lg);
+}
+
+.option[data-combobox-selected="true"] {
+  background-color: var(--mantine-color-midnight-9);
+}
