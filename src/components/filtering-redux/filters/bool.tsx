@@ -1,6 +1,6 @@
 import { Checkbox, Chip, Flex, SegmentedControl, Text } from "@mantine/core";
 import { DataTypeFilter } from "../groups/data-type";
-import { IconTrashFilled, IconX } from "@tabler/icons-react";
+import { IconTrashFilled } from "@tabler/icons-react";
 
 interface BoolFilterProps extends DataTypeFilter {
   onActiveToggle: (checked: boolean) => void;

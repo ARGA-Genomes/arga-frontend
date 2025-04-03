@@ -1,4 +1,4 @@
-import { Accordion, Divider, Flex, Group, Image, Stack, Text } from "@mantine/core";
+import { Accordion, Divider, Flex, Image, Stack, Text } from "@mantine/core";
 import classes from "./group.module.css";
 import { PropsWithChildren } from "react";
 

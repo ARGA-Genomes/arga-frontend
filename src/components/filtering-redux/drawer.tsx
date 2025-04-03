@@ -1,4 +1,4 @@
-import { Button, Drawer, Group, Stack } from "@mantine/core";
+import { Button, Drawer, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAdjustments } from "@tabler/icons-react";
 import { FilterItem } from "./filters/common";

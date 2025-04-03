@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react";
 
 import classes from "./taxon.module.css";
 import { ClassificationFilter } from "../groups/classification";
-import { IconTrashFilled, IconX } from "@tabler/icons-react";
+import { IconTrashFilled } from "@tabler/icons-react";
 
 export interface TaxonAutocomplete {
   commonName: string | null;
