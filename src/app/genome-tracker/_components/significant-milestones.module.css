@@ -1,23 +1,46 @@
 .item {
-    fill: var(--mantine-color-wheat-5);
+    cursor: pointer;
+    background-color: white;
+    border-radius: var(--mantine-radius-lg);
+    box-shadow: var(--mantine-shadow-sm);
+    overflow: hidden;
+}
+
+.itemDetails {
+    cursor: pointer;
+    background-color: var(--mantine-color-gray-2);
+    padding-left: var(--mantine-spacing-md);
+    padding-right: var(--mantine-spacing-md);
+}
+
+.itemYear {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--mantine-color-shellfish-6);
 }
 
 .itemButton {
-    fill: var(--mantine-color-midnight-8);
+    border-radius: var(--mantine-radius-xl);
+    background-color: var(--mantine-color-midnight-8);
 }
 
 .text {
     font-weight: 700;
-    font-size: 14px;
-    fill: var(--mantine-color-midnight-8);
-    text-anchor: start;
-    dominant-baseline: middle;
+    font-size: var(--mantine-font-size-sm);
+    color: var(--mantine-color-midnight-8);
+    text-align: center;
+}
+
+.detailsText {
+    font-weight: 500;
+    font-size: var(--mantine-font-size-xs);
+    color: var(--mantine-color-midnight-8);
 }
 
 .buttonText {
-    font-weight: 700;
-    font-size: 14px;
-    fill: var(--mantine-color-midnight-1);
+    font-weight: 600;
+    font-size: var(--mantine-font-size-sm);
+    color: var(--mantine-color-midnight-8);
     text-anchor: start;
     dominant-baseline: middle;
 }

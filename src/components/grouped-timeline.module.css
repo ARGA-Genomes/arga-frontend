@@ -1,0 +1,45 @@
+.group {
+    fill: #edf5f4;
+}
+
+.itemYear {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--mantine-color-shellfish-6);
+}
+
+.itemButton {
+    border-radius: var(--mantine-radius-xl);
+    background-color: var(--mantine-color-midnight-8);
+}
+
+.text {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--mantine-color-midnight-8);
+    text-align: center;
+}
+
+.buttonText {
+    font-weight: 700;
+    font-size: 14px;
+    fill: var(--mantine-color-midnight-1);
+    text-anchor: start;
+    dominant-baseline: middle;
+}
+
+.bullet {
+    fill: var(--mantine-color-midnight-8);
+}
+
+.line {
+    stroke: var(--mantine-color-bushfire-5);
+    stroke-width: 7;
+    fill: none;
+}
+
+.lineNotch {
+    stroke: var(--mantine-color-wheat-5);
+    stroke-width: 7;
+    fill: white;
+}

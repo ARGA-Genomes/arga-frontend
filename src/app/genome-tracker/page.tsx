@@ -141,7 +141,12 @@ export default function GenomeTracker() {
                   <Box h={500}>
                     <GenomeCompletion taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" domain={[minDate, maxDate]} />
                   </Box>
-                  <SignificantMilestones domain={[minDate, maxDate]} />
+                </Stack>
+                <Stack my="xl" gap="xl">
+                  <Text size="xl" fw="bold">
+                    Significant milestones in the genome sequencing of Australia&apos;s biodiversity
+                  </Text>
+                  <SignificantMilestones />
                 </Stack>
               </Paper>
               <Paper p="lg" radius="lg" withBorder>

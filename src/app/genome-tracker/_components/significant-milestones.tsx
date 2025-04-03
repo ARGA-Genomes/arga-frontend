@@ -3,14 +3,13 @@
 import classes from "./significant-milestones.module.css";
 
 import { gql, useQuery } from "@apollo/client";
-import { ScrollArea } from "@mantine/core";
-import { Group } from "@visx/group";
-import { ParentSize } from "@visx/responsive";
-import { scaleLinear, scaleTime } from "@visx/scale";
-import { Circle } from "@visx/shape";
-import { Text as SvgText } from "@visx/text";
+import { Center, Paper, ScrollArea, Stack } from "@mantine/core";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Group, Text } from "@mantine/core";
+import { GroupedTimeline } from "@/components/grouped-timeline";
+import { IconArrowRight, IconBook } from "@tabler/icons-react";
+import Link from "next/link";
 
 const GET_SIGNIFICANT_MILESTONES = gql`
   query SignificantMilestones {
@@ -48,102 +47,168 @@ interface Attribute {
 type Milestone = {
   canonicalName: string;
   accession?: string;
-  date?: Date;
+  date: Date;
+  publicationDoi?: string;
+  vernacularName?: string;
+  firsts?: string;
+  significance?: string;
 };
 
-interface MilestoneItemProps {
-  milestone: Milestone;
-  x: number;
-  y: number;
-  height: number;
+function getAttrString(attrs: Attribute[], name: string): string | undefined {
+  return attrs.find((attr) => attr.name == name)?.value;
 }
 
-function getAccession(attrs: Attribute[]): string | undefined {
-  return attrs.find((attr) => attr.name == "milestone_assembly_accession")?.value;
-}
-
-function getReleaseDate(attrs: Attribute[]): Date | undefined {
-  const value = attrs.find((attr) => attr.name == "milestone_assembly_release_date")?.value;
+function getAttrDate(attrs: Attribute[], name: string): Date | undefined {
+  const value = attrs.find((attr) => attr.name == name)?.value;
   return value ? new Date(value) : undefined;
 }
 
-function MilestoneItem({ milestone, x, y, height }: MilestoneItemProps) {
-  const [hovered, setHovered] = useState<boolean>(false);
+function getAccession(attrs: Attribute[]): string | undefined {
+  return getAttrString(attrs, "milestone_assembly_accession");
+}
 
-  const bulletOffset = { x: 30, y: height / 2 };
-  /* const text = `${milestone.date?.getFullYear()}: ${milestone.canonicalName} - ${milestone.accession}`; */
-  const text = `${milestone.canonicalName}`;
-  const textFull = `${milestone.date?.getFullYear()}: ${milestone.canonicalName} - ${milestone.accession}`;
+function getPublicationDOI(attrs: Attribute[]): string | undefined {
+  return getAttrString(attrs, "publication_doi");
+}
 
+function getVernacularName(attrs: Attribute[]): string | undefined {
+  return getAttrString(attrs, "vernacular_name");
+}
+
+function getFirsts(attrs: Attribute[]): string | undefined {
+  return getAttrString(attrs, "firsts");
+}
+
+function getSignificance(attrs: Attribute[]): string | undefined {
+  return getAttrString(attrs, "significance");
+}
+
+function getReleaseDate(attrs: Attribute[]): Date | undefined {
+  return getAttrDate(attrs, "milestone_assembly_release_date");
+}
+
+interface MilestoneItemDetails {
+  milestone: Milestone;
+  visible: boolean;
+}
+
+function MilestoneItemDetails({ milestone, visible }: MilestoneItemDetails) {
   const variants = {
     expanded: {
-      width: textFull.length * 10 + bulletOffset.x,
-      opacity: 1.0,
+      opacity: 1,
+      height: 100,
+      /* scale: 1, */
     },
     compact: {
-      width: text.length * 10 + bulletOffset.x,
-      opacity: 0.5,
-    },
-    visible: {
-      opacity: 1.0,
-    },
-    invisible: {
-      opacity: 0.0,
+      /* opacity: 0, */
+      height: 0,
+      /* scale: 0, */
     },
   };
 
   return (
-    <Group left={x - bulletOffset.x} top={y} onMouseOver={() => setHovered(true)} onMouseOut={() => setHovered(false)}>
-      <motion.rect
-        className={classes.item}
-        height={height}
-        ry={20}
-        animate={hovered ? "expanded" : "compact"}
-        variants={variants}
-      />
-      <Group left={bulletOffset.x} top={bulletOffset.y}>
-        <Circle r={6} className={classes.bullet} />
+    <Paper
+      component={motion.div}
+      className={classes.itemDetails}
+      animate={visible ? "expanded" : "compact"}
+      variants={variants}
+    >
+      <Stack justify="space-between">
+        <Stack gap={0}>
+          <Text className={classes.detailsText}>{milestone.firsts}</Text>
+          <Text className={classes.detailsText}>{milestone.significance}</Text>
+        </Stack>
 
-        <motion.g animate={hovered ? "invisible" : "visible"} variants={variants}>
-          <SvgText x={30} className={classes.text}>
-            {text}
-          </SvgText>
-        </motion.g>
-
-        <motion.g animate={hovered ? "visible" : "invisible"} variants={variants}>
-          <SvgText x={30} className={classes.text}>
-            {textFull}
-          </SvgText>
-        </motion.g>
-      </Group>
-
-      <Group left={textFull.length * 10 + bulletOffset.x + 10}>
-        <motion.rect
-          ry={20}
-          height={height}
-          width={80}
-          className={classes.itemButton}
-          animate={hovered ? "visible" : "invisible"}
-          variants={variants}
-        />
-        <motion.g animate={hovered ? "visible" : "invisible"} variants={variants}>
-          <SvgText x={23} y={height / 3} className={classes.buttonText}>
-            view
-          </SvgText>
-          <SvgText x={13} y={(height / 3) * 2} className={classes.buttonText}>
-            genome
-          </SvgText>
-        </motion.g>
-      </Group>
-    </Group>
+        <Stack gap={0}>
+          <Group component={motion.span} justify="space-between" wrap="nowrap">
+            <Text className={classes.buttonText}>view publication</Text>
+            <IconBook className={classes.buttonText} />
+          </Group>
+          <Group component={motion.span} justify="space-between" wrap="nowrap">
+            <Text className={classes.buttonText}>view genome</Text>
+            <IconArrowRight className={classes.buttonText} />
+          </Group>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 }
 
-interface SignificantMilestonesProps {
-  domain: [Date, Date];
+interface MilestoneItemHeaderProps {
+  milestone: Milestone;
+  compact: boolean;
 }
 
-export function SignificantMilestones({ domain }: SignificantMilestonesProps) {
+function MilestoneItemHeader({ milestone, compact }: MilestoneItemHeaderProps) {
+  const variants = {
+    expanded: {
+      height: 140,
+    },
+    compact: {
+      height: 40,
+      paddingTop: 10,
+    },
+    visible: {
+      opacity: 1,
+    },
+    invisible: {
+      opacity: 0,
+    },
+  };
+
+  return (
+    <Paper component={motion.div} animate={compact ? "compact" : "expanded"} variants={variants}>
+      <Center h="inherit">
+        <Stack px="sm" pb="xs" gap={0}>
+          <Text className={classes.text}>{milestone.vernacularName}</Text>
+          <Text
+            component={motion.span}
+            animate={compact ? "invisible" : "visible"}
+            variants={variants}
+            className={classes.text}
+            fz="xs"
+            fs="italic"
+          >
+            {milestone.canonicalName}
+          </Text>
+        </Stack>
+      </Center>
+    </Paper>
+  );
+}
+
+interface MilestoneItemProps {
+  milestone: Milestone;
+  inverted?: boolean;
+}
+
+function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
+  const [hovered, setHovered] = useState<boolean>(false);
+  const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/whole_genomes/${milestone.accession}`;
+
+  const details = <MilestoneItemDetails milestone={milestone} visible={hovered} />;
+
+  return (
+    <Center>
+      <Link href={genomeHref}>
+        <Paper
+          onMouseOver={() => setHovered(true)}
+          onMouseOut={() => setHovered(false)}
+          h={140}
+          withBorder
+          className={classes.item}
+        >
+          <Stack gap={0}>
+            {details}
+            <MilestoneItemHeader milestone={milestone} compact={hovered} />
+          </Stack>
+        </Paper>
+      </Link>
+    </Center>
+  );
+}
+
+export function SignificantMilestones() {
   const { data } = useQuery<SignificantMilestonesQuery>(GET_SIGNIFICANT_MILESTONES);
 
   const milestones = data?.source.species.records
@@ -151,36 +216,22 @@ export function SignificantMilestones({ domain }: SignificantMilestonesProps) {
       canonicalName: record.taxonomy.canonicalName,
       accession: getAccession(record.taxonomy.attributes),
       date: getReleaseDate(record.taxonomy.attributes) || new Date(),
+      publicationDoi: getPublicationDOI(record.taxonomy.attributes),
+      vernacularName: getVernacularName(record.taxonomy.attributes),
+      firsts: getFirsts(record.taxonomy.attributes),
+      significance: getSignificance(record.taxonomy.attributes),
     }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .reverse();
-
-  const maxY = milestones?.length ?? 0;
-  const height = 40;
-  const yScale = scaleLinear({ range: [0, maxY * (height + 10)], domain: [0, maxY] });
-  const totalHeight = yScale(maxY);
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
-    <ScrollArea h={300}>
-      <ParentSize>
-        {(parent) => {
-          const xScale = scaleTime({ range: [0, parent.width], domain });
-
-          return (
-            <svg height={totalHeight} width={parent.width} overflow="visible">
-              {milestones?.map((milestone, idx) => (
-                <MilestoneItem
-                  key={milestone.canonicalName}
-                  milestone={milestone}
-                  x={xScale(milestone.date)}
-                  y={yScale(milestones.length - idx)}
-                  height={height}
-                />
-              ))}
-            </svg>
-          );
-        }}
-      </ParentSize>
-    </ScrollArea>
+    <ScrollArea.Autosize>
+      <GroupedTimeline height={450}>
+        {milestones?.map((milestone, idx) => (
+          <GroupedTimeline.Item width={250} height={150} date={milestone.date} key={milestone.accession}>
+            <MilestoneItem milestone={milestone} inverted={idx % 2 == 1} />
+          </GroupedTimeline.Item>
+        ))}
+      </GroupedTimeline>
+    </ScrollArea.Autosize>
   );
 }
