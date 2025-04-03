@@ -36,7 +36,7 @@ import {
   IconFileZip,
   IconSortDescending,
   IconTerminal2,
-  IconTrash,
+  IconTrashFilled,
 } from "@tabler/icons-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
@@ -347,7 +347,7 @@ function SavedDataItem({ item, onRemove, onSelected, onDeselected }: SaveDataIte
             }}
             h={100}
           >
-            <IconTrash style={{ width: rem(35), height: rem(35) }} />
+            <IconTrashFilled style={{ width: rem(35), height: rem(35) }} />
           </Button>
         </Group>
       </Card.Section>
