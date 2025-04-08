@@ -847,7 +847,7 @@ const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "G
 export default function ClassificationPage(props: ClassificationPageProps) {
   const params = use(props.params);
   const rank = params.rank.toUpperCase();
-  const lowerRank = CLASSIFICATIONS_CHILD_MAP[rank].toUpperCase() || "";
+  const lowerRank = CLASSIFICATIONS_CHILD_MAP[rank]?.toUpperCase() || "";
 
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;

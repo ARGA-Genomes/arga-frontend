@@ -9,7 +9,7 @@ import { AttributePill as AttributePillStack } from "@/components/highlight-stac
 import { AttributePill } from "@/components/data-fields";
 import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
-import { SpeciesImage } from "@/components/species-image";
+import { SpeciesPhoto } from "@/components/species-image";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { ExternalLinkButton } from "@/components/button-link-external";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
@@ -131,11 +131,7 @@ function SummaryInfo({ label, value }: SummaryInfoProps) {
   );
 }
 
-function DataSummary({
-  speciesData,
-}: {
-  speciesData: speciesDataSummary | undefined;
-}) {
+function DataSummary({ speciesData }: { speciesData: speciesDataSummary | undefined }) {
   return (
     <Paper radius={16} p="md" withBorder>
       <Text fw={700} size="lg" pb={10}>
@@ -150,19 +146,10 @@ function DataSummary({
                   Whole genome data
                 </Text>
                 <Stack justify="space-between" pl={10}>
-                  <SummaryInfo
-                    label="Whole genome assemblies"
-                    value={speciesData?.genomes}
-                  />
-                  <SummaryInfo
-                    label="Partial genome assemblies"
-                    value="No data"
-                  />
+                  <SummaryInfo label="Whole genome assemblies" value={speciesData?.genomes} />
+                  <SummaryInfo label="Partial genome assemblies" value="No data" />
                   <SummaryInfo label="Genome annotations" value="No data" />
-                  <SummaryInfo
-                    label="Organellar genome assemblies"
-                    value="No data"
-                  />
+                  <SummaryInfo label="Organellar genome assemblies" value="No data" />
                 </Stack>
               </Stack>
               <Stack>
@@ -171,10 +158,7 @@ function DataSummary({
                 </Text>
                 <Stack justify="space-between" pl={10}>
                   <SummaryInfo label="Sequence read files" value="No data" />
-                  <SummaryInfo
-                    label="Sequence alignment files"
-                    value="No data"
-                  />
+                  <SummaryInfo label="Sequence alignment files" value="No data" />
                 </Stack>
               </Stack>
               <Stack>
@@ -244,15 +228,9 @@ function ExternalResources(props: ExternalResourcesProps) {
   useEffect(() => {
     async function matchTaxon() {
       try {
-        const response = await fetch(
-          `https://api.ala.org.au/species/guid/${encodeURIComponent(
-            props.canonicalName,
-          )}`,
-        );
+        const response = await fetch(`https://api.ala.org.au/species/guid/${encodeURIComponent(props.canonicalName)}`);
         const matches = (await response.json()) as TaxonMatch[];
-        setMatchedTaxon(
-          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
-        );
+        setMatchedTaxon(matches.map(({ acceptedIdentifier }) => acceptedIdentifier));
       } catch {
         setMatchedTaxon([]);
       }
@@ -361,10 +339,9 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
               hoverColor="midnight.0"
               label={Humanize.capitalize(node.rank.toLowerCase())}
               value={node.canonicalName}
-              href={`/${
-                taxonRankMappings[node.rank.toUpperCase()]?.toLowerCase() ||
-                node.rank.toLowerCase()
-              }/${node.canonicalName}`}
+              href={`/${taxonRankMappings[node.rank.toUpperCase()]?.toLowerCase() || node.rank.toLowerCase()}/${
+                node.canonicalName
+              }`}
               icon={IconArrowUpRight}
               showIconOnHover
               miw={100}
@@ -374,10 +351,6 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
       </Group>
     </Paper>
   );
-}
-
-function SpeciesPhoto({ photo }: { photo?: Photo }) {
-  return <SpeciesImage photo={photo} />;
 }
 
 export default function SummaryPage({ params }: { params: { name: string } }) {
@@ -403,10 +376,7 @@ export default function SummaryPage({ params }: { params: { name: string } }) {
         <DataSummary speciesData={data?.species.dataSummary} />
       </Grid.Col>
       <Grid.Col span={{ base: "auto", xl: 3 }}>
-        <ExternalResources
-          canonicalName={canonicalName}
-          species={data?.species}
-        />
+        <ExternalResources canonicalName={canonicalName} species={data?.species} />
       </Grid.Col>
       {taxonomy && (
         <Grid.Col span={12}>

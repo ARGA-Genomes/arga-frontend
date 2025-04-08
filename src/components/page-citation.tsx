@@ -68,6 +68,7 @@ export function PageCitation() {
                       onClick={() => {
                         clipboard.copy(citation.current?.innerText);
                       }}
+                      radius="md"
                     >
                       <IconCopy size={14} />
                     </ActionIcon>
@@ -119,6 +120,7 @@ export function DataPageCitation() {
                       onClick={() => {
                         clipboard.copy(citation.current?.innerText);
                       }}
+                      radius="md"
                     >
                       <IconCopy size={14} />
                     </ActionIcon>

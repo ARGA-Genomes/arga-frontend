@@ -1,0 +1,43 @@
+.table {
+  border-radius: var(--mantine-radius-lg);
+}
+
+.td {
+  color: var(--mantine-color-midnight-10);
+}
+
+/*
+ Table highlight column definitions
+*/
+
+.table .thead td {
+  transition: all ease-out 200ms;
+}
+
+.table .thead[data-col="1"] td:nth-child(1) {
+  background-color: var(--mantine-color-midnight-7);
+}
+
+.table .thead[data-col="2"] td:nth-child(1) {
+  background-color: var(--mantine-color-midnight-7);
+}
+
+.table .thead[data-col="3"] td:nth-child(2) {
+  background-color: var(--mantine-color-midnight-7);
+}
+
+.table .thead[data-col="4"] td:nth-child(3) {
+  background-color: var(--mantine-color-midnight-7);
+}
+
+.table .thead[data-col="5"] td:nth-child(4) {
+  background-color: var(--mantine-color-midnight-7);
+}
+
+.table .thead[data-col="6"] td:nth-child(5) {
+  background-color: var(--mantine-color-midnight-7);
+}
+
+.table .thead[data-col="7"] td:nth-child(6) {
+  background-color: var(--mantine-color-midnight-7);
+}
