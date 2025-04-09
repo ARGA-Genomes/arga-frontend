@@ -25,3 +25,37 @@
     font-weight: 700;
     font-size: 12px;
 }
+
+.tooltip {
+    background-color: var(--mantine-color-midnight-5);
+}
+
+.tooltipText {
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.rangeHighlight {
+    /* fill: var(--mantine-color-moss-5); */
+    opacity: 0.3;
+    /* stroke: var(--mantine-color-moss-9); */
+    stroke-dasharray: 5 5;
+    stroke-width: 2;
+}
+
+.rangeHighlightPercentage {
+    stroke-width: 0;
+    font-weight: 800;
+    font-size: 1.5em;
+    --number-flow-mask-height: 0.3em;
+    --number-flow-char-height: 0.85em;
+}
+
+.rangeHighlightYear {
+    font-weight: 900;
+    font-size: 3em;
+    fill: var(--mantine-color-midnight-9);
+    alignment-baseline: baseline;
+    dominant-baseline: text-bottom;
+    opacity: 0.3;
+}
