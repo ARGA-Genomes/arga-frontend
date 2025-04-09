@@ -58,17 +58,13 @@ export function GenomeCompletion({ taxonRank, taxonCanonicalName, domain }: Geno
   return (
     <ParentSize>
       {(parent) => (
-        <>
-          <svg width={parent.width} height={parent.height}>
-            <LineBarGraph
-              width={parent.width}
-              height={parent.height}
-              lineData={lineData ?? []}
-              barData={barData ?? []}
-              dateDomain={domain}
-            />
-          </svg>
-        </>
+        <LineBarGraph
+          width={parent.width}
+          height={parent.height}
+          lineData={lineData ?? []}
+          barData={barData ?? []}
+          dateDomain={domain}
+        />
       )}
     </ParentSize>
   );
