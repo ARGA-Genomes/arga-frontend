@@ -1,14 +1,11 @@
+import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import {
   ActionIcon,
-  Box,
   Center,
   Divider,
   Flex,
-  getThemeColor,
   Grid,
   Group,
-  Image,
-  Paper,
   ScrollArea,
   SimpleGrid,
   Skeleton,
@@ -18,12 +15,12 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
+import { DocumentNode, OperationVariables, useLazyQuery, useQuery } from "@apollo/client";
+import { IconArrowsSort, IconArrowUpRight, IconSortAscending, IconSortDescending } from "@tabler/icons-react";
 
 // Local components
 import { PaginationBar, PaginationSize } from "./pagination";
 import { FiltersDrawer } from "./filtering-redux/drawer";
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
-import { DocumentNode, OperationVariables, useQuery } from "@apollo/client";
 import { FilterItem } from "./filtering-redux/filters/common";
 import { DataItem, DataSummary, SpeciesCard } from "./species-card";
 import { Photo } from "@/app/type";
@@ -32,9 +29,9 @@ import { TableCardLayout, TableCardSwitch } from "./table-card-switch";
 
 import classes from "./browse-species.module.css";
 import { ExternalLinkButton } from "./button-link-external";
-import { IconArrowsSort, IconArrowUpRight, IconSortAscending, IconSortDescending } from "@tabler/icons-react";
 import { VernacularGroupChip } from "./icon-bar";
 import { DownloadButton } from "./download-btn";
+import { downloadCSV } from "@/helpers/downloadCSV";
 
 interface SpeciesRecord {
   taxonomy: { canonicalName: string; status: string; source: string; sourceUrl: string; vernacularGroup: string };
@@ -45,6 +42,7 @@ interface SpeciesRecord {
 interface BrowseSpeciesProps {
   query: {
     content: DocumentNode;
+    download: DocumentNode;
     variables?: OperationVariables;
     key: string;
   };
@@ -96,6 +94,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
 
   const tableRef = useRef<HTMLTableElement>(null);
 
+  // Species query
   const {
     loading,
     error,
@@ -111,6 +110,19 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
     },
   });
 
+  // Download query
+  const [_, { loading: downloading, refetch: fetchCSV }] = useLazyQuery(query.download, {
+    variables: query.variables,
+  });
+
+  const download = useCallback(async () => {
+    {
+      const { data: raw } = await fetchCSV();
+      const download = get(raw, `${query.key}.download`);
+      await downloadCSV(download);
+    }
+  }, [query.key]);
+
   useEffect(() => {
     if (rawData) setData(rawData);
   }, [rawData]);
@@ -125,7 +137,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
     }
   }, [layout]);
 
-  const records: SpeciesRecord[] = get(data, `${query.key}.records`) || [];
+  const records: SpeciesRecord[] = get(data, `${query.key}.species.records`) || [];
   const dataSummarySize = 140;
 
   // Handle table header highlighting
@@ -196,7 +208,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
             <TableCardSwitch layout={layout} onChange={setLayout} />
             <Divider orientation="vertical" />
             <Tooltip position="bottom" label="Download data as CSV spreadsheet">
-              <DownloadButton onClick={() => alert("download here")} />
+              <DownloadButton onClick={download} />
             </Tooltip>
           </Group>
         </Grid.Col>
@@ -298,11 +310,16 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
         <SimpleGrid cols={5}>
           {loading
             ? range(0, pageSize).map((id) => <SpeciesCard key={id} />)
-            : records.map((record) => <SpeciesCard key={record.taxonomy.canonicalName} species={record} />)}
+            : records.map((record, idx) => <SpeciesCard key={idx} species={record} />)}
         </SimpleGrid>
       )}
 
-      <PaginationBar total={get(data, `${query.key}.total`)} page={page} pageSize={pageSize} onChange={setPage} />
+      <PaginationBar
+        total={get(data, `${query.key}.species.total`)}
+        page={page}
+        pageSize={pageSize}
+        onChange={setPage}
+      />
     </Stack>
   );
 }

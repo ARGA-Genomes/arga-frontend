@@ -53,6 +53,7 @@
                 "@visx/text": "^3.12.0",
                 "@visx/visx": "^3.12.0",
                 "@visx/xychart": "^3.12.0",
+                "brotli-wasm": "^3.0.1",
                 "change-case": "^5.4.4",
                 "chart.js": "^4.4.7",
                 "d3": "^7.9.0",

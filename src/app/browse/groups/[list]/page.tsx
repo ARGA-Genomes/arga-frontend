@@ -133,6 +133,14 @@ const GET_SPECIES = gql`
   }
 `;
 
+const DOWNLOAD_SPECIES = gql`
+  query DownloadSourceSpecies($name: String, $filters: [FilterItem], $speciesAttribute: NameAttributeFilter) {
+    source(by: { name: $name }, filters: $filters, speciesAttribute: $speciesAttribute) {
+      download: speciesCsv
+    }
+  }
+`;
+
 function GroupDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
 
@@ -290,8 +298,9 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
             <Paper p="xl" radius="lg" withBorder>
               <BrowseSpecies
                 query={{
-                  key: "source.species",
+                  key: "source",
                   content: GET_SPECIES,
+                  download: DOWNLOAD_SPECIES,
                   variables: { name: group.source, speciesAttribute: group.filter || null },
                 }}
               />
