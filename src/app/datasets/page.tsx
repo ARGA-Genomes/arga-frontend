@@ -26,8 +26,6 @@ import {
   IconExternalLink,
   IconArrowUpRight,
   IconClockHour4,
-  IconTable,
-  IconLayoutGrid,
   IconArrowsSort,
   IconChevronDown,
 } from "@tabler/icons-react";

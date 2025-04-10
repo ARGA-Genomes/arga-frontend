@@ -1,7 +1,7 @@
-import { Stack, Text, UnstyledButton, UnstyledButtonProps, useMantineTheme } from "@mantine/core";
+import { Stack, Text, UnstyledButton, useMantineTheme } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
-import classes from "./download-btn.module.css";
 import { forwardRef } from "react";
+import classes from "./download-btn.module.css";
 
 interface DownloadButtonProps {
   onClick?: () => void;
@@ -21,3 +21,5 @@ export const DownloadButton = forwardRef<HTMLButtonElement, DownloadButtonProps>
     </UnstyledButton>
   );
 });
+
+DownloadButton.displayName = "DownloadButton";
