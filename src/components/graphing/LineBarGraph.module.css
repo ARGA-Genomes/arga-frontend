@@ -1,10 +1,6 @@
 .bar {
     fill: var(--mantine-color-shellfish-5);
     opacity: 0.4;
-
-    &:hover {
-        opacity: 1;
-    }
 }
 
 .line {
@@ -15,10 +11,6 @@
 .lineDot {
     stroke: var(--mantine-color-moss-5);
     fill: var(--mantine-color-moss-5);
-
-    &:hover {
-        stroke: var(--mantine-color-moss-8);
-    }
 }
 
 .scaleText {
@@ -36,9 +28,7 @@
 }
 
 .rangeHighlight {
-    /* fill: var(--mantine-color-moss-5); */
-    opacity: 0.3;
-    /* stroke: var(--mantine-color-moss-9); */
+    opacity: 0.7;
     stroke-dasharray: 5 5;
     stroke-width: 2;
 }
@@ -52,10 +42,26 @@
 }
 
 .rangeHighlightYear {
-    font-weight: 900;
-    font-size: 3em;
+    font-weight: 650;
+    font-size: 2.8em;
     fill: var(--mantine-color-midnight-9);
     alignment-baseline: baseline;
     dominant-baseline: text-bottom;
     opacity: 0.3;
+}
+
+.rangeHighlightDetailsNumber {
+    font-weight: 800;
+    font-size: 1.1em;
+    --number-flow-mask-height: 0.3em;
+    --number-flow-char-height: 0.85em;
+    padding: 0;
+    margin: 0;
+}
+
+.rangeHighlightDetails {
+    font-weight: 400;
+    font-size: 0.6em;
+    padding: 0;
+    margin: 0;
 }

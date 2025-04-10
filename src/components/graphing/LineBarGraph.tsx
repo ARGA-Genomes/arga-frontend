@@ -10,11 +10,11 @@ import { curveNatural } from "@visx/curve";
 import { Grid } from "@visx/grid";
 import { bisector, max, ScaleTime } from "d3";
 import { motion } from "framer-motion";
-import { useTooltip } from "@visx/tooltip";
 import { localPoint } from "@visx/event";
 import NumberFlow from "@number-flow/react";
 import { useState } from "react";
 import { IconArrowUp } from "@tabler/icons-react";
+import { Center, Stack, Text } from "@mantine/core";
 
 const MotionNumberFlow = motion.create(NumberFlow);
 const MotionArrowUp = motion.create(IconArrowUp);
@@ -53,10 +53,9 @@ interface LineBarGraphProps {
   dateDomain: [Date, Date];
   width: number;
   height: number;
-  tooltip?: React.ReactNode;
 }
 
-export function LineBarGraph({ lineData, barData, dateDomain, width, height, tooltip }: LineBarGraphProps) {
+export function LineBarGraph({ lineData, barData, dateDomain, width, height }: LineBarGraphProps) {
   const lineMax = max(lineData, (d) => d.y) ?? 0;
   const barMax = max(barData, (d) => d.y) ?? 0;
 
@@ -79,16 +78,6 @@ export function LineBarGraph({ lineData, barData, dateDomain, width, height, too
     domain: [0, barMax],
   });
 
-  // tooltip
-  const {
-    showTooltip,
-    hideTooltip,
-    tooltipOpen,
-    tooltipData,
-    tooltipLeft = 0,
-    tooltipTop = 0,
-  } = useTooltip<DataRange>();
-
   const [highlightRange, setHighlightRange] = useState<DataRange | null>(null);
 
   const handlePointerMove = (event: React.MouseEvent<SVGElement>) => {
@@ -110,26 +99,11 @@ export function LineBarGraph({ lineData, barData, dateDomain, width, height, too
     };
 
     setHighlightRange(range);
-    /*
-     *     showTooltip({
-     *       tooltipLeft: coords?.x,
-     *       tooltipTop: coords?.y,
-     *       tooltipData: range,
-     *     }); */
   };
-
-  /*
-   *       {tooltipOpen && tooltipData && (
-   *         <div style={{ position: "relative" }}>
-   *           <TooltipWithBounds left={tooltipLeft} top={tooltipTop} className={classes.tooltip}>
-   *             <TooltipPercentage range={tooltipData} />
-   *           </TooltipWithBounds>
-   *         </div>
-   *       )} */
 
   return (
     <>
-      <svg width={width} height={height} onMouseMove={handlePointerMove} onMouseOut={hideTooltip}>
+      <svg width={width} height={height} onMouseMove={handlePointerMove}>
         <rect width={width} height={height} fill="transparent" />
 
         <Group left={50} top={10}>
@@ -235,20 +209,22 @@ function RangeHighlight({ scale, range, height }: RangeHighlightProps) {
 
   const variants = {
     increased: {
-      fill: "var(--mantine-color-moss-5)",
+      fill: "var(--mantine-color-moss-2)",
       stroke: "var(--mantine-color-moss-9)",
     },
     decreased: {
-      fill: "var(--mantine-color-wheat-5)",
+      fill: "var(--mantine-color-wheat-2)",
       stroke: "var(--mantine-color-wheat-9)",
     },
   };
+
+  const color = increased ? "var(--mantine-color-moss-9)" : "var(--mantine-color-wheat-9)";
 
   return (
     <Group>
       <motion.rect
         width={width}
-        height={height}
+        height={height - 30}
         className={classes.rangeHighlight}
         variants={variants}
         animate={increased ? "increased" : "decreased"}
@@ -263,28 +239,34 @@ function RangeHighlight({ scale, range, height }: RangeHighlightProps) {
         </foreignObject>
       </Group>
 
-      <Group left={10} top={100}>
-        <foreignObject width={width} height={100}>
-          <MotionNumberFlow
-            value={percentage}
-            className={classes.rangeHighlightPercentage}
-            format={{ style: "percent", maximumFractionDigits: 0 }}
-            animate={{
-              color: increased ? "var(--mantine-color-moss-9)" : "var(--mantine-color-wheat-9)",
-            }}
-          />
+      <Group left={0} top={10}>
+        <foreignObject width={width} height={height}>
+          <Stack>
+            <Stack gap={0} p={0} m={0}>
+              <RangeItem value={range.bar.high.y} label="added" color={color} />
+              <RangeItem value={range.line.high.y} label="total" color={color} />
+              <RangeItem value={percentage} label="% increase" color={color} style="percent" />
 
-          <MotionArrowUp
-            style={{ marginLeft: 10 }}
-            strokeWidth={4}
-            transition={{
-              rotate: { type: "spring", duration: 0.5, bounce: 0 },
-            }}
-            animate={{
-              rotate: increased ? 0 : -180,
-              color: increased ? "var(--mantine-color-moss-9)" : "var(--mantine-color-wheat-9)",
-            }}
-          />
+              <Center>
+                <MotionArrowUp
+                  strokeWidth={3}
+                  transition={{
+                    rotate: { type: "spring", duration: 0.5, bounce: 0 },
+                  }}
+                  animate={{
+                    rotate: increased ? 0 : -180,
+                    color,
+                  }}
+                />
+              </Center>
+
+              <Center>
+                <motion.p className={classes.rangeHighlightDetails} animate={{ color }}>
+                  year on year
+                </motion.p>
+              </Center>
+            </Stack>
+          </Stack>
         </foreignObject>
       </Group>
 
@@ -301,19 +283,29 @@ function RangeHighlight({ scale, range, height }: RangeHighlightProps) {
   );
 }
 
-function TooltipPercentage({ range }: { range: DataRange }) {
-  const change = range.line.high.y - range.line.low.y;
-  const percentage = change / range.line.low.y;
+interface RangeItemProps {
+  value: number;
+  label: string;
+  color: string;
+  style?: string;
+}
 
+function RangeItem({ value, label, color, style }: RangeItemProps) {
   return (
     <>
-      <div>{range.line.previousChange}</div>
-      <div>{percentage} %</div>
-      <div>{change}</div>
-      <div>{Math.round(percentage * 100)}</div>
-      <div>
-        {range.line.low.y} - {range.line.high.y}
-      </div>
+      <Center>
+        <MotionNumberFlow
+          value={value}
+          className={classes.rangeHighlightDetailsNumber}
+          animate={{ color }}
+          format={{ style: style || "decimal", maximumFractionDigits: 0 }}
+        />
+      </Center>
+      <Center>
+        <motion.p className={classes.rangeHighlightDetails} animate={{ color }}>
+          {label}
+        </motion.p>
+      </Center>
     </>
   );
 }
