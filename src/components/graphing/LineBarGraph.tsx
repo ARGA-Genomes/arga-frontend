@@ -14,7 +14,7 @@ import { localPoint } from "@visx/event";
 import NumberFlow from "@number-flow/react";
 import { useState } from "react";
 import { IconArrowUp } from "@tabler/icons-react";
-import { Center, Stack, Text } from "@mantine/core";
+import { Center, Stack } from "@mantine/core";
 
 const MotionNumberFlow = motion.create(NumberFlow);
 const MotionArrowUp = motion.create(IconArrowUp);
