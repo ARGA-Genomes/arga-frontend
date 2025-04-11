@@ -50,7 +50,7 @@ function ActionButton({ label, icon }: ActionButtonProps) {
 export default function GenomeTracker() {
   const ranks = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
   const minDate = new Date("2009-01-01");
-  const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
+  const maxDate = new Date(`${new Date().getFullYear() + 2}-01-01`);
 
   return (
     <>

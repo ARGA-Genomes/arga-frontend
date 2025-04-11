@@ -9,7 +9,6 @@ import { useState } from "react";
 import { Group, Text } from "@mantine/core";
 import { GroupedTimeline } from "@/components/grouped-timeline";
 import { IconArrowRight, IconBook } from "@tabler/icons-react";
-import Link from "next/link";
 
 const GET_SIGNIFICANT_MILESTONES = gql`
   query SignificantMilestones {
@@ -89,91 +88,44 @@ function getReleaseDate(attrs: Attribute[]): Date | undefined {
 
 interface MilestoneItemDetails {
   milestone: Milestone;
-  visible: boolean;
 }
 
-function MilestoneItemDetails({ milestone, visible }: MilestoneItemDetails) {
-  const variants = {
-    expanded: {
-      opacity: 1,
-      height: 100,
-      /* scale: 1, */
-    },
-    compact: {
-      /* opacity: 0, */
-      height: 0,
-      /* scale: 0, */
-    },
-  };
-
+function MilestoneItemDetails({ milestone }: MilestoneItemDetails) {
   return (
-    <Paper
-      component={motion.div}
-      className={classes.itemDetails}
-      animate={visible ? "expanded" : "compact"}
-      variants={variants}
-    >
-      <Stack justify="space-between">
-        <Stack gap={0}>
-          <Text className={classes.detailsText}>{milestone.firsts}</Text>
-          <Text className={classes.detailsText}>{milestone.significance}</Text>
-        </Stack>
-
-        <Stack gap={0}>
-          <Group component={motion.span} justify="space-between" wrap="nowrap">
-            <Text className={classes.buttonText}>view publication</Text>
-            <IconBook className={classes.buttonText} />
-          </Group>
-          <Group component={motion.span} justify="space-between" wrap="nowrap">
-            <Text className={classes.buttonText}>view genome</Text>
-            <IconArrowRight className={classes.buttonText} />
-          </Group>
-        </Stack>
+    <Stack justify="space-between">
+      <Stack gap={0}>
+        <Text className={classes.detailsText}>{milestone.firsts}</Text>
+        <Text className={classes.detailsText}>{milestone.significance}</Text>
       </Stack>
-    </Paper>
+
+      <Stack gap={0}>
+        <Group component={motion.span} justify="space-between" wrap="nowrap">
+          <Text className={classes.buttonText}>view publication</Text>
+          <IconBook className={classes.buttonText} />
+        </Group>
+        <Group component={motion.span} justify="space-between" wrap="nowrap">
+          <Text className={classes.buttonText}>view genome</Text>
+          <IconArrowRight className={classes.buttonText} />
+        </Group>
+      </Stack>
+    </Stack>
   );
 }
 
 interface MilestoneItemHeaderProps {
   milestone: Milestone;
-  compact: boolean;
 }
 
-function MilestoneItemHeader({ milestone, compact }: MilestoneItemHeaderProps) {
-  const variants = {
-    expanded: {
-      height: 140,
-    },
-    compact: {
-      height: 40,
-      paddingTop: 10,
-    },
-    visible: {
-      opacity: 1,
-    },
-    invisible: {
-      opacity: 0,
-    },
-  };
-
+function MilestoneItemHeader({ milestone }: MilestoneItemHeaderProps) {
   return (
-    <Paper component={motion.div} animate={compact ? "compact" : "expanded"} variants={variants}>
-      <Center h="inherit">
-        <Stack px="sm" pb="xs" gap={0}>
-          <Text className={classes.text}>{milestone.vernacularName}</Text>
-          <Text
-            component={motion.span}
-            animate={compact ? "invisible" : "visible"}
-            variants={variants}
-            className={classes.text}
-            fz="xs"
-            fs="italic"
-          >
-            {milestone.canonicalName}
-          </Text>
-        </Stack>
-      </Center>
-    </Paper>
+    <Center h="inherit">
+      <Stack px="sm" pb="xs" gap={0}>
+        <Text className={classes.text}>{milestone.vernacularName}</Text>
+        <Text component={motion.span} className={classes.text} fz="xs" fs="italic">
+          {milestone.canonicalName}
+        </Text>
+      </Stack>
+    </Center>
   );
 }
 
@@ -186,25 +138,55 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
   const [hovered, setHovered] = useState<boolean>(false);
   const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/whole_genomes/${milestone.accession}`;
 
-  const details = <MilestoneItemDetails milestone={milestone} visible={hovered} />;
+  const spring = {
+    type: "spring",
+    stiffness: 300,
+    damping: 40,
+  };
 
   return (
-    <Center>
-      <Link href={genomeHref}>
-        <Paper
-          onMouseOver={() => setHovered(true)}
-          onMouseOut={() => setHovered(false)}
-          h={140}
-          withBorder
-          className={classes.item}
-        >
-          <Stack gap={0}>
-            {details}
-            <MilestoneItemHeader milestone={milestone} compact={hovered} />
-          </Stack>
+    <motion.div
+      onMouseOver={() => setHovered(true)}
+      onMouseOut={() => setHovered(false)}
+      style={{
+        perspective: "1200px",
+        transformStyle: "preserve-3d",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <motion.div
+        animate={{ rotateY: hovered ? -180 : 0 }}
+        transition={spring}
+        style={{
+          backfaceVisibility: "hidden",
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          padding: "var(--mantine-spacing-sm)",
+        }}
+      >
+        <Paper withBorder className={classes.item}>
+          <MilestoneItemHeader milestone={milestone} />
         </Paper>
-      </Link>
-    </Center>
+      </motion.div>
+      <motion.div
+        initial={{ rotateY: 180 }}
+        animate={{ rotateY: hovered ? 0 : 180 }}
+        transition={spring}
+        style={{
+          backfaceVisibility: "hidden",
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          padding: "var(--mantine-spacing-sm)",
+        }}
+      >
+        <Paper withBorder className={classes.itemDetails}>
+          <MilestoneItemDetails milestone={milestone} />
+        </Paper>
+      </motion.div>
+    </motion.div>
   );
 }
 
