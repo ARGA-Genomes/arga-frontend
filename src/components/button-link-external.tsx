@@ -1,10 +1,10 @@
-import { Button, Text } from "@mantine/core";
+import { Button, ButtonProps, Text } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 
 import classes from "./button-link-external.module.css";
 import { useMemo } from "react";
 
-interface ExternalLinkButtonProps {
+interface ExternalLinkButtonProps extends ButtonProps {
   url?: string;
   externalLinkName?: string;
   outline?: boolean;
@@ -32,15 +32,16 @@ export function ExternalLinkButton({
   outline,
   icon: Icon,
   acronym,
+  ...rest
 }: ExternalLinkButtonProps) {
   const content = useMemo(
-    () =>
-      acronym ? convertToAcronym(externalLinkName || "") : externalLinkName,
+    () => (acronym ? convertToAcronym(externalLinkName || "") : externalLinkName),
     [acronym, externalLinkName]
   );
 
   return (
     <Button
+      {...rest}
       className={classes.button}
       component="a"
       radius="xl"
@@ -50,12 +51,7 @@ export function ExternalLinkButton({
       target="_blank"
       variant={outline ? "outline" : "filled"}
     >
-      <Text
-        c={outline ? "shellfish.6" : "white"}
-        fw={600}
-        size="sm"
-        style={{ whiteSpace: "nowrap" }}
-      >
+      <Text c={outline ? "shellfish.6" : "white"} fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
         {content}
       </Text>
       {Icon && <Icon className={classes.icon} size={16} strokeWidth={3} />}

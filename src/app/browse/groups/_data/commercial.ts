@@ -5,9 +5,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "commercialSector",
-      value: {
-        string: "agriculture",
-      },
+      value: "agriculture",
     },
   },
   {
@@ -16,9 +14,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "agriculturalIndustry",
-      value: {
-        string: "agriculture",
-      },
+      value: "agriculture",
     },
   },
   {
@@ -27,9 +23,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "agriculturalIndustry",
-      value: {
-        string: "horticultural crop",
-      },
+      value: "horticultural crop",
     },
   },
   {
@@ -38,9 +32,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "agriculturalIndustry",
-      value: {
-        string: "livestock",
-      },
+      value: "livestock",
     },
   },
   {
@@ -49,9 +41,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "agriculturalIndustry",
-      value: {
-        string: "forestry",
-      },
+      value: "forestry",
     },
   },
   {
@@ -60,9 +50,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "commercialSector",
-      value: {
-        string: "aquaculture",
-      },
+      value: "aquaculture",
     },
   },
   {
@@ -71,9 +59,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "commercialAndTradeFisheries",
-      value: {
-        string: "commercial and trade fisheries",
-      },
+      value: "commercial and trade fisheries",
     },
   },
   {
@@ -82,9 +68,7 @@ export const commercial = [
     source: "ARGA Commercial Species",
     filter: {
       name: "managedFisheries",
-      value: {
-        string: "managed fisheries",
-      },
+      value: "managed fisheries",
     },
   },
 ];

@@ -59,9 +59,7 @@ export const threatened = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_CR",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
   {
@@ -70,9 +68,7 @@ export const threatened = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_EN",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
   {
@@ -81,9 +77,7 @@ export const threatened = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_VU",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
   {
@@ -92,9 +86,7 @@ export const threatened = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_cd",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
   {
@@ -103,9 +95,7 @@ export const threatened = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_nt",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
   {
@@ -114,9 +104,7 @@ export const threatened = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_lc",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
   {
@@ -125,9 +113,7 @@ export const threatened = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_ul",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
 ];

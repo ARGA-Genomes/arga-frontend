@@ -1,5 +1,5 @@
 import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
-import { Box, ThemeIcon, Image, Tooltip } from "@mantine/core";
+import { Box, ThemeIcon, Image, Tooltip, Paper, getThemeColor, useMantineTheme, Text } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
 import Link from "next/link";
@@ -10,6 +10,7 @@ interface IconData {
   label: string;
   image: string;
   link?: string;
+  colour?: string;
 }
 
 const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
@@ -68,151 +69,202 @@ export const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     image: "/icons/taxon/Taxon_ Bacteria (Prokaryota_Bacteria).svg",
     label: "Bacteria",
     link: "/kingdom/Bacteria",
+    colour: "wheat.4",
   },
   PROTISTS_AND_OTHER_UNICELLULAR_ORGANISMS: {
     image: "/icons/taxon/Taxon_ Protozoa (Kingdom Protozoa).svg",
     label: "Protists and other unicellular organisms",
     link: "/superkingdom/Protista",
+    colour: "moss.4",
   },
   FUNGI: {
     image: "/icons/taxon/Taxon_ Fungi (Fungi).svg",
     label: "Mushrooms and other fungi",
     link: "/regnum/Fungi",
+    colour: "bushfire.4",
   },
   MOLLUSCS: {
     image: "/icons/taxon/Taxon_ Molluscs (Mollusca).svg",
     label: "Molluscs",
     link: "/phylum/Mollusca",
+    colour: "shellfish.5",
   },
   CRUSTACEANS: {
     image: "/icons/taxon/Taxon_ Crustaceans (Crustacea).svg",
     label: "Crustaceans",
     link: "/subphylum/Crustacea",
+    colour: "shellfish.5",
   },
   INSECTS: {
     image: "/icons/taxon/Taxon_ Insects (Insecta).svg",
     label: "Insects",
     link: "/class/Insecta",
+    colour: "moss.4",
   },
   FROGS_AND_OTHER_AMPHIBIANS: {
     image: "/icons/taxon/Taxon_ Frogs and toads (Anura).svg",
     label: "Frogs and other amphibians",
     link: "/class/Amphibia",
+    colour: "moss.4",
   },
   BIRDS: {
     image: "/icons/taxon/Taxon_ Birds (Aves).svg",
     label: "Birds",
     link: "/class/Aves",
+    colour: "wheat.4",
   },
   MAMMALS: {
     image: "/icons/taxon/Taxon_ Mammals (Mammalia).svg",
     label: "Mammals",
     link: "/class/Mammalia",
+    colour: "moss.4",
   },
   HIGHER_PLANTS: {
     image: "/icons/taxon/Taxon_ Plants (Regnum Plantae).svg",
     label: "Higher plants",
     link: "/regnum/Plantae",
+    colour: "moss.4",
   },
   FLOWERING_PLANTS: {
     image: "/icons/taxon/Taxon_ Flowering plants (Magnoliidae).svg",
     label: "Flowering plants",
     link: "/subclassis/Magnoliidae",
+    colour: "moss.4",
   },
   ANIMALS: {
     image: "/icons/taxon/Taxon_ Animals (Kingdom Animalia).svg",
     label: "Animals",
     link: "/kingdom/Animalia",
+    colour: "shellfish.5",
   },
   BROWN_ALGAE: {
     image: "/icons/taxon/Taxon_ Brown algae (Phaeophyceae).svg",
     label: "Brown algae",
     link: "/classis/Phaeophyceae",
+    colour: "wheat.4",
   },
   RED_ALGAE: {
     image: "/icons/taxon/Taxon_ Red algae (Rhodophyta).svg",
     label: "Red algae",
     link: "/division/Rhodophyta",
+    colour: "bushfire.4",
   },
   GREEN_ALGAE: {
     image: "/icons/taxon/Taxon_ Green algae (Chlorophyta).svg",
     label: "Green algae",
     link: "/division/Chlorophyta",
+    colour: "moss.4",
   },
   ECHINODERMS: {
     image: "/icons/taxon/Taxon_ Echinoderms (Echinodermata).svg",
     label: "Echinoderms",
     link: "/phylum/Echinodermata",
+    colour: "shellfish.5",
   },
   FIN_FISHES: {
     image: "/icons/taxon/Taxon_ Finfishes (Actinopterygii).svg",
     label: "Fin fishes",
     link: "/class/Actinopterygii",
+    colour: "shellfish.5",
   },
   CORALS_AND_JELLYFISHES: {
     image: "/icons/taxon/Taxon_ Anemones, corals and jellyfishes (Cnidaria).svg",
     label: "Corals and jellyfishes",
     link: "/phylum/Cnidaria",
+    colour: "shellfish.5",
   },
   CYANOBACTERIA: {
     image: "/icons/taxon/Taxon_ Blue-green algae (Cyanobacteria).svg",
     label: "Cyanobacteria",
     link: "/division/Cyanobacteria",
+    colour: "shellfish.5",
   },
   SHARKS_AND_RAYS: {
     image: "/icons/taxon/Taxon_ Sharks and rays (Subclass Elasmobranchii).svg",
     label: "Sharks and rays",
     link: "/subclass/Elasmobranchii",
+    colour: "shellfish.5",
   },
   SPIDERS: {
     image: "/icons/taxon/Taxon_ Spiders (Araneae).svg",
     label: "Spiders",
     link: "/order/Araneae",
+    colour: "wheat.4",
   },
   REPTILES: {
     image: "/icons/taxon/Taxon_ Reptiles (Reptilia).svg",
     label: "Reptiles",
     link: "/class/Reptilia",
+    colour: "moss.4",
   },
   MOSSES: {
     image: "/icons/taxon/Taxon_ Mosses (Bryophyta).svg",
     label: "Mosses",
     link: "/classis/Bryopsida",
+    colour: "moss.4",
   },
   LIVERWORTS: {
     image: "/icons/taxon/Taxon_ Liverworts (Marchantiophyta).svg",
     label: "Liverworts",
     link: "/division/Marchantiophyta",
+    colour: "moss.4",
   },
   HORNWORTS: {
     image: "/icons/taxon/Taxon_ Hornworts (Anthocerotophyta).svg",
     label: "Hornworts",
     link: "/division/Anthocerotophyta",
+    colour: "moss.4",
   },
   LICHENS: {
     image: "/icons/taxon/Taxon_ Lichens.svg",
     label: "Lichens",
+    colour: "wheat.4",
   },
   FERNS: {
     image: "/icons/taxon/Taxon_ Ferns (Polypodiidae).svg",
     label: "Ferns",
     link: "/subclassis/Polypodiidae",
+    colour: "moss.4",
   },
   CONIFERS_AND_CYCADS: {
     image: "/icons/taxon/Taxon_ Conifers and cycads (Pinales, Araucariales, Cupressales, Cycadales).svg",
     label: "Conifers and cycads",
+    colour: "moss.4",
   },
   DIATOMS: {
     image: "/icons/taxon/Taxon_ Diatoms (Bacillariophyta).svg",
     label: "Diatoms",
     link: "/division/Bacillariophyta",
+    colour: "shellfish.5",
   },
   CHROMISTS: {
     image: "/icons/taxon/Taxon_ Chromists (Chromista).svg",
     label: "Chromists",
     link: "/regnum/Chromista",
+    colour: "shellfish.5",
   },
 };
+export function VernacularGroupChip({ group }: { group: string }) {
+  const theme = useMantineTheme();
+  const colour = VERNACULAR_GROUP_ICON[group]?.colour;
+  const rawColour = getThemeColor(colour || "lightgrey", theme);
+
+  return (
+    <Paper
+      radius="xl"
+      px="lg"
+      py={4}
+      style={{
+        border: `1px solid ${rawColour}`,
+        textAlign: "center",
+      }}
+    >
+      <Text size="sm" c={colour} fw={650}>
+        {VERNACULAR_GROUP_ICON[group]?.label || "Unknown"}
+      </Text>
+    </Paper>
+  );
+}
 
 const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   is_venomous: {
@@ -362,9 +414,10 @@ function ConservationIcon({ status, source }: { status: string; source: string |
 interface VernacularGroupIconProps {
   group: string;
   iconLink?: string;
+  size?: number;
 }
 
-function VernacularGroupIcon({ group, iconLink }: VernacularGroupIconProps) {
+function VernacularGroupIcon({ group, size, iconLink }: VernacularGroupIconProps) {
   const icon = VERNACULAR_GROUP_ICON[group];
   if (!icon) return null;
   if (!iconLink) {
@@ -373,7 +426,7 @@ function VernacularGroupIcon({ group, iconLink }: VernacularGroupIconProps) {
 
   const component = (
     <Tooltip label={icon.label}>
-      <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
+      <ThemeIcon radius="xl" size={size || 60} p={10} variant="transparent">
         <Image src={icon.image} alt={`Icon of ${icon.label}`} w={60} />
       </ThemeIcon>
     </Tooltip>

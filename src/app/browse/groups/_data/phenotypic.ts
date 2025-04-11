@@ -15,9 +15,7 @@ export const phenotypic = [
     source: "ARGA Useful Species", // TODO: MISSING
     filter: {
       name: "isMedicinalAndBioactive",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
   },
 ];

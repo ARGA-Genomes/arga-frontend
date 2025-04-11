@@ -1,45 +1,25 @@
 "use client";
 
-import { useEffect, useState, use, ReactElement } from "react";
-import { SpeciesCard } from "@/components/species-card";
+import { useEffect, use } from "react";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Paper,
-  SimpleGrid,
-  Text,
-  Title,
-  Group,
-  Stack,
-  Container,
-  Box,
-  Grid,
-  useMantineTheme,
-  Anchor,
-  Image,
-} from "@mantine/core";
+import { Paper, Text, Group, Stack, Container, Box, Grid, useMantineTheme, Anchor, Image } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
-import { Photo } from "@/app/type";
 import Link from "next/link";
 
 // App components & constants
 import { MAX_WIDTH } from "@/app/constants";
-import { PaginationBar } from "@/components/pagination";
 import { DataPageCitation } from "@/components/page-citation";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 
-import classes from "../../../../components/record-list.module.css";
-import { map as queryMap } from "../_data/all";
+import { groupInclude, GroupItem, map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
-import { FiltersDrawer } from "@/components/filtering-redux/drawer";
-import { FilterItem } from "@/components/filtering-redux/filters/common";
-
-const PAGE_SIZE = 10;
+import { BrowseSpecies } from "@/components/browse-species";
 
 const GET_DETAILS = gql`
-  query SourceDetails($name: String, $speciesAttribute: NameAttributeFilter) {
-    source(by: { name: $name }, speciesAttribute: $speciesAttribute) {
+  query SourceDetails($name: String, $filters: [FilterItem]) {
+    source(by: { name: $name }, filters: $filters) {
       license
       accessRights
       rightsHolder
@@ -59,20 +39,6 @@ const GET_DETAILS = gql`
     }
   }
 `;
-
-interface ListGroup {
-  category: string;
-  image: string;
-  source: string;
-  filter: {
-    name: string;
-    value: {
-      string?: string;
-      bool?: boolean;
-      int?: number;
-    };
-  };
-}
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
@@ -120,14 +86,19 @@ const GET_SPECIES = gql`
     $page: Int
     $pageSize: Int
     $filters: [FilterItem]
-    $speciesAttribute: NameAttributeFilter
+    $sort: SpeciesSort
+    $sortDirection: SortDirection
   ) {
-    source(by: { name: $name }, filters: $filters, speciesAttribute: $speciesAttribute) {
-      species(page: $page, pageSize: $pageSize) {
+    browse: source(by: { name: $name }, filters: $filters) {
+      species(page: $page, pageSize: $pageSize, sort: $sort, sortDirection: $sortDirection) {
         total
         records {
           taxonomy {
             canonicalName
+            status
+            vernacularGroup
+            source
+            sourceUrl
           }
           photo {
             url
@@ -147,83 +118,13 @@ const GET_SPECIES = gql`
   }
 `;
 
-interface DataSummary {
-  genomes: number;
-  loci: number;
-  specimens: number;
-  other: number;
-}
-
-interface SpeciesRecord {
-  taxonomy: { canonicalName: string };
-  photo: Photo;
-  dataSummary: DataSummary;
-}
-
-interface SpeciesQueryResults {
-  source: {
-    species: {
-      records: SpeciesRecord[];
-      total: number;
-    };
-  };
-}
-
-function Species({ group }: { group: ListGroup }) {
-  const [page, setPage] = useState(1);
-
-  const [filters, setFilters] = useState<FilterItem[]>([]);
-  const [filterChips, setFilterChips] = useState<ReactElement[] | null>(null);
-
-  const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
-    variables: {
-      page,
-      pageSize: PAGE_SIZE,
-      name: group.source,
-      filters: filters,
-      speciesAttribute: group.filter || null,
-    },
-  });
-
-  const records = Array.from(data?.source.species.records || []);
-
-  return (
-    <Stack>
-      <LoadOverlay visible={loading} />
-
-      <Grid gutter={50} align="baseline">
-        <Grid.Col span="content">
-          <Title order={5}>Browse species</Title>
-        </Grid.Col>
-
-        <Grid.Col span="auto">
-          <Group>
-            <Text fz="sm" fw={300}>
-              Filters
-            </Text>
-            <Group gap="xs">{filterChips}</Group>
-          </Group>
-        </Grid.Col>
-
-        <Grid.Col span="content">
-          <FiltersDrawer types={["dataType", "classification"]} onFilter={setFilters} onFilterChips={setFilterChips} />
-        </Grid.Col>
-      </Grid>
-
-      {error ? <Title order={4}>{error.message}</Title> : null}
-
-      {records.length === 0 && <Text className={classes.emptyList}>no data</Text>}
-
-      <SimpleGrid cols={5}>
-        {records.map((record) => (
-          <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
-        ))}
-      </SimpleGrid>
-
-      <PaginationBar total={data?.source.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
-    </Stack>
-  );
-}
+const DOWNLOAD_SPECIES = gql`
+  query DownloadSourceSpecies($name: String, $filters: [FilterItem]) {
+    download: source(by: { name: $name }, filters: $filters) {
+      csv: speciesCsv
+    }
+  }
+`;
 
 function GroupDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
@@ -333,11 +234,11 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
   const params = use(props.params);
   const router = useRouter();
 
-  const group = (queryMap as Record<string, ListGroup>)[params.list];
+  const group = (queryMap as Record<string, GroupItem>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-    variables: { name: group?.source.replaceAll("_", " ") || "", speciesAttribute: group.filter || null },
+    variables: { name: group?.source.replaceAll("_", " ") || "", filters: groupInclude(group) },
     skip: !group,
   });
 
@@ -380,7 +281,13 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
             <Paper p="xl" radius="lg" withBorder>
-              <Species group={group} />
+              <BrowseSpecies
+                query={{
+                  content: GET_SPECIES,
+                  download: DOWNLOAD_SPECIES,
+                  variables: { name: group.source, filters: groupInclude(group) },
+                }}
+              />
             </Paper>
           </Stack>
         </Container>
