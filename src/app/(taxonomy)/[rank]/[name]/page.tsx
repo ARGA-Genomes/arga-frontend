@@ -77,8 +77,11 @@ const GET_SPECIES = gql`
 `;
 
 const DOWNLOAD_SPECIES = gql`
-  query DownloadTaxonSpecies($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $page: Int, $pageSize: Int) {
-    download: taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
+  query DownloadTaxonSpecies($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $filters: [FilterItem]) {
+    download: taxon(
+      by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }
+      filters: $filters
+    ) {
       csv: speciesCsv
     }
   }
