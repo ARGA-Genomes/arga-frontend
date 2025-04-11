@@ -7,75 +7,56 @@ import {
   Title,
   Box,
   Text,
-  SimpleGrid,
   Stack,
   Grid,
   Container,
   Group,
-  Drawer,
-  Button,
-  Badge,
-  Accordion,
-  Avatar,
   Divider,
   UnstyledButton,
   Flex,
   ThemeIcon,
 } from "@mantine/core";
 
-import { IconCopy, IconDownload, IconFilter } from "@tabler/icons-react";
-import { useEffect, useState, use, ReactElement } from "react";
-import { LoadOverlay } from "@/components/load-overlay";
-import { Filter } from "@/components/filtering/common";
+import { IconCopy, IconDownload } from "@tabler/icons-react";
+import { useEffect, use, ReactElement } from "react";
 import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
-import { PaginationBar } from "@/components/pagination";
 import { Attribute, DataField } from "@/components/highlight-stack";
-import { useDisclosure } from "@mantine/hooks";
-import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
-import { VernacularGroupFilters } from "@/components/filtering/vernacular-group";
-// import { EcologyFilters } from "@/components/filtering/ecology";
-// import { IbraFilters } from "@/components/filtering/ibra";
-// import { ImcraFilters } from "@/components/filtering/imcra";
-// import { StateFilters } from "@/components/filtering/state";
-// import { DrainageBasinFilters } from "@/components/filtering/drainage-basin";
 import { TachoChart } from "@/components/graphing/tacho";
 import { BarChart } from "@/components/graphing/bar";
-import { BushfireRecoveryFilters } from "@/components/filtering/bushfire-recovery";
 import { DataTable, DataTableRow } from "@/components/data-table";
-import { SpeciesCard } from "@/components/species-card";
 import { usePreviousPage } from "@/components/navigation-history";
 import { usePathname } from "next/navigation";
-import { HasDataFilters } from "@/components/filtering/has-data";
-import { Photo } from "@/app/type";
 import { useDatasets } from "@/app/source-provider";
 import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-completion";
 import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-completion";
 import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
-
-const PAGE_SIZE = 10;
-
-interface Filters {
-  classifications: Filter[];
-  vernacularGroup?: Filter;
-  ecology?: Filter;
-  ibra?: Filter;
-  imcra?: Filter;
-  state?: Filter;
-  drainageBasin?: Filter;
-  bushfireRecovery: Filter[];
-  dataTypes: Filter[];
-}
+import { BrowseSpecies } from "@/components/browse-species";
 
 const GET_SPECIES = gql`
-  query TaxaSpecies($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $page: Int, $perPage: Int) {
-    taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
-      species(page: $page, perPage: $perPage) {
+  query TaxonSpecies(
+    $rank: TaxonRank
+    $canonicalName: String
+    $datasetId: UUID
+    $filters: [FilterItem]
+    $page: Int
+    $pageSize: Int
+    $sort: SpeciesSort
+    $sortDirection: SortDirection
+  ) {
+    browse: taxon(
+      by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }
+      filters: $filters
+    ) {
+      species(page: $page, pageSize: $pageSize, sort: $sort, sortDirection: $sortDirection) {
         total
         records {
           taxonomy {
-            scientificName
             canonicalName
+            status
+            vernacularGroup
+            source
+            sourceUrl
           }
           photo {
             url
@@ -91,6 +72,14 @@ const GET_SPECIES = gql`
           }
         }
       }
+    }
+  }
+`;
+
+const DOWNLOAD_SPECIES = gql`
+  query DownloadTaxonSpecies($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $page: Int, $pageSize: Int) {
+    download: taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
+      csv: speciesCsv
     }
   }
 `;
@@ -195,320 +184,8 @@ interface DataSummary {
   specimens: number;
   other: number;
 }
-
-interface Species {
-  taxonomy: {
-    scientificName: string;
-    canonicalName: string;
-  };
-  photo?: Photo;
-  dataSummary: DataSummary;
-}
-
-interface FilterOptions {
-  ecology: string[];
-  ibra: string[];
-  imcra: string[];
-  state: string[];
-  drainageBasin: string[];
-}
-
-interface Taxa {
-  species: {
-    records: Species[];
-    total: number;
-  };
-  filterOptions: FilterOptions;
-}
-
-interface QueryResults {
-  taxon: Taxa;
-}
-
 interface TaxonResults {
   taxon: Taxonomy;
-}
-
-interface FiltersProps {
-  filters: Filters;
-  options?: FilterOptions;
-  onChange: (filters: Filters) => void;
-}
-
-function Filters({ filters, options, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications);
-  const [vernacularGroup, setVernacularGroup] = useState<Filter | undefined>(filters.vernacularGroup);
-  const [ecology, setEcology] = useState<Filter | undefined>(filters.ecology);
-  const [ibra, setIbra] = useState<Filter | undefined>(filters.ibra);
-  const [imcra, setImcra] = useState<Filter | undefined>(filters.imcra);
-  const [state, setState] = useState<Filter | undefined>(filters.state);
-  const [drainageBasin, setDrainageBasin] = useState<Filter | undefined>(filters.drainageBasin);
-  const [bushfireRecovery, setBushfireRecovery] = useState<Filter[]>(filters.bushfireRecovery);
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
-
-  useEffect(() => {
-    onChange({
-      classifications,
-      vernacularGroup,
-      ecology,
-      ibra,
-      imcra,
-      state,
-      drainageBasin,
-      bushfireRecovery,
-      dataTypes,
-    });
-  }, [
-    classifications,
-    vernacularGroup,
-    ecology,
-    ibra,
-    imcra,
-    state,
-    drainageBasin,
-    bushfireRecovery,
-    dataTypes,
-    onChange,
-  ]);
-
-  return (
-    <Accordion defaultValue="classification" variant="separated">
-      <Accordion.Item value="classification">
-        <Accordion.Control>
-          <FilterGroup
-            label="Higher classification filters"
-            description="Limit data based on taxonomy"
-            image="/icons/data-type/Data type_ Higher taxon report.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="hasData">
-        <Accordion.Control>
-          <FilterGroup
-            label="Data types"
-            description="Only show species that have specific types of data"
-            image="/icons/data-type/Data type_ Whole genome.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <HasDataFilters filters={dataTypes} onChange={setDataTypes} />
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="vernacular">
-        <Accordion.Control>
-          <FilterGroup
-            label="Vernacular group"
-            description="Birds, Flowering plants, Bacteria, etc."
-            image="/icons/data-type/Data type_ Species (and subspecies) report.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <VernacularGroupFilters value={vernacularGroup?.vernacularGroup} onChange={setVernacularGroup} />
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="regions">
-        <Accordion.Control>
-          <FilterGroup
-            label="Regions"
-            description="Ecological and administrative boundaries"
-            image="/icons/list-group/List group_ Terrestrial.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          {/* <Stack>
-            <Box>
-              <Text fw={300} fz="sm">
-                Ecology
-              </Text>
-              <EcologyFilters value={ecology?.} options={options?.ecology || []} onChange={setEcology} />
-            </Box>
-            <Box>
-              <Text fw={300} fz="sm">
-                Ibra Region
-              </Text>
-              <IbraFilters value={ibra?.value} options={options?.ibra || []} onChange={setIbra} />
-            </Box>
-            <Box>
-              <Text fw={300} fz="sm">
-                Imcra Region
-              </Text>
-              <ImcraFilters value={imcra?.value} options={options?.imcra || []} onChange={setImcra} />
-            </Box>
-            <Box>
-              <Text fw={300} fz="sm">
-                State
-              </Text>
-              <StateFilters value={state?.value} options={options?.state || []} onChange={setState} />
-            </Box>
-            <Box>
-              <Text fw={300} fz="sm">
-                Drainage Basin
-              </Text>
-              <DrainageBasinFilters
-                value={drainageBasin?.value}
-                options={options?.drainageBasin || []}
-                onChange={setDrainageBasin}
-              />
-            </Box>
-          </Stack> */}
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="bushfire">
-        <Accordion.Control>
-          <FilterGroup
-            label="Bushfire traits"
-            description="Bushfire vulnerability and recovery"
-            image="/icons/list-group/List group_ Bushfire vulnerable.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <Stack>
-            <BushfireRecoveryFilters filters={bushfireRecovery} onChange={setBushfireRecovery} />
-          </Stack>
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
-  );
-}
-
-interface FilterGroupProps {
-  label: string;
-  description: string;
-  image: string;
-}
-
-function FilterGroup({ label, description, image }: FilterGroupProps) {
-  return (
-    <Group wrap="nowrap">
-      <Avatar src={image} size="lg" />
-      <div>
-        <Text>{label}</Text>
-        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
-          {description}
-        </Text>
-      </div>
-    </Group>
-  );
-}
-
-function FilterBadge({ filter }: { filter: Filter }) {
-  return (
-    <Badge variant="outline">
-      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
-    </Badge>
-  );
-}
-
-interface SpeciesProps {
-  rank: string;
-  canonicalName: string;
-  datasetId: string;
-}
-
-function Species({ rank, canonicalName, datasetId }: SpeciesProps) {
-  const [page, setPage] = useState(1);
-  const [opened, { open, close }] = useDisclosure(false);
-
-  const [filters, setFilters] = useState<Filters>({
-    classifications: [
-      {
-        canonicalName,
-        editable: false,
-      },
-    ],
-    bushfireRecovery: [],
-    dataTypes: [],
-  });
-
-  const flattenFilters = (filters: Filters) => {
-    const items = [
-      ...filters.classifications,
-      filters.vernacularGroup,
-      filters.ecology,
-      filters.ibra,
-      filters.imcra,
-      filters.state,
-      filters.drainageBasin,
-      ...filters.bushfireRecovery,
-      ...filters.dataTypes,
-    ];
-
-    return items.filter((item): item is Filter => !!item);
-  };
-
-  const { loading, error, data, previousData } = useQuery<QueryResults>(GET_SPECIES, {
-    variables: {
-      rank,
-      canonicalName,
-      datasetId,
-      page,
-      perPage: PAGE_SIZE,
-      /* filters: flattenFilters(filters)
-*   .map(intoFilterItem)
-      .filter((item) => item), */
-    },
-  });
-
-  if (error) {
-    return <Text>Error : {error.message}</Text>;
-  }
-
-  const records = data?.taxon.species.records || previousData?.taxon.species.records;
-
-  return (
-    <Stack>
-      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
-        <Box pt={200}>
-          <Filters filters={filters} onChange={setFilters} />
-        </Box>
-      </Drawer>
-
-      <LoadOverlay visible={loading} />
-
-      <Grid gutter={50} align="baseline">
-        <Grid.Col span="content">
-          <Group>
-            <Title order={5}>Browse species</Title>
-            <Text fz="sm" fw={300}>
-              ({data?.taxon.species.total} results)
-            </Text>
-          </Group>
-        </Grid.Col>
-
-        <Grid.Col span="auto">
-          <Group>
-            <Text fz="sm" fw={300}>
-              Filters
-            </Text>
-            {flattenFilters(filters).map((filter, idx) => (
-              <FilterBadge key={idx} filter={filter} />
-            ))}
-          </Group>
-        </Grid.Col>
-
-        <Grid.Col span="content">
-          <Button leftSection={<IconFilter />} variant="subtle" onClick={open} color="shellfish.7">
-            Filter
-          </Button>
-        </Grid.Col>
-      </Grid>
-
-      <SimpleGrid cols={5} pt={40}>
-        {records?.map((record) => (
-          <SpeciesCard key={record.taxonomy.scientificName} species={record} />
-        ))}
-      </SimpleGrid>
-
-      <PaginationBar total={data?.taxon.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
-    </Stack>
-  );
 }
 
 const CLASSIFICATIONS_CHILD_MAP: Record<string, string> = {
@@ -852,6 +529,8 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;
 
+  console.log("dataset", datasetId);
+
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
 
@@ -875,32 +554,21 @@ export default function ClassificationPage(props: ClassificationPageProps) {
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Stack>
-            {/* <Grid>
-              <Grid.Col span={3}>
-                <LoadPanel visible={taxonResults.loading} h={180}>
-                  <Title pb={10} order={5}>
-                    Taxonomy
-                  </Title>
-                  <TaxonomyDetails taxon={taxonResults.data?.taxon} />
-                </LoadPanel>
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <LoadPanel visible={taxonResults.loading} h={180}>
-                  <Title pb={10} order={5}>
-                    Higher classification
-                  </Title>
-                  <HigherClassification taxon={taxonResults.data?.taxon} />
-                </LoadPanel>
-              </Grid.Col>
-            </Grid> */}
-
             <Paper p="xl" radius="lg" pos="relative" withBorder>
               {taxonResults.called && <DataSummary rank={rank} taxon={taxonResults.data?.taxon} />}
             </Paper>
 
-            <Paper p="xl" radius="lg" pos="relative" withBorder>
-              <Species rank={rank} canonicalName={params.name} datasetId={datasetId ?? ""} />
-            </Paper>
+            {datasetId && (
+              <Paper p="xl" radius="lg" pos="relative" withBorder>
+                <BrowseSpecies
+                  query={{
+                    content: GET_SPECIES,
+                    download: DOWNLOAD_SPECIES,
+                    variables: { rank, canonicalName: params.name, datasetId },
+                  }}
+                />
+              </Paper>
+            )}
           </Stack>
         </Container>
       </Paper>

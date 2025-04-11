@@ -12,14 +12,14 @@ import { DataPageCitation } from "@/components/page-citation";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 
-import { map as queryMap } from "../_data/all";
+import { groupInclude, GroupItem, map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
 import { BrowseSpecies } from "@/components/browse-species";
 
 const GET_DETAILS = gql`
-  query SourceDetails($name: String, $speciesAttribute: NameAttributeFilter) {
-    source(by: { name: $name }, speciesAttribute: $speciesAttribute) {
+  query SourceDetails($name: String, $filters: [FilterItem]) {
+    source(by: { name: $name }, filters: $filters) {
       license
       accessRights
       rightsHolder
@@ -39,20 +39,6 @@ const GET_DETAILS = gql`
     }
   }
 `;
-
-interface ListGroup {
-  category: string;
-  image: string;
-  source: string;
-  filter: {
-    name: string;
-    value: {
-      string?: string;
-      bool?: boolean;
-      int?: number;
-    };
-  };
-}
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
@@ -100,11 +86,10 @@ const GET_SPECIES = gql`
     $page: Int
     $pageSize: Int
     $filters: [FilterItem]
-    $speciesAttribute: NameAttributeFilter
     $sort: SpeciesSort
     $sortDirection: SortDirection
   ) {
-    source(by: { name: $name }, filters: $filters, speciesAttribute: $speciesAttribute) {
+    browse: source(by: { name: $name }, filters: $filters) {
       species(page: $page, pageSize: $pageSize, sort: $sort, sortDirection: $sortDirection) {
         total
         records {
@@ -134,9 +119,9 @@ const GET_SPECIES = gql`
 `;
 
 const DOWNLOAD_SPECIES = gql`
-  query DownloadSourceSpecies($name: String, $filters: [FilterItem], $speciesAttribute: NameAttributeFilter) {
-    source(by: { name: $name }, filters: $filters, speciesAttribute: $speciesAttribute) {
-      download: speciesCsv
+  query DownloadSourceSpecies($name: String, $filters: [FilterItem]) {
+    download: source(by: { name: $name }, filters: $filters) {
+      csv: speciesCsv
     }
   }
 `;
@@ -249,11 +234,11 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
   const params = use(props.params);
   const router = useRouter();
 
-  const group = (queryMap as Record<string, ListGroup>)[params.list];
+  const group = (queryMap as Record<string, GroupItem>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-    variables: { name: group?.source.replaceAll("_", " ") || "", speciesAttribute: group.filter || null },
+    variables: { name: group?.source.replaceAll("_", " ") || "", filters: groupInclude(group) },
     skip: !group,
   });
 
@@ -298,10 +283,9 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
             <Paper p="xl" radius="lg" withBorder>
               <BrowseSpecies
                 query={{
-                  key: "source",
                   content: GET_SPECIES,
                   download: DOWNLOAD_SPECIES,
-                  variables: { name: group.source, speciesAttribute: group.filter || null },
+                  variables: { name: group.source, filters: groupInclude(group) },
                 }}
               />
             </Paper>

@@ -44,7 +44,6 @@ interface BrowseSpeciesProps {
     content: DocumentNode;
     download: DocumentNode;
     variables?: OperationVariables;
-    key: string;
   };
 }
 
@@ -101,27 +100,27 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
     data: rawData,
   } = useQuery(query.content, {
     variables: {
+      ...(query.variables || {}),
       page,
       pageSize,
-      filters,
       sort,
       sortDirection: sortDir ? SortDirection.Asc : SortDirection.Desc,
-      ...(query.variables || {}),
+      filters: [...(query.variables?.filters || []), ...filters],
     },
   });
 
   // Download query
-  const [_, { loading: downloading, refetch: fetchCSV }] = useLazyQuery(query.download, {
+  const [, { refetch: fetchCSV }] = useLazyQuery(query.download, {
     variables: query.variables,
   });
 
   const download = useCallback(async () => {
     {
       const { data: raw } = await fetchCSV();
-      const download = get(raw, `${query.key}.download`);
+      const download = get(raw, "download.csv");
       await downloadCSV(download);
     }
-  }, [query.key]);
+  }, []);
 
   useEffect(() => {
     if (rawData) setData(rawData);
@@ -137,7 +136,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
     }
   }, [layout]);
 
-  const records: SpeciesRecord[] = get(data, `${query.key}.species.records`) || [];
+  const records: SpeciesRecord[] = get(data, "browse.species.records") || [];
   const dataSummarySize = 140;
 
   // Handle table header highlighting
@@ -314,12 +313,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
         </SimpleGrid>
       )}
 
-      <PaginationBar
-        total={get(data, `${query.key}.species.total`)}
-        page={page}
-        pageSize={pageSize}
-        onChange={setPage}
-      />
+      <PaginationBar total={get(data, "browse.species.total")} page={page} pageSize={pageSize} onChange={setPage} />
     </Stack>
   );
 }
