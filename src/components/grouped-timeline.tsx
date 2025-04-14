@@ -133,7 +133,6 @@ export function GroupedTimeline({ height, children }: GroupedTimelineProps) {
     years[year] = group;
   }
 
-  console.log(years);
   const allGroups = Object.entries(years).reduce((acc, [_key, group]) => (acc += group.width), 0);
   const allMargins = Object.keys(years).length * GROUP_GAP;
   const totalWidth = allGroups + allMargins;
@@ -147,7 +146,7 @@ export function GroupedTimeline({ height, children }: GroupedTimelineProps) {
   return (
     <svg height={height} width={totalWidth + startPadding + endPadding} overflow="visible">
       <Group left={startPadding}>
-        {years?.entries().map(([year, group]) => {
+        {Object.entries(years).map(([year, group]) => {
           const left = groupLeft;
           groupLeft += group.width + GROUP_GAP;
 
