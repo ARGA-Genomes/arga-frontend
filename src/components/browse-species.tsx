@@ -7,7 +7,6 @@ import {
   Grid,
   Group,
   ScrollArea,
-  SimpleGrid,
   Skeleton,
   Stack,
   Table,
@@ -242,7 +241,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
               <Table ref={tableRef} classNames={classes} highlightOnHover highlightOnHoverColor="wheat.0" striped>
                 <Table.Thead pos="sticky">
                   <Table.Tr bg="midnight.9">
-                    {TABLE_HEADERS.map(({ name, span, sort: colSort, description }, i) => (
+                    {TABLE_HEADERS.map(({ name, span, sort: colSort, description }) => (
                       <Tooltip key={name} radius="md" position="bottom" withArrow label={description}>
                         <Table.Td colSpan={span} fw="bold" c="white" py="sm">
                           <Flex gap="xs" align="center" justify="center">
@@ -322,15 +321,21 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
           );
         } else {
           return (
-            <SimpleGrid cols={5}>
+            <Grid>
               {loading
-                ? range(0, pageSize).map((id) => <SpeciesCard key={id} />)
-                : records.map((record, idx) => <SpeciesCard key={idx} species={record} />)}
-            </SimpleGrid>
+                ? range(0, pageSize).map((idx) => (
+                    <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
+                      <SpeciesCard />
+                    </Grid.Col>
+                  ))
+                : records.map((record, idx) => (
+                    <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
+                      <SpeciesCard species={record} />
+                    </Grid.Col>
+                  ))}
+            </Grid>
           );
         }
-
-        return <Text>yo</Text>;
       })()}
       {/* 
       {!loading && records.length === 0 && (
