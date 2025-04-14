@@ -12,11 +12,18 @@ import {
   Stack,
   Table,
   Text,
+  ThemeIcon,
   Title,
   Tooltip,
 } from "@mantine/core";
 import { DocumentNode, OperationVariables, useLazyQuery, useQuery } from "@apollo/client";
-import { IconArrowsSort, IconArrowUpRight, IconSortAscending, IconSortDescending } from "@tabler/icons-react";
+import {
+  IconArrowsSort,
+  IconArrowUpRight,
+  IconDna2Off,
+  IconSortAscending,
+  IconSortDescending,
+} from "@tabler/icons-react";
 
 // Local components
 import { PaginationBar, PaginationSize } from "./pagination";
@@ -212,12 +219,126 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
           </Group>
         </Grid.Col>
       </Grid>
+      {(() => {
+        // Show the error
+        if (error) {
+          return <Title order={4}>{error.message}</Title>;
+        } else if (!loading && records.length === 0) {
+          return (
+            <Center h={500}>
+              <Group gap="md" align="center" justify="center">
+                <ThemeIcon c="dimmed" size={64} variant="white">
+                  <IconDna2Off size="3rem" />
+                </ThemeIcon>
+                <Title c="dimmed" order={3} fw={600} mt="md">
+                  No data
+                </Title>
+              </Group>
+            </Center>
+          );
+        } else if (layout === "table") {
+          return (
+            <ScrollArea h={500} style={{ borderRadius: 14 }}>
+              <Table ref={tableRef} classNames={classes} highlightOnHover highlightOnHoverColor="wheat.0" striped>
+                <Table.Thead pos="sticky">
+                  <Table.Tr bg="midnight.9">
+                    {TABLE_HEADERS.map(({ name, span, sort: colSort, description }, i) => (
+                      <Tooltip key={name} radius="md" position="bottom" withArrow label={description}>
+                        <Table.Td colSpan={span} fw="bold" c="white" py="sm">
+                          <Flex gap="xs" align="center" justify="center">
+                            {name}
+                            {colSort && (
+                              <ActionIcon variant="subtle" color="midnight.3" onClick={() => handleSort(colSort)}>
+                                {sort !== colSort ? (
+                                  <IconArrowsSort size="1rem" />
+                                ) : sortDir ? (
+                                  <IconSortAscending size="1rem" />
+                                ) : (
+                                  <IconSortDescending size="1rem" />
+                                )}
+                              </ActionIcon>
+                            )}
+                          </Flex>
+                        </Table.Td>
+                      </Tooltip>
+                    ))}
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {(loading ? range(0, pageSize).map(() => null) : records).map((record, idx) => (
+                    <Table.Tr key={idx}>
+                      <Table.Td w={110} data-col={1}>
+                        <Skeleton visible={loading} radius="lg">
+                          <ExternalLinkButton
+                            style={{ width: 100 }}
+                            url={record?.taxonomy.sourceUrl || "https://ala.org.au"}
+                            externalLinkName={record?.taxonomy.source || "ALA"}
+                            outline
+                            icon={IconArrowUpRight}
+                          />
+                        </Skeleton>
+                      </Table.Td>
+                      <Table.Td data-col={2}>
+                        <Skeleton visible={loading}>
+                          <Text size="sm" fw={600} fs="italic">
+                            {record?.taxonomy.canonicalName || "Canonical Name"}
+                          </Text>
+                        </Skeleton>
+                      </Table.Td>
+                      <Table.Td data-col={3} w={300} px="xl">
+                        <Skeleton visible={loading} radius="lg">
+                          <VernacularGroupChip group={record?.taxonomy.vernacularGroup || "Unknown"} />
+                        </Skeleton>
+                      </Table.Td>
+                      <Table.Td data-col={4} w={dataSummarySize} p={0}>
+                        <Center h={46} px={10} bg="rgba(0,0,0,0.05)">
+                          <Skeleton visible={loading}>
+                            <DataItem textWidth={17} count={record?.dataSummary.genomes || 0} />
+                          </Skeleton>
+                        </Center>
+                      </Table.Td>
+                      <Table.Td data-col={5} w={dataSummarySize}>
+                        <Skeleton visible={loading}>
+                          <DataItem textWidth={17} count={record?.dataSummary.other || 0} />
+                        </Skeleton>
+                      </Table.Td>
+                      <Table.Td data-col={6} w={dataSummarySize} p={0}>
+                        <Center h={46} px={10} bg="rgba(0,0,0,0.05)">
+                          <Skeleton visible={loading}>
+                            <DataItem textWidth={17} count={record?.dataSummary.loci || 0} />
+                          </Skeleton>
+                        </Center>
+                      </Table.Td>
+                      <Table.Td data-col={7} w={dataSummarySize}>
+                        <Skeleton visible={loading}>
+                          <DataItem textWidth={17} count={record?.dataSummary.specimens || 0} />
+                        </Skeleton>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </ScrollArea>
+          );
+        } else {
+          return (
+            <SimpleGrid cols={5}>
+              {loading
+                ? range(0, pageSize).map((id) => <SpeciesCard key={id} />)
+                : records.map((record, idx) => <SpeciesCard key={idx} species={record} />)}
+            </SimpleGrid>
+          );
+        }
 
-      {error ? <Title order={4}>{error.message}</Title> : null}
-
+        return <Text>yo</Text>;
+      })()}
+      {/* 
       {!loading && records.length === 0 && (
         <Center>
-          <Text>no data</Text>
+          <Stack>
+            <IconDna2Off size="3rem" />
+            <Text>No Data</Text>
+          </Stack>
         </Center>
       )}
 
@@ -311,7 +432,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
             ? range(0, pageSize).map((id) => <SpeciesCard key={id} />)
             : records.map((record, idx) => <SpeciesCard key={idx} species={record} />)}
         </SimpleGrid>
-      )}
+      )} */}
 
       <PaginationBar total={get(data, "browse.species.total")} page={page} pageSize={pageSize} onChange={setPage} />
     </Stack>
