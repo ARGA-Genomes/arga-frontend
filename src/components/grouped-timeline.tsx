@@ -140,8 +140,8 @@ export function GroupedTimeline({ height, children }: GroupedTimelineProps) {
   let childrenAccumulator = 0;
   let startInverted = false;
 
-  let startPadding = 120;
-  let endPadding = 50;
+  const startPadding = 120;
+  const endPadding = 50;
 
   return (
     <svg height={height} width={totalWidth + startPadding + endPadding} overflow="visible">
