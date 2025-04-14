@@ -93,7 +93,7 @@ function Line({ groups }: LineProps) {
 
   return (
     <>
-      <circle r={50} cx={50} fill="var(--mantine-color-bushfire-5)" />
+      <image href="/icons/list-group/List group_ milestone species.svg" height="100" width="100" y={-50} />
       <path d="M 100 0 h 20" className={classes.line} />
 
       <Group left={120}>
