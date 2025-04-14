@@ -8,7 +8,6 @@
 }
 
 .itemDetails {
-    background-color: var(--mantine-color-moss-0);
     border-radius: var(--mantine-radius-xl);
     box-shadow: var(--mantine-shadow-sm);
 
