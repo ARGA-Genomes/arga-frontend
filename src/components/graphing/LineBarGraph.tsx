@@ -81,7 +81,10 @@ export function LineBarGraph({ lineData, barData, dateDomain, width, height }: L
   const [highlightRange, setHighlightRange] = useState<DataRange | null>(null);
 
   const handlePointerMove = (event: React.MouseEvent<SVGElement>) => {
-    const coords = localPoint(event);
+    // need at least to data points
+    if (lineData.length <= 1) return;
+
+    const coords = { x: event.clientX - 50, y: event.clientY };
 
     const date = xScale.invert(coords?.x || 0);
     const idx = bisectDate(lineData, date, 1);
