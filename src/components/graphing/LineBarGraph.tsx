@@ -10,7 +10,6 @@ import { curveNatural } from "@visx/curve";
 import { Grid } from "@visx/grid";
 import { bisector, max, ScaleTime } from "d3";
 import { motion } from "framer-motion";
-import { localPoint } from "@visx/event";
 import NumberFlow from "@number-flow/react";
 import { useState } from "react";
 import { IconArrowUp } from "@tabler/icons-react";
