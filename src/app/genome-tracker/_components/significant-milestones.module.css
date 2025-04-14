@@ -1,6 +1,6 @@
 .item {
     background-color: white;
-    border-radius: var(--mantine-radius-lg);
+    border-radius: var(--mantine-radius-xl);
     box-shadow: var(--mantine-shadow-sm);
     width: 100%;
     height: 100%;
@@ -8,8 +8,8 @@
 }
 
 .itemDetails {
-    background-color: var(--mantine-color-midnight-1);
-    border-radius: var(--mantine-radius-lg);
+    background-color: var(--mantine-color-moss-0);
+    border-radius: var(--mantine-radius-xl);
     box-shadow: var(--mantine-shadow-sm);
 
     padding-left: var(--mantine-spacing-md);
@@ -18,15 +18,15 @@
     height: 100%;
 }
 
+.itemDetailsHeader {
+    font-size: 0.7em;
+    font-weight: 650;
+}
+
 .itemYear {
     font-size: 2.5em;
     font-weight: 700;
     color: var(--mantine-color-shellfish-6);
-}
-
-.itemButton {
-    border-radius: var(--mantine-radius-xl);
-    background-color: var(--mantine-color-midnight-8);
 }
 
 .text {
@@ -45,6 +45,13 @@
 .buttonText {
     font-weight: 600;
     font-size: var(--mantine-font-size-sm);
+    text-anchor: start;
+    dominant-baseline: middle;
+}
+
+.buttonTextInverted {
+    font-weight: 600;
+    font-size: var(--mantine-font-size-sm);
     color: var(--mantine-color-midnight-8);
     text-anchor: start;
     dominant-baseline: middle;
@@ -58,4 +65,13 @@
     stroke: var(--mantine-color-midnight-8);
     stroke-width: 1;
     stroke-dasharray: 1 1;
+}
+
+.flipButton {
+    cursor: pointer;
+    color: var(--mantine-color-midnight-2);
+
+    &:hover {
+        filter: brightness(50%);
+    }
 }

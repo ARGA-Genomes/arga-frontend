@@ -3,12 +3,13 @@
 import classes from "./significant-milestones.module.css";
 
 import { gql, useQuery } from "@apollo/client";
-import { Center, Paper, ScrollArea, Stack } from "@mantine/core";
+import { Box, Button, Center, Paper, ScrollArea, Stack } from "@mantine/core";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Group, Text } from "@mantine/core";
+import { Group, Text, Image } from "@mantine/core";
 import { GroupedTimeline } from "@/components/grouped-timeline";
-import { IconArrowRight, IconBook } from "@tabler/icons-react";
+import { IconBook } from "@tabler/icons-react";
+import Link from "next/link";
 
 const GET_SIGNIFICANT_MILESTONES = gql`
   query SignificantMilestones {
@@ -88,42 +89,108 @@ function getReleaseDate(attrs: Attribute[]): Date | undefined {
 
 interface MilestoneItemDetails {
   milestone: Milestone;
+  onFlip?: () => void;
 }
 
-function MilestoneItemDetails({ milestone }: MilestoneItemDetails) {
+function MilestoneItemDetails({ milestone, onFlip }: MilestoneItemDetails) {
   return (
-    <Stack justify="space-between">
+    <Stack justify="space-between" py="md" h="100%">
       <Stack gap={0}>
-        <Text className={classes.detailsText}>{milestone.firsts}</Text>
-        <Text className={classes.detailsText}>{milestone.significance}</Text>
+        <Group wrap="nowrap" justify="space-between" mb="sm">
+          <Paper radius="xl" px="md" py={4} w="70%" bg="moss.1" c="moss">
+            <Text className={classes.itemDetailsHeader}>MAMMALS</Text>
+          </Paper>
+
+          <Stack
+            style={{ position: "absolute", right: 15, top: 15 }}
+            gap={0}
+            p={15}
+            className={classes.flipButton}
+            onClick={onFlip}
+          >
+            <Image
+              src="/icons/misc/arrow.svg"
+              w={30}
+              h={30}
+              alt="flip card"
+              fit="contain"
+              style={{ rotate: "180deg" }}
+            />
+            <Center>
+              <Text fz="xs" fw={700}>
+                FLIP
+              </Text>
+            </Center>
+          </Stack>
+        </Group>
+
+        <Box pl="lg">
+          <div style={{ position: "relative", width: 0, height: 0 }}>
+            <svg width={10} height={10} style={{ position: "absolute", left: -20, top: 4 }}>
+              <circle cx={5} cy={5} r={5} fill="var(--mantine-color-moss-5)" />
+            </svg>
+          </div>
+
+          <Text className={classes.detailsText}>{milestone.firsts}</Text>
+          <Text className={classes.detailsText} fs="italic" fz=".6em">
+            {milestone.significance}
+          </Text>
+        </Box>
       </Stack>
 
-      <Stack gap={0}>
-        <Group component={motion.span} justify="space-between" wrap="nowrap">
-          <Text className={classes.buttonText}>view publication</Text>
-          <IconBook className={classes.buttonText} />
-        </Group>
-        <Group component={motion.span} justify="space-between" wrap="nowrap">
-          <Text className={classes.buttonText}>view genome</Text>
-          <IconArrowRight className={classes.buttonText} />
-        </Group>
-      </Stack>
+      {milestone.publicationDoi && (
+        <Button
+          variant="subtle"
+          rightSection={<IconBook className={classes.buttonTextInverted} />}
+          justify="space-between"
+          radius="lg"
+          color="moss"
+          component={Link}
+          href={milestone.publicationDoi}
+          target="_blank"
+        >
+          <Text className={classes.buttonTextInverted}>view publication</Text>
+        </Button>
+      )}
     </Stack>
   );
 }
 
 interface MilestoneItemHeaderProps {
   milestone: Milestone;
+  onFlip?: () => void;
 }
 
-function MilestoneItemHeader({ milestone }: MilestoneItemHeaderProps) {
+function MilestoneItemHeader({ milestone, onFlip }: MilestoneItemHeaderProps) {
+  const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/whole_genomes/${milestone.accession}`;
+
   return (
     <Center h="inherit">
-      <Stack px="sm" pb="xs" gap={0}>
-        <Text className={classes.text}>{milestone.vernacularName}</Text>
-        <Text component={motion.span} className={classes.text} fz="xs" fs="italic">
-          {milestone.canonicalName}
-        </Text>
+      <Stack px="sm" pb="xs" gap="lg">
+        <Stack gap={0}>
+          <Text className={classes.text}>{milestone.vernacularName}</Text>
+          <Text component={motion.span} className={classes.text} fz="xs" fs="italic">
+            {milestone.canonicalName}
+          </Text>
+        </Stack>
+        <Button color="midnight.8" radius="xl" component={Link} href={genomeHref}>
+          <Text className={classes.buttonText}>view genome</Text>
+        </Button>
+      </Stack>
+
+      <Stack
+        style={{ position: "absolute", right: 15, bottom: 5 }}
+        gap={0}
+        p={15}
+        className={classes.flipButton}
+        onClick={onFlip}
+      >
+        <Image src="/icons/misc/arrow.svg" w={30} h={30} alt="flip card" fit="contain" />
+        <Center>
+          <Text fz="xs" fw={700}>
+            FLIP
+          </Text>
+        </Center>
       </Stack>
     </Center>
   );
@@ -135,8 +202,7 @@ interface MilestoneItemProps {
 }
 
 function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
-  const [hovered, setHovered] = useState<boolean>(false);
-  const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/whole_genomes/${milestone.accession}`;
+  const [flipped, setFlipped] = useState<boolean>(false);
 
   const spring = {
     type: "spring",
@@ -146,8 +212,6 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
 
   return (
     <motion.div
-      onMouseOver={() => setHovered(true)}
-      onMouseOut={() => setHovered(false)}
       style={{
         perspective: "1200px",
         transformStyle: "preserve-3d",
@@ -156,7 +220,7 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
       }}
     >
       <motion.div
-        animate={{ rotateY: hovered ? -180 : 0 }}
+        animate={{ rotateY: flipped ? -180 : 0 }}
         transition={spring}
         style={{
           backfaceVisibility: "hidden",
@@ -167,12 +231,12 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
         }}
       >
         <Paper withBorder className={classes.item}>
-          <MilestoneItemHeader milestone={milestone} />
+          <MilestoneItemHeader milestone={milestone} onFlip={() => setFlipped(true)} />
         </Paper>
       </motion.div>
       <motion.div
         initial={{ rotateY: 180 }}
-        animate={{ rotateY: hovered ? 0 : 180 }}
+        animate={{ rotateY: flipped ? 0 : 180 }}
         transition={spring}
         style={{
           backfaceVisibility: "hidden",
@@ -183,7 +247,7 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
         }}
       >
         <Paper withBorder className={classes.itemDetails}>
-          <MilestoneItemDetails milestone={milestone} />
+          <MilestoneItemDetails milestone={milestone} onFlip={() => setFlipped(false)} />
         </Paper>
       </motion.div>
     </motion.div>
@@ -207,9 +271,9 @@ export function SignificantMilestones() {
 
   return (
     <ScrollArea.Autosize>
-      <GroupedTimeline height={450}>
+      <GroupedTimeline height={540}>
         {milestones?.map((milestone, idx) => (
-          <GroupedTimeline.Item width={250} height={150} date={milestone.date} key={milestone.accession}>
+          <GroupedTimeline.Item width={300} height={200} date={milestone.date} key={milestone.accession}>
             <MilestoneItem milestone={milestone} inverted={idx % 2 == 1} />
           </GroupedTimeline.Item>
         ))}
