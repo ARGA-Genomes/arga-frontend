@@ -114,7 +114,7 @@ function MilestoneItemDetails({ milestone, onFlip }: MilestoneItemDetails) {
     <Stack justify="space-between" py="md" h="100%">
       <Stack gap={0}>
         <Group wrap="nowrap" justify="space-between" mb="sm">
-          <Paper radius="xl" px="md" py={4} w="70%" bg={`${colour}.1`} c={colour}>
+          <Paper radius="xl" px="md" py={4} w="80%" bg={`${colour}.1`} c={colour}>
             <Text className={classes.itemDetailsHeader}>{milestone.taxonGroup?.toUpperCase()}</Text>
           </Paper>
 
@@ -274,7 +274,6 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
 
 export function SignificantMilestones() {
   const { data } = useQuery<SignificantMilestonesQuery>(GET_SIGNIFICANT_MILESTONES);
-  console.log(data?.source.species.records);
 
   const milestones = data?.source.species.records
     .map((record) => ({
@@ -291,13 +290,15 @@ export function SignificantMilestones() {
 
   return (
     <ScrollArea.Autosize>
-      <GroupedTimeline height={540}>
-        {milestones?.map((milestone, idx) => (
-          <GroupedTimeline.Item width={300} height={200} date={milestone.date} key={milestone.accession}>
-            <MilestoneItem milestone={milestone} inverted={idx % 2 == 1} />
-          </GroupedTimeline.Item>
-        ))}
-      </GroupedTimeline>
+      <Group wrap="nowrap" gap={0}>
+        <GroupedTimeline height={540}>
+          {milestones?.map((milestone, idx) => (
+            <GroupedTimeline.Item width={300} height={200} date={milestone.date} key={milestone.accession}>
+              <MilestoneItem milestone={milestone} inverted={idx % 2 == 1} />
+            </GroupedTimeline.Item>
+          ))}
+        </GroupedTimeline>
+      </Group>
     </ScrollArea.Autosize>
   );
 }

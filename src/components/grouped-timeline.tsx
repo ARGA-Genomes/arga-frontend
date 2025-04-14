@@ -3,8 +3,7 @@
 import classes from "./grouped-timeline.module.css";
 
 import { Group } from "@visx/group";
-import { motion } from "framer-motion";
-import { ReactElement, ReactNode, useState } from "react";
+import { ReactElement, ReactNode } from "react";
 
 const GROUP_GAP = 15;
 
@@ -34,8 +33,6 @@ interface GroupedTimelineYearProps {
 }
 
 function GroupedTimelineYear({ width, height, startInverted, header, children }: GroupedTimelineYearProps) {
-  const [hovered, setHovered] = useState<boolean>(false);
-
   // the line notches are about 90px
   const centerY = height / 2;
   const bottom = centerY + 60;
@@ -43,40 +40,27 @@ function GroupedTimelineYear({ width, height, startInverted, header, children }:
 
   const offset = width / (children.length + 1);
 
-  const variants = {
-    hovered: {
-      opacity: 1,
-      scale: 1,
-    },
-    unhovered: {
-      opacity: 0.8,
-      scale: 0.9,
-    },
-  };
-
   return (
-    <motion.g animate={hovered ? "hovered" : "unhovered"}>
-      <Group onMouseOver={() => setHovered(true)} onMouseOut={() => setHovered(false)}>
-        <rect height={height} width={width} className={classes.group} rx={50} />
-        {children.map((child, idx) => {
-          const inverted = idx % 2 == (startInverted ? 1 : 0);
+    <Group>
+      <rect height={height} width={width} className={classes.group} rx={50} />
+      {children.map((child, idx) => {
+        const inverted = idx % 2 == (startInverted ? 1 : 0);
 
-          const childOffset = offset * (idx + 1);
-          const childCenter = child.props.width / 2;
-          const left = childOffset - childCenter;
+        const childOffset = offset * (idx + 1);
+        const childCenter = child.props.width / 2;
+        const left = childOffset - childCenter;
 
-          return (
-            <Group key={child.props.date.toString()} left={left} top={inverted ? top - child.props.height : bottom}>
-              {child}
-            </Group>
-          );
-        })}
+        return (
+          <Group key={child.props.date.toString()} left={left} top={inverted ? top - child.props.height : bottom}>
+            {child}
+          </Group>
+        );
+      })}
 
-        <foreignObject x={50} y={startInverted ? 50 : height - 120} width={100} height={100}>
-          {header}
-        </foreignObject>
-      </Group>
-    </motion.g>
+      <foreignObject x={50} y={startInverted ? 50 : height - 120} width={100} height={100}>
+        {header}
+      </foreignObject>
+    </Group>
   );
 }
 
@@ -105,12 +89,22 @@ function Line({ groups }: LineProps) {
   const lineNotchUp = "q 20,0 20,-20 v -20 v 20 q 0,20, 20,20";
   const linePath = points.map((point, idx) => `L ${point - 20} 0 ${idx % 2 ? lineNotchUp : lineNotchDown}`).join(" ");
 
+  const lastPoint = points[points.length - 1];
+
   return (
     <>
-      <path d={`M 0 0 ${linePath}`} className={classes.line} />
-      {points.map((point, idx) => (
-        <circle key={point} cx={point} cy={idx % 2 ? -40 : 40} r={15} className={classes.lineNotch} />
-      ))}
+      <circle r={50} cx={50} fill="var(--mantine-color-bushfire-5)" />
+      <path d="M 100 0 h 20" className={classes.line} />
+
+      <Group left={120}>
+        <path d={`M 0 0 ${linePath}`} className={classes.line} />
+        <path d={`M ${lastPoint + 20} 0 h 200`} className={classes.line} />
+        <path d={`M ${lastPoint + 220} 0 l 0 30 l 30 -30 l -30 -30 l 0 30`} fill="var(--mantine-color-bushfire-5)" />
+
+        {points.map((point, idx) => (
+          <circle key={point} cx={point} cy={idx % 2 ? -40 : 40} r={15} className={classes.lineNotch} />
+        ))}
+      </Group>
     </>
   );
 }
@@ -146,28 +140,33 @@ export function GroupedTimeline({ height, children }: GroupedTimelineProps) {
   let childrenAccumulator = 0;
   let startInverted = false;
 
+  let startPadding = 120;
+  let endPadding = 50;
+
   return (
-    <svg height={height} width={totalWidth} overflow="visible">
-      {years?.entries().map(([year, group]) => {
-        const left = groupLeft;
-        groupLeft += group.width + GROUP_GAP;
+    <svg height={height} width={totalWidth + startPadding + endPadding} overflow="visible">
+      <Group left={startPadding}>
+        {years?.entries().map(([year, group]) => {
+          const left = groupLeft;
+          groupLeft += group.width + GROUP_GAP;
 
-        startInverted = childrenAccumulator % 2 == 0;
-        childrenAccumulator += group.children.length;
+          startInverted = childrenAccumulator % 2 == 0;
+          childrenAccumulator += group.children.length;
 
-        return (
-          <Group key={year} left={left}>
-            <GroupedTimelineYear
-              width={group.width}
-              height={height}
-              startInverted={startInverted}
-              header={<text className={classes.itemYear}>{year.toString()}</text>}
-            >
-              {group.children}
-            </GroupedTimelineYear>
-          </Group>
-        );
-      })}
+          return (
+            <Group key={year} left={left}>
+              <GroupedTimelineYear
+                width={group.width}
+                height={height}
+                startInverted={startInverted}
+                header={<text className={classes.itemYear}>{year.toString()}</text>}
+              >
+                {group.children}
+              </GroupedTimelineYear>
+            </Group>
+          );
+        })}
+      </Group>
 
       <Group top={height / 2}>
         <Line groups={years} />
