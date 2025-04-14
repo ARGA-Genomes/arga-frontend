@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Card, Text, Group, Stack, SimpleGrid, Box } from "@mantine/core";
+import { Card, Text, Group, Stack, SimpleGrid, Box, Skeleton } from "@mantine/core";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
-import { SpeciesImage } from "./species-image";
+import { SpeciesPhoto } from "./species-image";
 import { Photo } from "@/app/type";
 
 export interface Taxonomy {
@@ -21,45 +21,49 @@ export interface Species {
   dataSummary: DataSummary;
 }
 
-function DataItem({ name, count }: { name: string; count: number }) {
-  const hasData = count > 0;
+export function DataItem({ name, count, textWidth }: { name?: string; count?: number; textWidth?: number }) {
+  const hasData = count || 0 > 0;
+  const label = [...[count === undefined ? [] : [count.toString()]], ...[!name ? [] : [name]]].join(" ");
 
   return (
-    <Group>
-      {hasData ? (
-        <IconCircleCheck color="green" />
-      ) : (
-        <IconCircleX color="red" />
-      )}
-      <Text fw={300} fz="xs">
-        {name}
+    <Group gap="sm" justify="center">
+      {hasData ? <IconCircleCheck color="green" /> : <IconCircleX color="red" />}
+      <Text fw={300} w={textWidth} fz="xs">
+        {label}
       </Text>
     </Group>
   );
 }
 
-export function SpeciesCard({ species }: { species: Species }) {
-  const itemLinkName = species.taxonomy.canonicalName.replaceAll(" ", "_");
+export function SpeciesCard({ species }: { species?: Species }) {
+  const itemLinkName = species?.taxonomy.canonicalName.replaceAll(" ", "_") || "";
+  const height = 260;
 
   return (
     <Card shadow="sm" radius="lg" withBorder miw={313}>
-      <Card.Section bg="#a6c0cf">
+      <Card.Section bg="#a6c0cf" h={height} mah={height}>
         <Link href={`/species/${itemLinkName}`}>
-          <Box h={260}>
-            <SpeciesImage photo={species.photo} />
+          <Box h={height} mah={height}>
+            <SpeciesPhoto photo={species?.photo} mah={height} flatBottom />
           </Box>
         </Link>
       </Card.Section>
 
       <Stack gap={5} mt="sm">
-        <Link href={`/species/${itemLinkName}`}>
-          <Text fz="sm" fw={700} fs="italic">
-            {species.taxonomy.canonicalName}
-          </Text>
-        </Link>
+        <Skeleton visible={!species}>
+          <Link href={`/species/${itemLinkName}`}>
+            <Text fz="sm" fw={700} fs="italic">
+              {species?.taxonomy.canonicalName || "Name"}
+            </Text>
+          </Link>
+        </Skeleton>
         <SimpleGrid cols={2}>
-          <DataItem name="Genome" count={species.dataSummary.genomes} />
-          <DataItem name="Genetic loci" count={species.dataSummary.loci} />
+          <Skeleton visible={!species}>
+            <DataItem name="Genomes" count={species?.dataSummary.genomes || 0} />
+          </Skeleton>
+          <Skeleton visible={!species}>
+            <DataItem name="Genetic loci" count={species?.dataSummary.loci || 0} />
+          </Skeleton>
         </SimpleGrid>
       </Stack>
     </Card>

@@ -136,14 +136,14 @@ export function RadialGraph({ data, onHover, children }: RadialGraphProps) {
             <Group top={yMax / 2 + margin.top} left={xMax / 2 + margin.left}>
               <Group clipPath={`url(#${innerRadiusClipId})`}>{children}</Group>
 
-              {data.map((d) => {
+              {data.map((d, idx) => {
                 const startAngle = xScale(d.label) ?? 0;
                 const endAngle = startAngle + xScale.bandwidth();
                 const outerRadius = yScale(d.total) ?? 0;
 
                 return (
                   <Group
-                    key={d.label}
+                    key={idx}
                     className={classes.group}
                     onMouseOver={() => onHover && onHover(d)}
                     onMouseOut={() => onHover && onHover(null)}

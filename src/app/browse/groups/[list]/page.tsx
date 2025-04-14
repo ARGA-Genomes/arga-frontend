@@ -1,56 +1,25 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
-import { Filter, intoFilterItem } from "@/components/filtering/common";
-import { SpeciesCard } from "@/components/species-card";
+import { useEffect, use } from "react";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Paper,
-  SimpleGrid,
-  Text,
-  Title,
-  Group,
-  Stack,
-  Container,
-  Drawer,
-  Box,
-  Grid,
-  Button,
-  Accordion,
-  Badge,
-  Avatar,
-  useMantineTheme,
-  Anchor,
-  Image,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconFilter, IconExternalLink } from "@tabler/icons-react";
-import { Photo } from "@/app/type";
+import { Paper, Text, Group, Stack, Container, Box, Grid, useMantineTheme, Anchor, Image } from "@mantine/core";
+import { IconExternalLink } from "@tabler/icons-react";
 import Link from "next/link";
 
 // App components & constants
 import { MAX_WIDTH } from "@/app/constants";
-import { PaginationBar } from "@/components/pagination";
 import { DataPageCitation } from "@/components/page-citation";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
-import { HasDataFilters } from "@/components/filtering/has-data";
-import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 
-import classes from "../../../../components/record-list.module.css";
-import { map as queryMap } from "../_data/all";
+import { groupInclude, GroupItem, map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
-
-const PAGE_SIZE = 10;
-interface Filters {
-  classifications: Filter[];
-  dataTypes: Filter[];
-}
+import { BrowseSpecies } from "@/components/browse-species";
 
 const GET_DETAILS = gql`
-  query SourceDetails($name: String, $speciesAttribute: NameAttributeFilter) {
-    source(by: { name: $name }, speciesAttribute: $speciesAttribute) {
+  query SourceDetails($name: String, $filters: [FilterItem]) {
+    source(by: { name: $name }, filters: $filters) {
       license
       accessRights
       rightsHolder
@@ -70,20 +39,6 @@ const GET_DETAILS = gql`
     }
   }
 `;
-
-interface ListGroup {
-  category: string;
-  image: string;
-  source: string;
-  filter: {
-    name: string;
-    value: {
-      string?: string;
-      bool?: boolean;
-      int?: number;
-    };
-  };
-}
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
@@ -131,14 +86,19 @@ const GET_SPECIES = gql`
     $page: Int
     $pageSize: Int
     $filters: [FilterItem]
-    $speciesAttribute: NameAttributeFilter
+    $sort: SpeciesSort
+    $sortDirection: SortDirection
   ) {
-    source(by: { name: $name }, filters: $filters, speciesAttribute: $speciesAttribute) {
-      species(page: $page, pageSize: $pageSize) {
+    browse: source(by: { name: $name }, filters: $filters) {
+      species(page: $page, pageSize: $pageSize, sort: $sort, sortDirection: $sortDirection) {
         total
         records {
           taxonomy {
             canonicalName
+            status
+            vernacularGroup
+            source
+            sourceUrl
           }
           photo {
             url
@@ -158,179 +118,13 @@ const GET_SPECIES = gql`
   }
 `;
 
-interface DataSummary {
-  genomes: number;
-  loci: number;
-  specimens: number;
-  other: number;
-}
-
-interface SpeciesRecord {
-  taxonomy: { canonicalName: string };
-  photo: Photo;
-  dataSummary: DataSummary;
-}
-
-interface SpeciesQueryResults {
-  source: {
-    species: {
-      records: SpeciesRecord[];
-      total: number;
-    };
-  };
-}
-
-interface FiltersProps {
-  filters: Filters;
-  onChange: (filters: Filters) => void;
-}
-
-function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, setClassifications] = useState<Filter[]>(filters.classifications);
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
-
-  useEffect(() => {
-    onChange({
-      classifications,
-      dataTypes,
-    });
-  }, [classifications, dataTypes, onChange]);
-
-  return (
-    <Accordion defaultValue="hasData" variant="separated">
-      <Accordion.Item value="hasData">
-        <Accordion.Control>
-          <FilterGroup
-            label="Data types"
-            description="Only show species that have specific types of data"
-            image="/icons/data-type/Data type_ Whole genome.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <HasDataFilters filters={dataTypes} onChange={setDataTypes} />
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="classification">
-        <Accordion.Control>
-          <FilterGroup
-            label="Higher classification filters"
-            description="Limit data based on taxonomy"
-            image="/icons/data-type/Data type_ Higher taxon report.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <HigherClassificationFilters filters={classifications} onChange={setClassifications} />
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
-  );
-}
-
-interface FilterGroupProps {
-  label: string;
-  description: string;
-  image: string;
-}
-
-function FilterGroup({ label, description, image }: FilterGroupProps) {
-  return (
-    <Group wrap="nowrap">
-      <Avatar src={image} size="lg" />
-      <div>
-        <Text>{label}</Text>
-        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
-          {description}
-        </Text>
-      </div>
-    </Group>
-  );
-}
-
-function FilterBadge({ filter }: { filter: Filter }) {
-  return (
-    <Badge variant="outline">
-      {filter.scientificName || filter.canonicalName || filter.vernacularGroup || filter.hasData}
-    </Badge>
-  );
-}
-
-function Species({ group }: { group: ListGroup }) {
-  const [page, setPage] = useState(1);
-  const [opened, { open, close }] = useDisclosure(false);
-
-  const [filters, setFilters] = useState<Filters>({
-    classifications: [],
-    dataTypes: [],
-  });
-
-  const flattenFilters = (filters: Filters) => {
-    const items = [...filters.classifications, ...filters.dataTypes];
-
-    return items.filter((item): item is Filter => !!item);
-  };
-
-  const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
-    variables: {
-      page,
-      pageSize: PAGE_SIZE,
-      name: group.source,
-      filters: flattenFilters(filters)
-        .map(intoFilterItem)
-        .filter((item) => item),
-      speciesAttribute: group.filter || null,
-    },
-  });
-
-  const records = Array.from(data?.source.species.records || []);
-
-  return (
-    <Stack>
-      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
-        <Box pt={200}>
-          <Filters filters={filters} onChange={setFilters} />
-        </Box>
-      </Drawer>
-
-      <LoadOverlay visible={loading} />
-
-      <Grid gutter={50} align="baseline">
-        <Grid.Col span="content">
-          <Title order={5}>Browse species</Title>
-        </Grid.Col>
-
-        <Grid.Col span="auto">
-          <Group>
-            <Text fz="sm" fw={300}>
-              Filters
-            </Text>
-            {flattenFilters(filters).map((filter, idx) => (
-              <FilterBadge key={idx} filter={filter} />
-            ))}
-          </Group>
-        </Grid.Col>
-
-        <Grid.Col span="content">
-          <Button leftSection={<IconFilter />} variant="subtle" onClick={open}>
-            Filter
-          </Button>
-        </Grid.Col>
-      </Grid>
-
-      {error ? <Title order={4}>{error.message}</Title> : null}
-
-      {records.length === 0 && <Text className={classes.emptyList}>no data</Text>}
-
-      <SimpleGrid cols={5}>
-        {records.map((record) => (
-          <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
-        ))}
-      </SimpleGrid>
-
-      <PaginationBar total={data?.source.species.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
-    </Stack>
-  );
-}
+const DOWNLOAD_SPECIES = gql`
+  query DownloadSourceSpecies($name: String, $filters: [FilterItem]) {
+    download: source(by: { name: $name }, filters: $filters) {
+      csv: speciesCsv
+    }
+  }
+`;
 
 function GroupDetails({ source, loading }: { source: Source; loading: boolean }) {
   const theme = useMantineTheme();
@@ -440,15 +234,11 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
   const params = use(props.params);
   const router = useRouter();
 
-  const minDate = new Date("2009-01-01");
-  const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
-
-   
-  const group = (queryMap as Record<string, ListGroup>)[params.list];
+  const group = (queryMap as Record<string, GroupItem>)[params.list];
   const [_, setPreviousPage] = usePreviousPage();
 
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
-    variables: { name: group?.source.replaceAll("_", " ") || "", speciesAttribute: group.filter || null },
+    variables: { name: group?.source.replaceAll("_", " ") || "", filters: groupInclude(group) },
     skip: !group,
   });
 
@@ -456,7 +246,7 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
     if (group) {
       setPreviousPage({
         name: `browsing ${group.category}`,
-        url: `/browse/sources/${params.list}`,
+        url: `/browse/groups/${params.list}`,
       });
     } else {
       router.replace("/browse/groups");
@@ -490,24 +280,14 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
       <Paper py={30}>
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
-            {/**
-             * Taxonomic breakdown (Rename to data summary):
-             * - Number of species
-             * - Species with genomes
-             * - Species with data
-             * - Species with most genomes
-             * - Species with most data
-             * We want all excluding phyla with genomes
-             * We also want:
-             * - sunburst from genome tracker
-             *   - mammals, birds, frogs & reptiles, plants
-             * - Accumulation curve
-             * - taxonomic coverage (start at kingdom level)
-             * Artfully arange into an aesthetically pleasing order
-             * - Put the genome content above any genetic data (separate)
-             */}
             <Paper p="xl" radius="lg" withBorder>
-              <Species group={group} />
+              <BrowseSpecies
+                query={{
+                  content: GET_SPECIES,
+                  download: DOWNLOAD_SPECIES,
+                  variables: { name: group.source, filters: groupInclude(group) },
+                }}
+              />
             </Paper>
           </Stack>
         </Container>

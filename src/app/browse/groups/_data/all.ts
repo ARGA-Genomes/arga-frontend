@@ -5,15 +5,13 @@ import { other } from "./other";
 import { phenotypic } from "./phenotypic";
 import { threatened } from "./threatened";
 
-interface GroupItem {
+export interface GroupItem {
   category: string;
   image: string;
   source: string;
   filter?: {
     name: string;
-    value: {
-      string: string;
-    };
+    value: string | boolean;
   };
 }
 
@@ -26,4 +24,26 @@ const map = array.reduce(
   {}
 );
 
-export { array, map };
+const groupInclude = ({ filter }: GroupItem) =>
+  filter
+    ? [
+        {
+          filter: "ATTRIBUTE",
+          action: "INCLUDE",
+          value: [filter],
+        },
+      ]
+    : [];
+
+const groupExclude = ({ filter }: GroupItem) =>
+  filter
+    ? [
+        {
+          filter: "ATTRIBUTE",
+          action: "EXCLUDE",
+          value: [filter],
+        },
+      ]
+    : [];
+
+export { array, map, groupInclude, groupExclude };

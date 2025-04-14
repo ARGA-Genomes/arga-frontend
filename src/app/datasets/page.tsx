@@ -26,8 +26,6 @@ import {
   IconExternalLink,
   IconArrowUpRight,
   IconClockHour4,
-  IconTable,
-  IconLayoutGrid,
   IconArrowsSort,
   IconChevronDown,
 } from "@tabler/icons-react";
@@ -37,6 +35,7 @@ import { useState, useMemo } from "react";
 import { SortChip } from "@/components/sorting/sort-chips";
 import { DataPageCitation } from "@/components/page-citation";
 import styles from "../../components/record-list.module.css";
+import { TableCardLayout, TableCardSwitch } from "@/components/table-card-switch";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -454,7 +453,7 @@ function DatasetSort({ sortBy, setSortBy }: { sortBy: string | null; setSortBy: 
 
 function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) {
   const theme = useMantineTheme();
-  const [layoutView, setLayoutView] = useState("card");
+  const [layoutView, setLayoutView] = useState<TableCardLayout>("card");
   const [sortBy, setSortBy] = useState<string | null>(null);
 
   const sortedSources = useMemo(() => {
@@ -482,42 +481,7 @@ function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) 
           </Text>
           <Group mt={15} gap={50} align="center">
             <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
-            <Group gap={10}>
-              <UnstyledButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLayoutView("table");
-                }}
-              >
-                <Stack gap={1} align="center">
-                  <IconTable
-                    color={layoutView === "table" ? "white" : theme.colors.midnight[10]}
-                    className={classes.tableLayoutViewBtn}
-                    fill={layoutView === "table" ? theme.colors.midnight[10] : "none"}
-                  />
-                  <Text size="xs" fw={550} c={theme.colors.midnight[10]}>
-                    Table
-                  </Text>
-                </Stack>
-              </UnstyledButton>
-              <UnstyledButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLayoutView("card");
-                }}
-              >
-                <Stack gap={1} align="center">
-                  <IconLayoutGrid
-                    color={theme.colors.midnight[10]}
-                    className={classes.cardLayoutViewBtn}
-                    fill={layoutView === "card" ? theme.colors.midnight[10] : "none"}
-                  />
-                  <Text size="xs" fw={550} c={theme.colors.midnight[10]}>
-                    Card
-                  </Text>
-                </Stack>
-              </UnstyledButton>
-            </Group>
+            <TableCardSwitch layout={layoutView} onChange={setLayoutView} />
           </Group>
         </Group>
       </Accordion.Control>

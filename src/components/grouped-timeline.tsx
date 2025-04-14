@@ -65,14 +65,14 @@ function GroupedTimelineYear({ width, height, startInverted, header, children }:
 }
 
 interface LineProps {
-  groups: Map<number, GroupedYear>;
+  groups: { [year: number]: GroupedYear };
 }
 
 function Line({ groups }: LineProps) {
   const points: Array<number> = [];
 
   let cursor = 0;
-  for (const [_year, group] of groups.entries()) {
+  for (const [_year, group] of Object.entries(groups)) {
     // get the distance between points within the group
     const distance = group.width / (group.children.length + 1);
 
@@ -120,21 +120,22 @@ interface GroupedTimelineProps {
 }
 
 export function GroupedTimeline({ height, children }: GroupedTimelineProps) {
-  const years = new Map<number, GroupedYear>();
+  const years: { [year: number]: GroupedYear } = {};
 
   // group the timeline items into years
   for (const child of children ?? []) {
     const year = child.props.date.getFullYear();
 
-    const group = years.get(year) || { width: 100, children: [] };
+    const group = years[year] || { width: 100, children: [] };
     group.children.push(child);
     group.width += child.props.width;
 
-    years.set(year, group);
+    years[year] = group;
   }
 
-  const allGroups = years.entries().reduce((acc, [_key, group]) => (acc += group.width), 0);
-  const allMargins = years.keys().toArray().length * GROUP_GAP;
+  console.log(years);
+  const allGroups = Object.entries(years).reduce((acc, [_key, group]) => (acc += group.width), 0);
+  const allMargins = Object.keys(years).length * GROUP_GAP;
   const totalWidth = allGroups + allMargins;
   let groupLeft = 0;
   let childrenAccumulator = 0;
