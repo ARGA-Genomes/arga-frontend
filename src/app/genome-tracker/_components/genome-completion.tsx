@@ -41,7 +41,7 @@ export function GenomeCompletion({ taxonRank, taxonCanonicalName, domain }: Geno
   let accum = 0;
 
   const stats = data?.stats.completeGenomesByYear.filter(
-    (stat) => stat.year >= domain[0].getFullYear() && stat.year <= domain[1].getFullYear(),
+    (stat) => stat.year >= domain[0].getFullYear() && stat.year <= domain[1].getFullYear()
   );
 
   const lineData = stats?.map((stat) => ({
