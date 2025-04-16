@@ -4,21 +4,26 @@ import { FilterGroup } from "../group";
 import { FilterType, FilterItem } from "../filters/common";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
 
-export const dataTypeFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
+export const bushfireRecoveryFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
     .map(({ include, value }) => ({
-      filter: FilterType.HasData,
+      filter: FilterType.Attribute,
       action: include ? "INCLUDE" : "EXCLUDE",
-      value,
+      value: [
+        {
+          name: value,
+          value: true,
+        },
+      ],
     }));
 
-interface DataTypeFiltersProps {
+interface BushfireRecoveryFiltersProps {
   filters: BoolFilterData[];
   onChange: (filters: BoolFilterData[]) => void;
 }
 
-export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
+export function BushfireRecoveryFilters({ filters, onChange }: BushfireRecoveryFiltersProps) {
   // Event handlers for filter chip bools
   const handleActiveToggle = (value: string, active: boolean) =>
     onChange(
@@ -49,15 +54,15 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
 
   return (
     <FilterGroup
-      title="Data types"
-      description="Filter species that have specific types of data"
-      icon={"/icons/data-type/Data type_ DNA.svg"}
+      title="Bushfire recovery"
+      description="Filter species with bushfire recovery traits"
+      icon={"/icons/list-group/List group_ Bushfire vulnerable.svg"}
     >
       {filters.map((filter) => (
         <BoolFilter
           key={filter.value}
           {...filter}
-          options={["Has", "Missing"]}
+          options={["Include", "Exclude"]}
           onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
           onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
         />
@@ -66,7 +71,21 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
   );
 }
 
-export const DEFAULT_DATA_TYPE_FILTERS = ["Genome", "Locus", "Specimen", "Other"].map((value) => ({
+const DEFAULT_TRAITS = [
+  "vulnerable_wildfire",
+  "Interactive effects of fire and drought",
+  "Fire-disease interactions",
+  "High fire severity",
+  "Weed invasion",
+  "Elevated winter temperatures or changed temperature regimes",
+  "Fire sensitivity",
+  "Post-fire erosion",
+  "Post-fire herbivore impacts",
+  "Cumulative exposure to high risks",
+  "Other plausible threats or expert-driven nominations",
+];
+
+export const DEFAULT_BUSHFIRE_RECOVERY_FILTERS: BoolFilterData[] = DEFAULT_TRAITS.map((value) => ({
   value,
   active: false,
   disabled: false,

@@ -1,19 +1,31 @@
+import { ReactElement, useEffect, useState } from "react";
 import { Button, Drawer, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAdjustments } from "@tabler/icons-react";
 import { FilterItem } from "./filters/common";
-import { ReactElement, useEffect, useState } from "react";
-import { DataTypeFilter, DataTypeFilters, dataTypeFiltersToQuery, DEFAULT_DATA_TYPE_FILTERS } from "./groups/data-type";
-import { ClassificationFilter, ClassificationFilters, classificationFiltersToQuery } from "./groups/classification";
-import { renderBoolFilterChips } from "./filters/bool";
-import { renderTaxonFilterChips } from "./filters/taxon";
 
-type FilterType = "dataType" | "classification";
+// Filter groups
+import { DataTypeFilters, dataTypeFiltersToQuery, DEFAULT_DATA_TYPE_FILTERS } from "./groups/data-type";
+import { ClassificationFilter, ClassificationFilters, classificationFiltersToQuery } from "./groups/classification";
+
+// Chip rendering imports
+import { BoolFilterData, renderBoolFilterChips, renderVernacularGroupFilterChip } from "./filters/bool";
+import { renderTaxonFilterChips } from "./filters/taxon";
+import {
+  BushfireRecoveryFilters,
+  bushfireRecoveryFiltersToQuery,
+  DEFAULT_BUSHFIRE_RECOVERY_FILTERS,
+} from "./groups/bushfire-recovery";
+import { VernacularGroupFilter, vernacularGroupFilterToQuery } from "./groups/vernacular-group";
+import { DEFAULT_THREATENED_FILTERS, ThreatenedFilters, threatenedFiltersToQuery } from "./groups/threatened";
+
+type FilterType = "dataType" | "classification" | "bushfireRecovery" | "vernacularGroup" | "threatened";
 
 interface FiltersDrawerProps {
   types: FilterType[];
   defaultFilters?: {
-    dataType?: DataTypeFilter[];
+    dataType?: BoolFilterData[];
+    bushfireRecovery?: BoolFilterData[];
   };
   onFilter: (items: FilterItem[]) => void;
   onFilterChips: (chips: ReactElement[]) => void;
@@ -23,14 +35,29 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips }
   const [opened, handlers] = useDisclosure(false);
 
   // Filter states
-  const [dataTypeFilters, setDataTypeFilters] = useState<DataTypeFilter[]>(
+  const [dataTypeFilters, setDataTypeFilters] = useState<BoolFilterData[]>(
     DEFAULT_DATA_TYPE_FILTERS.map((defaultFilter) => {
       const override = (defaultFilters?.dataType || []).find((filter) => filter.value === defaultFilter.value);
       return override || defaultFilter;
     })
   );
 
+  const [threatenedFilters, setThreatenedFilters] = useState<BoolFilterData[]>(
+    DEFAULT_THREATENED_FILTERS.map((defaultFilter) => {
+      const override = (defaultFilters?.bushfireRecovery || []).find((filter) => filter.value === defaultFilter.value);
+      return override || defaultFilter;
+    })
+  );
+
+  const [bushfireRecoveryFilters, setBushfireRecoveryFilters] = useState<BoolFilterData[]>(
+    DEFAULT_BUSHFIRE_RECOVERY_FILTERS.map((defaultFilter) => {
+      const override = (defaultFilters?.bushfireRecovery || []).find((filter) => filter.value === defaultFilter.value);
+      return override || defaultFilter;
+    })
+  );
+
   const [classificationFilters, setClassificationFilters] = useState<ClassificationFilter[]>([]);
+  const [vernacularGroupFilter, setVernacularGroupFilter] = useState<BoolFilterData | null>(null);
 
   const uniqueTypes = Array.from(new Set(types));
 
@@ -40,16 +67,33 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips }
         return <DataTypeFilters key={type} filters={dataTypeFilters} onChange={setDataTypeFilters} />;
       case "classification":
         return <ClassificationFilters key={type} filters={classificationFilters} onChange={setClassificationFilters} />;
+      case "threatened":
+        return <ThreatenedFilters key={type} filters={threatenedFilters} onChange={setThreatenedFilters} />;
+      case "bushfireRecovery":
+        return (
+          <BushfireRecoveryFilters key={type} filters={bushfireRecoveryFilters} onChange={setBushfireRecoveryFilters} />
+        );
+      case "vernacularGroup":
+        return <VernacularGroupFilter key={type} filter={vernacularGroupFilter} onChange={setVernacularGroupFilter} />;
     }
   };
 
   useEffect(() => {
-    onFilter([...dataTypeFiltersToQuery(dataTypeFilters), ...classificationFiltersToQuery(classificationFilters)]);
-    onFilterChips([
-      ...renderBoolFilterChips(dataTypeFilters, setDataTypeFilters),
-      ...renderTaxonFilterChips(classificationFilters, setClassificationFilters),
+    onFilter([
+      ...dataTypeFiltersToQuery(dataTypeFilters),
+      ...classificationFiltersToQuery(classificationFilters),
+      ...threatenedFiltersToQuery(threatenedFilters),
+      ...bushfireRecoveryFiltersToQuery(bushfireRecoveryFilters),
+      ...vernacularGroupFilterToQuery(vernacularGroupFilter),
     ]);
-  }, [dataTypeFilters, classificationFilters]);
+    onFilterChips([
+      ...renderBoolFilterChips(dataTypeFilters, ["Has", "Missing"], setDataTypeFilters),
+      ...renderTaxonFilterChips(classificationFilters, setClassificationFilters),
+      ...renderBoolFilterChips(threatenedFilters, ["Includes", "Excludes"], setThreatenedFilters),
+      ...renderBoolFilterChips(bushfireRecoveryFilters, ["Includes", "Excludes"], setBushfireRecoveryFilters),
+      ...renderVernacularGroupFilterChip(vernacularGroupFilter, () => setVernacularGroupFilter(null)),
+    ]);
+  }, [dataTypeFilters, classificationFilters, threatenedFilters, bushfireRecoveryFilters, vernacularGroupFilter]);
 
   return (
     <>

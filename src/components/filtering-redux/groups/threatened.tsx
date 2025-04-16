@@ -4,21 +4,26 @@ import { FilterGroup } from "../group";
 import { FilterType, FilterItem } from "../filters/common";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
 
-export const dataTypeFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
+export const threatenedFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
     .map(({ include, value }) => ({
-      filter: FilterType.HasData,
+      filter: FilterType.Attribute,
       action: include ? "INCLUDE" : "EXCLUDE",
-      value,
+      value: [
+        {
+          name: value,
+          value: true,
+        },
+      ],
     }));
 
-interface DataTypeFiltersProps {
+interface ThreatenedFiltersProps {
   filters: BoolFilterData[];
   onChange: (filters: BoolFilterData[]) => void;
 }
 
-export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
+export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps) {
   // Event handlers for filter chip bools
   const handleActiveToggle = (value: string, active: boolean) =>
     onChange(
@@ -49,15 +54,15 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
 
   return (
     <FilterGroup
-      title="Data types"
-      description="Filter species that have specific types of data"
-      icon={"/icons/data-type/Data type_ DNA.svg"}
+      title="Threatened"
+      description="Filter threatened species"
+      icon={"/icons/list-group/List group_ Threatened species.svg"}
     >
       {filters.map((filter) => (
         <BoolFilter
           key={filter.value}
           {...filter}
-          options={["Has", "Missing"]}
+          options={["Include", "Exclude"]}
           onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
           onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
         />
@@ -66,7 +71,16 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
   );
 }
 
-export const DEFAULT_DATA_TYPE_FILTERS = ["Genome", "Locus", "Specimen", "Other"].map((value) => ({
+const DEFAULT_TRAITS = [
+  "EPBC_act_category_CR",
+  "EPBC_act_category_EN",
+  "EPBC_act_category_EW",
+  "EPBC_act_category_EX",
+  "EPBC_act_category_VU",
+  "EPBC_act_category_cd",
+];
+
+export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = DEFAULT_TRAITS.map((value) => ({
   value,
   active: false,
   disabled: false,

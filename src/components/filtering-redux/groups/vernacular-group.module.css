@@ -1,0 +1,16 @@
+.root {
+  flex-grow: 1;
+}
+
+.option {
+  padding-left: 6px;
+  border-radius: var(--mantine-radius-lg);
+}
+
+.option[data-combobox-selected="true"] {
+  background-color: var(--mantine-color-midnight-9);
+}
+
+.dropdown {
+  border-radius: var(--mantine-radius-lg);
+}
