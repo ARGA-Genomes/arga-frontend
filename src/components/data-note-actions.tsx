@@ -8,16 +8,17 @@ import { IconCopy, IconDownload } from "@tabler/icons-react";
 interface ActionButtonProps {
   label: string;
   icon: ReactElement;
+  disabled?: boolean;
 }
 
-function ActionButton({ label, icon }: ActionButtonProps) {
+function ActionButton({ label, icon, disabled }: ActionButtonProps) {
   return (
     <UnstyledButton>
       <Flex gap={12} align="center">
-        <ThemeIcon radius="md" color="midnight.11">
+        <ThemeIcon radius="md" color={disabled ? "midnight.1" : "midnight.11"}>
           {icon}
         </ThemeIcon>
-        <Text size="sm" fw={600} c="midnight.11">
+        <Text size="sm" fw={600} c={disabled ? "midnight.1" : "midnight.11"}>
           {label}
         </Text>
       </Flex>
@@ -48,9 +49,9 @@ export function DataNoteActions() {
         </Text>
         <Divider my="xs" />
         <Stack gap="sm">
-          <ActionButton label="Copy page citation" icon={<IconCopy size="1rem" />} />
-          <ActionButton label="Download raw data as CSV" icon={<IconDownload size="1rem" />} />
-          <ActionButton label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
+          <ActionButton disabled label="Copy page citation" icon={<IconCopy size="1rem" />} />
+          <ActionButton disabled label="Download raw data as CSV" icon={<IconDownload size="1rem" />} />
+          <ActionButton disabled label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
         </Stack>
       </Stack>
     </Paper>
