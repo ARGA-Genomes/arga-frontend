@@ -29,6 +29,30 @@ import { Circle } from "@visx/shape";
 import { CumulativeTracker } from "./cumulative-tracker";
 import { TachoChart } from "@/components/graphing/tacho";
 import { GenomeCompletion } from "./genome-completion";
+import { BarChart } from "@/components/graphing/bar";
+import { useDatasets } from "@/app/source-provider";
+
+const GET_SPECIES_GENOME_SUMMARY = gql`
+  query SpeciesGenomeSummary($rank: TaxonRank, $canonicalName: String, $datasetId: UUID) {
+    taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
+      speciesGenomesSummary {
+        canonicalName
+        genomes
+        totalGenomic
+      }
+    }
+  }
+`;
+
+export interface SpeciesGenomeSummary {
+  taxon: {
+    speciesGenomesSummary: {
+      canonicalName: string;
+      genomes: number;
+      totalGenomic: number;
+    }[];
+  };
+}
 
 const GET_COVERAGE_STATS = gql`
   query TaxonCoverageStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
@@ -120,6 +144,12 @@ const QUERIES: Record<string, QueryParams> = {
     includeRanks: ["PHYLUM", "CLASS"],
     rankStats: ["CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
+  snails: {
+    taxonRank: "CLASS",
+    taxonCanonicalName: "Gastropoda",
+    includeRanks: ["CLASS", "ORDER"],
+    rankStats: ["ORDER", "FAMILY", "GENUS", "SPECIES"],
+  },
   fungi: {
     taxonRank: "KINGDOM",
     taxonCanonicalName: "Fungi",
@@ -129,6 +159,12 @@ const QUERIES: Record<string, QueryParams> = {
   "flowering plants": {
     taxonRank: "CLASS",
     taxonCanonicalName: "Equisetopsida",
+    includeRanks: ["CLASS", "ORDER"],
+    rankStats: ["ORDER", "FAMILY", "GENUS", "SPECIES"],
+  },
+  "fin fishes": {
+    taxonRank: "CLASS",
+    taxonCanonicalName: "Actinopterygii",
     includeRanks: ["CLASS", "ORDER"],
     rankStats: ["ORDER", "FAMILY", "GENUS", "SPECIES"],
   },
@@ -143,14 +179,16 @@ const ICONS: Record<string, string> = {
   fungi: "/icons/taxon/Taxon_ Fungi (Fungi).svg",
   insects: "/icons/taxon/Taxon_ Insects (Insecta).svg",
   corals: "/icons/taxon/Taxon_ Hard corals (Order Scleractinia).svg",
+  "fin fishes": "/icons/taxon/Taxon_ Finfishes (Actinopterygii).svg",
 };
 
 interface GroupSelectionProps {
   group: string;
   onSelected: (group: string) => void;
+  selected?: boolean;
 }
 
-function GroupSelection({ group, onSelected }: GroupSelectionProps) {
+function GroupSelection({ group, onSelected, selected }: GroupSelectionProps) {
   const query = QUERIES[group];
 
   const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
@@ -170,11 +208,15 @@ function GroupSelection({ group, onSelected }: GroupSelectionProps) {
   }));
 
   return (
-    <Paper className={classes.groupButton} onClick={() => onSelected(group)} withBorder>
-      <Group mt={10} ml={10}>
-        <Image w={40} h={40} src={ICONS[group]} alt={group} />
-        <Text>{Humanize.capitalize(group)}</Text>
-      </Group>
+    <Paper
+      className={selected ? classes.groupButtonSelected : classes.groupButton}
+      onClick={() => onSelected(group)}
+      pt="xs"
+      withBorder
+    >
+      <Center>
+        <Text className={classes.groupButtonLabel}>{Humanize.capitalize(group)}</Text>
+      </Center>
       <Box h={200}>{coverage && <RadialGraph data={asPercentage(coverage)} />}</Box>
     </Paper>
   );
@@ -303,7 +345,7 @@ function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
 
   return (
     <Stack>
-      <Paper radius="lg" p="lg" withBorder>
+      <Paper radius="lg" p="lg">
         <Stack gap="xl">
           <SpeciesCoverageTacho group={group} />
           <Text c="midnight.11" size="sm">
@@ -312,7 +354,7 @@ function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
         </Stack>
       </Paper>
 
-      <Paper radius="lg" p="lg" withBorder>
+      <Paper radius="lg" p="lg">
         <Stack gap="xl">
           <Box h={300}>
             <GenomeCompletion
@@ -328,7 +370,7 @@ function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
         </Stack>
       </Paper>
 
-      <Paper radius="lg" p="lg" pb="xl" withBorder>
+      <Paper radius="lg" p="lg" pb="xl">
         <Stack gap="xl">
           <Box h={300}>
             <CumulativeTracker
@@ -347,25 +389,70 @@ function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
   );
 }
 
+function SpeciesWithGenomes({ group }: { group: string }) {
+  const query = QUERIES[group];
+
+  const { names } = useDatasets();
+  const datasetId = names.get("Atlas of Living Australia")?.id;
+
+  const { data } = useQuery<SpeciesGenomeSummary>(GET_SPECIES_GENOME_SUMMARY, {
+    variables: {
+      datasetId,
+      rank: query.taxonRank,
+      canonicalName: query.taxonCanonicalName,
+    },
+  });
+
+  const speciesGenomes = data?.taxon.speciesGenomesSummary
+    .filter((summary) => summary.genomes > 0)
+    .map((summary) => {
+      const linkName = encodeURIComponent(summary.canonicalName.replaceAll(" ", "_"));
+      return {
+        name: summary.canonicalName || "",
+        value: summary.genomes,
+        href: `/species/${linkName}`,
+      };
+    })
+    .sort((a, b) => b.value - a.value);
+
+  return speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />;
+}
+
 interface GroupDetailProps {
   group: string;
   domain: [Date, Date];
 }
 
 function GroupDetail({ group, domain }: GroupDetailProps) {
+  const query = QUERIES[group];
+
   return (
     <Paper radius="xl" p="lg" withBorder>
       <Stack>
-        <Group justify="center" mt={10} ml={10}>
-          <Image w={40} h={40} src={ICONS[group]} alt={group} />
-          <Title order={3}>{Humanize.capitalize(group)}</Title>
-        </Group>
-
         <Grid>
           <Grid.Col span={6}>
-            <GroupDetailRadial query={QUERIES[group]} />
+            <Stack gap={60}>
+              <GroupDetailRadial query={query} />
+
+              <Stack>
+                <Text fw={300} fz="xs">
+                  Species with genomes
+                </Text>
+                <SpeciesWithGenomes group={group} />
+              </Stack>
+            </Stack>
           </Grid.Col>
           <Grid.Col span={6}>
+            <Group justify="center" my="lg">
+              <Image w={100} h={100} src={ICONS[group]} alt={group} />
+              <Stack gap={0}>
+                <Title order={2}>{Humanize.capitalize(group)}</Title>
+                <Text fz="xl">
+                  {Humanize.capitalize(query.taxonRank.toLocaleLowerCase())} {query.taxonCanonicalName}
+                </Text>
+              </Stack>
+            </Group>
+
             <GroupDetailExtra group={group} domain={domain} />
           </Grid.Col>
         </Grid>
@@ -386,14 +473,16 @@ export function GroupingCompletion({ dateDomain }: GroupingCompletionProps) {
       <Grid>
         <Grid.Col span={4}>
           <SimpleGrid cols={2}>
-            <GroupSelection onSelected={setGroup} group="mammals" />
-            <GroupSelection onSelected={setGroup} group="birds" />
-            <GroupSelection onSelected={setGroup} group="reptiles" />
-            <GroupSelection onSelected={setGroup} group="amphibians" />
-            <GroupSelection onSelected={setGroup} group="flowering plants" />
-            <GroupSelection onSelected={setGroup} group="fungi" />
-            <GroupSelection onSelected={setGroup} group="insects" />
-            <GroupSelection onSelected={setGroup} group="corals" />
+            <GroupSelection onSelected={setGroup} group="mammals" selected={group == "mammals"} />
+            <GroupSelection onSelected={setGroup} group="birds" selected={group == "birds"} />
+            <GroupSelection onSelected={setGroup} group="reptiles" selected={group == "reptiles"} />
+            <GroupSelection onSelected={setGroup} group="amphibians" selected={group == "amphibians"} />
+            <GroupSelection onSelected={setGroup} group="flowering plants" selected={group == "flowering plants"} />
+            <GroupSelection onSelected={setGroup} group="fungi" selected={group == "fungi"} />
+            <GroupSelection onSelected={setGroup} group="insects" selected={group == "insects"} />
+            <GroupSelection onSelected={setGroup} group="corals" selected={group == "corals"} />
+            <GroupSelection onSelected={setGroup} group="fin fishes" selected={group == "fin fishes"} />
+            <GroupSelection onSelected={setGroup} group="snails" selected={group == "snails"} />
           </SimpleGrid>
         </Grid.Col>
         <Grid.Col span={8}>
