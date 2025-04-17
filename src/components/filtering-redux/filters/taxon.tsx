@@ -118,9 +118,9 @@ export function TaxonSearch({ onSelect }: TaxonSearchProps) {
         setSearching(true);
 
         const resp = await fetch(
-          `${process.env.NEXT_PUBLIC_ALA_BIE_API_URL}/search/auto?q=${encodeURIComponent(
-            search!
-          )}&idxType=TAXON&limit=30`
+          `${
+            process.env.NEXT_PUBLIC_ALA_BIE_API_URL || "https://api.ala.org.au/species"
+          }/search/auto?q=${encodeURIComponent(search!)}&idxType=TAXON&limit=30`
         );
 
         const seen = new Set();

@@ -2,8 +2,21 @@
 
 import { useEffect, use } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Paper, Text, Group, Stack, Container, Box, Grid, useMantineTheme, Anchor, Image } from "@mantine/core";
-import { IconExternalLink } from "@tabler/icons-react";
+import {
+  Paper,
+  Text,
+  Group,
+  Stack,
+  Container,
+  Box,
+  Grid,
+  useMantineTheme,
+  Anchor,
+  Image,
+  Flex,
+  ThemeIcon,
+} from "@mantine/core";
+import { IconExternalLink, IconStarFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
 // App components & constants
@@ -16,6 +29,9 @@ import { groupInclude, GroupItem, map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
 import { BrowseSpecies } from "@/components/browse-species";
+import { DataSummary, Taxonomy } from "./data-summary";
+
+import stubData from "./data-summary-stub.json";
 
 const GET_DETAILS = gql`
   query SourceDetails($name: String, $filters: [FilterItem]) {
@@ -231,6 +247,7 @@ function GroupDetails({ source, loading }: { source: Source; loading: boolean })
 }
 
 export default function BrowseGroup(props: { params: Promise<{ list: string }> }) {
+  const theme = useMantineTheme();
   const params = use(props.params);
   const router = useRouter();
 
@@ -254,6 +271,8 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
   }, [group, params.list, router, setPreviousPage]);
 
   if (!group) return null;
+
+  const OPTION = 2;
 
   return (
     <Stack mt="xl">
@@ -280,6 +299,75 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
       <Paper py={30}>
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
+            <Paper radius="lg" pos="relative" withBorder>
+              <Stack
+                justify="center"
+                align="center"
+                px="xl"
+                py="md"
+                mb={34}
+                bg="wheat.0"
+                style={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
+              >
+                <Text fw="bold" c="wheat.7">
+                  Dataset highlights
+                </Text>
+                <Flex direction="row" align="center" justify="center" mb={-48} gap="lg">
+                  <Paper miw={200} radius="lg" p="xs" shadow="sm" withBorder>
+                    <Stack gap={4}>
+                      <Text c="dimmed" size="xs" fw="bold">
+                        LATEST GENOME RELEASE
+                      </Text>
+                      <Text fw="bold" fs="italic" c="shellfish.9">
+                        Slaysia slayness
+                      </Text>
+                    </Stack>
+                  </Paper>
+                  <ThemeIcon radius="xl" color="wheat" variant="white">
+                    <IconStarFilled size="1rem" />
+                  </ThemeIcon>
+                  <Paper miw={200} radius="lg" p="xs" shadow="sm" withBorder>
+                    <Stack gap={4}>
+                      <Text c="dimmed" size="xs" fw="bold">
+                        MOST GENOMES
+                      </Text>
+                      <Text fw="bold" fs="italic" c="shellfish.9">
+                        Slaysia slayness
+                      </Text>
+                    </Stack>
+                  </Paper>
+                  <ThemeIcon radius="xl" color="wheat" variant="white">
+                    <IconStarFilled size="1rem" />
+                  </ThemeIcon>
+                  <Paper miw={200} radius="lg" p="xs" shadow="sm" withBorder>
+                    <Stack gap={4}>
+                      <Text c="dimmed" size="xs" fw="bold">
+                        MOST LOCI
+                      </Text>
+                      <Text fw="bold" fs="italic" c="shellfish.9">
+                        Slaysia slayness
+                      </Text>
+                    </Stack>
+                  </Paper>
+                  <ThemeIcon radius="xl" color="wheat" variant="white">
+                    <IconStarFilled size="1rem" />
+                  </ThemeIcon>
+                  <Paper miw={200} radius="lg" p="xs" shadow="sm" withBorder>
+                    <Stack gap={4}>
+                      <Text c="dimmed" size="xs" fw="bold">
+                        MOST DATA
+                      </Text>
+                      <Text fw="bold" fs="italic" c="shellfish.9">
+                        Slaysia slayness
+                      </Text>
+                    </Stack>
+                  </Paper>
+                </Flex>
+              </Stack>
+              <Box p="xl">
+                <DataSummary rank="KINGDOM" taxon={stubData as unknown as Taxonomy} />
+              </Box>
+            </Paper>
             <Paper p="xl" radius="lg" withBorder>
               <BrowseSpecies
                 query={{

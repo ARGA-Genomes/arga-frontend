@@ -5,6 +5,7 @@
 export enum FilterType {
   VernacularGroup = "VERNACULAR_GROUP",
   HasData = "HAS_DATA",
+  Attribute = "ATTRIBUTE",
   Domain = "DOMAIN",
   Superkingdom = "SUPERKINGDOM",
   Kingdom = "KINGDOM",
@@ -47,10 +48,15 @@ export enum FilterType {
 
 export type FilterAction = "INCLUDE" | "EXCLUDE";
 
+export interface FilterItemAttribute {
+  name: string;
+  value: string | number | boolean;
+}
+
 export interface FilterItem {
   filter: FilterType;
   action: FilterAction;
-  value: string;
+  value: string | FilterItemAttribute[];
 }
 
 /*

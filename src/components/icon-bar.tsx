@@ -197,6 +197,12 @@ export const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
     link: "/class/Reptilia",
     colour: "moss.4",
   },
+  SPONGES: {
+    image: "/icons/taxon/Taxon_ Sponges (Phylum Porifera).svg",
+    label: "Sponges",
+    link: "/phylum/Porifera",
+    colour: "shellfish.5",
+  },
   MOSSES: {
     image: "/icons/taxon/Taxon_ Mosses (Bryophyta).svg",
     label: "Mosses",
