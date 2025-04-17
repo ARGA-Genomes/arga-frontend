@@ -477,12 +477,12 @@ export function GroupingCompletion({ dateDomain }: GroupingCompletionProps) {
             <GroupSelection onSelected={setGroup} group="birds" selected={group == "birds"} />
             <GroupSelection onSelected={setGroup} group="reptiles" selected={group == "reptiles"} />
             <GroupSelection onSelected={setGroup} group="amphibians" selected={group == "amphibians"} />
+            <GroupSelection onSelected={setGroup} group="fin fishes" selected={group == "fin fishes"} />
+            <GroupSelection onSelected={setGroup} group="insects" selected={group == "insects"} />
+            <GroupSelection onSelected={setGroup} group="snails" selected={group == "snails"} />
+            <GroupSelection onSelected={setGroup} group="corals" selected={group == "corals"} />
             <GroupSelection onSelected={setGroup} group="flowering plants" selected={group == "flowering plants"} />
             <GroupSelection onSelected={setGroup} group="fungi" selected={group == "fungi"} />
-            <GroupSelection onSelected={setGroup} group="insects" selected={group == "insects"} />
-            <GroupSelection onSelected={setGroup} group="corals" selected={group == "corals"} />
-            <GroupSelection onSelected={setGroup} group="fin fishes" selected={group == "fin fishes"} />
-            <GroupSelection onSelected={setGroup} group="snails" selected={group == "snails"} />
           </SimpleGrid>
         </Grid.Col>
         <Grid.Col span={8}>
