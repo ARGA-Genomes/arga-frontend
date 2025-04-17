@@ -26,20 +26,22 @@ import { CumulativeTracker } from "./_components/cumulative-tracker";
 import { GroupingCompletion } from "./_components/grouping-completion";
 import { SignificantMilestones } from "./_components/significant-milestones";
 import { CompletionStepper } from "./_components/completion-stepper";
+import Link from "next/link";
 
 interface ActionButtonProps {
   label: string;
   icon: ReactElement;
+  disabled?: boolean;
 }
 
-function ActionButton({ label, icon }: ActionButtonProps) {
+function ActionButton({ label, icon, disabled }: ActionButtonProps) {
   return (
-    <UnstyledButton>
+    <UnstyledButton disabled={disabled}>
       <Flex gap={12} align="center">
-        <ThemeIcon radius="md" color="midnight.11">
+        <ThemeIcon radius="md" color={disabled ? "midnight.1" : "midnight.11"}>
           {icon}
         </ThemeIcon>
-        <Text size="sm" fw={600} c="midnight.11">
+        <Text size="sm" fw={600} c={disabled ? "midnight.1" : "midnight.11"}>
           {label}
         </Text>
       </Flex>
@@ -69,23 +71,25 @@ export default function GenomeTracker() {
                   <Grid gutter="xl">
                     <GridCol span={5}>
                       <Stack h={570} justify="space-between">
-                        <Text size="lg" fw="bold">
+                        <Text size="xl" fw="bold">
                           Taxonomic composition of Australia&apos;s biodiversity
                         </Text>
                         <GenomeComposition ranks={ranks} />
                       </Stack>
                     </GridCol>
                     <GridCol span={5}>
-                      <Text size="lg" fw="bold">
-                        Cumulative tracker
-                      </Text>
-                      <Text c="midnight.11" size="sm" mb="lg">
-                        Percentage of taxonomic group coverage, where there is a complete genome for at least one
-                        representative species from each grouping. Statistics based on records indexed within ARGA.
-                      </Text>
-                      <Box h={390}>
-                        <CumulativeTracker taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" ranks={ranks} />
-                      </Box>
+                      <Stack gap={0}>
+                        <Text size="xl" fw="bold">
+                          Cumulative tracker
+                        </Text>
+                        <Text c="midnight.11" size="sm" mb="lg">
+                          Percentage of taxonomic group coverage, where there is a complete genome for at least one
+                          representative species from each grouping. Statistics based on records indexed within ARGA.
+                        </Text>
+                        <Box h={390} mt="lg">
+                          <CumulativeTracker taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" ranks={ranks} />
+                        </Box>
+                      </Stack>
                     </GridCol>
                     <GridCol span={2}>
                       <Paper radius="lg" p="md" withBorder>
@@ -96,23 +100,45 @@ export default function GenomeTracker() {
                           <Text c="midnight.11" size="xs">
                             For the purposes of these data summaries, a “whole genome” is interpreted as being an entire
                             assembly of the genome, with or without chromosome assemblies (i.e. assemblies which are at
-                            least represented as “scaffold assemblies” in the NCBI GenBank Genomes Database).
+                            least represented as “scaffold assemblies” in the{" "}
+                            <Link href="https://www.ncbi.nlm.nih.gov/home/genomes/" target="_blank">
+                              NCBI GenBank Genomes Database
+                            </Link>
+                            ).
                           </Text>
                           <Text c="midnight.11" size="xs">
                             The higher classification of Australia&apos;s biodiversity is driven by the taxonomic system
-                            managed by the Atlas of Living Australia. The Atlas of Living Australia hosts a record of
-                            all of the species that appear on the Australian National Species List, and services
-                            nationally agreed nomenclature for these species.
+                            managed by the{" "}
+                            <Link href="https://ala.org.au" target="_blank">
+                              Atlas of Living Australia
+                            </Link>
+                            . The Atlas of Living Australia hosts a record of all of the species that appear on the{" "}
+                            <Link href="https://biodiversity.org.au/nsl/" target="_blank">
+                              Australian National Species List
+                            </Link>
+                            , and services nationally agreed nomenclature for these species.
                           </Text>
                           <Text c="midnight.11" size="xs">
                             The data used to generate the page statistics and graphics are accurate to dd/mm/yy. Data
-                            and graphics on this page may be shared under a CC BY 4.0 licence.
+                            and graphics on this page may be shared under a{" "}
+                            <Link href="https://creativecommons.org/licenses/by/4.0/deed.en" target="_blank">
+                              CC BY 4.0 licence
+                            </Link>
+                            .
                           </Text>
                           <Divider my="xs" />
                           <Stack>
-                            <ActionButton label="Copy page citation" icon={<IconCopy size="1rem" />} />
-                            <ActionButton label="Download raw data as CSV" icon={<IconDownload size="1rem" />} />
-                            <ActionButton label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
+                            <ActionButton disabled label="Copy page citation" icon={<IconCopy size="1rem" />} />
+                            <ActionButton
+                              disabled
+                              label="Download raw data as CSV"
+                              icon={<IconDownload size="1rem" />}
+                            />
+                            <ActionButton
+                              disabled
+                              label="Download graphics as PNG file"
+                              icon={<IconDownload size="1rem" />}
+                            />
                           </Stack>
                         </Stack>
                       </Paper>
@@ -131,7 +157,7 @@ export default function GenomeTracker() {
               <Paper p="md" radius="lg" withBorder>
                 <Stack>
                   <Text size="xl" fw="bold">
-                    Rate of genome completion for Australian species over time:
+                    Rate of genome completion for Australian species over time
                   </Text>
                   <Text c="midnight.11" size="sm">
                     This graph shows the aggregated total of species for which a whole genome has been sequenced and
@@ -151,8 +177,8 @@ export default function GenomeTracker() {
               </Paper>
               <Paper p="lg" radius="lg" withBorder>
                 <Stack>
-                  <Text size="lg" fw="bold">
-                    Completion of genome sequences for key biodiversity groupings:
+                  <Text size="xl" fw="bold">
+                    Completion of genome sequences for key biodiversity groupings
                   </Text>
                   <GroupingCompletion dateDomain={[minDate, new Date()]} />
                 </Stack>

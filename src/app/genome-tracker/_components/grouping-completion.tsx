@@ -180,6 +180,7 @@ const ICONS: Record<string, string> = {
   insects: "/icons/taxon/Taxon_ Insects (Insecta).svg",
   corals: "/icons/taxon/Taxon_ Hard corals (Order Scleractinia).svg",
   "fin fishes": "/icons/taxon/Taxon_ Finfishes (Actinopterygii).svg",
+  snails: "/icons/taxon/Taxon_Snails_Gastropoda.svg",
 };
 
 interface GroupSelectionProps {
@@ -361,6 +362,7 @@ function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
               taxonRank={query.taxonRank}
               taxonCanonicalName={query.taxonCanonicalName}
               domain={domain}
+              disabledHighlight={true}
             />
           </Box>
           <Text c="midnight.11" size="sm">
@@ -431,13 +433,11 @@ function GroupDetail({ group, domain }: GroupDetailProps) {
       <Stack>
         <Grid>
           <Grid.Col span={6}>
-            <Stack gap={60}>
+            <Stack gap={100}>
               <GroupDetailRadial query={query} />
 
               <Stack>
-                <Text fw={300} fz="xs">
-                  Species with genomes
-                </Text>
+                <Text className={classes.groupButtonLabel}>Species with genomes</Text>
                 <SpeciesWithGenomes group={group} />
               </Stack>
             </Stack>

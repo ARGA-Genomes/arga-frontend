@@ -52,9 +52,10 @@ interface LineBarGraphProps {
   dateDomain: [Date, Date];
   width: number;
   height: number;
+  disabledHighlight?: boolean;
 }
 
-export function LineBarGraph({ lineData, barData, dateDomain, width, height }: LineBarGraphProps) {
+export function LineBarGraph({ lineData, barData, dateDomain, width, height, disabledHighlight }: LineBarGraphProps) {
   const lineMax = max(lineData, (d) => d.y) ?? 0;
   const barMax = max(barData, (d) => d.y) ?? 0;
 
@@ -125,7 +126,7 @@ export function LineBarGraph({ lineData, barData, dateDomain, width, height }: L
           <BarGraph data={barData} x={xScale} y={y2Scale} height={graphHeight} />
           <LineGraph data={lineData} x={xScale} y={yScale} />
 
-          {highlightRange && (
+          {!disabledHighlight && highlightRange && (
             <motion.g animate={{ x: xScale(highlightRange.line.low.x) }}>
               <RangeHighlight scale={xScale} range={highlightRange} height={height - 11} />
             </motion.g>

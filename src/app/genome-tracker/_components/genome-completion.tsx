@@ -29,9 +29,10 @@ interface GenomeCompletionProps {
   taxonCanonicalName: string;
   domain: [Date, Date];
   milestones?: [];
+  disabledHighlight?: boolean;
 }
 
-export function GenomeCompletion({ taxonRank, taxonCanonicalName, domain }: GenomeCompletionProps) {
+export function GenomeCompletion({ taxonRank, taxonCanonicalName, domain, disabledHighlight }: GenomeCompletionProps) {
   const { data } = useQuery<CompleteGenomesYearStatsQuery>(GET_COMPLETE_GENOMES_YEAR_STATS, {
     variables: {
       taxonRank,
@@ -64,6 +65,7 @@ export function GenomeCompletion({ taxonRank, taxonCanonicalName, domain }: Geno
           lineData={lineData ?? []}
           barData={barData ?? []}
           dateDomain={domain}
+          disabledHighlight={disabledHighlight}
         />
       )}
     </ParentSize>
