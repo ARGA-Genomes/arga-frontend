@@ -15,7 +15,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { DocumentNode, OperationVariables, useLazyQuery, useQuery } from "@apollo/client";
+import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
 import {
   IconArrowsSort,
   IconArrowUpRight,
@@ -100,20 +100,19 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
   const tableRef = useRef<HTMLTableElement>(null);
 
   // Species query
-  const {
-    loading,
-    error,
-    data: rawData,
-  } = useQuery(query.content, {
-    variables: {
+  const [, { loading, error, data: rawData, refetch: fetchData }] = useLazyQuery(query.content);
+
+  // Effect hook to load the data when variables change
+  useEffect(() => {
+    fetchData({
       ...(query.variables || {}),
       page,
       pageSize,
       sort,
       sortDirection: sortDir ? SortDirection.Asc : SortDirection.Desc,
       filters: [...(query.variables?.filters || []), ...filters],
-    },
-  });
+    });
+  }, [page, pageSize, sort, sortDir, filters]);
 
   // Download query
   const [, { refetch: fetchCSV }] = useLazyQuery(query.download, {
@@ -134,7 +133,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
 
   // Handle pagination changes on layout/filter change
   useEffect(() => {
-    setPageSize(layout === "card" ? 10 : 100);
+    setPageSize(layout === "card" ? 12 : 100);
 
     if (layout === "card") {
       setSort(Sort.ScientificName);
@@ -198,14 +197,14 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
         <Grid.Col span="content">
           <Group gap="lg" pr="sm">
             <PaginationSize
-              options={layout === "card" ? [10, 25, 50] : [100, 250, 500]}
+              options={layout === "card" ? [12, 24, 48] : [100, 250, 500]}
               value={pageSize}
               onChange={setPageSize}
             />
             <FiltersDrawer
-              types={["dataType", "classification"]}
-              onFilter={(filters) => {
-                setFilters(filters);
+              types={["dataType", "classification", "threatened", "bushfireRecovery", "vernacularGroup"]}
+              onFilter={(newFilters) => {
+                setFilters(newFilters);
                 setPage(1);
               }}
               onFilterChips={setFilterChips}

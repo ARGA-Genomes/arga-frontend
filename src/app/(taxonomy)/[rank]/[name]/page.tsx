@@ -1,24 +1,9 @@
 "use client";
 
+import { useEffect, use, ReactElement } from "react";
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Paper,
-  Title,
-  Box,
-  Text,
-  Stack,
-  Grid,
-  Container,
-  Group,
-  Divider,
-  UnstyledButton,
-  Flex,
-  ThemeIcon,
-} from "@mantine/core";
-
-import { IconCopy, IconDownload } from "@tabler/icons-react";
-import { useEffect, use, ReactElement } from "react";
+import { Paper, Title, Box, Text, Stack, Grid, Container, Group, UnstyledButton, Flex, ThemeIcon } from "@mantine/core";
 import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
 import { Attribute, DataField } from "@/components/highlight-stack";
@@ -32,6 +17,7 @@ import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-comple
 import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-completion";
 import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
 import { BrowseSpecies } from "@/components/browse-species";
+import { DataNoteActions } from "@/components/data-note-actions";
 
 const GET_SPECIES = gql`
   query TaxonSpecies(
@@ -280,6 +266,7 @@ function ActionButton({ label, icon }: ActionButtonProps) {
 }
 
 function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefined }) {
+  console.log(rank, JSON.stringify(taxon));
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
   const childTaxonLabel = pluralTaxon(childTaxon);
 
@@ -480,34 +467,7 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
             </Grid>
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 12, md: 4, lg: 3, xl: 2 }}>
-            <Paper radius="lg" p="md" h="100%" withBorder>
-              <Stack>
-                <Text c="midnight.9" size="xs" fw="bold">
-                  Note:
-                </Text>
-                <Text c="midnight.11" size="xs">
-                  For the purposes of these data summaries, a “whole genome” is interpreted as being an entire assembly
-                  of the genome, with or without chromosome assemblies (i.e. assemblies which are at least represented
-                  as “scaffold assemblies” in the NCBI GenBank Genomes Database).
-                </Text>
-                <Text c="midnight.11" size="xs">
-                  The higher classification of Australia&apos;s biodiversity is driven by the taxonomic system managed
-                  by the Atlas of Living Australia. The Atlas of Living Australia hosts a record of all of the species
-                  that appear on the Australian National Species List, and services nationally agreed nomenclature for
-                  these species.
-                </Text>
-                <Text c="midnight.11" size="xs">
-                  The data used to generate the page statistics and graphics are accurate to dd/mm/yy. Data and graphics
-                  on this page may be shared under a CC BY 4.0 licence.
-                </Text>
-                <Divider my="xs" />
-                <Stack>
-                  <ActionButton label="Copy page citation" icon={<IconCopy size="1rem" />} />
-                  <ActionButton label="Download raw data as CSV" icon={<IconDownload size="1rem" />} />
-                  <ActionButton label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
-                </Stack>
-              </Stack>
-            </Paper>
+            <DataNoteActions />
           </Grid.Col>
         </Grid>
       </Grid.Col>
