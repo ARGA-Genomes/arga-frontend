@@ -15,17 +15,8 @@ import {
   Image,
   Flex,
   ThemeIcon,
-  Title,
 } from "@mantine/core";
-import {
-  IconChartArcs,
-  IconChartBar,
-  IconChartBarPopular,
-  IconChartLine,
-  IconDna2,
-  IconExternalLink,
-  IconStarFilled,
-} from "@tabler/icons-react";
+import { IconExternalLink, IconStarFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
 // App components & constants
@@ -374,7 +365,7 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
                 </Flex>
               </Stack>
               <Box p="xl">
-                <DataSummary rank="KINGDOM" taxon={stubData as any} />
+                <DataSummary rank="KINGDOM" taxon={stubData as unknown as Taxonomy} />
               </Box>
             </Paper>
             <Paper p="xl" radius="lg" withBorder>

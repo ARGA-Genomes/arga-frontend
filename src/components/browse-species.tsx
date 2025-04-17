@@ -15,7 +15,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { DocumentNode, OperationVariables, useLazyQuery, useQuery } from "@apollo/client";
+import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
 import {
   IconArrowsSort,
   IconArrowUpRight,

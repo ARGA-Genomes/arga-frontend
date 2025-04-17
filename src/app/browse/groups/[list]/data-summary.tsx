@@ -1,15 +1,9 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
-import { Paper, Title, Box, Text, Stack, Grid, Group } from "@mantine/core";
-
-import { Attribute, DataField } from "@/components/highlight-stack";
+import { Paper, Title, Box, Text, Stack, Grid } from "@mantine/core";
 import { TachoChart } from "@/components/graphing/tacho";
 import { BarChart } from "@/components/graphing/bar";
-import { DataTable, DataTableRow } from "@/components/data-table";
 import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-completion";
-import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-completion";
-import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
 import { DataNoteActions } from "@/components/data-note-actions";
 
 interface DataBreakdown {
