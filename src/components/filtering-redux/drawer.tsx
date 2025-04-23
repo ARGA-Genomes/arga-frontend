@@ -17,7 +17,12 @@ import {
   DEFAULT_BUSHFIRE_RECOVERY_FILTERS,
 } from "./groups/bushfire-recovery";
 import { VernacularGroupFilter, vernacularGroupFilterToQuery } from "./groups/vernacular-group";
-import { DEFAULT_THREATENED_FILTERS, ThreatenedFilters, threatenedFiltersToQuery } from "./groups/threatened";
+import {
+  DEFAULT_THREATENED_FILTERS,
+  DEFAULT_THREATENED_LABELS,
+  ThreatenedFilters,
+  threatenedFiltersToQuery,
+} from "./groups/threatened";
 
 type FilterType = "dataType" | "classification" | "bushfireRecovery" | "vernacularGroup" | "threatened";
 
@@ -89,7 +94,12 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips }
     onFilterChips([
       ...renderBoolFilterChips(dataTypeFilters, ["Has", "Missing"], setDataTypeFilters),
       ...renderTaxonFilterChips(classificationFilters, setClassificationFilters),
-      ...renderBoolFilterChips(threatenedFilters, ["Includes", "Excludes"], setThreatenedFilters),
+      ...renderBoolFilterChips(
+        threatenedFilters,
+        ["Includes", "Excludes"],
+        setThreatenedFilters,
+        DEFAULT_THREATENED_LABELS
+      ),
       ...renderBoolFilterChips(bushfireRecoveryFilters, ["Includes", "Excludes"], setBushfireRecoveryFilters),
       ...renderVernacularGroupFilterChip(vernacularGroupFilter, () => setVernacularGroupFilter(null)),
     ]);

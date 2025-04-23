@@ -202,7 +202,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
               onChange={setPageSize}
             />
             <FiltersDrawer
-              types={["dataType", "classification", "threatened", "bushfireRecovery", "vernacularGroup"]}
+              types={["dataType", "vernacularGroup", "classification", "threatened", "bushfireRecovery"]}
               onFilter={(newFilters) => {
                 setFilters(newFilters);
                 setPage(1);

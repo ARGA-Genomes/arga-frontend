@@ -60,8 +60,9 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
     >
       {filters.map((filter) => (
         <BoolFilter
-          key={filter.value}
           {...filter}
+          key={filter.value}
+          label={DEFAULT_THREATENED_LABELS[filter.value]}
           options={["Include", "Exclude"]}
           onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
           onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
@@ -71,16 +72,16 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
   );
 }
 
-const DEFAULT_TRAITS = [
-  "EPBC_act_category_CR",
-  "EPBC_act_category_EN",
-  "EPBC_act_category_EW",
-  "EPBC_act_category_EX",
-  "EPBC_act_category_VU",
-  "EPBC_act_category_cd",
-];
+export const DEFAULT_THREATENED_LABELS: { [key: string]: string } = {
+  EPBC_act_category_CR: "EPBC Critically Endangered",
+  EPBC_act_category_EN: "EPBC Endangered",
+  EPBC_act_category_EW: "EPBC Extinct in the Wild",
+  EPBC_act_category_EX: "EPBC Extinct",
+  EPBC_act_category_VU: "EPBC Vulnerable",
+  EPBC_act_category_cd: "EPBC Conservation Dependant",
+};
 
-export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = DEFAULT_TRAITS.map((value) => ({
+export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = Object.keys(DEFAULT_THREATENED_LABELS).map((value) => ({
   value,
   active: false,
   disabled: false,
