@@ -1,7 +1,12 @@
 // Import and initialize brotli-wasm
+import { DownloadQuery } from "@/components/data-note-actions";
+import { ApolloQueryResult } from "@apollo/client";
 import brotliPromise from "brotli-wasm";
+import { saveAs } from "file-saver";
+import JSZip from "jszip";
+import get from "lodash-es/get";
 
-export const downloadCSV = async (base64: string) => {
+export const generateCSV = async (base64: string) => {
   const brotli = await brotliPromise;
 
   // Convert the Base64 string into a binary array
@@ -15,17 +20,26 @@ export const downloadCSV = async (base64: string) => {
   const decompressedData = await brotli.decompress(compressedData);
   const csvContent = new TextDecoder("utf-8").decode(decompressedData);
 
-  // Create a Blob from the CSV content.
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  return csvContent;
+};
 
-  // Create a link element for the download, set the URL and file name,
-  // then trigger a programmatic click to start the download.
-  const downloadLink = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  downloadLink.href = url;
-  downloadLink.download = `arga-species-${new Date().toLocaleString()}.csv`;
+export const downloadCSV = async (
+  fetch: () => Promise<ApolloQueryResult<any>>,
+  name: string,
+  fields: { key: string; name: string }[]
+) => {
+  const { data: raw } = await fetch();
 
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  document.body.removeChild(downloadLink);
+  // Generate the content for all of the CSV files
+  const csvFiles = await Promise.all(fields.map(({ key }) => generateCSV(get(raw, key))));
+
+  // Create a ZIP archive and add CSV files
+  const zip = new JSZip();
+  fields.forEach(({ name: fileName }, idx) => {
+    zip.file(`arga-${name}-${fileName}.csv`, csvFiles[idx]);
+  });
+
+  // Generate the ZIP and trigger download
+  const blob = await zip.generateAsync({ type: "blob" });
+  saveAs(blob, `arga-${name}-raw-data-${new Date().toLocaleString()}.zip`);
 };

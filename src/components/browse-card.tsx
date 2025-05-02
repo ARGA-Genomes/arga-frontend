@@ -1,6 +1,7 @@
 "use client";
 
 import classes from "./browse-card.module.css";
+import skelClasses from "./browse-card-skel.module.css";
 
 import * as Humanize from "humanize-plus";
 import { Image, Stack, Text, Skeleton, Paper } from "@mantine/core";
@@ -22,7 +23,7 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
       <Link href={link}>
         <Stack align="center" gap={5}>
           <Skeleton
-            className={classes.skeleton}
+            classNames={skelClasses}
             visible={loading}
             circle
             width={imageSize}
@@ -32,13 +33,13 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
           >
             <Image src={image} height={imageSize} width={imageSize} alt={category} />
           </Skeleton>
-          <Skeleton className={classes.skeleton} visible={loading} mt="xs">
+          <Skeleton classNames={skelClasses} visible={loading} mt="xs">
             <Text size="md" fw={450} ta={"center"} c="white">
               {category}
             </Text>
           </Skeleton>
           {total !== null && (
-            <Skeleton className={classes.skeleton} visible={loading}>
+            <Skeleton classNames={skelClasses} visible={loading}>
               <Text size="sm" fw={400} ta={"center"} c="attribute">
                 {Humanize.compactInteger(total || 0, 2)} records
               </Text>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Container, Grid, GridCol, Group, Paper, Stack, Text } from "@mantine/core";
+import { gql } from "@apollo/client";
 
 import { PreviousPage } from "@/components/navigation-history";
 
@@ -12,6 +13,15 @@ import { GroupingCompletion } from "./_components/grouping-completion";
 import { SignificantMilestones } from "./_components/significant-milestones";
 import { CompletionStepper } from "./_components/completion-stepper";
 import { DataNoteActions } from "@/components/data-note-actions";
+
+const DOWNLOAD_STATS = gql`
+  query DownloadTrackerStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
+    stats {
+      completeGenomesByYearCsv(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName)
+      taxonomicRanksCsv(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, ranks: $ranks)
+    }
+  }
+`;
 
 export default function GenomeTracker() {
   const ranks = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
@@ -33,7 +43,7 @@ export default function GenomeTracker() {
               <Paper p="lg" radius="lg" withBorder>
                 <Stack gap="xl">
                   <Grid gutter="xl">
-                    <GridCol span={5}>
+                    <GridCol data-downloadname="Genome Tracker Taxonomic Composition" span={5}>
                       <Stack h={570} justify="space-between">
                         <Text size="xl" fw="bold">
                           Taxonomic composition of Australia&apos;s biodiversity
@@ -41,7 +51,7 @@ export default function GenomeTracker() {
                         <GenomeComposition ranks={ranks} />
                       </Stack>
                     </GridCol>
-                    <GridCol span={5}>
+                    <GridCol data-downloadname="Cumulative Tracker" span={5}>
                       <Stack gap={0}>
                         <Text size="xl" fw="bold">
                           Cumulative tracker
@@ -50,13 +60,33 @@ export default function GenomeTracker() {
                           Percentage of taxonomic group coverage, where there is a complete genome for at least one
                           representative species from each grouping. Statistics based on records indexed within ARGA.
                         </Text>
-                        <Box h={390} mt="lg">
+                        <Box h={390} mt="lg" data-downloadname="Complete genome for one representative species">
                           <CumulativeTracker taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" ranks={ranks} />
                         </Box>
                       </Stack>
                     </GridCol>
                     <GridCol span={2}>
-                      <DataNoteActions />
+                      <DataNoteActions
+                        query={{
+                          name: "genome-tracker",
+                          download: DOWNLOAD_STATS,
+                          fields: [
+                            {
+                              key: "stats.taxonomicRanksCsv",
+                              name: "cumulative-tracker",
+                            },
+                            {
+                              key: "stats.completeGenomesByYearCsv",
+                              name: "complete-genomes-by-year",
+                            },
+                          ],
+                          variables: {
+                            taxonRank: "DOMAIN",
+                            taxonCanonicalName: "Eukaryota",
+                            ranks,
+                          },
+                        }}
+                      />
                     </GridCol>
                     <GridCol span={12}>
                       <Stack gap="xl">
@@ -79,7 +109,7 @@ export default function GenomeTracker() {
                     made available. The first instance of a whole genome sequence for an individual species has been
                     plotted as an accumulated total. Statistics based on records indexed within ARGA.
                   </Text>
-                  <Box h={500}>
+                  <Box h={500} data-downloadname="Genome Completion for Australian Species">
                     <GenomeCompletion taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" domain={[minDate, maxDate]} />
                   </Box>
                 </Stack>
