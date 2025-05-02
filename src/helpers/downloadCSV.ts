@@ -1,5 +1,4 @@
 // Import and initialize brotli-wasm
-import { DownloadQuery } from "@/components/data-note-actions";
 import { ApolloQueryResult } from "@apollo/client";
 import brotliPromise from "brotli-wasm";
 import { saveAs } from "file-saver";
@@ -24,6 +23,7 @@ export const generateCSV = async (base64: string) => {
 };
 
 export const downloadCSV = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetch: () => Promise<ApolloQueryResult<any>>,
   name: string,
   fields: { key: string; name: string }[]

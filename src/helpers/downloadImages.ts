@@ -10,7 +10,7 @@ export const downloadImages = async (name: string) => {
       html2canvas(image, {
         onclone: (document) => {
           Array.from(document.querySelectorAll("*")).forEach((e) => {
-            let existingStyle = e.getAttribute("style") || "";
+            const existingStyle = e.getAttribute("style") || "";
             e.setAttribute("style", existingStyle + "; font-family: Helvetica, sans-serif !important");
           });
         },

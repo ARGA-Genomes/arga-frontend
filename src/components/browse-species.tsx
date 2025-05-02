@@ -37,7 +37,7 @@ import classes from "./browse-species.module.css";
 import { ExternalLinkButton } from "./button-link-external";
 import { VernacularGroupChip } from "./icon-bar";
 import { DownloadButton } from "./download-btn";
-import { downloadCSV, generateCSV } from "@/helpers/downloadCSV";
+import { generateCSV } from "@/helpers/downloadCSV";
 import { saveAs } from "file-saver";
 
 interface SpeciesRecord {
