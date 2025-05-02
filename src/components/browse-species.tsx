@@ -37,7 +37,8 @@ import classes from "./browse-species.module.css";
 import { ExternalLinkButton } from "./button-link-external";
 import { VernacularGroupChip } from "./icon-bar";
 import { DownloadButton } from "./download-btn";
-import { downloadCSV } from "@/helpers/downloadCSV";
+import { generateCSV } from "@/helpers/downloadCSV";
+import { saveAs } from "file-saver";
 
 interface SpeciesRecord {
   taxonomy: { canonicalName: string; status: string; source: string; sourceUrl: string; vernacularGroup: string };
@@ -101,6 +102,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
 
   // Species query
   const [, { loading, error, data: rawData, refetch: fetchData }] = useLazyQuery(query.content);
+  const [downloading, setDownloading] = useState<boolean>(false);
 
   // Effect hook to load the data when variables change
   useEffect(() => {
@@ -120,11 +122,15 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
   });
 
   const download = useCallback(async () => {
-    {
-      const { data: raw } = await fetchCSV();
-      const download = get(raw, "download.csv");
-      await downloadCSV(download);
-    }
+    setDownloading(true);
+
+    const { data: raw } = await fetchCSV();
+    saveAs(
+      new Blob([await generateCSV(get(raw, "download.csv"))], { type: "text/csv;charset=utf-8;" }),
+      `arga-species-${new Date().toLocaleString()}.csv`
+    );
+
+    setDownloading(false);
   }, []);
 
   useEffect(() => {
@@ -202,7 +208,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
               onChange={setPageSize}
             />
             <FiltersDrawer
-              types={["dataType", "classification", "threatened", "bushfireRecovery", "vernacularGroup"]}
+              types={["dataType", "vernacularGroup", "classification", "threatened", "bushfireRecovery"]}
               onFilter={(newFilters) => {
                 setFilters(newFilters);
                 setPage(1);
@@ -212,7 +218,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
             <TableCardSwitch layout={layout} onChange={setLayout} />
             <Divider orientation="vertical" />
             <Tooltip position="bottom" label="Download data as CSV spreadsheet">
-              <DownloadButton onClick={download} />
+              <DownloadButton loading={downloading} onClick={download} />
             </Tooltip>
           </Group>
         </Grid.Col>

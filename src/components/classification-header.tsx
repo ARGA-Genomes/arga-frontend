@@ -9,6 +9,7 @@ import { Taxonomy } from "@/app/(taxonomy)/[rank]/[name]/page";
 import { taxon as taxonOptions } from "../app/(home)/_data";
 import { AttributePill, AttributePillValue } from "./data-fields";
 import { IconArrowUpRight } from "@tabler/icons-react";
+import { getTaxonIcon } from "@/helpers/getTaxonIcon";
 
 interface ClassificationHeaderProps {
   rank: string;
@@ -41,14 +42,13 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
   const hierarchy = taxon?.hierarchy.toSorted((a, b) => b.depth - a.depth);
   const taxonIcon = useMemo(
     () =>
+      getTaxonIcon(classification) ||
       taxonOptions.find((item) => {
         const [itemRank, itemClassification] = item.link.substring(1).split("/");
         return itemRank.toUpperCase() === rank && itemClassification === classification;
       })?.image,
     [rank, classification]
   );
-
-  console.log(taxon);
 
   return (
     <Paper py={30} pos="relative">

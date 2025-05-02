@@ -1,5 +1,6 @@
 import { Checkbox, Chip, Flex, SegmentedControl, Text } from "@mantine/core";
 import { IconTrashFilled } from "@tabler/icons-react";
+import * as Humanize from "humanize-plus";
 
 export interface BoolFilterData {
   value: string;
@@ -19,6 +20,7 @@ export function BoolFilter({
   active,
   include,
   value,
+  label,
   disabled,
   options,
   onActiveToggle,
@@ -34,7 +36,7 @@ export function BoolFilter({
         onChange={(ev) => onActiveToggle(ev.currentTarget.checked)}
         label={
           <Text size="sm" fw={600}>
-            {value.replaceAll("_", " ")}
+            {label || Humanize.capitalize(value.replaceAll("_", " "))}
           </Text>
         }
       />
@@ -53,7 +55,8 @@ export function BoolFilter({
 export function renderBoolFilterChips(
   filters: BoolFilterData[],
   options: [string, string],
-  onRemove: (filters: BoolFilterData[]) => void
+  onRemove: (filters: BoolFilterData[]) => void,
+  labelMap?: { [key: string]: string }
 ) {
   const handleRemove = (currentFilter: BoolFilterData) =>
     onRemove(filters.map((filter) => (filter.value === currentFilter.value ? { ...filter, active: false } : filter)));
@@ -69,7 +72,7 @@ export function renderBoolFilterChips(
         onClick={() => handleRemove(filter)}
         size="xs"
       >
-        {filter.include ? options[0] : options[1]} {filter.value}
+        {filter.include ? options[0] : options[1]} <b>{(labelMap || {})[filter.value] || filter.value}</b>
       </Chip>
     ));
 }

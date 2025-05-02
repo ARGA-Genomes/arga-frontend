@@ -1,3 +1,5 @@
+"use client";
+
 import { ActionIcon, Container, Flex, Paper, Stack, Text, Tooltip } from "@mantine/core";
 import { DataTable, DataTableRow } from "./data-table";
 import { useParams, usePathname } from "next/navigation";
@@ -80,7 +82,7 @@ export function PageCitation() {
                     </i>
                     , The Australian Reference Genome Atlas. Accessed at:{" "}
                     <a aria-label="Citation Link" href={`https://app.arga.org.au${location}`}>
-                      https://app.arga.org.au{location}
+                      {`https://app.arga.org.au${location}`}
                     </a>{" "}
                     on {date.getDate()}-{date.getMonth() + 1}-{date.getFullYear()}.
                   </Text>
@@ -128,7 +130,7 @@ export function DataPageCitation() {
                   Australian Reference Genome Atlas. {date.getFullYear()}. <i>{page}</i>, The Australian Reference
                   Genome Atlas. Accessed at:{" "}
                   <a aria-label="Citation Link" href={`https://app.arga.org.au${location}`}>
-                    https://app.arga.org.au{location}
+                    {`https://app.arga.org.au${location}`}
                   </a>{" "}
                   on {date.getDate()}-{date.getMonth() + 1}-{date.getFullYear()}.
                 </Text>
