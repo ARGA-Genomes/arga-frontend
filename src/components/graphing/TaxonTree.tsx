@@ -2,7 +2,7 @@
 
 import classes from "./TaxonTree.module.css";
 
-import { gql, useApolloClient, useLazyQuery } from "@apollo/client";
+import { gql, useLazyQuery } from "@apollo/client";
 import { Tree } from "@visx/hierarchy";
 import { hierarchy } from "d3";
 
@@ -13,7 +13,6 @@ import { Text } from "@visx/text";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useListState } from "@mantine/hooks";
-import { ParentSize } from "@visx/responsive";
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
@@ -79,11 +78,11 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad }: TaxonNodeProps) {
   function toggleNode(node: Node) {
     const result = loadNode();
     node.expanded = !node.expanded;
-    onToggle && onToggle(node.expanded);
+    if (onToggle) onToggle(node.expanded);
 
     result.then((resp) => {
       const loadedNode = resp.data && convertToNode(resp.data?.stats.taxonBreakdown[0]);
-      onLoad && loadedNode && onLoad(loadedNode);
+      if (onLoad && loadedNode) onLoad(loadedNode);
     });
   }
 
@@ -163,7 +162,7 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
   }
 
   function onLoad(node: Node) {
-    let targetNode = findNode(tree.children, node);
+    const targetNode = findNode(tree.children, node);
     if (targetNode) {
       targetNode.children = node.children;
       setRoot(hierarchy(tree));
@@ -224,10 +223,10 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
 function findNode(children: Node[] | undefined, target: Node): Node | null {
   if (!children) return null;
 
-  for (let child of children) {
+  for (const child of children) {
     if (child.canonicalName === target.canonicalName) return child;
     else {
-      let node = findNode(child.children, target);
+      const node = findNode(child.children, target);
       if (node) return node;
     }
   }
