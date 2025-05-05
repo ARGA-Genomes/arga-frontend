@@ -492,8 +492,6 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;
 
-  console.log("dataset", datasetId);
-
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
 

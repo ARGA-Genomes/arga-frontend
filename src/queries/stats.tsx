@@ -10,6 +10,9 @@ export const TAXON_TREE_NODE_STATISTICS = gql`
     specimens
     other
     totalGenomic
+
+    species
+    fullGenomesCoverage
   }
 `;
 
@@ -22,6 +25,9 @@ export interface TaxonStatTreeNode {
   specimens?: number;
   other?: number;
   totalGenomic?: number;
+
+  species?: number;
+  fullGenomesCoverage?: number;
   children?: TaxonStatTreeNode[];
 }
 

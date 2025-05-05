@@ -38,7 +38,7 @@ import { useEffect, useMemo, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { AttributePillValue, DataField } from "@/components/data-fields";
-import { TaxonomyTree } from "@/components/graphing/taxon-tree";
+import { TaxonTree } from "@/components/graphing/TaxonTree";
 import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timeline";
 import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import { TaxonStatTreeNode, findChildren } from "@/queries/stats";
@@ -53,6 +53,7 @@ import { getCanonicalName } from "@/helpers/getCanonicalName";
 import { InternalLinkButton } from "@/components/button-link-internal";
 import RecordHistory from "@/components/record-history";
 import { Action, GET_NOMENCLATURAL_ACT_PROVENANCE, Operation } from "@/queries/provenance";
+import { useDatasets } from "@/app/source-provider";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -457,16 +458,15 @@ interface TaxonTreeStatsQuery {
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
-  query TaxonTreeNode($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $descendantRank: TaxonomicRank) {
+  query TaxonTreeNode($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
     stats {
-      taxonBreakdown(
-        taxonRank: $taxonRank
-        taxonCanonicalName: $taxonCanonicalName
-        includeRanks: [$taxonRank, $descendantRank]
-      ) {
+      taxonBreakdown(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, includeRanks: $includeRanks) {
         ...TaxonStatTreeNode
         children {
           ...TaxonStatTreeNode
+          children {
+            ...TaxonStatTreeNode
+          }
         }
       }
     }
@@ -640,7 +640,7 @@ function Details({ taxonomy, commonNames, subspecies, isSubspecies }: DetailsPro
 
   const typeSpecimens = specimens?.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.specimen.typeStatus != "no voucher",
   );
   const typeSpecimen = typeSpecimens?.[0]?.specimen;
 
@@ -1000,7 +1000,7 @@ function NomenclaturalActBody({ item, protonym, specimensWithData }: Nomenclatur
 
   const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == item.name.scientificName && typeSpecimen.specimen.typeStatus != "no voucher"
+      typeSpecimen.name.scientificName == item.name.scientificName && typeSpecimen.specimen.typeStatus != "no voucher",
   );
 
   const locality = useMemo(() => typeSpecimens?.find(({ specimen }) => specimen.locality !== null), [typeSpecimens]);
@@ -1019,7 +1019,7 @@ function NomenclaturalActBody({ item, protonym, specimensWithData }: Nomenclatur
               wholeGenomes: specimen.wholeGenomes,
             },
           }),
-          {}
+          {},
         );
     return {};
   }, [specimensWithData]);
@@ -1158,9 +1158,9 @@ function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
       <ScrollArea.Autosize ref={ref}>
         <Center>
           {treeData && (
-            <TaxonomyTree
+            <TaxonTree
               minWidth={rect.width}
-              layout={layout}
+              height={800}
               data={treeData}
               pinned={pinned}
               initialExpanded={expandedGenera}
@@ -1195,6 +1195,9 @@ const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
 };
 
 export default function TaxonomyPage({ params, isSubspecies }: { params: { name: string }; isSubspecies?: boolean }) {
+  const { names } = useDatasets();
+  const datasetId = names.get("Atlas of Living Australia")?.id;
+
   const canonicalName = getCanonicalName(params);
 
   const { loading, error, data } = useQuery<QueryResults>(isSubspecies ? GET_SUMMARY : GET_SUMMARY_HIERARCHY, {
@@ -1209,18 +1212,15 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
     variables: { filters: [{ canonicalName }] },
   });
 
-  const subfamily = hierarchy?.find(
-    (node) =>
-      node.rank === "SUBFAMILY" || node.rank === "SUBFAMILIA" || node.rank === "FAMILY" || node.rank === "FAMILIA"
-  );
+  const family = hierarchy?.find((node) => node.rank === "FAMILY" || node.rank === "FAMILIA");
 
   const tree = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
     variables: {
       taxonRank: "FAMILY",
-      taxonCanonicalName: subfamily?.canonicalName,
-      descendantRank: "GENUS",
+      taxonCanonicalName: family?.canonicalName,
+      includeRanks: ["FAMILY", "GENUS"],
+      datasetId,
     },
-    /* skip: !hierarchy, */
   });
 
   const subspecies = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
