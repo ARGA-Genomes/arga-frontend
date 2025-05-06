@@ -3,7 +3,7 @@
 import classes from "./TaxonTree.module.css";
 
 import { gql, useLazyQuery } from "@apollo/client";
-import { Tree } from "@visx/hierarchy";
+import { Cluster, Tree } from "@visx/hierarchy";
 import { hierarchy } from "d3";
 
 import { TaxonStatTreeNode } from "@/queries/stats";
@@ -13,6 +13,7 @@ import { Text } from "@visx/text";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useListState } from "@mantine/hooks";
+import { HierarchyPointNode } from "@visx/hierarchy/lib/types";
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
@@ -100,6 +101,12 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad }: TaxonNodeProps) {
     },
   };
 
+  // use the appropriate node label depending on where in the tree the node is
+  // we want root nodes to have horizontal labels, inner nodes to have
+  // vertical labels that move depending on the expanded state, and leaf nodes as
+  // vertical labels that are always positioned after the node
+  const NodeLabel = getNodeLabel(depth, data);
+
   return (
     <motion.g style={{ cursor: "pointer" }} whileHover={{ scale: 1.4 }} onClick={() => toggleNode(data)}>
       <rect x={-50} y={-10} width={100} height={30} fill="black" style={{ opacity: 0 }} />
@@ -107,15 +114,7 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad }: TaxonNodeProps) {
 
       <motion.g variants={variants} animate={query.loading ? "loading" : "initial"}>
         <circle r={6} className={nodeClassName(data)} strokeWidth={pinned ? 4 : 1} />
-        <Text
-          angle={depth === 0 ? 0 : 70}
-          dy={depth === 0 ? "-1.5em" : "1.0em"}
-          className={classes.nodeLabel}
-          fontWeight={pinned ? 600 : 400}
-          filter="url(#text-bg)"
-        >
-          {data.canonicalName}
-        </Text>
+        <NodeLabel text={data.canonicalName} pinned={!!pinned} />
         {query.loading && (
           <Text dy="2.5em" className={classes.loadingLabel}>
             loading..
@@ -123,6 +122,41 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad }: TaxonNodeProps) {
         )}
       </motion.g>
     </motion.g>
+  );
+}
+
+function getNodeLabel(depth: number, node: Node) {
+  if (depth === 0) return RootNodeLabel;
+  else if ((node.children?.length || 0) > 0) return InnerNodeLabel;
+  else return LeafNodeLabel;
+}
+
+interface NodeLabelProps {
+  text: string;
+  pinned: boolean;
+}
+
+function RootNodeLabel({ text }: NodeLabelProps) {
+  return (
+    <Text dy={"-1.5em"} className={classes.nodeLabel} fontWeight={600} filter="url(#text-bg)">
+      {text}
+    </Text>
+  );
+}
+
+function InnerNodeLabel({ text, pinned }: NodeLabelProps) {
+  return (
+    <Text angle={90} dy={"1.0em"} className={classes.nodeLabel} fontWeight={pinned ? 600 : 400} filter="url(#text-bg)">
+      {text}
+    </Text>
+  );
+}
+
+function LeafNodeLabel({ text, pinned }: NodeLabelProps) {
+  return (
+    <Text angle={90} dy={"1.0em"} className={classes.nodeLabel} fontWeight={pinned ? 600 : 400} filter="url(#text-bg)">
+      {text}
+    </Text>
   );
 }
 
@@ -150,10 +184,12 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
 
   const target = root.find((node) => node.data.canonicalName == "Macropus");
 
-  const margin = { top: 50, bottom: 100, left: 50, right: 50 };
+  const margin = { top: 50, bottom: 300, left: 50, right: 50 };
   const minNodeWidth = 20;
-  const minTreeWidth = (tree.children?.length || 0) * minNodeWidth;
-  const totalWidth = (minTreeWidth > minWidth ? minTreeWidth : minWidth) - margin.left - margin.right;
+  /* const minTreeWidth = (tree.children?.length || 0) * minNodeWidth; */
+  const minTreeWidth = (root.descendants().length || 0) * minNodeWidth;
+  const treeWidth = minTreeWidth > minWidth ? minTreeWidth : minWidth;
+  const totalWidth = treeWidth + margin.left + margin.right;
   const totalHeight = height;
 
   /* separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth} */
@@ -169,8 +205,14 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
     }
   }
 
+  function nodeSeparator(a: HierarchyPointNode<Node>, b: HierarchyPointNode<Node>): number {
+    return a.parent === b.parent ? 2 : 4;
+  }
+
+  /* size={[totalWidth, totalHeight - (margin.top + margin.bottom)]} */
+
   return (
-    <svg width={totalWidth + margin.left + margin.right} height={totalHeight}>
+    <svg width={totalWidth} height={totalHeight}>
       <defs>
         <filter x="0" y="0" width="1" height="1" id="text-bg">
           <feFlood floodColor="rgba(255, 255, 255, .7)" />
@@ -179,13 +221,9 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
       </defs>
 
       <Group left={0} top={margin.top}>
-        <Tree
-          root={root}
-          size={[totalWidth, totalHeight - (margin.top + margin.bottom)]}
-          separation={(a, b) => (a.parent === b.parent ? 1 : 2)}
-        >
+        <Cluster root={root} nodeSize={[10, 200]} separation={nodeSeparator}>
           {(tree) => (
-            <Group top={0} left={0}>
+            <Group top={0} left={totalWidth / 2}>
               {tree
                 .links()
                 .filter((n) => !n.target.data.isLoader)
@@ -195,6 +233,7 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
                     data={link}
                     className={linkClassName(link.target.data)}
                     strokeWidth={link.target === target ? 5 : 1}
+                    strokeOpacity={link.target === target ? 1 : 0.4}
                   />
                 ))}
 
@@ -214,7 +253,7 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
                 ))}
             </Group>
           )}
-        </Tree>
+        </Cluster>
       </Group>
     </svg>
   );
@@ -254,17 +293,11 @@ function nodeClassName(data: Node) {
 // from the taxon tree statistics query into a presentable tree by injecting and
 // defaulting variables used for tree interaction.
 function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: string[]): Node {
-  const shouldExpand =
-    !!expanded?.find((n) => n.canonicalName === node.canonicalName) ||
-    !!pinned?.find((name) => name === node.canonicalName) ||
-    node.rank !== "GENUS";
-
-  const loaded = !!node.children?.length;
-  const children = loaded && node.children?.map((child) => convertToNode(child, expanded));
+  const children = node.children?.map((child) => convertToNode(child, expanded));
 
   return {
     visible: true,
-    expanded: shouldExpand,
+    expanded: false,
     pinned: !!pinned?.find((name) => name === node.canonicalName),
     loaded: !!node.children?.length,
     allChildren: node.children?.map((child) => convertToNode(child, expanded)),
@@ -277,18 +310,21 @@ function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: stri
 
     // if the node is expanded then we want to convert all the children to nodes as well,
     // otherwise we add a stub node that will load the data when expanded
-    children: children || [
-      {
-        visible: false,
-        expanded: false,
-        pinned: false,
-        loaded: false,
-        canonicalName: "",
-        rank: "",
-        species: 0,
-        fullGenomesCoverage: 0,
-        isLoader: true,
-      },
-    ],
+    children:
+      (children ?? []).length > 0 || node.rank === "SPECIES"
+        ? children
+        : [
+            {
+              visible: false,
+              expanded: false,
+              pinned: false,
+              loaded: false,
+              canonicalName: "",
+              rank: "",
+              species: 0,
+              fullGenomesCoverage: 0,
+              isLoader: true,
+            },
+          ],
   };
 }
