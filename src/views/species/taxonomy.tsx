@@ -1218,7 +1218,7 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
     variables: {
       taxonRank: "FAMILY",
       taxonCanonicalName: family?.canonicalName,
-      includeRanks: ["FAMILY", "GENUS"],
+      includeRanks: ["FAMILY", "SUBFAMILY", "GENUS"],
       datasetId,
     },
   });
