@@ -3,7 +3,7 @@
 import classes from "./TaxonTree.module.css";
 
 import { gql, useLazyQuery } from "@apollo/client";
-import { Cluster, Tree } from "@visx/hierarchy";
+import { Cluster } from "@visx/hierarchy";
 import { hierarchy } from "d3";
 
 import { TaxonStatTreeNode } from "@/queries/stats";
