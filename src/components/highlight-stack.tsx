@@ -7,10 +7,7 @@ interface HighlightStackProps {
   children?: React.ReactNode;
 }
 
-export function HighlightStack({
-  children,
-  ...rest
-}: HighlightStackProps | StackProps) {
+export function HighlightStack({ children, ...rest }: HighlightStackProps | StackProps) {
   return (
     <Stack pl={16} className={classes.highlight} {...rest}>
       {children}
@@ -21,27 +18,29 @@ export function HighlightStack({
 const BADGE_COLOURS: Record<string, string> = {
   yes: "moss.3",
   no: "bushfire.3",
+  "raw reads": "bushfire.3",
   "representative genome": "moss.3",
   Full: "moss.3",
   Partial: "bushfire.3",
   Chromosome: "moss.3",
+  chromosome: "moss.3",
   Contig: "bushfire.3",
-  haploid: "wheat.2",
+  haploid: "wheat.3",
+  mitochondrion: "wheat.3",
+  scaffold: "wheat.3",
+  ribosome: "wheat.3",
+  nuclear: "moss.3",
   Major: "moss.3",
 };
 
-export function AttributePill({
-  value,
-}: {
-  value: string | number | undefined;
-}) {
+export function AttributePill({ value }: { value: string | number | undefined }) {
   value ||= "No data";
   const color = BADGE_COLOURS[value] || "#d6e4ed";
 
   return (
     <Paper py={5} px={15} bg={color} radius="xl" style={{ border: "none" }}>
       <Center>
-        <Text fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
+        <Text c="midnight.9" fw={600} size="sm" style={{ whiteSpace: "nowrap" }}>
           {value}
         </Text>
       </Center>
