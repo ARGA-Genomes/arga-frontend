@@ -13,12 +13,6 @@
     stroke: var(--mantine-color-bushfire-5);
 }
 
-.nodeLabel {
-    font-size: 1em;
-    text-anchor: start;
-    dominant-baseline: middle;
-}
-
 .nodeLinkMoss {
     stroke: var(--mantine-color-moss-5);
     fill: none;
