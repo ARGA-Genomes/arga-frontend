@@ -11,7 +11,7 @@ import { Group } from "@visx/group";
 import { LinkVertical } from "@visx/shape";
 import { Text } from "@visx/text";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HierarchyNode, HierarchyPointNode } from "@visx/hierarchy/lib/types";
 
 // Gets details for the specified taxon and the immediate decendants
@@ -143,7 +143,7 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
         <circle r={6} className={nodeClassName(data)} strokeWidth={pinned ? 4 : 1} />
 
         {depth === 0 && (
-          <Text dy={"-1.5em"} className={classes.nodeLabelRoot} fontWeight={600} filter="url(#text-bg)">
+          <Text dy={"-1.5em"} dominantBaseline="middle" textAnchor="middle" fontWeight={600} filter="url(#text-bg)">
             {data.canonicalName}
           </Text>
         )}
@@ -188,15 +188,35 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
   const [root, setRoot] = useState(hierarchy(tree));
   const [hoverPath, setHoverPath] = useState<HierarchyNode<Node>[]>([]);
 
+  const [totalWidth, setTotalWidth] = useState(0);
+  const [rootOffset, setRootOffset] = useState(0);
+  const totalHeight = height;
+
   const path = pinned || [];
 
   const margin = { top: 50, bottom: 200, left: 50, right: 50 };
-  const minNodeWidth = 20;
 
-  const minTreeWidth = (root.descendants().length || 0) * minNodeWidth;
-  const treeWidth = minTreeWidth > minWidth ? minTreeWidth : minWidth;
-  const totalWidth = treeWidth + margin.left + margin.right;
-  const totalHeight = height;
+  useEffect(() => {
+    const bounds = minWidth - margin.left - margin.right;
+    const leaves = root.leaves();
+    const first = leaves[0];
+    const last = leaves[leaves.length - 1];
+    const treeWidth = (last.x || 0) - (first.x || 0);
+
+    const viewWidth = treeWidth > bounds ? treeWidth : bounds;
+
+    // the dendrogram is not balanced which means the root node won't always be at the
+    // center of the tree, which means that we have to find the center position of the root node
+    // to provide an offset for the tree when rendering. since the root node is always at 0,0 the
+    // easiest way to do this is to simply get the first leaf since it'd be -1234 or some such value
+    setRootOffset((first.x || 0) * -1);
+
+    if (treeWidth < viewWidth) {
+      setRootOffset(viewWidth / 2);
+    }
+
+    setTotalWidth(viewWidth + margin.left + margin.right);
+  }, [root, setTotalWidth, setRootOffset]);
 
   function onLoad(node: Node) {
     const targetNode = findNode(tree.children, node);
@@ -239,10 +259,10 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
         </filter>
       </defs>
 
-      <Group left={0} top={margin.top}>
+      <Group left={margin.left} top={margin.top}>
         <Cluster root={root} nodeSize={[10, 200]} separation={nodeSeparator}>
           {(tree) => (
-            <Group top={0} left={totalWidth / 2}>
+            <Group top={0} left={rootOffset}>
               {tree
                 .links()
                 .filter((n) => n.target.data.visible)
