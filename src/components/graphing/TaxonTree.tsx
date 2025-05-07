@@ -43,11 +43,8 @@ interface TaxonTreeNodeQuery {
 // well as transient functional data such as expansion or pinning.
 interface Node {
   visible: boolean;
-  expanded: boolean;
-  pinned: boolean;
   loaded: boolean;
   children?: Node[];
-  allChildren?: Node[];
 
   canonicalName: string;
   rank: string;
@@ -59,12 +56,14 @@ interface TaxonNodeProps {
   data: Node;
   depth: number;
   pinned?: boolean;
-  onToggle?: (expanded: boolean) => void;
+  onToggle?: (data: Node) => void;
   onLoad?: (data: Node) => void;
   onHover?: (data: Node | null) => void;
 }
 
 function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNodeProps) {
+  const [childTree, setChildTree] = useState<Node[] | undefined>(data.children);
+
   const [loadNode, query] = useLazyQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
     variables: {
       taxonRank: data.rank,
@@ -73,15 +72,34 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
     },
   });
 
+  // there are two responsibilities for this function. the first is to load any children if the
+  // node only has a placeholder. and the other is to collapse and expand the node by removing
+  // and inserting children on the tree.
   function toggleNode(node: Node) {
-    const result = loadNode();
-    node.expanded = !node.expanded;
-    if (onToggle) onToggle(node.expanded);
+    // do nothing for leaf nodes
+    if (node.rank === "SPECIES") return;
 
-    result.then((resp) => {
-      const loadedNode = resp.data && convertToNode(resp.data?.stats.taxonBreakdown[0]);
-      if (onLoad && loadedNode) onLoad(loadedNode);
-    });
+    if (!data.loaded && !query.called) {
+      loadNode().then((resp) => {
+        const loadedNode = resp.data && convertToNode(resp.data?.stats.taxonBreakdown[0]);
+
+        if (loadedNode) {
+          setChildTree(loadedNode.children);
+          if (onLoad) onLoad(loadedNode);
+        }
+      });
+    } else {
+      // collapse if there are any visible children. its a bit awkward but having a placeholder
+      // as a child is needed for the dendrogram calculations in d3.
+      // to avoid reloading the data we use the previously loaded `childTree` if we are expanding
+      // the node
+      if (node.children && node.children.filter((n) => n.visible).length > 0 && !pinned) {
+        node.children = [nodePlaceholder()];
+      } else {
+        node.children = childTree;
+      }
+      if (onToggle) onToggle(node);
+    }
   }
 
   const variants = {
@@ -201,6 +219,13 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
     }
   }
 
+  function onToggle(node: Node) {
+    const targetNode = findNode(tree.children, node);
+    if (targetNode) {
+      setRoot(hierarchy(tree));
+    }
+  }
+
   function nodeSeparator(a: HierarchyPointNode<Node>, b: HierarchyPointNode<Node>): number {
     return a.parent === b.parent ? 2 : 4;
   }
@@ -244,6 +269,7 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
                       pinned={path.indexOf(node.data.canonicalName) > -1}
                       onLoad={onLoad}
                       onHover={onHover}
+                      onToggle={onToggle}
                     />
                   </Group>
                 ))}
@@ -288,15 +314,12 @@ function nodeClassName(data: Node) {
 // Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
 // from the taxon tree statistics query into a presentable tree by injecting and
 // defaulting variables used for tree interaction.
-function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: string[]): Node {
-  const children = node.children?.map((child) => convertToNode(child, expanded));
+function convertToNode(node: TaxonStatTreeNode): Node {
+  const children = node.children?.map((child) => convertToNode(child));
 
   return {
     visible: true,
-    expanded: !!node.children?.length,
-    pinned: !!pinned?.find((name) => name === node.canonicalName),
     loaded: !!node.children?.length,
-    allChildren: node.children?.map((child) => convertToNode(child, expanded)),
 
     canonicalName: node.canonicalName,
     rank: node.rank,
@@ -305,20 +328,17 @@ function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: stri
 
     // if the node is expanded then we want to convert all the children to nodes as well,
     // otherwise we add a stub node that will load the data when expanded
-    children:
-      (children ?? []).length > 0 || node.rank === "SPECIES"
-        ? children
-        : [
-            {
-              visible: false,
-              expanded: false,
-              pinned: false,
-              loaded: false,
-              canonicalName: "",
-              rank: "",
-              species: 0,
-              fullGenomesCoverage: 0,
-            },
-          ],
+    children: (children ?? []).length > 0 || node.rank === "SPECIES" ? children || [] : [nodePlaceholder()],
+  };
+}
+
+function nodePlaceholder() {
+  return {
+    visible: false,
+    loaded: false,
+    canonicalName: "",
+    rank: "",
+    species: 0,
+    fullGenomesCoverage: 0,
   };
 }
