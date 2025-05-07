@@ -41,7 +41,7 @@ import { AttributePillValue, DataField } from "@/components/data-fields";
 import { TaxonTree } from "@/components/graphing/TaxonTree";
 import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timeline";
 import { useDisclosure, useResizeObserver } from "@mantine/hooks";
-import { TaxonStatTreeNode, findChildren } from "@/queries/stats";
+import { TaxonStatTreeNode } from "@/queries/stats";
 import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
 import { Taxon } from "@/queries/taxa";
 import HorizontalTimeline, { TimelineItem, TimelineItemType } from "@/components/graphing/horizontal-timeline";
@@ -461,11 +461,21 @@ const GET_TAXON_TREE_NODE = gql`
   query TaxonTreeNode($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
     stats {
       taxonBreakdown(taxonRank: $taxonRank, taxonCanonicalName: $taxonCanonicalName, includeRanks: $includeRanks) {
+        # family
         ...TaxonStatTreeNode
+
+        # subfamilies
         children {
           ...TaxonStatTreeNode
+
+          # genera
           children {
             ...TaxonStatTreeNode
+
+            # species
+            children {
+              ...TaxonStatTreeNode
+            }
           }
         }
       }
@@ -1112,24 +1122,29 @@ function NomenclaturalActBody({ item, protonym, specimensWithData }: Nomenclatur
 }
 
 interface FamilyTaxonTreeProps {
-  hierarchy: TaxonNode[];
-  pin?: string;
-  tree: ReturnType<typeof useQuery<TaxonTreeStatsQuery>>;
+  family: TaxonStatTreeNode;
+  datasetId: string;
+  pinned?: string[];
 }
 
-function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
+function FamilyTaxonTree({ family, datasetId, pinned }: FamilyTaxonTreeProps) {
   const [ref, rect] = useResizeObserver();
   const [layout, setLayout] = useState<Layout>("top-to-bottom");
 
-  const { loading, error, data } = tree;
+  // auto-expand the tree if there aren't that many total species
+  const includeRanks = ["CLASS", "FAMILY", "SUBFAMILY", "GENUS"];
+  if ((family.species || 0) < 100) includeRanks.push("SPECIES");
+
+  const { loading, error, data } = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
+    variables: {
+      taxonRank: "FAMILY",
+      taxonCanonicalName: family.canonicalName,
+      includeRanks,
+      datasetId,
+    },
+  });
 
   const treeData = data?.stats.taxonBreakdown[0];
-  const pinned = hierarchy.map((h) => h.canonicalName).concat(pin ?? "");
-
-  const expandedFamily = hierarchy
-    .filter((h) => h.rank === "FAMILY" || h.rank === "FAMILIA")
-    .map((h) => h.canonicalName);
-  const expandedGenera = treeData && findChildren(treeData, expandedFamily[0]);
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -1156,17 +1171,7 @@ function FamilyTaxonTree({ hierarchy, pin, tree }: FamilyTaxonTreeProps) {
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
       <ScrollArea.Autosize ref={ref}>
-        <Center>
-          {treeData && (
-            <TaxonTree
-              minWidth={rect.width}
-              height={800}
-              data={treeData}
-              pinned={pinned}
-              initialExpanded={expandedGenera}
-            />
-          )}
-        </Center>
+        <Center>{treeData && <TaxonTree minWidth={rect.width} height={900} data={treeData} pinned={pinned} />}</Center>
       </ScrollArea.Autosize>
     </Paper>
   );
@@ -1207,6 +1212,7 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
   const species = data?.species;
   const taxonomy = species && sortTaxaBySources(species.taxonomy)[0];
   const hierarchy = species?.hierarchy;
+  const pinned = hierarchy ? [canonicalName, ...hierarchy.map((h) => h.canonicalName)] : [canonicalName];
 
   const results = useQuery<TaxaQuery>(GET_TAXA, {
     variables: { filters: [{ canonicalName }] },
@@ -1214,11 +1220,11 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
 
   const family = hierarchy?.find((node) => node.rank === "FAMILY" || node.rank === "FAMILIA");
 
-  const tree = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
+  const familyStats = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
     variables: {
       taxonRank: "FAMILY",
       taxonCanonicalName: family?.canonicalName,
-      includeRanks: ["FAMILY", "SUBFAMILY", "GENUS"],
+      includeRanks: ["FAMILY"],
       datasetId,
     },
   });
@@ -1262,7 +1268,9 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
           </Stack>
         </Grid.Col>
       </Grid>
-      {hierarchy && <FamilyTaxonTree hierarchy={hierarchy} pin={taxonomy?.canonicalName} tree={tree} />}
+      {familyStats.data && datasetId && (
+        <FamilyTaxonTree family={familyStats.data.stats.taxonBreakdown[0]} datasetId={datasetId} pinned={pinned} />
+      )}
       <ExternalLinks canonicalName={canonicalName} species={data?.species} />
 
       {taxonomy && <History taxonomy={taxonomy} specimens={specimens?.species.specimens.records} />}

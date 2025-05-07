@@ -12,7 +12,6 @@ import { LinkVertical } from "@visx/shape";
 import { Text } from "@visx/text";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useListState } from "@mantine/hooks";
 import { HierarchyPointNode } from "@visx/hierarchy/lib/types";
 
 // Gets details for the specified taxon and the immediate decendants
@@ -54,9 +53,6 @@ interface Node {
   rank: string;
   species: number;
   fullGenomesCoverage: number;
-
-  // whether or not to render a spinner to indicate the node is loading
-  isLoader: boolean;
 }
 
 interface TaxonNodeProps {
@@ -105,58 +101,50 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad }: TaxonNodeProps) {
   // we want root nodes to have horizontal labels, inner nodes to have
   // vertical labels that move depending on the expanded state, and leaf nodes as
   // vertical labels that are always positioned after the node
-  const NodeLabel = getNodeLabel(depth, data);
+  const children = data.children?.filter((n) => n.visible) || [];
+  const inverted = query.loading || children.length > 0;
+
+  // kick off a load if this node is marked as autoload. this should only be the case
+  // for pinned paths where species can't be loaded due to the size of the tree
+  if (pinned && !query.called && children.length === 0 && data.rank != "SPECIES") {
+    toggleNode(data);
+  }
 
   return (
     <motion.g style={{ cursor: "pointer" }} whileHover={{ scale: 1.4 }} onClick={() => toggleNode(data)}>
-      <rect x={-50} y={-10} width={100} height={30} fill="black" style={{ opacity: 0 }} />
+      <rect x={-10} y={inverted ? -180 : -50} width={40} height={inverted ? 200 : 300} style={{ opacity: 0.0 }} />
       <circle r={6} fill="white" />
 
       <motion.g variants={variants} animate={query.loading ? "loading" : "initial"}>
         <circle r={6} className={nodeClassName(data)} strokeWidth={pinned ? 4 : 1} />
-        <NodeLabel text={data.canonicalName} pinned={!!pinned} />
+
+        {depth === 0 && (
+          <Text dy={"-1.5em"} className={classes.nodeLabelRoot} fontWeight={600} filter="url(#text-bg)">
+            {data.canonicalName}
+          </Text>
+        )}
+
+        {depth > 0 && (
+          <Text
+            angle={90}
+            fontSize="1em"
+            dominantBaseline="middle"
+            textAnchor={query.loading || children.length > 0 ? "end" : "start"}
+            dy={query.loading || children.length > 0 ? -15 : "1em"}
+            fontWeight={pinned ? 600 : 400}
+            filter="url(#text-bg)"
+          >
+            {data.canonicalName}
+          </Text>
+        )}
+
         {query.loading && (
-          <Text dy="2.5em" className={classes.loadingLabel}>
+          <Text dy="2.5em" angle={90} className={classes.loadingLabel}>
             loading..
           </Text>
         )}
       </motion.g>
     </motion.g>
-  );
-}
-
-function getNodeLabel(depth: number, node: Node) {
-  if (depth === 0) return RootNodeLabel;
-  else if ((node.children?.length || 0) > 0) return InnerNodeLabel;
-  else return LeafNodeLabel;
-}
-
-interface NodeLabelProps {
-  text: string;
-  pinned: boolean;
-}
-
-function RootNodeLabel({ text }: NodeLabelProps) {
-  return (
-    <Text dy={"-1.5em"} className={classes.nodeLabel} fontWeight={600} filter="url(#text-bg)">
-      {text}
-    </Text>
-  );
-}
-
-function InnerNodeLabel({ text, pinned }: NodeLabelProps) {
-  return (
-    <Text angle={90} dy={"1.0em"} className={classes.nodeLabel} fontWeight={pinned ? 600 : 400} filter="url(#text-bg)">
-      {text}
-    </Text>
-  );
-}
-
-function LeafNodeLabel({ text, pinned }: NodeLabelProps) {
-  return (
-    <Text angle={90} dy={"1.0em"} className={classes.nodeLabel} fontWeight={pinned ? 600 : 400} filter="url(#text-bg)">
-      {text}
-    </Text>
   );
 }
 
@@ -166,36 +154,24 @@ interface TaxonTreeProps {
   minWidth: number;
   data: TaxonStatTreeNode;
   pinned?: string[];
-  initialExpanded?: TaxonStatTreeNode[];
 }
 
-export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: TaxonTreeProps) {
-  const [expanded, handlers] = useListState<Node>(initialExpanded?.map((n) => convertToNode(n, [])) || []);
-
+export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
   // we maintain two trees for this graph. the graphql results are cached in tree which
   // gets updated when an incremental load of a tree node happens.
   // a separate tree converted to interactive nodes is derived from the cached tree.
-  const [rawTree, setRawTree] = useState(data);
-  const [tree, setTree] = useState(convertToNode(rawTree, expanded, pinned));
+  const [tree, _setTree] = useState(convertToNode(data));
   const [root, setRoot] = useState(hierarchy(tree));
 
-  /* let root = hierarchy(data); */
-  /* const [root, setRoot] = useState(hierarchy(tree)); */
+  const path = pinned || [];
 
-  const target = root.find((node) => node.data.canonicalName == "Macropus");
-
-  const margin = { top: 50, bottom: 300, left: 50, right: 50 };
+  const margin = { top: 50, bottom: 200, left: 50, right: 50 };
   const minNodeWidth = 20;
-  /* const minTreeWidth = (tree.children?.length || 0) * minNodeWidth; */
+
   const minTreeWidth = (root.descendants().length || 0) * minNodeWidth;
   const treeWidth = minTreeWidth > minWidth ? minTreeWidth : minWidth;
   const totalWidth = treeWidth + margin.left + margin.right;
   const totalHeight = height;
-
-  /* separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth} */
-  function onToggle(expanded: boolean) {
-    console.log(expanded);
-  }
 
   function onLoad(node: Node) {
     const targetNode = findNode(tree.children, node);
@@ -208,8 +184,6 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
   function nodeSeparator(a: HierarchyPointNode<Node>, b: HierarchyPointNode<Node>): number {
     return a.parent === b.parent ? 2 : 4;
   }
-
-  /* size={[totalWidth, totalHeight - (margin.top + margin.bottom)]} */
 
   return (
     <svg width={totalWidth} height={totalHeight}>
@@ -226,27 +200,26 @@ export function TaxonTree({ height, minWidth, data, pinned, initialExpanded }: T
             <Group top={0} left={totalWidth / 2}>
               {tree
                 .links()
-                .filter((n) => !n.target.data.isLoader)
+                .filter((n) => n.target.data.visible)
                 .map((link, i) => (
                   <LinkVertical
                     key={i}
                     data={link}
                     className={linkClassName(link.target.data)}
-                    strokeWidth={link.target === target ? 5 : 1}
-                    strokeOpacity={link.target === target ? 1 : 0.4}
+                    strokeWidth={path.indexOf(link.target.data.canonicalName) > -1 ? 5 : 1}
+                    strokeOpacity={path.indexOf(link.target.data.canonicalName) > -1 ? 1 : 0.4}
                   />
                 ))}
 
               {tree
                 .descendants()
-                .filter((n) => !n.data.isLoader)
+                .filter((n) => n.data.visible)
                 .map((node, key) => (
                   <Group top={node.y} left={node.x} key={key}>
                     <TaxonNode
                       data={node.data}
                       depth={node.depth}
-                      pinned={node === target}
-                      onToggle={onToggle}
+                      pinned={path.indexOf(node.data.canonicalName) > -1}
                       onLoad={onLoad}
                     />
                   </Group>
@@ -297,11 +270,10 @@ function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: stri
 
   return {
     visible: true,
-    expanded: false,
+    expanded: !!node.children?.length,
     pinned: !!pinned?.find((name) => name === node.canonicalName),
     loaded: !!node.children?.length,
     allChildren: node.children?.map((child) => convertToNode(child, expanded)),
-    isLoader: false,
 
     canonicalName: node.canonicalName,
     rank: node.rank,
@@ -323,7 +295,6 @@ function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: stri
               rank: "",
               species: 0,
               fullGenomesCoverage: 0,
-              isLoader: true,
             },
           ],
   };
