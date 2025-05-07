@@ -12,7 +12,7 @@ import { LinkVertical } from "@visx/shape";
 import { Text } from "@visx/text";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { HierarchyPointNode } from "@visx/hierarchy/lib/types";
+import { HierarchyNode, HierarchyPointNode } from "@visx/hierarchy/lib/types";
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
@@ -61,9 +61,10 @@ interface TaxonNodeProps {
   pinned?: boolean;
   onToggle?: (expanded: boolean) => void;
   onLoad?: (data: Node) => void;
+  onHover?: (data: Node | null) => void;
 }
 
-function TaxonNode({ data, depth, pinned, onToggle, onLoad }: TaxonNodeProps) {
+function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNodeProps) {
   const [loadNode, query] = useLazyQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
     variables: {
       taxonRank: data.rank,
@@ -111,7 +112,12 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad }: TaxonNodeProps) {
   }
 
   return (
-    <motion.g style={{ cursor: "pointer" }} whileHover={{ scale: 1.4 }} onClick={() => toggleNode(data)}>
+    <motion.g
+      style={{ cursor: "pointer" }}
+      onClick={() => toggleNode(data)}
+      onMouseOver={() => onHover && onHover(data)}
+      onMouseOut={() => onHover && onHover(null)}
+    >
       <rect x={-10} y={inverted ? -180 : -50} width={40} height={inverted ? 200 : 300} style={{ opacity: 0.0 }} />
       <circle r={6} fill="white" />
 
@@ -162,6 +168,7 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
   // a separate tree converted to interactive nodes is derived from the cached tree.
   const [tree, _setTree] = useState(convertToNode(data));
   const [root, setRoot] = useState(hierarchy(tree));
+  const [hoverPath, setHoverPath] = useState<HierarchyNode<Node>[]>([]);
 
   const path = pinned || [];
 
@@ -178,6 +185,19 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
     if (targetNode) {
       targetNode.children = node.children;
       setRoot(hierarchy(tree));
+    }
+  }
+
+  function onHover(node: Node | null) {
+    if (!node) {
+      setHoverPath([]);
+      return;
+    }
+
+    const target = root.find((n) => n.data === node);
+    if (target) {
+      const path = root.path(target);
+      setHoverPath(path);
     }
   }
 
@@ -206,7 +226,9 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
                     key={i}
                     data={link}
                     className={linkClassName(link.target.data)}
-                    strokeWidth={path.indexOf(link.target.data.canonicalName) > -1 ? 5 : 1}
+                    strokeWidth={
+                      path.indexOf(link.target.data.canonicalName) > -1 || hoverPath.indexOf(link.target) > -1 ? 5 : 1
+                    }
                     strokeOpacity={path.indexOf(link.target.data.canonicalName) > -1 ? 1 : 0.4}
                   />
                 ))}
@@ -221,6 +243,7 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
                       depth={node.depth}
                       pinned={path.indexOf(node.data.canonicalName) > -1}
                       onLoad={onLoad}
+                      onHover={onHover}
                     />
                   </Group>
                 ))}
