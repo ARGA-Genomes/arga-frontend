@@ -22,6 +22,7 @@ import {
   Divider,
   ThemeIcon,
   Indicator,
+  Badge,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
 import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
@@ -38,7 +39,7 @@ import { useEffect, useMemo, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { AttributePillValue, DataField } from "@/components/data-fields";
-import { TaxonTree } from "@/components/graphing/TaxonTree";
+import { TaxonTree, Node } from "@/components/graphing/TaxonTree";
 import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timeline";
 import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
@@ -1171,9 +1172,47 @@ function FamilyTaxonTree({ family, datasetId, pinned }: FamilyTaxonTreeProps) {
       {error && <Text>{error.message}</Text>}
       <LoadOverlay visible={loading} />
       <ScrollArea.Autosize ref={ref}>
-        <Center>{treeData && <TaxonTree minWidth={rect.width} height={900} data={treeData} pinned={pinned} />}</Center>
+        <Center>
+          {treeData && (
+            <TaxonTree
+              minWidth={rect.width}
+              height={900}
+              data={treeData}
+              pinned={pinned}
+              onTooltip={(node) => <NodeTooltip node={node} />}
+            />
+          )}
+        </Center>
       </ScrollArea.Autosize>
     </Paper>
+  );
+}
+
+function NodeTooltip({ node }: { node: Node }) {
+  return (
+    <Paper p="md" bg="wheat.0" radius="lg" w={400} h={120}>
+      <Group align="baseline" wrap="nowrap">
+        <Text size="xs">{node.rank}</Text>
+        <Text fs="italic">{node.canonicalName}</Text>
+      </Group>
+      <Group justify="center" my="xs">
+        <StatBadge label="Loci" stat={node.loci} />
+        <StatBadge label="Genomes" stat={node.genomes} />
+        <StatBadge label="Specimens" stat={node.specimens} />
+      </Group>
+      <Group justify="center">
+        <StatBadge label="Other" stat={node.other} />
+        <StatBadge label="Total genomic" stat={node.totalGenomic} />
+      </Group>
+    </Paper>
+  );
+}
+
+function StatBadge({ label, stat }: { label: string; stat?: number }) {
+  return (
+    <Badge variant="light" color={stat || 0 > 0 ? "moss" : "bushfire"}>
+      {label}: {stat || 0}
+    </Badge>
   );
 }
 
