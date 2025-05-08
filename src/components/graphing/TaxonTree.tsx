@@ -41,7 +41,7 @@ interface TaxonTreeNodeQuery {
 // A node in the tree. This represents the visual node of a taxon and maintains
 // a heirarchy of child tree nodes. It should contain both the data to present as
 // well as transient functional data such as expansion or pinning.
-interface Node {
+export interface Node {
   visible: boolean;
   loaded: boolean;
   children?: Node[];
@@ -50,6 +50,12 @@ interface Node {
   rank: string;
   species: number;
   fullGenomesCoverage: number;
+
+  loci?: number;
+  genomes?: number;
+  specimens?: number;
+  other?: number;
+  totalGenomic?: number;
 }
 
 interface TaxonNodeProps {
@@ -178,15 +184,18 @@ interface TaxonTreeProps {
   minWidth: number;
   data: TaxonStatTreeNode;
   pinned?: string[];
+  onTooltip?: (node: Node) => React.ReactNode;
 }
 
-export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
+export function TaxonTree({ height, minWidth, data, pinned, onTooltip }: TaxonTreeProps) {
   // we maintain two trees for this graph. the graphql results are cached in tree which
   // gets updated when an incremental load of a tree node happens.
   // a separate tree converted to interactive nodes is derived from the cached tree.
   const [tree, _setTree] = useState(convertToNode(data));
   const [root, setRoot] = useState(hierarchy(tree));
   const [hoverPath, setHoverPath] = useState<HierarchyNode<Node>[]>([]);
+  const [hoverNode, setHoverNode] = useState<HierarchyNode<Node> | null>(null);
+  const [hoverNodePos, setHoverNodePos] = useState<[number, number] | null>(null);
 
   const [totalWidth, setTotalWidth] = useState(0);
   const [rootOffset, setRootOffset] = useState(0);
@@ -229,6 +238,8 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
   function onHover(node: Node | null) {
     if (!node) {
       setHoverPath([]);
+      setHoverNode(null);
+      setHoverNodePos(null);
       return;
     }
 
@@ -236,6 +247,8 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
     if (target) {
       const path = root.path(target);
       setHoverPath(path);
+      setHoverNode(target);
+      setHoverNodePos((target.x && target.y && [target.x, target.y]) || null);
     }
   }
 
@@ -277,6 +290,15 @@ export function TaxonTree({ height, minWidth, data, pinned }: TaxonTreeProps) {
                     strokeOpacity={path.indexOf(link.target.data.canonicalName) > -1 ? 1 : 0.4}
                   />
                 ))}
+
+              <Group
+                left={(hoverNodePos && hoverNodePos[0] - 200) || -1000}
+                top={(hoverNodePos && hoverNodePos[1] - 140) || -1000}
+              >
+                <foreignObject width={400} height={150}>
+                  {hoverNode && onTooltip && onTooltip(hoverNode.data)}
+                </foreignObject>
+              </Group>
 
               {tree
                 .descendants()
@@ -345,6 +367,10 @@ function convertToNode(node: TaxonStatTreeNode): Node {
     rank: node.rank,
     species: node.species ?? 0,
     fullGenomesCoverage: node.fullGenomesCoverage ?? 0,
+    specimens: node.specimens,
+    loci: node.loci,
+    genomes: node.genomes,
+    totalGenomic: node.totalGenomic,
 
     // if the node is expanded then we want to convert all the children to nodes as well,
     // otherwise we add a stub node that will load the data when expanded
