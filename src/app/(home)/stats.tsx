@@ -4,96 +4,46 @@ import { DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Group, Skeleton, Center } from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Skeleton } from "@mantine/core";
 import * as Humanize from "humanize-plus";
-import { BarChart, CircularBarChart } from "@/components/graphing/bar";
+import { BarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
-import { DonutChart } from "@/components/graphing/pie";
 import { CircularPackingChart } from "@/components/graphing/circular-packing";
 import { SunburstChart } from "@/components/graphing/sunburst";
 import { useState } from "react";
+import { useDatasets } from "../source-provider";
 
 const GET_TAXON = gql`
-  query HomeStats {
-    taxon(rank: DOMAIN, canonicalName: "Eukaryota") {
-      summary {
-        species
-        speciesData
-        speciesGenomes
+  query HomeStats($datasetId: UUID) {
+    taxon(by: { classification: { rank: DOMAIN, canonicalName: "Eukaryota", datasetId: $datasetId } }) {
+      speciesSummary: summary(rank: SPECIES) {
+        total
+        genomes
+        genomicData
       }
 
-      speciesSummary {
-        name
+      speciesGenomesSummary {
+        canonicalName
         genomes
         totalGenomic
-      }
-
-      speciesGenomeSummary {
-        name
-        genomes
-        totalGenomic
-      }
-
-      kingdomDescendants: descendants(rank: KINGDOM) {
-        canonicalName
-        species
-        speciesData
-        speciesGenomes
-      }
-
-      superKingdomDescendants: descendants(rank: SUPERKINGDOM) {
-        canonicalName
-        species
-        speciesData
-        speciesGenomes
-      }
-
-      regnumDescendants: descendants(rank: REGNUM) {
-        canonicalName
-        species
-        speciesData
-        speciesGenomes
       }
     }
   }
 `;
 
 interface DataBreakdown {
-  name: string;
+  canonicalName: string;
   genomes: number;
   totalGenomic: number;
 }
 
 interface Taxonomy {
-  dataSummary: DataBreakdown[];
-  speciesSummary: DataBreakdown[];
-  speciesGenomeSummary: DataBreakdown[];
-  summary: {
-    children: number;
-    childrenData: number;
-    childrenGenomes: number;
-    species: number;
-    speciesData: number;
-    speciesGenomes: number;
+  speciesGenomesSummary: DataBreakdown[];
+  speciesSummary: {
+    total: number;
+    genomes: number;
+    genomicData: number;
   };
-  kingdomDescendants: {
-    canonicalName: string;
-    species: number;
-    speciesData: number;
-    speciesGenomes: number;
-  }[];
-  superKingdomDescendants: {
-    canonicalName: string;
-    species: number;
-    speciesData: number;
-    speciesGenomes: number;
-  }[];
-  regnumDescendants: {
-    canonicalName: string;
-    species: number;
-    speciesData: number;
-    speciesGenomes: number;
-  }[];
 }
 
 interface TaxonResults {
@@ -315,7 +265,15 @@ interface EukaryotaTreeResults {
 }
 
 export function ShowStats() {
-  const taxonResults = useQuery<TaxonResults>(GET_TAXON);
+  const { names } = useDatasets();
+  const datasetId = names.get("Atlas of Living Australia")?.id;
+
+  const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
+    variables: {
+      datasetId,
+    },
+  });
+
   const taxon = taxonResults.data?.taxon;
 
   const thresholds = [
@@ -324,19 +282,19 @@ export function ShowStats() {
     { name: "great", color: "#97bc5d", start: 75, end: 100 },
   ];
 
-  const speciesGenomes = taxon?.speciesGenomeSummary
+  const speciesGenomes = taxon?.speciesGenomesSummary
     .filter((i) => i.genomes > 0)
     .map((summary) => {
-      const linkName = encodeURIComponent(summary.name.replaceAll(" ", "_"));
+      const linkName = encodeURIComponent(summary.canonicalName.replaceAll(" ", "_"));
       return {
-        name: summary.name || "",
+        name: summary.canonicalName || "",
         value: summary.genomes,
         href: `/species/${linkName}`,
       };
     })
     .sort((a, b) => b.value - a.value);
 
-  const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
+  const genomePercentile = taxon && (taxon.speciesSummary.genomes / taxon.speciesSummary.total) * 100;
 
   return (
     <Paper radius="lg" style={{ top: 200, right: 0, width: 640 }}>
@@ -358,15 +316,15 @@ export function ShowStats() {
 
             <DataTable my={2}>
               <DataTableRow label="Number of species/OTUs">
-                <DataField value={Humanize.formatNumber(taxon?.summary.species || 0)} />
+                <DataField value={Humanize.formatNumber(taxon?.speciesSummary.total || 0)} />
               </DataTableRow>
 
               <DataTableRow label="Species with genomes">
-                <DataField value={Humanize.formatNumber(taxon?.summary.speciesGenomes || 0)} />
+                <DataField value={Humanize.formatNumber(taxon?.speciesSummary.genomes || 0)} />
               </DataTableRow>
 
               <DataTableRow label="Species with data">
-                <DataField value={Humanize.formatNumber(taxon?.summary.speciesData || 0)} />
+                <DataField value={Humanize.formatNumber(taxon?.speciesSummary.genomicData || 0)} />
               </DataTableRow>
             </DataTable>
           </Stack>
@@ -387,84 +345,6 @@ export function ShowStats() {
         </Grid.Col>
       </Grid>
     </Paper>
-  );
-}
-
-export function ShowTaxonomicCoverageStats() {
-  const taxonResults = useQuery<TaxonResults>(GET_TAXON);
-  if (taxonResults.error) return <p>Error : {taxonResults.error.message}</p>;
-
-  const taxon = taxonResults.data?.taxon;
-
-  const domainData = [
-    { name: "Archaea", value: 1, label: 0 },
-    {
-      name: "Eukaryota",
-      value: 1,
-      label: taxon?.summary.species,
-      href: "/domain/Eukaryota",
-    },
-    { name: "Bacteria", value: 1, label: 0 },
-  ];
-
-  const kingdomRegnumData = taxon?.kingdomDescendants
-    .map((descendant) => {
-      return {
-        name: descendant.canonicalName,
-        value: descendant.species,
-        href: `/kingdom/${descendant.canonicalName}`,
-      };
-    })
-    .concat(
-      taxon.regnumDescendants
-        .filter((descendant) => descendant.canonicalName !== "Protista")
-        .map((descendant) => {
-          return {
-            name: descendant.canonicalName,
-            value: descendant.species,
-            href: `/regnum/${descendant.canonicalName}`,
-          };
-        })
-    )
-    .concat(
-      taxon.superKingdomDescendants.map((descendant) => {
-        return {
-          name: descendant.canonicalName,
-          value: descendant.species,
-          href: `/superkingdom/${descendant.canonicalName}`,
-        };
-      })
-    );
-
-  return (
-    <Group gap={40} justify="center">
-      <Stack>
-        <Skeleton visible={taxonResults.loading}>
-          <Center>
-            <Title order={4} c="white">
-              Domains
-            </Title>
-          </Center>
-        </Skeleton>
-        <Skeleton visible={taxonResults.loading} circle>
-          <DonutChart h={350} w={350} data={domainData} labelled={true} />
-        </Skeleton>
-      </Stack>
-      <Stack align="center">
-        <Skeleton visible={taxonResults.loading}>
-          <Center>
-            <Title order={4} c="white">
-              Kingdoms
-            </Title>
-          </Center>
-        </Skeleton>
-        {kingdomRegnumData && (
-          <Skeleton visible={taxonResults.loading} circle h={375} w={375}>
-            <CircularBarChart h={400} w={400} margin={30} data={kingdomRegnumData} />
-          </Skeleton>
-        )}
-      </Stack>
-    </Group>
   );
 }
 
