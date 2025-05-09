@@ -1,6 +1,5 @@
 import { Checkbox, Chip, Group, Stack } from "@mantine/core";
 
-import { ClassificationFilter } from "../groups/classification";
 import { IconChevronDown, IconTrashFilled } from "@tabler/icons-react";
 
 export interface RefineOption {
