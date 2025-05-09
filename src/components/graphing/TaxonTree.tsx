@@ -236,7 +236,7 @@ export function TaxonTree({ height, minWidth, data, pinned, onTooltip }: TaxonTr
   }
 
   function onHover(node: Node | null) {
-    if (!node) {
+    if (!node || node.rank !== "SPECIES") {
       setHoverPath([]);
       setHoverNode(null);
       setHoverNodePos(null);
