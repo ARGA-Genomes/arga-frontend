@@ -32,6 +32,7 @@ import { usePreviousPage } from "@/components/navigation-history";
 import { useHover } from "@mantine/hooks";
 import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { DataTypeFilters } from "@/components/filtering/data-type";
+import { Results } from "./_components/result";
 
 interface Filters {
   classifications: Filter[];
@@ -60,7 +61,7 @@ interface DataSummary {
   totalGenomic: number;
 }
 
-interface Item {
+export interface Item {
   type: string;
   score: number;
   status: string;
@@ -591,31 +592,6 @@ function SpecimenDetails({ item }: { item: Item }) {
   );
 }
 
-function SearchItem({ item }: { item: Item }) {
-  switch (item.type) {
-    case "TAXON":
-      return <TaxonItem item={item} />;
-    case "GENOME":
-      return <GenomeItem item={item} />;
-    case "LOCUS":
-      return <LocusItem item={item} />;
-    case "SPECIMEN":
-      return <SpecimenItem item={item} />;
-    default:
-      return null;
-  }
-}
-
-function SearchResults({ results }: { results: Item[] }) {
-  return (
-    <Stack gap="xs">
-      {results.map((record) => (
-        <SearchItem item={record} key={`${record.canonicalName}-${record.type}`} />
-      ))}
-    </Stack>
-  );
-}
-
 interface SearchProperties {
   onSearch: (searchTerms: string, dataType: string) => void;
   data: QueryResults | undefined;
@@ -824,7 +800,7 @@ function SearchPage() {
                   <Text c="red">{error.message}</Text>
                 </Alert>
               )}
-              <SearchResults results={data?.search.fullText.records || []} />
+              <Results items={data?.search.fullText.records || []} />
               <PaginationBar total={data?.search.fullText.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
             </Stack>
           </LoadPanel>
