@@ -17,7 +17,6 @@ import classes from "./result.module.css";
 import { ReactElement } from "react";
 import { IconCircleCheck, IconCircleX, IconDownload, TablerIcon } from "@tabler/icons-react";
 import { AttributePill } from "@/components/highlight-stack";
-import { text } from "d3";
 
 interface TaxonResultProps {
   item: Item;
