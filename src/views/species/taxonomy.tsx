@@ -81,8 +81,8 @@ interface TaxaQuery {
 }
 
 const GET_TAXON = gql`
-  query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
-    taxon(rank: $rank, canonicalName: $canonicalName) {
+  query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String, $datasetId: UUID) {
+    taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
       ...TaxonName
       ...TaxonSource
 
@@ -894,10 +894,14 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
 }
 
 function History({ taxonomy, specimens }: { taxonomy: Taxonomy; specimens?: Specimen[] }) {
+  const { names } = useDatasets();
+  const datasetId = names.get("Atlas of Living Australia")?.id;
+
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
     variables: {
       rank: taxonomy.rank,
       canonicalName: taxonomy.canonicalName,
+      datasetId,
     },
   });
 
