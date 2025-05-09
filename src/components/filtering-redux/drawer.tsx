@@ -23,8 +23,16 @@ import {
   ThreatenedFilters,
   threatenedFiltersToQuery,
 } from "./groups/threatened";
+import { IndustryCommerceFilter, industryCommerceFiltersToQuery } from "./groups/industry-commerce";
+import { RefineTreeNode, renderRefineFilterChip } from "./filters/refine";
 
-type FilterType = "dataType" | "classification" | "bushfireRecovery" | "vernacularGroup" | "threatened";
+type FilterType =
+  | "dataType"
+  | "classification"
+  | "bushfireRecovery"
+  | "vernacularGroup"
+  | "threatened"
+  | "industryCommerce";
 
 interface FiltersDrawerProps {
   types: FilterType[];
@@ -63,6 +71,7 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips }
 
   const [classificationFilters, setClassificationFilters] = useState<ClassificationFilter[]>([]);
   const [vernacularGroupFilter, setVernacularGroupFilter] = useState<BoolFilterData | null>(null);
+  const [industryCommerceFilters, setIndustryCommerceFilters] = useState<RefineTreeNode[]>([]);
 
   const uniqueTypes = Array.from(new Set(types));
 
@@ -80,6 +89,10 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips }
         );
       case "vernacularGroup":
         return <VernacularGroupFilter key={type} filter={vernacularGroupFilter} onChange={setVernacularGroupFilter} />;
+      case "industryCommerce":
+        return (
+          <IndustryCommerceFilter key={type} filters={industryCommerceFilters} onChange={setIndustryCommerceFilters} />
+        );
     }
   };
 
@@ -90,6 +103,7 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips }
       ...threatenedFiltersToQuery(threatenedFilters),
       ...bushfireRecoveryFiltersToQuery(bushfireRecoveryFilters),
       ...vernacularGroupFilterToQuery(vernacularGroupFilter),
+      ...industryCommerceFiltersToQuery(industryCommerceFilters),
     ]);
     onFilterChips([
       ...renderBoolFilterChips(dataTypeFilters, ["Has", "Missing"], setDataTypeFilters),
@@ -102,8 +116,16 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips }
       ),
       ...renderBoolFilterChips(bushfireRecoveryFilters, ["Includes", "Excludes"], setBushfireRecoveryFilters),
       ...renderVernacularGroupFilterChip(vernacularGroupFilter, () => setVernacularGroupFilter(null)),
+      ...renderRefineFilterChip(industryCommerceFilters, () => setIndustryCommerceFilters([])),
     ]);
-  }, [dataTypeFilters, classificationFilters, threatenedFilters, bushfireRecoveryFilters, vernacularGroupFilter]);
+  }, [
+    dataTypeFilters,
+    classificationFilters,
+    threatenedFilters,
+    bushfireRecoveryFilters,
+    vernacularGroupFilter,
+    industryCommerceFilters,
+  ]);
 
   return (
     <>
