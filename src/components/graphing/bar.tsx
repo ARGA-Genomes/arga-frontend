@@ -397,7 +397,7 @@ export function StackedBarGraph({ data }: StackedBarGraphProps) {
                 className={classes.legend}
               />
               {segmentLabels.map((segment, idx) => (
-                <Group left={30} top={30 * (idx + 1)}>
+                <Group left={30} top={30 * (idx + 1)} key={segment}>
                   <rect width={20} height={20} fill={colourScale(segment)} />
                   <text dx={30} dy={11} className={classes.legendLabel}>
                     {segment}
