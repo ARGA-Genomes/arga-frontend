@@ -7,10 +7,7 @@ import classes from "./layout.module.css";
 import { ApolloProvider } from "@apollo/client";
 import createClient from "../queries/client";
 
-import {
-  AppShell,
-  MantineProvider,
-} from "@mantine/core";
+import { AppShell, MantineProvider } from "@mantine/core";
 
 import { theme } from "../theme";
 import { TopNav } from "./top-nav";
@@ -18,13 +15,8 @@ import { Footer } from "./footer";
 import { TraceLoaderProvider } from "@/components/traces/context";
 import Fathom from "@/components/fathom";
 import { SourceProvider } from "./source-provider";
-import { MessagePopup } from "@/components/message-popup";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   // make the apollo graphql client available on all pages
   const client = createClient();
 
@@ -36,7 +28,6 @@ export default function RootLayout({
           <MantineProvider theme={theme}>
             <SourceProvider>
               <TraceLoaderProvider>
-                <MessagePopup />
                 <Shell>{children}</Shell>
               </TraceLoaderProvider>
             </SourceProvider>

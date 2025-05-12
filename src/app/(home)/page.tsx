@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Text, Title, Stack, TextInput, Flex, Box, Center, Group } from "@mantine/core";
 import { IconArrowUpRight, IconSearch } from "@tabler/icons-react";
-import { ShowStats, ShowSunburstTaxonomy } from "./stats";
+import { ShowStats, TaxonomicComposition } from "./stats";
 import { gql, useQuery } from "@apollo/client";
 
 // Project components
@@ -32,7 +32,7 @@ interface Counts {
     {
       name: string;
       total: number;
-    }
+    },
   ];
 }
 
@@ -109,13 +109,11 @@ export default function HomePage() {
               ...prev,
               [cur.name.replaceAll(" ", "_")]: cur.total,
             }),
-            { ARGA_Threatened_Species: 0 }
+            { ARGA_Threatened_Species: 0 },
           ),
         }
       : null;
   }, [data]);
-
-  console.log(data, formattedData);
 
   return (
     <Stack gap={0}>
@@ -191,7 +189,7 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Taxonomic coverage
               </Title>
-              <ShowSunburstTaxonomy />
+              <TaxonomicComposition />
             </Stack>
             <Stack gap={40} align="center">
               <Title order={3} c="moss.5" fz={28}>
