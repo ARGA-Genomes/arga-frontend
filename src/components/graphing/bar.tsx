@@ -1,5 +1,7 @@
 "use client";
 
+import classes from "./bar.module.css";
+
 import * as d3 from "d3";
 import * as Humanize from "humanize-plus";
 import { useSpring } from "@react-spring/web";
@@ -348,16 +350,15 @@ export function StackedBarGraph({ data }: StackedBarGraphProps) {
     <ParentSize>
       {(parent) => {
         yScale.range([0, parent.height]);
+        const boundsWidth = parent.width - 100; // margin to allow labels next to bars
 
         return (
           <svg width={parent.width} height={parent.height}>
             {data.map((barStack, idx) => {
               const height = yScale.bandwidth();
-              const maxWidth = parent.width - (parent.width / (groupLabels.length + 1)) * (groupLabels.length - idx);
+              const maxWidth = boundsWidth - (boundsWidth / (groupLabels.length + 1)) * (groupLabels.length - idx);
               const total = barStack.segments.reduce((acc, cur) => (acc += cur.value), 0);
 
-              console.log(barStack.label, groupLabels.length, idx, groupLabels.length - idx);
-              console.log(barStack.label, total);
               let stackLeft = 0;
 
               const xScale = scaleLinear<number>({
@@ -379,13 +380,31 @@ export function StackedBarGraph({ data }: StackedBarGraphProps) {
                     return bar;
                   })}
                   <Group top={height / 2} left={stackLeft + 20}>
-                    <text fill="var(--mantine-color-midnight-1)" dominantBaseline="middle">
+                    <text className={classes.barLabel}>
                       {Humanize.formatNumber(total)} {barStack.label}
                     </text>
                   </Group>
                 </Group>
               );
             })}
+
+            <Group left={parent.width - 150}>
+              <rect
+                rx="var(--mantine-radius-lg)"
+                ry="var(--mantine-radius-lg)"
+                width={150}
+                height={200}
+                className={classes.legend}
+              />
+              {segmentLabels.map((segment, idx) => (
+                <Group left={30} top={30 * (idx + 1)}>
+                  <rect width={20} height={20} fill={colourScale(segment)} />
+                  <text dx={30} dy={11} className={classes.legendLabel}>
+                    {segment}
+                  </text>
+                </Group>
+              ))}
+            </Group>
           </svg>
         );
       }}

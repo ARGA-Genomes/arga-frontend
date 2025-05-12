@@ -528,8 +528,18 @@ export function TaxonomicComposition() {
     data && ranks.map((rank) => ({ label: RANK_PLURALS[rank].toLocaleLowerCase(), segments: getSegments(rank, data) }));
 
   return (
-    <Skeleton h={500} w={600} visible={loading}>
-      {groups && <StackedBarGraph data={groups} />}
+    <Skeleton visible={loading}>
+      <Paper
+        h={500}
+        w={800}
+        radius="lg"
+        p="xl"
+        bg="midnight.9"
+        withBorder
+        style={{ borderColor: "var(--mantine-color-midnight-8)" }}
+      >
+        {groups && <StackedBarGraph data={groups} />}
+      </Paper>
     </Skeleton>
   );
 }
