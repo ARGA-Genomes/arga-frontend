@@ -4,7 +4,7 @@ import { DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Skeleton, Box } from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Skeleton } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart, StackedBarGraph } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";

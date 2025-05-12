@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Text, Title, Stack, TextInput, Flex, Box, Center, Group } from "@mantine/core";
 import { IconArrowUpRight, IconSearch } from "@tabler/icons-react";
-import { ShowStats, ShowSunburstTaxonomy, TaxonomicComposition } from "./stats";
+import { ShowStats, TaxonomicComposition } from "./stats";
 import { gql, useQuery } from "@apollo/client";
 
 // Project components
