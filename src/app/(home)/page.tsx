@@ -185,17 +185,21 @@ export default function HomePage() {
             </Stack>
           </Stack>
           <Group gap={140} pb={80} align="flex-start" justify="center">
-            <Stack gap={40} align="center">
+            <Stack gap={40}>
               <Title order={3} c="moss.5" fz={28}>
                 Taxonomic composition
               </Title>
-              <TaxonomicComposition />
+              <Center>
+                <TaxonomicComposition />
+              </Center>
             </Stack>
-            <Stack gap={40} align="center">
+            <Stack gap={40}>
               <Title order={3} c="moss.5" fz={28}>
                 Recent updates
               </Title>
-              <RecentUpdatesContainer />
+              <Center>
+                <RecentUpdatesContainer />
+              </Center>
             </Stack>
           </Group>
         </Stack>

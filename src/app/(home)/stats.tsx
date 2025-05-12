@@ -530,7 +530,7 @@ export function TaxonomicComposition() {
   return (
     <Skeleton visible={loading}>
       <Paper
-        h={500}
+        h={520}
         w={800}
         radius="lg"
         p="xl"
