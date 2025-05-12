@@ -187,7 +187,7 @@ export default function HomePage() {
           <Group gap={140} pb={80} align="flex-start" justify="center">
             <Stack gap={40} align="center">
               <Title order={3} c="moss.5" fz={28}>
-                Taxonomic coverage
+                Taxonomic composition
               </Title>
               <TaxonomicComposition />
             </Stack>

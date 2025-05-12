@@ -1,0 +1,17 @@
+.barLabel {
+    fill: var(--mantine-color-midnight-1);
+    dominant-baseline: middle;
+    font-weight: 600;
+}
+
+.legend {
+    fill: var(--mantine-color-midnight-8);
+    border-radius: var(--mantine-radius-lg);
+}
+
+.legendLabel {
+    fill: var(--mantine-color-midnight-1);
+    dominant-baseline: middle;
+    font-weight: 600;
+    font-size: 0.8em;
+}
