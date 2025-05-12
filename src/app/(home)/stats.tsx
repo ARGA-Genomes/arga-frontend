@@ -4,14 +4,26 @@ import { DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Skeleton } from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Skeleton, Box } from "@mantine/core";
 import * as Humanize from "humanize-plus";
-import { BarChart } from "@/components/graphing/bar";
+import { BarChart, StackedBarGraph } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
 import { CircularPackingChart } from "@/components/graphing/circular-packing";
 import { SunburstChart } from "@/components/graphing/sunburst";
 import { useState } from "react";
 import { useDatasets } from "../source-provider";
+import { TaxonomicRankStatistic } from "@/queries/stats";
+
+const RANK_PLURALS: Record<string, string> = {
+  DOMAIN: "Domain",
+  KINGDOM: "Kingdoms",
+  PHYLUM: "Phyla",
+  CLASS: "Classes",
+  ORDER: "Orders",
+  FAMILY: "Families",
+  GENUS: "Genera",
+  SPECIES: "Species",
+};
 
 const GET_TAXON = gql`
   query HomeStats($datasetId: UUID) {
@@ -444,6 +456,80 @@ export function ShowSunburstTaxonomy() {
   return (
     <Skeleton visible={loading} circle>
       {treeData && <SunburstChart data={treeData} width={520} height={520} />}
+    </Skeleton>
+  );
+}
+
+const GET_TAXONOMIC_RANK_STATS = gql`
+  query TaxonomicRankStats($ranks: [TaxonomicRank]) {
+    stats {
+      animalia: taxonomicRanks(taxonRank: "KINGDOM", taxonCanonicalName: "Animalia", ranks: $ranks) {
+        rank
+        children
+        coverage
+        atLeastOne
+      }
+      plantae: taxonomicRanks(taxonRank: "KINGDOM", taxonCanonicalName: "Plantae", ranks: $ranks) {
+        rank
+        children
+        coverage
+        atLeastOne
+      }
+      fungi: taxonomicRanks(taxonRank: "KINGDOM", taxonCanonicalName: "Fungi", ranks: $ranks) {
+        rank
+        children
+        coverage
+        atLeastOne
+      }
+      chromista: taxonomicRanks(taxonRank: "KINGDOM", taxonCanonicalName: "Chromista", ranks: $ranks) {
+        rank
+        children
+        coverage
+        atLeastOne
+      }
+      protista: taxonomicRanks(taxonRank: "KINGDOM", taxonCanonicalName: "Protista", ranks: $ranks) {
+        rank
+        children
+        coverage
+        atLeastOne
+      }
+    }
+  }
+`;
+
+type TaxonomicRankStatsQuery = {
+  stats: {
+    animalia: TaxonomicRankStatistic[];
+    plantae: TaxonomicRankStatistic[];
+    fungi: TaxonomicRankStatistic[];
+    chromista: TaxonomicRankStatistic[];
+    protista: TaxonomicRankStatistic[];
+  };
+};
+
+export function TaxonomicComposition() {
+  const ranks = ["KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
+
+  const { loading, data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
+    variables: { ranks },
+  });
+
+  function getSegments(rank: string, stats: TaxonomicRankStatsQuery) {
+    return [
+      { label: "Animalia", value: stats.stats.animalia.find((stat) => stat.rank === rank)?.children || 0 },
+      { label: "Plantae", value: stats.stats.plantae.find((stat) => stat.rank === rank)?.children || 0 },
+      { label: "Fungi", value: stats.stats.fungi.find((stat) => stat.rank === rank)?.children || 0 },
+      { label: "Chromista", value: stats.stats.chromista.find((stat) => stat.rank === rank)?.children || 0 },
+      { label: "Protista", value: stats.stats.protista.find((stat) => stat.rank === rank)?.children || 0 },
+    ];
+  }
+
+  const groups =
+    data && ranks.map((rank) => ({ label: RANK_PLURALS[rank].toLocaleLowerCase(), segments: getSegments(rank, data) }));
+
+  return (
+    <Skeleton h={500} w={600} visible={loading}>
+      {groups && <StackedBarGraph data={groups} />}
     </Skeleton>
   );
 }
