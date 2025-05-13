@@ -1,0 +1,36 @@
+.nodeGlyphMoss {
+    fill: var(--mantine-color-moss-2);
+    stroke: var(--mantine-color-moss-5);
+}
+
+.nodeGlyphWheat {
+    fill: var(--mantine-color-wheat-2);
+    stroke: var(--mantine-color-wheat-5);
+}
+
+.nodeGlyphBushfire {
+    fill: var(--mantine-color-bushfire-2);
+    stroke: var(--mantine-color-bushfire-5);
+}
+
+.nodeLinkMoss {
+    stroke: var(--mantine-color-moss-5);
+    fill: none;
+}
+
+.nodeLinkWheat {
+    stroke: var(--mantine-color-wheat-5);
+    fill: none;
+}
+
+.nodeLinkBushfire {
+    stroke: var(--mantine-color-bushfire-5);
+    fill: none;
+}
+
+.loadingLabel {
+    font-size: 0.7em;
+    font-weight: 300;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}

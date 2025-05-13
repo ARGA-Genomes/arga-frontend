@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, use, ReactElement } from "react";
+import { useEffect, use } from "react";
 import * as Humanize from "humanize-plus";
-import { gql, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Text, Stack, Grid, Container, Group, UnstyledButton, Flex, ThemeIcon } from "@mantine/core";
+import { gql, OperationVariables, useQuery } from "@apollo/client";
+import { Paper, Title, Box, Text, Stack, Grid, Container, Group } from "@mantine/core";
 import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
 import { Attribute, DataField } from "@/components/highlight-stack";
@@ -18,6 +18,7 @@ import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-com
 import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
 import { BrowseSpecies } from "@/components/browse-species";
 import { DataNoteActions } from "@/components/data-note-actions";
+import { PageCitation } from "@/components/page-citation";
 
 const GET_SPECIES = gql`
   query TaxonSpecies(
@@ -115,6 +116,22 @@ const GET_TAXON = gql`
         genomes
         totalGenomic
       }
+    }
+  }
+`;
+
+const DOWNLOAD_SUMMARY = gql`
+  query DownloadTaxonSummary($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $lowerRank: TaxonRank) {
+    summary: taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
+      overview: summaryCsv(rank: $lowerRank)
+
+      speciesGenomicDataSummaryCsv
+
+      speciesGenomesSummaryCsv
+    }
+
+    stats {
+      completeGenomesByYearCsv(taxonRank: $rank, taxonCanonicalName: $canonicalName)
     }
   }
 `;
@@ -245,28 +262,15 @@ function pluralTaxon(rank: string) {
   else return rank;
 }
 
-interface ActionButtonProps {
-  label: string;
-  icon: ReactElement;
-}
-
-function ActionButton({ label, icon }: ActionButtonProps) {
-  return (
-    <UnstyledButton>
-      <Flex gap={12} align="center">
-        <ThemeIcon radius="md" color="midnight.11">
-          {icon}
-        </ThemeIcon>
-        <Text size="sm" fw={600} c="midnight.11">
-          {label}
-        </Text>
-      </Flex>
-    </UnstyledButton>
-  );
-}
-
-function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefined }) {
-  console.log(rank, JSON.stringify(taxon));
+function DataSummary({
+  rank,
+  taxon,
+  downloadVariables,
+}: {
+  rank: string;
+  taxon: Taxonomy | undefined;
+  downloadVariables: OperationVariables;
+}) {
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
   const childTaxonLabel = pluralTaxon(childTaxon);
 
@@ -341,7 +345,7 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
       </Grid.Col>
       <Grid.Col span="auto">
         <Paper h={560} p="lg" radius="lg" withBorder>
-          <Stack h="100%" justify="space-between">
+          <Stack data-downloadname="Aggregated total species" h="100%" justify="space-between">
             <Box h={400}>
               <GenomeCompletion
                 taxonRank={rank}
@@ -404,7 +408,7 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
       </Grid.Col>
       <Grid.Col span={12}>
         <Grid mt="xl">
-          <Grid.Col span={12}>
+          <Grid.Col data-downloadname="Complete genomes for representative species" span={12}>
             <Stack>
               <Text fz="sm" fw={300}>
                 Complete genome for at least one representative species from each:
@@ -416,7 +420,7 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 12, md: 8, lg: 9, xl: 10 }}>
             <Grid>
-              <Grid.Col span={collapsable(4)}>
+              <Grid.Col data-downloadname="Percentage of species with genomes" span={collapsable(4)}>
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Percentage of species with genomes
@@ -432,7 +436,7 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
                   )}
                 </Stack>
               </Grid.Col>
-              <Grid.Col span={collapsable(8)}>
+              <Grid.Col data-downloadname="Species with genomes" span={collapsable(8)}>
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Species with genomes
@@ -440,7 +444,7 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
                   {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
                 </Stack>
               </Grid.Col>
-              <Grid.Col span={collapsable(4)}>
+              <Grid.Col data-downloadname="Percentage of species with any genetic data" span={collapsable(4)}>
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Percentage of species with any genetic data
@@ -456,7 +460,7 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
                   )}
                 </Stack>
               </Grid.Col>
-              <Grid.Col span={collapsable(8)}>
+              <Grid.Col data-downloadname="Species with any genetic data" span={collapsable(8)}>
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Species with any genetic data
@@ -467,7 +471,31 @@ function DataSummary({ rank, taxon }: { rank: string; taxon: Taxonomy | undefine
             </Grid>
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 12, md: 4, lg: 3, xl: 2 }}>
-            <DataNoteActions />
+            <DataNoteActions
+              query={{
+                name: taxon?.canonicalName.toLocaleLowerCase() || "taxon",
+                download: DOWNLOAD_SUMMARY,
+                fields: [
+                  {
+                    key: "summary.overview",
+                    name: "overview-summary",
+                  },
+                  {
+                    key: "summary.speciesGenomicDataSummaryCsv",
+                    name: "species-genomic-data-summary",
+                  },
+                  {
+                    key: "summary.speciesGenomesSummaryCsv",
+                    name: "species-genomes-summary",
+                  },
+                  {
+                    key: "stats.completeGenomesByYearCsv",
+                    name: "complete-genomes-by-year",
+                  },
+                ],
+                variables: downloadVariables,
+              }}
+            />
           </Grid.Col>
         </Grid>
       </Grid.Col>
@@ -491,19 +519,18 @@ export default function ClassificationPage(props: ClassificationPageProps) {
 
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;
-
-  console.log("dataset", datasetId);
+  const variables = {
+    rank,
+    datasetId,
+    canonicalName: params.name,
+    lowerRank,
+  };
 
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
 
   const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
-    variables: {
-      rank,
-      datasetId,
-      canonicalName: params.name,
-      lowerRank,
-    },
+    variables,
   });
 
   useEffect(() => {
@@ -511,14 +538,16 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   }, [params.name, pathname, setPreviousPage]);
 
   return (
-    <Stack mt={40}>
+    <Stack mt={40} gap={0}>
       <ClassificationHeader rank={rank} classification={params.name} taxon={taxonResults.data?.taxon} />
 
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Stack>
             <Paper p="xl" radius="lg" pos="relative" withBorder>
-              {taxonResults.called && <DataSummary rank={rank} taxon={taxonResults.data?.taxon} />}
+              {taxonResults.called && (
+                <DataSummary rank={rank} taxon={taxonResults.data?.taxon} downloadVariables={variables} />
+              )}
             </Paper>
 
             {datasetId && (
@@ -535,6 +564,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
           </Stack>
         </Container>
       </Paper>
+      <PageCitation />
     </Stack>
   );
 }

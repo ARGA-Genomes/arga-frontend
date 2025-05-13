@@ -1,0 +1,8 @@
+.root {
+  &::before {
+    background: var(--mantine-color-midnight-9);
+  }
+  &::after {
+    background: var(--mantine-color-midnight-7);
+  }
+}

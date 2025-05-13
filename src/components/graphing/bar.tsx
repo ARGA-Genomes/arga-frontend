@@ -1,12 +1,18 @@
 "use client";
 
+import classes from "./bar.module.css";
+
 import * as d3 from "d3";
+import * as Humanize from "humanize-plus";
 import { useSpring } from "@react-spring/web";
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps, Tooltip } from "@mantine/core";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ParentSize } from "@visx/responsive";
+import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
+import { Group } from "@visx/group";
 
 const MARGIN = { top: 10, right: 10, bottom: 10, left: 10 };
 
@@ -304,5 +310,104 @@ export function CircularBarChart({ data, margin, ...rest }: CircularBarChartProp
         ))}
       </svg>
     </Box>
+  );
+}
+
+interface StackedBarData {
+  label: string;
+  segments: {
+    label: string;
+    value: number;
+  }[];
+}
+
+interface StackedBarGraphProps {
+  data: StackedBarData[];
+}
+
+export function StackedBarGraph({ data }: StackedBarGraphProps) {
+  const groupValues = data.map((group) => group.segments.reduce((acc, cur) => (acc += cur.value), 0));
+  const groupLabels = data.map((d) => d.label);
+  const segmentLabels = data[0].segments.map((s) => s.label);
+
+  const yScale = scaleBand<string>({
+    domain: groupLabels,
+    padding: 0.3,
+  });
+
+  const colourScale = scaleOrdinal<string, string>({
+    domain: segmentLabels,
+    range: [
+      "var(--mantine-color-shellfish-5)",
+      "var(--mantine-color-moss-5)",
+      "var(--mantine-color-bushfire-5)",
+      "var(--mantine-color-bushfire-9)",
+      "var(--mantine-color-wheat-5)",
+    ],
+  });
+
+  return (
+    <ParentSize>
+      {(parent) => {
+        yScale.range([0, parent.height]);
+        const boundsWidth = parent.width - 100; // margin to allow labels next to bars
+
+        return (
+          <svg width={parent.width} height={parent.height}>
+            {data.map((barStack, idx) => {
+              const height = yScale.bandwidth();
+              const maxWidth = boundsWidth - (boundsWidth / (groupLabels.length + 1)) * (groupLabels.length - idx);
+              const total = barStack.segments.reduce((acc, cur) => (acc += cur.value), 0);
+
+              let stackLeft = 0;
+
+              const xScale = scaleLinear<number>({
+                domain: [0, total],
+                range: [0, maxWidth],
+              });
+
+              return (
+                <Group left={0} top={yScale(barStack.label)} key={barStack.label}>
+                  {barStack.segments.map((segment) => {
+                    const width = xScale(segment.value);
+                    const bar = (
+                      <Group left={stackLeft} key={`${barStack.label}-${segment.label}`}>
+                        <rect width={width} height={height} fill={colourScale(segment.label)} />
+                      </Group>
+                    );
+
+                    stackLeft += width;
+                    return bar;
+                  })}
+                  <Group top={height / 2} left={stackLeft + 20}>
+                    <text className={classes.barLabel}>
+                      {Humanize.formatNumber(total)} {barStack.label}
+                    </text>
+                  </Group>
+                </Group>
+              );
+            })}
+
+            <Group left={parent.width - 150}>
+              <rect
+                rx="var(--mantine-radius-lg)"
+                ry="var(--mantine-radius-lg)"
+                width={150}
+                height={200}
+                className={classes.legend}
+              />
+              {segmentLabels.map((segment, idx) => (
+                <Group left={30} top={30 * (idx + 1)} key={segment}>
+                  <rect width={20} height={20} fill={colourScale(segment)} />
+                  <text dx={30} dy={11} className={classes.legendLabel}>
+                    {segment}
+                  </text>
+                </Group>
+              ))}
+            </Group>
+          </svg>
+        );
+      }}
+    </ParentSize>
   );
 }
