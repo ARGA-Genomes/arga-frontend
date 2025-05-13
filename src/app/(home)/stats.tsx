@@ -565,7 +565,7 @@ export function TaxonomicComposition() {
           <Text c="midnight.4" size="sm">
             Each bar shows the total count of taxa at that rank, with colours representing the proportional contribution
             of each kingdom. This graph highlights both the scope of data at each taxonomic level and the shifting
-            kingdom comparison across the breadth of the Australian eukaryotic biodiversit.
+            kingdom comparison across the breadth of the Australian eukaryotic biodiversity.
           </Text>
         </Stack>
       </Stack>

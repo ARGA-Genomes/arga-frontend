@@ -7,7 +7,7 @@ import * as Humanize from "humanize-plus";
 import { useSpring } from "@react-spring/web";
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
-import { Box, BoxProps, Tooltip, useMantineTheme } from "@mantine/core";
+import { Box, BoxProps, Text, Tooltip, useMantineTheme } from "@mantine/core";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ParentSize } from "@visx/responsive";
@@ -374,11 +374,24 @@ export function StackedBarGraph({ data }: StackedBarGraphProps) {
                   {barStack.segments.map((segment) => {
                     const width = xScale(segment.value);
                     const bar = (
-                      <Group left={stackLeft} key={`${barStack.label}-${segment.label}`}>
-                        <rect width={width} height={height} fill={colourScale(segment.label)} />
-                      </Group>
+                      <Tooltip.Floating
+                        color="rgba(255,255,255,0.8)"
+                        key={`${barStack.label}-${segment.label}`}
+                        label={
+                          <Text size="sm" c="midnight.11" fw={500}>
+                            <b>
+                              {segment.value} {barStack.label}
+                            </b>{" "}
+                            in <b>{segment.label}</b>
+                          </Text>
+                        }
+                        radius="md"
+                      >
+                        <Group left={stackLeft}>
+                          <rect width={width} height={height} fill={colourScale(segment.label)} />
+                        </Group>
+                      </Tooltip.Floating>
                     );
-
                     stackLeft += width;
                     return bar;
                   })}
