@@ -4,7 +4,7 @@ import { DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Skeleton } from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Skeleton, Box } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart, StackedBarGraph } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -13,6 +13,10 @@ import { SunburstChart } from "@/components/graphing/sunburst";
 import { useState } from "react";
 import { useDatasets } from "../source-provider";
 import { TaxonomicRankStatistic } from "@/queries/stats";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import Link from "next/link";
+
+import classes from "./stats.module.css";
 
 const RANK_PLURALS: Record<string, string> = {
   DOMAIN: "Domain",
@@ -309,7 +313,21 @@ export function ShowStats() {
   const genomePercentile = taxon && (taxon.speciesSummary.genomes / taxon.speciesSummary.total) * 100;
 
   return (
-    <Paper radius="lg" style={{ top: 200, right: 0, width: 640 }}>
+    <Paper
+      component={Link}
+      href="/genome-tracker"
+      className={classes.stats}
+      pos="relative"
+      radius="lg"
+      style={{ width: 640, height: 608 }}
+    >
+      <Box className={classes.message}>
+        <IconArrowUpRight size="2rem" />
+        <Text style={{ fontSize: 24 }} fw={600}>
+          Go to genome tracker
+        </Text>
+        <Text>Track progress for Australian biodiversity genomics</Text>
+      </Box>
       <LoadOverlay visible={taxonResults.loading} />
       <Grid p={20}>
         <Grid.Col span={12}>
@@ -528,18 +546,29 @@ export function TaxonomicComposition() {
     data && ranks.map((rank) => ({ label: RANK_PLURALS[rank].toLocaleLowerCase(), segments: getSegments(rank, data) }));
 
   return (
-    <Skeleton visible={loading}>
-      <Paper
-        h={520}
-        w={800}
-        radius="lg"
-        p="xl"
-        bg="midnight.9"
-        withBorder
-        style={{ borderColor: "var(--mantine-color-midnight-8)" }}
-      >
-        {groups && <StackedBarGraph data={groups} />}
-      </Paper>
-    </Skeleton>
+    <Paper
+      w={800}
+      radius="lg"
+      p="xl"
+      bg="midnight.9"
+      withBorder
+      style={{ borderColor: "var(--mantine-color-midnight-8)" }}
+    >
+      <Stack>
+        <Skeleton radius="lg" visible={loading}>
+          <Box h={520}>{groups && <StackedBarGraph data={groups} />}</Box>
+        </Skeleton>
+        <Stack gap={4}>
+          <Text c="midnight.1" fw={700}>
+            Number of taxa per rank, coloured by kingdom
+          </Text>
+          <Text c="midnight.4" size="sm">
+            Each bar shows the total count of taxa at that rank, with colours representing the proportional contribution
+            of each kingdom. This graph highlights both the scope of data at each taxonomic level and the shifting
+            kingdom comparison across the breadth of the Australian eukaryotic biodiversit.
+          </Text>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 }

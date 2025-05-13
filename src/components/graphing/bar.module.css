@@ -1,17 +1,24 @@
 .barLabel {
-    fill: var(--mantine-color-midnight-1);
-    dominant-baseline: middle;
-    font-weight: 600;
+  fill: var(--mantine-color-midnight-1);
+  dominant-baseline: middle;
+  font-weight: 600;
 }
 
 .legend {
-    fill: var(--mantine-color-midnight-8);
-    border-radius: var(--mantine-radius-lg);
+  fill: var(--mantine-color-midnight-8);
+  border-radius: var(--mantine-radius-lg);
 }
 
 .legendLabel {
-    fill: var(--mantine-color-midnight-1);
-    dominant-baseline: middle;
-    font-weight: 600;
-    font-size: 0.8em;
+  fill: var(--mantine-color-midnight-1);
+  dominant-baseline: middle;
+  font-weight: 600;
+  font-size: 0.8em;
+}
+
+.legendHeader {
+  fill: white;
+  dominant-baseline: middle;
+  font-weight: 700;
+  font-size: 1.2em;
 }
