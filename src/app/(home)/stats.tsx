@@ -313,8 +313,15 @@ export function ShowStats() {
   const genomePercentile = taxon && (taxon.speciesSummary.genomes / taxon.speciesSummary.total) * 100;
 
   return (
-    <Paper className={classes.stats} pos="relative" radius="lg" style={{ width: 640, height: 608 }}>
-      <Box component={Link} href="/genome-tracker" className={classes.message}>
+    <Paper
+      component={Link}
+      href="/genome-tracker"
+      className={classes.stats}
+      pos="relative"
+      radius="lg"
+      style={{ width: 640, height: 608 }}
+    >
+      <Box className={classes.message}>
         <IconArrowUpRight size="2rem" />
         <Text style={{ fontSize: 24 }} fw={600}>
           Go to genome tracker
@@ -539,18 +546,29 @@ export function TaxonomicComposition() {
     data && ranks.map((rank) => ({ label: RANK_PLURALS[rank].toLocaleLowerCase(), segments: getSegments(rank, data) }));
 
   return (
-    <Skeleton visible={loading}>
-      <Paper
-        h={520}
-        w={800}
-        radius="lg"
-        p="xl"
-        bg="midnight.9"
-        withBorder
-        style={{ borderColor: "var(--mantine-color-midnight-8)" }}
-      >
-        {groups && <StackedBarGraph data={groups} />}
-      </Paper>
-    </Skeleton>
+    <Paper
+      w={800}
+      radius="lg"
+      p="xl"
+      bg="midnight.9"
+      withBorder
+      style={{ borderColor: "var(--mantine-color-midnight-8)" }}
+    >
+      <Stack>
+        <Skeleton radius="lg" visible={loading}>
+          <Box h={520}>{groups && <StackedBarGraph data={groups} />}</Box>
+        </Skeleton>
+        <Stack gap={4}>
+          <Text c="midnight.1" fw={700}>
+            Number of taxa per rank, coloured by kingdom
+          </Text>
+          <Text c="midnight.4" size="sm">
+            Each bar shows the total count of taxa at that rank, with colours representing the proportional contribution
+            of each kingdom. This graph highlights both the scope of data at each taxonomic level and the shifting
+            kingdom comparison across the breadth of the Australian eukaryotic biodiversit.
+          </Text>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 }

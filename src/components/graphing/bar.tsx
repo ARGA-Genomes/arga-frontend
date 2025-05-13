@@ -7,7 +7,7 @@ import * as Humanize from "humanize-plus";
 import { useSpring } from "@react-spring/web";
 import { SVGProps, useState } from "react";
 import { useElementSize } from "@mantine/hooks";
-import { Box, BoxProps, Tooltip } from "@mantine/core";
+import { Box, BoxProps, Tooltip, useMantineTheme } from "@mantine/core";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ParentSize } from "@visx/responsive";
@@ -267,7 +267,7 @@ export function CircularBarChart({ data, margin, ...rest }: CircularBarChartProp
     .domain(
       data.map(function (d) {
         return d.name;
-      }),
+      })
     );
 
   const yScale = d3.scaleRadial().range([innerRadius, outerRadius]).domain([0, maxValue]);
@@ -330,6 +330,9 @@ export function StackedBarGraph({ data }: StackedBarGraphProps) {
   const groupLabels = data.map((d) => d.label);
   const segmentLabels = data[0].segments.map((s) => s.label);
 
+  const theme = useMantineTheme();
+  const radiusLg = theme.radius.lg.toString().substring(0, -2);
+
   const yScale = scaleBand<string>({
     domain: groupLabels,
     padding: 0.3,
@@ -389,15 +392,12 @@ export function StackedBarGraph({ data }: StackedBarGraphProps) {
             })}
 
             <Group left={parent.width - 150}>
-              <rect
-                rx="var(--mantine-radius-lg)"
-                ry="var(--mantine-radius-lg)"
-                width={150}
-                height={200}
-                className={classes.legend}
-              />
+              <rect rx="16" ry="16" width={150} height={225} className={classes.legend} />
+              <text dx={57} dy={30} className={classes.legendHeader}>
+                Key
+              </text>
               {segmentLabels.map((segment, idx) => (
-                <Group left={30} top={30 * (idx + 1)} key={segment}>
+                <Group left={30} top={30 * (idx + 1) + 30} key={segment}>
                   <rect width={20} height={20} fill={colourScale(segment)} />
                   <text dx={30} dy={11} className={classes.legendLabel}>
                     {segment}
