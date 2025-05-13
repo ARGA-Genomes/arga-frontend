@@ -4,7 +4,7 @@ import { DataField } from "@/components/highlight-stack";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TachoChart } from "@/components/graphing/tacho";
 import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Group, Skeleton, Center } from "@mantine/core";
+import { Grid, Paper, Stack, Title, Text, Skeleton, Center, Box } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { BarChart, CircularBarChart } from "@/components/graphing/bar";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -12,6 +12,21 @@ import { DonutChart } from "@/components/graphing/pie";
 import { CircularPackingChart } from "@/components/graphing/circular-packing";
 import { SunburstChart } from "@/components/graphing/sunburst";
 import { useState } from "react";
+
+import classes from "./stats.module.css";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import Link from "next/link";
+
+const RANK_PLURALS: Record<string, string> = {
+  DOMAIN: "Domain",
+  KINGDOM: "Kingdoms",
+  PHYLUM: "Phyla",
+  CLASS: "Classes",
+  ORDER: "Orders",
+  FAMILY: "Families",
+  GENUS: "Genera",
+  SPECIES: "Species",
+};
 
 const GET_TAXON = gql`
   query HomeStats {
@@ -339,7 +354,14 @@ export function ShowStats() {
   const genomePercentile = taxon && (taxon.summary.speciesGenomes / taxon.summary.species) * 100;
 
   return (
-    <Paper radius="lg" style={{ top: 200, right: 0, width: 640 }}>
+    <Paper className={classes.stats} pos="relative" radius="lg" style={{ width: 640, height: 608 }}>
+      <Box component={Link} href="/genome-tracker" className={classes.message}>
+        <IconArrowUpRight size="2rem" />
+        <Text style={{ fontSize: 24 }} fw={600}>
+          Go to genome tracker
+        </Text>
+        <Text>Track progress for Australian biodiversity genomics</Text>
+      </Box>
       <LoadOverlay visible={taxonResults.loading} />
       <Grid p={20}>
         <Grid.Col span={12}>

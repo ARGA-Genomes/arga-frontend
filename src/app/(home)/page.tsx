@@ -148,9 +148,7 @@ export default function HomePage() {
                   <Search />
                 </Stack>
               </Stack>
-              <Box>
-                <ShowStats />
-              </Box>
+              <ShowStats />
             </Flex>
           </Center>
         </Box>
