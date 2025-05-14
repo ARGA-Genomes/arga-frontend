@@ -60,7 +60,7 @@ export default function GenomeTracker() {
                           Percentage of taxonomic group coverage, where there is a complete genome for at least one
                           representative species from each grouping. Statistics based on records indexed within ARGA.
                         </Text>
-                        <Box h={390} mt="lg" data-downloadname="Complete genome for one representative species">
+                        <Box h={390} mt="lg">
                           <CumulativeTracker taxonRank="DOMAIN" taxonCanonicalName="Eukaryota" ranks={ranks} />
                         </Box>
                       </Stack>
@@ -89,7 +89,7 @@ export default function GenomeTracker() {
                       />
                     </GridCol>
                     <GridCol span={12}>
-                      <Stack gap="xl">
+                      <Stack gap="xl" data-downloadname="Complete genome for one representative species">
                         <Text size="xl" fw="bold">
                           There is a complete genome for at least one representative species from each:
                         </Text>
