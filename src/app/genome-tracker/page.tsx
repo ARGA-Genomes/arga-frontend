@@ -13,7 +13,6 @@ import { GroupingCompletion } from "./_components/grouping-completion";
 import { SignificantMilestones } from "./_components/significant-milestones";
 import { CompletionStepper } from "./_components/completion-stepper";
 import { DataNoteActions } from "@/components/data-note-actions";
-import FloatingCircles from "./_components/explore-summaries";
 
 const DOWNLOAD_STATS = gql`
   query DownloadTrackerStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
@@ -127,16 +126,6 @@ export default function GenomeTracker() {
                     Completion of genome sequences for key biodiversity groupings
                   </Text>
                   <GroupingCompletion dateDomain={[minDate, new Date()]} />
-                </Stack>
-              </Paper>
-              <Paper p="lg" radius="lg" withBorder>
-                <Stack>
-                  <Text size="xl" fw="bold">
-                    Browse selected other taxon summaries to explore in more depth
-                  </Text>
-                  <Box h={800}>
-                    <FloatingCircles />
-                  </Box>
                 </Stack>
               </Paper>
             </Stack>
