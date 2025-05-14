@@ -178,6 +178,16 @@ interface MilestoneItemHeaderProps {
   onFlip?: () => void;
 }
 
+const DISABLED_ACCESSIONS = [
+  undefined,
+  "GCA_000004035.1",
+  "GCA_000612305.1",
+  "GCA_000827275.1",
+  "GCA_900303285.1",
+  "GCA_009430485.1",
+  "GCA_008360975.2",
+];
+
 function MilestoneItemHeader({ milestone, onFlip }: MilestoneItemHeaderProps) {
   const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/whole_genomes/${milestone.accession}`;
 
@@ -190,9 +200,11 @@ function MilestoneItemHeader({ milestone, onFlip }: MilestoneItemHeaderProps) {
             {milestone.canonicalName}
           </Text>
         </Stack>
-        <Button color="midnight.8" radius="xl" component={Link} href={genomeHref}>
-          <Text className={classes.buttonText}>view genome</Text>
-        </Button>
+        {!DISABLED_ACCESSIONS.includes(milestone.accession) && (
+          <Button color="midnight.8" radius="xl" component={Link} href={genomeHref}>
+            <Text className={classes.buttonText}>view genome</Text>
+          </Button>
+        )}
       </Stack>
 
       <Stack

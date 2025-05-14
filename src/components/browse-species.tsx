@@ -39,6 +39,7 @@ import { VernacularGroupChip } from "./icon-bar";
 import { DownloadButton } from "./download-btn";
 import { generateCSV } from "@/helpers/downloadCSV";
 import { saveAs } from "file-saver";
+import Link from "next/link";
 
 interface SpeciesRecord {
   taxonomy: { canonicalName: string; status: string; source: string; sourceUrl: string; vernacularGroup: string };
@@ -291,7 +292,13 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
                       </Table.Td>
                       <Table.Td data-col={2}>
                         <Skeleton visible={loading}>
-                          <Text size="sm" fw={600} fs="italic">
+                          <Text
+                            component={Link}
+                            size="sm"
+                            fw={600}
+                            fs="italic"
+                            href={`/species/${record?.taxonomy.canonicalName}`}
+                          >
                             {record?.taxonomy.canonicalName || "Canonical Name"}
                           </Text>
                         </Skeleton>
