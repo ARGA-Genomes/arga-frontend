@@ -322,11 +322,11 @@ export function ShowStats() {
       style={{ width: 640, height: 608 }}
     >
       <Box className={classes.message}>
-        <IconArrowUpRight size="2rem" />
-        <Text style={{ fontSize: 24 }} fw={600}>
-          Go to genome tracker
+        <IconArrowUpRight size="2.4rem" />
+        <Text style={{ fontSize: 28 }} fw={600}>
+          Go to Genome Tracker
         </Text>
-        <Text>Track progress for Australian biodiversity genomics</Text>
+        <Text size="lg">Track progress for Australian biodiversity genomics</Text>
       </Box>
       <LoadOverlay visible={taxonResults.loading} />
       <Grid p={20}>
