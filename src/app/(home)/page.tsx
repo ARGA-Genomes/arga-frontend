@@ -32,7 +32,7 @@ interface Counts {
     {
       name: string;
       total: number;
-    }
+    },
   ];
 }
 
@@ -109,7 +109,7 @@ export default function HomePage() {
               ...prev,
               [cur.name.replaceAll(" ", "_")]: cur.total,
             }),
-            { ARGA_Threatened_Species: 0 }
+            { ARGA_Threatened_Species: 0 },
           ),
         }
       : null;
@@ -158,7 +158,7 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Browse by data type
               </Title>
-              <Browse items={type} data={formattedData} error={error} />
+              <Browse items={type} data={formattedData} error={error} disabled />
             </Stack>
             <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
