@@ -11,11 +11,16 @@ const AnimatedDiv = animated("div");
 const AnimatedLabel = animated("div");
 const AnimatedImage = animated("image");
 
+const DISABLED_GROUPS = ["BACTERIA", "CYANOBACTERIA"];
+
 export const ExploreSummaries = () => {
   const [animals, producers] = useMemo(() => {
-    const all = Object.values(VERNACULAR_GROUP_ICON);
+    const all = Object.entries(VERNACULAR_GROUP_ICON)
+      .filter(([key]) => !DISABLED_GROUPS.includes(key))
+      .map(([, value]) => value);
+
     return [all.filter((item) => item.group === 1), all.filter((item) => item.group === 2 || item.group === 3)];
-  }, []);
+  }, [VERNACULAR_GROUP_ICON]);
 
   return (
     <Stack gap="sm">

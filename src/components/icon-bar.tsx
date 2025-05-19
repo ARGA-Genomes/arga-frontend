@@ -64,10 +64,7 @@ const CONSERVATION_STATUS_ICON: Record<string, IconData> = {
   },
 };
 
-export const VERNACULAR_GROUP_ICON: Record<
-  string,
-  IconData & { group: 1 | 2 | 3; size: "small" | "medium" | "large" }
-> = {
+export const VERNACULAR_GROUP_ICON: Record<string, IconData & { group: 1 | 2 | 3 }> = {
   // Group 1: Animals
   ANIMALS: {
     image: "/icons/taxon/Taxon_ Animals (Kingdom Animalia).svg",
@@ -75,7 +72,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/kingdom/Animalia",
     colour: "shellfish.5",
     group: 1,
-    size: "large",
   },
   MOLLUSCS: {
     image: "/icons/taxon/Taxon_ Molluscs (Mollusca).svg",
@@ -83,7 +79,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/phylum/Mollusca",
     colour: "shellfish.5",
     group: 1,
-    size: "large",
   },
   CRUSTACEANS: {
     image: "/icons/taxon/Taxon_ Crustaceans (Crustacea).svg",
@@ -91,7 +86,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/subphylum/Crustacea",
     colour: "shellfish.5",
     group: 1,
-    size: "large",
   },
   INSECTS: {
     image: "/icons/taxon/Taxon_ Insects (Insecta).svg",
@@ -99,7 +93,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/class/Insecta",
     colour: "moss.4",
     group: 1,
-    size: "large",
   },
   SPIDERS: {
     image: "/icons/taxon/Taxon_ Spiders (Araneae).svg",
@@ -107,7 +100,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/order/Araneae",
     colour: "wheat.4",
     group: 1,
-    size: "large",
   },
   FROGS_AND_OTHER_AMPHIBIANS: {
     image: "/icons/taxon/Taxon_ Frogs and toads (Anura).svg",
@@ -115,7 +107,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/class/Amphibia",
     colour: "moss.4",
     group: 1,
-    size: "medium",
   },
   REPTILES: {
     image: "/icons/taxon/Taxon_ Reptiles (Reptilia).svg",
@@ -123,7 +114,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/class/Reptilia",
     colour: "moss.4",
     group: 1,
-    size: "medium",
   },
   BIRDS: {
     image: "/icons/taxon/Taxon_ Birds (Aves).svg",
@@ -131,7 +121,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/class/Aves",
     colour: "wheat.4",
     group: 1,
-    size: "medium",
   },
   MAMMALS: {
     image: "/icons/taxon/Taxon_ Mammals (Mammalia).svg",
@@ -139,7 +128,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/class/Mammalia",
     colour: "moss.4",
     group: 1,
-    size: "medium",
   },
   ECHINODERMS: {
     image: "/icons/taxon/Taxon_ Echinoderms (Echinodermata).svg",
@@ -147,7 +135,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/phylum/Echinodermata",
     colour: "shellfish.5",
     group: 1,
-    size: "medium",
   },
   FIN_FISHES: {
     image: "/icons/taxon/Taxon_ Finfishes (Actinopterygii).svg",
@@ -155,7 +142,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/class/Actinopterygii",
     colour: "shellfish.5",
     group: 1,
-    size: "large",
   },
   SHARKS_AND_RAYS: {
     image: "/icons/taxon/Taxon_ Sharks and rays (Subclass Elasmobranchii).svg",
@@ -163,7 +149,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/subclass/Elasmobranchii",
     colour: "shellfish.5",
     group: 1,
-    size: "small",
   },
   CORALS_AND_JELLYFISHES: {
     image: "/icons/taxon/Taxon_ Anemones, corals and jellyfishes (Cnidaria).svg",
@@ -171,7 +156,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/phylum/Cnidaria",
     colour: "shellfish.5",
     group: 1,
-    size: "medium",
   },
   SPONGES: {
     image: "/icons/taxon/Taxon_ Sponges (Phylum Porifera).svg",
@@ -179,7 +163,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/phylum/Porifera",
     colour: "shellfish.5",
     group: 1,
-    size: "medium",
   },
 
   // Group 2: Primary producers & decomposers
@@ -189,7 +172,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/regnum/Fungi",
     colour: "bushfire.4",
     group: 2,
-    size: "large",
   },
   BROWN_ALGAE: {
     image: "/icons/taxon/Taxon_ Brown algae (Phaeophyceae).svg",
@@ -197,7 +179,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/classis/Phaeophyceae",
     colour: "wheat.4",
     group: 2,
-    size: "small",
   },
   RED_ALGAE: {
     image: "/icons/taxon/Taxon_ Red algae (Rhodophyta).svg",
@@ -205,7 +186,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/division/Rhodophyta",
     colour: "bushfire.4",
     group: 2,
-    size: "medium",
   },
   GREEN_ALGAE: {
     image: "/icons/taxon/Taxon_ Green algae (Chlorophyta).svg",
@@ -213,7 +193,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/division/Chlorophyta",
     colour: "moss.4",
     group: 2,
-    size: "medium",
   },
   HIGHER_PLANTS: {
     image: "/icons/taxon/Taxon_ Plants (Regnum Plantae).svg",
@@ -221,7 +200,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/regnum/Plantae",
     colour: "moss.4",
     group: 2,
-    size: "large",
   },
   FLOWERING_PLANTS: {
     image: "/icons/taxon/Taxon_ Flowering plants (Magnoliidae).svg",
@@ -229,7 +207,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/subclassis/Magnoliidae",
     colour: "moss.4",
     group: 2,
-    size: "large",
   },
   MOSSES: {
     image: "/icons/taxon/Taxon_ Mosses (Bryophyta).svg",
@@ -237,7 +214,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/classis/Bryopsida",
     colour: "moss.4",
     group: 2,
-    size: "medium",
   },
   LIVERWORTS: {
     image: "/icons/taxon/Taxon_ Liverworts (Marchantiophyta).svg",
@@ -245,7 +221,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/division/Marchantiophyta",
     colour: "moss.4",
     group: 2,
-    size: "medium",
   },
   HORNWORTS: {
     image: "/icons/taxon/Taxon_ Hornworts (Anthocerotophyta).svg",
@@ -253,14 +228,12 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/division/Anthocerotophyta",
     colour: "moss.4",
     group: 2,
-    size: "small",
   },
   LICHENS: {
     image: "/icons/taxon/Taxon_ Lichens.svg",
     label: "Lichens",
     colour: "wheat.4",
     group: 2,
-    size: "medium",
   },
   FERNS: {
     image: "/icons/taxon/Taxon_ Ferns (Polypodiidae).svg",
@@ -268,14 +241,12 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/subclassis/Polypodiidae",
     colour: "moss.4",
     group: 2,
-    size: "medium",
   },
   CONIFERS_AND_CYCADS: {
     image: "/icons/taxon/Taxon_ Conifers and cycads (Pinales, Araucariales, Cupressales, Cycadales).svg",
     label: "Conifers and cycads",
     colour: "moss.4",
     group: 2,
-    size: "small",
   },
 
   // Group 3: Microbes & protists
@@ -285,7 +256,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/kingdom/Bacteria",
     colour: "wheat.4",
     group: 3,
-    size: "large",
   },
   PROTISTS_AND_OTHER_UNICELLULAR_ORGANISMS: {
     image: "/icons/taxon/Taxon_ Protozoa (Kingdom Protozoa).svg",
@@ -293,7 +263,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/superkingdom/Protista",
     colour: "moss.4",
     group: 3,
-    size: "medium",
   },
   CYANOBACTERIA: {
     image: "/icons/taxon/Taxon_ Blue-green algae (Cyanobacteria).svg",
@@ -301,7 +270,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/division/Cyanobacteria",
     colour: "shellfish.5",
     group: 3,
-    size: "small",
   },
   DIATOMS: {
     image: "/icons/taxon/Taxon_ Diatoms (Bacillariophyta).svg",
@@ -309,7 +277,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/division/Bacillariophyta",
     colour: "shellfish.5",
     group: 3,
-    size: "large",
   },
   CHROMISTS: {
     image: "/icons/taxon/Taxon_ Chromists (Chromista).svg",
@@ -317,7 +284,6 @@ export const VERNACULAR_GROUP_ICON: Record<
     link: "/regnum/Chromista",
     colour: "shellfish.5",
     group: 3,
-    size: "medium",
   },
 };
 
