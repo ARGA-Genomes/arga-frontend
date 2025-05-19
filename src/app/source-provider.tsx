@@ -7,6 +7,7 @@ const GET_DETAILS = gql`
       datasets {
         id
         name
+        url
       }
     }
   }
@@ -15,6 +16,7 @@ const GET_DETAILS = gql`
 export interface Dataset {
   id: string;
   name: string;
+  url?: string;
 }
 
 interface Source {
