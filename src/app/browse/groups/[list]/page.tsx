@@ -13,10 +13,10 @@ import {
   useMantineTheme,
   Anchor,
   Image,
-  Flex,
-  ThemeIcon,
+  // Flex,
+  // ThemeIcon,
 } from "@mantine/core";
-import { IconExternalLink, IconStarFilled } from "@tabler/icons-react";
+import { IconExternalLink /*, IconStarFilled*/ } from "@tabler/icons-react";
 import Link from "next/link";
 
 // App components & constants
@@ -29,9 +29,9 @@ import { groupInclude, GroupItem, map as queryMap } from "../_data/all";
 import { useRouter } from "next/navigation";
 import { getLicense } from "@/helpers/getLicense";
 import { BrowseSpecies } from "@/components/browse-species";
-import { DataSummary, Taxonomy } from "./data-summary";
+// import { DataSummary, Taxonomy } from "./data-summary";
 
-import stubData from "./data-summary-stub.json";
+// import stubData from "./data-summary-stub.json";
 
 const GET_DETAILS = gql`
   query SourceDetails($name: String, $filters: [FilterItem]) {
@@ -299,7 +299,7 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
       <Paper py={30}>
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
-            <Paper radius="lg" pos="relative" withBorder>
+            {/* <Paper radius="lg" pos="relative" withBorder>
               <Stack
                 justify="center"
                 align="center"
@@ -367,7 +367,7 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
               <Box p="xl">
                 <DataSummary rank="KINGDOM" taxon={stubData as unknown as Taxonomy} />
               </Box>
-            </Paper>
+            </Paper> */}
             <Paper p="xl" radius="lg" withBorder>
               <BrowseSpecies
                 query={{
@@ -377,9 +377,9 @@ export default function BrowseGroup(props: { params: Promise<{ list: string }> }
                 }}
               />
             </Paper>
+            <DataPageCitation />
           </Stack>
         </Container>
-        <DataPageCitation />
       </Paper>
     </Stack>
   );
