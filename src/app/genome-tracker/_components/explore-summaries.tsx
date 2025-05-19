@@ -1,13 +1,12 @@
 import React, { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { ParentSize } from "@visx/responsive";
 import { Group } from "@visx/group";
-import { Circle } from "@visx/shape";
 import { useSpring, animated, to as interpolate } from "@react-spring/web";
 import { VERNACULAR_GROUP_ICON } from "@/components/icon-bar";
-import { useRouter } from "next/navigation";
 
-// Data for each rendered circle
-type CircleDatum = {
+// Data for each rendered bubble, now with group and size categories
+interface CircleDatum {
   id: string;
   cx: number;
   cy: number;
@@ -16,11 +15,12 @@ type CircleDatum = {
   image: string;
   label: string;
   link?: string;
-};
+  group: number;
+  sizeCategory: "small" | "medium" | "large";
+}
 
 // Animated SVG primitives
 const AnimatedGroup = animated(Group);
-const AnimatedCircle = animated(Circle);
 const AnimatedImage = animated("image");
 const AnimatedText = animated("text");
 
@@ -32,14 +32,12 @@ interface FloatingCircleProps {
   onLeave: () => void;
 }
 
-// Single bubble with float, hover, and repulsion
 const FloatingCircle: React.FC<FloatingCircleProps> = ({ datum, hoveredId, hoveredPoint, onHover, onLeave }) => {
+  const { id, cx, cy, radius, image, label, link } = datum;
+  const isHovered = hoveredId === id;
   const router = useRouter();
 
-  const { id, cx, cy, radius, colourKey, image, label, link } = datum;
-  const isHovered = hoveredId === id;
-
-  // Float animation
+  // Floating up/down
   const { floatY } = useSpring({
     from: { floatY: 0 },
     to: { floatY: 10 },
@@ -48,10 +46,7 @@ const FloatingCircle: React.FC<FloatingCircleProps> = ({ datum, hoveredId, hover
   });
 
   // Hover scale
-  const { r } = useSpring({
-    r: isHovered ? radius * 1.3 : radius,
-    config: { tension: 300, friction: 20 },
-  });
+  const { r } = useSpring({ r: isHovered ? radius * 1.3 : radius, config: { tension: 300, friction: 20 } });
 
   // Repulsion spring
   const [repelSprings, repelApi] = useSpring(() => ({ repelX: 0, repelY: 0 }));
@@ -80,52 +75,53 @@ const FloatingCircle: React.FC<FloatingCircleProps> = ({ datum, hoveredId, hover
     (x, y, fy) => `translate(${x},${y + fy})`
   );
 
-  const fillVar = `var(--mantine-color-${colourKey.replace(".", "-")})`;
-
-  const navigate = () => {
-    if (link) router.push(link);
-  };
+  // Split label into lines for wrapping
+  const maxChars = 12;
+  const words = label.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  words.forEach((w) => {
+    if ((current + " " + w).trim().length <= maxChars) current = current ? `${current} ${w}` : w;
+    else {
+      lines.push(current);
+      current = w;
+    }
+  });
+  if (current) lines.push(current);
 
   return (
     <AnimatedGroup transform={transform}>
-      <AnimatedCircle
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill={fillVar}
-        onMouseEnter={() => onHover(id, datum)}
-        onMouseLeave={onLeave}
-        onClick={navigate}
-        style={{ cursor: "pointer" }}
-      />
       <AnimatedImage
         href={image}
-        x={r.to((val) => cx - val * 0.6)}
-        y={r.to((val) => cy - val * 0.6)}
-        width={r.to((val) => val * 1.2)}
-        height={r.to((val) => val * 1.2)}
-        pointerEvents="none"
+        x={r.to((val) => cx - val)}
+        y={r.to((val) => cy - val)}
+        width={r.to((val) => val * 2)}
+        height={r.to((val) => val * 2)}
+        onMouseEnter={() => onHover(id, datum)}
+        onMouseLeave={onLeave}
+        onClick={() => link && router.push(link)}
+        style={{ cursor: link ? "pointer" : "default" }}
       />
       <AnimatedText
         x={cx}
-        y={r.to((val) => cy + val + 18)}
+        y={r.to((val) => cy + val + 20)}
         textAnchor="middle"
-        fontSize={14}
         fontWeight={600}
+        fontSize={14}
         fill="var(--mantine-color-midnight-10)"
         pointerEvents="none"
       >
-        {label}
+        {lines.map((line, idx) => (
+          <tspan key={idx} x={cx} dy={idx === 0 ? 0 : 16}>
+            {line}
+          </tspan>
+        ))}
       </AnimatedText>
     </AnimatedGroup>
   );
 };
 
-export interface FloatingCirclesProps {
-  onCircleClick?: (id: string) => void;
-}
-
-// Inner responsive component that can use hooks directly
+// SVG layout component with proportional group widths
 const CirclesSVG: React.FC<{
   width: number;
   height: number;
@@ -133,36 +129,84 @@ const CirclesSVG: React.FC<{
   hoveredPoint: CircleDatum | null;
   setHoveredId: React.Dispatch<React.SetStateAction<string | null>>;
   setHoveredPoint: React.Dispatch<React.SetStateAction<CircleDatum | null>>;
-  onCircleClick: (id: string) => void;
-}> = ({ width, height, hoveredId, hoveredPoint, setHoveredId, setHoveredPoint, onCircleClick }) => {
+}> = ({ width, height, hoveredId, hoveredPoint, setHoveredId, setHoveredPoint }) => {
   const circles = useMemo<CircleDatum[]>(() => {
-    const entries = Object.entries(VERNACULAR_GROUP_ICON);
-    const placed: CircleDatum[] = [];
-    const padding = 8;
-    const labelBuffer = 28;
+    // Extract entries with group and size
+    const raw = Object.entries(VERNACULAR_GROUP_ICON).map(
+      ([id, data]) =>
+        ({
+          id,
+          colourKey: data.colour || "white-0",
+          image: data.image,
+          label: data.label,
+          link: data.link,
+          group: data.group,
+          sizeCategory: data.size as "small" | "medium" | "large",
+        } as Partial<CircleDatum>)
+    );
 
-    entries.forEach(([key, data]) => {
-      const radius = 30 + Math.random() * 20;
-      let cx: number, cy: number;
-      let attempts = 0;
-      const maxAttempts = 200;
-      do {
-        cx = Math.random() * (width - 2 * radius) + radius;
-        cy = Math.random() * (height - 2 * radius - labelBuffer) + radius;
-        attempts++;
-      } while (
-        attempts < maxAttempts &&
-        placed.some((c) => Math.hypot(c.cx - cx, c.cy - cy) < c.radius + radius + padding + labelBuffer)
-      );
-      placed.push({
-        id: key,
-        cx,
-        cy,
-        radius,
-        colourKey: data.colour || "white-0",
-        image: data.image,
-        label: data.label,
-        link: data.link,
+    // Sort by group then arbitrary
+    raw.sort((a, b) => a.group! - b.group! || 0);
+    const totalCount = raw.length;
+    const groups = Array.from(new Set(raw.map((e) => e.group))).sort() as number[];
+    const groupCount = groups.length;
+    const groupMap = Object.fromEntries(groups.map((g) => [g, raw.filter((e) => e.group === g)]));
+    const counts = groups.map((g) => groupMap[g].length);
+
+    const padding = 8;
+    const labelBuffer = 14;
+    const edgePadding = 36;
+    const groupGap = 160;
+    const availableWidth = width - edgePadding * 2 - groupGap * (groupCount - 1);
+
+    // Compute proportional widths
+    const groupWidths = counts.map((count) => (count / totalCount) * availableWidth);
+    // Compute start X for each group
+    const groupStarts = groupWidths.reduce<number[]>((acc, w, i) => {
+      if (i === 0) return [edgePadding];
+      return [...acc, acc[i - 1] + groupWidths[i - 1] + groupGap];
+    }, []);
+
+    const placed: CircleDatum[] = [];
+    const sizeMap = { small: 35, medium: 40, large: 50 };
+    const yCenter = height / 2;
+    const yJitter = height * 0.8;
+
+    groups.forEach((g, gi) => {
+      const items = groupMap[g];
+      const blockStart = groupStarts[gi];
+      const blockWidth = groupWidths[gi];
+      const stepX = blockWidth / items.length;
+
+      items.forEach((item, idx) => {
+        const baseRadius = sizeMap[item.sizeCategory!];
+        const radius = baseRadius + (Math.random() - 0.5) * 8;
+        let cx: number;
+        let cy: number;
+        let attempts = 0;
+        do {
+          cx = blockStart + stepX * idx + stepX / 2 + (Math.random() - 0.5) * stepX * 0.3;
+          cy = yCenter + (Math.random() - 0.5) * yJitter;
+          // Clamp within padded bounds
+          cx = Math.max(radius + edgePadding, Math.min(width - radius - edgePadding, cx));
+          cy = Math.max(radius + edgePadding, Math.min(height - radius - labelBuffer - edgePadding, cy));
+          attempts++;
+        } while (
+          attempts < 200 &&
+          placed.some((c) => Math.hypot(c.cx - cx, c.cy - cy) < c.radius + radius + padding + labelBuffer)
+        );
+        placed.push({
+          id: item.id!,
+          cx,
+          cy,
+          radius,
+          colourKey: item.colourKey!,
+          image: item.image!,
+          label: item.label!,
+          link: item.link,
+          group: item.group!,
+          sizeCategory: item.sizeCategory!,
+        });
       });
     });
 
@@ -194,7 +238,7 @@ const CirclesSVG: React.FC<{
 };
 
 // Main component
-const FloatingCircles: React.FC<FloatingCirclesProps> = ({ onCircleClick = () => {} }) => {
+const FloatingCircles: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [hoveredPoint, setHoveredPoint] = useState<CircleDatum | null>(null);
 
@@ -208,7 +252,6 @@ const FloatingCircles: React.FC<FloatingCirclesProps> = ({ onCircleClick = () =>
           hoveredPoint={hoveredPoint}
           setHoveredId={setHoveredId}
           setHoveredPoint={setHoveredPoint}
-          onCircleClick={onCircleClick}
         />
       )}
     </ParentSize>

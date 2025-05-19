@@ -13,7 +13,7 @@ import { GroupingCompletion } from "./_components/grouping-completion";
 import { SignificantMilestones } from "./_components/significant-milestones";
 import { CompletionStepper } from "./_components/completion-stepper";
 import { DataNoteActions } from "@/components/data-note-actions";
-import FloatingCircles from "./_components/explore-summaries";
+import { ExploreSummaries } from "./_components/explore-summaries-new";
 
 const DOWNLOAD_STATS = gql`
   query DownloadTrackerStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
@@ -134,9 +134,7 @@ export default function GenomeTracker() {
                   <Text size="xl" fw="bold">
                     Browse selected other taxon summaries to explore in more depth
                   </Text>
-                  <Box h={800}>
-                    <FloatingCircles />
-                  </Box>
+                  <ExploreSummaries />
                 </Stack>
               </Paper>
             </Stack>
