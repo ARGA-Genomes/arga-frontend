@@ -1,261 +1,201 @@
-import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { ParentSize } from "@visx/responsive";
+import React, { FC, useState, useEffect, useMemo } from "react";
+import { useSpring, animated } from "@react-spring/web";
 import { Group } from "@visx/group";
-import { useSpring, animated, to as interpolate } from "@react-spring/web";
+import { useRouter } from "next/navigation";
+import type { IconData } from "@/components/icon-bar";
 import { VERNACULAR_GROUP_ICON } from "@/components/icon-bar";
+import { Stack, Text } from "@mantine/core";
 
-// Data for each rendered bubble, now with group and size categories
-interface CircleDatum {
-  id: string;
-  cx: number;
-  cy: number;
-  radius: number;
-  colourKey: string;
-  image: string;
-  label: string;
-  link?: string;
-  group: number;
-  sizeCategory: "small" | "medium" | "large";
-}
-
-// Animated SVG primitives
-const AnimatedGroup = animated(Group);
+// Typed animated components
+const AnimatedDiv = animated("div");
+const AnimatedLabel = animated("div");
 const AnimatedImage = animated("image");
-const AnimatedText = animated("text");
 
-interface FloatingCircleProps {
-  datum: CircleDatum;
-  hoveredId: string | null;
-  hoveredPoint: CircleDatum | null;
-  onHover: (id: string, meta: CircleDatum) => void;
-  onLeave: () => void;
-}
-
-const FloatingCircle: React.FC<FloatingCircleProps> = ({ datum, hoveredId, hoveredPoint, onHover, onLeave }) => {
-  const { id, cx, cy, radius, image, label, link } = datum;
-  const isHovered = hoveredId === id;
-  const router = useRouter();
-
-  // Floating up/down
-  const { floatY } = useSpring({
-    from: { floatY: 0 },
-    to: { floatY: 10 },
-    config: { duration: 2000 + Math.random() * 1000 },
-    loop: { reverse: true },
-  });
-
-  // Hover scale
-  const { r } = useSpring({ r: isHovered ? radius * 1.3 : radius, config: { tension: 300, friction: 20 } });
-
-  // Repulsion spring
-  const [repelSprings, repelApi] = useSpring(() => ({ repelX: 0, repelY: 0 }));
-  React.useEffect(() => {
-    if (hoveredPoint && hoveredId !== id) {
-      const dx = cx - hoveredPoint.cx;
-      const dy = cy - hoveredPoint.cy;
-      const dist = Math.hypot(dx, dy);
-      const repulseRadius = hoveredPoint.radius * 8;
-      if (dist > 0 && dist < repulseRadius) {
-        const strength = (repulseRadius - dist) / repulseRadius;
-        const repulseDist = strength * hoveredPoint.radius * 1.5;
-        const ux = dx / dist;
-        const uy = dy / dist;
-        repelApi.start({ repelX: ux * repulseDist, repelY: uy * repulseDist });
-      } else {
-        repelApi.start({ repelX: 0, repelY: 0 });
-      }
-    } else {
-      repelApi.start({ repelX: 0, repelY: 0 });
-    }
-  }, [hoveredPoint, hoveredId, cx, cy, radius, repelApi]);
-
-  const transform = interpolate(
-    [repelSprings.repelX, repelSprings.repelY, floatY],
-    (x, y, fy) => `translate(${x},${y + fy})`
-  );
-
-  // Split label into lines for wrapping
-  const maxChars = 12;
-  const words = label.split(" ");
-  const lines: string[] = [];
-  let current = "";
-  words.forEach((w) => {
-    if ((current + " " + w).trim().length <= maxChars) current = current ? `${current} ${w}` : w;
-    else {
-      lines.push(current);
-      current = w;
-    }
-  });
-  if (current) lines.push(current);
+export const ExploreSummaries = () => {
+  const [animals, producers] = useMemo(() => {
+    const all = Object.values(VERNACULAR_GROUP_ICON);
+    return [all.filter((item) => item.group === 1), all.filter((item) => item.group === 2 || item.group === 3)];
+  }, []);
 
   return (
-    <AnimatedGroup transform={transform}>
-      <AnimatedImage
-        href={image}
-        x={r.to((val) => cx - val)}
-        y={r.to((val) => cy - val)}
-        width={r.to((val) => val * 2)}
-        height={r.to((val) => val * 2)}
-        onMouseEnter={() => onHover(id, datum)}
-        onMouseLeave={onLeave}
-        onClick={() => link && router.push(link)}
-        style={{ cursor: link ? "pointer" : "default" }}
-      />
-      <AnimatedText
-        x={cx}
-        y={r.to((val) => cy + val + 20)}
-        textAnchor="middle"
-        fontWeight={600}
-        fontSize={14}
-        fill="var(--mantine-color-midnight-10)"
-        pointerEvents="none"
-      >
-        {lines.map((line, idx) => (
-          <tspan key={idx} x={cx} dy={idx === 0 ? 0 : 16}>
-            {line}
-          </tspan>
-        ))}
-      </AnimatedText>
-    </AnimatedGroup>
+    <Stack gap="sm">
+      <Text size="md" fw={600} c="midnight.9">
+        Animals
+      </Text>
+      <VernacularCarousel items={animals} />
+      <Text size="md" fw={600} c="midnight.9">
+        Plants and Microbial life
+      </Text>
+      <VernacularCarousel items={producers} reverse />
+    </Stack>
   );
 };
 
-// SVG layout component with proportional group widths
-const CirclesSVG: React.FC<{
-  width: number;
-  height: number;
-  hoveredId: string | null;
-  hoveredPoint: CircleDatum | null;
-  setHoveredId: React.Dispatch<React.SetStateAction<string | null>>;
-  setHoveredPoint: React.Dispatch<React.SetStateAction<CircleDatum | null>>;
-}> = ({ width, height, hoveredId, hoveredPoint, setHoveredId, setHoveredPoint }) => {
-  const circles = useMemo<CircleDatum[]>(() => {
-    // Extract entries with group and size
-    const raw = Object.entries(VERNACULAR_GROUP_ICON).map(
-      ([id, data]) =>
-        ({
-          id,
-          colourKey: data.colour || "white-0",
-          image: data.image,
-          label: data.label,
-          link: data.link,
-          group: data.group,
-          sizeCategory: data.size as "small" | "medium" | "large",
-        } as Partial<CircleDatum>)
-    );
+interface VernacularCarouselProps {
+  items: IconData[];
+  scrollSpeed?: number;
+  reverse?: boolean;
+  itemWidth?: number;
+  gapWidth?: number;
+  fadeWidth?: number;
+}
 
-    // Sort by group then arbitrary
-    raw.sort((a, b) => a.group! - b.group! || 0);
-    const totalCount = raw.length;
-    const groups = Array.from(new Set(raw.map((e) => e.group))).sort() as number[];
-    const groupCount = groups.length;
-    const groupMap = Object.fromEntries(groups.map((g) => [g, raw.filter((e) => e.group === g)]));
-    const counts = groups.map((g) => groupMap[g].length);
+export const VernacularCarousel: FC<VernacularCarouselProps> = ({
+  items,
+  scrollSpeed = 50,
+  reverse = false,
+  itemWidth = 130,
+  gapWidth = 18,
+  fadeWidth = 75,
+}) => {
+  const totalWidth = items.length * itemWidth + gapWidth * items.length;
 
-    const padding = 8;
-    const labelBuffer = 14;
-    const edgePadding = 36;
-    const groupGap = 160;
-    const availableWidth = width - edgePadding * 2 - groupGap * (groupCount - 1);
+  const [scrollOffset, setScrollOffset] = useState<number>(0);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
-    // Compute proportional widths
-    const groupWidths = counts.map((count) => (count / totalCount) * availableWidth);
-    // Compute start X for each group
-    const groupStarts = groupWidths.reduce<number[]>((acc, w, i) => {
-      if (i === 0) return [edgePadding];
-      return [...acc, acc[i - 1] + groupWidths[i - 1] + groupGap];
-    }, []);
+  // Spring for controlling scroll speed
+  const [springs, api] = useSpring<{ speedFactor: number }>(() => ({
+    speedFactor: 1,
+    config: { tension: 120, friction: 20 },
+  }));
 
-    const placed: CircleDatum[] = [];
-    const sizeMap = { small: 35, medium: 40, large: 50 };
-    const yCenter = height / 2;
-    const yJitter = height * 0.8;
+  useEffect(() => {
+    api.start({ speedFactor: isHovered ? 0 : 1 });
+  }, [isHovered, api]);
 
-    groups.forEach((g, gi) => {
-      const items = groupMap[g];
-      const blockStart = groupStarts[gi];
-      const blockWidth = groupWidths[gi];
-      const stepX = blockWidth / items.length;
+  useEffect(() => {
+    let frameId: number;
+    let last = performance.now();
+    const direction = reverse ? -1 : 1;
 
-      items.forEach((item, idx) => {
-        const baseRadius = sizeMap[item.sizeCategory!];
-        const radius = baseRadius + (Math.random() - 0.5) * 8;
-        let cx: number;
-        let cy: number;
-        let attempts = 0;
-        do {
-          cx = blockStart + stepX * idx + stepX / 2 + (Math.random() - 0.5) * stepX * 0.3;
-          cy = yCenter + (Math.random() - 0.5) * yJitter;
-          // Clamp within padded bounds
-          cx = Math.max(radius + edgePadding, Math.min(width - radius - edgePadding, cx));
-          cy = Math.max(radius + edgePadding, Math.min(height - radius - labelBuffer - edgePadding, cy));
-          attempts++;
-        } while (
-          attempts < 200 &&
-          placed.some((c) => Math.hypot(c.cx - cx, c.cy - cy) < c.radius + radius + padding + labelBuffer)
-        );
-        placed.push({
-          id: item.id!,
-          cx,
-          cy,
-          radius,
-          colourKey: item.colourKey!,
-          image: item.image!,
-          label: item.label!,
-          link: item.link,
-          group: item.group!,
-          sizeCategory: item.sizeCategory!,
-        });
+    const step = (now: number) => {
+      const delta = now - last;
+      last = now;
+      const factor = springs.speedFactor.get() as number;
+      setScrollOffset((prev) => {
+        const next = prev + ((direction * delta * scrollSpeed) / 1000) * factor;
+        return ((next % totalWidth) + totalWidth) % totalWidth;
       });
-    });
+      frameId = requestAnimationFrame(step);
+    };
 
-    return placed;
-  }, [width, height]);
+    frameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frameId);
+  }, [scrollSpeed, reverse, totalWidth, springs.speedFactor]);
 
   return (
-    <svg width={width} height={height}>
-      <Group>
-        {circles.map((d) => (
-          <FloatingCircle
-            key={d.id}
-            datum={d}
-            hoveredId={hoveredId}
-            hoveredPoint={hoveredPoint}
-            onHover={(id, pt) => {
-              setHoveredId(id);
-              setHoveredPoint(pt);
-            }}
-            onLeave={() => {
-              setHoveredId(null);
-              setHoveredPoint(null);
+    <AnimatedDiv
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ position: "relative", overflow: "hidden", width: "100%" }}
+    >
+      <div
+        style={{
+          display: "flex",
+          transform: `translateX(-${scrollOffset}px)`,
+          willChange: "transform",
+          gap: gapWidth,
+        }}
+      >
+        {[...items, ...items].map((icon, idx) => (
+          <CarouselItem key={`${icon.label}-${idx}`} data={icon} width={itemWidth} />
+        ))}
+      </div>
+      {/* Fade overlays */}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: fadeWidth,
+          pointerEvents: "none",
+          background: "linear-gradient(to right, #ffffff, rgba(255,255,255,0))",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: fadeWidth,
+          pointerEvents: "none",
+          background: "linear-gradient(to left, #ffffff, rgba(255,255,255,0))",
+        }}
+      />
+    </AnimatedDiv>
+  );
+};
+
+interface CarouselItemProps {
+  data: IconData;
+  width: number;
+}
+
+export const CarouselItem: FC<CarouselItemProps> = ({ data, width }) => {
+  const router = useRouter();
+  const [hovered, setHovered] = useState<boolean>(false);
+
+  // Spring for hover animations
+  const springs = useSpring<{ scale: number; y: number; opacity: number }>({
+    to: {
+      scale: hovered ? 1.2 : 1,
+      y: hovered ? 10 : 0,
+      opacity: hovered ? 0.7 : 1,
+    },
+    config: { tension: 200, friction: 15 },
+  });
+
+  return (
+    <AnimatedDiv
+      onClick={() => {
+        if (data.link) router.push(data.link);
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width,
+        flexShrink: 0,
+        padding: 20,
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        cursor: "pointer",
+      }}
+    >
+      <svg width={width} height={width} viewBox="0 0 100 100" style={{ overflow: "visible" }}>
+        <Group>
+          <AnimatedImage
+            xlinkHref={data.image}
+            width={100}
+            height={100}
+            preserveAspectRatio="xMidYMid meet"
+            style={{
+              transform: springs.scale.to((s) => `scale(${s})`),
+              transformOrigin: "50% 50%",
+              opacity: springs.opacity,
             }}
           />
-        ))}
-      </Group>
-    </svg>
+        </Group>
+      </svg>
+      <AnimatedLabel
+        style={{
+          transform: springs.y.to((y) => `translateY(${y}px)`),
+          opacity: springs.opacity,
+          display: "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: 2,
+          overflow: "hidden",
+          textAlign: "center",
+          fontWeight: 600,
+          color: "var(--mantine-color-midnight-10)",
+          marginTop: 18,
+        }}
+      >
+        {data.label}
+      </AnimatedLabel>
+    </AnimatedDiv>
   );
 };
-
-// Main component
-const FloatingCircles: React.FC = () => {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [hoveredPoint, setHoveredPoint] = useState<CircleDatum | null>(null);
-
-  return (
-    <ParentSize>
-      {({ width, height }) => (
-        <CirclesSVG
-          width={width}
-          height={height}
-          hoveredId={hoveredId}
-          hoveredPoint={hoveredPoint}
-          setHoveredId={setHoveredId}
-          setHoveredPoint={setHoveredPoint}
-        />
-      )}
-    </ParentSize>
-  );
-};
-
-export default FloatingCircles;
