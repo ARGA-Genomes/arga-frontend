@@ -180,7 +180,7 @@ const ICONS: Record<string, string> = {
   insects: "/icons/taxon/Taxon_ Insects (Insecta).svg",
   corals: "/icons/taxon/Taxon_ Hard corals (Order Scleractinia).svg",
   "fin fishes": "/icons/taxon/Taxon_ Finfishes (Actinopterygii).svg",
-  snails: "/icons/taxon/Taxon_Snails_Gastropoda.svg",
+  snails: "/icons/taxon/Taxon_ Snails (Gastropoda).svg",
 };
 
 interface GroupSelectionProps {
