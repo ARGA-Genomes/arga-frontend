@@ -3,7 +3,7 @@
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import { Grid, Group, Paper, Stack, Text } from "@mantine/core";
-import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
+import { Taxonomy, Photo } from "@/app/type";
 
 import { AttributePill as AttributePillStack } from "@/components/highlight-stack";
 import { AttributePill } from "@/components/data-fields";
