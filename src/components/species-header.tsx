@@ -1,19 +1,8 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-import {
-  Container,
-  Group,
-  Paper,
-  Text,
-  Flex,
-  useMantineTheme,
-} from "@mantine/core";
-import {
-  Conservation,
-  IndigenousEcologicalKnowledge,
-  Taxonomy,
-} from "@/app/type";
+import { Container, Group, Paper, Text, Flex, useMantineTheme } from "@mantine/core";
+import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
@@ -78,14 +67,10 @@ interface HeaderProps {
   attributes?: NameAttribute[];
 }
 
-function Header({
-  taxonomy,
-  conservation,
-  traits,
-  referenceGenome,
-  attributes,
-}: HeaderProps) {
+function Header({ taxonomy, conservation, traits, referenceGenome, attributes }: HeaderProps) {
   const theme = useMantineTheme();
+
+  const details = taxonomy.find((t) => t.source === "Atlas of Living Australia");
 
   return (
     // Original format
@@ -101,10 +86,10 @@ function Header({
         align={{ base: "normal", lg: "center" }}
       >
         <Text c="dimmed" fw={400}>
-          {taxonomy[0]?.rank}
+          {details?.rank}
         </Text>
         <Text fz={38} fw={700} fs="italic">
-          {taxonomy[0]?.canonicalName}
+          {details?.canonicalName}
         </Text>
       </Flex>
 
@@ -113,12 +98,7 @@ function Header({
         gap={{ base: "md", lg: "xl" }}
         align={{ base: "normal", lg: "center" }}
       >
-        <IconBar
-          taxonomy={taxonomy[0]}
-          conservation={conservation}
-          traits={traits}
-          attributes={attributes}
-        />
+        {details && <IconBar taxonomy={details} conservation={conservation} traits={traits} attributes={attributes} />}
 
         <Group h="100%" wrap="nowrap" gap={5}>
           <Text fw={700} c="dimmed" style={{ whiteSpace: "nowrap" }}>
@@ -135,11 +115,7 @@ function Header({
   );
 }
 
-export default function SpeciesHeader({
-  canonicalName,
-}: {
-  canonicalName: string;
-}) {
+export default function SpeciesHeader({ canonicalName }: { canonicalName: string }) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
       canonicalName,
