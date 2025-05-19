@@ -44,7 +44,7 @@ import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timel
 import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
 import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
-import { Taxon } from "@/queries/taxa";
+import { Taxon, TaxonNode } from "@/queries/taxa";
 import HorizontalTimeline, { TimelineItem, TimelineItemType } from "@/components/graphing/horizontal-timeline";
 import { Publication } from "@/queries/publication";
 import { Specimen } from "@/queries/specimen";
@@ -74,9 +74,13 @@ const GET_TAXA = gql`
   }
 `;
 
+interface TaxaRecordExtended extends Taxon {
+  hierarchy: TaxonNode[];
+}
+
 interface TaxaQuery {
   taxa: {
-    records: Taxon[];
+    records: TaxaRecordExtended[];
   };
 }
 
