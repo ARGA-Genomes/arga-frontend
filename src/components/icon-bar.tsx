@@ -167,7 +167,7 @@ export const VERNACULAR_GROUP_ICON: Record<string, VernacularIconData> = {
     grouping: VernacularGrouping.Animals,
   },
   CORALS_AND_JELLYFISHES: {
-    image: "/icons/taxon/Taxon_ Anemones, corals and jellyfishes (Cnidaria).svg",
+    image: "/icons/taxon/Taxon_ Anemones corals and jellyfishes (Cnidaria).svg",
     label: "Corals and jellyfishes",
     link: "/phylum/Cnidaria",
     colour: "shellfish.5",
