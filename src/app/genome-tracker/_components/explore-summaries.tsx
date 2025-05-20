@@ -2,8 +2,7 @@ import React, { FC, useState, useEffect, useMemo } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import { Group } from "@visx/group";
 import { useRouter } from "next/navigation";
-import type { IconData } from "@/components/icon-bar";
-import { VERNACULAR_GROUP_ICON } from "@/components/icon-bar";
+import { VERNACULAR_GROUP_ICON, IconData } from "@/components/icon-bar";
 import { Stack, Text } from "@mantine/core";
 
 // Typed animated components
@@ -11,7 +10,7 @@ const AnimatedDiv = animated("div");
 const AnimatedLabel = animated("div");
 const AnimatedImage = animated("image");
 
-const DISABLED_GROUPS = ["BACTERIA", "CYANOBACTERIA"];
+const DISABLED_GROUPS = ["BACTERIA", "CYANOBACTERIA", "CONIFERS_AND_CYCADS"];
 
 export const ExploreSummaries = () => {
   const [animals, producers] = useMemo(() => {

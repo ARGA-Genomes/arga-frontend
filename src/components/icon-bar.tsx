@@ -101,6 +101,13 @@ export const VERNACULAR_GROUP_ICON: Record<string, IconData & { group: 1 | 2 | 3
     colour: "wheat.4",
     group: 1,
   },
+  SNAILS: {
+    image: "/icons/taxon/Taxon_Snails (Gastropoda).svg",
+    label: "Snails",
+    link: "/class/Gastropoda",
+    colour: "moss.4",
+    group: 1,
+  },
   FROGS_AND_OTHER_AMPHIBIANS: {
     image: "/icons/taxon/Taxon_ Frogs and toads (Anura).svg",
     label: "Frogs and other amphibians",
