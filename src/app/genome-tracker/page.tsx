@@ -3,16 +3,19 @@
 import { Box, Container, Grid, GridCol, Group, Paper, Stack, Text } from "@mantine/core";
 import { gql } from "@apollo/client";
 
+// Global components
 import { PreviousPage } from "@/components/navigation-history";
-
-import { GenomeCompletion } from "./_components/genome-completion";
+import { DataNoteActions } from "@/components/data-note-actions";
 import { DataPageCitation } from "@/components/page-citation";
+
+// Local components
+import { GenomeCompletion } from "./_components/genome-completion";
 import { GenomeComposition } from "./_components/genome-composition";
 import { CumulativeTracker } from "./_components/cumulative-tracker";
 import { GroupingCompletion } from "./_components/grouping-completion";
 import { SignificantMilestones } from "./_components/significant-milestones";
 import { CompletionStepper } from "./_components/completion-stepper";
-import { DataNoteActions } from "@/components/data-note-actions";
+import { ExploreSummaries } from "./_components/explore-summaries";
 
 const DOWNLOAD_STATS = gql`
   query DownloadTrackerStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $ranks: [TaxonomicRank]) {
@@ -126,6 +129,14 @@ export default function GenomeTracker() {
                     Completion of genome sequences for key biodiversity groupings
                   </Text>
                   <GroupingCompletion dateDomain={[minDate, new Date()]} />
+                </Stack>
+              </Paper>
+              <Paper p="lg" radius="lg" withBorder>
+                <Stack>
+                  <Text size="xl" fw="bold">
+                    Browse selected other taxon summaries to explore in more depth
+                  </Text>
+                  <ExploreSummaries />
                 </Stack>
               </Paper>
             </Stack>
