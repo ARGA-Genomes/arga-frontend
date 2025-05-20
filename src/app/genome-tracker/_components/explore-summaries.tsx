@@ -1,14 +1,9 @@
-import React, { FC, useState, useEffect, useMemo } from "react";
-import { useSpring, animated } from "@react-spring/web";
-import { Group } from "@visx/group";
-import { useRouter } from "next/navigation";
-import { VERNACULAR_GROUP_ICON, IconData } from "@/components/icon-bar";
+import { IconData, VERNACULAR_GROUP_ICON, VernacularGrouping } from "@/components/icon-bar";
 import { Stack, Text } from "@mantine/core";
-
-// Typed animated components
-const AnimatedDiv = animated("div");
-const AnimatedLabel = animated("div");
-const AnimatedImage = animated("image");
+import { Group } from "@visx/group";
+import { animate, motion, useMotionValue } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 const DISABLED_GROUPS = ["BACTERIA", "CYANOBACTERIA", "CONIFERS_AND_CYCADS"];
 
@@ -18,8 +13,13 @@ export const ExploreSummaries = () => {
       .filter(([key]) => !DISABLED_GROUPS.includes(key))
       .map(([, value]) => value);
 
-    return [all.filter((item) => item.group === 1), all.filter((item) => item.group === 2 || item.group === 3)];
-  }, [VERNACULAR_GROUP_ICON]);
+    return [
+      all.filter((item) => item.grouping === VernacularGrouping.Animals),
+      all.filter(
+        (item) => item.grouping === VernacularGrouping.Microbes || item.grouping === VernacularGrouping.Producers
+      ),
+    ];
+  }, []);
 
   return (
     <Stack gap="sm">
@@ -44,29 +44,31 @@ interface VernacularCarouselProps {
   fadeWidth?: number;
 }
 
-export const VernacularCarousel: FC<VernacularCarouselProps> = ({
+export const VernacularCarousel = ({
   items,
   scrollSpeed = 50,
   reverse = false,
   itemWidth = 130,
   gapWidth = 18,
   fadeWidth = 75,
-}) => {
-  const totalWidth = items.length * itemWidth + gapWidth * items.length;
+}: VernacularCarouselProps) => {
+  const totalWidth = items.length * (itemWidth + gapWidth);
 
-  const [scrollOffset, setScrollOffset] = useState<number>(0);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+  // MotionValue for controlling “speedFactor”
+  const speedFactor = useMotionValue(1);
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
-  // Spring for controlling scroll speed
-  const [springs, api] = useSpring<{ speedFactor: number }>(() => ({
-    speedFactor: 1,
-    config: { tension: 120, friction: 20 },
-  }));
-
+  // on hover, animate speedFactor → 0, otherwise → 1
   useEffect(() => {
-    api.start({ speedFactor: isHovered ? 0 : 1 });
-  }, [isHovered, api]);
+    animate(speedFactor, isHovered ? 0 : 1, {
+      type: "spring",
+      stiffness: 120,
+      damping: 20,
+    });
+  }, [isHovered, speedFactor]);
 
+  // manual RAF loop to update scrollOffset based on speedFactor
   useEffect(() => {
     let frameId: number;
     let last = performance.now();
@@ -75,9 +77,10 @@ export const VernacularCarousel: FC<VernacularCarouselProps> = ({
     const step = (now: number) => {
       const delta = now - last;
       last = now;
-      const factor = springs.speedFactor.get() as number;
+      const factor = speedFactor.get();
       setScrollOffset((prev) => {
         const next = prev + ((direction * delta * scrollSpeed) / 1000) * factor;
+        // wrap within [0, totalWidth)
         return ((next % totalWidth) + totalWidth) % totalWidth;
       });
       frameId = requestAnimationFrame(step);
@@ -85,12 +88,12 @@ export const VernacularCarousel: FC<VernacularCarouselProps> = ({
 
     frameId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frameId);
-  }, [scrollSpeed, reverse, totalWidth, springs.speedFactor]);
+  }, [scrollSpeed, reverse, totalWidth, speedFactor]);
 
   return (
-    <AnimatedDiv
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <motion.div
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       style={{ position: "relative", overflow: "hidden", width: "100%" }}
     >
       <div
@@ -105,6 +108,7 @@ export const VernacularCarousel: FC<VernacularCarouselProps> = ({
           <CarouselItem key={`${icon.label}-${idx}`} data={icon} width={itemWidth} />
         ))}
       </div>
+
       {/* Fade overlays */}
       <div
         style={{
@@ -128,7 +132,7 @@ export const VernacularCarousel: FC<VernacularCarouselProps> = ({
           background: "linear-gradient(to left, #ffffff, rgba(255,255,255,0))",
         }}
       />
-    </AnimatedDiv>
+    </motion.div>
   );
 };
 
@@ -137,27 +141,25 @@ interface CarouselItemProps {
   width: number;
 }
 
-export const CarouselItem: FC<CarouselItemProps> = ({ data, width }) => {
+export const CarouselItem = ({ data, width }: CarouselItemProps) => {
   const router = useRouter();
-  const [hovered, setHovered] = useState<boolean>(false);
+  const [isHover, setIsHover] = useState(false);
 
-  // Spring for hover animations
-  const springs = useSpring<{ scale: number; y: number; opacity: number }>({
-    to: {
-      scale: hovered ? 1.2 : 1,
-      y: hovered ? 10 : 0,
-      opacity: hovered ? 0.7 : 1,
-    },
-    config: { tension: 200, friction: 15 },
-  });
+  // Variants for hover animation
+  const imageVariants = {
+    initial: { scale: 1, opacity: 1 },
+    hover: { scale: 1.2, opacity: 0.7 },
+  };
+  const labelVariants = {
+    initial: { y: 0, opacity: 1 },
+    hover: { y: 10, opacity: 0.7 },
+  };
 
   return (
-    <AnimatedDiv
-      onClick={() => {
-        if (data.link) router.push(data.link);
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <motion.div
+      onClick={() => data.link && router.push(data.link)}
+      onHoverStart={() => setIsHover(true)}
+      onHoverEnd={() => setIsHover(false)}
       style={{
         width,
         flexShrink: 0,
@@ -166,28 +168,31 @@ export const CarouselItem: FC<CarouselItemProps> = ({ data, width }) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        cursor: "pointer",
+        cursor: data.link ? "pointer" : "default",
       }}
     >
       <svg width={width} height={width} viewBox="0 0 100 100" style={{ overflow: "visible" }}>
         <Group>
-          <AnimatedImage
+          <motion.image
             xlinkHref={data.image}
             width={100}
             height={100}
             preserveAspectRatio="xMidYMid meet"
-            style={{
-              transform: springs.scale.to((s) => `scale(${s})`),
-              transformOrigin: "50% 50%",
-              opacity: springs.opacity,
-            }}
+            variants={imageVariants}
+            initial="initial"
+            animate={isHover ? "hover" : "initial"}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            style={{ originX: "50%", originY: "50%" }}
           />
         </Group>
       </svg>
-      <AnimatedLabel
+
+      <motion.div
+        variants={labelVariants}
+        initial="initial"
+        animate={isHover ? "hover" : "initial"}
+        transition={{ type: "spring", stiffness: 200, damping: 15 }}
         style={{
-          transform: springs.y.to((y) => `translateY(${y}px)`),
-          opacity: springs.opacity,
           display: "-webkit-box",
           WebkitBoxOrient: "vertical",
           WebkitLineClamp: 2,
@@ -199,7 +204,7 @@ export const CarouselItem: FC<CarouselItemProps> = ({ data, width }) => {
         }}
       >
         {data.label}
-      </AnimatedLabel>
-    </AnimatedDiv>
+      </motion.div>
+    </motion.div>
   );
 };
