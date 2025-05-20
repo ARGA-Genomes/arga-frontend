@@ -3,7 +3,7 @@
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import { Grid, Group, Paper, Stack, Text } from "@mantine/core";
-import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
+import { Taxonomy, Photo } from "@/app/type";
 
 import { AttributePill as AttributePillStack } from "@/components/highlight-stack";
 import { AttributePill } from "@/components/data-fields";
@@ -13,10 +13,11 @@ import { SpeciesPhoto } from "@/components/species-image";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { ExternalLinkButton } from "@/components/button-link-external";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
+import { useDatasets } from "@/app/source-provider";
 
 const GET_TAXON = gql`
-  query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String) {
-    taxon(rank: $rank, canonicalName: $canonicalName) {
+  query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String, $datasetId: UUID) {
+    taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
       hierarchy {
         canonicalName
         rank
@@ -43,22 +44,7 @@ const GET_SUMMARY = gql`
     species(canonicalName: $canonicalName) {
       taxonomy {
         canonicalName
-        authorship
-        status
         rank
-        source
-        sourceUrl
-      }
-      vernacularNames {
-        datasetId
-        vernacularName
-        citation
-        sourceUrl
-      }
-      synonyms {
-        scientificName
-        canonicalName
-        authorship
       }
       photos {
         url
@@ -66,10 +52,6 @@ const GET_SUMMARY = gql`
         publisher
         license
         rightsHolder
-      }
-      indigenousEcologicalKnowledge {
-        id
-        sourceUrl
       }
       dataSummary {
         genomes
@@ -79,19 +61,6 @@ const GET_SUMMARY = gql`
   }
 `;
 
-interface VernacularName {
-  datasetId: string;
-  vernacularName: string;
-  citation?: string;
-  sourceUrl?: string;
-}
-
-interface Synonym {
-  scientificName: string;
-  canonicalName: string;
-  authorship?: string;
-}
-
 interface speciesDataSummary {
   genomes: number;
   loci: number;
@@ -99,10 +68,7 @@ interface speciesDataSummary {
 
 interface Species {
   taxonomy: Taxonomy[];
-  vernacularNames: VernacularName[];
-  synonyms: Synonym[];
   photos: Photo[];
-  indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[];
   dataSummary: speciesDataSummary;
 }
 
@@ -271,28 +237,18 @@ function ExternalResources(props: ExternalResourcesProps) {
 }
 
 function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
+  const { names } = useDatasets();
+  const dataset = names.get("Atlas of Living Australia");
+
   const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
     variables: {
       rank: taxonomy.rank,
       canonicalName: taxonomy.canonicalName,
+      datasetId: dataset?.id,
     },
   });
 
   const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
-
-  const taxonRankMappings: Record<string, string> = {
-    KINGDOM: "REGNUM",
-    PHYLUM: "DIVISION",
-    SUBPHYLUM: "SUBDIVISION",
-    CLASS: "CLASSIS",
-    SUBCLASS: "SUBCLASSIS",
-    ORDER: "ORDO",
-    SUPERORDER: "SUPERORDO",
-    FAMILY: "FAMILIA",
-    GENUS: "GENUS",
-    SPECIES: "SPECIES",
-  };
-  const isAnimalia = hierarchy?.[1]?.canonicalName === "Animalia";
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -306,48 +262,26 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
           <Text fw={300} size="xs">
             Source
           </Text>
-          <ExternalLinkButton
-            url={taxonomy.sourceUrl}
-            externalLinkName={taxonomy.source}
-            outline
-            icon={IconArrowUpRight}
-          />
+          <ExternalLinkButton url={dataset?.url} externalLinkName={dataset?.name} outline icon={IconArrowUpRight} />
         </Group>
       </Group>
 
       <Group>
         {error && <Text>{error.message}</Text>}
-        {hierarchy?.map((node, idx) =>
-          isAnimalia ? (
-            <AttributePill
-              key={idx}
-              labelColor="midnight.8"
-              popoverDisabled
-              hoverColor="midnight.0"
-              label={Humanize.capitalize(node.rank.toLowerCase())}
-              value={node.canonicalName}
-              href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
-              icon={IconArrowUpRight}
-              showIconOnHover
-              miw={100}
-            />
-          ) : (
-            <AttributePill
-              key={idx}
-              labelColor="midnight.8"
-              popoverDisabled
-              hoverColor="midnight.0"
-              label={Humanize.capitalize(node.rank.toLowerCase())}
-              value={node.canonicalName}
-              href={`/${taxonRankMappings[node.rank.toUpperCase()]?.toLowerCase() || node.rank.toLowerCase()}/${
-                node.canonicalName
-              }`}
-              icon={IconArrowUpRight}
-              showIconOnHover
-              miw={100}
-            />
-          )
-        )}
+        {hierarchy?.map((node, idx) => (
+          <AttributePill
+            key={idx}
+            labelColor="midnight.8"
+            popoverDisabled
+            hoverColor="midnight.0"
+            label={Humanize.capitalize(node.rank.toLowerCase())}
+            value={node.canonicalName}
+            href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
+            icon={IconArrowUpRight}
+            showIconOnHover
+            miw={100}
+          />
+        ))}
       </Group>
     </Paper>
   );
@@ -364,6 +298,8 @@ export default function SummaryPage({ params }: { params: { name: string } }) {
     return <Text>Error : {error.message}</Text>;
   }
 
+  // just use the first one for now while the backend guarantees it. we want
+  // to phase this endpoint out but for now there is too much yak shaving involved
   const taxonomy = data?.species.taxonomy[0];
 
   return (

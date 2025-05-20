@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Text, Title, Stack, TextInput, Flex, Box, Center, Group } from "@mantine/core";
-import { IconArrowUpRight, IconSearch } from "@tabler/icons-react";
+import { /* IconArrowUpRight,*/ IconSearch } from "@tabler/icons-react";
 import { ShowStats, TaxonomicComposition } from "./stats";
 import { gql, useQuery } from "@apollo/client";
 
 // Project components
-import { InternalLinkButton } from "@/components/button-link-internal";
+// import { InternalLinkButton } from "@/components/button-link-internal";
 
 // Local components
 import RecentUpdatesContainer from "../../components/recent-updates-container";
@@ -158,7 +158,7 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Browse by data type
               </Title>
-              <Browse items={type} data={formattedData} error={error} />
+              <Browse items={type} data={formattedData} error={error} disabled />
             </Stack>
             <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
@@ -170,8 +170,8 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Browse by functional or ecological group
               </Title>
-              <Browse items={grouping} data={formattedData} error={error} />
-              <InternalLinkButton
+              <Browse items={grouping} data={formattedData} error={error} disabled />
+              {/* <InternalLinkButton
                 url={`/browse/groups`}
                 icon={IconArrowUpRight}
                 textColor="white"
@@ -179,7 +179,7 @@ export default function HomePage() {
                 outline
               >
                 View all groups
-              </InternalLinkButton>
+              </InternalLinkButton> */}
             </Stack>
           </Stack>
           <Group gap={140} pb={80} align="flex-start" justify="center">

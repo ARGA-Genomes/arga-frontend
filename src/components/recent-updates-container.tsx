@@ -16,9 +16,7 @@ function RecentUpdatesItem({ update }: { update: UpdateItem }) {
       <Grid.Col key={`desc-${update.date}`} span={2}>
         {update.updates.map((updateMsg) => {
           return (
-            <Text key={`${update.date}-${updateMsg}`} c="midnight.3">
-              {updateMsg}
-            </Text>
+            <Text key={`${update.date}-${updateMsg}`} c="midnight.3" dangerouslySetInnerHTML={{ __html: updateMsg }} />
           );
         })}
       </Grid.Col>

@@ -25,7 +25,7 @@ import {
   Badge,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
-import { Taxonomy, IndigenousEcologicalKnowledge, Photo } from "@/app/type";
+import { Taxonomy } from "@/app/type";
 
 import {
   IconArrowUpRight,
@@ -44,7 +44,7 @@ import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timel
 import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import { TaxonStatTreeNode } from "@/queries/stats";
 import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
-import { Taxon } from "@/queries/taxa";
+import { Taxon, TaxonNode } from "@/queries/taxa";
 import HorizontalTimeline, { TimelineItem, TimelineItemType } from "@/components/graphing/horizontal-timeline";
 import { Publication } from "@/queries/publication";
 import { Specimen } from "@/queries/specimen";
@@ -54,7 +54,7 @@ import { getCanonicalName } from "@/helpers/getCanonicalName";
 import { InternalLinkButton } from "@/components/button-link-internal";
 import RecordHistory from "@/components/record-history";
 import { Action, GET_NOMENCLATURAL_ACT_PROVENANCE, Operation } from "@/queries/provenance";
-import { useDatasets } from "@/app/source-provider";
+import { Dataset, useDatasets } from "@/app/source-provider";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -74,9 +74,13 @@ const GET_TAXA = gql`
   }
 `;
 
+interface TaxaRecordExtended extends Taxon {
+  hierarchy: TaxonNode[];
+}
+
 interface TaxaQuery {
   taxa: {
-    records: Taxon[];
+    records: TaxaRecordExtended[];
   };
 }
 
@@ -85,11 +89,33 @@ const GET_TAXON = gql`
     taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
       ...TaxonName
       ...TaxonSource
+      rank
 
       hierarchy {
         canonicalName
         rank
         depth
+      }
+
+      typeSpecimens {
+        name {
+          scientificName
+        }
+        specimen {
+          typeStatus
+          recordId
+          materialSampleId
+          collectionCode
+          institutionCode
+          institutionName
+          recordedBy
+          identifiedBy
+          locality
+          country
+          stateProvince
+          latitude
+          longitude
+        }
       }
 
       taxonomicActs {
@@ -124,22 +150,6 @@ const GET_TAXON = gql`
           scientificName
           canonicalName
           authorship
-        }
-      }
-    }
-  }
-`;
-
-const GET_SYNONYMS = gql`
-  query TaxonSynonyms($rank: TaxonomicRank, $canonicalName: String) {
-    taxon(rank: $rank, canonicalName: $canonicalName) {
-      taxonomicActs {
-        entityId
-        sourceUrl
-        taxon {
-          canonicalName
-          authorship
-          status
         }
       }
     }
@@ -212,17 +222,19 @@ interface NomenclaturalAct {
   };
 }
 
-interface TaxonQuery {
-  taxon: Taxon & {
-    hierarchy: ClassificationNode[];
-    nomenclaturalActs: NomenclaturalAct[];
-  };
+interface ExtendedTaxon extends Taxon {
+  rank: string;
+  hierarchy: ClassificationNode[];
+  nomenclaturalActs: NomenclaturalAct[];
+  taxonomicActs: TaxonomicAct[];
+  typeSpecimens: {
+    specimen: Specimen;
+    name: { scientificName: string };
+  }[];
 }
 
-interface SynonymsQuery {
-  taxon: {
-    taxonomicActs: TaxonomicAct[];
-  };
+interface TaxonQuery {
+  taxon: ExtendedTaxon;
 }
 
 interface TypeSpecimenQuery {
@@ -246,107 +258,6 @@ interface ProvenanceQuery {
   };
 }
 
-const GET_SUMMARY = gql`
-  query SpeciesSummary($canonicalName: String) {
-    species(canonicalName: $canonicalName) {
-      taxonomy {
-        canonicalName
-        authorship
-        status
-        rank
-        source
-        sourceUrl
-        __typename
-      }
-      vernacularNames {
-        datasetId
-        vernacularName
-        citation
-        sourceUrl
-        __typename
-      }
-      synonyms {
-        scientificName
-        canonicalName
-        authorship
-        __typename
-      }
-      photos {
-        url
-        source
-        publisher
-        license
-        rightsHolder
-        __typename
-      }
-      indigenousEcologicalKnowledge {
-        id
-        sourceUrl
-        __typename
-      }
-      dataSummary {
-        genomes
-        loci
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-
-const GET_SUMMARY_HIERARCHY = gql`
-  query SpeciesSummary($canonicalName: String) {
-    species(canonicalName: $canonicalName) {
-      taxonomy {
-        canonicalName
-        authorship
-        status
-        rank
-        source
-        sourceUrl
-        __typename
-      }
-      hierarchy {
-        canonicalName
-        rank
-        __typename
-      }
-      vernacularNames {
-        datasetId
-        vernacularName
-        citation
-        sourceUrl
-        __typename
-      }
-      synonyms {
-        scientificName
-        canonicalName
-        authorship
-        __typename
-      }
-      photos {
-        url
-        source
-        publisher
-        license
-        rightsHolder
-        __typename
-      }
-      indigenousEcologicalKnowledge {
-        id
-        sourceUrl
-        __typename
-      }
-      dataSummary {
-        genomes
-        loci
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-
 interface VernacularName {
   datasetId: string;
   vernacularName: string;
@@ -360,18 +271,10 @@ interface Synonym {
   authorship?: string;
 }
 
-interface TaxonNode {
-  canonicalName: string;
-  rank: string;
-}
-
 interface Species {
   taxonomy: Taxonomy[];
-  hierarchy: TaxonNode[];
   vernacularNames: VernacularName[];
   synonyms: Synonym[];
-  photos: Photo[];
-  indigenousEcologicalKnowledge?: IndigenousEcologicalKnowledge[];
   specimens: {
     total: number;
     records: Specimen[];
@@ -499,10 +402,9 @@ interface TaxonMatch {
 
 interface ExternalLinksProps {
   canonicalName: string;
-  species?: Species;
 }
 
-function ExternalLinks({ canonicalName, species }: ExternalLinksProps) {
+function ExternalLinks({ canonicalName }: ExternalLinksProps) {
   const [matchedTaxon, setMatchedTaxon] = useState<string[] | null>(null);
   const hasFrogID = false;
   const hasAFD = false;
@@ -535,24 +437,6 @@ function ExternalLinks({ canonicalName, species }: ExternalLinksProps) {
           icon={IconArrowUpRight}
         />
 
-        {species?.indigenousEcologicalKnowledge?.map((iek) => (
-          <Button
-            key={iek.id}
-            component="a"
-            radius="md"
-            color="gray"
-            variant="light"
-            size="xs"
-            leftSection={<IconExternalLink size="1rem" color="black" />}
-            href={iek.sourceUrl}
-            target="_blank"
-          >
-            <Text>
-              View on&nbsp;<b>Profiles</b>
-            </Text>
-          </Button>
-        ))}
-
         {hasFrogID && (
           <Button radius="md" color="midnight" size="xs" leftSection={<IconExternalLink size="1rem" />}>
             View on&nbsp;<b>FrogID</b>
@@ -568,15 +452,8 @@ function ExternalLinks({ canonicalName, species }: ExternalLinksProps) {
   );
 }
 
-function Synonyms({ taxonomy }: { taxonomy: Taxonomy }) {
-  const { data } = useQuery<SynonymsQuery>(GET_SYNONYMS, {
-    variables: {
-      rank: taxonomy.rank,
-      canonicalName: taxonomy.canonicalName,
-    },
-  });
-
-  const acts = data?.taxon.taxonomicActs.filter((act) => act.taxon.status !== "ACCEPTED");
+function Synonyms({ taxonomy }: { taxonomy: ExtendedTaxon }) {
+  const acts = taxonomy.taxonomicActs.filter((act) => act.taxon.status !== "ACCEPTED");
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
   const synonyms: Record<string, TaxonomicAct[]> = {};
@@ -633,23 +510,15 @@ function SourcePill({ value }: SourcePillProps) {
 }
 
 interface DetailsProps {
-  taxonomy: Taxonomy;
+  taxonomy: ExtendedTaxon;
+  dataset: Dataset;
   commonNames: VernacularName[];
   subspecies?: TaxonStatTreeNode[];
   isSubspecies?: boolean;
 }
 
-function Details({ taxonomy, commonNames, subspecies, isSubspecies }: DetailsProps) {
-  const { data } = useQuery<TypeSpecimenQuery>(GET_TYPE_SPECIMENS, {
-    variables: {
-      rank: taxonomy.rank,
-      canonicalName: taxonomy.canonicalName,
-    },
-  });
-
-  const specimens = data?.taxon.typeSpecimens;
-
-  const typeSpecimens = specimens?.filter(
+function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: DetailsProps) {
+  const typeSpecimens = taxonomy.typeSpecimens?.filter(
     (typeSpecimen) =>
       typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.specimen.typeStatus != "no voucher",
   );
@@ -665,12 +534,7 @@ function Details({ taxonomy, commonNames, subspecies, isSubspecies }: DetailsPro
           <Text fw={300} size="xs">
             Source
           </Text>
-          <ExternalLinkButton
-            url={taxonomy.sourceUrl}
-            externalLinkName={taxonomy.source}
-            outline
-            icon={IconArrowUpRight}
-          />
+          <ExternalLinkButton url={dataset.url} externalLinkName={dataset.name} outline icon={IconArrowUpRight} />
         </Group>
       </Group>
       <Grid>
@@ -893,7 +757,7 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
   return 0;
 }
 
-function History({ taxonomy, specimens }: { taxonomy: Taxonomy; specimens?: Specimen[] }) {
+function History({ taxonomy, specimens }: { taxonomy: ExtendedTaxon; specimens?: Specimen[] }) {
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;
 
@@ -1220,41 +1084,19 @@ function StatBadge({ label, stat }: { label: string; stat?: number }) {
   );
 }
 
-const TAXA_SOURCE_PRIORITIES = ["Australian Living Atlas", "Australian Faunal Directory"];
-
-const sortTaxaBySources = (taxonomy: Taxonomy[]) => {
-  return taxonomy
-    .map((t) => t)
-    .sort((a: Taxonomy, b: Taxonomy): number => {
-      let indexA = TAXA_SOURCE_PRIORITIES.indexOf(a.source ?? "");
-      let indexB = TAXA_SOURCE_PRIORITIES.indexOf(b.source ?? "");
-
-      if (indexA == -1) indexA = TAXA_SOURCE_PRIORITIES.length;
-      if (indexB == -1) indexB = TAXA_SOURCE_PRIORITIES.length;
-
-      if (indexA < indexB) return -1;
-      else if (indexA > indexB) return 1;
-      else {
-        const sourceA = a.source ?? "";
-        const sourceB = b.source ?? "";
-        return sourceA.localeCompare(sourceB);
-      }
-    });
-};
-
 export default function TaxonomyPage({ params, isSubspecies }: { params: { name: string }; isSubspecies?: boolean }) {
   const { names } = useDatasets();
-  const datasetId = names.get("Atlas of Living Australia")?.id;
+  const dataset = names.get("Atlas of Living Australia");
 
   const canonicalName = getCanonicalName(params);
 
-  const { loading, error, data } = useQuery<QueryResults>(isSubspecies ? GET_SUMMARY : GET_SUMMARY_HIERARCHY, {
-    variables: { canonicalName },
+  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+    variables: { canonicalName, rank: "SPECIES", datasetId: dataset?.id },
   });
 
-  const species = data?.species;
-  const taxonomy = species && sortTaxaBySources(species.taxonomy)[0];
-  const hierarchy = species?.hierarchy;
+  // get the taxonomy and build the pinned taxonomy hierarchy path for the tree
+  const taxonomy = data?.taxon;
+  const hierarchy = taxonomy?.hierarchy;
   const pinned = hierarchy ? [canonicalName, ...hierarchy.map((h) => h.canonicalName)] : [canonicalName];
 
   const results = useQuery<TaxaQuery>(GET_TAXA, {
@@ -1268,7 +1110,7 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
       taxonRank: "FAMILY",
       taxonCanonicalName: family?.canonicalName,
       includeRanks: ["FAMILY"],
-      datasetId,
+      datasetId: dataset?.id,
     },
   });
 
@@ -1299,10 +1141,11 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
         <Grid.Col span={12}>
           <Stack gap={20} pos="relative">
             <LoadOverlay visible={loading} />
-            {species && taxonomy && (
+            {taxonomy && dataset && (
               <Details
                 taxonomy={taxonomy}
-                commonNames={species.vernacularNames}
+                dataset={dataset}
+                commonNames={[]}
                 subspecies={subspecies.data?.stats.taxonBreakdown}
                 isSubspecies={isSubspecies}
               />
@@ -1311,10 +1154,10 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
           </Stack>
         </Grid.Col>
       </Grid>
-      {familyStats.data && datasetId && (
-        <FamilyTaxonTree family={familyStats.data.stats.taxonBreakdown[0]} datasetId={datasetId} pinned={pinned} />
+      {familyStats.data && dataset && (
+        <FamilyTaxonTree family={familyStats.data.stats.taxonBreakdown[0]} datasetId={dataset.id} pinned={pinned} />
       )}
-      <ExternalLinks canonicalName={canonicalName} species={data?.species} />
+      <ExternalLinks canonicalName={canonicalName} />
 
       {taxonomy && <History taxonomy={taxonomy} specimens={specimens?.species.specimens.records} />}
     </Stack>

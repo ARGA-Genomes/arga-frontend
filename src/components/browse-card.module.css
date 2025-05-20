@@ -5,3 +5,11 @@
     background-color: var(--mantine-color-midnight-11);
   }
 }
+
+.disabled {
+  background-color: transparent;
+  opacity: 0.5;
+  & a {
+    cursor: default;
+  }
+}

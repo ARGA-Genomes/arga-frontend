@@ -20,9 +20,10 @@ interface BrowseProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
   error?: ApolloError;
+  disabled?: boolean;
 }
 
-export default function Browse({ items, data, error }: BrowseProps) {
+export default function Browse({ items, data, error, disabled }: BrowseProps) {
   return (
     <Carousel slideSize={150} slideGap="sm" slidesToScroll="auto" align="start" withControls={false}>
       <Group justify="center" align="flex-start">
@@ -31,7 +32,7 @@ export default function Browse({ items, data, error }: BrowseProps) {
         ) : (
           items.map((item, idx) => (
             <Carousel.Slide key={`${item.link}-${idx}`}>
-              <BrowseCard {...item} total={item.total ? get(data, item.total) : item.total} />
+              <BrowseCard disabled={disabled} {...item} total={item.total ? get(data, item.total) : item.total} />
             </Carousel.Slide>
           ))
         )}

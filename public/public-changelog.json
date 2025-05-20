@@ -1,15 +1,29 @@
 {
-    "changelog": [
-        {
-            "date": "9 July 2024",
-            "updates": ["Refreshed front page release", "New features: taxonomic coverage widget, updates log"]
-        },
-        {
-            "date": "3 April 2024",
-            "updates": ["User Interface fixes"]
-        },
-        {
-            "date": "7 February 2024",
-            "updates": ["Public release"]
-        }]
+  "changelog": [
+    {
+      "date": "19 May 2025",
+      "updates": ["<b>New feature release:</b> Genome Tracker – version 1.0.0",
+        "Refreshes: taxonomic coverage widget, link to Genome Tracker",
+        "UI version 0.2.0"
+      ]
+    },
+    {
+      "date": "9 July 2024",
+      "updates": [
+        "<b>New feature releases:</b> taxonomic coverage widget, updates log", 
+        "Refreshes: front page release"
+      ]
+    },
+    {
+      "date": "3 April 2024",
+      "updates": ["User Interface fixes"]
+    },
+    {
+      "date": "7 February 2024",
+      "updates": [
+        "<b>Public release</b>",
+        "UI version 0.1.0"
+      ]
+    }
+  ]
 }

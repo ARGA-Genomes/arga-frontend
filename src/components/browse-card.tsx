@@ -12,15 +12,21 @@ export interface BrowseCardProps {
   category: string;
   image: string;
   link: string;
+  disabled?: boolean;
 }
 
-function BrowseCard({ link, category, total, image }: BrowseCardProps) {
+function BrowseCard({ link, category, total, image, disabled }: BrowseCardProps) {
   const loading = total === undefined;
   const imageSize = 150;
 
   return (
-    <Paper radius="xl" p={20} className={classes.card}>
-      <Link href={link}>
+    <Paper radius="xl" p={20} className={disabled ? classes.disabled : classes.card}>
+      <Link
+        href={link}
+        onClick={(e) => {
+          if (disabled) e.preventDefault();
+        }}
+      >
         <Stack align="center" gap={5}>
           <Skeleton
             classNames={skelClasses}
@@ -38,12 +44,18 @@ function BrowseCard({ link, category, total, image }: BrowseCardProps) {
               {category}
             </Text>
           </Skeleton>
-          {total !== null && (
-            <Skeleton classNames={skelClasses} visible={loading}>
-              <Text size="sm" fw={400} ta={"center"} c="attribute">
-                {Humanize.compactInteger(total || 0, 2)} records
-              </Text>
-            </Skeleton>
+          {disabled ? (
+            <Text size="sm" fw={400} ta={"center"} c="attribute">
+              Coming soon
+            </Text>
+          ) : (
+            total !== null && (
+              <Skeleton classNames={skelClasses} visible={loading}>
+                <Text size="sm" fw={400} ta={"center"} c="attribute">
+                  {Humanize.compactInteger(total || 0, 2)} records
+                </Text>
+              </Skeleton>
+            )
           )}
         </Stack>
       </Link>

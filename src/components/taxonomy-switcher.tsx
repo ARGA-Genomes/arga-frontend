@@ -16,7 +16,7 @@ import {
 
 import accClasses from "./taxonomy-switcher-acc.module.css";
 
-import { Taxon } from "@/queries/taxa";
+import { Taxon, TaxonNode } from "@/queries/taxa";
 import { Attribute, AttributePill, AttributePillContainer, AttributePillValue } from "./data-fields";
 import { Dataset, useDatasets } from "@/app/source-provider";
 import { useMemo, useState } from "react";
@@ -34,12 +34,13 @@ interface ClassificationNode {
 }
 
 interface TaxonomySwitcherProps {
-  taxa: Taxon[];
+  taxa: TaxonExtended[];
 }
 
 type TaxonMap = Record<string, string>;
 
 interface TaxonExtended extends Taxon {
+  hierarchy: TaxonNode[];
   dataset?: Dataset;
   originalCanonicalNames?: TaxonMap;
 }
@@ -130,7 +131,7 @@ function compareTaxons(taxa: TaxonExtended[], baseTaxon: TaxonExtended) {
   });
 }
 
-function mapTaxaDatasets(taxa: Taxon[], datasets: Map<string, Dataset>) {
+function mapTaxaDatasets(taxa: TaxonExtended[], datasets: Map<string, Dataset>) {
   return taxa.map((taxon) => ({
     ...taxon,
     dataset: datasets.get(taxon.datasetId),
@@ -154,7 +155,7 @@ export function sortTaxaBySources(taxa: TaxonExtended[]) {
     });
 }
 
-function processTaxa(taxa: Taxon[], datasets: Map<string, Dataset>) {
+function processTaxa(taxa: TaxonExtended[], datasets: Map<string, Dataset>) {
   const taxaWithDatasets = mapTaxaDatasets(taxa, datasets);
   const sorted = sortTaxaBySources(taxaWithDatasets);
   compareTaxons(sorted.slice(1), sorted[0]);

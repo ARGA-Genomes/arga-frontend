@@ -52,5 +52,4 @@ export type Taxon = TaxonName &
   TaxonSource & {
     datasetId: string;
     entityId: string;
-    hierarchy: TaxonNode[];
   };
