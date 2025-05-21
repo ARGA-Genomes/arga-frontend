@@ -290,7 +290,7 @@ export const VERNACULAR_GROUP_ICON: Record<string, VernacularIconData> = {
   DIATOMS: {
     image: "/icons/taxon/Taxon_ Diatoms (Bacillariophyta).svg",
     label: "Diatoms",
-    link: "/phylum/Bacillariophyta",
+    link: "/class/Bacillariophyceae",
     colour: "shellfish.5",
     grouping: VernacularGrouping.Microbes,
   },
