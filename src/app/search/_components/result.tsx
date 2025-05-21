@@ -15,7 +15,6 @@ import {
   Tooltip,
   useMantineTheme,
 } from "@mantine/core";
-import uniqBy from "lodash-es/uniqBy";
 import { Item } from "../page";
 
 import { AttributePill } from "@/components/highlight-stack";
@@ -173,7 +172,7 @@ const CardTaxonDetails = ({ item }: TaxonResultProps) => {
       </Stack>
       <Supertext label="Latest record">
         <Text size="sm" fw="bold" c="midnight.9">
-          {item.eventDate || "not known"}
+          {item.eventDate || "no data"}
         </Text>
       </Supertext>
     </Stack>
@@ -246,12 +245,12 @@ const CardSpecimenDetails = ({ item }: TaxonResultProps) => {
       <SimpleGrid mt="md" cols={2}>
         <Supertext label="Location">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.eventLocation || "not known"}
+            {item.eventLocation || "no data"}
           </Text>
         </Supertext>
         <Supertext label="Collection year">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.eventDate || "not known"}
+            {item.eventDate || "no data"}
           </Text>
         </Supertext>
       </SimpleGrid>
@@ -321,7 +320,7 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
       <SimpleGrid mt="md" cols={1}>
         <Supertext label="Release date">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.releaseDate || "not known"}
+            {item.releaseDate || "no data"}
           </Text>
         </Supertext>
       </SimpleGrid>
@@ -395,7 +394,7 @@ const CardLociDetails = ({ item }: TaxonResultProps) => {
       <SimpleGrid mt="md" cols={1}>
         <Supertext label="Release date">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.releaseDate || "not known"}
+            {item.releaseDate || "no data"}
           </Text>
         </Supertext>
       </SimpleGrid>
@@ -563,8 +562,6 @@ interface ResultsProps {
 }
 
 export function Results({ items, perPage, layout }: ResultsProps) {
-  const results = uniqBy(items, (item) => Object.values(item).join("-"));
-
   if (!items) {
     return layout === "table" ? (
       <ScrollArea>
@@ -588,14 +585,14 @@ export function Results({ items, perPage, layout }: ResultsProps) {
   return layout === "table" ? (
     <ScrollArea>
       <Stack gap={4}>
-        {results.map((result, idx) => (
+        {items.map((result, idx) => (
           <TableResult key={idx} item={result} />
         ))}
       </Stack>
     </ScrollArea>
   ) : (
     <Grid>
-      {results.map((result, idx) => (
+      {items.map((result, idx) => (
         <Grid.Col span={{ xs: 12, sm: 12, md: 4, lg: 3, xl: 3 }} key={idx}>
           <CardResult item={result} />
         </Grid.Col>
