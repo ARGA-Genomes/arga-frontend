@@ -13,7 +13,6 @@ import {
   Text,
   ThemeIcon,
   Tooltip,
-  UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
 import uniqBy from "lodash-es/uniqBy";
@@ -53,30 +52,6 @@ interface DetailsActionProps {
   label: string;
   icon: TablerIcon;
 }
-
-const DetailsAction = ({ colour, label, icon: Icon }: DetailsActionProps) => {
-  const theme = useMantineTheme();
-  const themeColours = theme.colors[colour];
-  const textColour = themeColours[8];
-
-  return (
-    <UnstyledButton
-      h="100%"
-      px="sm"
-      py={4}
-      w={125}
-      bg={themeColours[1]}
-      style={{ borderRadius: theme.radius.lg /*outline: `1px solid ${themeColours[3]}`*/ }}
-    >
-      <Flex direction="column" align="center" gap={4}>
-        <Icon size="1rem" color={textColour} />
-        <Text c={textColour} fw={600} size="sm">
-          {label}
-        </Text>
-      </Flex>
-    </UnstyledButton>
-  );
-};
 
 const TableTaxonDetails = ({ item }: TaxonResultProps) => {
   return (
@@ -310,26 +285,7 @@ const TableGenomeDetails = ({ item }: TaxonResultProps) => {
         <Supertext w={150} label="Assembly level">
           <AttributePill value={item.assemblyType} />
         </Supertext>
-        {/* <Supertext align="center" w={100} label="Genome size">
-          <Text fw="bold" c="midnight.9">
-            TODO: Pull in data for this
-          </Text>
-        </Supertext>
-        <Supertext align="center" w={50} label="BUSCO">
-          <Text fw="bold" c="midnight.9">
-            TODO: Pull in data for this
-          </Text>
-        </Supertext>
-        <Supertext align="center" w={50} label="N50">
-          <Text fw="bold" c="midnight.9">
-            TODO: Pull in data for this
-          </Text>
-        </Supertext> */}
       </Flex>
-      {/* <Flex direction="row" h="100%" gap="xs" p="xs">
-        <DetailsAction icon={IconDownload} label="download" colour="bushfire" />
-        <DetailsAction icon={IconCircleCheck} label="add to list" colour="bushfire" />
-      </Flex> */}
     </Flex>
   );
 };
@@ -399,19 +355,7 @@ const TableLociDetails = ({ item }: TaxonResultProps) => {
             {item.locusType}
           </Text>
         </Supertext>
-        {/* <Supertext w={150} label="Fragment size">
-          <Text fw="bold" c="midnight.7">
-            TODO: pull in actual data
-          </Text>
-        </Supertext>
-        <Supertext w={150} label="Location">
-          <AttributePill value="TODO: pull in actual data" />
-        </Supertext> */}
       </Flex>
-      {/* <Flex direction="row" h="100%" gap="xs" p="xs">
-        <DetailsAction icon={IconDownload} label="download" colour="wheat" />
-        <DetailsAction icon={IconCircleCheck} label="add to list" colour="wheat" />
-      </Flex> */}
     </Flex>
   );
 };
