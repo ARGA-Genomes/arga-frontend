@@ -343,7 +343,7 @@ function SearchPage() {
               </Alert>
             )}
             <Results layout={layout} items={data?.search.fullText.records} perPage={perPage} />
-            <PaginationBar total={data?.search.fullText.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
+            <PaginationBar total={data?.search.fullText.total} page={page} pageSize={perPage} onChange={setPage} />
           </Stack>
         </Container>
       </Paper>
