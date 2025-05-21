@@ -459,7 +459,7 @@ export function TableResult({ item }: { item?: Item }) {
           </Center>
           <Flex gap="xl" py="xs">
             {range(0, 5).map((idx) => (
-              <Stack key={idx} h={54.297} w={150} gap={6}>
+              <Stack key={idx} h={54.297} w={250} gap={6}>
                 <Skeleton>
                   <Text size="sm">Label</Text>
                 </Skeleton>
@@ -558,24 +558,25 @@ export function CardResult({ item }: { item?: Item }) {
 
 interface ResultsProps {
   items?: Item[];
+  perPage: number;
   layout: TableCardLayout;
 }
 
-export function Results({ items, layout }: ResultsProps) {
+export function Results({ items, perPage, layout }: ResultsProps) {
   const results = uniqBy(items, (item) => Object.values(item).join("-"));
 
   if (!items) {
     return layout === "table" ? (
       <ScrollArea>
         <Stack gap={4}>
-          {range(0, 10).map((idx) => (
+          {range(0, perPage).map((idx) => (
             <TableResult key={idx} />
           ))}
         </Stack>
       </ScrollArea>
     ) : (
       <Grid>
-        {range(0, 12).map((idx) => (
+        {range(0, perPage).map((idx) => (
           <Grid.Col span={{ xs: 12, sm: 12, md: 4, lg: 3, xl: 3 }} key={idx}>
             <CardResult />
           </Grid.Col>
