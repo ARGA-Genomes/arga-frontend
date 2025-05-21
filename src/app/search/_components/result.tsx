@@ -442,7 +442,7 @@ const resultType: ResultDetails = {
     label: "SPECIMEN",
     colour: "shellfish",
     icon: "Data type_ Specimen.svg",
-    link: (item) => `/species/${item.canonicalName}/specimen/${item.accession}`,
+    link: (item) => `/species/${item.canonicalName}/specimens/${item.accession}`,
     tableComponent: TableSpecimenDetails,
     cardComponent: CardSpecimenDetails,
   },
