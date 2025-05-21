@@ -9,12 +9,13 @@ import createClient from "../queries/client";
 
 import { AppShell, MantineProvider } from "@mantine/core";
 
-import { theme } from "../theme";
-import { TopNav } from "./top-nav";
-import { Footer } from "./footer";
-import { TraceLoaderProvider } from "@/components/traces/context";
 import Fathom from "@/components/fathom";
+import { TraceLoaderProvider } from "@/components/traces/context";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { theme } from "../theme";
+import { Footer } from "./footer";
 import { SourceProvider } from "./source-provider";
+import { TopNav } from "./top-nav";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // make the apollo graphql client available on all pages
@@ -28,12 +29,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MantineProvider theme={theme}>
             <SourceProvider>
               <TraceLoaderProvider>
-                <Shell>{children}</Shell>
+                <NuqsAdapter>
+                  <Shell>{children}</Shell>
+                </NuqsAdapter>
               </TraceLoaderProvider>
             </SourceProvider>
           </MantineProvider>
         </ApolloProvider>
-
         <script src="/workers.js" async></script>
       </body>
     </html>

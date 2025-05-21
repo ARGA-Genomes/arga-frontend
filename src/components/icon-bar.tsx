@@ -1,10 +1,10 @@
 import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
-import { Box, ThemeIcon, Image, Tooltip, Paper, getThemeColor, useMantineTheme, Text } from "@mantine/core";
+import { gql, useQuery } from "@apollo/client";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
+import { Box, Image, Paper, Text, ThemeIcon, Tooltip, getThemeColor, useMantineTheme } from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
 
 interface IconData {
   label: string;
@@ -146,7 +146,7 @@ export const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   RED_ALGAE: {
     image: "/icons/taxon/Taxon_ Red algae (Rhodophyta).svg",
     label: "Red algae",
-    link: "/division/Rhodophyta",
+    link: "/unranked/Rhodophyta",
     colour: "bushfire.4",
   },
   GREEN_ALGAE: {
@@ -240,7 +240,7 @@ export const VERNACULAR_GROUP_ICON: Record<string, IconData> = {
   DIATOMS: {
     image: "/icons/taxon/Taxon_ Diatoms (Bacillariophyta).svg",
     label: "Diatoms",
-    link: "/division/Bacillariophyta",
+    link: "/class/Bacillariophyceae",
     colour: "shellfish.5",
   },
   CHROMISTS: {
