@@ -1,10 +1,21 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
+import { DataTable, DataTableRow } from "@/components/data-table";
+import { useSavedData } from "@/components/DownloadManager";
+import { Attribute, AttributePill, DataField } from "@/components/highlight-stack";
+import { LoadPanel } from "@/components/load-overlay";
+import { AnalysisMap } from "@/components/mapping";
+import { Marker } from "@/components/mapping/analysis-map";
+import {
+  AnnotationEvent,
+  AssemblyEvent,
+  DataDepositionEvent,
+  Sequence,
+  SequencingEvent,
+  SequencingRunEvent,
+} from "@/queries/sequence";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, ButtonProps, Center, Grid, Group, Paper, Stack, Table, Text, Title } from "@mantine/core";
-import { LoadPanel } from "@/components/load-overlay";
-import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import {
   IconArrowNarrowLeft,
   IconCircleCheck,
@@ -14,20 +25,9 @@ import {
   IconLink,
   IconMicroscope,
 } from "@tabler/icons-react";
+import * as Humanize from "humanize-plus";
 import Link from "next/link";
-import {
-  AnnotationEvent,
-  AssemblyEvent,
-  DataDepositionEvent,
-  Sequence,
-  SequencingEvent,
-  SequencingRunEvent,
-} from "@/queries/sequence";
-import { AnalysisMap } from "@/components/mapping";
-import { DataTable, DataTableRow } from "@/components/data-table";
-import { Marker } from "@/components/mapping/analysis-map";
-import { useSavedData } from "@/components/DownloadManager";
-import { use } from "react";
+import { use, useMemo } from "react";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -124,20 +124,31 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
 
   const [saved, setSaved] = useSavedData();
 
-  const saveToList = () => {
+  // Construct URL
+  const url = useMemo(() => {
     if (sequence && deposition?.sourceUri && deposition.accession) {
       const components = deposition.sourceUri.split("/");
-      const url = `${deposition.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
+      return `${deposition.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
+    }
 
-      const item = {
-        url,
-        label: deposition.accession,
-        dataType: deposition.dataType ?? "whole genome",
-        scientificName: canonicalName,
-        datePublished: deposition.eventDate,
-        dataset: { id: "", name: sequence.datasetName },
-      };
-      setSaved([...saved, item]);
+    return null;
+  }, [sequence, deposition, annotation]);
+
+  const inCart = Boolean(saved.find((item) => item.url === url));
+
+  const saveToList = () => {
+    if (sequence && deposition?.sourceUri && deposition.accession && url) {
+      setSaved([
+        ...saved,
+        {
+          url,
+          label: deposition.accession,
+          dataType: deposition.dataType ?? "whole genome",
+          scientificName: canonicalName,
+          datePublished: deposition.eventDate,
+          dataset: { id: "", name: sequence.datasetName },
+        },
+      ]);
     }
   };
 
@@ -175,8 +186,14 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button color="midnight.10" radius="md" leftSection={<IconCircleCheck />} onClick={saveToList}>
-              add to list
+            <Button
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconCircleCheck />}
+              onClick={saveToList}
+              disabled={inCart}
+            >
+              {inCart ? "added to list" : "add to list"}
             </Button>
             <LinkButton color="midnight.10" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>
               get data
