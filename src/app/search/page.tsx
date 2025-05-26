@@ -315,7 +315,7 @@ function SearchPage() {
           <Stack>
             <Group justify="space-between">
               <Text fz="lg">
-                {lastResultCount ? (
+                {lastResultCount !== null ? (
                   <>
                     <b>
                       {1 + perPage * (page - 1)}-{Math.min(page * perPage, lastResultCount)}

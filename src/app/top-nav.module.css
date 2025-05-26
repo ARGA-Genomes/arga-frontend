@@ -1,54 +1,87 @@
 @font-face {
-    font-family: Gotham;
-    src: url( "../../public/fonts/gotham/GothamBold.ttf");
+  font-family: Gotham;
+  src: url("../../public/fonts/gotham/GothamBold.ttf");
 }
 
 .navlink {
-    color: white;
-    border-bottom: rem(5) solid var(--mantine-color-midnight-11);
-    font-family: Gotham;
+  transition: all 200ms ease;
+  color: white;
+  border-bottom: 3px solid transparent;
+  font-family: Gotham;
+
+  @media (max-width: 1040px) {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: transparent;
+    border-bottom: 3px solid var(--mantine-color-midnight-6);
+    color: var(--mantine-color-bushfire-4);
 
     @media (max-width: 1040px) {
-        border-bottom: none;
+      border-bottom: none;
     }
+  }
 
-    &:hover {
-        background: var(--mantine-color-midnight-11);
-        border-bottom: rem(5) solid white;
-        color: var(--mantine-color-bushfire-4);
+  &[data-active] {
+    background: transparent;
+    border-bottom: 3px solid white;
+    color: var(--mantine-color-wheat-4);
 
-        @media (max-width: 1040px) {
-            border-bottom: none;
-        }
+    @media (max-width: 1040px) {
+      border-bottom: none;
     }
+  }
+}
 
-    &[data-active] {
-        background: var(--mantine-color-midnight-11);
-        border-bottom: rem(5) solid white;
-        color: var(--mantine-color-wheat-4);
+.logoWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
 
-        @media (max-width: 1040px) {
-            border-bottom: none;
-        }
-    }
+  @media screen and (max-width: 1040px) {
+    justify-content: center;
+  }
+}
+
+.actionsWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 18px;
+
+  @media screen and (max-width: 1040px) {
+    justify-content: center;
+  }
 }
 
 .menuItems {
-    @media screen and (max-width: 1040px) {
-        display: none;
-    }
+  @media screen and (max-width: 1040px) {
+    display: none;
+  }
 }
 
 .burgerNav {
-    display: none;
-    @media screen and (max-width: 1040px) {
-        display: block;
-    }
+  display: none;
+  @media screen and (max-width: 1040px) {
+    display: block;
+  }
 }
 
-.cart {
-    padding-top: 20px;
-    @media screen and (max-width: 1040px) {
-        padding-top: 0;
-    }
+.collapse {
+  background-color: rgba(32, 54, 68, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.search {
+  border: none;
+  background-color: var(--mantine-color-midnight-0);
+  backdrop-filter: blur(8px);
+  color: var(--mantine-color-midnight-11);
+}
+
+.search::placeholder {
+  color: var(--mantine-color-midnight-6);
 }
