@@ -13,10 +13,8 @@ import {
   Text,
   ThemeIcon,
   Tooltip,
-  UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
-import uniqBy from "lodash-es/uniqBy";
 import { Item } from "../page";
 
 import { AttributePill } from "@/components/highlight-stack";
@@ -53,30 +51,6 @@ interface DetailsActionProps {
   label: string;
   icon: TablerIcon;
 }
-
-const DetailsAction = ({ colour, label, icon: Icon }: DetailsActionProps) => {
-  const theme = useMantineTheme();
-  const themeColours = theme.colors[colour];
-  const textColour = themeColours[8];
-
-  return (
-    <UnstyledButton
-      h="100%"
-      px="sm"
-      py={4}
-      w={125}
-      bg={themeColours[1]}
-      style={{ borderRadius: theme.radius.lg /*outline: `1px solid ${themeColours[3]}`*/ }}
-    >
-      <Flex direction="column" align="center" gap={4}>
-        <Icon size="1rem" color={textColour} />
-        <Text c={textColour} fw={600} size="sm">
-          {label}
-        </Text>
-      </Flex>
-    </UnstyledButton>
-  );
-};
 
 const TableTaxonDetails = ({ item }: TaxonResultProps) => {
   return (
@@ -198,7 +172,7 @@ const CardTaxonDetails = ({ item }: TaxonResultProps) => {
       </Stack>
       <Supertext label="Latest record">
         <Text size="sm" fw="bold" c="midnight.9">
-          {item.eventDate || "not known"}
+          {item.eventDate || "no data"}
         </Text>
       </Supertext>
     </Stack>
@@ -271,12 +245,12 @@ const CardSpecimenDetails = ({ item }: TaxonResultProps) => {
       <SimpleGrid mt="md" cols={2}>
         <Supertext label="Location">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.eventLocation || "not known"}
+            {item.eventLocation || "no data"}
           </Text>
         </Supertext>
         <Supertext label="Collection year">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.eventDate || "not known"}
+            {item.eventDate || "no data"}
           </Text>
         </Supertext>
       </SimpleGrid>
@@ -310,26 +284,7 @@ const TableGenomeDetails = ({ item }: TaxonResultProps) => {
         <Supertext w={150} label="Assembly level">
           <AttributePill value={item.assemblyType} />
         </Supertext>
-        {/* <Supertext align="center" w={100} label="Genome size">
-          <Text fw="bold" c="midnight.9">
-            TODO: Pull in data for this
-          </Text>
-        </Supertext>
-        <Supertext align="center" w={50} label="BUSCO">
-          <Text fw="bold" c="midnight.9">
-            TODO: Pull in data for this
-          </Text>
-        </Supertext>
-        <Supertext align="center" w={50} label="N50">
-          <Text fw="bold" c="midnight.9">
-            TODO: Pull in data for this
-          </Text>
-        </Supertext> */}
       </Flex>
-      {/* <Flex direction="row" h="100%" gap="xs" p="xs">
-        <DetailsAction icon={IconDownload} label="download" colour="bushfire" />
-        <DetailsAction icon={IconCircleCheck} label="add to list" colour="bushfire" />
-      </Flex> */}
     </Flex>
   );
 };
@@ -365,7 +320,7 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
       <SimpleGrid mt="md" cols={1}>
         <Supertext label="Release date">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.releaseDate || "not known"}
+            {item.releaseDate || "no data"}
           </Text>
         </Supertext>
       </SimpleGrid>
@@ -399,19 +354,7 @@ const TableLociDetails = ({ item }: TaxonResultProps) => {
             {item.locusType}
           </Text>
         </Supertext>
-        {/* <Supertext w={150} label="Fragment size">
-          <Text fw="bold" c="midnight.7">
-            TODO: pull in actual data
-          </Text>
-        </Supertext>
-        <Supertext w={150} label="Location">
-          <AttributePill value="TODO: pull in actual data" />
-        </Supertext> */}
       </Flex>
-      {/* <Flex direction="row" h="100%" gap="xs" p="xs">
-        <DetailsAction icon={IconDownload} label="download" colour="wheat" />
-        <DetailsAction icon={IconCircleCheck} label="add to list" colour="wheat" />
-      </Flex> */}
     </Flex>
   );
 };
@@ -451,7 +394,7 @@ const CardLociDetails = ({ item }: TaxonResultProps) => {
       <SimpleGrid mt="md" cols={1}>
         <Supertext label="Release date">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.releaseDate || "not known"}
+            {item.releaseDate || "no data"}
           </Text>
         </Supertext>
       </SimpleGrid>
@@ -483,7 +426,7 @@ const resultType: ResultDetails = {
     label: "WHOLE GENOME",
     colour: "bushfire",
     icon: "Data type_ Whole genome.svg",
-    link: (item) => `/species/${item.canonicalName}/whole_genome/${item.accession}`,
+    link: (item) => `/species/${item.canonicalName}/whole_genomes/${item.accession}`,
     tableComponent: TableGenomeDetails,
     cardComponent: CardGenomeDetails,
   },
@@ -499,7 +442,7 @@ const resultType: ResultDetails = {
     label: "SPECIMEN",
     colour: "shellfish",
     icon: "Data type_ Specimen.svg",
-    link: (item) => `/species/${item.canonicalName}/specimen/${item.accession}`,
+    link: (item) => `/species/${item.canonicalName}/specimens/${item.accession}`,
     tableComponent: TableSpecimenDetails,
     cardComponent: CardSpecimenDetails,
   },
@@ -515,7 +458,7 @@ export function TableResult({ item }: { item?: Item }) {
           </Center>
           <Flex gap="xl" py="xs">
             {range(0, 5).map((idx) => (
-              <Stack key={idx} h={54.297} w={150} gap={6}>
+              <Stack key={idx} h={54.297} w={250} gap={6}>
                 <Skeleton>
                   <Text size="sm">Label</Text>
                 </Skeleton>
@@ -614,24 +557,23 @@ export function CardResult({ item }: { item?: Item }) {
 
 interface ResultsProps {
   items?: Item[];
+  perPage: number;
   layout: TableCardLayout;
 }
 
-export function Results({ items, layout }: ResultsProps) {
-  const results = uniqBy(items, (item) => Object.values(item).join("-"));
-
+export function Results({ items, perPage, layout }: ResultsProps) {
   if (!items) {
     return layout === "table" ? (
       <ScrollArea>
         <Stack gap={4}>
-          {range(0, 10).map((idx) => (
+          {range(0, perPage).map((idx) => (
             <TableResult key={idx} />
           ))}
         </Stack>
       </ScrollArea>
     ) : (
       <Grid>
-        {range(0, 12).map((idx) => (
+        {range(0, perPage).map((idx) => (
           <Grid.Col span={{ xs: 12, sm: 12, md: 4, lg: 3, xl: 3 }} key={idx}>
             <CardResult />
           </Grid.Col>
@@ -643,14 +585,14 @@ export function Results({ items, layout }: ResultsProps) {
   return layout === "table" ? (
     <ScrollArea>
       <Stack gap={4}>
-        {results.map((result, idx) => (
+        {items.map((result, idx) => (
           <TableResult key={idx} item={result} />
         ))}
       </Stack>
     </ScrollArea>
   ) : (
     <Grid>
-      {results.map((result, idx) => (
+      {items.map((result, idx) => (
         <Grid.Col span={{ xs: 12, sm: 12, md: 4, lg: 3, xl: 3 }} key={idx}>
           <CardResult item={result} />
         </Grid.Col>

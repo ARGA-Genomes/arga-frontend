@@ -2,31 +2,31 @@
 
 import { Dataset } from "@/app/source-provider";
 import {
+  Box,
   Button,
-  Drawer,
-  Indicator,
-  Stack,
-  Text,
-  ScrollArea,
   Card,
-  Group,
-  Image,
-  SimpleGrid,
-  rem,
-  Menu,
-  Table,
+  Center,
   Checkbox,
   createTheme,
-  MantineProvider,
-  Box,
-  Center,
-  Grid,
-  Space,
-  Paper,
-  Tooltip,
   Divider,
+  Drawer,
+  Grid,
+  Group,
+  Image,
+  Indicator,
+  MantineProvider,
+  Menu,
+  Paper,
+  rem,
+  ScrollArea,
+  SimpleGrid,
+  Space,
+  Stack,
+  Table,
+  Text,
+  Tooltip,
 } from "@mantine/core";
-import { useClipboard, useDisclosure, useLocalStorage, useSet } from "@mantine/hooks";
+import { useClipboard, useDisclosure, useLocalStorage } from "@mantine/hooks";
 import {
   IconChevronDown,
   IconClipboardCopy,
@@ -83,8 +83,7 @@ export function SavedDataManagerButton() {
 
 function SavedDataManager() {
   const [saved, setSaved] = useSavedData();
-  const selectedSet = useSet<SavedItem>();
-  const [selected, setSelected] = useState<SavedItem[]>([]);
+  const [selected, setSelected] = useState<SavedItem[]>(saved);
 
   const [metadataUrl, setMetadataUrl] = useState<string | undefined>();
   const [manifestUrl, setManifestUrl] = useState<string | undefined>();
@@ -117,16 +116,7 @@ function SavedDataManager() {
       setManifestUrl(undefined);
       setScriptUrl(undefined);
     }
-  }, [manifestUrl, metadataUrl, scriptUrl, selected]);
-
-  // auto-select newly saved items
-  useEffect(() => {
-    if (!saved) return;
-    for (const item of saved) {
-      selectedSet.add(item);
-    }
-    setSelected(Array.from(selectedSet));
-  }, [selectedSet, saved]);
+  }, [selected]);
 
   function remove(item: SavedItem) {
     const newList = saved.filter((value) => value.url != item.url);
@@ -141,12 +131,13 @@ function SavedDataManager() {
   }
 
   function selectItem(item: SavedItem) {
-    selectedSet.add(item);
-    setSelected(Array.from(selectedSet));
+    setSelected((current) => {
+      if (current.find((i) => i.url === item.url)) return current;
+      return [...current, item];
+    });
   }
   function deselectItem(item: SavedItem) {
-    selectedSet.delete(item);
-    setSelected(Array.from(selectedSet));
+    setSelected((current) => current.filter((i) => i.url !== item.url));
   }
 
   return (
@@ -269,7 +260,9 @@ function HintedCheckbox({ onChange }: HintedCheckboxProps) {
   useEffect(() => {
     setHint(!checked ? "moss.1" : "moss.0");
     onChange(checked);
-  }, [checked, onChange]);
+    // Only run when 'checked' changes; ignore 'onChange' identity
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checked]);
 
   return (
     <Box
