@@ -2,6 +2,7 @@
 
 import { Dataset } from "@/app/source-provider";
 import {
+  ActionIcon,
   Box,
   Button,
   Card,
@@ -33,7 +34,6 @@ import {
   IconFileInfo,
   IconFileText,
   IconFileZip,
-  IconSortDescending,
   IconTerminal2,
   IconTrashFilled,
 } from "@tabler/icons-react";
@@ -66,17 +66,28 @@ export function SavedDataManagerButton() {
         <SavedDataManager />
       </Drawer>
       <Indicator inline label={saved.length} size={16} color="bushfire" disabled={!saved.length}>
-        <Button
+        {/* <Button
           variant="subtle"
           opacity={!saved.length ? 0.4 : 1}
           disabled={!saved.length}
           color="midnight.2"
           radius="lg"
           onClick={toggle}
-          leftSection={<IconSortDescending color="white" strokeWidth="1.75" />}
+          leftSection={<Image src="/icons/misc/file-leaf.svg" width={24} height={24} />}
         >
           Saved
-        </Button>
+        </Button> */}
+        <ActionIcon
+          size="lg"
+          onClick={toggle}
+          radius="md"
+          variant="subtle"
+          opacity={!saved.length ? 0.4 : 1}
+          disabled={!saved.length}
+          color="midnight.2"
+        >
+          <Image src="/icons/misc/file-leaf.svg" width={26} height={26} />
+        </ActionIcon>
       </Indicator>
     </>
   );

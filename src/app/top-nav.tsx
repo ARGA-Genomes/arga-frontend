@@ -4,7 +4,6 @@ import classes from "./top-nav.module.css";
 
 import { SavedDataManagerButton } from "@/components/DownloadManager";
 import { Search } from "@/components/search";
-import { gothamBold } from "@/theme";
 import { Burger, Collapse, Flex, Group, Image, Modal, NavLink, Stack, Text } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
 import { IconExternalLink, IconSearch } from "@tabler/icons-react";
@@ -74,17 +73,7 @@ export function TopNav() {
               setActive(0);
             }}
           >
-            <Flex gap="xs" align="center">
-              <Image p="md" src="/arga-logomark.svg" h={100} w="auto" alt="Australian Reference Genome Atlas" />
-              <Stack gap={0}>
-                <Text style={{ fontFamily: gothamBold.style.fontFamily, fontSize: 32 }} fw="bold" c="white">
-                  ARGA
-                </Text>
-                <Text c="midnight.2" fw={600} mt={-12}>
-                  Australian Reference Genome Atlas
-                </Text>
-              </Stack>
-            </Flex>
+            <Image p="md" src="/arga-logo.svg" h={110} w="auto" alt="Australian Reference Genome Atlas" />
           </Link>
 
           <div className={classes.actionsWrapper}>
