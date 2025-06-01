@@ -1,7 +1,7 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-import { Accordion, Alert, Avatar, Box, Container, Grid, Group, Paper, Stack, Text, TextInput } from "@mantine/core";
+import { Accordion, Alert, Avatar, Box, Container, Group, Paper, Stack, Text } from "@mantine/core";
 import { IconExclamationMark, IconSearch } from "@tabler/icons-react";
 import * as Humanize from "humanize-plus";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -10,6 +10,7 @@ import { Filter } from "@/components/filtering/common";
 import { DataTypeFilters } from "@/components/filtering/data-type";
 import { PaginationBar, PaginationSize } from "@/components/pagination";
 
+import { Search } from "@/components/search";
 import { TableCardLayout, TableCardSwitch } from "@/components/table-card-switch";
 import { Suspense, useEffect, useState } from "react";
 import { MAX_WIDTH } from "../constants";
@@ -167,58 +168,6 @@ const SEARCH_FULLTEXT = gql`
   }
 `;
 
-interface SearchProperties {
-  onSearch: (searchTerms: string, dataType: string) => void;
-  data: QueryResults | undefined;
-  loading: boolean;
-  initialQuery: string;
-}
-
-function Search({ onSearch, initialQuery, data, loading }: SearchProperties & { initialQuery: string }) {
-  const [value, setValue] = useState(initialQuery);
-  const [searchTerms, setSearchTerms] = useState(initialQuery);
-  const [dataType, setDataType] = useState("all");
-
-  function _onFilter(value: string) {
-    setDataType(value);
-    onSearch(searchTerms, value);
-  }
-
-  function onSearchHandler(value: string) {
-    setSearchTerms(value);
-    onSearch(value, dataType);
-  }
-
-  return (
-    <Paper bg="midnight.0" p={10} radius={0}>
-      <Box>
-        <form
-          onSubmit={(ev) => {
-            ev.preventDefault();
-            onSearchHandler(value);
-          }}
-        >
-          <Grid align="center" m={10}>
-            <Grid.Col span={12}>
-              <TextInput
-                placeholder="e.g. sequence accession, species name"
-                value={value}
-                onChange={(val) => {
-                  setValue(val.target.value);
-                }}
-                leftSectionWidth={60}
-                size="xl"
-                radius={16}
-                leftSection={<IconSearch size={28} />}
-              />
-            </Grid.Col>
-          </Grid>
-        </form>
-      </Box>
-    </Paper>
-  );
-}
-
 interface FilterGroupProps {
   label: string;
   description: string;
@@ -308,7 +257,15 @@ function SearchPage() {
 
   return (
     <>
-      <Search onSearch={onSearch} data={data} loading={loading} initialQuery={query} />
+      <Box p="md">
+        <Search
+          placeholder="e.g. sequence accession, species name"
+          leftSectionWidth={60}
+          size="xl"
+          radius="lg"
+          leftSection={<IconSearch size={24} color="black" />}
+        />
+      </Box>
 
       <Paper>
         <Container maw={MAX_WIDTH} fluid py="xl">

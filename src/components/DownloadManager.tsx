@@ -156,7 +156,7 @@ function SavedDataManager() {
     <Flex gap="md">
       <Grid w="100%">
         {saved.map((item) => (
-          <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 6, xl: 6 }}>
+          <Grid.Col key={item.url} span={{ xs: 12, sm: 12, md: 12, lg: 6, xl: 6 }}>
             <SavedDataItem
               key={item.url}
               item={item}

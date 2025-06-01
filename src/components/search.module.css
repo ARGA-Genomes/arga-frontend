@@ -1,0 +1,7 @@
+.suggestion {
+  transition: opacity 100ms ease;
+  opacity: 0.5;
+  &:hover {
+    opacity: 0.9;
+  }
+}

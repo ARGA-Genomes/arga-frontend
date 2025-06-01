@@ -108,15 +108,6 @@ export default function HomePage() {
                     leftSectionWidth={60}
                     size="xl"
                     radius="lg"
-                    styles={{
-                      input: {
-                        height: 55,
-                        fontSize: "16px",
-                        fontWeight: "normal",
-                        border: "none",
-                        color: "#707070",
-                      },
-                    }}
                     leftSection={<IconSearch size={24} color="black" />}
                   />
                 </Stack>
