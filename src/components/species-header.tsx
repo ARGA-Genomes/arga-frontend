@@ -2,30 +2,20 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Container, Group, Paper, Text, Flex, useMantineTheme } from "@mantine/core";
-import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
+import { Conservation, Taxonomy } from "@/app/type";
 import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
 import { MAX_WIDTH } from "@/app/constants";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 
 const GET_SPECIES = gql`
-  query SpeciesWithConservation($canonicalName: String) {
+  query SpeciesWithAttributes($canonicalName: String) {
     species(canonicalName: $canonicalName) {
       taxonomy {
         canonicalName
         vernacularGroup
         source
         rank
-      }
-
-      indigenousEcologicalKnowledge {
-        id
-        name
-        datasetName
-        culturalConnection
-        foodUse
-        medicinalUse
-        sourceUrl
       }
       referenceGenome {
         recordId
@@ -52,8 +42,6 @@ interface NameAttribute {
 interface QueryResults {
   species: {
     taxonomy: Taxonomy[];
-    conservation: Conservation[];
-    indigenousEcologicalKnowledge: IndigenousEcologicalKnowledge[];
     referenceGenome?: { recordId: string };
     attributes?: NameAttribute[];
   };
@@ -61,13 +49,11 @@ interface QueryResults {
 
 interface HeaderProps {
   taxonomy: Taxonomy[];
-  conservation?: Conservation[];
-  traits?: IndigenousEcologicalKnowledge[];
   referenceGenome?: { recordId: string };
   attributes?: NameAttribute[];
 }
 
-function Header({ taxonomy, conservation, traits, referenceGenome, attributes }: HeaderProps) {
+function Header({ taxonomy, referenceGenome, attributes }: HeaderProps) {
   const theme = useMantineTheme();
 
   const details = taxonomy.find((t) => t.source === "Atlas of Living Australia");
@@ -98,7 +84,7 @@ function Header({ taxonomy, conservation, traits, referenceGenome, attributes }:
         gap={{ base: "md", lg: "xl" }}
         align={{ base: "normal", lg: "center" }}
       >
-        {details && <IconBar taxonomy={details} conservation={conservation} traits={traits} attributes={attributes} />}
+        {details && <IconBar taxonomy={details} conservation={[]} traits={[]} attributes={attributes} />}
 
         <Group h="100%" wrap="nowrap" gap={5}>
           <Text fw={700} c="dimmed" style={{ whiteSpace: "nowrap" }}>
@@ -127,8 +113,6 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
   }
 
   const taxonomy = data?.species.taxonomy;
-  const conservation = data?.species.conservation;
-  const traits = data?.species.indigenousEcologicalKnowledge;
   const referenceGenome = data?.species.referenceGenome;
   const attributes = data?.species.attributes;
 
@@ -136,15 +120,7 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
     <Paper py={20} pos="relative">
       <LoadOverlay visible={loading} />
       <Container maw={MAX_WIDTH}>
-        {taxonomy ? (
-          <Header
-            taxonomy={taxonomy}
-            conservation={conservation}
-            traits={traits}
-            referenceGenome={referenceGenome}
-            attributes={attributes}
-          />
-        ) : null}
+        {taxonomy ? <Header taxonomy={taxonomy} referenceGenome={referenceGenome} attributes={attributes} /> : null}
       </Container>
     </Paper>
   );
