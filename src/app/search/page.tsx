@@ -169,7 +169,7 @@ const SEARCH_FULLTEXT = gql`
 function SearchPage() {
   const [layout, setLayout] = useState<TableCardLayout>("table");
   const [rawQuery] = useQueryState("q", { defaultValue: "" });
-  const [attributes] = useQueryState("attributes", parseAsAttribute.withDefault([]));
+  const [attributes, setAttributes] = useQueryState("attributes", parseAsAttribute.withDefault([]));
 
   const [filters, setFilters] = useState<InputQueryAttribute[]>([]);
 
@@ -198,6 +198,25 @@ function SearchPage() {
   useEffect(() => {
     if (data) setLastResultCount(data.search.fullText.total);
   }, [data]);
+
+  const handleAttributeSwitch = (
+    item: InputQueryAttribute,
+    items: InputQueryAttribute[],
+    setItems: (items: InputQueryAttribute[]) => void
+  ) =>
+    setItems(
+      items.map((filterAttr) =>
+        item.field === filterAttr.field && item.value === filterAttr.value
+          ? { ...filterAttr, include: !filterAttr.include }
+          : filterAttr
+      )
+    );
+
+  const handleAttributeRemove = (
+    item: InputQueryAttribute,
+    items: InputQueryAttribute[],
+    setItems: (items: InputQueryAttribute[]) => void
+  ) => setItems(items.filter((filterAttr) => !(item.field === filterAttr.field && item.value === filterAttr.value)));
 
   return (
     <>
@@ -254,7 +273,8 @@ function SearchPage() {
                     value={attr.value}
                     include={attr.include}
                     tooltip={getTooltipForAttribute(attr)}
-                    readOnly
+                    onSwitch={() => handleAttributeSwitch(attr, attributes, setAttributes)}
+                    onRemove={() => handleAttributeRemove(attr, attributes, setAttributes)}
                   />
                 ))}
                 {attributes.length > 0 && filters.length > 0 && <Divider orientation="vertical" />}
@@ -270,7 +290,8 @@ function SearchPage() {
                     value={attr.value}
                     include={attr.include}
                     tooltip={getTooltipForAttribute(attr)}
-                    readOnly
+                    onSwitch={() => handleAttributeSwitch(attr, filters, setFilters)}
+                    onRemove={() => handleAttributeRemove(attr, filters, setFilters)}
                   />
                 ))}
               </Group>

@@ -117,7 +117,14 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips, 
         );
       // Search filters
       case "searchDataType":
-        return <DataTypeFilters key={type} filters={searchDataTypeFilters} onChange={setSearchDataTypeFilters} />;
+        return (
+          <DataTypeFilters
+            key={type}
+            filters={searchDataTypeFilters}
+            onChange={setSearchDataTypeFilters}
+            boolOptions={["Include", "Exclude"]}
+          />
+        );
     }
   };
 

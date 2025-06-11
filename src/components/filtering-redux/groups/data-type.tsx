@@ -19,16 +19,17 @@ export const searchDataTypeFiltersToQuery = (filters: BoolFilterData[]): InputQu
     .filter(({ active }) => active)
     .map(({ include, value }) => ({
       ...SEARCH_ATTRIBUTES_MAP["data_type"],
-      value: value.toLowerCase(),
+      value: value,
       include,
     }));
 
 interface DataTypeFiltersProps {
   filters: BoolFilterData[];
+  boolOptions?: [string, string];
   onChange: (filters: BoolFilterData[]) => void;
 }
 
-export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
+export function DataTypeFilters({ filters, boolOptions, onChange }: DataTypeFiltersProps) {
   // Event handlers for filter chip bools
   const handleActiveToggle = (value: string, active: boolean) =>
     onChange(
@@ -67,7 +68,7 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
         <BoolFilter
           key={filter.value}
           {...filter}
-          options={["Has", "Missing"]}
+          options={boolOptions || ["Has", "Missing"]}
           onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
           onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
         />
