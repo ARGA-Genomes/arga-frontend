@@ -69,9 +69,9 @@ const DetailsAction = ({ w, colour, label, disabled, icon: Icon, onClick }: Deta
       px="sm"
       py={4}
       w={w || 125}
-      bg={themeColours[1]}
+      bg={disabled ? themeColours[0] : themeColours[1]}
       style={{ borderRadius: theme.radius.lg }}
-      className={classes.hover}
+      className={disabled ? classes.disabled : classes.hover}
       onClick={(e) => {
         if (onClick) {
           e.preventDefault();
@@ -305,14 +305,16 @@ const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
     ? `${item.sourceUri}/${downloadParts[downloadParts.length - 1]}_genomic.fna.gz`
     : null;
 
+  const inCart = saved.find(({ url }) => url === downloadUrl) !== undefined;
+
   const handleDownloadGenome = useCallback(() => {
     if (downloadUrl) {
       window.open(downloadUrl, "_blank");
     }
-  }, [downloadUrl]);
+  }, [saved, downloadUrl]);
 
   const handleSaveGenome = useCallback(() => {
-    if (downloadUrl) {
+    if (downloadUrl && !inCart) {
       setSaved([
         ...saved,
         {
@@ -325,7 +327,7 @@ const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
         },
       ]);
     }
-  }, [downloadUrl]);
+  }, [saved, downloadUrl, inCart]);
 
   return (
     <Flex style={{ flexGrow: 1 }} gap="xl" align="flex-start" justify="space-between">
@@ -357,14 +359,14 @@ const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
           label="download"
           colour="bushfire"
           onClick={handleDownloadGenome}
-          disabled={!item.sourceUri}
+          disabled={!downloadUrl}
         />
         <DetailsAction
           icon={IconCircleCheck}
-          label="add to list"
+          label={inCart ? "in cart" : "add to cart"}
           colour="bushfire"
           onClick={handleSaveGenome}
-          disabled={!item.sourceUri}
+          disabled={!downloadUrl || inCart}
         />
       </Flex>
     </Flex>
@@ -379,14 +381,16 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
     ? `${item.sourceUri}/${downloadParts[downloadParts.length - 1]}_genomic.fna.gz`
     : null;
 
+  const inCart = saved.find(({ url }) => url === downloadUrl) !== undefined;
+
   const handleDownloadGenome = useCallback(() => {
     if (downloadUrl) {
       window.open(downloadUrl, "_blank");
     }
-  }, [downloadUrl]);
+  }, [saved, downloadUrl]);
 
   const handleSaveGenome = useCallback(() => {
-    if (downloadUrl) {
+    if (downloadUrl && !inCart) {
       setSaved([
         ...saved,
         {
@@ -399,7 +403,7 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
         },
       ]);
     }
-  }, [downloadUrl]);
+  }, [saved, downloadUrl, inCart]);
 
   return (
     <Stack justify="space-between" h="100%" w="100%">
@@ -442,15 +446,15 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
           label="download"
           colour="bushfire"
           onClick={handleDownloadGenome}
-          disabled={!item.sourceUri}
+          disabled={!downloadUrl}
         />
         <DetailsAction
           w="100%"
           icon={IconCircleCheck}
-          label="add to list"
+          label={inCart ? "in cart" : "add to cart"}
           colour="bushfire"
           onClick={handleSaveGenome}
-          disabled={!item.sourceUri}
+          disabled={!downloadUrl || inCart}
         />
       </SimpleGrid>
     </Stack>

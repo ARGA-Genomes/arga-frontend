@@ -113,6 +113,7 @@ function SavedDataManager() {
 
   function remove(item: SavedItem) {
     setSaved(saved.filter((value) => value.url != item.url));
+    setSelected(selected.filter((value) => value.url != item.url));
   }
 
   function copySelected() {

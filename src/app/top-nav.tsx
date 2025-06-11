@@ -28,7 +28,7 @@ export function TopNav() {
   const pathname = usePathname();
   const [opened, { toggle, close }] = useDisclosure(false);
   const [active, setActive] = useState(pathname === "/" ? 0 : 1);
-  const [saved, _setSaved] = useLocalStorage<string[]>({
+  const [saved] = useLocalStorage<string[]>({
     key: "save-list",
     defaultValue: [],
   });

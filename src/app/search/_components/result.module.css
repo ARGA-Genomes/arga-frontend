@@ -18,6 +18,11 @@
   }
 }
 
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .card {
   transition: all ease 200ms;
   &:hover {
