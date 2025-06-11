@@ -66,26 +66,7 @@ export function SavedDataManagerButton() {
         <SavedDataManager />
       </Drawer>
       <Indicator inline label={saved.length} size={16} color="bushfire" disabled={!saved.length}>
-        {/* <Button
-          variant="subtle"
-          opacity={!saved.length ? 0.4 : 1}
-          disabled={!saved.length}
-          color="midnight.2"
-          radius="lg"
-          onClick={toggle}
-          leftSection={<Image src="/icons/misc/file-leaf.svg" width={24} height={24} />}
-        >
-          Saved
-        </Button> */}
-        <ActionIcon
-          size="lg"
-          onClick={toggle}
-          radius="md"
-          variant="subtle"
-          opacity={!saved.length ? 0.4 : 1}
-          disabled={!saved.length}
-          color="midnight.2"
-        >
+        <ActionIcon size="lg" onClick={toggle} radius="md" variant="subtle" color="midnight.2">
           <Image src="/icons/misc/file-leaf.svg" width={26} height={26} />
         </ActionIcon>
       </Indicator>

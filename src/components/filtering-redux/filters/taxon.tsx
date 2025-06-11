@@ -1,7 +1,6 @@
 import {
   ActionIcon,
   Badge,
-  Chip,
   Combobox,
   Flex,
   Group,
@@ -15,9 +14,10 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
 
-import classes from "./taxon.module.css";
-import { ClassificationFilter } from "../groups/classification";
 import { IconTrashFilled } from "@tabler/icons-react";
+import { GenericFilter } from "../generic";
+import { ClassificationFilter } from "../groups/classification";
+import classes from "./taxon.module.css";
 
 export interface TaxonAutocomplete {
   commonName: string | null;
@@ -83,22 +83,25 @@ export function TaxonFilter({ guid, disabled, name, rank, include, onRemove, onI
 
 export function renderTaxonFilterChips(
   filters: ClassificationFilter[],
-  onRemove: (filters: ClassificationFilter[]) => void
+  onChange: (filters: ClassificationFilter[]) => void
 ) {
   const handleRemove = (currentFilter: ClassificationFilter) =>
-    onRemove(filters.filter((filter) => filter.guid !== currentFilter.guid));
+    onChange(filters.filter((filter) => filter.guid !== currentFilter.guid));
+
+  const handleSwitch = (currentFilter: ClassificationFilter) =>
+    onChange(
+      filters.map((filter) => (filter.guid === currentFilter.guid ? { ...filter, include: !filter.include } : filter))
+    );
 
   return filters.map((filter) => (
-    <Chip
+    <GenericFilter
       key={filter.guid}
-      checked
-      icon={<IconTrashFilled size={12} />}
-      color="gray"
-      onClick={() => handleRemove(filter)}
-      size="xs"
-    >
-      {filter.include ? "Includes" : "Excludes"} {filter.rank.toLowerCase()} <b>{filter.name}</b>
-    </Chip>
+      name={filter.rank.charAt(0) + filter.rank.substring(1).toLowerCase()}
+      onSwitch={() => handleSwitch(filter)}
+      onRemove={() => handleRemove(filter)}
+      value={filter.name}
+      include={filter.include}
+    />
   ));
 }
 
