@@ -1,10 +1,21 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
+import { DataTable, DataTableRow } from "@/components/data-table";
+import { useSavedData } from "@/components/DownloadManager";
+import { Attribute, AttributePill, DataField } from "@/components/highlight-stack";
+import { LoadPanel } from "@/components/load-overlay";
+import { AnalysisMap } from "@/components/mapping";
+import { Marker } from "@/components/mapping/analysis-map";
+import {
+  AnnotationEvent,
+  AssemblyEvent,
+  DataDepositionEvent,
+  Sequence,
+  SequencingEvent,
+  SequencingRunEvent,
+} from "@/queries/sequence";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, ButtonProps, Center, Grid, Group, Paper, Stack, Table, Text, Title } from "@mantine/core";
-import { LoadPanel } from "@/components/load-overlay";
-import { AttributePill, Attribute, DataField } from "@/components/highlight-stack";
 import {
   IconArrowNarrowLeft,
   IconCircleCheck,
@@ -14,19 +25,8 @@ import {
   IconLink,
   IconMicroscope,
 } from "@tabler/icons-react";
+import * as Humanize from "humanize-plus";
 import Link from "next/link";
-import {
-  AnnotationEvent,
-  AssemblyEvent,
-  DataDepositionEvent,
-  Sequence,
-  SequencingEvent,
-  SequencingRunEvent,
-} from "@/queries/sequence";
-import { AnalysisMap } from "@/components/mapping";
-import { DataTable, DataTableRow } from "@/components/data-table";
-import { Marker } from "@/components/mapping/analysis-map";
-import { useSavedData } from "@/components/DownloadManager";
 import { use } from "react";
 
 const GET_ASSEMBLY = gql`
@@ -129,15 +129,17 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
       const components = deposition.sourceUri.split("/");
       const url = `${deposition.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
 
-      const item = {
-        url,
-        label: deposition.accession,
-        dataType: deposition.dataType ?? "whole genome",
-        scientificName: canonicalName,
-        datePublished: deposition.eventDate,
-        dataset: { id: "", name: sequence.datasetName },
-      };
-      setSaved([...saved, item]);
+      setSaved([
+        ...saved,
+        {
+          url,
+          label: deposition.accession,
+          dataType: deposition.dataType ?? "whole genome",
+          scientificName: canonicalName,
+          datePublished: deposition.eventDate,
+          dataset: { id: "", name: sequence.datasetName },
+        },
+      ]);
     }
   };
 

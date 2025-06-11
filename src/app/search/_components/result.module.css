@@ -1,9 +1,5 @@
 .result {
   border-radius: var(--mantine-radius-sm);
-  transition: opacity ease 200ms;
-  &:hover {
-    opacity: 0.4;
-  }
 
   &:first-of-type {
     border-top-left-radius: var(--mantine-radius-lg);
@@ -15,10 +11,16 @@
   }
 }
 
+.hover {
+  transition: opacity ease 200ms;
+  &:hover {
+    opacity: 0.4;
+  }
+}
+
 .card {
   transition: all ease 200ms;
   &:hover {
     transform: scale(1.05);
-    opacity: 0.6;
   }
 }

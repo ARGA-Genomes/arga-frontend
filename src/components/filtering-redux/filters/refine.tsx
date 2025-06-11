@@ -1,6 +1,7 @@
-import { Checkbox, Chip, Group, Stack } from "@mantine/core";
+import { Checkbox, Group, Stack } from "@mantine/core";
 
-import { IconChevronDown, IconTrashFilled } from "@tabler/icons-react";
+import { IconChevronDown } from "@tabler/icons-react";
+import { GenericFilter } from "../generic";
 
 export interface RefineOption {
   label: string;
@@ -9,31 +10,37 @@ export interface RefineOption {
   options: RefineOption[];
 }
 
-export function renderRefineFilterChip(filters: RefineTreeNode[], onRemove: () => void) {
+export function renderRefineFilterChip(filters: RefineTreeNode[], onChange: (items: RefineTreeNode[]) => void) {
   const last = filters[filters.length - 1];
   const previous = filters[filters.length - 2];
 
+  const handleRemove = () => onChange([]);
+
+  const handleSwitch = () =>
+    onChange(
+      filters.map((filter) =>
+        filter.name === last.name && filter.value === last.value ? { ...last, include: !last.include } : filter
+      )
+    );
+
   return last
     ? [
-        <Chip
+        <GenericFilter
           key={`${last.name}-${last.value}`}
-          checked
-          icon={<IconTrashFilled size={12} />}
-          color="gray"
-          onClick={onRemove}
-          size="xs"
-        >
-          Is{" "}
-          {previous ? (
-            <>
-              <b>{previous.label}</b>
-              {" > "}
-              <b>{last.label}</b>
-            </>
-          ) : (
-            <b>{last.label}</b>
-          )}
-        </Chip>,
+          name={last.include ? "Is" : "Is not"}
+          value={
+            previous ? (
+              <>
+                {previous.label} <span style={{ opacity: 0.4 }}>{">"}</span> {last.label}
+              </>
+            ) : (
+              last.label
+            )
+          }
+          onSwitch={handleSwitch}
+          onRemove={handleRemove}
+          include={last.include}
+        />,
       ]
     : [];
 }
@@ -42,6 +49,7 @@ export interface RefineTreeNode {
   name: string;
   value: string | boolean | number;
   label: string;
+  include: boolean;
   children?: RefineTreeNode[];
 }
 

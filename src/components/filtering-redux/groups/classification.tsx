@@ -1,9 +1,10 @@
 import { FilterGroup } from "../group";
 
-import { FilterType, FilterItem } from "../filters/common";
-import { TaxonAutocomplete, TaxonFilter, TaxonSearch } from "../filters/taxon";
-import { useCallback } from "react";
+import { InputQueryAttribute, SEARCH_ATTRIBUTES_MAP } from "@/components/search";
 import { Stack } from "@mantine/core";
+import { useCallback } from "react";
+import { FilterItem, FilterType } from "../filters/common";
+import { TaxonAutocomplete, TaxonFilter, TaxonSearch } from "../filters/taxon";
 
 export interface ClassificationFilter {
   guid: string;
@@ -19,6 +20,15 @@ export const classificationFiltersToQuery = (filters: ClassificationFilter[]): F
     action: include ? "INCLUDE" : "EXCLUDE",
     value: name,
   }));
+
+export const searchClassificationFiltersToQuery = (filters: ClassificationFilter[]): InputQueryAttribute[] =>
+  filters
+    .filter(({ rank }) => Boolean(SEARCH_ATTRIBUTES_MAP[rank.toLowerCase()]))
+    .map(({ include, rank, name }) => ({
+      ...SEARCH_ATTRIBUTES_MAP[rank.toLowerCase()],
+      value: name,
+      include,
+    }));
 
 interface ClassificationFiltersProps {
   filters: ClassificationFilter[];

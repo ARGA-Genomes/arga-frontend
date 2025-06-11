@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { FilterGroup } from "../group";
 
-import { FilterType, FilterItem } from "../filters/common";
+import { InputQueryAttribute, SEARCH_ATTRIBUTES_MAP } from "@/components/search";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
+import { FilterItem, FilterType } from "../filters/common";
 
 export const dataTypeFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
@@ -11,6 +12,15 @@ export const dataTypeFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] 
       filter: FilterType.HasData,
       action: include ? "INCLUDE" : "EXCLUDE",
       value,
+    }));
+
+export const searchDataTypeFiltersToQuery = (filters: BoolFilterData[]): InputQueryAttribute[] =>
+  filters
+    .filter(({ active }) => active)
+    .map(({ include, value }) => ({
+      ...SEARCH_ATTRIBUTES_MAP["data_type"],
+      value: value.toLowerCase(),
+      include,
     }));
 
 interface DataTypeFiltersProps {
@@ -67,6 +77,13 @@ export function DataTypeFilters({ filters, onChange }: DataTypeFiltersProps) {
 }
 
 export const DEFAULT_DATA_TYPE_FILTERS = ["Genome", "Locus", "Specimen", "Other"].map((value) => ({
+  value,
+  active: false,
+  disabled: false,
+  include: true,
+}));
+
+export const DEFAULT_SEARCH_DATA_TYPE_FILTERS = ["Taxon", "Genome", "Locus", "Specimen"].map((value) => ({
   value,
   active: false,
   disabled: false,

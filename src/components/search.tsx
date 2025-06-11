@@ -8,6 +8,7 @@ import {
   Combobox,
   Divider,
   Flex,
+  Group,
   InputBase,
   InputBaseProps,
   Kbd,
@@ -27,6 +28,9 @@ import { useLocalStorage } from "@mantine/hooks";
 import { IconMinus, IconPlus, IconTrashFilled } from "@tabler/icons-react";
 
 // Classes
+import { parseAsAttribute } from "@/helpers/searchParamParser";
+import { isEqual } from "lodash-es";
+import { GenericFilter } from "./filtering-redux/generic";
 import dropdownClasses from "./search-dropdown.module.css";
 import classes from "./search.module.css";
 
@@ -34,28 +38,53 @@ const SearchAttributeCheck: CheckboxProps["icon"] = ({ indeterminate, ...others 
   indeterminate ? <IconMinus stroke="4" {...others} /> : <IconPlus stroke="4" {...others} />;
 
 interface SearchAttributeProps {
-  attribute: InputQueryAttribute;
-  onSwitch: (attribute: InputQueryAttribute) => void;
-  onRemove: (attribute: InputQueryAttribute) => void;
+  name: string;
+  value: string;
+  include: boolean;
+  tooltip?: Omit<TooltipProps, "children">;
+  onSwitch: () => void;
+  onRemove: () => void;
 }
 
-function SearchAttribute({ attribute, onSwitch, onRemove }: SearchAttributeProps) {
+export function SearchAttribute({ name, value, include, tooltip, onSwitch, onRemove }: SearchAttributeProps) {
+  const inner = (
+    <Pill
+      styles={{ label: { display: "flex", alignItems: "center" } }}
+      size="xl"
+      withRemoveButton
+      removeButtonProps={{ style: { transform: "scale(0.8)", opacity: 0.75 } }}
+      onRemove={onRemove}
+    >
+      <Flex align="center" justify="center" gap="xs">
+        <Checkbox
+          icon={SearchAttributeCheck}
+          checked={include}
+          onChange={onSwitch}
+          indeterminate={!include}
+          color="midnight.9"
+          size="xs"
+        />{" "}
+        <Text size="sm" pb={2}>
+          <b>{name}: </b> {value}
+        </Text>
+      </Flex>
+    </Pill>
+  );
+
+  return tooltip ? <Tooltip {...tooltip}>{inner}</Tooltip> : inner;
+}
+
+export function DisplaySearchAttribute({ attribute }: { attribute: InputQueryAttribute }) {
   return (
     <Tooltip {...getTooltipForAttribute(attribute)}>
-      <Pill
-        styles={{ label: { display: "flex", alignItems: "center" } }}
-        size="xl"
-        withRemoveButton
-        removeButtonProps={{ style: { transform: "scale(0.8)", opacity: 0.75 } }}
-        onRemove={() => onRemove(attribute)}
-      >
+      <Pill styles={{ label: { display: "flex", alignItems: "center" } }} size="xl">
         <Flex align="center" justify="center" gap="xs">
           <Checkbox
+            readOnly
             icon={SearchAttributeCheck}
             checked={attribute.include}
-            onChange={() => onSwitch(attribute)}
             indeterminate={!attribute.include}
-            color="midnight.9"
+            color="gray.5"
             size="xs"
           />{" "}
           <Text size="sm" pb={2}>
@@ -68,7 +97,7 @@ function SearchAttribute({ attribute, onSwitch, onRemove }: SearchAttributeProps
 }
 
 // Define the interface for each entry
-interface QueryAttribute {
+export interface QueryAttribute {
   group: string;
   field: string;
   name: string;
@@ -76,13 +105,83 @@ interface QueryAttribute {
   example: string;
 }
 
-interface InputQueryAttribute extends QueryAttribute {
+export interface InputQueryAttribute extends QueryAttribute {
   value: string;
   include: boolean;
 }
 
+export function buildTantivyQuery(attributes: InputQueryAttribute[], freeText: string = ""): string {
+  // Remove duplicate attributes by field, value, and include
+  const uniqueAttributes = attributes.filter(
+    (attr, index) =>
+      attributes.findIndex(
+        (a) => a.field === attr.field && a.value.trim() === attr.value.trim() && a.include === attr.include
+      ) === index
+  );
+  const clauses: string[] = [];
+  const textTerm = freeText.trim();
+  if (textTerm.length > 0) {
+    // Add the raw free‐text clause (Tantivy will search default fields)
+    clauses.push(textTerm);
+  }
+
+  // Group attributes by field into {includes: string[], excludes: string[]}
+  const fieldMap = new Map<string, { includes: string[]; excludes: string[] }>();
+
+  for (const attr of uniqueAttributes) {
+    const val = attr.value.trim();
+    if (!val) continue;
+
+    if (!fieldMap.has(attr.field)) {
+      fieldMap.set(attr.field, { includes: [], excludes: [] });
+    }
+    const bucket = fieldMap.get(attr.field)!;
+    if (attr.include) {
+      bucket.includes.push(val);
+    } else {
+      bucket.excludes.push(val);
+    }
+  }
+
+  // Build one clause per field
+  for (const [field, { includes, excludes }] of fieldMap.entries()) {
+    // 1) If there are includes → group them under `field:…`
+    if (includes.length > 0) {
+      // Quote any value containing whitespace
+      const formatValue = (v: string) => (/\s/.test(v) ? `"${v}"` : v);
+
+      // First include must carry the `field:` prefix
+      const firstInc = formatValue(includes[0]);
+      let clause = `${field}:${firstInc}`;
+
+      // Subsequent includes can drop the repeated `field:` prefix
+      for (let i = 1; i < includes.length; i++) {
+        clause += " " + formatValue(includes[i]);
+      }
+
+      // Append each exclude as ` -excludeValue` (Tantivy treats it as `-field:excludeValue`)
+      for (const exVal of excludes) {
+        clause += " -" + formatValue(exVal);
+      }
+
+      clauses.push(clause);
+    }
+    // 2) If no includes but some excludes → each gets its own `-field:value`
+    else if (excludes.length > 0) {
+      const formatValue = (v: string) => (/\s/.test(v) ? `"${v}"` : v);
+
+      for (const exVal of excludes) {
+        clauses.push(`-${field}:${formatValue(exVal)}`);
+      }
+    }
+    // If both includes and excludes are empty, nothing for this field.
+  }
+
+  return clauses.join(" ");
+}
+
 // Create the array of data attributes
-const ATTRIBUTES: QueryAttribute[] = [
+export const SEARCH_ATTRIBUTES: QueryAttribute[] = [
   {
     group: "Taxonomic attributes",
     field: "canonical_name",
@@ -240,7 +339,12 @@ const ATTRIBUTES: QueryAttribute[] = [
   },
 ];
 
-const getTooltipForAttribute = (attribute: QueryAttribute): Omit<TooltipProps, "children"> => ({
+export const SEARCH_ATTRIBUTES_MAP: Record<string, QueryAttribute> = SEARCH_ATTRIBUTES.reduce((map, attribute) => {
+  map[attribute.field] = attribute;
+  return map;
+}, {} as Record<string, QueryAttribute>);
+
+export const getTooltipForAttribute = (attribute: QueryAttribute): Omit<TooltipProps, "children"> => ({
   zIndex: 3000,
   position: "bottom",
   radius: "lg",
@@ -292,21 +396,27 @@ interface SearchRequest {
   attributes: InputQueryAttribute[];
 }
 
+export function useSearchAttributes() {
+  return useLocalStorage<InputQueryAttribute[]>({ key: "search-attributes", defaultValue: [] });
+}
+
 export function Search(props: SearchProps) {
-  const [previous, setPrevious] = useLocalStorage<SearchRequest[]>({ key: "previous-searches", defaultValue: [] });
-  const [attributes, setAttributes] = useState<InputQueryAttribute[]>([]);
+  const [previous, setPrevious] = useLocalStorage<SearchRequest[]>({ key: "search-previous", defaultValue: [] });
+  const [attributes, setAttributes] = useSearchAttributes();
 
   const combobox = useCombobox();
   const router = useRouter();
 
   const [search, setSearch] = useState<string>("");
+  const searchLower = search.toLowerCase().trim();
+  const [flash, setFlash] = useState<boolean>(false);
 
-  const suggestions = ATTRIBUTES.filter(
-    (attr) => search.length > 0 && attr.name.toLowerCase().startsWith(search.toLowerCase().trim())
+  const suggestions = SEARCH_ATTRIBUTES.filter(
+    (attr) => search.length > 0 && attr.name.toLowerCase().includes(searchLower)
   ).slice(0, 5);
 
   const attributeSuggestion: InputQueryAttribute | null = useMemo(() => {
-    const found = ATTRIBUTES.find((attr) => new RegExp(`^${attr.name} [a-zA-Z0-9 \._]+$`).test(search)) || null;
+    const found = SEARCH_ATTRIBUTES.find((attr) => new RegExp(`^${attr.name} [a-zA-Z0-9 \._]+$`).test(search)) || null;
     return found
       ? {
           ...found,
@@ -316,6 +426,19 @@ export function Search(props: SearchProps) {
       : found;
   }, [search]);
 
+  const handlePreviousSelect = useCallback(
+    (prev: SearchRequest) => {
+      // apply the previous search
+      setSearch(prev.search);
+      setAttributes(prev.attributes);
+
+      // trigger flash
+      setFlash(true);
+      setTimeout(() => setFlash(false), 500);
+    },
+    [setSearch, setAttributes]
+  );
+
   const handleAttributeAdd = useCallback(() => {
     if (attributeSuggestion) {
       setAttributes([...attributes, attributeSuggestion]);
@@ -324,15 +447,19 @@ export function Search(props: SearchProps) {
   }, [attributes, attributeSuggestion, setAttributes]);
 
   const handleAttributeRemove = useCallback(
-    ({ field }: InputQueryAttribute) => {
-      setAttributes(attributes.filter((attr) => attr.field !== field));
+    ({ field, value }: InputQueryAttribute) => {
+      setAttributes(attributes.filter((attr) => !(attr.field === field && attr.value === value)));
     },
     [attributes, setAttributes]
   );
 
   const handleAttributeSwitch = useCallback(
-    ({ field }: InputQueryAttribute) => {
-      setAttributes(attributes.map((attr) => (attr.field === field ? { ...attr, include: !attr.include } : attr)));
+    ({ field, value }: InputQueryAttribute) => {
+      setAttributes(
+        attributes.map((attr) =>
+          attr.field === field && attr.value === value ? { ...attr, include: !attr.include } : attr
+        )
+      );
     },
     [attributes, setAttributes]
   );
@@ -345,13 +472,17 @@ export function Search(props: SearchProps) {
     _previous: SearchRequest[],
     skip: boolean = false
   ) => {
-    const query = `${encodeURIComponent(_search)} ${_attributes
-      .map((attr) => `${attr.include ? "" : "-"}${attr.field}:"${attr.value}"`)
-      .join(" ")}`;
+    router.push(
+      `/search?q=${_search}${attributes.length > 0 ? `&attributes=${parseAsAttribute.serialize(_attributes)}` : ""}`
+    );
 
-    router.push(`/search?q=${query}`);
+    // Reset search & filter state
+    setSearch("");
+    setAttributes([]);
 
-    if (!skip) setPrevious([{ search: _search, attributes: _attributes }, ..._previous.slice(0, 5)]);
+    if (!skip && !(_previous[0]?.search === _search && isEqual(_previous[0]?.attributes, _attributes))) {
+      setPrevious([{ search: _search, attributes: _attributes }, ..._previous.slice(0, 5)]);
+    }
   };
 
   return (
@@ -385,6 +516,7 @@ export function Search(props: SearchProps) {
           )}
           <InputBase
             {...props}
+            classNames={{ input: flash ? classes.flash : undefined }}
             pos="relative"
             value={search}
             onChange={(val) => {
@@ -416,7 +548,7 @@ export function Search(props: SearchProps) {
       </Combobox.Target>
       <Combobox.Dropdown>
         <Combobox.Options>
-          <Stack gap={0}>
+          <Stack className={flash ? classes.flash : undefined} gap={0}>
             <Flex
               style={{
                 transition: "all ease 200ms",
@@ -432,13 +564,29 @@ export function Search(props: SearchProps) {
                   Suggested:{" "}
                 </Text>
               )}
-              {suggestions.map((suggestion, i) => (
-                <Text size="sm" c="gray.6" key={suggestion.field}>
-                  <b>{suggestion.name.substring(0, search.length)}</b>
-                  {suggestion.name.substring(search.length)}
-                  {i < suggestions.length - 1 ? ", " : ""}
-                </Text>
-              ))}
+              {suggestions.map((suggestion, i) => {
+                const name = suggestion.name;
+                const matchIndex = name.toLowerCase().indexOf(searchLower);
+                if (matchIndex === -1) {
+                  return (
+                    <Text size="sm" c="gray.6" key={suggestion.field}>
+                      {name}
+                      {i < suggestions.length - 1 ? ", " : ""}
+                    </Text>
+                  );
+                }
+                const before = name.substring(0, matchIndex);
+                const matchText = name.substring(matchIndex, matchIndex + searchLower.length);
+                const after = name.substring(matchIndex + searchLower.length);
+                return (
+                  <Text size="sm" c="gray.6" key={suggestion.field}>
+                    {before}
+                    <b>{matchText}</b>
+                    {after}
+                    {i < suggestions.length - 1 ? ", " : ""}
+                  </Text>
+                );
+              })}
             </Flex>
             {suggestions.length > 0 && <Divider mb={5} />}
             <Flex h={32} gap={5} mb={5} align="center">
@@ -459,11 +607,14 @@ export function Search(props: SearchProps) {
                       />
                     )}
                     {attributes.map((attribute, idx) => (
-                      <SearchAttribute
+                      <GenericFilter
                         key={idx}
-                        attribute={attribute}
-                        onSwitch={handleAttributeSwitch}
-                        onRemove={handleAttributeRemove}
+                        name={attribute.name}
+                        value={attribute.value}
+                        include={attribute.include}
+                        onSwitch={() => handleAttributeSwitch(attribute)}
+                        onRemove={() => handleAttributeRemove(attribute)}
+                        tooltip={getTooltipForAttribute(attribute)}
                       />
                     ))}
                   </Flex>
@@ -476,37 +627,30 @@ export function Search(props: SearchProps) {
               )}
             </Flex>
           </Stack>
-          <Divider />
+          <Divider mb={5} />
           {previous.length > 0 ? (
             <>
               {previous.map((prev, idx) => (
-                <Combobox.Option
-                  key={idx}
-                  value={idx.toString()}
-                  onClick={() => performSearch(prev.search, prev.attributes, previous, true)}
-                >
+                <Combobox.Option key={idx} value={idx.toString()} onClick={() => handlePreviousSelect(prev)}>
                   <Flex gap="sm" align="center">
                     <Text size="sm" c={prev.search.length > 0 ? undefined : "gray.6"}>
                       {prev.search.length > 0 ? prev.search : "No search term"}
                     </Text>
                     {prev.attributes.length > 0 ? "+" : ""}
-                    {prev.attributes.map((attr) => (
-                      <Pill styles={{ label: { display: "flex", alignItems: "center" } }} size="xl">
-                        <Flex align="center" justify="center" gap="xs">
-                          <Checkbox
+                    {prev.attributes.length > 0 && (
+                      <Group gap={5}>
+                        {prev.attributes.map((attr, idx) => (
+                          <GenericFilter
+                            key={idx}
+                            name={attr.name}
+                            value={attr.value}
+                            include={attr.include}
+                            tooltip={getTooltipForAttribute(attr)}
                             readOnly
-                            icon={SearchAttributeCheck}
-                            checked={attr.include}
-                            indeterminate={!attr.include}
-                            color="gray.5"
-                            size="xs"
-                          />{" "}
-                          <Text size="sm" pb={2}>
-                            <b>{attr.name}: </b> {attr.value}
-                          </Text>
-                        </Flex>
-                      </Pill>
-                    ))}
+                          />
+                        ))}
+                      </Group>
+                    )}
                   </Flex>
                 </Combobox.Option>
               ))}

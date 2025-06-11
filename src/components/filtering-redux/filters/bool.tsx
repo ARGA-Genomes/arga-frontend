@@ -1,6 +1,6 @@
-import { Checkbox, Chip, Flex, SegmentedControl, Text } from "@mantine/core";
-import { IconTrashFilled } from "@tabler/icons-react";
+import { Checkbox, Flex, SegmentedControl, Text } from "@mantine/core";
 import * as Humanize from "humanize-plus";
+import { GenericFilter } from "../generic";
 
 export interface BoolFilterData {
   value: string;
@@ -11,7 +11,7 @@ export interface BoolFilterData {
 
 interface BoolFilterProps extends BoolFilterData {
   onActiveToggle: (checked: boolean) => void;
-  onIncludeToggle: (include: boolean) => void;
+  onIncludeToggle?: (include: boolean) => void;
   options: [string, string];
   label?: string;
 }
@@ -40,14 +40,16 @@ export function BoolFilter({
           </Text>
         }
       />
-      <SegmentedControl
-        value={include ? options[0] : options[1]}
-        onChange={(value) => onIncludeToggle(value === options[0] ? true : false)}
-        disabled={!active || disabled}
-        radius="lg"
-        size="xs"
-        data={options}
-      />
+      {onIncludeToggle && (
+        <SegmentedControl
+          value={include ? options[0] : options[1]}
+          onChange={(value) => onIncludeToggle(value === options[0] ? true : false)}
+          disabled={!active || disabled}
+          radius="lg"
+          size="xs"
+          data={options}
+        />
+      )}
     </Flex>
   );
 }
@@ -55,34 +57,52 @@ export function BoolFilter({
 export function renderBoolFilterChips(
   filters: BoolFilterData[],
   options: [string, string],
-  onRemove: (filters: BoolFilterData[]) => void,
+  onChange: (filters: BoolFilterData[]) => void,
   labelMap?: { [key: string]: string }
 ) {
   const handleRemove = (currentFilter: BoolFilterData) =>
-    onRemove(filters.map((filter) => (filter.value === currentFilter.value ? { ...filter, active: false } : filter)));
+    onChange(filters.map((filter) => (filter.value === currentFilter.value ? { ...filter, active: false } : filter)));
+
+  const handleSwitch = (currentFilter: BoolFilterData) =>
+    onChange(
+      filters.map((filter) =>
+        filter.value === currentFilter.value ? { ...filter, include: !currentFilter.include } : filter
+      )
+    );
 
   return filters
     .filter(({ active }) => active)
     .map((filter) => (
-      <Chip
+      <GenericFilter
         key={filter.value}
-        checked
-        icon={<IconTrashFilled size={12} />}
-        color="gray"
-        onClick={() => handleRemove(filter)}
-        size="xs"
-      >
-        {filter.include ? options[0] : options[1]} <b>{(labelMap || {})[filter.value] || filter.value}</b>
-      </Chip>
+        name={(labelMap || {})[filter.value] || filter.value}
+        value={filter.include ? options[0] : options[1]}
+        include={filter.include}
+        onSwitch={() => handleSwitch(filter)}
+        onRemove={() => handleRemove(filter)}
+      />
     ));
 }
 
-export function renderVernacularGroupFilterChip(filter: BoolFilterData | null, onRemove: () => void) {
+export function renderVernacularGroupFilterChip(
+  filter: BoolFilterData | null,
+  onChange: (item: BoolFilterData | null) => void
+) {
   return filter
     ? [
-        <Chip key={filter.value} checked icon={<IconTrashFilled size={12} />} color="gray" onClick={onRemove} size="xs">
-          {filter.include ? "Include" : "Exclude"} group <b>{filter.value}</b>
-        </Chip>,
+        <GenericFilter
+          key={filter.value}
+          name="Vernacular group"
+          value={filter.value}
+          include={filter.include}
+          onSwitch={() =>
+            onChange({
+              ...filter,
+              include: !filter.include,
+            })
+          }
+          onRemove={() => onChange(null)}
+        />,
       ]
     : [];
 }
