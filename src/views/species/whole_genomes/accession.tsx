@@ -27,7 +27,7 @@ import {
 } from "@tabler/icons-react";
 import * as Humanize from "humanize-plus";
 import Link from "next/link";
-import { use } from "react";
+import { use, useMemo } from "react";
 
 const GET_ASSEMBLY = gql`
   query AssemblyFullData($accession: String) {
@@ -124,11 +124,20 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
 
   const [saved, setSaved] = useSavedData();
 
-  const saveToList = () => {
+  // Construct URL
+  const url = useMemo(() => {
     if (sequence && deposition?.sourceUri && deposition.accession) {
       const components = deposition.sourceUri.split("/");
-      const url = `${deposition.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
+      return `${deposition.sourceUri}/${components[components.length - 1]}_genomic.fna.gz`;
+    }
 
+    return null;
+  }, [sequence, deposition, annotation]);
+
+  const inCart = Boolean(saved.find((item) => item.url === url));
+
+  const saveToList = () => {
+    if (sequence && deposition?.sourceUri && deposition.accession && url) {
       setSaved([
         ...saved,
         {
@@ -177,8 +186,14 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <Button color="midnight.10" radius="md" leftSection={<IconCircleCheck />} onClick={saveToList}>
-              add to list
+            <Button
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconCircleCheck />}
+              onClick={saveToList}
+              disabled={inCart}
+            >
+              {inCart ? "added to list" : "add to list"}
             </Button>
             <LinkButton color="midnight.10" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>
               get data

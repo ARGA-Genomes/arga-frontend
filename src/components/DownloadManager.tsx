@@ -112,8 +112,7 @@ function SavedDataManager() {
   }, [selected]);
 
   function remove(item: SavedItem) {
-    const newList = saved.filter((value) => value.url != item.url);
-    setSaved(newList || []);
+    setSaved(saved.filter((value) => value.url != item.url));
   }
 
   function copySelected() {
@@ -124,11 +123,11 @@ function SavedDataManager() {
   }
 
   function selectItem(item: SavedItem) {
-    setSelected((current) => {
-      if (current.find((i) => i.url === item.url)) return current;
-      return [...current, item];
-    });
+    if (!selected.find((i) => i.url === item.url)) {
+      setSelected([...selected, item]);
+    }
   }
+
   function deselectItem(item: SavedItem) {
     setSelected((current) => current.filter((i) => i.url !== item.url));
   }
