@@ -2,6 +2,7 @@
 
 import { Dataset } from "@/app/source-provider";
 import {
+  ActionIcon,
   Box,
   Button,
   Card,
@@ -10,6 +11,7 @@ import {
   createTheme,
   Divider,
   Drawer,
+  Flex,
   Grid,
   Group,
   Image,
@@ -18,8 +20,6 @@ import {
   Menu,
   Paper,
   rem,
-  ScrollArea,
-  SimpleGrid,
   Space,
   Stack,
   Table,
@@ -34,7 +34,6 @@ import {
   IconFileInfo,
   IconFileText,
   IconFileZip,
-  IconSortDescending,
   IconTerminal2,
   IconTrashFilled,
 } from "@tabler/icons-react";
@@ -63,19 +62,13 @@ export function SavedDataManagerButton() {
   return (
     <>
       <Drawer opened={opened} onClose={close} position="top" size="xl">
-        <Space h={150} />
+        <Space h={88} />
         <SavedDataManager />
       </Drawer>
       <Indicator inline label={saved.length} size={16} color="bushfire" disabled={!saved.length}>
-        <Button
-          variant="subtle"
-          color="midnight.2"
-          radius="lg"
-          onClick={toggle}
-          leftSection={<IconSortDescending size={35} color="white" strokeWidth="1.75" />}
-        >
-          Saved data
-        </Button>
+        <ActionIcon size="lg" onClick={toggle} radius="md" variant="subtle" color="midnight.2">
+          <Image src="/icons/misc/file-leaf.svg" width={26} height={26} />
+        </ActionIcon>
       </Indicator>
     </>
   );
@@ -120,6 +113,7 @@ function SavedDataManager() {
 
   function remove(item: SavedItem) {
     setSaved(saved.filter((value) => value.url != item.url));
+    setSelected(selected.filter((value) => value.url != item.url));
   }
 
   function copySelected() {
@@ -140,107 +134,103 @@ function SavedDataManager() {
   }
 
   return (
-    <Grid>
-      <Grid.Col span={10}>
-        <ScrollArea.Autosize>
-          <SimpleGrid cols={3}>
-            {saved.map((item) => (
-              <SavedDataItem
-                key={item.url}
-                item={item}
-                onRemove={remove}
-                onSelected={selectItem}
-                onDeselected={deselectItem}
-              />
-            ))}
-          </SimpleGrid>
-        </ScrollArea.Autosize>
-      </Grid.Col>
-      <Grid.Col span={2}>
-        <Paper shadow="md" radius="md" withBorder p="xl">
-          <Stack>
-            <DownloadSelectedForm items={selected} metadata={metadataUrl}>
-              <Tooltip label="Download all selected files and metadata as a single .zip file">
-                <Button
-                  fullWidth
-                  disabled={selected.length <= 0}
-                  color="midnight.8"
-                  radius="md"
-                  rightSection={<IconFileZip />}
-                  type="submit"
-                >
-                  Download selected
-                </Button>
-              </Tooltip>
-            </DownloadSelectedForm>
-
-            <Tooltip label="Download a metadata file containing metadata for all selected files">
-              <Button
-                component="a"
-                href={metadataUrl}
-                download="metadata.csv"
-                disabled={!metadataUrl}
-                fullWidth
-                variant="light"
-                color="shellfish"
-                radius="md"
-                rightSection={<IconFileInfo />}
-              >
-                Download metadata
-              </Button>
-            </Tooltip>
-
-            <Divider mt="md" label="Tools for programmatic access" />
-
-            <Tooltip label="Copy the URLs of all selected files into the clipboard">
+    <Flex gap="md">
+      <Grid w="100%">
+        {saved.map((item) => (
+          <Grid.Col key={item.url} span={{ xs: 12, sm: 12, md: 12, lg: 6, xl: 6 }}>
+            <SavedDataItem
+              key={item.url}
+              item={item}
+              onRemove={remove}
+              onSelected={selectItem}
+              onDeselected={deselectItem}
+            />
+          </Grid.Col>
+        ))}
+      </Grid>
+      <Paper w={300} shadow="md" radius="lg" withBorder p="xl">
+        <Stack>
+          <DownloadSelectedForm items={selected} metadata={metadataUrl}>
+            <Tooltip label="Download all selected files and metadata as a single .zip file">
               <Button
                 fullWidth
                 disabled={selected.length <= 0}
-                variant="light"
-                color="shellfish"
+                color="midnight.8"
                 radius="md"
-                rightSection={<IconClipboardCopy />}
-                onClick={copySelected}
+                rightSection={<IconFileZip />}
+                type="submit"
               >
-                {clipboard.copied ? "Copied!" : "Copy URLs to clipboard"}
+                Download selected
               </Button>
             </Tooltip>
+          </DownloadSelectedForm>
 
-            <Tooltip label="Download a text file containing links to all selected files">
-              <Button
-                component="a"
-                href={manifestUrl}
-                download="manifest.txt"
-                disabled={!manifestUrl}
-                fullWidth
-                variant="light"
-                color="shellfish"
-                radius="md"
-                rightSection={<IconFileText />}
-              >
-                Download manifest
-              </Button>
-            </Tooltip>
+          <Tooltip label="Download a metadata file containing metadata for all selected files">
+            <Button
+              component="a"
+              href={metadataUrl}
+              download="metadata.csv"
+              disabled={!metadataUrl}
+              fullWidth
+              variant="light"
+              color="shellfish"
+              radius="md"
+              rightSection={<IconFileInfo />}
+            >
+              Download metadata
+            </Button>
+          </Tooltip>
 
-            <Tooltip label="Download a shell script that downloads all selected files">
-              <Button
-                component="a"
-                href={scriptUrl}
-                download="arga-download.sh"
-                disabled={!scriptUrl}
-                fullWidth
-                variant="light"
-                color="shellfish"
-                radius="md"
-                rightSection={<IconTerminal2 />}
-              >
-                Download script
-              </Button>
-            </Tooltip>
-          </Stack>
-        </Paper>
-      </Grid.Col>
-    </Grid>
+          <Divider mt="md" label="Tools for programmatic access" />
+
+          <Tooltip label="Copy the URLs of all selected files into the clipboard">
+            <Button
+              fullWidth
+              disabled={selected.length <= 0}
+              variant="light"
+              color="shellfish"
+              radius="md"
+              rightSection={<IconClipboardCopy />}
+              onClick={copySelected}
+            >
+              {clipboard.copied ? "Copied!" : "Copy URLs to clipboard"}
+            </Button>
+          </Tooltip>
+
+          <Tooltip label="Download a text file containing links to all selected files">
+            <Button
+              component="a"
+              href={manifestUrl}
+              download="manifest.txt"
+              disabled={!manifestUrl}
+              fullWidth
+              variant="light"
+              color="shellfish"
+              radius="md"
+              rightSection={<IconFileText />}
+            >
+              Download manifest
+            </Button>
+          </Tooltip>
+
+          <Tooltip label="Download a shell script that downloads all selected files">
+            <Button
+              component="a"
+              href={scriptUrl}
+              download="arga-download.sh"
+              disabled={!scriptUrl}
+              fullWidth
+              variant="light"
+              color="shellfish"
+              radius="md"
+              rightSection={<IconTerminal2 />}
+            >
+              Download script
+            </Button>
+          </Tooltip>
+        </Stack>
+      </Paper>
+    </Flex>
   );
 }
 
@@ -307,18 +297,18 @@ function SavedDataItem({ item, onRemove, onSelected, onDeselected }: SaveDataIte
   return (
     <Card shadow="sm" padding="lg" radius="lg" withBorder>
       <Card.Section withBorder mb="md">
-        <Group justify="space-between">
-          <Group gap="xl">
+        <Group gap={4} justify="space-between">
+          <Flex style={{ flexShrink: 1 }} gap="lg" align="center">
             <HintedCheckbox
               onChange={(checked) => {
                 if (checked) onSelected(item);
                 else onDeselected(item);
               }}
             />
-            <Link href={`/species/${item.scientificName}/whole_genomes/${item.label}`}>
-              <Group>
-                <Image src={"/icons/data-type/Data type_ Whole genome.svg"} fit="contain" h={80} w={80} alt="" />
-                <Stack gap={0}>
+            <Link href={`/species/${item.scientificName}/whole_genomes/${item.label}`} style={{ flexShrink: 1 }}>
+              <Flex gap="lg">
+                <Image src={"/icons/data-type/Data type_ Whole genome.svg"} fit="contain" h={65} w={65} alt="" />
+                <Stack justify="center" gap={0}>
                   <Text fw={500} truncate="end">
                     {item.label}
                   </Text>
@@ -326,9 +316,9 @@ function SavedDataItem({ item, onRemove, onSelected, onDeselected }: SaveDataIte
                     {item.dataType}
                   </Text>
                 </Stack>
-              </Group>
+              </Flex>
             </Link>
-          </Group>
+          </Flex>
 
           <Button
             color="red"
@@ -413,7 +403,14 @@ function DownloadButton({ links }: { links: DownloadLink[] }) {
         {clipboard.copied ? "Copied!" : "Copy URL"}
       </Button>
 
-      <Menu shadow="md" width={200}>
+      <Menu
+        shadow="md"
+        width={200}
+        styles={{
+          dropdown: { borderRadius: "var(--mantine-radius-lg)" },
+          item: { borderRadius: "var(--mantine-radius-lg)" },
+        }}
+      >
         <Menu.Target>
           <Button
             color="moss.7"

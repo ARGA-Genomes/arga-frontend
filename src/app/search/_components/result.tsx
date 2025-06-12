@@ -13,21 +13,24 @@ import {
   Text,
   ThemeIcon,
   Tooltip,
+  UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
 import { Item } from "../page";
 
+import { useSavedData } from "@/components/DownloadManager";
 import { AttributePill } from "@/components/highlight-stack";
 import { DataSummary } from "@/components/species-card";
 import { TableCardLayout } from "@/components/table-card-switch";
-import { IconCircleCheck, IconCircleX, TablerIcon } from "@tabler/icons-react";
+import { IconCircleCheck, IconCircleX, IconDownload, TablerIcon } from "@tabler/icons-react";
 import { range } from "lodash-es";
 import Link from "next/link";
-import { ReactElement } from "react";
+import { ReactElement, useCallback } from "react";
 import classes from "./result.module.css";
 
 interface TaxonResultProps {
   item: Item;
+  link: string;
 }
 
 interface SupertextProps extends StackProps {
@@ -47,14 +50,49 @@ const Supertext = ({ children, label, labelColour, ...rest }: SupertextProps) =>
 };
 
 interface DetailsActionProps {
+  w?: string | number;
   colour: string;
   label: string;
+  disabled?: boolean;
   icon: TablerIcon;
+  onClick?: () => void;
 }
 
-const TableTaxonDetails = ({ item }: TaxonResultProps) => {
+const DetailsAction = ({ w, colour, label, disabled, icon: Icon, onClick }: DetailsActionProps) => {
+  const theme = useMantineTheme();
+  const themeColours = theme.colors[colour];
+  const textColour = themeColours[8];
+
   return (
-    <Flex gap="xl" align="flex-start" py="xs">
+    <UnstyledButton
+      h="100%"
+      px="sm"
+      py={4}
+      w={w || 125}
+      bg={disabled ? themeColours[0] : themeColours[1]}
+      style={{ borderRadius: theme.radius.lg }}
+      className={disabled ? classes.disabled : classes.hover}
+      onClick={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      disabled={disabled}
+    >
+      <Flex direction="column" align="center" gap={4}>
+        <Icon size="1rem" color={textColour} />
+        <Text c={textColour} fw={600} size="sm">
+          {label}
+        </Text>
+      </Flex>
+    </UnstyledButton>
+  );
+};
+
+const TableTaxonDetails = ({ item, link }: TaxonResultProps) => {
+  return (
+    <Flex className={classes.hover} component={Link} href={link} gap="xl" align="flex-start" py="xs">
       <Supertext w={250} label="Accepted name">
         <Text c="midnight.9" fw="bold" fs="italic">
           {item.canonicalName}
@@ -89,7 +127,7 @@ const TableTaxonDetails = ({ item }: TaxonResultProps) => {
   );
 };
 
-const CardTaxonDetails = ({ item }: TaxonResultProps) => {
+const CardTaxonDetails = ({ item, link }: TaxonResultProps) => {
   return (
     <Stack justify="space-between" w="100%" h="100%">
       <Stack>
@@ -179,7 +217,7 @@ const CardTaxonDetails = ({ item }: TaxonResultProps) => {
   );
 };
 
-const TableSpecimenDetails = ({ item }: TaxonResultProps) => {
+const TableSpecimenDetails = ({ item, link }: TaxonResultProps) => {
   const theme = useMantineTheme();
 
   return (
@@ -215,7 +253,7 @@ const TableSpecimenDetails = ({ item }: TaxonResultProps) => {
   );
 };
 
-const CardSpecimenDetails = ({ item }: TaxonResultProps) => {
+const CardSpecimenDetails = ({ item, link }: TaxonResultProps) => {
   return (
     <Stack justify="space-between" h="100%" w="100%">
       <Stack>
@@ -258,12 +296,42 @@ const CardSpecimenDetails = ({ item }: TaxonResultProps) => {
   );
 };
 
-const TableGenomeDetails = ({ item }: TaxonResultProps) => {
+const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
+  const [saved, setSaved] = useSavedData();
   const theme = useMantineTheme();
+
+  const downloadParts = item.sourceUri ? item.sourceUri.split("/") : [];
+  const downloadUrl = item.sourceUri
+    ? `${item.sourceUri}/${downloadParts[downloadParts.length - 1]}_genomic.fna.gz`
+    : null;
+
+  const inCart = saved.find(({ url }) => url === downloadUrl) !== undefined;
+
+  const handleDownloadGenome = useCallback(() => {
+    if (downloadUrl) {
+      window.open(downloadUrl, "_blank");
+    }
+  }, [saved, downloadUrl]);
+
+  const handleSaveGenome = useCallback(() => {
+    if (downloadUrl && !inCart) {
+      setSaved([
+        ...saved,
+        {
+          url: downloadUrl,
+          label: item.accession || "",
+          dataType: "whole genome",
+          scientificName: item.canonicalName,
+          datePublished: item.eventDate || "Unknown",
+          dataset: { id: "", name: item.dataSource || "Unknown dataset" },
+        },
+      ]);
+    }
+  }, [saved, downloadUrl, inCart]);
 
   return (
     <Flex style={{ flexGrow: 1 }} gap="xl" align="flex-start" justify="space-between">
-      <Flex gap="xl" align="flex-start" py="xs">
+      <Flex className={classes.hover} component={Link} href={link} gap="xl" align="flex-start" py="xs">
         <Supertext w={150} label="Accession number">
           <Text c="midnight.9" fw="bold">
             {item.accession}
@@ -285,11 +353,58 @@ const TableGenomeDetails = ({ item }: TaxonResultProps) => {
           <AttributePill value={item.assemblyType} />
         </Supertext>
       </Flex>
+      <Flex direction="row" h="100%" gap="xs" p="xs">
+        <DetailsAction
+          icon={IconDownload}
+          label="download"
+          colour="bushfire"
+          onClick={handleDownloadGenome}
+          disabled={!downloadUrl}
+        />
+        <DetailsAction
+          icon={IconCircleCheck}
+          label={inCart ? "in cart" : "add to cart"}
+          colour="bushfire"
+          onClick={handleSaveGenome}
+          disabled={!downloadUrl || inCart}
+        />
+      </Flex>
     </Flex>
   );
 };
 
 const CardGenomeDetails = ({ item }: TaxonResultProps) => {
+  const [saved, setSaved] = useSavedData();
+
+  const downloadParts = item.sourceUri ? item.sourceUri.split("/") : [];
+  const downloadUrl = item.sourceUri
+    ? `${item.sourceUri}/${downloadParts[downloadParts.length - 1]}_genomic.fna.gz`
+    : null;
+
+  const inCart = saved.find(({ url }) => url === downloadUrl) !== undefined;
+
+  const handleDownloadGenome = useCallback(() => {
+    if (downloadUrl) {
+      window.open(downloadUrl, "_blank");
+    }
+  }, [saved, downloadUrl]);
+
+  const handleSaveGenome = useCallback(() => {
+    if (downloadUrl && !inCart) {
+      setSaved([
+        ...saved,
+        {
+          url: downloadUrl,
+          label: item.accession || "",
+          dataType: "whole genome",
+          scientificName: item.canonicalName,
+          datePublished: item.eventDate || "Unknown",
+          dataset: { id: "", name: item.dataSource || "Unknown dataset" },
+        },
+      ]);
+    }
+  }, [saved, downloadUrl, inCart]);
+
   return (
     <Stack justify="space-between" h="100%" w="100%">
       <Stack>
@@ -324,13 +439,39 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
           </Text>
         </Supertext>
       </SimpleGrid>
+      <SimpleGrid mt="md" cols={2}>
+        <DetailsAction
+          w="100%"
+          icon={IconDownload}
+          label="download"
+          colour="bushfire"
+          onClick={handleDownloadGenome}
+          disabled={!downloadUrl}
+        />
+        <DetailsAction
+          w="100%"
+          icon={IconCircleCheck}
+          label={inCart ? "in cart" : "add to cart"}
+          colour="bushfire"
+          onClick={handleSaveGenome}
+          disabled={!downloadUrl || inCart}
+        />
+      </SimpleGrid>
     </Stack>
   );
 };
 
-const TableLociDetails = ({ item }: TaxonResultProps) => {
+const TableLociDetails = ({ item, link }: TaxonResultProps) => {
   return (
-    <Flex style={{ flexGrow: 1 }} gap="xl" align="flex-start" justify="space-between">
+    <Flex
+      className={classes.hover}
+      component={Link}
+      href={link}
+      style={{ flexGrow: 1 }}
+      gap="xl"
+      align="flex-start"
+      justify="space-between"
+    >
       <Flex gap="xl" align="flex-start" py="xs">
         <Supertext w={150} label="Accession number">
           <Text c="midnight.9" fw="bold">
@@ -404,7 +545,7 @@ const CardLociDetails = ({ item }: TaxonResultProps) => {
 
 type ResultDetails = {
   [key: string]: {
-    label: string;
+    label: (data: Item) => string;
     colour: string;
     icon: string;
     link: (data: Item) => string;
@@ -415,15 +556,15 @@ type ResultDetails = {
 
 const resultType: ResultDetails = {
   TAXON: {
-    label: "SPECIES REPORT",
+    label: (item) => (["species", "subspecies"].includes(item.rank) ? `${item.rank.toUpperCase()}` : "HIGHER TAXON"),
     colour: "moss",
     icon: "Data type_ Species (and subspecies) report.svg",
-    link: (item) => `/species/${item.canonicalName}`,
+    link: (item) => `/${item.rank}/${item.canonicalName}`,
     tableComponent: TableTaxonDetails,
     cardComponent: CardTaxonDetails,
   },
   GENOME: {
-    label: "WHOLE GENOME",
+    label: () => "WHOLE GENOME",
     colour: "bushfire",
     icon: "Data type_ Whole genome.svg",
     link: (item) => `/species/${item.canonicalName}/whole_genomes/${item.accession}`,
@@ -431,7 +572,7 @@ const resultType: ResultDetails = {
     cardComponent: CardGenomeDetails,
   },
   LOCUS: {
-    label: "SINGLE LOCUS",
+    label: () => "SINGLE LOCUS",
     colour: "wheat",
     icon: "Data type_ Markers.svg",
     link: (item) => `/species/${item.canonicalName}/markers/${item.accession}`,
@@ -439,7 +580,7 @@ const resultType: ResultDetails = {
     cardComponent: CardLociDetails,
   },
   SPECIMEN: {
-    label: "SPECIMEN",
+    label: () => "SPECIMEN",
     colour: "shellfish",
     icon: "Data type_ Specimen.svg",
     link: (item) => `/species/${item.canonicalName}/specimens/${item.accession}`,
@@ -454,7 +595,7 @@ export function TableResult({ item }: { item?: Item }) {
       <Paper className={classes.result} radius="sm" bg="gray.0">
         <Flex pl="lg" direction="row" gap="xl">
           <Center>
-            <Skeleton w={150} h={30.3} radius="xl" />
+            <Skeleton w={175} h={30.3} radius="xl" />
           </Center>
           <Flex gap="xl" py="xs">
             {range(0, 5).map((idx) => (
@@ -475,18 +616,18 @@ export function TableResult({ item }: { item?: Item }) {
   const { label, colour, link, tableComponent: Component } = resultType[item.type];
 
   return (
-    <Paper component={Link} href={link(item)} className={classes.result} radius="sm" bg={`${colour}.0`}>
+    <Paper className={classes.result} radius="sm" bg={`${colour}.0`}>
       <Flex pl="lg" direction="row" gap="xl">
-        <Center>
-          <Paper w={150} py={5} px={15} bg={`${colour}.2`} radius="xl">
+        <Center className={classes.hover} component={Link} href={link(item)}>
+          <Paper w={175} py={5} px={15} bg={`${colour}.2`} radius="xl">
             <Center>
               <Text size="sm" fw="bold" c={`${colour}.9`}>
-                {label}
+                {label(item)}
               </Text>
             </Center>
           </Paper>
         </Center>
-        <Component item={item} />
+        <Component item={item} link={link(item)} />
       </Flex>
     </Paper>
   );
@@ -542,13 +683,13 @@ export function CardResult({ item }: { item?: Item }) {
           <Paper py={5} px="xl" bg={`${colour}.2`} radius="xl">
             <Center>
               <Text size="sm" fw="bold" c={`${colour}.9`}>
-                {label}
+                {label(item)}
               </Text>
             </Center>
           </Paper>
         </Group>
         <Box px="md" pb="md" h="100%">
-          <Component item={item} />
+          <Component item={item} link={link(item)} />
         </Box>
       </Flex>
     </Paper>

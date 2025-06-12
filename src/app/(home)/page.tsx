@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Text, Title, Stack, TextInput, Flex, Box, Center, Group } from "@mantine/core";
-import { /* IconArrowUpRight,*/ IconSearch } from "@tabler/icons-react";
-import { ShowStats, TaxonomicComposition } from "./stats";
 import { gql, useQuery } from "@apollo/client";
+import { Box, Center, Flex, Group, Stack, Text, Title } from "@mantine/core";
+import { /* IconArrowUpRight,*/ IconSearch } from "@tabler/icons-react";
+import { useMemo } from "react";
+import { ShowStats, TaxonomicComposition } from "./stats";
 
 // Project components
 // import { InternalLinkButton } from "@/components/button-link-internal";
@@ -16,6 +15,7 @@ import Browse from "./browse";
 import classes from "./page.module.css";
 
 // Browse data
+import { Search } from "@/components/search";
 import { grouping, taxon, type } from "./_data";
 
 interface Counts {
@@ -32,7 +32,7 @@ interface Counts {
     {
       name: string;
       total: number;
-    },
+    }
   ];
 }
 
@@ -56,46 +56,6 @@ const GET_COUNTS = gql`
   }
 `;
 
-function Search() {
-  const router = useRouter();
-
-  const [value, setValue] = useState("");
-
-  function onSearch(searchTerms: string) {
-    router.push(`/search?q=${encodeURIComponent(searchTerms)}`);
-  }
-
-  return (
-    <form
-      onSubmit={(ev) => {
-        ev.preventDefault();
-        onSearch(value);
-      }}
-    >
-      <TextInput
-        placeholder="e.g. sequence accession, species name"
-        value={value}
-        onChange={(val) => {
-          setValue(val.target.value);
-        }}
-        leftSectionWidth={60}
-        size="xl"
-        radius="lg"
-        styles={{
-          input: {
-            height: 55,
-            fontSize: "16px",
-            fontWeight: "normal",
-            border: 0,
-            color: "#707070",
-          },
-        }}
-        leftSection={<IconSearch size={28} color="black" />}
-      />
-    </form>
-  );
-}
-
 export default function HomePage() {
   const { error, data } = useQuery<{ overview: Counts }>(GET_COUNTS);
 
@@ -109,7 +69,7 @@ export default function HomePage() {
               ...prev,
               [cur.name.replaceAll(" ", "_")]: cur.total,
             }),
-            { ARGA_Threatened_Species: 0 },
+            { ARGA_Threatened_Species: 0 }
           ),
         }
       : null;
@@ -139,11 +99,17 @@ export default function HomePage() {
                     by entering any word in the search bar below, or scroll down to browse pre-filtered groupings.
                   </Text>
                 </Stack>
-                <Stack gap={5}>
+                <Stack gap="lg">
                   <Title order={3} c="moss.5" fz={28} fw={600}>
                     Search for data
                   </Title>
-                  <Search />
+                  <Search
+                    placeholder="e.g. sequence accession, species name"
+                    leftSectionWidth={60}
+                    size="xl"
+                    radius="lg"
+                    leftSection={<IconSearch size={24} color="black" />}
+                  />
                 </Stack>
               </Stack>
               <ShowStats />

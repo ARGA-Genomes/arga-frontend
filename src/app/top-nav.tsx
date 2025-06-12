@@ -2,31 +2,42 @@
 
 import classes from "./top-nav.module.css";
 
-import Link from "next/link";
-import { Burger, NavLink, Group, Image, Stack, Text, Modal, useMantineTheme, Collapse } from "@mantine/core";
-import { useDisclosure, useLocalStorage } from "@mantine/hooks";
-import { useState } from "react";
 import { SavedDataManagerButton } from "@/components/DownloadManager";
+import { Search } from "@/components/search";
+import { Burger, Collapse, Flex, Group, Image, Modal, NavLink, Stack, Text } from "@mantine/core";
+import { useDisclosure, useLocalStorage } from "@mantine/hooks";
+import { IconExternalLink, IconSearch } from "@tabler/icons-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const links = [
-  { link: "/", label: "APP HOME" },
-  { link: "/datasets", label: "DATA SOURCES" },
-  { link: "https://arga.org.au/", label: "PROJECT HOME" },
+  { link: "/", label: <>APP HOME</> },
+  { link: "/datasets", label: <>DATA SOURCES</> },
+  {
+    link: "https://arga.org.au/",
+    label: (
+      <>
+        PROJECT HOME <IconExternalLink style={{ marginLeft: 8 }} size="0.9rem" />
+      </>
+    ),
+  },
 ];
 
 export function TopNav() {
-  const theme = useMantineTheme();
+  const pathname = usePathname();
   const [opened, { toggle, close }] = useDisclosure(false);
-  const [active, setActive] = useState(0);
-  const [saved, _setSaved] = useLocalStorage<string[]>({
+  const [active, setActive] = useState(pathname === "/" ? 0 : 1);
+  const [saved] = useLocalStorage<string[]>({
     key: "save-list",
     defaultValue: [],
   });
+
   const [savedOpened, savedHandler] = useDisclosure(false);
 
   const items = links.map((item, index) => (
     <Link
-      key={item.label}
+      key={item.link}
       href={item.link}
       onClick={() => {
         setActive(index);
@@ -35,58 +46,59 @@ export function TopNav() {
     >
       <NavLink
         component="text"
-        label={<Text fz={16}>{item.label}</Text>}
+        label={<Text fz={14}>{item.label}</Text>}
         active={active === index}
         className={classes.navlink}
-        px={30}
-        pb={25}
+        px={20}
+        py={10}
       />
     </Link>
   ));
 
   return (
-    <Stack gap={40} h="100%">
-      <Modal opened={savedOpened} onClose={savedHandler.close} title="Saved list" size="auto" centered>
-        {saved.map((item, idx) => (
-          <Link href={item} key={idx}>
-            <Text>{item}</Text>
+    <>
+      <Stack gap={40} h="100%">
+        <Modal opened={savedOpened} onClose={savedHandler.close} title="Saved list" size="auto" centered>
+          {saved.map((item, idx) => (
+            <Link href={item} key={idx}>
+              <Text>{item}</Text>
+            </Link>
+          ))}
+        </Modal>
+
+        <Group justify="space-between" align="center" px={25} wrap="nowrap" h="100%">
+          <Link
+            href="/"
+            onClick={() => {
+              setActive(0);
+            }}
+          >
+            <Image p="md" src="/arga-logo.svg" h={110} w="auto" alt="Australian Reference Genome Atlas" />
           </Link>
-        ))}
-      </Modal>
 
-      <Group justify="space-between" align="center" px={25} wrap="nowrap" h="100%">
-        <Link
-          href="/"
-          onClick={() => {
-            setActive(0);
-          }}
-        >
-          <Image p="md" src="/arga-logo.svg" alt="Australian Reference Genome Atlas" />
-        </Link>
-
-        <Stack h="100%">
-          <Group align="center" justify="end" mr={20} wrap="nowrap" h="100%" className={classes.cart}>
-            <SavedDataManagerButton />
-            <Burger opened={opened} onClick={toggle} size="md" color={"white"} className={classes.burgerNav} />
-          </Group>
-
-          <Group wrap="nowrap" className={classes.menuItems}>
-            {items}
-          </Group>
-        </Stack>
-      </Group>
-
+          <div className={classes.actionsWrapper}>
+            <Flex gap="lg" align="center" justify="space-between" mr={20} wrap="nowrap">
+              <Search
+                style={{ flexGrow: 1 }}
+                leftSection={<IconSearch color="var(--mantine-color-midnight-11)" size="1rem" />}
+                radius="md"
+                classNames={{ root: classes.menuItems, input: classes.search }}
+                placeholder="search ARGA"
+              />
+              <SavedDataManagerButton />
+              <Burger opened={opened} onClick={toggle} size="md" color={"white"} className={classes.burgerNav} />
+            </Flex>
+            <Group wrap="nowrap" className={classes.menuItems}>
+              {items}
+            </Group>
+          </div>
+        </Group>
+      </Stack>
       <Collapse in={opened}>
-        <Stack h="100vh" bg={theme.colors.midnight[11]}>
+        <Stack className={classes.collapse} h="100vh" pt="xl">
           {items}
         </Stack>
       </Collapse>
-
-      {/* <Stack hiddenFrom="md" bg={theme.colors.midnight[8]}>
-        <Transition transition="pop-top-right" duration={200} mounted={opened}>
-          {(_styles) => <Stack gap="0">{items}</Stack>}
-        </Transition>
-      </Stack> */}
-    </Stack>
+    </>
   );
 }

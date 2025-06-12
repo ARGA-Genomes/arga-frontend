@@ -1,24 +1,21 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-import { Accordion, Alert, Avatar, Box, Container, Grid, Group, Paper, Stack, Text, TextInput } from "@mantine/core";
+import { Alert, Box, Container, Divider, Group, Paper, Stack, Text } from "@mantine/core";
 import { IconExclamationMark, IconSearch } from "@tabler/icons-react";
 import * as Humanize from "humanize-plus";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { Filter } from "@/components/filtering/common";
-import { DataTypeFilters } from "@/components/filtering/data-type";
 import { PaginationBar, PaginationSize } from "@/components/pagination";
 
+import { FiltersDrawer } from "@/components/filtering-redux/drawer";
+import { GenericFilter } from "@/components/filtering-redux/generic";
+import { buildTantivyQuery, getTooltipForAttribute, InputQueryAttribute, Search } from "@/components/search";
 import { TableCardLayout, TableCardSwitch } from "@/components/table-card-switch";
+import { parseAsAttribute } from "@/helpers/searchParamParser";
 import { Suspense, useEffect, useState } from "react";
 import { MAX_WIDTH } from "../constants";
 import { Results } from "./_components/result";
-
-interface Filters {
-  classifications: Filter[];
-  dataTypes: Filter[];
-}
 
 interface Classification {
   kingdom?: string;
@@ -47,6 +44,7 @@ export interface Item {
   score: number;
   status: string;
   canonicalName: string;
+  rank: string;
   subspecies?: string[];
   synonyms?: string[];
   commonNames?: string[];
@@ -60,6 +58,7 @@ export interface Item {
   assemblyType?: string;
   referenceGenome?: boolean;
   releaseDate?: string;
+  sourceUri?: string;
 
   locusType?: string;
   voucherStatus?: string;
@@ -85,11 +84,9 @@ interface QueryResults {
   search: SearchResults;
 }
 
-const PAGE_SIZE = 10;
-
 const SEARCH_FULLTEXT = gql`
-  query FullTextSearch($query: String, $page: Int, $perPage: Int, $filters: [FilterItem]) {
-    search(filters: $filters) {
+  query FullTextSearch($query: String, $page: Int, $perPage: Int) {
+    search {
       fullText(query: $query, page: $page, perPage: $perPage) {
         total
         records {
@@ -101,6 +98,7 @@ const SEARCH_FULLTEXT = gql`
             subspecies
             synonyms
             commonNames
+            rank
             classification {
               kingdom
               phylum
@@ -134,6 +132,7 @@ const SEARCH_FULLTEXT = gql`
             assemblyType
             referenceGenome
             releaseDate
+            sourceUri
           }
           ... on LocusItem {
             type
@@ -167,134 +166,28 @@ const SEARCH_FULLTEXT = gql`
   }
 `;
 
-interface SearchProperties {
-  onSearch: (searchTerms: string, dataType: string) => void;
-  data: QueryResults | undefined;
-  loading: boolean;
-  initialQuery: string;
-}
-
-function Search({ onSearch, initialQuery, data, loading }: SearchProperties & { initialQuery: string }) {
-  const [value, setValue] = useState(initialQuery);
-  const [searchTerms, setSearchTerms] = useState(initialQuery);
-  const [dataType, setDataType] = useState("all");
-
-  function _onFilter(value: string) {
-    setDataType(value);
-    onSearch(searchTerms, value);
-  }
-
-  function onSearchHandler(value: string) {
-    setSearchTerms(value);
-    onSearch(value, dataType);
-  }
-
-  return (
-    <Paper bg="midnight.0" p={10} radius={0}>
-      <Box>
-        <form
-          onSubmit={(ev) => {
-            ev.preventDefault();
-            onSearchHandler(value);
-          }}
-        >
-          <Grid align="center" m={10}>
-            <Grid.Col span={12}>
-              <TextInput
-                placeholder="e.g. sequence accession, species name"
-                value={value}
-                onChange={(val) => {
-                  setValue(val.target.value);
-                }}
-                leftSectionWidth={60}
-                size="xl"
-                radius={16}
-                leftSection={<IconSearch size={28} />}
-              />
-            </Grid.Col>
-          </Grid>
-        </form>
-      </Box>
-    </Paper>
-  );
-}
-
-interface FilterGroupProps {
-  label: string;
-  description: string;
-  image: string;
-}
-
-function FilterGroup({ label, description, image }: FilterGroupProps) {
-  return (
-    <Group wrap="nowrap">
-      <Avatar src={image} size="lg" />
-      <div>
-        <Text>{label}</Text>
-        <Text size="sm" c="dimmed" fw={400} lineClamp={1}>
-          {description}
-        </Text>
-      </div>
-    </Group>
-  );
-}
-
-interface FiltersProps {
-  filters: Filters;
-  onChange: (filters: Filters) => void;
-}
-
-function Filters({ filters, onChange }: FiltersProps) {
-  const [classifications, _setClassifications] = useState<Filter[]>(filters.classifications);
-  const [dataTypes, setDataTypes] = useState<Filter[]>(filters.dataTypes);
-
-  useEffect(() => {
-    onChange({
-      classifications,
-      dataTypes,
-    });
-  }, [classifications, dataTypes, onChange]);
-
-  return (
-    <Accordion defaultValue="dataType" variant="separated">
-      <Accordion.Item value="dataType">
-        <Accordion.Control>
-          <FilterGroup
-            label="Data types"
-            description="Only show records of the specific types enabled"
-            image="/icons/data-type/Data type_ Whole genome.svg"
-          />
-        </Accordion.Control>
-        <Accordion.Panel>
-          <DataTypeFilters filters={dataTypes} onChange={setDataTypes} />
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
-  );
-}
-
 function SearchPage() {
   const [layout, setLayout] = useState<TableCardLayout>("table");
-  const [query, setQuery] = useQueryState("q", { defaultValue: "" });
+  const [rawQuery] = useQueryState("q", { defaultValue: "" });
+  const [attributes, setAttributes] = useQueryState("attributes", parseAsAttribute.withDefault([]));
+
+  const [filters, setFilters] = useState<InputQueryAttribute[]>([]);
 
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [perPage, setPerPage] = useQueryState("perPage", parseAsInteger.withDefault(10));
 
   const [lastResultCount, setLastResultCount] = useState<number | null>(null);
 
+  const allAttributes = [...attributes, ...filters];
+  const query = buildTantivyQuery(allAttributes, rawQuery);
+
   const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
     variables: {
       query,
       page,
       perPage,
-      filters: [],
     },
   });
-
-  function onSearch(searchTerms: string, _dataType: string) {
-    setQuery(searchTerms);
-    setPage(1);
-  }
 
   // Handle pagination changes on layout/filter change
   useEffect(() => {
@@ -306,16 +199,43 @@ function SearchPage() {
     if (data) setLastResultCount(data.search.fullText.total);
   }, [data]);
 
+  const handleAttributeSwitch = (
+    item: InputQueryAttribute,
+    items: InputQueryAttribute[],
+    setItems: (items: InputQueryAttribute[]) => void
+  ) =>
+    setItems(
+      items.map((filterAttr) =>
+        item.field === filterAttr.field && item.value === filterAttr.value
+          ? { ...filterAttr, include: !filterAttr.include }
+          : filterAttr
+      )
+    );
+
+  const handleAttributeRemove = (
+    item: InputQueryAttribute,
+    items: InputQueryAttribute[],
+    setItems: (items: InputQueryAttribute[]) => void
+  ) => setItems(items.filter((filterAttr) => !(item.field === filterAttr.field && item.value === filterAttr.value)));
+
   return (
     <>
-      <Search onSearch={onSearch} data={data} loading={loading} initialQuery={query} />
+      <Box p="md">
+        <Search
+          placeholder="e.g. sequence accession, species name"
+          leftSectionWidth={60}
+          size="xl"
+          radius="lg"
+          leftSection={<IconSearch size={24} color="black" />}
+        />
+      </Box>
 
       <Paper>
         <Container maw={MAX_WIDTH} fluid py="xl">
           <Stack>
             <Group justify="space-between">
               <Text fz="lg">
-                {lastResultCount ? (
+                {lastResultCount !== null ? (
                   <>
                     <b>
                       {1 + perPage * (page - 1)}-{Math.min(page * perPage, lastResultCount)}
@@ -325,7 +245,8 @@ function SearchPage() {
                 ) : (
                   "Loading "
                 )}
-                search results{lastResultCount ? " found" : ""} for <b>{query}</b>
+                search results{lastResultCount ? " found" : ""} for{" "}
+                <b>{rawQuery.length > 0 ? rawQuery : "everything"}</b>
               </Text>
               <Group>
                 <PaginationSize
@@ -333,10 +254,48 @@ function SearchPage() {
                   value={perPage}
                   onChange={setPerPage}
                 />
+                <FiltersDrawer
+                  types={["searchDataType", "classification"]}
+                  onSearchFilter={(newFilters) => {
+                    setFilters(newFilters);
+                    setPage(1);
+                  }}
+                />
                 <TableCardSwitch layout={layout} onChange={setLayout} />
               </Group>
             </Group>
-
+            {allAttributes.length > 0 && (
+              <Group>
+                {attributes.map((attr, idx) => (
+                  <GenericFilter
+                    key={idx}
+                    name={attr.name}
+                    value={attr.value}
+                    include={attr.include}
+                    tooltip={getTooltipForAttribute(attr)}
+                    onSwitch={() => handleAttributeSwitch(attr, attributes, setAttributes)}
+                    onRemove={() => handleAttributeRemove(attr, attributes, setAttributes)}
+                  />
+                ))}
+                {attributes.length > 0 && filters.length > 0 && <Divider orientation="vertical" />}
+                {filters.length > 0 && (
+                  <Text size="sm" c="dimmed" mb={3}>
+                    Page filters
+                  </Text>
+                )}
+                {filters.map((attr, idx) => (
+                  <GenericFilter
+                    key={idx}
+                    name={attr.name}
+                    value={attr.value}
+                    include={attr.include}
+                    tooltip={getTooltipForAttribute(attr)}
+                    onSwitch={() => handleAttributeSwitch(attr, filters, setFilters)}
+                    onRemove={() => handleAttributeRemove(attr, filters, setFilters)}
+                  />
+                ))}
+              </Group>
+            )}
             {error && (
               <Alert radius="lg" variant="light" color="red" title="Unexpected failure" icon={<IconExclamationMark />}>
                 <Text c="red">{error.message}</Text>

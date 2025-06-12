@@ -1,0 +1,16 @@
+.combobox {
+  border-radius: var(--mantine-radius-lg);
+}
+
+.option {
+  border-radius: var(--mantine-radius-lg);
+}
+
+.option[data-combobox-selected="true"] {
+  background-color: var(--mantine-color-midnight-9);
+}
+
+.dropdown {
+  border-radius: var(--mantine-radius-lg);
+  z-index: 3000 !important;
+}

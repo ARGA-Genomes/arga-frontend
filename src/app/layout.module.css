@@ -1,7 +1,9 @@
 .header {
-    background-color: light-dark(var(--mantine-color-midnight-11), var(--mantine-color-midnight-11));
+  background-color: rgba(32, 54, 68, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--mantine-shadow-lg);
 }
 
 .footer {
-    background-color: light-dark(var(--mantine-color-midnight-11), var(--mantine-color-midnight-11));
+  background-color: light-dark(var(--mantine-color-midnight-11), var(--mantine-color-midnight-11));
 }
