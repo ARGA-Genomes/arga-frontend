@@ -1,12 +1,12 @@
 "use client";
 
+import { MAX_WIDTH } from "@/app/constants";
+import { Taxonomy } from "@/app/type";
 import { gql, useQuery } from "@apollo/client";
-import { Container, Group, Paper, Text, Flex, useMantineTheme } from "@mantine/core";
-import { Conservation, Taxonomy } from "@/app/type";
+import { Container, Flex, Group, Paper, Text, useMantineTheme } from "@mantine/core";
+import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
-import { MAX_WIDTH } from "@/app/constants";
-import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 
 const GET_SPECIES = gql`
   query SpeciesWithAttributes($canonicalName: String) {
