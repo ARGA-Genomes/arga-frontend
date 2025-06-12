@@ -378,7 +378,7 @@ function SearchSuggestion({ attribute, value, onAdd }: SearchSuggestionProps) {
         >
           <Flex justify="center" align="center" gap="xs">
             <Text size="sm">
-              Filter <b>{attribute.name}</b> by '{value}'
+              Filter <b>{attribute.name}</b> by &apos;{value}&apos;
             </Text>
             <IconPlus size="1rem" />
           </Flex>
@@ -416,6 +416,8 @@ export function Search(props: SearchProps) {
   ).slice(0, 5);
 
   const attributeSuggestion: InputQueryAttribute | null = useMemo(() => {
+    // Ignore this lint for the next line becuase it's needed for the regex
+    // eslint-disable-next-line no-useless-escape
     const found = SEARCH_ATTRIBUTES.find((attr) => new RegExp(`^${attr.name} [a-zA-Z0-9 \._]+$`).test(search)) || null;
     return found
       ? {
