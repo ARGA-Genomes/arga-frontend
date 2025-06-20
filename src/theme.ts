@@ -12,6 +12,34 @@ export const gothamBold = localFont({
   src: "../public/fonts/gotham/GothamBold.ttf",
 });
 
+/*** BRAND COLOURS ***
+ *
+ * Midnight
+ *   CMYK 87 67 50 42
+ *   RGB 35 60 75
+ *   HEX #233C4B
+ *
+ * Shellfish
+ *   CMYK 66 17 40 2
+ *   RGB 88 163 157
+ *   HEX #58A39D
+ *
+ * Moss
+ *   CMYK 40 7 73 0
+ *   RGB 162 195 110
+ *   HEX #A2C36E
+ *
+ * Bushfire
+ *   CMYK 0 64 92 0
+ *   RGB 244 124 46
+ *   HEX #F47C2E
+ *
+ * Wheat
+ *   CMYK 0 22 84 0
+ *   RGB 254 199 67
+ *   HEX #FEC743
+ *********************/
+
 export const theme = createTheme({
   colors: {
     // midnight: ['#e7f4ff', '#c8dce9', '#a8c5d6', '#87aec5', '#6797b4', '#486471', '#2d4d5c', '#193d4d', '#15313f', '#001017'],
@@ -101,6 +129,32 @@ export const theme = createTheme({
       "#4e938e",
       "#40847f",
       "#2b736d",
+    ],
+
+    wheatBg: [
+      "rgba(254, 199, 67, 0.1)",
+      "rgba(254, 199, 67, 0.2)",
+      "rgba(254, 199, 67, 0.3)",
+      "rgba(254, 199, 67, 0.4)",
+      "rgba(254, 199, 67, 0.5)",
+      "rgba(254, 199, 67, 0.6)",
+      "rgba(254, 199, 67, 0.7)",
+      "rgba(254, 199, 67, 0.8)",
+      "rgba(254, 199, 67, 0.9)",
+      "rgba(254, 199, 67, 1.0)",
+    ],
+
+    shellfishBg: [
+      "rgba(88, 163, 157, 0.1)",
+      "rgba(88, 163, 157, 0.2)",
+      "rgba(88, 163, 157, 0.3)",
+      "rgba(88, 163, 157, 0.4)",
+      "rgba(88, 163, 157, 0.5)",
+      "rgba(88, 163, 157, 0.6)",
+      "rgba(88, 163, 157, 0.7)",
+      "rgba(88, 163, 157, 0.8)",
+      "rgba(88, 163, 157, 0.9)",
+      "rgba(88, 163, 157, 1.0)",
     ],
   },
 

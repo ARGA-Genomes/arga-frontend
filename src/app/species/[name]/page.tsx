@@ -1,7 +1,5 @@
-'use client';
+"use client";
 
 export default function SpeciesPage() {
-  return (
-    <></>
-  );
+  return <></>;
 }

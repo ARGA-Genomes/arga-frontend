@@ -1,9 +1,10 @@
-"use client";;
+"use client";
 import { use } from "react";
 
 import classes from "./layout.module.css";
 
 import { Container, Paper, Stack, Tabs } from "@mantine/core";
+import { SpeciesProvider } from "@/app/species-provider";
 import SpeciesHeader from "@/components/species-header";
 import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -11,13 +12,7 @@ import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
 
-function DataTabs({
-  name,
-  children,
-}: {
-  name: string;
-  children: React.ReactNode;
-}) {
+function DataTabs({ name, children }: { name: string; children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
 
@@ -78,23 +73,23 @@ interface SpeciesLayoutProps {
 export default function SpeciesLayout(props: SpeciesLayoutProps) {
   const params = use(props.params);
 
-  const {
-    children
-  } = props;
+  const { children } = props;
 
   const name = decodeURIComponent(params.name);
   const canonicalName = name.replaceAll("_", " ");
 
   return (
-    <Stack gap={0} mt="xl">
-      <Container mb={20} w="100%" maw={MAX_WIDTH}>
-        <PreviousPage />
-      </Container>
-      <SpeciesHeader canonicalName={canonicalName} />
-      <DataTabs name={name}>
-        <Container maw={MAX_WIDTH}>{children}</Container>
-      </DataTabs>
-      <PageCitation />
-    </Stack>
+    <SpeciesProvider name={canonicalName}>
+      <Stack gap={0} mt="xl">
+        <Container mb={20} w="100%" maw={MAX_WIDTH}>
+          <PreviousPage />
+        </Container>
+        <SpeciesHeader canonicalName={canonicalName} />
+        <DataTabs name={name}>
+          <Container maw={MAX_WIDTH}>{children}</Container>
+        </DataTabs>
+        <PageCitation />
+      </Stack>
+    </SpeciesProvider>
   );
 }

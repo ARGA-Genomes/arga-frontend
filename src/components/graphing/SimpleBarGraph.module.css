@@ -1,0 +1,9 @@
+.simpleBar {
+    fill: var(--mantine-color-shellfish-5);
+    opacity: 0.6;
+}
+
+.axisLine {
+    stroke: var(--mantine-color-midnight-5);
+    stroke-width: 2px;
+}
