@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { createFragmentRegistry } from "@apollo/client/cache";
 
-import { ACCESSION_EVENT, COLLECTION_EVENT, SPECIMEN } from "./specimen";
+import { ACCESSION_EVENT, COLLECTION_EVENT, SPECIMEN, SPECIMEN_OVERVIEW, SPECIMEN_MAP_MARKER } from "./specimen";
 import { SUBSAMPLE, SUBSAMPLE_EVENT } from "./subsample";
 import { DNA_EXTRACT, DNA_EXTRACTION_EVENT } from "./dna-extract";
 import { TAXON_TREE_NODE_STATISTICS } from "./stats";
@@ -19,6 +19,8 @@ import { PUBLICATION } from "./publication";
 export default function createClient() {
   const fragments = createFragmentRegistry(
     SPECIMEN,
+    SPECIMEN_OVERVIEW,
+    SPECIMEN_MAP_MARKER,
     SUBSAMPLE,
     DNA_EXTRACT,
     SEQUENCE,
@@ -35,7 +37,7 @@ export default function createClient() {
     TAXON_NAME,
     TAXON_SOURCE,
     TAXON_NODE,
-    PUBLICATION
+    PUBLICATION,
   );
 
   // for now just use the memory cache to help reduce the total amount of server requests.

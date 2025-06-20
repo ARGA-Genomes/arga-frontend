@@ -2,161 +2,216 @@ import { gql } from "@apollo/client";
 
 export const SPECIMEN = gql`
   fragment SpecimenDetails on Specimen {
-    recordId
     entityId
     organismId
-    materialSampleId
-    collectionCode
-    institutionName
-    institutionCode
-    recordedBy
-    identifiedBy
-    identifiedDate
-    typeStatus
-    latitude
-    longitude
-    locationSource
-    locality
-    country
-    countryCode
-    county
-    municipality
-    stateProvince
-    depth
-    elevation
-    depthAccuracy
-    elevationAccuracy
-    details
-    remarks
-    identificationRemarks
+    canonicalName
   }
 `;
 
 export interface Specimen {
-  recordId: string;
-  entityId?: string;
-  organismId?: string;
-  materialSampleId?: string;
-  collectionCode?: string;
-  institutionName?: string;
+  entityId: string;
+  organismId: string;
+  canonicalName: string;
+}
+
+export const SPECIMEN_SUMMARY = gql`
+  fragment SpecimenSummary on Specimen {
+    entityId
+    collectionRepositoryId
+    collectionRepositoryCode
+    institutionCode
+    institutionName
+    typeStatus
+    locality
+    country
+    latitude
+    longitude
+    sequences
+    wholeGenomes
+    markers
+  }
+`;
+
+export interface SpecimenSummary {
+  entityId: string;
+  collectionRepositoryId?: string;
+  collectionRepositoryCode?: string;
   institutionCode?: string;
-  recordedBy?: string;
-  identifiedBy?: string;
-  identifiedDate?: string;
+  institutionName?: string;
   typeStatus?: string;
-  latitude?: number;
-  longitude?: number;
-  locationSource?: string;
   locality?: string;
   country?: string;
-  countryCode?: string;
-  county?: string;
-  municipality?: string;
-  stateProvince?: string;
-  depth?: string;
-  elevation?: string;
-  depthAccuracy?: string;
-  elevationAccuracy?: string;
-  details?: string;
-  remarks?: string;
-  identificationRemarks?: string;
-  markers?: number;
+  latitude?: number;
+  longitude?: number;
   sequences?: number;
   wholeGenomes?: number;
+  markers?: number;
+}
+
+export const SPECIMEN_OVERVIEW = gql`
+  fragment SpecimenOverviewDetails on SpecimensOverview {
+    total
+    majorCollections
+    holotype
+    otherTypes
+    formalVouchers
+    tissues
+    genomicDna
+    australianMaterial
+    nonAustralianMaterial
+    collectionYears {
+      year
+      value
+    }
+  }
+`;
+
+export interface SpecimenOverview {
+  total: number;
+  majorCollections: string[];
+  holotype?: string;
+  otherTypes?: number;
+  formalVouchers?: number;
+  tissues?: number;
+  genomicDna?: number;
+  australianMaterial?: number;
+  nonAustralianMaterial?: number;
+  collectionYears: YearValue<number>[];
+}
+
+export interface YearValue<T> {
+  year: number;
+  value: T;
+}
+
+export const SPECIMEN_MAP_MARKER = gql`
+  fragment SpecimenMapMarkerDetails on SpecimenMapMarker {
+    collectionRepositoryId
+    typeStatus
+    latitude
+    longitude
+  }
+`;
+
+export interface SpecimenMapMarker {
+  collectionRepositoryId?: string;
+  typeStatus?: string;
+  latitude: number;
+  longitude: number;
 }
 
 export const COLLECTION_EVENT = gql`
   fragment CollectionEventDetails on CollectionEvent {
+    entityId
+    fieldCollectingId
     eventDate
     eventTime
     collectedBy
-    behavior
-    catalogNumber
-    degreeOfEstablishment
-    envBroadScale
-    envLocalScale
-    envMedium
+    collectionRemarks
+    identifiedBy
+    identifiedDate
+    identificationRemarks
+    locality
+    country
+    countryCode
+    stateProvince
+    county
+    municipality
+    latitude
+    longitude
+    elevation
+    depth
+    elevationAccuracy
+    depthAccuracy
+    locationSource
+    preparation
+    environmentBroadScale
+    environmentLocalScale
+    environmentMedium
     habitat
-    establishmentMeans
+    specificHost
     individualCount
-    isolate
-    lifeStage
-    occurrenceStatus
     organismQuantity
     organismQuantityType
-    otherCatalogNumbers
-    pathway
-    preparation
-    recordNumber
-    refBiomaterial
-    reproductiveCondition
-    sex
-    genotypicSex
-    phenotypicSex
-    sourceMatId
-    specificHost
     strain
-    fieldNumber
+    isolate
     fieldNotes
-    remarks
   }
 `;
 
 export interface CollectionEvent {
-  eventDate?: string;
+  entityId: string;
+  fieldCollectingId?: string;
+  eventDate?: Date;
   eventTime?: string;
   collectedBy?: string;
-  behavior?: string;
-  catalogNumber?: string;
-  degreeOfEstablishment?: string;
-  envBroadScale?: string;
-  envLocalScale?: string;
-  envMedium?: string;
+  collectionRemarks?: string;
+  identifiedBy?: string;
+  identifiedDate?: Date;
+  identificationRemarks?: string;
+  locality?: string;
+  country?: string;
+  countryCode?: string;
+  stateProvince?: string;
+  county?: string;
+  municipality?: string;
+  latitude?: number;
+  longitude?: number;
+  elevation?: number;
+  depth?: number;
+  elevationAccuracy?: number;
+  depthAccuracy?: number;
+  locationSource?: string;
+  preparation?: string;
+  environmentBroadScale?: string;
+  environmentLocalScale?: string;
+  environmentMedium?: string;
   habitat?: string;
-  establishmentMeans?: string;
+  specificHost?: string;
   individualCount?: string;
-  isolate?: string;
-  lifeStage?: string;
-  occurrenceStatus?: string;
   organismQuantity?: string;
   organismQuantityType?: string;
-  otherCatalogNumbers?: string;
-  pathway?: string;
-  preparation?: string;
-  recordNumber?: string;
-  refBiomaterial?: string;
-  reproductiveCondition?: string;
-  sex?: string;
-  genotypicSex?: string;
-  phenotypicSex?: string;
-  sourceMatId?: string;
-  specificHost?: string;
   strain?: string;
-  fieldNumber?: string;
+  isolate?: string;
   fieldNotes?: string;
-  remarks?: string;
 }
 
 export const ACCESSION_EVENT = gql`
   fragment AccessionEventDetails on AccessionEvent {
+    entityId
+    typeStatus
     eventDate
     eventTime
-    accession
-    accessionedBy
+    collectionRepositoryId
+    collectionRepositoryCode
     institutionName
     institutionCode
-    materialSampleId
-    typeStatus
+    disposition
+    preparation
+    accessionedBy
+    preparedBy
+    identifiedBy
+    identifiedDate
+    identificationRemarks
+    otherCatalogNumbers
   }
 `;
 
 export interface AccessionEvent {
-  eventDate?: string;
+  entityId: string;
+  typeStatus?: string;
+  eventDate?: Date;
   eventTime?: string;
-  accession?: string;
-  accessionedBy?: string;
+  collectionRepositoryId?: string;
+  collectionRepositoryCode?: string;
   institutionName?: string;
   institutionCode?: string;
-  materialSampleId?: string;
-  typeStatus?: string;
+  disposition?: string;
+  preparation?: string;
+  accessionedBy?: string;
+  preparedBy?: string;
+  identifiedBy?: string;
+  identifiedDate?: Date;
+  identificationRemarks?: string;
+  otherCatalogNumbers?: string;
 }

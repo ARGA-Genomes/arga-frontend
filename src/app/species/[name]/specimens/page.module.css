@@ -1,0 +1,23 @@
+.skeletonOverview:where([data-visible])::before {
+    background-color: var(--mantine-color-wheat-2);
+}
+
+.skeletonOverview:where([data-visible])::after {
+    background-color: var(--mantine-color-wheat-1);
+}
+
+.cardTable {
+    th {
+        font-weight: 300;
+        background-color: transparent;
+        color: var(--mantine-color-midnight-9);
+        width: 1px;
+        white-space: nowrap;
+    }
+
+    td {
+        font-weight: 600;
+        color: var(--mantine-color-midnight-9);
+        width: 100%;
+    }
+}
