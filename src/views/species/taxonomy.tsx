@@ -35,7 +35,7 @@ import {
   IconExternalLink,
   IconSearch,
 } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { AttributePillValue, DataField } from "@/components/data-fields";
@@ -47,7 +47,7 @@ import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
 import { Taxon, TaxonNode } from "@/queries/taxa";
 import HorizontalTimeline, { TimelineItem, TimelineItemType } from "@/components/graphing/horizontal-timeline";
 import { Publication } from "@/queries/publication";
-import { Specimen } from "@/queries/specimen";
+import { AccessionEvent, CollectionEvent, Specimen } from "@/queries/specimen";
 import { AnalysisMap } from "@/components/mapping";
 import { ExternalLinkButton } from "@/components/button-link-external";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
@@ -101,20 +101,11 @@ const GET_TAXON = gql`
         name {
           scientificName
         }
-        specimen {
-          typeStatus
-          recordId
-          materialSampleId
-          collectionCode
-          institutionCode
-          institutionName
-          recordedBy
-          identifiedBy
-          locality
-          country
-          stateProvince
-          latitude
-          longitude
+        accession {
+          ...AccessionEventDetails
+        }
+        collection {
+          ...CollectionEventDetails
         }
       }
 
@@ -163,20 +154,11 @@ const GET_TYPE_SPECIMENS = gql`
         name {
           scientificName
         }
-        specimen {
-          typeStatus
-          recordId
-          materialSampleId
-          collectionCode
-          institutionCode
-          institutionName
-          recordedBy
-          identifiedBy
-          locality
-          country
-          stateProvince
-          latitude
-          longitude
+        accession {
+          ...AccessionEventDetails
+        }
+        collection {
+          ...CollectionEventDetails
         }
       }
     }
@@ -228,7 +210,8 @@ interface ExtendedTaxon extends Taxon {
   nomenclaturalActs: NomenclaturalAct[];
   taxonomicActs: TaxonomicAct[];
   typeSpecimens: {
-    specimen: Specimen;
+    accession: AccessionEvent;
+    collection: CollectionEvent;
     name: { scientificName: string };
   }[];
 }
@@ -237,12 +220,15 @@ interface TaxonQuery {
   taxon: ExtendedTaxon;
 }
 
+interface TypeSpecimen {
+  accession: AccessionEvent;
+  collection: CollectionEvent;
+  name: { scientificName: string };
+}
+
 interface TypeSpecimenQuery {
   taxon: {
-    typeSpecimens: {
-      specimen: Specimen;
-      name: { scientificName: string };
-    }[];
+    typeSpecimens: TypeSpecimen[];
   };
 }
 
@@ -520,9 +506,12 @@ interface DetailsProps {
 function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: DetailsProps) {
   const typeSpecimens = taxonomy.typeSpecimens?.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.specimen.typeStatus != "no voucher",
+      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher",
   );
-  const typeSpecimen = typeSpecimens?.[0]?.specimen;
+
+  // TODO: change this to show multiple type specimens for things like syntypes
+  const typeAccession = typeSpecimens?.[0]?.accession;
+  const typeCollection = typeSpecimens?.[0]?.collection;
 
   return (
     <Paper radius={16} p="md" withBorder>
@@ -564,22 +553,26 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
                 <DataField value={undefined} />
               </DataTableRow>
               <DataTableRow label="Type material">
-                <AttributePillValue value={typeSpecimen?.recordId} />
+                <AttributePillValue
+                  value={`${typeAccession?.institutionCode} ${typeAccession?.collectionRepositoryId}`}
+                />
               </DataTableRow>
               <DataTableRow label="Type location (from source)">
                 <Flex justify="space-between" align="center">
                   <DataField
-                    value={[typeSpecimen?.locality, typeSpecimen?.stateProvince, typeSpecimen?.country]
+                    value={[typeCollection?.locality, typeCollection?.stateProvince, typeCollection?.country]
                       .filter((t) => t)
                       .join(", ")}
                   />
-                  {typeSpecimen?.locationSource && <SourcePill value={typeSpecimen.locationSource} />}
+                  {typeCollection?.locationSource && <SourcePill value={typeCollection.locationSource} />}
                 </Flex>
               </DataTableRow>
-              {typeSpecimen?.latitude && typeSpecimen.longitude && (
+              {typeCollection?.latitude && typeCollection.longitude && (
                 <DataTableRow label="Type location (geo)">
                   <Group>
-                    <DataField value={[typeSpecimen.latitude, typeSpecimen.longitude].filter((t) => t).join(", ")} />
+                    <DataField
+                      value={[typeCollection.latitude, typeCollection.longitude].filter((t) => t).join(", ")}
+                    />
 
                     <Popover width={500} position="right" withArrow shadow="md">
                       <Popover.Target>
@@ -599,9 +592,9 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
                           <AnalysisMap
                             markers={[
                               {
-                                recordId: typeSpecimen.recordId,
-                                latitude: typeSpecimen.latitude,
-                                longitude: typeSpecimen.longitude,
+                                recordId: typeAccession?.collectionRepositoryId ?? "",
+                                latitude: typeCollection.latitude,
+                                longitude: typeCollection.longitude,
                                 color: [103, 151, 180, 220],
                               },
                             ]}
@@ -831,7 +824,7 @@ function History({ taxonomy, specimens }: { taxonomy: ExtendedTaxon; specimens?:
                 />
               }
               header={<NomenclaturalActHeader item={act} />}
-              body={<NomenclaturalActBody item={act} protonym={protonym} specimensWithData={specimens} />}
+              body={<NomenclaturalActBody item={act} protonym={protonym} />}
             />
           ))}
         </EventTimeline>
@@ -862,10 +855,9 @@ function NomenclaturalActHeader({ item }: { item: NomenclaturalAct }) {
 interface NomenclaturalActBodyProps {
   item: NomenclaturalAct;
   protonym: NomenclaturalAct;
-  specimensWithData?: Specimen[];
 }
 
-function NomenclaturalActBody({ item, protonym, specimensWithData }: NomenclaturalActBodyProps) {
+function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   const { loading, data } = useQuery<ProvenanceQuery>(GET_NOMENCLATURAL_ACT_PROVENANCE, {
     variables: { entityId: item.entityId },
   });
@@ -877,31 +869,9 @@ function NomenclaturalActBody({ item, protonym, specimensWithData }: Nomenclatur
     },
   });
 
-  const typeSpecimens = specimens.data?.taxon.typeSpecimens.filter(
-    (typeSpecimen) =>
-      typeSpecimen.name.scientificName == item.name.scientificName && typeSpecimen.specimen.typeStatus != "no voucher",
+  const holotype = specimens.data?.taxon.typeSpecimens.find(
+    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype",
   );
-
-  const locality = useMemo(() => typeSpecimens?.find(({ specimen }) => specimen.locality !== null), [typeSpecimens]);
-  const geo = useMemo(() => typeSpecimens?.find(({ specimen }) => specimen.latitude !== null), [typeSpecimens]);
-
-  const specimenMap: Record<string, SpecimenRecordNumbers> = useMemo(() => {
-    if (specimensWithData)
-      return specimensWithData
-        .filter((specimen) => (specimen.markers || 0) + (specimen.sequences || 0) + (specimen.wholeGenomes || 0) > 0)
-        .reduce(
-          (prev, specimen) => ({
-            ...prev,
-            [specimen.recordId]: {
-              markers: specimen.markers,
-              sequences: specimen.sequences,
-              wholeGenomes: specimen.wholeGenomes,
-            },
-          }),
-          {},
-        );
-    return {};
-  }, [specimensWithData]);
 
   function humanize(text: string) {
     return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
@@ -951,21 +921,17 @@ function NomenclaturalActBody({ item, protonym, specimensWithData }: Nomenclatur
         {item.act == "ORIGINAL_DESCRIPTION" && (
           <DataTableRow label="Type material" key={item.entityId}>
             <Group gap={12}>
-              {typeSpecimens?.map(({ specimen }) => (
-                <TypeSpecimenPill
-                  key={specimen.entityId}
-                  specimen={specimen}
-                  records={specimenMap?.[specimen.recordId]}
-                />
+              {specimens.data?.taxon.typeSpecimens?.map((specimen) => (
+                <TypeSpecimenPill key={specimen.accession.entityId} specimen={specimen} />
               ))}
             </Group>
           </DataTableRow>
         )}
         <DataTableRow label="Type location (source)">
-          <DataField value={locality?.specimen.locality} />
+          <DataField value={holotype?.collection.locality} />
         </DataTableRow>
         <DataTableRow label="Type location (geo)">
-          <DataField value={`${geo?.specimen.latitude}, ${geo?.specimen.longitude}`} />
+          <DataField value={`${holotype?.collection.latitude}, ${holotype?.collection.longitude}`} />
         </DataTableRow>
       </DataTable>
 
@@ -1123,14 +1089,6 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
     skip: isSubspecies,
   });
 
-  const { data: specimens } = useQuery<QueryResults>(GET_SPECIMENS, {
-    variables: {
-      canonicalName: canonicalName,
-      page: 1,
-      pageSize: 500,
-    },
-  });
-
   if (error) {
     return <Text>Error : {error.message}</Text>;
   }
@@ -1159,7 +1117,7 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
       )}
       <ExternalLinks canonicalName={canonicalName} />
 
-      {taxonomy && <History taxonomy={taxonomy} specimens={specimens?.species.specimens.records} />}
+      {taxonomy && <History taxonomy={taxonomy} />}
     </Stack>
   );
 }
@@ -1168,10 +1126,11 @@ function humanize(text: string) {
   return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
 }
 
-function TypeSpecimenPill({ specimen, records }: { specimen: Specimen; records?: SpecimenRecordNumbers }) {
+function TypeSpecimenPill({ specimen, records }: { specimen: TypeSpecimen; records?: SpecimenRecordNumbers }) {
   const [opened, { close, open }] = useDisclosure(false);
 
   const hasData = Boolean(records);
+  const recordId = `${specimen.accession.institutionCode} ${specimen.accession.collectionRepositoryId}`;
 
   return (
     <Popover position="right" withArrow shadow="md" opened={opened && hasData} radius="md">
@@ -1184,15 +1143,17 @@ function TypeSpecimenPill({ specimen, records }: { specimen: Specimen; records?:
           color={hasData ? "moss" : "bushfire"}
         >
           <InternalLinkButton
-            url={`specimens/${specimen.recordId}`}
+            url={`specimens/${recordId}`}
             icon={IconArrowUpRight}
             color={"#d6e4ed"}
             textColor="midnight.8"
             onMouseEnter={hasData ? open : undefined}
             onMouseLeave={hasData ? close : undefined}
           >
-            {specimen.recordId}
-            <span style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>{humanize(specimen.typeStatus ?? "")}</span>
+            {recordId}
+            <span style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>
+              {humanize(specimen.accession.typeStatus ?? "")}
+            </span>
           </InternalLinkButton>
         </Indicator>
       </Popover.Target>

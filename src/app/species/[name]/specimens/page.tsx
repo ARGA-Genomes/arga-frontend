@@ -207,10 +207,10 @@ function Explorer({ name }: { name: string }) {
   });
 
   const markers = data?.species.mapping.specimens.map((marker) => ({
-    recordId: marker.collectionRepositoryId,
+    recordId: marker.collectionRepositoryId || "not registered",
     latitude: marker.latitude,
     longitude: marker.longitude,
-    color: [123, 161, 63, 220],
+    color: [123, 161, 63, 220] as [number, number, number, number],
   }));
 
   return (
