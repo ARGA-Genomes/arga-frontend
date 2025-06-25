@@ -15,7 +15,7 @@ export interface Specimen {
 }
 
 export const SPECIMEN_SUMMARY = gql`
-  fragment SpecimenSummary on Specimen {
+  fragment SpecimenSummary on SpecimenSummary {
     entityId
     collectionRepositoryId
     collectionRepositoryCode

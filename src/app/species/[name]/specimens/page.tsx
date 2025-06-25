@@ -4,14 +4,39 @@ import classes from "./page.module.css";
 
 import { gql, useQuery } from "@apollo/client";
 import { AnalysisMap } from "@/components/mapping";
-import { AttributePillContainer } from "@/components/data-fields";
+import { RecordTable, SortOrder } from "@/components/RecordTable";
+import { AttributePillContainer, AttributePillValue } from "@/components/data-fields";
+import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
 import SimpleBarGraph from "@/components/graphing/SimpleBarGraph";
-import { AccessionEvent, CollectionEvent, SpecimenMapMarker, SpecimenOverview, YearValue } from "@/queries/specimen";
-import { Grid, Paper, Stack, Text, Title, Skeleton, Box, Table, Group, Image, Tooltip, Button } from "@mantine/core";
+import {
+  AccessionEvent,
+  CollectionEvent,
+  SpecimenMapMarker,
+  SpecimenOverview,
+  SpecimenSummary,
+  YearValue,
+} from "@/queries/specimen";
+import {
+  Grid,
+  Paper,
+  ScrollArea,
+  Stack,
+  Text,
+  Title,
+  Skeleton,
+  Box,
+  Table,
+  Group,
+  Image,
+  Tooltip,
+  Button,
+} from "@mantine/core";
 import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
 import { useSpecies } from "@/app/species-provider";
+import { getVoucherStatus, getVoucherColour } from "@/helpers/colors";
+import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -70,6 +95,28 @@ interface SpecimenCardQuery {
   specimen: {
     collections: CollectionEvent[];
     accessions: AccessionEvent[];
+  };
+}
+
+const GET_SPECIMENS = gql`
+  query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
+    species(canonicalName: $canonicalName) {
+      specimens(page: $page, pageSize: $pageSize) {
+        total
+        records {
+          ...SpecimenSummary
+        }
+      }
+    }
+  }
+`;
+
+interface SpecimensQuery {
+  species: {
+    specimens: {
+      total: number;
+      records: SpecimenSummary[];
+    };
   };
 }
 
@@ -219,6 +266,7 @@ function Explorer({ name }: { name: string }) {
       <Grid>
         <Grid.Col span={7}>
           <Paper pos="relative" radius="xl" style={{ overflow: "hidden" }} h="100%">
+            <LoadOverlay visible={loading} error={error} />
             <AnalysisMap markers={markers} />
           </Paper>
         </Grid.Col>
@@ -250,7 +298,7 @@ function HolotypeCard() {
   const accession = data?.specimen.accessions[0];
 
   return (
-    <Paper radius="xl" p={20} bg="bushfire.0">
+    <LoadPanel visible={loading} error={error} radius="xl" p="lg" bg="bushfire.0">
       <Title order={4}>Holotype</Title>
 
       <Group wrap="nowrap">
@@ -308,13 +356,13 @@ function HolotypeCard() {
           </Button>
         </Stack>
       </Group>
-    </Paper>
+    </LoadPanel>
   );
 }
 
 function SpecimenCard() {
   return (
-    <Paper radius="xl" p={20} withBorder>
+    <LoadPanel visible={false} radius="xl" p="lg" withBorder>
       <Title order={4}>Specimen</Title>
 
       <Table variant="vertical" withRowBorders={false} className={classes.cardTable}>
@@ -353,17 +401,72 @@ function SpecimenCard() {
           </Table.Tr>
         </Table.Tbody>
       </Table>
-    </Paper>
+    </LoadPanel>
   );
 }
 
 function AllSpecimens() {
+  const { details } = { ...useSpecies() };
+
+  const { loading, error, data } = useQuery<SpecimensQuery>(GET_SPECIMENS, {
+    skip: !details,
+    variables: { canonicalName: details?.name, page: 1, pageSize: 100 },
+  });
+
+  const specimens = data?.species.specimens;
+
   return (
-    <Paper radius="lg" p={20} bg="shellfishBg.0">
+    <LoadPanel visible={loading} error={error} radius="lg" p="lg" bg="shellfishBg.0" mih={500}>
       <Title order={3} c="shellfish">
         All specimens
       </Title>
-    </Paper>
+
+      <Group>
+        <Text>
+          Showing {specimens?.total} of {specimens?.total}
+        </Text>
+      </Group>
+
+      <ScrollArea h={700} type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
+        <RecordTable
+          radius="lg"
+          columns={
+            <>
+              <RecordTable.Column label="Voucher status" sorting={SortOrder.Ascending} />
+              <RecordTable.Column label="Specimen number" />
+              <RecordTable.Column label="Institution" />
+              <RecordTable.Column label="Country" />
+              <RecordTable.Column label="Collection date" />
+              <RecordTable.Column label="Collection metadata score" />
+              <RecordTable.Column label="Whole genomes" />
+              <RecordTable.Column label="Single loci" />
+              <RecordTable.Column label="Other genetic data" />
+            </>
+          }
+        >
+          {specimens?.records.map((record) => (
+            <RecordTable.Row key={record.entityId}>
+              <AttributePillValue
+                value={getVoucherStatus(record.typeStatus, record.collectionRepositoryId)}
+                color={getVoucherColour(record.typeStatus, record.collectionRepositoryId)}
+                textColor="white"
+                popoverDisabled
+              />
+              <Text fw={600} c="midnight">
+                {record.collectionRepositoryId}
+              </Text>
+              {record.institutionCode}
+              {record.country}
+              <Text></Text>
+              <Text></Text>
+              <DataCheckIcon total={record.wholeGenomes} />
+              <DataCheckIcon total={record.markers} />
+              <Text></Text>
+            </RecordTable.Row>
+          ))}
+        </RecordTable>
+      </ScrollArea>
+    </LoadPanel>
   );
 }
 
@@ -414,4 +517,8 @@ function CollectionYearsGraph({ data }: CollectionYearsGraphProps) {
       }}
     </ParentSize>
   );
+}
+
+function DataCheckIcon({ total }: { total?: number }) {
+  return total && total > 0 ? <IconCircleCheck color="moss" size="3em" /> : <IconCircleX color="red" size="3em" />;
 }
