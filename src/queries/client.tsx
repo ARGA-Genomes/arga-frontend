@@ -1,7 +1,14 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { createFragmentRegistry } from "@apollo/client/cache";
 
-import { ACCESSION_EVENT, COLLECTION_EVENT, SPECIMEN, SPECIMEN_OVERVIEW, SPECIMEN_MAP_MARKER } from "./specimen";
+import {
+  ACCESSION_EVENT,
+  COLLECTION_EVENT,
+  SPECIMEN,
+  SPECIMEN_SUMMARY,
+  SPECIMEN_OVERVIEW,
+  SPECIMEN_MAP_MARKER,
+} from "./specimen";
 import { SUBSAMPLE, SUBSAMPLE_EVENT } from "./subsample";
 import { DNA_EXTRACT, DNA_EXTRACTION_EVENT } from "./dna-extract";
 import { TAXON_TREE_NODE_STATISTICS } from "./stats";
@@ -19,6 +26,7 @@ import { PUBLICATION } from "./publication";
 export default function createClient() {
   const fragments = createFragmentRegistry(
     SPECIMEN,
+    SPECIMEN_SUMMARY,
     SPECIMEN_OVERVIEW,
     SPECIMEN_MAP_MARKER,
     SUBSAMPLE,

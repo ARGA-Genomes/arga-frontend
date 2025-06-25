@@ -1,0 +1,24 @@
+.header {
+    color: white;
+    background-color: var(--mantine-color-midnight-9);
+
+    th {
+        padding: var(--mantine-spacing-xl);
+        font-weight: 600;
+        text-align: center;
+    }
+}
+
+.row {
+    td {
+        font-weight: 300;
+        font-size: var(--mantine-font-size-xs);
+        text-align: center;
+        color: var(--mantine-color-midnight-9);
+    }
+}
+
+.container {
+    overflow: hidden;
+    background: none;
+}
