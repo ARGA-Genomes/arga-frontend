@@ -375,7 +375,7 @@ function HolotypeCard() {
         </Table>
 
         <Stack>
-          <Image w={200} h={200} src="/icons/specimen-listing/Specimen listing_ accession.svg" alt="Holotype badge" />
+          <Image w={200} h={200} src="/icons/specimen-type/holotype_neotype_syntype.svg" alt="Holotype badge" />
           <Button bg="midnight.9" radius="xl">
             record history
           </Button>
@@ -456,21 +456,19 @@ function AllSpecimens() {
         <ScrollArea h={700} type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
           <RecordTable
             radius="lg"
-            columns={
-              <>
-                <RecordTable.Column label="Voucher status" sorting={SortOrder.Ascending} />
-                <RecordTable.Column label="Specimen number" />
-                <RecordTable.Column label="Institution" />
-                <RecordTable.Column label="Country" />
-                <RecordTable.Column label="Collection date" />
-                <RecordTable.Column label="Collection metadata score" />
-                <RecordTable.Column label="Whole genomes" />
-                <RecordTable.Column label="Single loci" />
-                <RecordTable.Column label="Other genetic data" />
-                <RecordTable.Column label="View full record" />
-                <RecordTable.Column label="View in ALA" />
-              </>
-            }
+            columns={[
+              <RecordTable.Column key="voucher" label="Voucher status" sorting={SortOrder.Ascending} />,
+              <RecordTable.Column key="id" label="Specimen number" />,
+              <RecordTable.Column key="institution" label="Institution" />,
+              <RecordTable.Column key="country" label="Country" />,
+              <RecordTable.Column key="date" label="Collection date" />,
+              <RecordTable.Column key="score" label="Collection metadata score" />,
+              <RecordTable.Column key="genomes" label="Whole genomes" width={1} color="shellfishBg.0" />,
+              <RecordTable.Column key="loci" label="Single loci" width={1} />,
+              <RecordTable.Column key="other" label="Other genetic data" width={1} color="shellfishBg.0" />,
+              <RecordTable.Column key="view" label="View full record" width={1} />,
+              <RecordTable.Column key="ala" label="View in ALA" width={1} />,
+            ]}
           >
             {specimens?.records.map((record) => (
               <RecordTable.Row key={record.entityId}>
@@ -495,10 +493,10 @@ function AllSpecimens() {
                 <DataCheckIcon value={record.fullGenomes} />
                 <DataCheckIcon value={record.loci} />
                 <DataCheckIcon value={record.otherGenomic} />
-                <Button color="midnight.9">
+                <Button color="midnight.9" radius="lg">
                   <IconMicroscope />
                 </Button>
-                <Button color="shellfish" variant="light">
+                <Button color="shellfish" variant="outline" bg="white" radius="lg">
                   <IconMicroscope />
                 </Button>
               </RecordTable.Row>
@@ -565,7 +563,7 @@ function DataCheckIcon({ value }: { value?: number | string | boolean | null | u
 
   return (
     <Paper radius="xl" p={0} m={0} h={size} w={size}>
-      {!!value ? <IconCircleCheck color={theme.colors.moss[5]} size={size} /> : <IconCircleX color="red" size={size} />}
+      {value ? <IconCircleCheck color={theme.colors.moss[5]} size={size} /> : <IconCircleX color="red" size={size} />}
     </Paper>
   );
 }
