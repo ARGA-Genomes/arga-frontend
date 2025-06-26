@@ -39,7 +39,7 @@ import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
 import { useSpecies } from "@/app/species-provider";
 import { getVoucherStatus, getVoucherColour } from "@/helpers/colors";
-import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
+import { IconCircleCheck, IconCircleX, IconMicroscope } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 
 const GET_SPECIMENS_OVERVIEW = gql`
@@ -128,17 +128,21 @@ interface OverviewBlockProps {
   title: string;
   children?: React.ReactNode;
   loading: boolean;
+  hasData?: boolean;
 }
 
-function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
+function OverviewBlock({ title, children, loading, hasData }: OverviewBlockProps) {
   return (
     <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
       <Paper radius="lg" p={20} bg="wheatBg.0" withBorder style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}>
-        <Stack>
-          <Text fw={700} c="midnight" fz="xs">
-            {title}
-          </Text>
-          {children}
+        <Stack gap="sm">
+          <Group justify="space-between" wrap="nowrap">
+            <Text fw={700} c="midnight" fz="xs">
+              {title}
+            </Text>
+            <DataCheckIcon value={hasData} />
+          </Group>
+          <Center>{children}</Center>
         </Stack>
       </Paper>
     </Skeleton>
@@ -149,6 +153,11 @@ function Overview({ name }: { name: string }) {
   const { loading, error, data } = useQuery<OverviewQuery>(GET_SPECIMENS_OVERVIEW, {
     variables: { canonicalName: name },
   });
+
+  const specimens = data?.species.overview.specimens;
+  function col<T, R>(value?: T, retValue?: R): R | undefined {
+    return value ? retValue : undefined;
+  }
 
   return (
     <Paper radius="lg" p={20} bg="wheatBg.0">
@@ -170,23 +179,21 @@ function Overview({ name }: { name: string }) {
             >
               <Grid>
                 <Grid.Col span={2}>
-                  <Text fw={700} c="midnight" fz="xs">
+                  <Text fw={700} c="midnight" fz="xs" mb="sm">
                     Total number of specimens
                   </Text>
-                  <AttributePillContainer color="white">
-                    {data?.species.overview.specimens.total}
+                  <AttributePillContainer color="white" className={classes.pill}>
+                    {specimens?.total}
                   </AttributePillContainer>
                 </Grid.Col>
                 <Grid.Col span={8} px={50}>
-                  <Text fw={700} c="midnight" fz="xs">
+                  <Text fw={700} c="midnight" fz="xs" mb="sm">
                     Collection years
                   </Text>
-                  <Box h={100}>
-                    {data && <CollectionYearsGraph data={data.species.overview.specimens.collectionYears} />}
-                  </Box>
+                  <Box h={100}>{specimens && <CollectionYearsGraph data={specimens?.collectionYears} />}</Box>
                 </Grid.Col>
                 <Grid.Col span={2}>
-                  <Text fw={700} c="midnight" fz="xs">
+                  <Text fw={700} c="midnight" fz="xs" mb="sm">
                     Top 5 bioregions
                   </Text>
                 </Grid.Col>
@@ -197,9 +204,11 @@ function Overview({ name }: { name: string }) {
         <Grid.Col span={2}>
           <OverviewBlock title="Major collections" loading={loading}>
             <Grid>
-              {data?.species.overview.specimens.majorCollections.map((collection) => (
+              {specimens?.majorCollections.map((collection) => (
                 <Grid.Col span={6} key={collection}>
-                  <AttributePillContainer color="white">{collection}</AttributePillContainer>
+                  <AttributePillContainer color="white" className={classes.pill}>
+                    {collection}
+                  </AttributePillContainer>
                 </Grid.Col>
               ))}
             </Grid>
@@ -207,43 +216,55 @@ function Overview({ name }: { name: string }) {
         </Grid.Col>
 
         <Grid.Col span={1}>
-          <OverviewBlock title="Holotype" loading={loading}>
-            <AttributePillContainer color="white">{data?.species.overview.specimens.holotype}</AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Other types" loading={loading}>
-            <AttributePillContainer color="white">{data?.species.overview.specimens.otherTypes}</AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Formal vouchers" loading={loading}>
-            <AttributePillContainer color="white">
-              {data?.species.overview.specimens.formalVouchers}
+          <OverviewBlock title="Holotype" loading={loading} hasData={!!specimens?.holotype}>
+            <AttributePillContainer
+              className={classes.holotypePill}
+              color={col(specimens?.holotype, "white")}
+              withBorder={!!specimens?.holotype}
+            >
+              {specimens?.holotype}
             </AttributePillContainer>
           </OverviewBlock>
         </Grid.Col>
         <Grid.Col span={1}>
-          <OverviewBlock title="Tissue available" loading={loading}>
-            <AttributePillContainer color="white">{data?.species.overview.specimens.tissues}</AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Genomic DNA available" loading={loading}>
-            <AttributePillContainer color="white">{data?.species.overview.specimens.genomicDna}</AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Australian material" loading={loading}>
-            <AttributePillContainer color="white">
-              {data?.species.overview.specimens.australianMaterial}
+          <OverviewBlock title="Other types" loading={loading} hasData={!!specimens?.otherTypes}>
+            <AttributePillContainer className={classes.pill} color={col(specimens?.otherTypes, "white")}>
+              {specimens?.otherTypes}
             </AttributePillContainer>
           </OverviewBlock>
         </Grid.Col>
         <Grid.Col span={1}>
-          <OverviewBlock title="Non-Australian material" loading={loading}>
-            <AttributePillContainer color="white">
-              {data?.species.overview.specimens.nonAustralianMaterial}
+          <OverviewBlock title="Formal vouchers" loading={loading} hasData={!!specimens?.formalVouchers}>
+            <AttributePillContainer className={classes.pill} color={col(specimens?.formalVouchers, "white")}>
+              {specimens?.formalVouchers}
+            </AttributePillContainer>
+          </OverviewBlock>
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <OverviewBlock title="Tissue available" loading={loading} hasData={!!specimens?.tissues}>
+            <AttributePillContainer className={classes.pill} color={col(specimens?.tissues, "white")}>
+              {specimens?.tissues}
+            </AttributePillContainer>
+          </OverviewBlock>
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <OverviewBlock title="Genomic DNA available" loading={loading} hasData={!!specimens?.genomicDna}>
+            <AttributePillContainer className={classes.pill} color={col(specimens?.genomicDna, "white")}>
+              {specimens?.genomicDna}
+            </AttributePillContainer>
+          </OverviewBlock>
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <OverviewBlock title="Australian material" loading={loading} hasData={!!specimens?.australianMaterial}>
+            <AttributePillContainer className={classes.pill} color={col(specimens?.australianMaterial, "white")}>
+              {specimens?.australianMaterial}
+            </AttributePillContainer>
+          </OverviewBlock>
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <OverviewBlock title="Non-Australian material" loading={loading} hasData={!!specimens?.nonAustralianMaterial}>
+            <AttributePillContainer className={classes.pill} color={col(specimens?.nonAustralianMaterial, "white")}>
+              {specimens?.nonAustralianMaterial}
             </AttributePillContainer>
           </OverviewBlock>
         </Grid.Col>
@@ -421,60 +442,70 @@ function AllSpecimens() {
 
   return (
     <LoadPanel visible={loading} error={error} radius="lg" p="lg" bg="shellfishBg.0" mih={500}>
-      <Title order={3} c="shellfish">
-        All specimens
-      </Title>
+      <Stack>
+        <Title order={3} c="shellfish">
+          All specimens
+        </Title>
 
-      <Group>
-        <Text>
-          Showing {specimens?.total} of {specimens?.total}
-        </Text>
-      </Group>
+        <Group>
+          <Text fw={700} fz="xs" c="midnight.9">
+            Showing {specimens?.records.length} of {specimens?.total}
+          </Text>
+        </Group>
 
-      <ScrollArea h={700} type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
-        <RecordTable
-          radius="lg"
-          columns={
-            <>
-              <RecordTable.Column label="Voucher status" sorting={SortOrder.Ascending} />
-              <RecordTable.Column label="Specimen number" />
-              <RecordTable.Column label="Institution" />
-              <RecordTable.Column label="Country" />
-              <RecordTable.Column label="Collection date" />
-              <RecordTable.Column label="Collection metadata score" />
-              <RecordTable.Column label="Whole genomes" />
-              <RecordTable.Column label="Single loci" />
-              <RecordTable.Column label="Other genetic data" />
-            </>
-          }
-        >
-          {specimens?.records.map((record) => (
-            <RecordTable.Row key={record.entityId}>
-              <AttributePillValue
-                value={getVoucherStatus(record.typeStatus, record.collectionRepositoryId)}
-                color={getVoucherColour(record.typeStatus, record.collectionRepositoryId)}
-                textColor="white"
-                popoverDisabled
-              />
-              <Text fw={600} c="midnight">
-                {record.collectionRepositoryId}
-              </Text>
-              {record.institutionCode}
-              {record.country}
-              {record.collectedAt &&
-                DateTime.fromISO(record.collectedAt).toLocaleString({
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                })}
-              <SmallScore specimen={record} />
-              <DataCheckIcon total={record.fullGenomes} />
-              <DataCheckIcon total={record.loci} />
-              <DataCheckIcon total={record.otherGenomic} />
-            </RecordTable.Row>
-          ))}
-        </RecordTable>
-      </ScrollArea>
+        <ScrollArea h={700} type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
+          <RecordTable
+            radius="lg"
+            columns={
+              <>
+                <RecordTable.Column label="Voucher status" sorting={SortOrder.Ascending} />
+                <RecordTable.Column label="Specimen number" />
+                <RecordTable.Column label="Institution" />
+                <RecordTable.Column label="Country" />
+                <RecordTable.Column label="Collection date" />
+                <RecordTable.Column label="Collection metadata score" />
+                <RecordTable.Column label="Whole genomes" />
+                <RecordTable.Column label="Single loci" />
+                <RecordTable.Column label="Other genetic data" />
+                <RecordTable.Column label="View full record" />
+                <RecordTable.Column label="View in ALA" />
+              </>
+            }
+          >
+            {specimens?.records.map((record) => (
+              <RecordTable.Row key={record.entityId}>
+                <AttributePillValue
+                  value={getVoucherStatus(record.typeStatus, record.collectionRepositoryId)}
+                  color={getVoucherColour(record.typeStatus, record.collectionRepositoryId)}
+                  textColor="white"
+                  popoverDisabled
+                />
+                <Text fw={600} c="midnight">
+                  {record.collectionRepositoryId}
+                </Text>
+                {record.institutionCode}
+                {record.country}
+                {record.collectedAt &&
+                  DateTime.fromISO(record.collectedAt).toLocaleString({
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                <SmallScore specimen={record} />
+                <DataCheckIcon value={record.fullGenomes} />
+                <DataCheckIcon value={record.loci} />
+                <DataCheckIcon value={record.otherGenomic} />
+                <Button color="midnight.9">
+                  <IconMicroscope />
+                </Button>
+                <Button color="shellfish" variant="light">
+                  <IconMicroscope />
+                </Button>
+              </RecordTable.Row>
+            ))}
+          </RecordTable>
+        </ScrollArea>
+      </Stack>
     </LoadPanel>
   );
 }
@@ -528,13 +559,14 @@ function CollectionYearsGraph({ data }: CollectionYearsGraphProps) {
   );
 }
 
-function DataCheckIcon({ total }: { total?: number }) {
+function DataCheckIcon({ value }: { value?: number | string | boolean | null | undefined }) {
   const theme = useMantineTheme();
+  const size = 35;
 
-  return total && total > 0 ? (
-    <IconCircleCheck color={theme.colors.moss[5]} size="3em" />
-  ) : (
-    <IconCircleX color="red" size="3em" />
+  return (
+    <Paper radius="xl" p={0} m={0} h={size} w={size}>
+      {!!value ? <IconCircleCheck color={theme.colors.moss[5]} size={size} /> : <IconCircleX color="red" size={size} />}
+    </Paper>
   );
 }
 

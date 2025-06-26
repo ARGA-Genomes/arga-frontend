@@ -35,3 +35,16 @@
     fill: transparent;
     stroke: var(--mantine-color-moss-5);
 }
+
+.holotypePill {
+    border-color: var(--mantine-color-bushfire-5);
+    color: var(--mantine-color-bushfire-5);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 700;
+}
+
+.pill {
+    color: var(--mantine-color-midnight-7);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 700;
+}

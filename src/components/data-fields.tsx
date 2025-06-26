@@ -187,15 +187,7 @@ interface AttributePillContainerProps extends PaperProps {
 
 export function AttributePillContainer({ color, className, children, ...rest }: AttributePillContainerProps) {
   return (
-    <Paper
-      py={5}
-      px={15}
-      bg={color || "#d6e4ed"}
-      radius="xl"
-      style={{ border: "none" }}
-      className={className}
-      {...rest}
-    >
+    <Paper py={5} px={15} bg={color || "#d6e4ed"} radius="xl" className={className} {...rest}>
       <Center>{children}</Center>
     </Paper>
   );

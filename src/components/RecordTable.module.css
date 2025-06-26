@@ -7,6 +7,13 @@
         font-weight: 600;
         text-align: center;
     }
+
+    tr {
+        :hover {
+            cursor: pointer;
+            background-color: var(--mantine-color-midnight-8);
+        }
+    }
 }
 
 .row {
