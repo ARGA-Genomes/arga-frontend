@@ -21,3 +21,17 @@
         width: 100%;
     }
 }
+
+.scoreContainer {
+    border-color: var(--mantine-color-moss-5);
+}
+
+.scoreYes {
+    fill: var(--mantine-color-moss-5);
+    stroke: var(--mantine-color-moss-5);
+}
+
+.scoreNo {
+    fill: transparent;
+    stroke: var(--mantine-color-moss-5);
+}

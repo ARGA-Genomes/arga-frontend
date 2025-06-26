@@ -623,7 +623,7 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
         const link = item.link.substring(item.link.lastIndexOf("/") + 1);
         return names.includes(link);
       })?.image,
-    [params.name]
+    [params.name],
   );
 
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
