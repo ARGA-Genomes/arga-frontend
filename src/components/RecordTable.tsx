@@ -2,7 +2,8 @@
 
 import classes from "./RecordTable.module.css";
 
-import { Table, Tooltip, Group, Paper, MantineRadius, Center } from "@mantine/core";
+import React from "react";
+import { Table, Tooltip, Group, Paper, MantineRadius, Center, MantineColor } from "@mantine/core";
 import { IconSortAscending, IconSortDescending } from "@tabler/icons-react";
 
 export enum SortOrder {
@@ -11,22 +12,28 @@ export enum SortOrder {
 }
 
 interface RecordTableProps {
-  columns?: React.ReactNode;
+  columns?: React.ReactElement<RecordTableColumnProps>[];
   children?: React.ReactNode[];
   radius?: MantineRadius;
 }
 
 export function RecordTable({ columns, children, radius }: RecordTableProps) {
-  return (
-    <Paper radius={radius} className={classes.container}>
-      <Table highlightOnHoverColor="wheat.1" withRowBorders={false} highlightOnHover striped>
-        <Table.Thead className={classes.header}>
-          <Table.Tr>{columns}</Table.Tr>
-        </Table.Thead>
+  const context = {
+    columns: columns?.map((column) => column.props) ?? [],
+  };
 
-        <Table.Tbody>{children}</Table.Tbody>
-      </Table>
-    </Paper>
+  return (
+    <RecordTableContext.Provider value={context}>
+      <Paper radius={radius} className={classes.container}>
+        <Table highlightOnHoverColor="wheat.1" withRowBorders={false} highlightOnHover striped>
+          <Table.Thead className={classes.header}>
+            <Table.Tr>{columns}</Table.Tr>
+          </Table.Thead>
+
+          <Table.Tbody>{children}</Table.Tbody>
+        </Table>
+      </Paper>
+    </RecordTableContext.Provider>
   );
 }
 
@@ -34,17 +41,19 @@ interface RecordTableColumnProps {
   label: string;
   tooltip?: string;
   sorting?: SortOrder;
+  width?: number | string;
+  color?: MantineColor;
 }
 
-export function RecordTableColumn({ label, tooltip, sorting }: RecordTableColumnProps) {
+export function RecordTableColumn({ label, tooltip, sorting, width }: RecordTableColumnProps) {
   return (
     <Tooltip label={tooltip} disabled={!tooltip}>
-      <Table.Th>
+      <Table.Th w={width}>
         <Group gap="xs" wrap="nowrap" justify="center">
           {label}
 
-          {sorting === SortOrder.Ascending && <IconSortAscending size="1rem" />}
-          {sorting === SortOrder.Descending && <IconSortDescending size="1rem" />}
+          {sorting === SortOrder.Ascending && <IconSortAscending size={20} />}
+          {sorting === SortOrder.Descending && <IconSortDescending size={20} />}
         </Group>
       </Table.Th>
     </Tooltip>
@@ -56,6 +65,7 @@ interface RecordTableRowProps {
 }
 
 export function RecordTableRow({ children }: RecordTableRowProps) {
+  const { columns } = useRecordTable();
   const cells = Array.isArray(children) ? children : [children];
 
   // we can use an index for the cells because it only needs to be unique
@@ -63,13 +73,20 @@ export function RecordTableRow({ children }: RecordTableRowProps) {
   return (
     <Table.Tr className={classes.row}>
       {cells.map((cell, idx) => (
-        <Table.Td key={`${idx}`}>
+        <Table.Td key={`${idx}`} bg={columns[idx]?.color}>
           <Center>{cell}</Center>
         </Table.Td>
       ))}
     </Table.Tr>
   );
 }
+
+interface RecordTableContextValue {
+  columns: RecordTableColumnProps[];
+}
+
+const RecordTableContext = React.createContext<RecordTableContextValue>({ columns: [] });
+const useRecordTable = () => React.useContext(RecordTableContext);
 
 RecordTable.Column = RecordTableColumn;
 RecordTable.Row = RecordTableRow;
