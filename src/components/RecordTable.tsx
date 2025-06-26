@@ -2,7 +2,7 @@
 
 import classes from "./RecordTable.module.css";
 
-import { Table, Tooltip, Group, Paper, MantineRadius } from "@mantine/core";
+import { Table, Tooltip, Group, Paper, MantineRadius, Center } from "@mantine/core";
 import { IconSortAscending, IconSortDescending } from "@tabler/icons-react";
 
 export enum SortOrder {
@@ -19,9 +19,9 @@ interface RecordTableProps {
 export function RecordTable({ columns, children, radius }: RecordTableProps) {
   return (
     <Paper radius={radius} className={classes.container}>
-      <Table highlightOnHoverColor="wheat.1" highlightOnHover striped>
-        <Table.Thead>
-          <Table.Tr className={classes.header}>{columns}</Table.Tr>
+      <Table highlightOnHoverColor="wheat.1" withRowBorders={false} highlightOnHover striped>
+        <Table.Thead className={classes.header}>
+          <Table.Tr>{columns}</Table.Tr>
         </Table.Thead>
 
         <Table.Tbody>{children}</Table.Tbody>
@@ -38,9 +38,9 @@ interface RecordTableColumnProps {
 
 export function RecordTableColumn({ label, tooltip, sorting }: RecordTableColumnProps) {
   return (
-    <Tooltip label={tooltip}>
+    <Tooltip label={tooltip} disabled={!tooltip}>
       <Table.Th>
-        <Group gap="xs" wrap="nowrap">
+        <Group gap="xs" wrap="nowrap" justify="center">
           {label}
 
           {sorting === SortOrder.Ascending && <IconSortAscending size="1rem" />}
@@ -63,7 +63,9 @@ export function RecordTableRow({ children }: RecordTableRowProps) {
   return (
     <Table.Tr className={classes.row}>
       {cells.map((cell, idx) => (
-        <Table.Td key={`${idx}`}>{cell}</Table.Td>
+        <Table.Td key={`${idx}`}>
+          <Center>{cell}</Center>
+        </Table.Td>
       ))}
     </Table.Tr>
   );
