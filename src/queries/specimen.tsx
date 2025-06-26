@@ -22,13 +22,19 @@ export const SPECIMEN_SUMMARY = gql`
     institutionCode
     institutionName
     typeStatus
-    locality
     country
     latitude
     longitude
+    collectedAt
     sequences
-    wholeGenomes
-    markers
+    loci
+    otherGenomic
+    fullGenomes
+    partialGenomes
+    completeGenomes
+    assemblyChromosomes
+    assemblyScaffolds
+    assemblyContigs
   }
 `;
 
@@ -39,13 +45,19 @@ export interface SpecimenSummary {
   institutionCode?: string;
   institutionName?: string;
   typeStatus?: string;
-  locality?: string;
   country?: string;
   latitude?: number;
   longitude?: number;
+  collectedAt?: string;
   sequences?: number;
-  wholeGenomes?: number;
-  markers?: number;
+  loci?: number;
+  otherGenomic?: number;
+  fullGenomes?: number;
+  partialGenomes?: number;
+  completeGenomes?: number;
+  assemblyChromosomes?: number;
+  assemblyScaffolds?: number;
+  assemblyContigs?: number;
 }
 
 export const SPECIMEN_OVERVIEW = gql`

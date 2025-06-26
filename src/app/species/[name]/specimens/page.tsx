@@ -2,6 +2,7 @@
 
 import classes from "./page.module.css";
 
+import { DateTime } from "luxon";
 import { gql, useQuery } from "@apollo/client";
 import { AnalysisMap } from "@/components/mapping";
 import { RecordTable, SortOrder } from "@/components/RecordTable";
@@ -30,6 +31,8 @@ import {
   Image,
   Tooltip,
   Button,
+  Center,
+  useMantineTheme,
 } from "@mantine/core";
 import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear } from "@visx/scale";
@@ -37,6 +40,7 @@ import { max, min } from "d3";
 import { useSpecies } from "@/app/species-provider";
 import { getVoucherStatus, getVoucherColour } from "@/helpers/colors";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -457,11 +461,16 @@ function AllSpecimens() {
               </Text>
               {record.institutionCode}
               {record.country}
-              <Text></Text>
-              <Text></Text>
-              <DataCheckIcon total={record.wholeGenomes} />
-              <DataCheckIcon total={record.markers} />
-              <Text></Text>
+              {record.collectedAt &&
+                DateTime.fromISO(record.collectedAt).toLocaleString({
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              <SmallScore specimen={record} />
+              <DataCheckIcon total={record.fullGenomes} />
+              <DataCheckIcon total={record.loci} />
+              <DataCheckIcon total={record.otherGenomic} />
             </RecordTable.Row>
           ))}
         </RecordTable>
@@ -520,5 +529,53 @@ function CollectionYearsGraph({ data }: CollectionYearsGraphProps) {
 }
 
 function DataCheckIcon({ total }: { total?: number }) {
-  return total && total > 0 ? <IconCircleCheck color="moss" size="3em" /> : <IconCircleX color="red" size="3em" />;
+  const theme = useMantineTheme();
+
+  return total && total > 0 ? (
+    <IconCircleCheck color={theme.colors.moss[5]} size="3em" />
+  ) : (
+    <IconCircleX color="red" size="3em" />
+  );
+}
+
+function SmallScore({ specimen }: { specimen: SpecimenSummary }) {
+  const isRegistered = specimen.collectionRepositoryId;
+  const hasCollectionData = specimen.collectedAt && specimen.latitude && specimen.longitude;
+  const hasGenomicData = specimen.sequences && specimen.sequences > 0;
+
+  return (
+    <Center>
+      <Paper radius="xl" c="moss" p={8} px="lg" className={classes.scoreContainer} withBorder>
+        <Group gap={10}>
+          <SmallScorePip value={!!isRegistered} yes="Specimen is registered" no="Specimen is not registered" />
+          <SmallScorePip
+            value={!!hasCollectionData}
+            yes="Specimen has full collection data"
+            no="Specimen does not have full collection data"
+          />
+          <SmallScorePip
+            value={!!hasGenomicData}
+            yes="Specimen has linked genetic data"
+            no="Specimen does not have linked genetic data"
+          />
+        </Group>
+      </Paper>
+    </Center>
+  );
+}
+
+interface SmallScorePipProps {
+  value: boolean;
+  yes: string;
+  no: string;
+}
+
+function SmallScorePip({ value, yes, no }: SmallScorePipProps) {
+  return (
+    <Tooltip position="bottom" label={value ? yes : no} withArrow>
+      <motion.svg width={20} height={20} whileHover={{ scale: 2.0 }}>
+        <circle cx={10} cy={10} r={5} className={value ? classes.scoreYes : classes.scoreNo} />
+      </motion.svg>
+    </Tooltip>
+  );
 }
