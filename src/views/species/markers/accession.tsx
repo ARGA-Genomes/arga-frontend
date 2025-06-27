@@ -1,19 +1,7 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-import {
-  Box,
-  Button,
-  ButtonProps,
-  Center,
-  Flex,
-  Grid,
-  Group,
-  Paper,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Box, Button, ButtonProps, Center, Flex, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { LoadPanel } from "@/components/load-overlay";
 import { AttributePill, DataField } from "@/components/highlight-stack";
 import {
@@ -27,12 +15,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { CopyableData } from "@/components/data-fields";
-import {
-  DataDepositionEvent,
-  Sequence,
-  SequencingEvent,
-  SequencingRunEvent,
-} from "@/queries/sequence";
+import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
 import { AnalysisMap } from "@/components/mapping";
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { TraceData } from "@/components/traces/trace-data";
@@ -124,17 +107,12 @@ function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
   );
 }
 
-function MoleculeDetails({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
   const depositionBase =
-    sequence?.datasetName === "BOLD" &&
-    "https://www.boldsystems.org/index.php/Public_RecordView?processid=";
+    sequence?.datasetName === "BOLD" && "https://www.boldsystems.org/index.php/Public_RecordView?processid=";
 
   return (
     <Grid>
@@ -172,31 +150,18 @@ function MoleculeDetails({
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <LinkButton
-              color="midnight.10"
-              radius="md"
-              leftSection={<IconDownload />}
-              href={deposition?.sourceUri}
-            >
+            <LinkButton color="midnight.10" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>
               get FASTA
             </LinkButton>
             <LinkButton
               color="midnight.10"
               radius="md"
               leftSection={<IconLink />}
-              href={
-                deposition?.accession &&
-                `${depositionBase}${deposition.accession}`
-              }
+              href={deposition?.accession && `${depositionBase}${deposition.accession}`}
             >
               go to source
             </LinkButton>
-            <Button
-              color="midnight.10"
-              radius="md"
-              leftSection={<IconCloudUpload />}
-              disabled
-            >
+            <Button color="midnight.10" radius="md" leftSection={<IconCloudUpload />} disabled>
               send to Galaxy
             </Button>
           </Stack>
@@ -224,13 +189,7 @@ function MoleculeDetails({
   );
 }
 
-function DataAvailabilityItem({
-  value,
-  children,
-}: {
-  value: boolean | undefined;
-  children: React.ReactNode;
-}) {
+function DataAvailabilityItem({ value, children }: { value: boolean | undefined; children: React.ReactNode }) {
   return (
     <Group wrap="nowrap">
       {value ? <IconCircleCheck color="green" /> : <IconCircleX color="red" />}
@@ -254,36 +213,20 @@ function DataAvailability({
 
   return (
     <Stack>
-      <DataAvailabilityItem value={!!sequencing?.dnaSequence}>
-        Marker data available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>
-        Contig data available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!sequencingRun?.trace?.traceLink}>
-        Trace files available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!deposition?.url}>
-        Marker publication available
-      </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen}>
-        Specimen collection data available
-      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencing?.dnaSequence}>Marker data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={false}>Contig data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencingRun?.trace?.traceLink}>Trace files available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!deposition?.url}>Marker publication available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
       <DataAvailabilityItem value={!!specimen?.events.accessions.length}>
         Specimen voucher accessioned
       </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen?.latitude}>
-        Specimen location available
-      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen?.latitude}>Specimen location available</DataAvailabilityItem>
     </Stack>
   );
 }
 
-function DataProvenance({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined }) {
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
@@ -305,11 +248,7 @@ function DataProvenance({
   );
 }
 
-function AmplificationMethods({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefined }) {
   const sequencingRun = sequence?.events.sequencingRuns[0];
 
   return (
@@ -327,11 +266,7 @@ function AmplificationMethods({
   );
 }
 
-function SpecimenPreview({
-  specimen,
-}: {
-  specimen: SpecimenDetails | undefined;
-}) {
+function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
   return (
     <Grid>
       <Grid.Col span={7}>
@@ -349,11 +284,7 @@ function SpecimenPreview({
 
           <Center>
             <Link href={`../specimens/${specimen?.recordId}`}>
-              <Button
-                radius="md"
-                color="midnight.10"
-                leftSection={<IconMicroscope />}
-              >
+              <Button radius="md" color="midnight.10" leftSection={<IconMicroscope />}>
                 go to specimen
               </Button>
             </Link>
@@ -369,18 +300,16 @@ function SpecimenPreview({
 
 function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   const position: [number, number] | undefined =
-    specimen?.latitude && specimen.longitude
-      ? [Number(specimen.latitude), Number(specimen.longitude)]
-      : undefined;
+    specimen?.latitude && specimen.longitude ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
 
   const marker =
     position &&
     ({
-      recordId: specimen?.recordId,
+      tooltip: specimen?.recordId,
       latitude: position[0],
       longitude: position[1],
       color: [103, 151, 180, 220],
-    } as Marker);
+    } as Marker<null>);
 
   return (
     <Box pos="relative" h={300}>
@@ -394,33 +323,20 @@ function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   );
 }
 
-function TraceDataList({
-  sequence,
-}: {
-  sequence: SequenceDetails | undefined;
-}) {
+function TraceDataList({ sequence }: { sequence: SequenceDetails | undefined }) {
   return (
     <Stack>
-      {sequence?.events.sequencingRuns.map(
-        (run, idx) => run.trace && <TraceData key={idx} trace={run.trace} />
-      )}
+      {sequence?.events.sequencingRuns.map((run, idx) => run.trace && <TraceData key={idx} trace={run.trace} />)}
     </Stack>
   );
 }
 
-export default function MarkerAccession({
-  params,
-}: {
-  params: { accession: string };
-}) {
-  const { loading, error, data } = useQuery<SequenceQueryResults>(
-    GET_ASSEMBLY,
-    {
-      variables: {
-        recordId: params.accession,
-      },
-    }
-  );
+export default function MarkerAccession({ params }: { params: { accession: string } }) {
+  const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
+    variables: {
+      recordId: params.accession,
+    },
+  });
 
   if (error) {
     return <Text>Error : {error.message}</Text>;
@@ -439,10 +355,7 @@ export default function MarkerAccession({
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title
-            order={3}
-            mb={10}
-          >{`Full data view: ${sequence?.recordId}`}</Title>
+          <Title order={3} mb={10}>{`Full data view: ${sequence?.recordId}`}</Title>
           <Text fz="sm" c="dimmed">
             Source
           </Text>

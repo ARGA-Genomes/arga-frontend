@@ -2,19 +2,7 @@
 
 import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  Grid,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Box, Button, Center, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useState, use } from "react";
 import { LoadOverlay } from "@/components/load-overlay";
 import { PaginationBar } from "@/components/pagination";
@@ -27,11 +15,7 @@ import { Marker } from "@/components/mapping/analysis-map";
 import { FilterBar } from "@/components/filtering/filter-bar";
 import { SequenceFilters } from "@/components/filtering/sequence-filters";
 import { Filter, intoFilterItem } from "@/components/filtering/common";
-import {
-  AttributePill,
-  AttributePillValue,
-  DataField,
-} from "@/components/data-fields";
+import { AttributePill, AttributePillValue, DataField } from "@/components/data-fields";
 import { DataTable, DataTableRow } from "@/components/data-table";
 
 const PAGE_SIZE = 5;
@@ -67,12 +51,7 @@ const GET_REFERENCE_GENOME = gql`
 `;
 
 const GET_WHOLE_GENOMES = gql`
-  query SpeciesWholeGenomes(
-    $canonicalName: String
-    $page: Int
-    $pageSize: Int
-    $filters: [FilterItem]
-  ) {
+  query SpeciesWholeGenomes($canonicalName: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
     species(canonicalName: $canonicalName) {
       wholeGenomes(page: $page, pageSize: $pageSize, filters: $filters) {
         total
@@ -136,13 +115,7 @@ interface RefseqResults {
   };
 }
 
-function LabeledValue({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | undefined;
-}) {
+function LabeledValue({ label, value }: { label: string; value: string | undefined }) {
   return (
     <Group gap={20}>
       <Text fw={300} size="sm">
@@ -168,10 +141,7 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
         <AttributePill label="Release date" value={record.releaseDate} />
       </Grid.Col>
       <Grid.Col span={2}>
-        <AttributePill
-          label="Genome size"
-          value={Humanize.fileSize(record.genomeSize ?? 0)}
-        />
+        <AttributePill label="Genome size" value={Humanize.fileSize(record.genomeSize ?? 0)} />
       </Grid.Col>
       <Grid.Col span={2}>
         <AttributePill label="Representation" value={record.representation} />
@@ -189,10 +159,7 @@ function WholeGenomeList({ records }: { records: WholeGenome[] }) {
   return (
     <RecordList>
       {records.map((record, idx) => (
-        <RecordItem
-          key={idx}
-          href={`${path}/${encodeURIComponent(record.accession ?? "")}`}
-        >
+        <RecordItem key={idx} href={`${path}/${encodeURIComponent(record.accession ?? "")}`}>
           <RecordItemContent record={record} />
         </RecordItem>
       ))}
@@ -200,14 +167,11 @@ function WholeGenomeList({ records }: { records: WholeGenome[] }) {
   );
 }
 
-function toMarker(
-  color: [number, number, number, number],
-  records?: WholeGenome[],
-) {
+function toMarker(color: [number, number, number, number], records?: WholeGenome[]) {
   if (!records) return [];
   return records.map((r) => {
     return {
-      recordId: r.recordId || "unknown",
+      tooltip: r.recordId || "unknown",
       latitude: r.latitude,
       longitude: r.longitude,
       color: color,
@@ -216,9 +180,7 @@ function toMarker(
 }
 
 function WholeGenomeMap({ records }: { records: WholeGenome[] | undefined }) {
-  const markers = toMarker([243, 117, 36, 220], records).filter(
-    (s) => s.latitude,
-  ) as Marker[];
+  const markers = toMarker([243, 117, 36, 220], records).filter((s) => s.latitude) as Marker<null>[];
 
   return (
     <Box pos="relative" h="100%">
@@ -233,12 +195,9 @@ function WholeGenomeMap({ records }: { records: WholeGenome[] | undefined }) {
 function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
   const path = usePathname();
 
-  const { loading, error, data } = useQuery<RefseqResults>(
-    GET_REFERENCE_GENOME,
-    {
-      variables: { canonicalName },
-    },
-  );
+  const { loading, error, data } = useQuery<RefseqResults>(GET_REFERENCE_GENOME, {
+    variables: { canonicalName },
+  });
 
   if (error) {
     return <Text>Error : {error.message}</Text>;
@@ -260,17 +219,13 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
           <Stack gap={20}>
             <DataTable>
               <DataTableRow label="Representation">
-                <AttributePillValue
-                  value={data.species.referenceGenome.representation}
-                />
+                <AttributePillValue value={data.species.referenceGenome.representation} />
               </DataTableRow>
               <DataTableRow label="Release date">
                 <DataField value={data.species.referenceGenome.releaseDate} />
               </DataTableRow>
               <DataTableRow label="Assembly type">
-                <AttributePillValue
-                  value={data.species.referenceGenome.assemblyType}
-                />
+                <AttributePillValue value={data.species.referenceGenome.assemblyType} />
               </DataTableRow>
               <DataTableRow label="Accession">
                 <DataField value={data.species.referenceGenome.accession} />
@@ -280,15 +235,9 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
               </DataTableRow>
             </DataTable>
 
-            <Link
-              href={`${path}/${data.species.referenceGenome.accession ?? "#"}`}
-            >
+            <Link href={`${path}/${data.species.referenceGenome.accession ?? "#"}`}>
               <Center>
-                <Button
-                  color="midnight.10"
-                  radius="md"
-                  leftSection={<IconEye />}
-                >
+                <Button color="midnight.10" radius="md" leftSection={<IconEye />}>
                   view
                 </Button>
               </Center>
@@ -313,10 +262,7 @@ function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
 
       <SimpleGrid cols={5} spacing={50}>
         <Stack>
-          <AttributePill
-            label="Genome size"
-            value={Humanize.fileSize(genome?.genomeSize ?? 0)}
-          />
+          <AttributePill label="Genome size" value={Humanize.fileSize(genome?.genomeSize ?? 0)} />
           <AttributePill label="Ungapped length" value={Humanize.fileSize(0)} />
           <AttributePill label="BUSCO score" value={undefined} />
         </Stack>
@@ -374,21 +320,14 @@ export default function WholeGenome(props: { params: Promise<{ name: string }> }
         <Paper p="lg" radius="lg" withBorder>
           <Stack>
             <FilterBar title="All genomes" filters={[]}>
-              <SequenceFilters
-                filters={{ assembly: [] }}
-                onChange={setFilters}
-              />
+              <SequenceFilters filters={{ assembly: [] }} onChange={setFilters} />
             </FilterBar>
 
             <Grid>
               <Grid.Col span={8}>
                 <Box pos="relative" mih={568}>
                   <LoadOverlay visible={loading} />
-                  {data?.species.wholeGenomes && (
-                    <WholeGenomeList
-                      records={data.species.wholeGenomes.records}
-                    />
-                  )}
+                  {data?.species.wholeGenomes && <WholeGenomeList records={data.species.wholeGenomes.records} />}
                 </Box>
               </Grid.Col>
               <Grid.Col span={4} mih={568}>
