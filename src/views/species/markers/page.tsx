@@ -1,16 +1,7 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-import {
-  Box,
-  Grid,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Box, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { AnalysisMap } from "@/components/mapping";
 
 import React, { useState, use } from "react";
@@ -81,9 +72,7 @@ function toMarker(color: [number, number, number, number], records?: Loci[]) {
 }
 
 function MarkerMap({ records }: { records: Loci[] | undefined }) {
-  const markers = toMarker([123, 161, 63, 220], records).filter(
-    (s) => s.latitude
-  ) as Marker[];
+  const markers = toMarker([123, 161, 63, 220], records).filter((s) => s.latitude) as Marker<null>[];
 
   return (
     <Box pos="relative" h="100%">
@@ -95,13 +84,7 @@ function MarkerMap({ records }: { records: Loci[] | undefined }) {
   );
 }
 
-function LabeledValue({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | undefined;
-}) {
+function LabeledValue({ label, value }: { label: string; value: string | undefined }) {
   return (
     <Group gap={20}>
       <Text fw={300} size="sm">
@@ -178,9 +161,7 @@ export default function Markers(props: { params: Promise<{ name: string }> }) {
         <Grid.Col span={8}>
           <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
-            {data?.species.markers ? (
-              <LociList records={data.species.markers.records} />
-            ) : null}
+            {data?.species.markers ? <LociList records={data.species.markers.records} /> : null}
           </Box>
         </Grid.Col>
         <Grid.Col span={4} mih={568}>
@@ -188,12 +169,7 @@ export default function Markers(props: { params: Promise<{ name: string }> }) {
         </Grid.Col>
 
         <Grid.Col span={8}>
-          <PaginationBar
-            total={data?.species.markers.total}
-            page={page}
-            pageSize={PAGE_SIZE}
-            onChange={setPage}
-          />
+          <PaginationBar total={data?.species.markers.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
         </Grid.Col>
       </Grid>
     </Paper>

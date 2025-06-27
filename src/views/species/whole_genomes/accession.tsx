@@ -381,11 +381,11 @@ function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   const marker =
     position &&
     ({
-      recordId: specimen?.recordId,
+      tooltip: specimen?.recordId,
       latitude: position[0],
       longitude: position[1],
       color: [103, 151, 180, 220],
-    } as Marker);
+    } as Marker<null>);
 
   return (
     <Box pos="relative" h={300}>

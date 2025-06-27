@@ -592,7 +592,7 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
                           <AnalysisMap
                             markers={[
                               {
-                                recordId: typeAccession?.collectionRepositoryId ?? "",
+                                tooltip: typeAccession?.collectionRepositoryId ?? "",
                                 latitude: typeCollection.latitude,
                                 longitude: typeCollection.longitude,
                                 color: [103, 151, 180, 220],
