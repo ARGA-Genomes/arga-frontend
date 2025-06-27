@@ -38,7 +38,7 @@ import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
 import { useSpecies } from "@/app/species-provider";
-import { getVoucherStatus, getVoucherColour } from "@/helpers/colors";
+import { getVoucherStatus, getVoucherColour, getVoucherRGBA } from "@/helpers/colors";
 import { IconCircleCheck, IconCircleX, IconMicroscope } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 
@@ -122,6 +122,19 @@ interface SpecimensQuery {
       records: SpecimenSummary[];
     };
   };
+}
+
+export default function Page() {
+  const { details } = { ...useSpecies() };
+  if (!details) return;
+
+  return (
+    <Stack gap="xl">
+      <Overview name={details.name} />
+      <Explorer name={details.name} />
+      <AllSpecimens />
+    </Stack>
+  );
 }
 
 interface OverviewBlockProps {
@@ -278,11 +291,22 @@ function Explorer({ name }: { name: string }) {
     variables: { canonicalName: name },
   });
 
-  const markers = data?.species.mapping.specimens.map((marker) => ({
-    recordId: marker.collectionRepositoryId || "not registered",
-    latitude: marker.latitude,
-    longitude: marker.longitude,
-    color: [123, 161, 63, 220] as [number, number, number, number],
+  // sort the map markers so that holotypes and other more uncommon types are rendered last
+  function getRenderLayer(typeStatus?: string, collectionRepositoryId?: string) {
+    const status = getVoucherStatus(typeStatus, collectionRepositoryId);
+
+    if (status === "holotype") return 0;
+    else if (status === "paratype") return 1;
+    else if (status === "registered voucher") return 2;
+    else return 3;
+  }
+
+  const markers = data?.species.mapping.specimens.map((specimen) => ({
+    recordId: specimen.collectionRepositoryId || "not registered",
+    latitude: specimen.latitude,
+    longitude: specimen.longitude,
+    color: getVoucherRGBA(200, specimen.typeStatus, specimen.collectionRepositoryId),
+    renderLayer: getRenderLayer(specimen.typeStatus, specimen.collectionRepositoryId),
   }));
 
   return (
@@ -505,19 +529,6 @@ function AllSpecimens() {
         </ScrollArea>
       </Stack>
     </LoadPanel>
-  );
-}
-
-export default function Page() {
-  const { details } = { ...useSpecies() };
-  if (!details) return;
-
-  return (
-    <Stack gap="xl">
-      <Overview name={details.name} />
-      <Explorer name={details.name} />
-      <AllSpecimens />
-    </Stack>
   );
 }
 

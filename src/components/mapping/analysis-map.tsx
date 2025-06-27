@@ -3,7 +3,6 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import classes from "./analysis-map.module.css";
 
-/* import Map from "react-map-gl/maplibre"; */
 import { Map } from "@vis.gl/react-maplibre";
 
 import DeckGL, { GeoJsonLayer, MapView, PickingInfo, ScatterplotLayer } from "deck.gl";
@@ -44,8 +43,9 @@ export interface Marker {
   recordId: string;
   latitude: number;
   longitude: number;
-  color: [number, number, number, number];
+  color: [number, number, number, number] | [number, number, number];
   type?: Layer;
+  renderLayer?: number;
 }
 
 interface AnalysisMapProps {
@@ -271,6 +271,15 @@ interface Specimens {
 }
 
 function specimenPlotLayer({ markers }: Specimens) {
+  // sort order isn't that important for a scatterplot but because we don't support
+  // adding multiple scatter plots on the map we sort them with an internal render layer
+  // to make sure some markers are rendered last so that they are more visible
+  markers.sort(({ renderLayer: a = 0 }, { renderLayer: b = 0 }) => {
+    if (a < b) return 1;
+    else if (a > b) return -1;
+    else return 0;
+  });
+
   return new ScatterplotLayer({
     id: "scatter-plot",
     data: markers,

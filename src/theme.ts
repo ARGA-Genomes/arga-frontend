@@ -170,4 +170,17 @@ export const theme = createTheme({
       h3: { fontSize: rem(24) },
     },
   },
+
+  other: {
+    // Brand RGB colours without an alpha component.
+    // Primarily used for libraries like Deck.gl which requires a specific colour format
+    // for various plotting layers
+    rawColors: {
+      midnight: [35, 60, 75],
+      shellfish: [88, 163, 157],
+      moss: [162, 195, 110],
+      bushfire: [244, 124, 46],
+      wheat: [254, 199, 67],
+    },
+  },
 });
