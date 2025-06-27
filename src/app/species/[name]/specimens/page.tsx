@@ -38,9 +38,11 @@ import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
 import { useSpecies } from "@/app/species-provider";
-import { getVoucherStatus, getVoucherColour } from "@/helpers/colors";
+import { getVoucherStatus, getVoucherColour, getVoucherRGBA } from "@/helpers/colors";
 import { IconCircleCheck, IconCircleX, IconMicroscope } from "@tabler/icons-react";
 import { motion } from "framer-motion";
+import { Marker } from "@/components/mapping/analysis-map";
+import { useStateHistory } from "@mantine/hooks";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -83,8 +85,8 @@ interface MappingQuery {
 }
 
 const GET_SPECIMEN_CARD = gql`
-  query SpecimenCard($recordId: String) {
-    specimen(by: { recordId: $recordId }) {
+  query SpecimenCard($entityId: String) {
+    specimen(by: { entityId: $entityId }) {
       collections {
         ...CollectionEventDetails
       }
@@ -122,6 +124,19 @@ interface SpecimensQuery {
       records: SpecimenSummary[];
     };
   };
+}
+
+export default function Page() {
+  const { details } = { ...useSpecies() };
+  if (!details) return;
+
+  return (
+    <Stack gap="xl">
+      <Overview name={details.name} />
+      <Explorer name={details.name} />
+      <AllSpecimens />
+    </Stack>
+  );
 }
 
 interface OverviewBlockProps {
@@ -274,16 +289,35 @@ function Overview({ name }: { name: string }) {
 }
 
 function Explorer({ name }: { name: string }) {
+  const [selectedSpecimen, handlers, history] = useStateHistory<SpecimenMapMarker | null>(null);
+
   const { loading, error, data } = useQuery<MappingQuery>(GET_SPECIMEN_MAP_MARKERS, {
     variables: { canonicalName: name },
   });
 
-  const markers = data?.species.mapping.specimens.map((marker) => ({
-    recordId: marker.collectionRepositoryId || "not registered",
-    latitude: marker.latitude,
-    longitude: marker.longitude,
-    color: [123, 161, 63, 220] as [number, number, number, number],
-  }));
+  // sort the map markers so that holotypes and other more uncommon types are rendered last
+  function getRenderLayer(typeStatus?: string, collectionRepositoryId?: string) {
+    const status = getVoucherStatus(typeStatus, collectionRepositoryId);
+
+    if (status === "holotype") return 0;
+    else if (status === "paratype") return 1;
+    else if (status === "registered voucher") return 2;
+    else return 3;
+  }
+
+  const markers: Marker<SpecimenMapMarker>[] =
+    data?.species.mapping.specimens.map((specimen) => ({
+      latitude: specimen.latitude,
+      longitude: specimen.longitude,
+      tooltip: `${specimen.institutionCode} ${specimen.collectionRepositoryId}` || "not registered",
+      color: getVoucherRGBA(200, specimen.typeStatus, specimen.collectionRepositoryId),
+      renderLayer: getRenderLayer(specimen.typeStatus, specimen.collectionRepositoryId),
+      data: specimen,
+    })) ?? [];
+
+  function onMarkerClick(marker: SpecimenMapMarker) {
+    handlers.set(marker);
+  }
 
   return (
     <Paper>
@@ -292,13 +326,13 @@ function Explorer({ name }: { name: string }) {
         <Grid.Col span={7}>
           <Paper pos="relative" radius="xl" style={{ overflow: "hidden" }} h="100%">
             <LoadOverlay visible={loading} error={error} />
-            <AnalysisMap markers={markers} />
+            <AnalysisMap markers={markers} onMarkerClick={onMarkerClick} />
           </Paper>
         </Grid.Col>
         <Grid.Col span={5}>
           <Stack>
             <HolotypeCard />
-            <SpecimenCard />
+            <SpecimenCard entityId={selectedSpecimen?.entityId} />
           </Stack>
         </Grid.Col>
       </Grid>
@@ -316,7 +350,7 @@ function HolotypeCard() {
 
   const { loading, error, data } = useQuery<SpecimenCardQuery>(GET_SPECIMEN_CARD, {
     skip: !overviewResult.data,
-    variables: { recordId: overviewResult.data?.species.overview.specimens.holotype },
+    variables: { entityId: overviewResult.data?.species.overview.specimens.holotypeEntityId },
   });
 
   const collection = data?.specimen.collections[0];
@@ -385,44 +419,54 @@ function HolotypeCard() {
   );
 }
 
-function SpecimenCard() {
+function SpecimenCard({ entityId }: { entityId?: string }) {
+  const { loading, error, data } = useQuery<SpecimenCardQuery>(GET_SPECIMEN_CARD, {
+    skip: !entityId,
+    variables: { entityId },
+  });
+
+  const collection = data?.specimen.collections[0];
+  const accession = data?.specimen.accessions[0];
+
   return (
-    <LoadPanel visible={false} radius="xl" p="lg" withBorder>
+    <LoadPanel visible={loading} error={error} radius="xl" p="lg" withBorder>
       <Title order={4}>Specimen</Title>
 
       <Table variant="vertical" withRowBorders={false} className={classes.cardTable}>
         <Table.Tbody>
           <Table.Tr>
             <Table.Th>Registration number</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>{accession?.collectionRepositoryId}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Institution</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>{accession?.institutionCode}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Specimen status</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>{getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId)}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Preparation type</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>{accession?.preparation}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Collection location</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>{collection?.locality}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Coordinates</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>
+              {collection?.latitude} {collection?.longitude}
+            </Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Collected by</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>{collection?.collectedBy}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Identified by</Table.Th>
-            <Table.Td></Table.Td>
+            <Table.Td>{accession?.identifiedBy}</Table.Td>
           </Table.Tr>
         </Table.Tbody>
       </Table>
@@ -505,19 +549,6 @@ function AllSpecimens() {
         </ScrollArea>
       </Stack>
     </LoadPanel>
-  );
-}
-
-export default function Page() {
-  const { details } = { ...useSpecies() };
-  if (!details) return;
-
-  return (
-    <Stack gap="xl">
-      <Overview name={details.name} />
-      <Explorer name={details.name} />
-      <AllSpecimens />
-    </Stack>
   );
 }
 

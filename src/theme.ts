@@ -1,6 +1,7 @@
 "use client";
 
 import { createTheme, rem } from "@mantine/core";
+import { RAW_COLOURS_RGB } from "@/helpers/colors";
 
 import localFont from "next/font/local";
 
@@ -169,5 +170,12 @@ export const theme = createTheme({
       h2: { fontSize: rem(30) },
       h3: { fontSize: rem(24) },
     },
+  },
+
+  other: {
+    // Brand RGB colours without an alpha component.
+    // Primarily used for libraries like Deck.gl which requires a specific colour format
+    // for various plotting layers
+    rawColors: RAW_COLOURS_RGB,
   },
 });
