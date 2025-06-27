@@ -309,7 +309,9 @@ function Explorer({ name }: { name: string }) {
     data?.species.mapping.specimens.map((specimen) => ({
       latitude: specimen.latitude,
       longitude: specimen.longitude,
-      tooltip: `${specimen.institutionCode} ${specimen.collectionRepositoryId}` || "not registered",
+      tooltip: specimen.institutionCode
+        ? `${specimen.institutionCode} ${specimen.collectionRepositoryId}`
+        : "not registered",
       color: getVoucherRGBA(200, specimen.typeStatus, specimen.collectionRepositoryId),
       renderLayer: getRenderLayer(specimen.typeStatus, specimen.collectionRepositoryId),
       data: specimen,
