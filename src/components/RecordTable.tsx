@@ -25,7 +25,7 @@ export function RecordTable({ columns, children, radius }: RecordTableProps) {
   return (
     <RecordTableContext.Provider value={context}>
       <Paper radius={radius} className={classes.container}>
-        <Table highlightOnHoverColor="wheat.1" withRowBorders={false} highlightOnHover striped>
+        <Table highlightOnHoverColor="wheat.1" withRowBorders={false} highlightOnHover striped stickyHeader>
           <Table.Thead className={classes.header}>
             <Table.Tr>{columns}</Table.Tr>
           </Table.Thead>

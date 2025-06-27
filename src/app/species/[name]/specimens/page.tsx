@@ -446,7 +446,7 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Specimen status</Table.Th>
-            <Table.Td>{getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId)}</Table.Td>
+            <Table.Td>{data && getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId)}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Preparation type</Table.Th>
