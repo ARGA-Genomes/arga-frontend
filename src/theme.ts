@@ -1,6 +1,7 @@
 "use client";
 
 import { createTheme, rem } from "@mantine/core";
+import { RAW_COLOURS_RGB } from "@/helpers/colors";
 
 import localFont from "next/font/local";
 
@@ -175,12 +176,6 @@ export const theme = createTheme({
     // Brand RGB colours without an alpha component.
     // Primarily used for libraries like Deck.gl which requires a specific colour format
     // for various plotting layers
-    rawColors: {
-      midnight: [35, 60, 75],
-      shellfish: [88, 163, 157],
-      moss: [162, 195, 110],
-      bushfire: [244, 124, 46],
-      wheat: [254, 199, 67],
-    },
+    rawColors: RAW_COLOURS_RGB,
   },
 });

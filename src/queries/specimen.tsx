@@ -65,6 +65,7 @@ export const SPECIMEN_OVERVIEW = gql`
     total
     majorCollections
     holotype
+    holotypeEntityId
     otherTypes
     formalVouchers
     tissues
@@ -82,6 +83,7 @@ export interface SpecimenOverview {
   total: number;
   majorCollections: string[];
   holotype?: string;
+  holotypeEntityId?: string;
   otherTypes?: number;
   formalVouchers?: number;
   tissues?: number;
@@ -98,7 +100,9 @@ export interface YearValue<T> {
 
 export const SPECIMEN_MAP_MARKER = gql`
   fragment SpecimenMapMarkerDetails on SpecimenMapMarker {
+    entityId
     collectionRepositoryId
+    institutionCode
     typeStatus
     latitude
     longitude
@@ -106,7 +110,9 @@ export const SPECIMEN_MAP_MARKER = gql`
 `;
 
 export interface SpecimenMapMarker {
+  entityId: string;
   collectionRepositoryId?: string;
+  institutionCode?: string;
   typeStatus?: string;
   latitude: number;
   longitude: number;
