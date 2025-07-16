@@ -158,12 +158,7 @@ export function DataNoteActions({ query }: DataNoteActionProps) {
             label="Download raw data as CSV"
             icon={downloadingData ? <Loader color="white" size="1rem" /> : <IconDownload size="1rem" />}
           />
-          <ActionButton
-            disabled={downloadingImages}
-            onClick={handleDownloadImages}
-            label="Download graphics as PNG file"
-            icon={downloadingImages ? <Loader color="white" size="1rem" /> : <IconDownload size="1rem" />}
-          />
+          <ActionButton disabled={true} label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
         </Stack>
       </Stack>
     </Paper>
