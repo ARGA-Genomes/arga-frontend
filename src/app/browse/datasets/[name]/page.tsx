@@ -158,7 +158,7 @@ function DatasetDetails({ dataset }: { dataset: string }) {
         <Text fw={700} c="dimmed" size="sm">
           Source:{" "}
           <Link href={data.dataset.url} target="_blank">
-            ALA Profiles
+            ALA
           </Link>
         </Text>
       )}

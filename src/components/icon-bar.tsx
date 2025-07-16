@@ -212,7 +212,7 @@ export const VERNACULAR_GROUP_ICON: Record<string, VernacularIconData> = {
   },
   HIGHER_PLANTS: {
     image: "/icons/taxon/Taxon_ Plants (Regnum Plantae).svg",
-    label: "Higher plants",
+    label: "Plants",
     link: "/kingdom/Plantae",
     colour: "moss.4",
     grouping: VernacularGrouping.Producers,
@@ -726,7 +726,7 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
                 )}
               </Box>
             </Carousel.Slide>
-          )
+          ),
       )}
       {attributeHeaderIcons &&
         attributeHeaderIcons.map(
@@ -737,7 +737,7 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
                   <AttributeGroupIcon attribute={icon} />
                 </Box>
               </Carousel.Slide>
-            )
+            ),
         )}
     </Carousel>
   );
