@@ -1,5 +1,29 @@
 import { gql } from "@apollo/client";
 
+export const ORGANISM = gql`
+  fragment OrganismDetails on Organism {
+    entityId
+    organismId
+    sex
+    genotypicSex
+    phenotypicSex
+    lifeStage
+    reproductiveCondition
+    behavior
+  }
+`;
+
+export interface Organism {
+  entityId: string;
+  organismId: string;
+  sex?: string;
+  genotypicSex?: string;
+  phenotypicSex?: string;
+  lifeStage?: string;
+  reproductiveCondition?: string;
+  behavior?: string;
+}
+
 export const SPECIMEN = gql`
   fragment SpecimenDetails on Specimen {
     entityId

@@ -4,6 +4,7 @@ import { createFragmentRegistry } from "@apollo/client/cache";
 import {
   ACCESSION_EVENT,
   COLLECTION_EVENT,
+  ORGANISM,
   SPECIMEN,
   SPECIMEN_SUMMARY,
   SPECIMEN_OVERVIEW,
@@ -25,6 +26,7 @@ import { PUBLICATION } from "./publication";
 
 export default function createClient() {
   const fragments = createFragmentRegistry(
+    ORGANISM,
     SPECIMEN,
     SPECIMEN_SUMMARY,
     SPECIMEN_OVERVIEW,
