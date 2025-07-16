@@ -103,7 +103,7 @@ function Species({ dataset }: { dataset: string }) {
 
       {error ? <Title order={4}>{error.message}</Title> : null}
 
-      <SimpleGrid cols={5}>
+      <SimpleGrid cols={4}>
         {records.map((record) => (
           <SpeciesCard key={record.taxonomy.canonicalName} species={record} />
         ))}
@@ -181,9 +181,9 @@ export default function BrowseDataset(props: { params: Promise<{ name: string }>
   useEffect(() => {
     setPreviousPage({
       name: `browsing ${dataset}`,
-      url: "/browse/datasets/${params.name}",
+      url: `/browse/datasets/${dataset}`,
     });
-  });
+  }, [dataset, setPreviousPage]);
 
   return (
     <Stack mt="xl">
