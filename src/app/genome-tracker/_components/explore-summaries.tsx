@@ -39,13 +39,8 @@ const PRODUCERS_BAR = [
 ];
 
 export const ExploreSummaries = () => {
-  const animals = Object.entries(VERNACULAR_GROUP_ICON)
-    .filter(([key, _]) => ANIMAL_BAR.indexOf(key) >= 0)
-    .map(([_, icon]) => icon);
-
-  const producers = Object.entries(VERNACULAR_GROUP_ICON)
-    .filter(([key, _]) => PRODUCERS_BAR.indexOf(key) >= 0)
-    .map(([_, icon]) => icon);
+  const animals = ANIMAL_BAR.map((key) => VERNACULAR_GROUP_ICON[key]);
+  const producers = PRODUCERS_BAR.map((key) => VERNACULAR_GROUP_ICON[key]).reverse();
 
   return (
     <Stack gap="sm">
