@@ -8,6 +8,7 @@ import {
   SPECIMEN,
   SPECIMEN_SUMMARY,
   SPECIMEN_OVERVIEW,
+  SPECIMEN_STATS,
   SPECIMEN_MAP_MARKER,
 } from "./specimen";
 import { SUBSAMPLE, SUBSAMPLE_EVENT } from "./subsample";
@@ -30,6 +31,7 @@ export default function createClient() {
     SPECIMEN,
     SPECIMEN_SUMMARY,
     SPECIMEN_OVERVIEW,
+    SPECIMEN_STATS,
     SPECIMEN_MAP_MARKER,
     SUBSAMPLE,
     DNA_EXTRACT,

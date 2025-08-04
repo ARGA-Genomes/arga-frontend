@@ -257,3 +257,31 @@ export interface AccessionEvent {
   identificationRemarks?: string;
   otherCatalogNumbers?: string;
 }
+
+export const SPECIMEN_STATS = gql`
+  fragment SpecimenStatsDetails on SpecimenStats {
+    sequences
+    wholeGenomes
+    loci
+    otherGenomic
+    fullGenomes
+    partialGenomes
+    completeGenomes
+    assemblyChromosomes
+    assemblyScaffolds
+    assemblyContigs
+  }
+`;
+
+export interface SpecimenStats {
+  sequences: number;
+  wholeGenomes: number;
+  loci: number;
+  otherGenomic: number;
+  fullGenomes: number;
+  partialGenomes: number;
+  completeGenomes: number;
+  assemblyChromosomes: number;
+  assemblyScaffolds: number;
+  assemblyContigs: number;
+}

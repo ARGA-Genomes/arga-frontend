@@ -162,6 +162,7 @@ export const theme = createTheme({
   fontFamily: workSans.style.fontFamily,
 
   headings: {
+    // gotham bold doesn't have variable weight
     fontFamily: gothamBold.style.fontFamily,
     // fontWeight: "550",
 
@@ -169,6 +170,8 @@ export const theme = createTheme({
       h1: { fontSize: rem(38) },
       h2: { fontSize: rem(30) },
       h3: { fontSize: rem(24) },
+
+      h5: { fontSize: rem(18), fontWeight: "600" },
     },
   },
 

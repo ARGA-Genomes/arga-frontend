@@ -14,6 +14,7 @@ import {
   CollectionEvent,
   SpecimenMapMarker,
   SpecimenOverview,
+  SpecimenStats,
   SpecimenSummary,
   YearValue,
 } from "@/queries/specimen";
@@ -93,6 +94,9 @@ const GET_SPECIMEN_CARD = gql`
       accessions {
         ...AccessionEventDetails
       }
+      stats {
+        ...SpecimenStatsDetails
+      }
     }
   }
 `;
@@ -101,6 +105,7 @@ interface SpecimenCardQuery {
   specimen: {
     collections: CollectionEvent[];
     accessions: AccessionEvent[];
+    stats: SpecimenStats;
   };
 }
 
@@ -323,7 +328,10 @@ function Explorer({ name }: { name: string }) {
 
   return (
     <Paper>
-      <Title order={3}>Interactive specimen explorer</Title>
+      <Title order={3} mb="lg">
+        Interactive specimen explorer
+      </Title>
+
       <Grid>
         <Grid.Col span={7}>
           <Paper pos="relative" radius="xl" style={{ overflow: "hidden" }} h="100%">
@@ -429,49 +437,90 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
 
   const collection = data?.specimen.collections[0];
   const accession = data?.specimen.accessions[0];
+  const stats = data?.specimen.stats;
 
   return (
     <LoadPanel visible={loading} error={error} radius="xl" p="lg" withBorder>
       <Title order={4}>Specimen</Title>
 
-      <Table variant="vertical" withRowBorders={false} className={classes.cardTable}>
-        <Table.Tbody>
-          <Table.Tr>
-            <Table.Th>Registration number</Table.Th>
-            <Table.Td>{accession?.collectionRepositoryId}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Institution</Table.Th>
-            <Table.Td>{accession?.institutionCode}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Specimen status</Table.Th>
-            <Table.Td>{data && getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId)}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Preparation type</Table.Th>
-            <Table.Td>{accession?.preparation}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Collection location</Table.Th>
-            <Table.Td>{collection?.locality}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Coordinates</Table.Th>
-            <Table.Td>
-              {collection?.latitude} {collection?.longitude}
-            </Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Collected by</Table.Th>
-            <Table.Td>{collection?.collectedBy}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th>Identified by</Table.Th>
-            <Table.Td>{accession?.identifiedBy}</Table.Td>
-          </Table.Tr>
-        </Table.Tbody>
-      </Table>
+      <Group wrap="nowrap">
+        <Table variant="vertical" withRowBorders={false} className={classes.cardTable}>
+          <Table.Tbody>
+            <Table.Tr>
+              <Table.Th>Registration number</Table.Th>
+              <Table.Td>{accession?.collectionRepositoryId}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Institution</Table.Th>
+              <Table.Td>{accession?.institutionCode}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Specimen status</Table.Th>
+              <Table.Td>{data && getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId)}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Preparation type</Table.Th>
+              <Table.Td>{accession?.preparation}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Collection location</Table.Th>
+              <Table.Td>{collection?.locality}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Coordinates</Table.Th>
+              <Table.Td>
+                {collection?.latitude} {collection?.longitude}
+              </Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Collected by</Table.Th>
+              <Table.Td>{collection?.collectedBy}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th>Identified by</Table.Th>
+              <Table.Td>{accession?.identifiedBy}</Table.Td>
+            </Table.Tr>
+          </Table.Tbody>
+        </Table>
+
+        <Paper bg="moss.1" p="lg" radius="xl" w={300}>
+          <Stack gap="xs">
+            <Text fw={600} fz={18}>
+              Data indexed
+            </Text>
+            <Group wrap="nowrap" justify="space-between" ml="sm">
+              <Text fz="md" fw={600} c="midnight.8">
+                Genome
+              </Text>
+              <DataCheckIcon value={stats?.fullGenomes} />
+            </Group>
+            <Group wrap="nowrap" justify="space-between" ml="sm">
+              <Text fz="md" fw={600} c="midnight.8">
+                Libraires
+              </Text>
+              <DisabledDataCheckIcon />
+            </Group>
+            <Group wrap="nowrap" justify="space-between" ml="sm">
+              <Text fz="md" fw={600} c="midnight.8">
+                Single loci
+              </Text>
+              <DataCheckIcon value={stats?.loci} />
+            </Group>
+            <Group wrap="nowrap" justify="space-between" ml="sm">
+              <Text fz="md" fw={600} c="midnight.8">
+                SNPs
+              </Text>
+              <DisabledDataCheckIcon />
+            </Group>
+            <Group wrap="nowrap" justify="space-between" ml="sm">
+              <Text fz="md" fw={600} c="midnight.8">
+                Other
+              </Text>
+              <DataCheckIcon value={stats?.otherGenomic} />
+            </Group>
+          </Stack>
+        </Paper>
+      </Group>
     </LoadPanel>
   );
 }
@@ -597,6 +646,16 @@ function DataCheckIcon({ value }: { value?: number | string | boolean | null | u
   return (
     <Paper radius="xl" p={0} m={0} h={size} w={size}>
       {value ? <IconCircleCheck color={theme.colors.moss[5]} size={size} /> : <IconCircleX color="red" size={size} />}
+    </Paper>
+  );
+}
+
+function DisabledDataCheckIcon() {
+  const size = 35;
+
+  return (
+    <Paper bg="lightgrey" radius="xl" p={0} m={0} h={size} w={size}>
+      <IconCircleX color="grey" size={size} />
     </Paper>
   );
 }
