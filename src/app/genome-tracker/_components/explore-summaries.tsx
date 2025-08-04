@@ -1,25 +1,46 @@
-import { IconData, VERNACULAR_GROUP_ICON, VernacularGrouping } from "@/components/icon-bar";
+import { IconData, VERNACULAR_GROUP_ICON } from "@/components/icon-bar";
 import { Stack, Text } from "@mantine/core";
 import { Group } from "@visx/group";
 import { animate, motion, useMotionValue } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-const DISABLED_GROUPS = ["BACTERIA", "CYANOBACTERIA", "CONIFERS_AND_CYCADS"];
+const ANIMAL_BAR = [
+  "ANIMALS",
+  "MAMMALS",
+  "BIRDS",
+  "REPTILES",
+  "FROGS_AND_OTHER_AMPHIBIANS",
+  "FIN_FISHES",
+  "SHARKS_AND_RAYS",
+  "INSECTS",
+  "SPIDERS",
+  "CRUSTACEANS",
+  "ECHINODERMS",
+  "MOLLUSCS",
+  "SNAILS",
+  "CORALS_AND_JELLYFISHES",
+  "SPONGES",
+];
+
+const PRODUCERS_BAR = [
+  "HIGHER_PLANTS",
+  "FLOWERING_PLANTS",
+  "FUNGI",
+  "FERNS",
+  "MOSSES",
+  "HORNWORTS",
+  "LIVERWORTS",
+  "RED_ALGAE",
+  "BROWN_ALGAE",
+  "GREEN_ALGAE",
+  "CHROMISTS",
+  "DIATOMS",
+];
 
 export const ExploreSummaries = () => {
-  const [animals, producers] = useMemo(() => {
-    const all = Object.entries(VERNACULAR_GROUP_ICON)
-      .filter(([key]) => !DISABLED_GROUPS.includes(key))
-      .map(([, value]) => value);
-
-    return [
-      all.filter((item) => item.grouping === VernacularGrouping.Animals),
-      all.filter(
-        (item) => item.grouping === VernacularGrouping.Microbes || item.grouping === VernacularGrouping.Producers
-      ),
-    ];
-  }, []);
+  const animals = ANIMAL_BAR.map((key) => VERNACULAR_GROUP_ICON[key]);
+  const producers = PRODUCERS_BAR.map((key) => VERNACULAR_GROUP_ICON[key]).reverse();
 
   return (
     <Stack gap="sm">

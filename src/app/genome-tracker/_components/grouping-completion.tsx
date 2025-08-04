@@ -31,6 +31,7 @@ import { TachoChart } from "@/components/graphing/tacho";
 import { GenomeCompletion } from "./genome-completion";
 import { BarChart } from "@/components/graphing/bar";
 import { useDatasets } from "@/app/source-provider";
+import Link from "next/link";
 
 const GET_SPECIES_GENOME_SUMMARY = gql`
   query SpeciesGenomeSummary($rank: TaxonRank, $canonicalName: String, $datasetId: UUID) {
@@ -444,7 +445,9 @@ function GroupDetail({ group, domain }: GroupDetailProps) {
           </Grid.Col>
           <Grid.Col span={6}>
             <Group justify="center" my="lg">
-              <Image w={100} h={100} src={ICONS[group]} alt={group} />
+              <Link href={`/${query.taxonRank.toLocaleLowerCase()}/${query.taxonCanonicalName}`}>
+                <Image w={100} h={100} src={ICONS[group]} alt={group} />
+              </Link>
               <Stack gap={0}>
                 <Title order={2}>{Humanize.capitalize(group)}</Title>
                 <Text fz="xl">
