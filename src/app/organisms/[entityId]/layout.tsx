@@ -8,7 +8,6 @@ import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
-import { PageCitation } from "@/components/page-citation";
 
 function DataTabs({ entityId, children }: { entityId: string; children: React.ReactNode }) {
   const path = usePathname();
