@@ -12,6 +12,11 @@ import SimpleBarGraph from "@/components/graphing/SimpleBarGraph";
 import {
   AccessionEvent,
   CollectionEvent,
+  getEnumKeyByValue,
+  getFilterLabel,
+  getFilterValues,
+  HasData,
+  SpecimenFilterItem,
   SpecimenMapMarker,
   SpecimenOverview,
   SpecimenStats,
@@ -34,16 +39,21 @@ import {
   Button,
   Center,
   useMantineTheme,
+  Checkbox,
+  Transition,
+  TagsInput,
 } from "@mantine/core";
 import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
 import { useSpecies } from "@/app/species-provider";
 import { getVoucherStatus, getVoucherColour, getVoucherRGBA } from "@/helpers/colors";
-import { IconCircleCheck, IconCircleX, IconMicroscope } from "@tabler/icons-react";
+import { IconCircleCheck, IconCircleX, IconFilter, IconMicroscope, IconX } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { Marker } from "@/components/mapping/analysis-map";
-import { useStateHistory } from "@mantine/hooks";
+import { useSet, useStateHistory } from "@mantine/hooks";
+import { FilterGroup } from "@/components/filtering-redux/group";
+import { PropsWithChildren, useState } from "react";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -110,9 +120,9 @@ interface SpecimenCardQuery {
 }
 
 const GET_SPECIMENS = gql`
-  query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
+  query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int, $filters: [SpecimenFilterItem]) {
     species(canonicalName: $canonicalName) {
-      specimens(page: $page, pageSize: $pageSize) {
+      specimens(page: $page, pageSize: $pageSize, filters: $filters) {
         total
         records {
           ...SpecimenSummary
@@ -526,11 +536,13 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
 }
 
 function AllSpecimens() {
+  const [opened, setOpened] = useState(false);
+  const [filters, setFilters] = useState<SpecimenFilterItem[]>([]);
   const { details } = { ...useSpecies() };
 
   const { loading, error, data } = useQuery<SpecimensQuery>(GET_SPECIMENS, {
     skip: !details,
-    variables: { canonicalName: details?.name, page: 1, pageSize: 100 },
+    variables: { canonicalName: details?.name, page: 1, pageSize: 100, filters },
   });
 
   const specimens = data?.species.specimens;
@@ -542,64 +554,266 @@ function AllSpecimens() {
           All specimens
         </Title>
 
-        <Group>
-          <Text fw={700} fz="xs" c="midnight.9">
-            Showing {specimens?.records.length} of {specimens?.total}
-          </Text>
+        <Group justify="space-between">
+          <Group gap="xl">
+            <Text fw={700} fz="xs" c="midnight.9">
+              Showing {specimens?.records.length} of {specimens?.total} specimens
+            </Text>
+
+            <Group>
+              <Text fw={700} fz="xs" c="midnight.9">
+                Filters:
+              </Text>
+              {filters.map((filter) => (
+                <FilterBadge filter={filter} key={Object.keys(filter).join()} />
+              ))}
+            </Group>
+          </Group>
+
+          <Group>
+            <Button
+              size="xs"
+              color="midnight.7"
+              radius="xl"
+              variant="outline"
+              leftSection={<IconFilter size="1rem" />}
+              onClick={() => setOpened(!opened)}
+            >
+              Filters
+            </Button>
+          </Group>
         </Group>
 
-        <ScrollArea h={700} type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
-          <RecordTable
-            radius="lg"
-            columns={[
-              <RecordTable.Column key="voucher" label="Voucher status" sorting={SortOrder.Ascending} />,
-              <RecordTable.Column key="id" label="Specimen number" />,
-              <RecordTable.Column key="institution" label="Institution" />,
-              <RecordTable.Column key="country" label="Country" />,
-              <RecordTable.Column key="date" label="Collection date" />,
-              <RecordTable.Column key="score" label="Collection metadata score" />,
-              <RecordTable.Column key="genomes" label="Whole genomes" width={1} color="shellfishBg.0" />,
-              <RecordTable.Column key="loci" label="Single loci" width={1} />,
-              <RecordTable.Column key="other" label="Other genetic data" width={1} color="shellfishBg.0" />,
-              <RecordTable.Column key="view" label="View full record" width={1} />,
-              <RecordTable.Column key="ala" label="View in ALA" width={1} />,
-            ]}
-          >
-            {specimens?.records.map((record) => (
-              <RecordTable.Row key={record.entityId}>
-                <AttributePillValue
-                  value={getVoucherStatus(record.typeStatus, record.collectionRepositoryId)}
-                  color={getVoucherColour(record.typeStatus, record.collectionRepositoryId)}
-                  textColor="white"
-                  popoverDisabled
-                />
-                <Text fw={600} c="midnight">
-                  {record.collectionRepositoryId}
-                </Text>
-                {record.institutionCode}
-                {record.country}
-                {record.collectedAt &&
-                  DateTime.fromISO(record.collectedAt).toLocaleString({
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                <SmallScore specimen={record} />
-                <DataCheckIcon value={record.fullGenomes} />
-                <DataCheckIcon value={record.loci} />
-                <DataCheckIcon value={record.otherGenomic} />
-                <Button color="midnight.9" radius="lg">
-                  <IconMicroscope />
-                </Button>
-                <Button color="shellfish" variant="outline" bg="white" radius="lg">
-                  <IconMicroscope />
-                </Button>
-              </RecordTable.Row>
-            ))}
-          </RecordTable>
-        </ScrollArea>
+        <Box h={700}>
+          <FilterDrawer opened={opened} onClose={() => setOpened(false)}>
+            <Filter onApply={(filters) => setFilters(filters)} />
+          </FilterDrawer>
+
+          <ScrollArea h="inherit" type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
+            <SpecimenTable specimens={specimens?.records} />
+          </ScrollArea>
+        </Box>
       </Stack>
     </LoadPanel>
+  );
+}
+
+interface SpecimenTableProps {
+  specimens?: SpecimenSummary[];
+}
+
+function SpecimenTable({ specimens }: SpecimenTableProps) {
+  return (
+    <RecordTable
+      radius="lg"
+      columns={[
+        <RecordTable.Column key="voucher" label="Voucher status" sorting={SortOrder.Ascending} />,
+        <RecordTable.Column key="id" label="Specimen number" />,
+        <RecordTable.Column key="institution" label="Institution" />,
+        <RecordTable.Column key="country" label="Country" />,
+        <RecordTable.Column key="date" label="Collection date" />,
+        <RecordTable.Column key="score" label="Collection metadata score" />,
+        <RecordTable.Column key="genomes" label="Whole genomes" width={1} color="shellfishBg.0" />,
+        <RecordTable.Column key="loci" label="Single loci" width={1} />,
+        <RecordTable.Column key="other" label="Other genetic data" width={1} color="shellfishBg.0" />,
+        <RecordTable.Column key="view" label="View full record" width={1} />,
+        <RecordTable.Column key="ala" label="View in ALA" width={1} />,
+      ]}
+    >
+      {specimens?.map((record) => (
+        <RecordTable.Row key={record.entityId}>
+          <AttributePillValue
+            value={getVoucherStatus(record.typeStatus, record.collectionRepositoryId)}
+            color={getVoucherColour(record.typeStatus, record.collectionRepositoryId)}
+            textColor="white"
+            popoverDisabled
+          />
+          <Text fw={600} c="midnight">
+            {record.collectionRepositoryId}
+          </Text>
+          {record.institutionCode}
+          {record.country}
+          {record.collectedAt &&
+            DateTime.fromISO(record.collectedAt).toLocaleString({
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
+          <SmallScore specimen={record} />
+          <DataCheckIcon value={record.fullGenomes} />
+          <DataCheckIcon value={record.loci} />
+          <DataCheckIcon value={record.otherGenomic} />
+          <Button color="midnight.9" radius="lg">
+            <IconMicroscope />
+          </Button>
+          <Button color="shellfish" variant="outline" bg="white" radius="lg">
+            <IconMicroscope />
+          </Button>
+        </RecordTable.Row>
+      ))}
+    </RecordTable>
+  );
+}
+
+interface FilterDrawerProps extends PropsWithChildren {
+  opened: boolean;
+  onClose: () => void;
+}
+
+function FilterDrawer({ opened, onClose, children }: FilterDrawerProps) {
+  return (
+    <Transition mounted={opened} transition="fade-left" duration={200}>
+      {(styles) => (
+        <Box className={classes.filterDrawer} style={styles} onClick={onClose}>
+          <Paper shadow="xl" p="lg" w="30%" className={classes.filterPane} onClick={(e) => e.stopPropagation()}>
+            {children}
+          </Paper>
+        </Box>
+      )}
+    </Transition>
+  );
+}
+
+interface FilterProps {
+  onApply: (filters: SpecimenFilterItem[]) => void;
+}
+
+function Filter({ onApply }: FilterProps) {
+  const hasData = useSet<HasData>();
+  const institutions = useSet<string>();
+  const countries = useSet<string>();
+
+  function setData(values: string[]) {
+    hasData.clear();
+    for (const value of values) {
+      const filter = getEnumKeyByValue(HasData, value);
+      if (filter) {
+        hasData.add(HasData[filter]);
+      }
+    }
+  }
+
+  function setInstitutions(values: string[]) {
+    institutions.clear();
+    for (const value of values) {
+      institutions.add(value);
+    }
+  }
+
+  function setCountries(values: string[]) {
+    countries.clear();
+    for (const value of values) {
+      countries.add(value);
+    }
+  }
+
+  function applyFilters() {
+    const filters = [];
+    if (hasData.size) filters.push({ data: [...hasData] });
+    if (institutions.size) filters.push({ institution: [...institutions] });
+    if (countries.size) filters.push({ country: [...countries] });
+
+    onApply(filters);
+  }
+
+  return (
+    <Stack h="100%">
+      <ScrollArea h="100%">
+        <Stack>
+          <FilterGroup
+            title="Data types"
+            description="Data derived from specimens"
+            icon="/icons/data-type/Data type_ DNA.svg"
+          >
+            <Checkbox.Group onChange={setData}>
+              <Stack pt="md" gap="xs">
+                <Checkbox.Card className={classes.checkbox} radius="xl" value={HasData.Genomes}>
+                  <Group wrap="nowrap" align="flex-start">
+                    <Checkbox.Indicator color="moss.3" />
+                    <div>
+                      <Text className={classes.checkboxLabel}>Genomes</Text>
+                      <Text className={classes.checkboxDescription}>
+                        Include specimens that have at least on full genome that has been derived from it
+                      </Text>
+                    </div>
+                  </Group>
+                </Checkbox.Card>
+
+                <Checkbox.Card className={classes.checkbox} radius="xl" value={HasData.Loci}>
+                  <Group wrap="nowrap" align="flex-start">
+                    <Checkbox.Indicator color="moss.3" />
+                    <div>
+                      <Text className={classes.checkboxLabel}>Loci</Text>
+                      <Text className={classes.checkboxDescription}>
+                        Include specimens that have at least on loci that has been derived from it
+                      </Text>
+                    </div>
+                  </Group>
+                </Checkbox.Card>
+
+                <Checkbox.Card className={classes.checkbox} radius="xl" value={HasData.GenomicData}>
+                  <Group wrap="nowrap" align="flex-start">
+                    <Checkbox.Indicator color="moss.3" />
+                    <div>
+                      <Text className={classes.checkboxLabel}>Genomic data</Text>
+                      <Text className={classes.checkboxDescription}>
+                        Include specimens that have any genomic data that has been derived from it
+                      </Text>
+                    </div>
+                  </Group>
+                </Checkbox.Card>
+              </Stack>
+            </Checkbox.Group>
+          </FilterGroup>
+
+          <FilterGroup
+            title="Collection"
+            description="Specimen collection details"
+            icon="/icons/specimen-listing/Specimen listing_ collection.svg"
+          >
+            <TagsInput
+              label="Institution"
+              placeholder="Pick one or more institutions"
+              data={["QM", "SAMA"]}
+              onChange={setInstitutions}
+              radius="lg"
+              clearable
+            />
+
+            <TagsInput
+              label="Country"
+              placeholder="Pick one or more countries"
+              data={["Australia"]}
+              onChange={setCountries}
+              radius="lg"
+              clearable
+            />
+          </FilterGroup>
+        </Stack>
+      </ScrollArea>
+
+      <Button onClick={applyFilters} radius="lg" color="midnight.9">
+        Filter specimens
+      </Button>
+    </Stack>
+  );
+}
+
+function FilterBadge({ filter }: { filter: SpecimenFilterItem }) {
+  return (
+    <Group wrap="nowrap" gap={0}>
+      <Paper px="sm" className={classes.filterBadgeLabel}>
+        <Text fz="xs">{getFilterLabel(filter)}</Text>
+      </Paper>
+      <Paper pl="sm" pr={5} className={classes.filterBadgeValue}>
+        <Group gap="xs">
+          <Text fz="xs" fw={300}>
+            {getFilterValues(filter)}
+          </Text>
+          <IconX size={10} />
+        </Group>
+      </Paper>
+    </Group>
   );
 }
 

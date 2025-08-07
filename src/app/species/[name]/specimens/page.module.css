@@ -48,3 +48,61 @@
     font-size: var(--mantine-font-size-xs);
     font-weight: 700;
 }
+
+.filterDrawer {
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+    height: inherit;
+    display: flex;
+    justify-content: flex-end;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: var(--mantine-radius-lg);
+}
+
+.filterPane {
+    height: 100%;
+    border-radius: 0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0;
+    border: 1px solid var(--mantine-color-midnight-2);
+}
+
+.checkbox {
+    position: relative;
+    padding: var(--mantine-spacing-md);
+    transition: border-color 150ms ease;
+
+    &[data-checked] {
+        border-color: var(--mantine-color-moss-5);
+        background-color: var(--mantine-color-moss-0);
+    }
+
+    @mixin hover {
+        background-color: var(--mantine-color-moss-0);
+        border-color: var(--mantine-color-moss-2);
+    }
+}
+
+.checkboxLabel {
+    font-weight: 600;
+    font-size: var(--mantine-font-size-md);
+    line-height: 1.3;
+    color: var(--mantine-color-bright);
+}
+
+.checkboxDescription {
+    margin-top: 8px;
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-xs);
+}
+
+.filterBadgeLabel {
+    border-radius: var(--mantine-radius-lg) 0 0 var(--mantine-radius-lg);
+    border: 1px solid var(--mantine-color-shellfish-4);
+    background-color: var(--mantine-color-shellfishBg-3);
+}
+
+.filterBadgeValue {
+    border-radius: 0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0;
+    border: 1px solid var(--mantine-color-shellfish-4);
+    background-color: var(--mantine-color-shellfishBg-1);
+}

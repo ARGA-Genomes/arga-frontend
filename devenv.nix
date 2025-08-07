@@ -2,8 +2,9 @@
 
 {
   cachix.enable = false;
-  
+
   packages = with pkgs; [
+    emmet-ls
     nodePackages.typescript-language-server
     nodePackages.prettier
   ];

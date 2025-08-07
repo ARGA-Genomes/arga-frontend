@@ -285,3 +285,28 @@ export interface SpecimenStats {
   assemblyScaffolds: number;
   assemblyContigs: number;
 }
+
+export enum HasData {
+  Genomes = "GENOMES",
+  Loci = "LOCI",
+  GenomicData = "GENOMIC_DATA",
+}
+
+export type SpecimenFilterItem = { institution: string[] } | { country: string[] } | { data: HasData[] };
+
+export function getEnumKeyByValue<T extends object>(enumObj: T, value: string): keyof T | undefined {
+  const keys = Object.keys(enumObj) as Array<keyof T>;
+  return keys.find((key) => enumObj[key] === value);
+}
+
+export function getFilterLabel(filter: SpecimenFilterItem) {
+  if ("institution" in filter) return "Institution";
+  else if ("country" in filter) return "Country";
+  else if ("data" in filter) return "Has data";
+}
+
+export function getFilterValues(filter: SpecimenFilterItem) {
+  if ("institution" in filter) return filter.institution.join(", ");
+  else if ("country" in filter) return filter.country.join(", ");
+  else if ("data" in filter) return filter.data.join(", ").toLocaleLowerCase().replace("_", " ");
+}
