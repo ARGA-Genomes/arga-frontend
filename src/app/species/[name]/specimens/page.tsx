@@ -502,43 +502,45 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
           </Table.Tbody>
         </Table>
 
-        <Paper bg="moss.1" p="lg" radius="xl" w={300}>
-          <Stack gap="xs">
-            <Text fw={600} fz={18}>
-              Data indexed
-            </Text>
-            <Group wrap="nowrap" justify="space-between" ml="sm">
-              <Text fz="md" fw={600} c="midnight.8">
-                Genome
+        {data && (
+          <Paper bg="moss.1" p="lg" radius="xl" w={300}>
+            <Stack gap="xs">
+              <Text fw={600} fz={18}>
+                Data indexed
               </Text>
-              <DataCheckIcon value={stats?.fullGenomes} />
-            </Group>
-            <Group wrap="nowrap" justify="space-between" ml="sm">
-              <Text fz="md" fw={600} c="midnight.8">
-                Libraires
-              </Text>
-              <DisabledDataCheckIcon />
-            </Group>
-            <Group wrap="nowrap" justify="space-between" ml="sm">
-              <Text fz="md" fw={600} c="midnight.8">
-                Single loci
-              </Text>
-              <DataCheckIcon value={stats?.loci} />
-            </Group>
-            <Group wrap="nowrap" justify="space-between" ml="sm">
-              <Text fz="md" fw={600} c="midnight.8">
-                SNPs
-              </Text>
-              <DisabledDataCheckIcon />
-            </Group>
-            <Group wrap="nowrap" justify="space-between" ml="sm">
-              <Text fz="md" fw={600} c="midnight.8">
-                Other
-              </Text>
-              <DataCheckIcon value={stats?.otherGenomic} />
-            </Group>
-          </Stack>
-        </Paper>
+              <Group wrap="nowrap" justify="space-between" ml="sm">
+                <Text fz="md" fw={600} c="midnight.8">
+                  Genome
+                </Text>
+                <DataCheckIcon value={stats?.fullGenomes} />
+              </Group>
+              <Group wrap="nowrap" justify="space-between" ml="sm">
+                <Text fz="md" fw={600} c="midnight.8">
+                  Libraires
+                </Text>
+                <DisabledDataCheckIcon />
+              </Group>
+              <Group wrap="nowrap" justify="space-between" ml="sm">
+                <Text fz="md" fw={600} c="midnight.8">
+                  Single loci
+                </Text>
+                <DataCheckIcon value={stats?.loci} />
+              </Group>
+              <Group wrap="nowrap" justify="space-between" ml="sm">
+                <Text fz="md" fw={600} c="midnight.8">
+                  SNPs
+                </Text>
+                <DisabledDataCheckIcon />
+              </Group>
+              <Group wrap="nowrap" justify="space-between" ml="sm">
+                <Text fz="md" fw={600} c="midnight.8">
+                  Other
+                </Text>
+                <DataCheckIcon value={stats?.otherGenomic} />
+              </Group>
+            </Stack>
+          </Paper>
+        )}
       </Group>
     </LoadPanel>
   );

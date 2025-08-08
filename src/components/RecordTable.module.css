@@ -26,6 +26,6 @@
 }
 
 .container {
-    overflow: hidden;
+    overflow: clip;
     background: none;
 }
