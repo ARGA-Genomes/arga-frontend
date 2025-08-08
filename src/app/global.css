@@ -3,11 +3,16 @@ body {
     a {
         outline: none;
         text-decoration: none;
-        color: #3C6377;
-    };
+        color: #3c6377;
+    }
 }
-
 
 .footer {
     background-color: light-dark(var(--mantine-color-midnight-6), var(--mantine-color-midnight-6));
+}
+
+@supports (-moz-appearance: none) {
+    input[readonly][aria-haspopup] {
+        pointer-events: auto !important;
+    }
 }

@@ -42,13 +42,21 @@ import {
   Checkbox,
   Transition,
   TagsInput,
+  Select,
 } from "@mantine/core";
 import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
 import { useSpecies } from "@/app/species-provider";
 import { getVoucherStatus, getVoucherColour, getVoucherRGBA } from "@/helpers/colors";
-import { IconCircleCheck, IconCircleX, IconFilter, IconMicroscope, IconX } from "@tabler/icons-react";
+import {
+  IconCircleCheck,
+  IconCircleX,
+  IconAdjustments,
+  IconMicroscope,
+  IconX,
+  IconDownload,
+} from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { Marker } from "@/components/mapping/analysis-map";
 import { useSet, useStateHistory } from "@mantine/hooks";
@@ -536,16 +544,22 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
 }
 
 function AllSpecimens() {
+  const { details } = { ...useSpecies() };
   const [opened, setOpened] = useState(false);
   const [filters, setFilters] = useState<SpecimenFilterItem[]>([]);
-  const { details } = { ...useSpecies() };
+  const [pageSize, setPageSize] = useState<number>(100);
 
   const { loading, error, data } = useQuery<SpecimensQuery>(GET_SPECIMENS, {
     skip: !details,
-    variables: { canonicalName: details?.name, page: 1, pageSize: 100, filters },
+    variables: { canonicalName: details?.name, page: 1, pageSize, filters },
   });
 
   const specimens = data?.species.specimens;
+
+  function removeFilter(filter: SpecimenFilterItem) {
+    const newFilters = filters.filter((f) => f != filter);
+    setFilters(newFilters);
+  }
 
   return (
     <LoadPanel visible={loading} error={error} radius="lg" p="lg" bg="shellfishBg.0" mih={500}>
@@ -560,26 +574,53 @@ function AllSpecimens() {
               Showing {specimens?.records.length} of {specimens?.total} specimens
             </Text>
 
-            <Group>
-              <Text fw={700} fz="xs" c="midnight.9">
-                Filters:
-              </Text>
-              {filters.map((filter) => (
-                <FilterBadge filter={filter} key={Object.keys(filter).join()} />
-              ))}
-            </Group>
+            {filters.length && (
+              <Group>
+                <Text fw={700} fz="xs" c="midnight.9">
+                  Filters:
+                </Text>
+                {filters.map((filter) => (
+                  <FilterBadge filter={filter} onRemove={removeFilter} key={Object.keys(filter).join()} />
+                ))}
+              </Group>
+            )}
           </Group>
 
           <Group>
+            <Select
+              size="xs"
+              color="midnight.7"
+              radius="xl"
+              data={[
+                { value: "20", label: "20 records" },
+                { value: "50", label: "50 records" },
+                { value: "100", label: "100 records" },
+              ]}
+              defaultValue="100"
+              readOnly={false}
+              onChange={(value) => value && setPageSize(parseInt(value, 10))}
+            />
+
             <Button
               size="xs"
               color="midnight.7"
               radius="xl"
-              variant="outline"
-              leftSection={<IconFilter size="1rem" />}
+              variant={opened ? "filled" : "outline"}
+              leftSection={<IconAdjustments size="1rem" />}
               onClick={() => setOpened(!opened)}
             >
               Filters
+            </Button>
+
+            <Button variant="subtle" color="mantine.7" radius="xl" disabled>
+              <Stack gap={0}>
+                <Center>
+                  <IconDownload size={16} />
+                </Center>
+                <Text fz="xs" fw={500}>
+                  Download
+                </Text>
+              </Stack>
             </Button>
           </Group>
         </Group>
@@ -799,18 +840,31 @@ function Filter({ onApply }: FilterProps) {
   );
 }
 
-function FilterBadge({ filter }: { filter: SpecimenFilterItem }) {
+interface FilterBadgeProps {
+  filter: SpecimenFilterItem;
+  onRemove: (filter: SpecimenFilterItem) => void;
+}
+
+function FilterBadge({ filter, onRemove }: FilterBadgeProps) {
+  const [highlight, setHighlight] = useState(false);
+
   return (
     <Group wrap="nowrap" gap={0}>
-      <Paper px="sm" className={classes.filterBadgeLabel}>
+      <Paper px="sm" className={highlight ? classes.filterBadgeLabelHover : classes.filterBadgeLabel}>
         <Text fz="xs">{getFilterLabel(filter)}</Text>
       </Paper>
-      <Paper pl="sm" pr={5} className={classes.filterBadgeValue}>
+      <Paper pl="sm" pr={5} className={highlight ? classes.filterBadgeValueHover : classes.filterBadgeValue}>
         <Group gap="xs">
           <Text fz="xs" fw={300}>
             {getFilterValues(filter)}
           </Text>
-          <IconX size={10} />
+          <IconX
+            size={10}
+            onClick={() => onRemove(filter)}
+            className={classes.filterBadgeRemove}
+            onMouseOver={() => setHighlight(true)}
+            onMouseOut={() => setHighlight(false)}
+          />
         </Group>
       </Paper>
     </Group>
