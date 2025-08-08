@@ -62,6 +62,7 @@ import { Marker } from "@/components/mapping/analysis-map";
 import { useSet, useStateHistory } from "@mantine/hooks";
 import { FilterGroup } from "@/components/filtering-redux/group";
 import { PropsWithChildren, useState } from "react";
+import { PaginationBar } from "@/components/pagination";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -548,10 +549,11 @@ function AllSpecimens() {
   const [opened, setOpened] = useState(false);
   const [filters, setFilters] = useState<SpecimenFilterItem[]>([]);
   const [pageSize, setPageSize] = useState<number>(100);
+  const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<SpecimensQuery>(GET_SPECIMENS, {
     skip: !details,
-    variables: { canonicalName: details?.name, page: 1, pageSize, filters },
+    variables: { canonicalName: details?.name, page, pageSize, filters },
   });
 
   const specimens = data?.species.specimens;
@@ -598,7 +600,10 @@ function AllSpecimens() {
               ]}
               defaultValue="100"
               readOnly={false}
-              onChange={(value) => value && setPageSize(parseInt(value, 10))}
+              onChange={(value) => {
+                setPage(1);
+                if (value) setPageSize(parseInt(value, 10));
+              }}
             />
 
             <Button
@@ -634,6 +639,8 @@ function AllSpecimens() {
             <SpecimenTable specimens={specimens?.records} />
           </ScrollArea>
         </Box>
+
+        <PaginationBar total={specimens?.total} page={page} pageSize={pageSize} onChange={setPage} />
       </Stack>
     </LoadPanel>
   );
