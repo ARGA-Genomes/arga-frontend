@@ -23,6 +23,7 @@ import {
   SpecimenSorting,
   SpecimenStats,
   SpecimenSummary,
+  StringValue,
   YearValue,
 } from "@/queries/specimen";
 import {
@@ -66,6 +67,7 @@ import { FilterGroup } from "@/components/filtering-redux/group";
 import { PropsWithChildren, useState } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { getEnumKeyByValue, SortOrder } from "@/queries/common";
+import SimpleVerticalBarGraph from "@/components/graphing/SimpleVerticalBarGraph";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -230,7 +232,7 @@ function Overview({ name }: { name: string }) {
               withBorder
               style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}
             >
-              <Grid>
+              <Grid gutter={50}>
                 <Grid.Col span={2}>
                   <Text fw={700} c="midnight" fz="xs" mb="sm">
                     Total number of specimens
@@ -239,16 +241,17 @@ function Overview({ name }: { name: string }) {
                     {specimens?.total}
                   </AttributePillContainer>
                 </Grid.Col>
-                <Grid.Col span={8} px={50}>
+                <Grid.Col span={7}>
                   <Text fw={700} c="midnight" fz="xs" mb="sm">
                     Collection years
                   </Text>
                   <Box h={100}>{specimens && <CollectionYearsGraph data={specimens?.collectionYears} />}</Box>
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={3}>
                   <Text fw={700} c="midnight" fz="xs" mb="sm">
-                    Top 5 bioregions
+                    Top 5 countries
                   </Text>
+                  <Box h={100}>{specimens && <TopCountriesGraph data={specimens?.topCountries} />}</Box>
                 </Grid.Col>
               </Grid>
             </Paper>
@@ -530,7 +533,7 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
               </Group>
               <Group wrap="nowrap" justify="space-between" ml="sm">
                 <Text fz="md" fw={600} c="midnight.8">
-                  Libraires
+                  Libraries
                 </Text>
                 <DisabledDataCheckIcon />
               </Group>
@@ -944,6 +947,41 @@ function CollectionYearsGraph({ data }: CollectionYearsGraphProps) {
             getX={(d: YearValue<number>) => d.year}
             getY={(d: YearValue<number>) => d.value}
             tickValues={[min(xScale.domain()) ?? 0, max(xScale.domain()) ?? 0]}
+          />
+        );
+      }}
+    </ParentSize>
+  );
+}
+
+interface TopCountriesGraphProps {
+  data: StringValue<number>[];
+}
+
+function TopCountriesGraph({ data }: TopCountriesGraphProps) {
+  return (
+    <ParentSize>
+      {(parent) => {
+        const xScale = scaleLinear({
+          range: [0, parent.width],
+          domain: [0, max(data, (d) => d.value) ?? 0],
+        });
+
+        const yScale = scaleBand({
+          range: [0, parent.height - 20],
+          domain: data.map((stat) => stat.label),
+          padding: 0.4,
+        });
+
+        return (
+          <SimpleVerticalBarGraph
+            width={parent.width}
+            height={parent.height}
+            xScale={xScale}
+            yScale={yScale}
+            data={data}
+            getX={(d: StringValue<number>) => d.value}
+            getY={(d: StringValue<number>) => d.label}
           />
         );
       }}

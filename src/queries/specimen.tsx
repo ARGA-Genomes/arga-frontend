@@ -101,6 +101,10 @@ export const SPECIMEN_OVERVIEW = gql`
       year
       value
     }
+    topCountries {
+      label
+      value
+    }
   }
 `;
 
@@ -116,10 +120,16 @@ export interface SpecimenOverview {
   australianMaterial?: number;
   nonAustralianMaterial?: number;
   collectionYears: YearValue<number>[];
+  topCountries: StringValue<number>[];
 }
 
 export interface YearValue<T> {
   year: number;
+  value: T;
+}
+
+export interface StringValue<T> {
+  label: string;
   value: T;
 }
 
