@@ -17,6 +17,7 @@ import {
   HasData,
   SpecimenFilterItem,
   SpecimenMapMarker,
+  SpecimenOptions,
   SpecimenOverview,
   SpecimenSortable,
   SpecimenSorting,
@@ -144,6 +145,10 @@ const GET_SPECIMENS = gql`
         records {
           ...SpecimenSummary
         }
+        options {
+          institutions
+          countries
+        }
       }
     }
   }
@@ -154,6 +159,7 @@ interface SpecimensQuery {
     specimens: {
       total: number;
       records: SpecimenSummary[];
+      options: SpecimenOptions;
     };
   };
 }
@@ -646,7 +652,7 @@ function AllSpecimens() {
 
         <Box h={700}>
           <FilterDrawer opened={opened} onClose={() => setOpened(false)}>
-            <Filter onApply={(filters) => setFilters(filters)} />
+            <Filter options={specimens?.options} onApply={(filters) => setFilters(filters)} />
           </FilterDrawer>
 
           <ScrollArea h="inherit" type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
@@ -753,10 +759,11 @@ function FilterDrawer({ opened, onClose, children }: FilterDrawerProps) {
 }
 
 interface FilterProps {
+  options?: SpecimenOptions;
   onApply: (filters: SpecimenFilterItem[]) => void;
 }
 
-function Filter({ onApply }: FilterProps) {
+function Filter({ options, onApply }: FilterProps) {
   const hasData = useSet<HasData>();
   const institutions = useSet<string>();
   const countries = useSet<string>();
@@ -852,7 +859,7 @@ function Filter({ onApply }: FilterProps) {
             <TagsInput
               label="Institution"
               placeholder="Pick one or more institutions"
-              data={["QM", "SAMA"]}
+              data={options?.institutions}
               onChange={setInstitutions}
               radius="lg"
               clearable
@@ -861,7 +868,7 @@ function Filter({ onApply }: FilterProps) {
             <TagsInput
               label="Country"
               placeholder="Pick one or more countries"
-              data={["Australia"]}
+              data={options?.countries}
               onChange={setCountries}
               radius="lg"
               clearable

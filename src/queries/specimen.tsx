@@ -320,3 +320,8 @@ export enum SpecimenSortable {
 }
 
 export type SpecimenSorting = Sorting<SpecimenSortable>;
+
+export interface SpecimenOptions {
+  institutions: string[];
+  countries: string[];
+}
