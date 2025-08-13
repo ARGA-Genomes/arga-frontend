@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Sorting, SortOrder } from "./common";
+import { Sorting } from "./common";
 
 export const ORGANISM = gql`
   fragment OrganismDetails on Organism {

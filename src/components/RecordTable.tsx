@@ -102,7 +102,11 @@ interface RecordTableContextValue<Sortable> {
   sorting?: Sorting<Sortable>;
 }
 
+// disable lint as we don't expose this context outside of the component and don't
+// want to setup a factory just to pass in Sortable
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 const RecordTableContext = React.createContext<RecordTableContextValue<any>>({ columns: [], onColumnClick: () => {} });
+/* eslint-enable  @typescript-eslint/no-explicit-any */
 const useRecordTable = () => React.useContext(RecordTableContext);
 
 RecordTable.Column = RecordTableColumn;
