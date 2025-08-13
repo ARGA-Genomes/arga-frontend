@@ -5,20 +5,21 @@ import classes from "./page.module.css";
 import { DateTime } from "luxon";
 import { gql, useQuery } from "@apollo/client";
 import { AnalysisMap } from "@/components/mapping";
-import { RecordTable, SortOrder } from "@/components/RecordTable";
+import { RecordTable } from "@/components/RecordTable";
 import { AttributePillContainer, AttributePillValue } from "@/components/data-fields";
 import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
 import SimpleBarGraph from "@/components/graphing/SimpleBarGraph";
 import {
   AccessionEvent,
   CollectionEvent,
-  getEnumKeyByValue,
   getFilterLabel,
   getFilterValues,
   HasData,
   SpecimenFilterItem,
   SpecimenMapMarker,
   SpecimenOverview,
+  SpecimenSortable,
+  SpecimenSorting,
   SpecimenStats,
   SpecimenSummary,
   YearValue,
@@ -63,6 +64,7 @@ import { useSet, useStateHistory } from "@mantine/hooks";
 import { FilterGroup } from "@/components/filtering-redux/group";
 import { PropsWithChildren, useState } from "react";
 import { PaginationBar } from "@/components/pagination";
+import { getEnumKeyByValue, SortOrder } from "@/queries/common";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -129,9 +131,15 @@ interface SpecimenCardQuery {
 }
 
 const GET_SPECIMENS = gql`
-  query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int, $filters: [SpecimenFilterItem]) {
+  query SpeciesSpecimens(
+    $canonicalName: String
+    $page: Int
+    $pageSize: Int
+    $filters: [SpecimenFilterItem]
+    $sorting: SpecimenSorting
+  ) {
     species(canonicalName: $canonicalName) {
-      specimens(page: $page, pageSize: $pageSize, filters: $filters) {
+      specimens(page: $page, pageSize: $pageSize, filters: $filters, sorting: $sorting) {
         total
         records {
           ...SpecimenSummary
@@ -550,12 +558,16 @@ function AllSpecimens() {
   const { details } = { ...useSpecies() };
   const [opened, setOpened] = useState(false);
   const [filters, setFilters] = useState<SpecimenFilterItem[]>([]);
+  const [sorting, setSorting] = useState<SpecimenSorting>({
+    sortable: SpecimenSortable.Status,
+    order: SortOrder.Ascending,
+  });
   const [pageSize, setPageSize] = useState<number>(100);
   const [page, setPage] = useState(1);
 
   const { loading, error, data } = useQuery<SpecimensQuery>(GET_SPECIMENS, {
     skip: !details,
-    variables: { canonicalName: details?.name, page, pageSize, filters },
+    variables: { canonicalName: details?.name, page, pageSize, filters, sorting },
   });
 
   const specimens = data?.species.specimens;
@@ -638,7 +650,7 @@ function AllSpecimens() {
           </FilterDrawer>
 
           <ScrollArea h="inherit" type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
-            <SpecimenTable specimens={specimens?.records} />
+            <SpecimenTable specimens={specimens?.records} sorting={sorting} onSort={setSorting} />
           </ScrollArea>
         </Box>
 
@@ -650,24 +662,40 @@ function AllSpecimens() {
 
 interface SpecimenTableProps {
   specimens?: SpecimenSummary[];
+  sorting: SpecimenSorting;
+  onSort: (sorting: SpecimenSorting) => void;
 }
 
-function SpecimenTable({ specimens }: SpecimenTableProps) {
+function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
   return (
     <RecordTable
       radius="lg"
+      onSort={onSort}
+      sorting={sorting}
       columns={[
-        <RecordTable.Column key="voucher" label="Voucher status" sorting={SortOrder.Ascending} />,
-        <RecordTable.Column key="id" label="Specimen number" />,
-        <RecordTable.Column key="institution" label="Institution" />,
-        <RecordTable.Column key="country" label="Country" />,
-        <RecordTable.Column key="date" label="Collection date" />,
-        <RecordTable.Column key="score" label="Collection metadata score" />,
-        <RecordTable.Column key="genomes" label="Whole genomes" width={1} color="shellfishBg.0" />,
-        <RecordTable.Column key="loci" label="Single loci" width={1} />,
-        <RecordTable.Column key="other" label="Other genetic data" width={1} color="shellfishBg.0" />,
-        <RecordTable.Column key="view" label="View full record" width={1} />,
-        <RecordTable.Column key="ala" label="View in ALA" width={1} />,
+        <RecordTable.Column key={1} value={SpecimenSortable.Status} label="Voucher status" />,
+        <RecordTable.Column key={2} value={SpecimenSortable.Voucher} label="Specimen number" />,
+        <RecordTable.Column key={3} value={SpecimenSortable.Institution} label="Institution" />,
+        <RecordTable.Column key={4} value={SpecimenSortable.Country} label="Country" />,
+        <RecordTable.Column key={5} value={SpecimenSortable.CollectionDate} label="Collection date" />,
+        <RecordTable.Column key={6} value={SpecimenSortable.MetadataScore} label="Collection metadata score" />,
+        <RecordTable.Column
+          key={7}
+          value={SpecimenSortable.Genomes}
+          label="Whole genomes"
+          width={1}
+          color="shellfishBg.0"
+        />,
+        <RecordTable.Column key={8} value={SpecimenSortable.Loci} label="Single loci" width={1} />,
+        <RecordTable.Column
+          key={9}
+          value={SpecimenSortable.GenomicData}
+          label="Other genetic data"
+          width={1}
+          color="shellfishBg.0"
+        />,
+        <RecordTable.Column key={10} value="view" label="View full record" width={1} />,
+        <RecordTable.Column key={11} value="ala" label="View in ALA" width={1} />,
       ]}
     >
       {specimens?.map((record) => (

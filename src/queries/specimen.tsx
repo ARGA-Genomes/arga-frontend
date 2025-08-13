@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { Sorting, SortOrder } from "./common";
 
 export const ORGANISM = gql`
   fragment OrganismDetails on Organism {
@@ -294,11 +295,6 @@ export enum HasData {
 
 export type SpecimenFilterItem = { institution: string[] } | { country: string[] } | { data: HasData[] };
 
-export function getEnumKeyByValue<T extends object>(enumObj: T, value: string): keyof T | undefined {
-  const keys = Object.keys(enumObj) as Array<keyof T>;
-  return keys.find((key) => enumObj[key] === value);
-}
-
 export function getFilterLabel(filter: SpecimenFilterItem) {
   if ("institution" in filter) return "Institution";
   else if ("country" in filter) return "Country";
@@ -310,3 +306,17 @@ export function getFilterValues(filter: SpecimenFilterItem) {
   else if ("country" in filter) return filter.country.join(", ");
   else if ("data" in filter) return filter.data.join(", ").toLocaleLowerCase().replace("_", " ");
 }
+
+export enum SpecimenSortable {
+  Status = "STATUS",
+  Voucher = "VOUCHER",
+  Institution = "INSTITUTION",
+  Country = "COUNTRY",
+  CollectionDate = "COLLECTION_DATE",
+  MetadataScore = "METADATA_SCORE",
+  Genomes = "GENOMES",
+  Loci = "LOCI",
+  GenomicData = "GENOMIC_DATA",
+}
+
+export type SpecimenSorting = Sorting<SpecimenSortable>;
