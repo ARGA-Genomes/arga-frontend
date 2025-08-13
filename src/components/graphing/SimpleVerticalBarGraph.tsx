@@ -2,7 +2,7 @@ import classes from "./SimpleVerticalBarGraph.module.css";
 
 import { Group } from "@visx/group";
 import { ScaleBand } from "d3";
-import { AxisBottom, AxisLeft } from "@visx/axis";
+import { AxisLeft } from "@visx/axis";
 import { Line } from "@visx/shape";
 
 interface SimpleVerticalBarGraphProps<TypeX, TypeY extends { toString(): string }, Datum> {
