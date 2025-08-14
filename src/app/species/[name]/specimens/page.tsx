@@ -656,7 +656,14 @@ function AllSpecimens() {
 
         <Box h={700}>
           <FilterDrawer opened={opened} onClose={() => setOpened(false)}>
-            <Filter options={specimens?.options} onApply={(filters) => setFilters(filters)} />
+            <Filter
+              filters={filters}
+              options={specimens?.options}
+              onApply={(filters) => {
+                setOpened(false);
+                setFilters(filters);
+              }}
+            />
           </FilterDrawer>
 
           <ScrollArea h="inherit" type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
@@ -763,15 +770,27 @@ function FilterDrawer({ opened, onClose, children }: FilterDrawerProps) {
 }
 
 interface FilterProps {
+  filters?: SpecimenFilterItem[];
   options?: SpecimenOptions;
   onApply: (filters: SpecimenFilterItem[]) => void;
 }
 
-function Filter({ options, onApply }: FilterProps) {
-  const hasData = useSet<HasData>();
-  const institutions = useSet<string>();
-  const countries = useSet<string>();
-  const [yearRange, setYearRange] = useState<[number, number] | null>(null);
+function Filter({ filters, options, onApply }: FilterProps) {
+  const hasData = useSet<HasData>(filters?.find((f) => "data" in f)?.data);
+  const institutions = useSet<string>(filters?.find((f) => "institution" in f)?.institution);
+  const countries = useSet<string>(filters?.find((f) => "country" in f)?.country);
+
+  // none of the methods to save the filter settings is pretty here but this
+  // one is particularly eggregious. it would be worth rethinking this
+  const collectedBetween = filters?.find((f) => "collectedBetween" in f)?.collectedBetween;
+  const [yearRange, setYearRange] = useState<[number, number] | undefined>(
+    collectedBetween
+      ? [
+          DateTime.fromFormat(collectedBetween.after, "yyyy-mm-dd").year,
+          DateTime.fromFormat(collectedBetween.before, "yyyy-mm-dd").year,
+        ]
+      : undefined,
+  );
 
   function setData(values: string[]) {
     hasData.clear();
@@ -817,7 +836,7 @@ function Filter({ options, onApply }: FilterProps) {
             description="Data derived from specimens"
             icon="/icons/data-type/Data type_ DNA.svg"
           >
-            <Checkbox.Group onChange={setData}>
+            <Checkbox.Group value={[...hasData]} onChange={setData}>
               <Stack pt="md" gap="xs">
                 <Checkbox.Card className={classes.checkbox} radius="xl" value={HasData.Genomes}>
                   <Group wrap="nowrap" align="flex-start">
@@ -868,6 +887,7 @@ function Filter({ options, onApply }: FilterProps) {
               placeholder="Pick one or more institutions"
               description="The institution that hosts the specimen"
               data={options?.institutions}
+              value={[...institutions]}
               onChange={setInstitutions}
               radius="lg"
               clearable
@@ -878,6 +898,7 @@ function Filter({ options, onApply }: FilterProps) {
               placeholder="Pick one or more countries"
               description="The country where a specimen was collected from"
               data={options?.countries}
+              value={[...countries]}
               onChange={setCountries}
               radius="lg"
               clearable
@@ -886,6 +907,7 @@ function Filter({ options, onApply }: FilterProps) {
             <YearRangeInput
               label="Collection date"
               description="Only include specimens collected within the specified years"
+              value={yearRange}
               onChange={setYearRange}
             />
           </FilterGroup>
@@ -902,9 +924,10 @@ function Filter({ options, onApply }: FilterProps) {
 interface YearRangeInputProps {
   label?: string;
   description?: string;
+  value?: [number, number];
   onChange?: (range: [number, number]) => void;
 }
-function YearRangeInput({ label, description, onChange }: YearRangeInputProps) {
+function YearRangeInput({ label, description, value, onChange }: YearRangeInputProps) {
   // for the collection years to restrict the range for the collection date range filter.
   // this uses the existing overview query which should already be cached on this page
   const { details } = { ...useSpecies() };
@@ -920,6 +943,7 @@ function YearRangeInput({ label, description, onChange }: YearRangeInputProps) {
       <AreaGraphInput
         label={label}
         description={description}
+        value={value}
         data={specimens.collectionYears}
         getX={(d) => d.year}
         getY={(d) => d.value}
@@ -1064,8 +1088,8 @@ function SmallScore({ specimen }: { specimen: SpecimenSummary }) {
           <SmallScorePip value={!!isRegistered} yes="Specimen is registered" no="Specimen is not registered" />
           <SmallScorePip
             value={!!hasCollectionData}
-            yes="Specimen has full collection data"
-            no="Specimen does not have full collection data"
+            yes="Specimen has date and location details"
+            no="Specimen does not have date and location details"
           />
           <SmallScorePip
             value={!!hasGenomicData}

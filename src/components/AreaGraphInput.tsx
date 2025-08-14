@@ -11,6 +11,7 @@ import { Group } from "@visx/group";
 interface AreaGraphInputProps<Datum> {
   label?: string;
   description?: string;
+  value?: [number, number];
   height?: number;
   data: Datum[];
   getX: (d: Datum) => number;
@@ -21,6 +22,7 @@ interface AreaGraphInputProps<Datum> {
 export function AreaGraphInput<Datum>({
   label,
   description,
+  value,
   height,
   data,
   getX,
@@ -30,7 +32,7 @@ export function AreaGraphInput<Datum>({
   const margin = 20;
   const [min, max] = d3.extent(data.map((d) => getX(d)));
 
-  const [value, setValue] = useState([min ?? 0, max ?? 0]);
+  const [range, setRange] = useState<[number, number]>(value ?? [min ?? 0, max ?? 0]);
 
   return (
     <ParentSize>
@@ -76,14 +78,14 @@ export function AreaGraphInput<Datum>({
                   curve={curveNatural}
                 />
                 <rect
-                  width={slider(value[0])}
+                  width={slider(range[0])}
                   height={innerHeight}
                   opacity={0.2}
                   fill="var(--mantine-color-midnight-9)"
                 />
                 <rect
-                  x={slider(value[1])}
-                  width={innerWidth - slider(value[1])}
+                  x={slider(range[1])}
+                  width={innerWidth - slider(range[1])}
                   height={innerHeight}
                   opacity={0.2}
                   fill="var(--mantine-color-midnight-9)"
@@ -96,20 +98,21 @@ export function AreaGraphInput<Datum>({
               color="moss"
               min={min}
               max={max}
+              value={range}
               marks={[
                 { value: min ?? 0, label: min },
                 { value: max ?? 0, label: max },
               ]}
-              onChange={(range) => {
-                setValue(range);
-                if (onChange) onChange(range);
+              onChange={(rangeValue) => {
+                setRange(rangeValue);
+                if (onChange) onChange(rangeValue);
               }}
               thumbSize={24}
               thumbChildren={[<IconArrowBadgeRightFilled key="1" />, <IconArrowBadgeLeftFilled key="2" />]}
             />
             <Center>
               <Text fz="sm" fw={600} c="dimmed">
-                {value[0]} - {value[1]}
+                {range[0]} - {range[1]}
               </Text>
             </Center>
           </Stack>
