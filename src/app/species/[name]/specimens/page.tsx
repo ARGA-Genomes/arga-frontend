@@ -68,6 +68,7 @@ import { PropsWithChildren, useState } from "react";
 import { PaginationBar } from "@/components/pagination";
 import { getEnumKeyByValue, SortOrder } from "@/queries/common";
 import SimpleVerticalBarGraph from "@/components/graphing/SimpleVerticalBarGraph";
+import { AreaGraphInput } from "@/components/AreaGraphInput";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -770,6 +771,7 @@ function Filter({ options, onApply }: FilterProps) {
   const hasData = useSet<HasData>();
   const institutions = useSet<string>();
   const countries = useSet<string>();
+  const [yearRange, setYearRange] = useState<[number, number] | null>(null);
 
   function setData(values: string[]) {
     hasData.clear();
@@ -800,6 +802,8 @@ function Filter({ options, onApply }: FilterProps) {
     if (hasData.size) filters.push({ data: [...hasData] });
     if (institutions.size) filters.push({ institution: [...institutions] });
     if (countries.size) filters.push({ country: [...countries] });
+    if (yearRange)
+      filters.push({ collectedBetween: { after: `${yearRange[0]}-12-31`, before: `${yearRange[1]}-01-01` } });
 
     onApply(filters);
   }
@@ -862,6 +866,7 @@ function Filter({ options, onApply }: FilterProps) {
             <TagsInput
               label="Institution"
               placeholder="Pick one or more institutions"
+              description="The institution that hosts the specimen"
               data={options?.institutions}
               onChange={setInstitutions}
               radius="lg"
@@ -871,10 +876,17 @@ function Filter({ options, onApply }: FilterProps) {
             <TagsInput
               label="Country"
               placeholder="Pick one or more countries"
+              description="The country where a specimen was collected from"
               data={options?.countries}
               onChange={setCountries}
               radius="lg"
               clearable
+            />
+
+            <YearRangeInput
+              label="Collection date"
+              description="Only include specimens collected within the specified years"
+              onChange={setYearRange}
             />
           </FilterGroup>
         </Stack>
@@ -884,6 +896,36 @@ function Filter({ options, onApply }: FilterProps) {
         Filter specimens
       </Button>
     </Stack>
+  );
+}
+
+interface YearRangeInputProps {
+  label?: string;
+  description?: string;
+  onChange?: (range: [number, number]) => void;
+}
+function YearRangeInput({ label, description, onChange }: YearRangeInputProps) {
+  // for the collection years to restrict the range for the collection date range filter.
+  // this uses the existing overview query which should already be cached on this page
+  const { details } = { ...useSpecies() };
+  const { data } = useQuery<OverviewQuery>(GET_SPECIMENS_OVERVIEW, {
+    skip: !details,
+    variables: { canonicalName: details?.name },
+  });
+
+  const specimens = data?.species.overview.specimens;
+
+  return (
+    specimens && (
+      <AreaGraphInput
+        label={label}
+        description={description}
+        data={specimens.collectionYears}
+        getX={(d) => d.year}
+        getY={(d) => d.value}
+        onChange={onChange}
+      />
+    )
   );
 }
 

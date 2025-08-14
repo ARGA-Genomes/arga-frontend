@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { gql } from "@apollo/client";
 import { Sorting } from "./common";
 
@@ -303,11 +304,16 @@ export enum HasData {
   GenomicData = "GENOMIC_DATA",
 }
 
-export type SpecimenFilterItem = { institution: string[] } | { country: string[] } | { data: HasData[] };
+export type SpecimenFilterItem =
+  | { institution: string[] }
+  | { country: string[] }
+  | { collectedBetween: { after: string; before: string } }
+  | { data: HasData[] };
 
 export function getFilterLabel(filter: SpecimenFilterItem) {
   if ("institution" in filter) return "Institution";
   else if ("country" in filter) return "Country";
+  else if ("collectedBetween" in filter) return "Collected between";
   else if ("data" in filter) return "Has data";
 }
 
@@ -315,6 +321,11 @@ export function getFilterValues(filter: SpecimenFilterItem) {
   if ("institution" in filter) return filter.institution.join(", ");
   else if ("country" in filter) return filter.country.join(", ");
   else if ("data" in filter) return filter.data.join(", ").toLocaleLowerCase().replace("_", " ");
+  else if ("collectedBetween" in filter) {
+    const after = DateTime.fromFormat(filter.collectedBetween.after, "yyyy-mm-dd");
+    const before = DateTime.fromFormat(filter.collectedBetween.before, "yyyy-mm-dd");
+    return `${after.year} - ${before.year}`;
+  }
 }
 
 export enum SpecimenSortable {
