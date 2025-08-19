@@ -1,0 +1,19 @@
+.navbar {
+    background-color: var(--mantine-color-midnight-0);
+}
+
+.item {
+    cursor: pointer;
+    background-color: transparent;
+
+    &:hover {
+        background-color: var(--mantine-color-midnight-1);
+    }
+}
+
+.label {
+    font-weight: 600;
+    font-size: var(--mantine-font-size-xs);
+    color: var(--mantine-color-midnight-9);
+    text-align: center;
+}
