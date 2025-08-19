@@ -2,18 +2,18 @@
 
 import classes from "./LineBarGraph.module.css";
 
-import { Group } from "@visx/group";
-import { scaleLinear, scaleTime } from "@visx/scale";
+import { Center, Stack } from "@mantine/core";
+import NumberFlow from "@number-flow/react";
+import { IconArrowUp } from "@tabler/icons-react";
 import { AxisBottom, AxisLeft, AxisRight } from "@visx/axis";
-import { LinePath, Bar } from "@visx/shape";
 import { curveNatural } from "@visx/curve";
 import { Grid } from "@visx/grid";
+import { Group } from "@visx/group";
+import { scaleLinear, scaleTime } from "@visx/scale";
+import { Bar, LinePath } from "@visx/shape";
 import { bisector, max, ScaleTime } from "d3";
 import { motion } from "framer-motion";
-import NumberFlow from "@number-flow/react";
 import { useState } from "react";
-import { IconArrowUp } from "@tabler/icons-react";
-import { Center, Stack } from "@mantine/core";
 
 const MotionNumberFlow = motion.create(NumberFlow);
 const MotionArrowUp = motion.create(IconArrowUp);
@@ -84,7 +84,9 @@ export function LineBarGraph({ lineData, barData, dateDomain, width, height, dis
     // need at least to data points
     if (lineData.length <= 1) return;
 
-    const coords = { x: event.clientX - 50, y: event.clientY };
+    const svgElement = event.currentTarget;
+    const rect = svgElement.getBoundingClientRect();
+    const coords = { x: event.clientX - rect.left - 50, y: event.clientY - rect.top };
 
     const date = xScale.invert(coords?.x || 0);
     const idx = bisectDate(lineData, date, 1);
