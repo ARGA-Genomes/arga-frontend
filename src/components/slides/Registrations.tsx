@@ -1,16 +1,18 @@
-import { Divider, Grid, Group, Paper, Stack, Text } from "@mantine/core";
+import { Box, Divider, Grid, Group, Paper, Stack, Text } from "@mantine/core";
 import { DataTable } from "../data-table";
 import { IconSpecimenRegistration } from "../ArgaIcons";
 
 export function RegistrationsSlide() {
   return (
-    <Group wrap="nowrap">
-      <Stack justify="space-between" align="center" h="100%">
-        <DataTable>
-          <DataTable.Row label="Catalog number"></DataTable.Row>
-        </DataTable>
+    <Group wrap="nowrap" align="flex-start">
+      <Box w={0} style={{ alignSelf: "flex-end", position: "relative" }}>
         <IconSpecimenRegistration size={200} />
-      </Stack>
+      </Box>
+
+      <DataTable w={200}>
+        <DataTable.Row label="Catalog number"></DataTable.Row>
+      </DataTable>
+
       <Divider orientation="vertical" mx="md" />
 
       <Grid w="100%">
