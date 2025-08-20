@@ -47,7 +47,7 @@ export default function Page(props: PageProps) {
   return (
     <Stack gap="xl">
       <Overview entityId={params.entityId} />
-      <Provenance />
+      <Provenance entityId={params.entityId} />
     </Stack>
   );
 }
@@ -134,7 +134,11 @@ function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
   );
 }
 
-function Provenance() {
+function Provenance({ entityId }: { entityId: string }) {
+  const { loading, error, data } = useQuery<OrganismQuery>(GET_ORGANISM, {
+    variables: { entityId },
+  });
+
   const [card, setCard] = useState(0);
   return (
     <Stack>
@@ -163,7 +167,8 @@ function Provenance() {
           <LiveStateSlide />
         </CardSlider.Card>
         <CardSlider.Card title="Collecting events">
-          <CollectingSlide />
+          {error && <Text>{error.message}</Text>}
+          {data && <CollectingSlide collections={data.organism.collections} />}
         </CardSlider.Card>
         <CardSlider.Card title="Registrations">
           <RegistrationsSlide />

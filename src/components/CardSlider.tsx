@@ -1,6 +1,6 @@
 import classes from "./CardSlider.module.css";
 
-import { Text, Paper, Stack, ScrollArea, Box } from "@mantine/core";
+import { Text, Paper, Stack, ScrollArea } from "@mantine/core";
 import { PropsWithChildren, useEffect, useRef } from "react";
 
 interface CardSliderProps {
@@ -22,7 +22,7 @@ export function CardSlider({ card, children }: CardSliderProps) {
 
   return (
     <ScrollArea.Autosize scrollbars={false} viewportRef={ref} className={classes.container}>
-      <Box py="xl">{children}</Box>
+      {children}
     </ScrollArea.Autosize>
   );
 }
@@ -33,8 +33,8 @@ interface CardSliderCardProps extends PropsWithChildren {
 
 export function CardSliderCard({ title, children }: CardSliderCardProps) {
   return (
-    <Paper withBorder radius="xl" p="xl" w="80%" shadow="xl" className={classes.card}>
-      <Stack>
+    <Paper withBorder radius="xl" shadow="xl" mb={60} p="xl" w="80%" className={classes.card}>
+      <Stack h="100%">
         <Text fw={600} fz="md" c="midnight.9">
           {title}
         </Text>
