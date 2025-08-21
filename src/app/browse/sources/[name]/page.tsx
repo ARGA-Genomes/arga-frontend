@@ -1,51 +1,53 @@
 "use client";
 
-import { Filter, intoFilterItem } from "@/components/filtering/common";
-import { SpeciesCard } from "@/components/species-card";
-import { gql, useQuery } from "@apollo/client";
-import {
-  Paper,
-  SimpleGrid,
-  Text,
-  Title,
-  Group,
-  Stack,
-  Container,
-  Drawer,
-  Box,
-  Grid,
-  Button,
-  Accordion,
-  Badge,
-  Avatar,
-  useMantineTheme,
-  ScrollArea,
-  Chip,
-  Center,
-  Anchor,
-  Image,
-} from "@mantine/core";
-import { useEffect, useState, useMemo, use } from "react";
-import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
-import { LoadOverlay } from "@/components/load-overlay";
-import { usePreviousPage } from "@/components/navigation-history";
-import { useDisclosure } from "@mantine/hooks";
-import { IconFilter, IconClockHour4, IconExternalLink, IconArrowsSort } from "@tabler/icons-react";
-import { HasDataFilters } from "@/components/filtering/has-data";
-import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
 import { Photo } from "@/app/type";
 import { AttributePill } from "@/components/data-fields";
+import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { HasDataFilters } from "@/components/filtering/has-data";
+import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
+import { LoadOverlay } from "@/components/load-overlay";
+import { usePreviousPage } from "@/components/navigation-history";
+import { DataPageCitation } from "@/components/page-citation";
+import { PaginationBar } from "@/components/pagination";
+import { SortChip } from "@/components/sorting/sort-chips";
+import { SpeciesCard } from "@/components/species-card";
+import { getLicense } from "@/helpers/getLicense";
+import { gql, useQuery } from "@apollo/client";
+import {
+  Accordion,
+  Anchor,
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Center,
+  Chip,
+  Container,
+  Drawer,
+  Grid,
+  Group,
+  Image,
+  Paper,
+  ScrollArea,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+  useMantineTheme,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { IconArrowsSort, IconClockHour4, IconExternalLink, IconFilter } from "@tabler/icons-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import { DataPageCitation } from "@/components/page-citation";
-import { SortChip } from "@/components/sorting/sort-chips";
+import { use, useEffect, useMemo, useState } from "react";
 import classes from "../../../../components/record-list.module.css";
-import { getLicense } from "@/helpers/getLicense";
 
 // Icons data
-import { array as groupingExtra } from "../../../browse/groups/_data/all";
 import { grouping as groupingData } from "../../../(home)/_data";
+import { array as groupingExtra } from "../../../browse/groups/_data/all";
+import DataHighlights from "./_components/data-highlights";
+import { DataSummary } from "./_components/data-summary";
 
 const PAGE_SIZE = 10;
 interface Filters {
@@ -82,6 +84,28 @@ const GET_DETAILS = gql`
         accessPill
         reusePill
         publicationYear
+      }
+
+      speciesRankSummary: summary {
+        total
+        genomes
+        loci
+        genomicData
+      }
+
+      speciesGenomicDataSummary {
+        canonicalName
+        totalGenomic
+      }
+
+      speciesGenomesSummary {
+        canonicalName
+        genomes
+      }
+
+      speciesLociSummary {
+        canonicalName
+        loci
       }
     }
   }
@@ -124,7 +148,14 @@ interface SpeciesCount {
   total: number;
 }
 
-interface Source {
+interface DataBreakdown {
+  canonicalName: string;
+  genomes: number;
+  loci: number;
+  totalGenomic: number;
+}
+
+export interface Source {
   license: string;
   accessRights: string;
   rightsHolder: string;
@@ -135,6 +166,20 @@ interface Source {
   accessPill?: AccessPillType;
   species: SpeciesCount;
   datasets: Dataset[];
+  speciesGenomicDataSummary: DataBreakdown[];
+  speciesGenomesSummary: DataBreakdown[];
+  speciesLociSummary: DataBreakdown[];
+  speciesRankSummary: {
+    total: number;
+    genomes: number;
+    loci: number;
+    genomicData: number;
+  };
+  speciesSummary: {
+    total: number;
+    genomes: number;
+    totalGenomic: number;
+  };
 }
 
 interface DetailsQueryResults {
@@ -623,7 +668,7 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
         const link = item.link.substring(item.link.lastIndexOf("/") + 1);
         return names.includes(link);
       })?.image,
-    [params.name],
+    [params.name]
   );
 
   const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
@@ -665,15 +710,21 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
       <Paper py={30}>
         <Container maw={MAX_WIDTH} pb={16}>
           <Stack>
-            <Paper p="xl" radius="lg" withBorder>
-              {data?.source.datasets ? <BrowseComponentDatasets datasets={data.source.datasets} /> : error?.message}
+            <Paper radius="lg" pos="relative" withBorder>
+              <DataHighlights source={data?.source} />
+              <Box p="xl">
+                <DataSummary source={data?.source} />
+              </Box>
             </Paper>
             <Paper p="xl" radius="lg" withBorder>
               <Species source={source} />
             </Paper>
+            <Paper p="xl" radius="lg" withBorder>
+              {data?.source.datasets ? <BrowseComponentDatasets datasets={data.source.datasets} /> : error?.message}
+            </Paper>
+            <DataPageCitation />
           </Stack>
         </Container>
-        <DataPageCitation />
       </Paper>
     </Stack>
   );

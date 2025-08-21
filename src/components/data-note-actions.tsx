@@ -1,23 +1,23 @@
 "use client";
 
-import { ReactElement, useCallback, useState } from "react";
 import {
-  Paper,
-  Text,
-  Stack,
   Divider,
-  UnstyledButton,
   Flex,
-  ThemeIcon,
-  UnstyledButtonProps,
   Loader,
+  Paper,
+  Stack,
+  Text,
+  ThemeIcon,
+  UnstyledButton,
+  UnstyledButtonProps,
 } from "@mantine/core";
 import Link from "next/link";
+import { ReactElement, useCallback, useState } from "react";
 
-import { IconDownload } from "@tabler/icons-react";
+import { downloadCSV } from "@/helpers/downloadCSV";
 import { downloadImages } from "@/helpers/downloadImages";
 import { DocumentNode, gql, OperationVariables, useLazyQuery } from "@apollo/client";
-import { downloadCSV } from "@/helpers/downloadCSV";
+import { IconDownload } from "@tabler/icons-react";
 
 function getCurrentDate() {
   const date = new Date();
@@ -99,12 +99,13 @@ export function DataNoteActions({ query }: DataNoteActionProps) {
       if (!query) return;
 
       setDownloadingData(true);
-      await downloadCSV(fetchCSV, query.name, query.fields);
+      console.log(query);
+      await downloadCSV(fetchCSV, query.name.replaceAll(" ", "-").toLowerCase(), query.fields);
       setDownloadingData(false);
     }
 
     if (!downloadingData) download();
-  }, [downloadingData]);
+  }, [query, downloadingData]);
 
   const handleDownloadImages = useCallback(() => {
     async function download() {
@@ -114,7 +115,7 @@ export function DataNoteActions({ query }: DataNoteActionProps) {
     }
 
     if (!downloadingImages) download();
-  }, [downloadImages]);
+  }, [query, downloadImages]);
 
   return (
     <Paper radius="lg" p="md" h="100%" withBorder>

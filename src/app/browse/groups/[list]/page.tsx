@@ -1,34 +1,21 @@
 "use client";
 
-import { useEffect, use } from "react";
 import { gql, useQuery } from "@apollo/client";
-import {
-  Paper,
-  Text,
-  Group,
-  Stack,
-  Container,
-  Box,
-  Grid,
-  useMantineTheme,
-  Anchor,
-  Image,
-  // Flex,
-  // ThemeIcon,
-} from "@mantine/core";
+import { Anchor, Box, Container, Grid, Group, Image, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
 import { IconExternalLink /*, IconStarFilled*/ } from "@tabler/icons-react";
 import Link from "next/link";
+import { use, useEffect } from "react";
 
 // App components & constants
 import { MAX_WIDTH } from "@/app/constants";
-import { DataPageCitation } from "@/components/page-citation";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
+import { DataPageCitation } from "@/components/page-citation";
 
-import { groupInclude, GroupItem, map as queryMap } from "../_data/all";
-import { useRouter } from "next/navigation";
-import { getLicense } from "@/helpers/getLicense";
 import { BrowseSpecies } from "@/components/browse-species";
+import { getLicense } from "@/helpers/getLicense";
+import { useRouter } from "next/navigation";
+import { groupInclude, GroupItem, map as queryMap } from "../_data/all";
 // import { DataSummary, Taxonomy } from "./data-summary";
 
 // import stubData from "./data-summary-stub.json";
