@@ -2,17 +2,17 @@
 
 import classes from "./bar.module.css";
 
-import * as d3 from "d3";
-import * as Humanize from "humanize-plus";
-import { useSpring } from "@react-spring/web";
-import { SVGProps, useState } from "react";
-import { useElementSize } from "@mantine/hooks";
 import { Box, BoxProps, Text, Tooltip, useMantineTheme } from "@mantine/core";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import { useElementSize } from "@mantine/hooks";
+import { useSpring } from "@react-spring/web";
+import { Group } from "@visx/group";
 import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
-import { Group } from "@visx/group";
+import * as d3 from "d3";
+import { motion } from "framer-motion";
+import * as Humanize from "humanize-plus";
+import Link from "next/link";
+import { SVGProps, useState } from "react";
 
 const MARGIN = { top: 10, right: 10, bottom: 10, left: 10 };
 
@@ -186,7 +186,7 @@ export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps &
   const [_min, max] = d3.extent(data.map((d) => d.value));
   const xScale = d3
     .scaleLinear()
-    .domain([0, max || 0])
+    .domain([0, Math.max(max || 0, 1)]) // Ensure minimum domain of 1 to avoid division by zero
     .range([0, boundsWidth]);
 
   const grid = xScale.ticks(5).slice(1);
@@ -226,7 +226,7 @@ export function BarChart({ data, spacing, labelWidth, ...rest }: BarChartProps &
               rect={{
                 x: xScale(0),
                 y: yScale(datum.name) || 0,
-                width: xScale(datum.value),
+                width: Math.max(0, xScale(datum.value) - xScale(0)), // Ensure width is never negative
                 height: yScale.bandwidth(),
               }}
               yAxisWidth={yAxisWidth}
