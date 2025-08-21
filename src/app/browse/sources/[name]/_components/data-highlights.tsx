@@ -5,6 +5,7 @@ import { IconStarFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { Source } from "../page";
+import classes from "./data-highlights.module.css";
 
 export default function DataHighlights({ source }: { source?: Source }) {
   const speciesGenomes = useMemo(
@@ -55,6 +56,19 @@ export default function DataHighlights({ source }: { source?: Source }) {
     [source?.speciesGenomicDataSummary]
   );
 
+  const latestGenomeReleases = useMemo(
+    () =>
+      source?.latestGenomeReleases.map((summary) => {
+        const linkName = encodeURIComponent(summary.canonicalName.replaceAll(" ", "_"));
+        return {
+          name: summary.canonicalName || "",
+          value: summary.releaseDate,
+          href: `/species/${linkName}`,
+        };
+      }),
+    [source?.latestGenomeReleases]
+  );
+
   return (
     <Stack
       justify="center"
@@ -69,20 +83,32 @@ export default function DataHighlights({ source }: { source?: Source }) {
         Dataset highlights
       </Text>
       <Flex direction="row" align="center" justify="center" mb={-48} gap="lg">
-        <Paper miw={200} radius="lg" p="xs" shadow="sm" withBorder>
+        <Paper
+          className={classes.stat}
+          component={Link}
+          href={latestGenomeReleases?.[0].href || "#"}
+          miw={200}
+          radius="lg"
+          p="xs"
+          shadow="sm"
+          withBorder
+        >
           <Stack gap={4}>
             <Text c="dimmed" size="xs" fw="bold">
               LATEST GENOME RELEASE
             </Text>
-            <Text fw="bold" fs="italic" c="shellfish.9">
-              Slaysia slayness
-            </Text>
+            <Skeleton radius="lg" visible={!speciesGenomes}>
+              <Text fw="bold" fs="italic" c="shellfish.9">
+                {latestGenomeReleases?.[0].name || "Unknown"}
+              </Text>
+            </Skeleton>
           </Stack>
         </Paper>
         <ThemeIcon radius="xl" color="wheat" variant="white">
           <IconStarFilled size="1rem" />
         </ThemeIcon>
         <Paper
+          className={classes.stat}
           component={Link}
           href={speciesGenomes?.[0].href || "#"}
           miw={200}
@@ -106,6 +132,7 @@ export default function DataHighlights({ source }: { source?: Source }) {
           <IconStarFilled size="1rem" />
         </ThemeIcon>
         <Paper
+          className={classes.stat}
           component={Link}
           href={speciesGenomes?.[0].href || "#"}
           miw={200}
@@ -129,6 +156,7 @@ export default function DataHighlights({ source }: { source?: Source }) {
           <IconStarFilled size="1rem" />
         </ThemeIcon>
         <Paper
+          className={classes.stat}
           component={Link}
           href={speciesOther?.[0].href || "#"}
           miw={200}

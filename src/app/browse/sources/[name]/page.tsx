@@ -31,6 +31,7 @@ import {
   Paper,
   ScrollArea,
   SimpleGrid,
+  Skeleton,
   Stack,
   Text,
   Title,
@@ -91,6 +92,11 @@ const GET_DETAILS = gql`
         genomes
         loci
         genomicData
+      }
+
+      latestGenomeReleases {
+        canonicalName
+        releaseDate
       }
 
       speciesGenomicDataSummary {
@@ -180,6 +186,11 @@ export interface Source {
     genomes: number;
     totalGenomic: number;
   };
+  latestGenomeReleases: {
+    scientificName: string;
+    canonicalName: string;
+    releaseDate: string;
+  }[];
 }
 
 interface DetailsQueryResults {
@@ -547,99 +558,121 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
   );
 }
 
-function SourceDetails({ source, loading }: { source: Source; loading: boolean }) {
+function SourceDetails({ source }: { source?: Source }) {
   const theme = useMantineTheme();
 
   // Gross and hacky and terrible, to fix at a later date
-  const LISTS_URL = location.href.startsWith("https://app") ? "lists.ala.org.au" : "lists.test.ala.org.au";
+  const LISTS_URL =
+    typeof window !== "undefined" && location.href.startsWith("https://app")
+      ? "lists.ala.org.au"
+      : "lists.test.ala.org.au";
 
-  const license = getLicense(source.license);
+  const loading = !Boolean(source);
+  const license = source ? getLicense(source.license) : "";
 
   return (
     <Box w="100%">
       <Stack gap={4}>
-        <LoadOverlay visible={loading} />
-        <Text fw="bold" c="dimmed" size="xs">
-          {source.author}
-        </Text>
-        <Text c="dimmed" size="xs">
-          &copy; {source.rightsHolder}
-        </Text>
-        {source.listsId && (
+        <Skeleton visible={loading} maw={loading ? 100 : undefined}>
+          <Text fw="bold" c="dimmed" size="xs">
+            {source?.author || "Author"}
+          </Text>
+        </Skeleton>
+        <Skeleton visible={loading} maw={loading ? 650 : undefined}>
+          <Text c="dimmed" size="xs">
+            &copy; {source?.rightsHolder || "Rights Holder"}
+          </Text>
+        </Skeleton>
+
+        <Skeleton visible={loading} mt="sm" maw={loading ? 140 : undefined}>
           <Anchor
             style={{ display: "flex", alignItems: "center", gap: 8 }}
             target="_blank"
             size="xs"
-            href={`https://${LISTS_URL}/list/${source.listsId}`}
-            mt="sm"
+            href={`https://${LISTS_URL}/list/${source?.listsId}`}
           >
             View on ALA Lists <IconExternalLink size="0.8rem" />
           </Anchor>
-        )}
+        </Skeleton>
         <Group mt="lg">
-          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
-            <Group gap={5} justify="center" wrap="nowrap">
-              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                <b>{source.datasets.length}</b> datasets
-              </Text>
-            </Group>
-          </Paper>
-          <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
-            <Group gap={5} justify="center" wrap="nowrap">
-              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                <b>{source.species.total}</b> species
-              </Text>
-            </Group>
-          </Paper>
-          <Paper
-            miw={110}
-            radius="lg"
-            bg={source.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"}
-            px={10}
-            py={3}
-          >
-            <Group gap={5} justify="center" wrap="nowrap">
-              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                <b>
-                  {source.accessPill
-                    ?.toLowerCase()
-                    .charAt(0)
-                    .toUpperCase()
-                    .concat(source.accessPill.slice(1).toLowerCase())}
-                </b>{" "}
-                access
-              </Text>
-            </Group>
-          </Paper>
-          <Paper
-            miw={110}
-            radius="lg"
-            bg={source.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"}
-            px={10}
-            py={3}
-          >
-            <Group gap={5} justify="center" wrap="nowrap">
-              <Text size="xs" c={theme.colors.midnight[10]} p={4}>
-                <b>
-                  {source.reusePill
-                    ?.toLowerCase()
-                    .charAt(0)
-                    .toUpperCase()
-                    .concat(source.reusePill.slice(1).toLowerCase())}
-                </b>{" "}
-                reuse
-              </Text>
-            </Group>
-          </Paper>
-          {license && (
-            <Paper component={Link} href={license.url} target="_blank" miw={110} radius="lg" px={10} py={3} withBorder>
-              <Group gap={5} justify="center" wrap="nowrap">
-                <IconExternalLink size="0.8rem" />
-                <Text fw="bold" size="xs" c={theme.colors.midnight[10]} p={4}>
-                  {license.name.substring(1, license.name.length - 1)}
-                </Text>
-              </Group>
-            </Paper>
+          {loading ? (
+            [0, 1, 2, 3, 4].map((index) => <Skeleton key={index} w={110} h={30.8} radius="xl" />)
+          ) : (
+            <>
+              <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+                <Group gap={5} justify="center" wrap="nowrap">
+                  <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                    <b>{source?.datasets.length}</b> datasets
+                  </Text>
+                </Group>
+              </Paper>
+              <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
+                <Group gap={5} justify="center" wrap="nowrap">
+                  <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                    <b>{source?.species.total}</b> species
+                  </Text>
+                </Group>
+              </Paper>
+              <Paper
+                miw={110}
+                radius="lg"
+                bg={source?.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"}
+                px={10}
+                py={3}
+              >
+                <Group gap={5} justify="center" wrap="nowrap">
+                  <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                    <b>
+                      {source?.accessPill
+                        ?.toLowerCase()
+                        .charAt(0)
+                        .toUpperCase()
+                        .concat(source.accessPill.slice(1).toLowerCase())}
+                    </b>{" "}
+                    access
+                  </Text>
+                </Group>
+              </Paper>
+              <Paper
+                miw={110}
+                radius="lg"
+                bg={source?.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"}
+                px={10}
+                py={3}
+              >
+                <Group gap={5} justify="center" wrap="nowrap">
+                  <Text size="xs" c={theme.colors.midnight[10]} p={4}>
+                    <b>
+                      {source?.reusePill
+                        ?.toLowerCase()
+                        .charAt(0)
+                        .toUpperCase()
+                        .concat(source.reusePill.slice(1).toLowerCase())}
+                    </b>{" "}
+                    reuse
+                  </Text>
+                </Group>
+              </Paper>
+              {license && (
+                <Paper
+                  component={Link}
+                  href={license.url}
+                  target="_blank"
+                  miw={110}
+                  radius="lg"
+                  px={10}
+                  py={3}
+                  withBorder
+                >
+                  <Group gap={5} justify="center" wrap="nowrap">
+                    <IconExternalLink size="0.8rem" />
+                    <Text fw="bold" size="xs" c={theme.colors.midnight[10]} p={4}>
+                      {license.name.substring(1, license.name.length - 1)}
+                    </Text>
+                  </Group>
+                </Paper>
+              )}
+            </>
           )}
         </Group>
       </Stack>
@@ -671,7 +704,7 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
     [params.name]
   );
 
-  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
+  const { error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
     variables: { name: source },
   });
 
@@ -695,7 +728,7 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
                 <Text fz={38} fw={700}>
                   {source}
                 </Text>
-                {data?.source ? <SourceDetails source={data.source} loading={loading} /> : error?.message}
+                {error ? <Text fw="bold">{error.message}</Text> : <SourceDetails source={data?.source} />}
               </Stack>
             </Grid.Col>
             {sourceIcon && (
