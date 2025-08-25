@@ -329,87 +329,87 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   is_venomous: {
     image: "/icons/list-group/List group_ Venomous and poisonous.svg",
     label: "Venomous and poisonous",
-    link: "/browse/sources/ARGA_Venomous_and_Poisonous_Species",
+    link: "/browse/sources/ARGA Venomous and Poisonous Species",
   },
   vulnerable_wildfire: {
     image: "/icons/list-group/List group_ Bushfire vulnerable.svg",
     label: "Fire vulnerable",
-    link: "/browse/sources/ARGA_Bushfire_Recovery",
+    link: "/browse/sources/ARGA Bushfire Recovery",
   },
   native_species_icon: {
     image: "/icons/list-group/List group_ native.svg",
     label: "Native",
-    link: "/browse/sources/ARGA_Native_Species",
+    link: "/browse/sources/ARGA Native Species",
   },
   edible_wild_species_icon: {
     image: "/icons/list-group/List group_ edible wild species.svg",
     label: "Edible wild",
-    link: "/browse/sources/ARGA_Edible_Species",
+    link: "/browse/sources/ARGA Edible Species",
   },
   crop_wild_relative_icon: {
     image: "/icons/list-group/List group_ crop wild relative.svg",
     label: "Crop wild relative",
-    link: "/browse/sources/ARGA_Crop_Wild_Relatives",
+    link: "/browse/sources/ARGA Crop Wild Relatives",
   },
   invasives_pests_icon: {
     image: "/icons/list-group/List group_ invasives and pests.svg",
     label: "Invasive/pest",
-    link: "/browse/sources/ARGA_Exotic_Species",
+    link: "/browse/sources/ARGA Exotic Species",
   },
   migratory_species_icon: {
     image: "/icons/list-group/List group_ migratory species.svg",
     label: "Migratory",
-    link: "/browse/sources/ARGA_Migratory_Species",
+    link: "/browse/sources/ARGA Migratory Species",
   },
   top_110_species_icon: {
     image: "/icons/list-group/List group_ Threatened (Top 110 Species).svg",
     label: "Threatened",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_EX: {
     image: "/icons/list-group/List group_ EPBC_ extinct.svg",
     label: "EPBC Act Status: Extinct",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_EW: {
     image: "/icons/list-group/List group_ EPBC_ extinct in the wild.svg",
     label: "EPBC Act Status: Extinct in the wild",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_CR: {
     image: "/icons/list-group/List group_ EPBC_ critically endangered.svg",
     label: "EPBC Act Status: Critically endangered",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_EN: {
     image: "/icons/list-group/List group_ EPBC_ endangered.svg",
     label: "EPBC Act Status: Endangered",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_VU: {
     image: "/icons/list-group/List group_ EPBC_ vulnerable.svg",
     label: "EPBC Act Status: Vulnerable",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_cd: {
     image: "/icons/list-group/List group_ EPBC_ conservation dependent.svg",
     label: "EPBC Act Status: Conservation dependent",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_nt: {
     image: "/icons/list-group/List group_ EPBC_ not threatened.svg",
     label: "EPBC Act Status: Not threatened",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_lc: {
     image: "/icons/list-group/List group_ EPBC_ least concern.svg",
     label: "EPBC Act Status: Least concern",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   EPBC_act_category_ul: {
     image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
     label: "EPBC Act Status: Unlisted",
-    link: "/browse/sources/ARGA_Threatened_Species",
+    link: "/browse/sources/ARGA Threatened Species",
   },
   is_medicinal_and_bioactive_icon: {
     image: "/icons/list-group/List group_ medicinal and bioactive.svg",
@@ -418,42 +418,42 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   agriculture: {
     image: "/icons/list-group/List group_ Agriculture.svg",
     label: "Agriculture",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
   aquaculture: {
     image: "/icons/list-group/List group_ Aquaculture.svg",
     label: "Aquaculture",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
   "horticultural crop": {
     image: "/icons/list-group/List group_ Horticultural crops.svg",
     label: "Horticultural crop",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
   "crops and cereals": {
     image: "/icons/list-group/List group_ Cereals and crops.svg",
     label: "Crops and cereals",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
   forestry: {
     image: "/icons/list-group/List group_ Forestry timber and textiles.svg",
     label: "Forestry and timber industry",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
   livestock: {
     image: "/icons/list-group/List group_ Livestock.svg",
     label: "Livestock industry",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
   commercial_and_trade_fisheries_icon: {
     image: "/icons/list-group/List group_ Commercial and trade fishes.svg",
     label: "Commercial and trade fisheries",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
   managed_fisheries_icon: {
     image: "/icons/list-group/List group_ Managed fisheries.svg",
     label: "Managed fisheries",
-    link: "/browse/sources/ARGA_Commercial_Species",
+    link: "/browse/sources/ARGA Commercial Species",
   },
 };
 
@@ -726,7 +726,7 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
                 )}
               </Box>
             </Carousel.Slide>
-          ),
+          )
       )}
       {attributeHeaderIcons &&
         attributeHeaderIcons.map(
@@ -737,7 +737,7 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
                   <AttributeGroupIcon attribute={icon} />
                 </Box>
               </Carousel.Slide>
-            ),
+            )
         )}
     </Carousel>
   );

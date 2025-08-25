@@ -46,7 +46,7 @@ export function PaginationSize({ value, options: rawOptions, onChange }: Paginat
       radius="lg"
       value={value.toString()}
       data={options.map((item) => ({ value: item, label: `${item} items` }))}
-      onChange={(_, option) => onChange(parseInt(option.value, 10))}
+      onChange={(_, option) => onChange(parseInt(option.value || "10", 10))}
     />
   );
 }

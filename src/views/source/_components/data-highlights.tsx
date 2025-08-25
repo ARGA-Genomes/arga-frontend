@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { Source } from "../page";
 import classes from "./data-highlights.module.css";
 
-export default function DataHighlights({ source }: { source?: Source }) {
+export default function DataHighlights({ source, loading }: { source?: Source; loading: boolean }) {
   const speciesGenomes = useMemo(
     () =>
       source?.speciesGenomesSummary
@@ -84,9 +84,9 @@ export default function DataHighlights({ source }: { source?: Source }) {
       </Text>
       <Flex direction="row" align="center" justify="center" mb={-48} gap="lg">
         <Paper
-          className={classes.stat}
-          component={Link}
-          href={latestGenomeReleases?.[0].href || "#"}
+          className={latestGenomeReleases?.[0] ? classes.stat : undefined}
+          component={latestGenomeReleases?.[0] ? Link : undefined}
+          href={latestGenomeReleases?.[0]?.href || "#"}
           miw={200}
           radius="lg"
           p="xs"
@@ -97,9 +97,9 @@ export default function DataHighlights({ source }: { source?: Source }) {
             <Text c="dimmed" size="xs" fw="bold">
               LATEST GENOME RELEASE
             </Text>
-            <Skeleton radius="lg" visible={!speciesGenomes}>
+            <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
-                {latestGenomeReleases?.[0].name || "Unknown"}
+                {latestGenomeReleases?.[0]?.name || "Unknown"}
               </Text>
             </Skeleton>
           </Stack>
@@ -108,9 +108,9 @@ export default function DataHighlights({ source }: { source?: Source }) {
           <IconStarFilled size="1rem" />
         </ThemeIcon>
         <Paper
-          className={classes.stat}
-          component={Link}
-          href={speciesGenomes?.[0].href || "#"}
+          className={speciesGenomes?.[0] ? classes.stat : undefined}
+          component={speciesGenomes?.[0] ? Link : undefined}
+          href={speciesGenomes?.[0]?.href || "#"}
           miw={200}
           radius="lg"
           p="xs"
@@ -121,7 +121,7 @@ export default function DataHighlights({ source }: { source?: Source }) {
             <Text c="dimmed" size="xs" fw="bold">
               MOST GENOMES
             </Text>
-            <Skeleton radius="lg" visible={!speciesGenomes}>
+            <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
                 {speciesGenomes?.[0]?.name || "Unknown"}
               </Text>
@@ -132,9 +132,9 @@ export default function DataHighlights({ source }: { source?: Source }) {
           <IconStarFilled size="1rem" />
         </ThemeIcon>
         <Paper
-          className={classes.stat}
-          component={Link}
-          href={speciesGenomes?.[0].href || "#"}
+          className={speciesLoci?.[0] ? classes.stat : undefined}
+          component={speciesLoci?.[0] ? Link : undefined}
+          href={speciesLoci?.[0]?.href || "#"}
           miw={200}
           radius="lg"
           p="xs"
@@ -145,7 +145,7 @@ export default function DataHighlights({ source }: { source?: Source }) {
             <Text c="dimmed" size="xs" fw="bold">
               MOST LOCI
             </Text>
-            <Skeleton radius="lg" visible={!speciesLoci}>
+            <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
                 {speciesLoci?.[0]?.name || "Unknown"}
               </Text>
@@ -156,9 +156,9 @@ export default function DataHighlights({ source }: { source?: Source }) {
           <IconStarFilled size="1rem" />
         </ThemeIcon>
         <Paper
-          className={classes.stat}
-          component={Link}
-          href={speciesOther?.[0].href || "#"}
+          className={speciesOther?.[0] ? classes.stat : undefined}
+          component={speciesOther?.[0] ? Link : undefined}
+          href={speciesOther?.[0]?.href || "#"}
           miw={200}
           radius="lg"
           p="xs"

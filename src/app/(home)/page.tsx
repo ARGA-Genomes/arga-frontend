@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Flex, Group, Stack, Text, Title } from "@mantine/core";
-import { /* IconArrowUpRight,*/ IconSearch } from "@tabler/icons-react";
+import { IconArrowUpRight, IconSearch } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { ShowStats, TaxonomicComposition } from "./stats";
 
@@ -15,6 +15,7 @@ import Browse from "./browse";
 import classes from "./page.module.css";
 
 // Browse data
+import { InternalLinkButton } from "@/components/button-link-internal";
 import { Search } from "@/components/search";
 import { grouping, taxon, type } from "./_data";
 
@@ -67,9 +68,9 @@ export default function HomePage() {
           sources: data.overview.sources.reduce(
             (prev, cur) => ({
               ...prev,
-              [cur.name.replaceAll(" ", "_")]: cur.total,
+              [cur.name]: cur.total,
             }),
-            { ARGA_Threatened_Species: 0 }
+            { "ARGA Threatened Species": 0 }
           ),
         }
       : null;
@@ -136,8 +137,8 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Browse by functional or ecological group
               </Title>
-              <Browse items={grouping} data={formattedData} error={error} disabled />
-              {/* <InternalLinkButton
+              <Browse items={grouping} data={formattedData} error={error} />
+              <InternalLinkButton
                 url={`/browse/groups`}
                 icon={IconArrowUpRight}
                 textColor="white"
@@ -145,7 +146,7 @@ export default function HomePage() {
                 outline
               >
                 View all groups
-              </InternalLinkButton> */}
+              </InternalLinkButton>
             </Stack>
           </Stack>
           <Group gap={140} pb={80} align="flex-start" justify="center">

@@ -1,9 +1,9 @@
 import { DataField } from "@/components/data-fields";
 import { DataNoteActions } from "@/components/data-note-actions";
 import { DataTable, DataTableRow } from "@/components/data-table";
+import { FilterItem } from "@/components/filtering-redux/filters/common";
 import { BarChart } from "@/components/graphing/bar";
 import { TachoChart } from "@/components/graphing/tacho";
-import { Attribute } from "@/components/highlight-stack";
 import { gql } from "@apollo/client";
 import { Box, Flex, Grid, Paper, Stack, Text, Title } from "@mantine/core";
 import * as Humanize from "humanize-plus";
@@ -11,8 +11,8 @@ import { Source } from "../page";
 import { GenomeCompletion } from "./genome-completion";
 
 const DOWNLOAD_SUMMARY = gql`
-  query DownloadSourceSummary($name: String) {
-    summary: source(by: { name: $name }) {
+  query DownloadSourceSummary($name: String, $filters: [FilterItem]) {
+    summary: source(by: { name: $name }, filters: $filters) {
       overview: summaryCsv
       speciesGenomicDataSummaryCsv
       speciesGenomesSummaryCsv
@@ -25,8 +25,8 @@ const DOWNLOAD_SUMMARY = gql`
   }
 `;
 
-export function DataSummary({ source }: { source?: Source }) {
-  const minDate = new Date("2009-01-01");
+export function DataSummary({ source, filters }: { source?: Source; filters: FilterItem[] }) {
+  const minDate = new Date("2007-01-01");
   const maxDate = new Date(`${new Date().getFullYear() + 5}-01-01`);
 
   const thresholds = [
@@ -48,12 +48,12 @@ export function DataSummary({ source }: { source?: Source }) {
     .sort((a, b) => b.value - a.value);
 
   const speciesLoci = source?.speciesLociSummary
-    .filter((i) => i.genomes > 0)
+    .filter((i) => i.loci > 0)
     .map((summary) => {
       const linkName = encodeURIComponent(summary.canonicalName.replaceAll(" ", "_"));
       return {
         name: summary.canonicalName || "",
-        value: summary.genomes,
+        value: summary.loci,
         href: `/species/${linkName}`,
       };
     })
@@ -89,7 +89,7 @@ export function DataSummary({ source }: { source?: Source }) {
             <Paper h={560} p="lg" radius="lg" withBorder style={{ display: "flex", flexDirection: "column" }}>
               <Stack data-downloadname="Aggregated total species" h="100%" justify="space-between">
                 <Box style={{ flex: 1, minHeight: 0 }}>
-                  <GenomeCompletion name={source?.name} domain={[minDate, maxDate]} />
+                  <GenomeCompletion name={source?.name} filters={filters} domain={[minDate, maxDate]} />
                 </Box>
                 <Text fw={300} size="sm">
                   This graph shows the aggregated total of species for which a whole genome has been sequenced and made
@@ -115,18 +115,6 @@ export function DataSummary({ source }: { source?: Source }) {
                   <DataField value={Humanize.formatNumber(source?.speciesRankSummary.genomicData || 0)} />
                 </DataTableRow>
               </DataTable>
-              <Stack mt={5}>
-                <Attribute
-                  label="Species with most genomes"
-                  value={speciesGenomes?.[0]?.name}
-                  href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(" ", "_")}/taxonomy`}
-                />
-                <Attribute
-                  label="Species with most data"
-                  value={speciesOther?.[0]?.name}
-                  href={`/species/${speciesOther?.[0]?.name.replaceAll(" ", "_")}/taxonomy`}
-                />
-              </Stack>
             </Paper>
           </Box>
         </Flex>
@@ -214,6 +202,7 @@ export function DataSummary({ source }: { source?: Source }) {
                 ],
                 variables: {
                   name: source?.name,
+                  filters,
                 },
               }}
             />

@@ -358,43 +358,51 @@ export function StackedBarGraph({ data }: StackedBarGraphProps) {
         return (
           <svg width={parent.width} height={parent.height}>
             {data.map((barStack, idx) => {
-              const height = yScale.bandwidth();
-              const maxWidth = boundsWidth - (boundsWidth / (groupLabels.length + 1)) * (groupLabels.length - idx);
-              const total = barStack.segments.reduce((acc, cur) => (acc += cur.value), 0);
+              const height = Math.max(0, yScale.bandwidth()); // Ensure height is never negative
+              const maxWidth = Math.max(
+                0,
+                boundsWidth - (boundsWidth / (groupLabels.length + 1)) * (groupLabels.length - idx)
+              ); // Ensure maxWidth is never negative
+              const total = Math.max(
+                0,
+                barStack.segments.reduce((acc, cur) => (acc += Math.max(0, cur.value)), 0)
+              ); // Ensure total and segment values are never negative
 
               let stackLeft = 0;
 
               const xScale = scaleLinear<number>({
-                domain: [0, total],
+                domain: [0, Math.max(1, total)], // Ensure domain minimum is at least 1 to avoid division by zero
                 range: [0, maxWidth],
               });
 
               return (
                 <Group left={0} top={yScale(barStack.label)} key={barStack.label}>
-                  {barStack.segments.map((segment) => {
-                    const width = xScale(segment.value);
-                    const bar = (
-                      <Tooltip.Floating
-                        color="rgba(255,255,255,0.8)"
-                        key={`${barStack.label}-${segment.label}`}
-                        label={
-                          <Text size="sm" c="midnight.11" fw={500}>
-                            <b>
-                              {segment.value} {barStack.label}
-                            </b>{" "}
-                            in <b>{segment.label}</b>
-                          </Text>
-                        }
-                        radius="md"
-                      >
-                        <Group left={stackLeft}>
-                          <rect width={width} height={height} fill={colourScale(segment.label)} />
-                        </Group>
-                      </Tooltip.Floating>
-                    );
-                    stackLeft += width;
-                    return bar;
-                  })}
+                  {barStack.segments
+                    .filter((segment) => segment.value > 0) // Only render segments with positive values
+                    .map((segment) => {
+                      const width = Math.max(0, xScale(segment.value)); // Ensure width is never negative
+                      const bar = (
+                        <Tooltip.Floating
+                          color="rgba(255,255,255,0.8)"
+                          key={`${barStack.label}-${segment.label}`}
+                          label={
+                            <Text size="sm" c="midnight.11" fw={500}>
+                              <b>
+                                {segment.value} {barStack.label}
+                              </b>{" "}
+                              in <b>{segment.label}</b>
+                            </Text>
+                          }
+                          radius="md"
+                        >
+                          <Group left={stackLeft}>
+                            <rect width={width} height={Math.max(0, height)} fill={colourScale(segment.label)} />
+                          </Group>
+                        </Tooltip.Floating>
+                      );
+                      stackLeft += width;
+                      return bar;
+                    })}
                   <Group top={height / 2} left={stackLeft + 20}>
                     <text className={classes.barLabel}>
                       {Humanize.formatNumber(total)} {barStack.label}

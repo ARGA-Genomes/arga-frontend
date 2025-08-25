@@ -1,13 +1,14 @@
 "use client";
 
+import { FilterItem } from "@/components/filtering-redux/filters/common";
 import { LineBarGraph } from "@/components/graphing/LineBarGraph";
 import { gql, useQuery } from "@apollo/client";
 import { ParentSize } from "@visx/responsive";
 
 const GET_COMPLETE_GENOMES_YEAR_STATS = gql`
-  query CompleteGenomesYearStats($name: String) {
+  query CompleteGenomesYearStats($name: String, $filters: [FilterItem]) {
     stats {
-      completeGenomesByYearForSource(name: $name) {
+      completeGenomesByYearForSource(name: $name, filters: $filters) {
         year
         total
       }
@@ -26,15 +27,17 @@ type CompleteGenomesYearStatsQuery = {
 
 interface GenomeCompletionProps {
   name?: string;
+  filters?: FilterItem[];
   domain: [Date, Date];
   milestones?: [];
   disabledHighlight?: boolean;
 }
 
-export function GenomeCompletion({ name, domain, disabledHighlight }: GenomeCompletionProps) {
+export function GenomeCompletion({ name, filters, domain, disabledHighlight }: GenomeCompletionProps) {
   const { data } = useQuery<CompleteGenomesYearStatsQuery>(GET_COMPLETE_GENOMES_YEAR_STATS, {
     variables: {
       name,
+      filters,
     },
     skip: !name,
   });

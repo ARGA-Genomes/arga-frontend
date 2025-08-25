@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
 import {
   ActionIcon,
   Center,
@@ -15,7 +15,6 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
 import {
   IconArrowsSort,
   IconArrowUpRight,
@@ -23,23 +22,24 @@ import {
   IconSortAscending,
   IconSortDescending,
 } from "@tabler/icons-react";
+import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 // Local components
-import { PaginationBar, PaginationSize } from "./pagination";
-import { FiltersDrawer } from "./filtering-redux/drawer";
-import { FilterItem } from "./filtering-redux/filters/common";
-import { DataItem, DataSummary, SpeciesCard } from "./species-card";
 import { Photo } from "@/app/type";
 import { get, range } from "lodash-es";
+import { FiltersDrawer } from "./filtering-redux/drawer";
+import { FilterItem } from "./filtering-redux/filters/common";
+import { PaginationBar, PaginationSize } from "./pagination";
+import { DataItem, DataSummary, SpeciesCard } from "./species-card";
 import { TableCardLayout, TableCardSwitch } from "./table-card-switch";
 
-import classes from "./browse-species.module.css";
-import { ExternalLinkButton } from "./button-link-external";
-import { VernacularGroupChip } from "./icon-bar";
-import { DownloadButton } from "./download-btn";
 import { generateCSV } from "@/helpers/downloadCSV";
 import { saveAs } from "file-saver";
 import Link from "next/link";
+import classes from "./browse-species.module.css";
+import { ExternalLinkButton } from "./button-link-external";
+import { DownloadButton } from "./download-btn";
+import { VernacularGroupChip } from "./icon-bar";
 
 interface SpeciesRecord {
   taxonomy: { canonicalName: string; status: string; source: string; sourceUrl: string; vernacularGroup: string };
