@@ -6,7 +6,13 @@ import { AccessionEvent, CollectionEvent, Organism } from "@/queries/specimen";
 import { gql, useQuery } from "@apollo/client";
 import { Grid, Paper, Stack, Text, Title, Skeleton, Center, Group } from "@mantine/core";
 import { AttributePillContainer } from "@/components/data-fields";
-import { use } from "react";
+import { use, useState } from "react";
+import { TimelineNavbar } from "@/components/TimelineNavbar";
+import { IconLiveState, IconSpecimenCollection, IconSpecimenRegistration, IconSubsample } from "@/components/ArgaIcons";
+import { CardSlider } from "@/components/CardSlider";
+import { LiveStateSlide } from "@/components/slides/LiveState";
+import { CollectingSlide } from "@/components/slides/Collecting";
+import { RegistrationsSlide } from "@/components/slides/Registrations";
 
 const GET_ORGANISM = gql`
   query SpeciesSpecimens($entityId: String) {
@@ -41,6 +47,7 @@ export default function Page(props: PageProps) {
   return (
     <Stack gap="xl">
       <Overview entityId={params.entityId} />
+      <Provenance entityId={params.entityId} />
     </Stack>
   );
 }
@@ -49,10 +56,6 @@ function Overview({ entityId }: { entityId: string }) {
   const { loading, error, data } = useQuery<OrganismQuery>(GET_ORGANISM, {
     variables: { entityId },
   });
-
-  function col<T, R>(value?: T, retValue?: R): R | undefined {
-    return value ? retValue : undefined;
-  }
 
   return (
     <Paper radius="lg" p={20} bg="wheatBg.0">
@@ -75,7 +78,7 @@ function Overview({ entityId }: { entityId: string }) {
                 <Group>
                   <AttributePillContainer
                     className={classes.holotypePill}
-                    color={col(undefined, "white")}
+                    color="white"
                     withBorder={false}
                   ></AttributePillContainer>
                 </Group>
@@ -128,5 +131,50 @@ function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
         </Stack>
       </Paper>
     </Skeleton>
+  );
+}
+
+function Provenance({ entityId }: { entityId: string }) {
+  const { loading, error, data } = useQuery<OrganismQuery>(GET_ORGANISM, {
+    variables: { entityId },
+  });
+
+  const [card, setCard] = useState(0);
+  return (
+    <Stack>
+      <Title order={3}>Organism provenance timeline</Title>
+      <TimelineNavbar>
+        <TimelineNavbar.Item label="Live state" icon={<IconLiveState size={60} />} onClick={() => setCard(0)} />
+        <TimelineNavbar.Item
+          label="Collecting"
+          icon={<IconSpecimenCollection size={60} />}
+          onClick={() => setCard(1)}
+        />
+        <TimelineNavbar.Item
+          label="Registration"
+          icon={<IconSpecimenRegistration size={60} />}
+          onClick={() => setCard(2)}
+        />
+        <TimelineNavbar.Item
+          label="Subsamples and tissues"
+          icon={<IconSubsample size={60} />}
+          onClick={() => setCard(3)}
+        />
+      </TimelineNavbar>
+
+      <CardSlider card={card}>
+        <CardSlider.Card title="Live state">
+          <LiveStateSlide />
+        </CardSlider.Card>
+        <CardSlider.Card title="Collecting events">
+          {error && <Text>{error.message}</Text>}
+          {data && <CollectingSlide collections={data.organism.collections} />}
+        </CardSlider.Card>
+        <CardSlider.Card title="Registrations">
+          <RegistrationsSlide />
+        </CardSlider.Card>
+        <CardSlider.Card title="Subsamples and tissues"></CardSlider.Card>
+      </CardSlider>
+    </Stack>
   );
 }
