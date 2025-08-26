@@ -1,7 +1,7 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: process.env.NEXT_PUBLIC_ARGA_API_URL || "http://localhost:5000/api",
+  schema: process.env.NEXT_PUBLIC_ARGA_API_URL || "https://staging.arga.org.au/api",
   ignoreNoDocuments: true,
   generates: {
     // Generate TypeScript types from schema only
@@ -25,13 +25,6 @@ const config: CodegenConfig = {
           typeNames: "pascal-case#pascalCase",
           enumValues: "upper-case#upperCase",
         },
-      },
-    },
-    // Generate introspection data for development tools
-    "src/generated/introspection.json": {
-      plugins: ["introspection"],
-      config: {
-        minify: true,
       },
     },
   },
