@@ -25,11 +25,8 @@ export function TaxonomicDiversityGraph({ data }: TaxonomicDiversityGraphProps) 
       "var(--mantine-color-shellfish-5)",
       "var(--mantine-color-moss-5)",
       "var(--mantine-color-bushfire-5)",
-      "var(--mantine-color-wheat-5)",
-      "var(--mantine-color-shellfish-9)",
-      "var(--mantine-color-moss-9)",
       "var(--mantine-color-bushfire-9)",
-      "var(--mantine-color-wheat-9)",
+      "var(--mantine-color-wheat-5)",
     ],
   });
 
@@ -60,10 +57,11 @@ export function TaxonomicDiversityGraph({ data }: TaxonomicDiversityGraphProps) 
           {(parent) => {
             const chartWidth = parent.width;
             const chartHeight = parent.height;
-            const sideMargin = 30; // Add padding to sides for rotated labels
+            const sideMargin = 40; // Add padding to sides for rotated labels
+            const leftMargin = 60; // Add margin for y-axis labels
 
             const xScale = scaleBand({
-              range: [sideMargin, chartWidth - sideMargin],
+              range: [leftMargin, chartWidth - sideMargin],
               domain: data.map((stat) => stat.phylum),
               padding: 0.4,
             });
@@ -73,8 +71,40 @@ export function TaxonomicDiversityGraph({ data }: TaxonomicDiversityGraphProps) 
               domain: [0, max(data, (d) => d.count) ?? 0],
             });
 
+            // Generate y-axis tick values
+            const yTicks = yScale.ticks(5);
+
             return (
               <svg width={chartWidth} height={chartHeight}>
+                {/* Y-axis grid lines and labels */}
+                {yTicks.map((tick) => {
+                  const yPos = chartHeight - 100 - yScale(tick);
+                  return (
+                    <g key={tick}>
+                      {/* Grid line */}
+                      <Line
+                        from={{ x: leftMargin, y: yPos }}
+                        to={{ x: chartWidth - sideMargin, y: yPos }}
+                        stroke="#e0e0e0"
+                        strokeWidth={1}
+                        opacity={0.5}
+                      />
+                      {/* Y-axis label */}
+                      <VisxText
+                        x={leftMargin - 10}
+                        y={yPos}
+                        fontSize={12}
+                        fontWeight={600}
+                        textAnchor="end"
+                        verticalAnchor="middle"
+                      >
+                        {tick}
+                      </VisxText>
+                    </g>
+                  );
+                })}
+
+                {/* Bars */}
                 {data.map((datum) => {
                   const x = xScale(datum.phylum);
                   const y = yScale(datum.count) ?? 0;
@@ -110,13 +140,13 @@ export function TaxonomicDiversityGraph({ data }: TaxonomicDiversityGraphProps) 
                 })}
 
                 <Line
-                  from={{ x: sideMargin + 1, y: 0 }}
-                  to={{ x: sideMargin + 1, y: chartHeight - 99 }}
+                  from={{ x: leftMargin, y: 0 }}
+                  to={{ x: leftMargin, y: chartHeight - 99 }}
                   stroke="#000"
                   strokeWidth={1}
                 />
                 <Line
-                  from={{ x: sideMargin, y: chartHeight - 100 }}
+                  from={{ x: leftMargin, y: chartHeight - 100 }}
                   to={{ x: chartWidth - sideMargin, y: chartHeight - 100 }}
                   stroke="#000"
                   strokeWidth={1}
@@ -153,7 +183,7 @@ export function TaxonomicDiversityGraph({ data }: TaxonomicDiversityGraphProps) 
                   return (
                     <Tooltip.Floating
                       key={`label-${datum.phylum}`}
-                      label={`${datum.phylum} - ${datum.count} records`}
+                      label={`${datum.phylum} - ${datum.count} species`}
                       radius="md"
                     >
                       <Link href={`/phylum/${datum.phylum}`}>{label}</Link>
