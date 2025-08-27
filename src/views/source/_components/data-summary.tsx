@@ -72,6 +72,7 @@ export function DataSummary({ source, filters }: { source?: Source; filters: Fil
     .sort((a, b) => b.value - a.value);
 
   const genomePercentile = source && (source.speciesRankSummary.genomes / source.speciesRankSummary.total) * 100;
+  const lociPercentile = source && (source.speciesRankSummary.loci / source.speciesRankSummary.total) * 100;
   const otherPercentile = source && (source.speciesRankSummary.genomicData / source.speciesRankSummary.total) * 100;
 
   function collapsable(span: number) {
@@ -145,6 +146,30 @@ export function DataSummary({ source, filters }: { source?: Source; filters: Fil
                     Species with genomes
                   </Text>
                   {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
+                </Stack>
+              </Grid.Col>
+              <Grid.Col data-downloadname="Percentage of species with loci" span={collapsable(4)}>
+                <Stack>
+                  <Text fz="sm" fw={300}>
+                    Percentage of species with loci
+                  </Text>
+                  {source && (
+                    <TachoChart
+                      mt={10}
+                      h={150}
+                      w={300}
+                      thresholds={thresholds}
+                      value={Math.round(lociPercentile || 0)}
+                    />
+                  )}
+                </Stack>
+              </Grid.Col>
+              <Grid.Col data-downloadname="Species with loci" span={collapsable(8)}>
+                <Stack>
+                  <Text fz="sm" fw={300}>
+                    Species with loci
+                  </Text>
+                  {speciesLoci && <BarChart h={200} data={speciesLoci.slice(0, 8)} spacing={0.1} />}
                 </Stack>
               </Grid.Col>
               <Grid.Col data-downloadname="Percentage of species with any genetic data" span={collapsable(4)}>

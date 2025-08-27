@@ -169,7 +169,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
             <Text c="dimmed" size="xs" fw="bold">
               MOST DATA
             </Text>
-            <Skeleton radius="lg" visible={!speciesOther}>
+            <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
                 {speciesOther?.[0]?.name || "Unknown"}
               </Text>
