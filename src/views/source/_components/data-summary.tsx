@@ -9,6 +9,7 @@ import { Box, Flex, Grid, Paper, Stack, Text, Title } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { Source } from "../page";
 import { GenomeCompletion } from "./genome-completion";
+import { TaxonomicDiversityGraph } from "./taxonomic-diversity-graph";
 
 const DOWNLOAD_SUMMARY = gql`
   query DownloadSourceSummary($name: String, $filters: [FilterItem]) {
@@ -17,6 +18,7 @@ const DOWNLOAD_SUMMARY = gql`
       speciesGenomicDataSummaryCsv
       speciesGenomesSummaryCsv
       speciesLociSummaryCsv
+      taxonomicDiversityCsv
     }
 
     stats {
@@ -83,6 +85,18 @@ export function DataSummary({ source, filters }: { source?: Source; filters: Fil
     <Grid>
       <Grid.Col span={12}>
         <Title order={5}>Data summary</Title>
+      </Grid.Col>
+      <Grid.Col span={12}>
+        <Paper radius="lg" p="xl" withBorder>
+          <Stack>
+            <Text fw={300} size="sm">
+              Taxonomic diversity of this dataset
+            </Text>
+            <Box h={250}>
+              <TaxonomicDiversityGraph data={source?.taxonomicDiversity || []} />
+            </Box>
+          </Stack>
+        </Paper>
       </Grid.Col>
       <Grid.Col span={12}>
         <Flex gap="md" align="stretch">
@@ -219,6 +233,10 @@ export function DataSummary({ source, filters }: { source?: Source; filters: Fil
                   {
                     key: "summary.speciesLociSummaryCsv",
                     name: "species-genomes-summary",
+                  },
+                  {
+                    key: "summary.taxonomicDiversityCsv",
+                    name: "taxonomic-diversity",
                   },
                   {
                     key: "stats.completeGenomesByYearForSourceCsv",

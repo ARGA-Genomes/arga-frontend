@@ -96,6 +96,12 @@ const GET_DETAILS = gql`
         canonicalName
         loci
       }
+
+      taxonomicDiversity {
+        kingdom
+        phylum
+        count
+      }
     }
   }
 `;
@@ -144,6 +150,12 @@ interface DataBreakdown {
   totalGenomic: number;
 }
 
+export interface KingdomPhylumCount {
+  kingdom: string;
+  phylum: string;
+  count: number;
+}
+
 export interface Source {
   license: string;
   accessRights: string;
@@ -174,6 +186,7 @@ export interface Source {
     canonicalName: string;
     releaseDate: string;
   }[];
+  taxonomicDiversity: KingdomPhylumCount[];
 }
 
 interface DetailsQueryResults {
