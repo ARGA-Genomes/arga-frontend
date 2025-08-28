@@ -1,20 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
 import { Container, Grid, Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
-import { MAX_WIDTH } from "../app/constants";
 import * as Humanize from "humanize-plus";
+import { useMemo } from "react";
+import { MAX_WIDTH } from "../app/constants";
 
-import { Taxonomy } from "@/app/(taxonomy)/[rank]/[name]/page";
+import { TaxonResult } from "@/app/(taxonomy)/[rank]/[name]/page";
+import { getTaxonIcon } from "@/helpers/getTaxonIcon";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { taxon as taxonOptions } from "../app/(home)/_data";
 import { AttributePill, AttributePillValue } from "./data-fields";
-import { IconArrowUpRight } from "@tabler/icons-react";
-import { getTaxonIcon } from "@/helpers/getTaxonIcon";
 
 interface ClassificationHeaderProps {
   rank: string;
   classification: string;
-  taxon?: Taxonomy;
+  taxon?: TaxonResult;
 }
 
 const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
