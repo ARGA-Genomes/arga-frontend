@@ -9,7 +9,7 @@ import { CollectingSlide } from "@/components/slides/Collecting";
 import { LiveStateSlide } from "@/components/slides/LiveState";
 import { RegistrationsSlide } from "@/components/slides/Registrations";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { AccessionEvent, CollectionEvent, Organism } from "@/queries/specimen";
+import { AccessionEvent, CollectionEvent, Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Center, Grid, Group, Paper, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { use, useState } from "react";
