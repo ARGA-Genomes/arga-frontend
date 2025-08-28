@@ -16,20 +16,46 @@ import {
   UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
-import { Item } from "../page";
 
 import { useSavedData } from "@/components/DownloadManager";
 import { AttributePill } from "@/components/highlight-stack";
 import { DataSummary } from "@/components/species-card";
 import { TableCardLayout } from "@/components/table-card-switch";
+import {
+  FullTextSearchItem,
+  GenomeItem as GenomeItemRaw,
+  LocusItem as LocusItemRaw,
+  SpecimenItem as SpecimenItemRaw,
+  TaxonItem as TaxonItemRaw,
+} from "@/generated/types";
 import { IconCircleCheck, IconCircleX, IconDownload, TablerIcon } from "@tabler/icons-react";
 import { range } from "lodash-es";
 import Link from "next/link";
 import { ReactElement, useCallback } from "react";
 import classes from "./result.module.css";
 
-interface TaxonResultProps {
-  item: Item;
+// Additional props to be added
+interface TaxonItem extends TaxonItemRaw {
+  referenceGenome?: string;
+  eventDate?: string;
+}
+
+interface SpecimenItem extends SpecimenItemRaw {
+  commonNames?: string[];
+}
+
+interface GenomeItem extends GenomeItemRaw {
+  commonNames?: string[];
+  eventDate?: string;
+}
+
+interface LocusItem extends LocusItemRaw {
+  commonNames?: string[];
+  releaseDate?: string;
+}
+
+interface ResultProps<T = GenomeItem | LocusItem | SpecimenItem | TaxonItem> {
+  item: T;
   link: string;
 }
 
@@ -90,7 +116,7 @@ const DetailsAction = ({ w, colour, label, disabled, icon: Icon, onClick }: Deta
   );
 };
 
-const TableTaxonDetails = ({ item, link }: TaxonResultProps) => {
+const TableTaxonDetails = ({ item, link }: ResultProps<TaxonItem>) => {
   return (
     <Flex className={classes.hover} component={Link} href={link} gap="xl" align="flex-start" py="xs">
       <Supertext w={250} label="Accepted name">
@@ -127,7 +153,7 @@ const TableTaxonDetails = ({ item, link }: TaxonResultProps) => {
   );
 };
 
-const CardTaxonDetails = ({ item, link }: TaxonResultProps) => {
+const CardTaxonDetails = ({ item, link }: ResultProps<TaxonItem>) => {
   return (
     <Stack justify="space-between" w="100%" h="100%">
       <Stack>
@@ -217,7 +243,7 @@ const CardTaxonDetails = ({ item, link }: TaxonResultProps) => {
   );
 };
 
-const TableSpecimenDetails = ({ item, link }: TaxonResultProps) => {
+const TableSpecimenDetails = ({ item, link }: ResultProps<SpecimenItem>) => {
   const theme = useMantineTheme();
 
   return (
@@ -253,7 +279,7 @@ const TableSpecimenDetails = ({ item, link }: TaxonResultProps) => {
   );
 };
 
-const CardSpecimenDetails = ({ item, link }: TaxonResultProps) => {
+const CardSpecimenDetails = ({ item, link }: ResultProps<SpecimenItem>) => {
   return (
     <Stack justify="space-between" h="100%" w="100%">
       <Stack>
@@ -296,7 +322,7 @@ const CardSpecimenDetails = ({ item, link }: TaxonResultProps) => {
   );
 };
 
-const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
+const TableGenomeDetails = ({ item, link }: ResultProps<GenomeItem>) => {
   const [saved, setSaved] = useSavedData();
   const theme = useMantineTheme();
 
@@ -321,7 +347,7 @@ const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
           url: downloadUrl,
           label: item.accession || "",
           dataType: "whole genome",
-          scientificName: item.canonicalName,
+          scientificName: item.canonicalName || "Unknown",
           datePublished: item.eventDate || "Unknown",
           dataset: { id: "", name: item.dataSource || "Unknown dataset" },
         },
@@ -350,7 +376,7 @@ const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
           </Text>
         </Supertext>
         <Supertext w={150} label="Assembly level">
-          <AttributePill value={item.assemblyType} />
+          <AttributePill value={item.assemblyType || "Unknown"} />
         </Supertext>
       </Flex>
       <Flex direction="row" h="100%" gap="xs" p="xs">
@@ -373,7 +399,7 @@ const TableGenomeDetails = ({ item, link }: TaxonResultProps) => {
   );
 };
 
-const CardGenomeDetails = ({ item }: TaxonResultProps) => {
+const CardGenomeDetails = ({ item }: ResultProps<GenomeItem>) => {
   const [saved, setSaved] = useSavedData();
 
   const downloadParts = item.sourceUri ? item.sourceUri.split("/") : [];
@@ -397,8 +423,8 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
           url: downloadUrl,
           label: item.accession || "",
           dataType: "whole genome",
-          scientificName: item.canonicalName,
-          datePublished: item.eventDate || "Unknown",
+          scientificName: item.canonicalName || "Unknown",
+          // datePublished: item.eventDate || "Unknown",
           dataset: { id: "", name: item.dataSource || "Unknown dataset" },
         },
       ]);
@@ -428,7 +454,7 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
                 {item.dataSource}
               </Text>
             </Paper>
-            <AttributePill value={item.assemblyType} />
+            <AttributePill value={item.assemblyType || "Unknown"} />
           </Stack>
         </Paper>
       </Stack>
@@ -461,7 +487,8 @@ const CardGenomeDetails = ({ item }: TaxonResultProps) => {
   );
 };
 
-const TableLociDetails = ({ item, link }: TaxonResultProps) => {
+const TableLociDetails = ({ item: rawItem, link }: ResultProps<LocusItem>) => {
+  const item = rawItem as LocusItem;
   return (
     <Flex
       className={classes.hover}
@@ -500,7 +527,8 @@ const TableLociDetails = ({ item, link }: TaxonResultProps) => {
   );
 };
 
-const CardLociDetails = ({ item }: TaxonResultProps) => {
+const CardLociDetails = ({ item: rawItem }: ResultProps<LocusItem>) => {
+  const item = rawItem! as LocusItem;
   return (
     <Stack justify="space-between" h="100%" w="100%">
       <Stack>
@@ -544,22 +572,49 @@ const CardLociDetails = ({ item }: TaxonResultProps) => {
 };
 
 type ResultDetails = {
-  [key: string]: {
-    label: (data: Item) => string;
+  TAXON: {
+    label: (data: FullTextSearchItem) => string;
     colour: string;
     icon: string;
-    link: (data: Item) => string;
-    tableComponent: ({ item }: TaxonResultProps) => ReactElement;
-    cardComponent: ({ item }: TaxonResultProps) => ReactElement;
+    link: (data: FullTextSearchItem) => string;
+    tableComponent: ({ item, link }: ResultProps<TaxonItem>) => ReactElement;
+    cardComponent: ({ item, link }: ResultProps<TaxonItem>) => ReactElement;
+  };
+  GENOME: {
+    label: (data: FullTextSearchItem) => string;
+    colour: string;
+    icon: string;
+    link: (data: FullTextSearchItem) => string;
+    tableComponent: ({ item, link }: ResultProps<GenomeItem>) => ReactElement;
+    cardComponent: ({ item, link }: ResultProps<GenomeItem>) => ReactElement;
+  };
+  LOCUS: {
+    label: (data: FullTextSearchItem) => string;
+    colour: string;
+    icon: string;
+    link: (data: FullTextSearchItem) => string;
+    tableComponent: ({ item, link }: ResultProps<LocusItem>) => ReactElement;
+    cardComponent: ({ item, link }: ResultProps<LocusItem>) => ReactElement;
+  };
+  SPECIMEN: {
+    label: (data: FullTextSearchItem) => string;
+    colour: string;
+    icon: string;
+    link: (data: FullTextSearchItem) => string;
+    tableComponent: ({ item, link }: ResultProps<SpecimenItem>) => ReactElement;
+    cardComponent: ({ item, link }: ResultProps<SpecimenItem>) => ReactElement;
   };
 };
 
 const resultType: ResultDetails = {
   TAXON: {
-    label: (item) => (["species", "subspecies"].includes(item.rank) ? `${item.rank.toUpperCase()}` : "HIGHER TAXON"),
+    label: (item) =>
+      ["species", "subspecies"].includes((item as TaxonItem).rank!)
+        ? `${(item as TaxonItem).rank!.toUpperCase()}`
+        : "HIGHER TAXON",
     colour: "moss",
     icon: "Data type_ Species (and subspecies) report.svg",
-    link: (item) => `/${item.rank}/${item.canonicalName}`,
+    link: (item) => `/${(item as TaxonItem).rank}/${item.canonicalName}`,
     tableComponent: TableTaxonDetails,
     cardComponent: CardTaxonDetails,
   },
@@ -567,7 +622,7 @@ const resultType: ResultDetails = {
     label: () => "WHOLE GENOME",
     colour: "bushfire",
     icon: "Data type_ Whole genome.svg",
-    link: (item) => `/species/${item.canonicalName}/whole_genomes/${item.accession}`,
+    link: (item) => `/species/${item.canonicalName}/whole_genomes/${(item as GenomeItem).accession}`,
     tableComponent: TableGenomeDetails,
     cardComponent: CardGenomeDetails,
   },
@@ -575,7 +630,7 @@ const resultType: ResultDetails = {
     label: () => "SINGLE LOCUS",
     colour: "wheat",
     icon: "Data type_ Markers.svg",
-    link: (item) => `/species/${item.canonicalName}/markers/${item.accession}`,
+    link: (item) => `/species/${item.canonicalName}/markers/${(item as LocusItem).accession}`,
     tableComponent: TableLociDetails,
     cardComponent: CardLociDetails,
   },
@@ -583,13 +638,13 @@ const resultType: ResultDetails = {
     label: () => "SPECIMEN",
     colour: "shellfish",
     icon: "Data type_ Specimen.svg",
-    link: (item) => `/species/${item.canonicalName}/specimens/${item.accession}`,
+    link: (item) => `/species/${item.canonicalName}/specimens/${(item as SpecimenItem).accession}`,
     tableComponent: TableSpecimenDetails,
     cardComponent: CardSpecimenDetails,
   },
 };
 
-export function TableResult({ item }: { item?: Item }) {
+export function TableResult({ item }: { item?: FullTextSearchItem }) {
   if (!item)
     return (
       <Paper className={classes.result} radius="sm" bg="gray.0">
@@ -613,7 +668,22 @@ export function TableResult({ item }: { item?: Item }) {
       </Paper>
     );
 
-  const { label, colour, link, tableComponent: Component } = resultType[item.type];
+  const { label, colour, link } = resultType[item.type];
+
+  const renderTableComponent = () => {
+    switch (item.type) {
+      case "TAXON":
+        return <TableTaxonDetails item={item as TaxonItem} link={link(item)} />;
+      case "GENOME":
+        return <TableGenomeDetails item={item as GenomeItem} link={link(item)} />;
+      case "LOCUS":
+        return <TableLociDetails item={item as LocusItem} link={link(item)} />;
+      case "SPECIMEN":
+        return <TableSpecimenDetails item={item as SpecimenItem} link={link(item)} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <Paper className={classes.result} radius="sm" bg={`${colour}.0`}>
@@ -627,13 +697,13 @@ export function TableResult({ item }: { item?: Item }) {
             </Center>
           </Paper>
         </Center>
-        <Component item={item} link={link(item)} />
+        {renderTableComponent()}
       </Flex>
     </Paper>
   );
 }
 
-export function CardResult({ item }: { item?: Item }) {
+export function CardResult({ item }: { item?: FullTextSearchItem }) {
   if (!item)
     return (
       <Paper h="100%" radius="lg" style={{ border: `1px solid var(--mantine-color-midnight-0)` }}>
@@ -662,7 +732,22 @@ export function CardResult({ item }: { item?: Item }) {
       </Paper>
     );
 
-  const { label, colour, link, cardComponent: Component } = resultType[item.type];
+  const { label, colour, link } = resultType[item.type];
+
+  const renderCardComponent = () => {
+    switch (item.type) {
+      case "TAXON":
+        return <CardTaxonDetails item={item as TaxonItem} link={link(item)} />;
+      case "GENOME":
+        return <CardGenomeDetails item={item as GenomeItem} link={link(item)} />;
+      case "LOCUS":
+        return <CardLociDetails item={item as LocusItem} link={link(item)} />;
+      case "SPECIMEN":
+        return <CardSpecimenDetails item={item as SpecimenItem} link={link(item)} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <Paper
@@ -689,7 +774,7 @@ export function CardResult({ item }: { item?: Item }) {
           </Paper>
         </Group>
         <Box px="md" pb="md" h="100%">
-          <Component item={item} link={link(item)} />
+          {renderCardComponent()}
         </Box>
       </Flex>
     </Paper>
@@ -697,7 +782,7 @@ export function CardResult({ item }: { item?: Item }) {
 }
 
 interface ResultsProps {
-  items?: Item[];
+  items?: FullTextSearchItem[];
   perPage: number;
   layout: TableCardLayout;
 }
