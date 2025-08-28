@@ -1,9 +1,7 @@
 "use client";
 
 import { MAX_WIDTH } from "@/app/constants";
-import { Photo } from "@/app/type";
 import DataTypeHeader from "@/components/data-type-header";
-import { Filter } from "@/components/filtering/common";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { Taxa, Taxon } from "@/generated/types";
@@ -14,11 +12,6 @@ import { IconFilter } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 const PAGE_SIZE = 10;
-
-interface Filters {
-  classifications: Filter[];
-  dataTypes: Filter[];
-}
 
 const GET_SPECIES = gql`
   query TaxaSpecies($page: Int, $perPage: Int, $filters: [FilterItem]) {
@@ -53,21 +46,6 @@ const GET_SPECIES = gql`
     }
   }
 `;
-
-interface DataSummary {
-  genomes: number;
-  loci: number;
-  specimens: number;
-  other: number;
-}
-
-interface Species {
-  taxonomy: {
-    canonicalName: string;
-  };
-  photo: Photo;
-  dataSummary: DataSummary;
-}
 
 function Species() {
   const [page, setPage] = useState(1);
