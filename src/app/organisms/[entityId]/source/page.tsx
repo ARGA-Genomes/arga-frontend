@@ -2,17 +2,17 @@
 
 import classes from "./page.module.css";
 
-import { AccessionEvent, CollectionEvent, Organism } from "@/queries/specimen";
-import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Text, Title, Skeleton, Center, Group } from "@mantine/core";
-import { AttributePillContainer } from "@/components/data-fields";
-import { use, useState } from "react";
-import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { IconLiveState, IconSpecimenCollection, IconSpecimenRegistration, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
-import { LiveStateSlide } from "@/components/slides/LiveState";
+import { AttributePillContainer } from "@/components/data-fields";
 import { CollectingSlide } from "@/components/slides/Collecting";
+import { LiveStateSlide } from "@/components/slides/LiveState";
 import { RegistrationsSlide } from "@/components/slides/Registrations";
+import { TimelineNavbar } from "@/components/TimelineNavbar";
+import { AccessionEvent, CollectionEvent, Organism } from "@/queries/specimen";
+import { gql, useQuery } from "@apollo/client";
+import { Center, Grid, Group, Paper, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { use, useState } from "react";
 
 const GET_ORGANISM = gql`
   query SpeciesSpecimens($entityId: String) {
@@ -168,7 +168,7 @@ function Provenance({ entityId }: { entityId: string }) {
         </CardSlider.Card>
         <CardSlider.Card title="Collecting events">
           {error && <Text>{error.message}</Text>}
-          {data && <CollectingSlide collections={data.organism.collections} />}
+          {data && <CollectingSlide accessions={[]} collections={data.organism.collections} />}
         </CardSlider.Card>
         <CardSlider.Card title="Registrations">
           <RegistrationsSlide />

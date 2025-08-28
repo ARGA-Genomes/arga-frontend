@@ -16,24 +16,16 @@ import classes from "./page.module.css";
 
 // Browse data
 import { Search } from "@/components/search";
+import { Overview } from "@/generated/types";
 import { grouping, taxon, type } from "./_data";
 
-interface Counts {
+interface Counts extends Overview {
   animals: number;
   plants: number;
   fungi: number;
   protista: number;
   chromista: number;
   allSpecies: number;
-  wholeGenomes: number;
-  loci: number;
-  specimens: number;
-  sources: [
-    {
-      name: string;
-      total: number;
-    }
-  ];
 }
 
 const GET_COUNTS = gql`

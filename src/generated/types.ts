@@ -13,11 +13,11 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: string; output: string; }
-  JSON: { input: any; output: any; }
-  NaiveDate: { input: any; output: any; }
-  NaiveDateTime: { input: any; output: any; }
-  NaiveTime: { input: any; output: any; }
-  UUID: { input: any; output: any; }
+  JSON: { input: Record<string, unknown>; output: Record<string, unknown>; }
+  NaiveDate: { input: string; output: string; }
+  NaiveDateTime: { input: string; output: string; }
+  NaiveTime: { input: string; output: string; }
+  UUID: { input: string; output: string; }
 };
 
 export type AccessRightsStatus =

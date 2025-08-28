@@ -16,7 +16,11 @@ const config: CodegenConfig = {
         scalars: {
           DateTime: "string",
           Date: "string",
-          JSON: "any",
+          JSON: "Record<string, unknown>",
+          NaiveDate: "string",
+          NaiveDateTime: "string",
+          NaiveTime: "string",
+          UUID: "string",
         },
         // Add helpful comments
         addDocBlocks: true,
