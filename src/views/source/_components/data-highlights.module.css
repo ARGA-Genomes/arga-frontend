@@ -1,0 +1,8 @@
+.stat {
+  transition: all ease 200ms;
+
+  &:hover {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}

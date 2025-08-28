@@ -221,7 +221,7 @@ const TableSpecimenDetails = ({ item, link }: TaxonResultProps) => {
   const theme = useMantineTheme();
 
   return (
-    <Flex gap="xl" align="flex-start" py="xs">
+    <Flex className={classes.hover} component={Link} href={link} gap="xl" align="flex-start" py="xs">
       <Supertext w={250} label="Identification">
         <Text c="midnight.9" fw="bold" fs="italic">
           {item.canonicalName}

@@ -1,11 +1,17 @@
 // Import and initialize brotli-wasm
 import { ApolloQueryResult } from "@apollo/client";
-import brotliPromise from "brotli-wasm";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import get from "lodash-es/get";
 
 export const generateCSV = async (base64: string) => {
+  // Check if we're in the browser
+  if (typeof window === "undefined") {
+    throw new Error("generateCSV can only be executed on the client side");
+  }
+
+  // Dynamic import to ensure client-side only execution
+  const brotliPromise = (await import("brotli-wasm")).default;
   const brotli = await brotliPromise;
 
   // Convert the Base64 string into a binary array

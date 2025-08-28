@@ -19,7 +19,7 @@ const array: GroupItem[] = [...commercial, ...ecosystems, ...iek, ...other, ...p
 const map = array.reduce(
   (prev, group) => ({
     ...prev,
-    [group.category.toLowerCase().replaceAll(" ", "-").replaceAll("'", "")]: group,
+    [group.category.replaceAll("'", "")]: group,
   }),
   {}
 );
@@ -46,4 +46,4 @@ const groupExclude = ({ filter }: GroupItem) =>
       ]
     : [];
 
-export { array, map, groupInclude, groupExclude };
+export { array, groupExclude, groupInclude, map };
