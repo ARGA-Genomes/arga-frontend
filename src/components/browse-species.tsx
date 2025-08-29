@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
 import {
   ActionIcon,
   Center,
@@ -15,7 +15,6 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
 import {
   IconArrowsSort,
   IconArrowUpRight,
@@ -23,29 +22,24 @@ import {
   IconSortAscending,
   IconSortDescending,
 } from "@tabler/icons-react";
+import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 // Local components
-import { PaginationBar, PaginationSize } from "./pagination";
+import { get, range } from "lodash-es";
 import { FiltersDrawer } from "./filtering-redux/drawer";
 import { FilterItem } from "./filtering-redux/filters/common";
-import { DataItem, DataSummary, SpeciesCard } from "./species-card";
-import { Photo } from "@/app/type";
-import { get, range } from "lodash-es";
+import { PaginationBar, PaginationSize } from "./pagination";
+import { DataItem, SpeciesCard } from "./species-card";
 import { TableCardLayout, TableCardSwitch } from "./table-card-switch";
 
-import classes from "./browse-species.module.css";
-import { ExternalLinkButton } from "./button-link-external";
-import { VernacularGroupChip } from "./icon-bar";
-import { DownloadButton } from "./download-btn";
+import { SpeciesCardPage, SpeciesCard as SpeciesCardType } from "@/generated/types";
 import { generateCSV } from "@/helpers/downloadCSV";
 import { saveAs } from "file-saver";
 import Link from "next/link";
-
-interface SpeciesRecord {
-  taxonomy: { canonicalName: string; status: string; source: string; sourceUrl: string; vernacularGroup: string };
-  photo: Photo;
-  dataSummary: DataSummary;
-}
+import classes from "./browse-species.module.css";
+import { ExternalLinkButton } from "./button-link-external";
+import { DownloadButton } from "./download-btn";
+import { VernacularGroupChip } from "./icon-bar";
 
 interface BrowseSpeciesProps {
   query: {
@@ -88,7 +82,7 @@ const TABLE_HEADERS: TableHeader[] = [
 ];
 
 export function BrowseSpecies({ query }: BrowseSpeciesProps) {
-  const [data, setData] = useState();
+  const [data, setData] = useState<SpeciesCardPage>();
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<Sort>(Sort.ScientificName);
   const [sortDir, setSortDir] = useState<boolean>(true);
@@ -148,7 +142,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
     }
   }, [layout]);
 
-  const records: SpeciesRecord[] = get(data, "browse.species.records") || [];
+  const records: SpeciesCardType[] = get(data, "browse.species.records") || [];
   const dataSummarySize = 140;
 
   // Handle table header highlighting

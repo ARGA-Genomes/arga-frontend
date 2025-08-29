@@ -1,51 +1,51 @@
 "use client";
 
-import { Filter, intoFilterItem } from "@/components/filtering/common";
-import { SpeciesCard } from "@/components/species-card";
-import { gql, useQuery } from "@apollo/client";
-import {
-  Paper,
-  SimpleGrid,
-  Text,
-  Title,
-  Group,
-  Stack,
-  Container,
-  Drawer,
-  Box,
-  Grid,
-  Button,
-  Accordion,
-  Badge,
-  Avatar,
-  useMantineTheme,
-  ScrollArea,
-  Chip,
-  Center,
-  Anchor,
-  Image,
-} from "@mantine/core";
-import { useEffect, useState, useMemo, use } from "react";
-import { PaginationBar } from "@/components/pagination";
 import { MAX_WIDTH } from "@/app/constants";
-import { LoadOverlay } from "@/components/load-overlay";
-import { usePreviousPage } from "@/components/navigation-history";
-import { useDisclosure } from "@mantine/hooks";
-import { IconFilter, IconClockHour4, IconExternalLink, IconArrowsSort } from "@tabler/icons-react";
+import { AttributePill } from "@/components/data-fields";
+import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { HasDataFilters } from "@/components/filtering/has-data";
 import { HigherClassificationFilters } from "@/components/filtering/higher-classification";
-import { Photo } from "@/app/type";
-import { AttributePill } from "@/components/data-fields";
+import { LoadOverlay } from "@/components/load-overlay";
+import { usePreviousPage } from "@/components/navigation-history";
+import { DataPageCitation } from "@/components/page-citation";
+import { PaginationBar } from "@/components/pagination";
+import { SortChip } from "@/components/sorting/sort-chips";
+import { SpeciesCard } from "@/components/species-card";
+import { getLicense } from "@/helpers/getLicense";
+import { gql, useQuery } from "@apollo/client";
+import {
+  Accordion,
+  Anchor,
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Center,
+  Chip,
+  Container,
+  Drawer,
+  Grid,
+  Group,
+  Image,
+  Paper,
+  ScrollArea,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+  useMantineTheme,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { IconArrowsSort, IconClockHour4, IconExternalLink, IconFilter } from "@tabler/icons-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import { DataPageCitation } from "@/components/page-citation";
-import { SortChip } from "@/components/sorting/sort-chips";
+import { use, useEffect, useMemo, useState } from "react";
 import classes from "../../../../components/record-list.module.css";
-import { getLicense } from "@/helpers/getLicense";
 
 // Icons data
-import { array as groupingExtra } from "../../../browse/groups/_data/all";
+import { DatasetDetails, Source } from "@/generated/types";
 import { grouping as groupingData } from "../../../(home)/_data";
+import { array as groupingExtra } from "../../../browse/groups/_data/all";
 
 const PAGE_SIZE = 10;
 interface Filters {
@@ -87,21 +87,6 @@ const GET_DETAILS = gql`
   }
 `;
 
-interface Dataset {
-  name: string;
-  shortName?: string;
-  description?: string;
-  url?: string;
-  citation?: string;
-  license?: string;
-  rightsHolder?: string;
-  createdAt: string;
-  updatedAt: string;
-  reusePill?: ReusePillType;
-  accessPill?: AccessPillType;
-  publicationYear?: number;
-}
-
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
 const accessPillColours: Record<AccessPillType, string> = {
@@ -119,27 +104,6 @@ const reusePillColours: Record<ReusePillType, string> = {
   NONE: "#d6e4ed",
   VARIABLE: "wheat.3",
 };
-
-interface SpeciesCount {
-  total: number;
-}
-
-interface Source {
-  license: string;
-  accessRights: string;
-  rightsHolder: string;
-  author: string;
-  name: string;
-  listsId: string | null;
-  reusePill?: ReusePillType;
-  accessPill?: AccessPillType;
-  species: SpeciesCount;
-  datasets: Dataset[];
-}
-
-interface DetailsQueryResults {
-  source: Source;
-}
 
 const GET_SPECIES = gql`
   query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
@@ -167,28 +131,6 @@ const GET_SPECIES = gql`
     }
   }
 `;
-
-interface DataSummary {
-  genomes: number;
-  loci: number;
-  specimens: number;
-  other: number;
-}
-
-interface SpeciesRecord {
-  taxonomy: { canonicalName: string };
-  photo: Photo;
-  dataSummary: DataSummary;
-}
-
-interface SpeciesQueryResults {
-  source: {
-    species: {
-      records: SpeciesRecord[];
-      total: number;
-    };
-  };
-}
 
 interface FiltersProps {
   filters: Filters;
@@ -280,7 +222,7 @@ function Species({ source }: { source: string }) {
     return items.filter((item): item is Filter => !!item);
   };
 
-  const { loading, error, data } = useQuery<SpeciesQueryResults>(GET_SPECIES, {
+  const { loading, error, data } = useQuery<{ source: Source }>(GET_SPECIES, {
     variables: {
       page,
       pageSize: PAGE_SIZE,
@@ -375,7 +317,7 @@ function DatasetSort({ sortBy, setSortBy }: { sortBy: string | null; setSortBy: 
   );
 }
 
-function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
+function BrowseComponentDatasets({ datasets }: { datasets: DatasetDetails[] }) {
   const [sortBy, setSortBy] = useState<string | null>(null);
 
   const filteredDatasets = datasets.filter((dataset) => dataset.name.trim() !== "");
@@ -420,7 +362,7 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
   );
 }
 
-function DatasetRow({ dataset }: { dataset: Dataset }) {
+function DatasetRow({ dataset }: { dataset: DatasetDetails }) {
   const theme = useMantineTheme();
 
   return (
@@ -623,10 +565,10 @@ export default function BrowseSource(props: { params: Promise<{ name: string }> 
         const link = item.link.substring(item.link.lastIndexOf("/") + 1);
         return names.includes(link);
       })?.image,
-    [params.name],
+    [params.name]
   );
 
-  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
+  const { loading, error, data } = useQuery<{ source: Source }>(GET_DETAILS, {
     variables: { name: source },
   });
 

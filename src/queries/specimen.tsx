@@ -1,5 +1,5 @@
-import { DateTime } from "luxon";
 import { gql } from "@apollo/client";
+import { DateTime } from "luxon";
 import { Sorting } from "./common";
 
 export const ORGANISM = gql`
@@ -147,9 +147,9 @@ export const SPECIMEN_MAP_MARKER = gql`
 
 export interface SpecimenMapMarker {
   entityId: string;
-  collectionRepositoryId?: string;
-  institutionCode?: string;
-  typeStatus?: string;
+  collectionRepositoryId?: string | null;
+  institutionCode?: string | null;
+  typeStatus?: string | null;
   latitude: number;
   longitude: number;
 }

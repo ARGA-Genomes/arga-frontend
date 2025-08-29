@@ -6,7 +6,7 @@ export const RAW_COLOURS_RGB: Record<string, [number, number, number]> = {
   wheat: [254, 199, 67],
 };
 
-export function getVoucherStatus(typeStatus?: string, collectionRepositoryId?: string) {
+export function getVoucherStatus(typeStatus?: string | null, collectionRepositoryId?: string | null) {
   const status = typeStatus?.toLowerCase();
 
   if (status === "holotype") return "holotype";
@@ -15,7 +15,7 @@ export function getVoucherStatus(typeStatus?: string, collectionRepositoryId?: s
   else return "unregistered voucher";
 }
 
-export function getVoucherColour(typeStatus?: string, collectionRepositoryId?: string) {
+export function getVoucherColour(typeStatus?: string | null, collectionRepositoryId?: string | null) {
   const status = getVoucherStatus(typeStatus, collectionRepositoryId);
 
   if (status === "holotype") return "bushfire";
@@ -24,7 +24,10 @@ export function getVoucherColour(typeStatus?: string, collectionRepositoryId?: s
   else return "shellfish";
 }
 
-export function getVoucherRGB(typeStatus?: string, collectionRepositoryId?: string): [number, number, number] {
+export function getVoucherRGB(
+  typeStatus?: string | null,
+  collectionRepositoryId?: string | null
+): [number, number, number] {
   const status = getVoucherStatus(typeStatus, collectionRepositoryId);
 
   if (status === "holotype") return RAW_COLOURS_RGB.bushfire;
@@ -35,8 +38,8 @@ export function getVoucherRGB(typeStatus?: string, collectionRepositoryId?: stri
 
 export function getVoucherRGBA(
   alpha: number,
-  typeStatus?: string,
-  collectionRepositoryId?: string,
+  typeStatus?: string | null,
+  collectionRepositoryId?: string | null
 ): [number, number, number, number] {
   return [...getVoucherRGB(typeStatus, collectionRepositoryId), alpha];
 }

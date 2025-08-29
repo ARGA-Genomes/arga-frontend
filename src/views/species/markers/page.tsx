@@ -1,17 +1,18 @@
 "use client";
 
+import { AnalysisMap } from "@/components/mapping";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { AnalysisMap } from "@/components/mapping";
 
-import React, { useState, use } from "react";
-import { LoadOverlay } from "@/components/load-overlay";
 import { Attribute } from "@/components/highlight-stack";
-import { RecordItem, RecordList } from "@/components/record-list";
-import { PaginationBar } from "@/components/pagination";
-import { usePathname } from "next/navigation";
+import { LoadOverlay } from "@/components/load-overlay";
 import { Marker } from "@/components/mapping/analysis-map";
+import { PaginationBar } from "@/components/pagination";
+import { RecordItem, RecordList } from "@/components/record-list";
+import { Species, SpeciesMarker } from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
+import { usePathname } from "next/navigation";
+import { use, useState } from "react";
 
 const PAGE_SIZE = 5;
 
@@ -37,29 +38,7 @@ const GET_SPECIES = gql`
   }
 `;
 
-interface Loci {
-  sequenceId: string;
-  datasetName: string;
-  recordId: string;
-  accession?: string;
-  materialSampleId?: string;
-  sequencedBy?: string;
-  targetGene: string;
-  releaseDate?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-interface QueryResults {
-  species: {
-    markers: {
-      total: number;
-      records: Loci[];
-    };
-  };
-}
-
-function toMarker(color: [number, number, number, number], records?: Loci[]) {
+function toMarker(color: [number, number, number, number], records?: SpeciesMarker[]) {
   if (!records) return [];
   return records.map((r) => {
     return {
@@ -71,7 +50,7 @@ function toMarker(color: [number, number, number, number], records?: Loci[]) {
   });
 }
 
-function MarkerMap({ records }: { records: Loci[] | undefined }) {
+function MarkerMap({ records }: { records?: SpeciesMarker[] }) {
   const markers = toMarker([123, 161, 63, 220], records).filter((s) => s.latitude) as Marker<null>[];
 
   return (
@@ -84,7 +63,7 @@ function MarkerMap({ records }: { records: Loci[] | undefined }) {
   );
 }
 
-function LabeledValue({ label, value }: { label: string; value: string | undefined }) {
+function LabeledValue({ label, value }: { label: string; value?: string | null }) {
   return (
     <Group gap={20}>
       <Text fw={300} size="sm">
@@ -95,7 +74,7 @@ function LabeledValue({ label, value }: { label: string; value: string | undefin
   );
 }
 
-function RecordItemContent({ record }: { record: Loci }) {
+function RecordItemContent({ record }: { record: SpeciesMarker }) {
   return (
     <Grid p={20}>
       <Grid.Col span={6}>
@@ -122,7 +101,7 @@ function RecordItemContent({ record }: { record: Loci }) {
   );
 }
 
-function LociList({ records }: { records: Loci[] }) {
+function LociList({ records }: { records: SpeciesMarker[] }) {
   const path = usePathname();
 
   return (
@@ -141,7 +120,7 @@ export default function Markers(props: { params: Promise<{ name: string }> }) {
   const canonicalName = getCanonicalName(params);
   const [page, setPage] = useState(1);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIES, {
     variables: {
       canonicalName,
       page,

@@ -142,12 +142,7 @@ function DatasetRow({ dataset, sourceLength, count }: DatasetRowProps) {
           </Stack>
         </Grid.Col>
         <Grid.Col span={2} p="lg">
-          <AttributePill
-            label="Rights holder"
-            value={dataset.rightsHolder || "Unknown"}
-            popoverDisabled
-            textColor="black"
-          />
+          <AttributePill label="Rights holder" value={dataset.rightsHolder} popoverDisabled textColor="black" />
         </Grid.Col>
         <Grid.Col span={2} p="lg">
           <AttributePill

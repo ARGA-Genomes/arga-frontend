@@ -2,73 +2,69 @@
 
 import classes from "./page.module.css";
 
-import { DateTime } from "luxon";
-import { gql, useQuery } from "@apollo/client";
-import { AnalysisMap } from "@/components/mapping";
-import { RecordTable } from "@/components/RecordTable";
+import { useSpecies } from "@/app/species-provider";
+import { AreaGraphInput } from "@/components/AreaGraphInput";
 import { AttributePillContainer, AttributePillValue } from "@/components/data-fields";
-import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
+import { FilterGroup } from "@/components/filtering-redux/group";
 import SimpleBarGraph from "@/components/graphing/SimpleBarGraph";
+import SimpleVerticalBarGraph from "@/components/graphing/SimpleVerticalBarGraph";
+import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
+import { AnalysisMap } from "@/components/mapping";
+import { Marker } from "@/components/mapping/analysis-map";
+import { PaginationBar } from "@/components/pagination";
+import { RecordTable } from "@/components/RecordTable";
+import { Species, Specimen, SpecimenSummary } from "@/generated/types";
+import { getVoucherColour, getVoucherRGBA, getVoucherStatus } from "@/helpers/colors";
+import { getEnumKeyByValue, SortOrder } from "@/queries/common";
 import {
-  AccessionEvent,
-  CollectionEvent,
   getFilterLabel,
   getFilterValues,
   HasData,
   SpecimenFilterItem,
   SpecimenMapMarker,
   SpecimenOptions,
-  SpecimenOverview,
   SpecimenSortable,
   SpecimenSorting,
-  SpecimenStats,
-  SpecimenSummary,
   StringValue,
   YearValue,
 } from "@/queries/specimen";
+import { gql, useQuery } from "@apollo/client";
 import {
-  Grid,
-  Paper,
-  ScrollArea,
-  Stack,
-  Text,
-  Title,
-  Skeleton,
   Box,
-  Table,
-  Group,
-  Image,
-  Tooltip,
   Button,
   Center,
-  useMantineTheme,
   Checkbox,
-  Transition,
-  TagsInput,
+  Grid,
+  Group,
+  Image,
+  Paper,
+  ScrollArea,
   Select,
+  Skeleton,
+  Stack,
+  Table,
+  TagsInput,
+  Text,
+  Title,
+  Tooltip,
+  Transition,
+  useMantineTheme,
 } from "@mantine/core";
+import { useSet, useStateHistory } from "@mantine/hooks";
+import {
+  IconAdjustments,
+  IconCircleCheck,
+  IconCircleX,
+  IconDownload,
+  IconMicroscope,
+  IconX,
+} from "@tabler/icons-react";
 import { ParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
-import { useSpecies } from "@/app/species-provider";
-import { getVoucherStatus, getVoucherColour, getVoucherRGBA } from "@/helpers/colors";
-import {
-  IconCircleCheck,
-  IconCircleX,
-  IconAdjustments,
-  IconMicroscope,
-  IconX,
-  IconDownload,
-} from "@tabler/icons-react";
 import { motion } from "framer-motion";
-import { Marker } from "@/components/mapping/analysis-map";
-import { useSet, useStateHistory } from "@mantine/hooks";
-import { FilterGroup } from "@/components/filtering-redux/group";
+import { DateTime } from "luxon";
 import { PropsWithChildren, useState } from "react";
-import { PaginationBar } from "@/components/pagination";
-import { getEnumKeyByValue, SortOrder } from "@/queries/common";
-import SimpleVerticalBarGraph from "@/components/graphing/SimpleVerticalBarGraph";
-import { AreaGraphInput } from "@/components/AreaGraphInput";
 
 const GET_SPECIMENS_OVERVIEW = gql`
   query SpeciesSpecimens($canonicalName: String) {
@@ -82,14 +78,6 @@ const GET_SPECIMENS_OVERVIEW = gql`
   }
 `;
 
-interface OverviewQuery {
-  species: {
-    overview: {
-      specimens: SpecimenOverview;
-    };
-  };
-}
-
 const GET_SPECIMEN_MAP_MARKERS = gql`
   query SpeciesSpecimenMapMarkers($canonicalName: String) {
     species(canonicalName: $canonicalName) {
@@ -101,14 +89,6 @@ const GET_SPECIMEN_MAP_MARKERS = gql`
     }
   }
 `;
-
-interface MappingQuery {
-  species: {
-    mapping: {
-      specimens: SpecimenMapMarker[];
-    };
-  };
-}
 
 const GET_SPECIMEN_CARD = gql`
   query SpecimenCard($entityId: String) {
@@ -125,14 +105,6 @@ const GET_SPECIMEN_CARD = gql`
     }
   }
 `;
-
-interface SpecimenCardQuery {
-  specimen: {
-    collections: CollectionEvent[];
-    accessions: AccessionEvent[];
-    stats: SpecimenStats;
-  };
-}
 
 const GET_SPECIMENS = gql`
   query SpeciesSpecimens(
@@ -156,16 +128,6 @@ const GET_SPECIMENS = gql`
     }
   }
 `;
-
-interface SpecimensQuery {
-  species: {
-    specimens: {
-      total: number;
-      records: SpecimenSummary[];
-      options: SpecimenOptions;
-    };
-  };
-}
 
 export default function Page() {
   const { details } = { ...useSpecies() };
@@ -206,7 +168,7 @@ function OverviewBlock({ title, children, loading, hasData }: OverviewBlockProps
 }
 
 function Overview({ name }: { name: string }) {
-  const { loading, error, data } = useQuery<OverviewQuery>(GET_SPECIMENS_OVERVIEW, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIMENS_OVERVIEW, {
     variables: { canonicalName: name },
   });
 
@@ -331,14 +293,14 @@ function Overview({ name }: { name: string }) {
 }
 
 function Explorer({ name }: { name: string }) {
-  const [selectedSpecimen, handlers, history] = useStateHistory<SpecimenMapMarker | null>(null);
+  const [selectedSpecimen, handlers] = useStateHistory<SpecimenMapMarker | null>(null);
 
-  const { loading, error, data } = useQuery<MappingQuery>(GET_SPECIMEN_MAP_MARKERS, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIMEN_MAP_MARKERS, {
     variables: { canonicalName: name },
   });
 
   // sort the map markers so that holotypes and other more uncommon types are rendered last
-  function getRenderLayer(typeStatus?: string, collectionRepositoryId?: string) {
+  function getRenderLayer(typeStatus?: string | null, collectionRepositoryId?: string | null) {
     const status = getVoucherStatus(typeStatus, collectionRepositoryId);
 
     if (status === "holotype") return 0;
@@ -390,12 +352,12 @@ function Explorer({ name }: { name: string }) {
 function HolotypeCard() {
   const { details } = { ...useSpecies() };
 
-  const overviewResult = useQuery<OverviewQuery>(GET_SPECIMENS_OVERVIEW, {
+  const overviewResult = useQuery<{ species: Species }>(GET_SPECIMENS_OVERVIEW, {
     skip: !details,
     variables: { canonicalName: details?.name },
   });
 
-  const { loading, error, data } = useQuery<SpecimenCardQuery>(GET_SPECIMEN_CARD, {
+  const { loading, error, data } = useQuery<{ specimen: Specimen }>(GET_SPECIMEN_CARD, {
     skip: !overviewResult.data,
     variables: { entityId: overviewResult.data?.species.overview.specimens.holotypeEntityId },
   });
@@ -467,7 +429,7 @@ function HolotypeCard() {
 }
 
 function SpecimenCard({ entityId }: { entityId?: string }) {
-  const { loading, error, data } = useQuery<SpecimenCardQuery>(GET_SPECIMEN_CARD, {
+  const { loading, error, data } = useQuery<{ specimen: Specimen }>(GET_SPECIMEN_CARD, {
     skip: !entityId,
     variables: { entityId },
   });
@@ -575,7 +537,7 @@ function AllSpecimens() {
   const [pageSize, setPageSize] = useState<number>(100);
   const [page, setPage] = useState(1);
 
-  const { loading, error, data } = useQuery<SpecimensQuery>(GET_SPECIMENS, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIMENS, {
     skip: !details,
     variables: { canonicalName: details?.name, page, pageSize, filters, sorting },
   });
@@ -789,7 +751,7 @@ function Filter({ filters, options, onApply }: FilterProps) {
           DateTime.fromFormat(collectedBetween.after, "yyyy-mm-dd").year,
           DateTime.fromFormat(collectedBetween.before, "yyyy-mm-dd").year,
         ]
-      : undefined,
+      : undefined
   );
 
   function setData(values: string[]) {
@@ -931,7 +893,7 @@ function YearRangeInput({ label, description, value, onChange }: YearRangeInputP
   // for the collection years to restrict the range for the collection date range filter.
   // this uses the existing overview query which should already be cached on this page
   const { details } = { ...useSpecies() };
-  const { data } = useQuery<OverviewQuery>(GET_SPECIMENS_OVERVIEW, {
+  const { data } = useQuery<{ species: Species }>(GET_SPECIMENS_OVERVIEW, {
     skip: !details,
     variables: { canonicalName: details?.name },
   });
