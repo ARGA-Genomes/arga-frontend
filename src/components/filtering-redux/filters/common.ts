@@ -5,6 +5,7 @@
 export enum FilterType {
   VernacularGroup = "VERNACULAR_GROUP",
   HasData = "HAS_DATA",
+  Dataset = "DATASET",
   Attribute = "ATTRIBUTE",
   Domain = "DOMAIN",
   Superkingdom = "SUPERKINGDOM",

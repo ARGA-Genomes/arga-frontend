@@ -29,6 +29,7 @@ import {
   bushfireRecoveryFiltersToQuery,
   DEFAULT_BUSHFIRE_RECOVERY_FILTERS,
 } from "./groups/bushfire-recovery";
+import { DatasetFilters, datasetFiltersToQuery } from "./groups/dataset";
 import { IndustryCommerceFilter, industryCommerceFiltersToQuery } from "./groups/industry-commerce";
 import {
   DEFAULT_THREATENED_FILTERS,
@@ -40,6 +41,7 @@ import { VernacularGroupFilter, vernacularGroupFilterToQuery } from "./groups/ve
 
 type FilterType =
   | "dataType"
+  | "dataset"
   | "searchDataType"
   | "classification"
   | "bushfireRecovery"
@@ -49,38 +51,22 @@ type FilterType =
 
 interface FiltersDrawerProps {
   types: FilterType[];
-  defaultFilters?: {
-    dataType?: BoolFilterData[];
-    bushfireRecovery?: BoolFilterData[];
-  };
+  values?: { [key: string]: unknown };
   onFilter?: (items: FilterItem[]) => void;
   onFilterChips?: (chips: ReactElement[]) => void;
   onSearchFilter?: (items: InputQueryAttribute[]) => void;
 }
 
-export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips, onSearchFilter }: FiltersDrawerProps) {
+export function FiltersDrawer({ types, values, onFilter, onFilterChips, onSearchFilter }: FiltersDrawerProps) {
   const [opened, handlers] = useDisclosure(false);
 
   // Filter states
-  const [dataTypeFilters, setDataTypeFilters] = useState<BoolFilterData[]>(
-    DEFAULT_DATA_TYPE_FILTERS.map((defaultFilter) => {
-      const override = (defaultFilters?.dataType || []).find((filter) => filter.value === defaultFilter.value);
-      return override || defaultFilter;
-    })
-  );
-
-  const [threatenedFilters, setThreatenedFilters] = useState<BoolFilterData[]>(
-    DEFAULT_THREATENED_FILTERS.map((defaultFilter) => {
-      const override = (defaultFilters?.bushfireRecovery || []).find((filter) => filter.value === defaultFilter.value);
-      return override || defaultFilter;
-    })
-  );
+  const [dataTypeFilters, setDataTypeFilters] = useState<BoolFilterData[]>(DEFAULT_DATA_TYPE_FILTERS);
+  const [datasetFilters, setDatasetFilters] = useState<BoolFilterData[]>([]);
+  const [threatenedFilters, setThreatenedFilters] = useState<BoolFilterData[]>(DEFAULT_THREATENED_FILTERS);
 
   const [bushfireRecoveryFilters, setBushfireRecoveryFilters] = useState<BoolFilterData[]>(
-    DEFAULT_BUSHFIRE_RECOVERY_FILTERS.map((defaultFilter) => {
-      const override = (defaultFilters?.bushfireRecovery || []).find((filter) => filter.value === defaultFilter.value);
-      return override || defaultFilter;
-    })
+    DEFAULT_BUSHFIRE_RECOVERY_FILTERS
   );
 
   const [classificationFilters, setClassificationFilters] = useState<ClassificationFilter[]>([]);
@@ -89,11 +75,20 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips, 
 
   // Search filter states
   const [searchDataTypeFilters, setSearchDataTypeFilters] = useState<BoolFilterData[]>(
-    DEFAULT_SEARCH_DATA_TYPE_FILTERS.map((defaultFilter) => {
-      const override = (defaultFilters?.dataType || []).find((filter) => filter.value === defaultFilter.value);
-      return override || defaultFilter;
-    })
+    DEFAULT_SEARCH_DATA_TYPE_FILTERS
   );
+
+  useEffect(() => {
+    setDatasetFilters(
+      ((values?.datasets || []) as { id: string; name: string }[]).map((dataset) => ({
+        value: dataset.id,
+        label: dataset.name,
+        active: false,
+        disabled: false,
+        include: true,
+      }))
+    );
+  }, [values?.datasets]);
 
   const uniqueTypes = Array.from(new Set(types));
 
@@ -101,6 +96,15 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips, 
     switch (type) {
       case "dataType":
         return <DataTypeFilters key={type} filters={dataTypeFilters} onChange={setDataTypeFilters} />;
+      case "dataset":
+        return (
+          <DatasetFilters
+            key={type}
+            filters={datasetFilters}
+            onChange={setDatasetFilters}
+            loading={!datasetFilters.length}
+          />
+        );
       case "classification":
         return <ClassificationFilters key={type} filters={classificationFilters} onChange={setClassificationFilters} />;
       case "threatened":
@@ -133,6 +137,7 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips, 
     if (onFilter) {
       onFilter([
         ...dataTypeFiltersToQuery(dataTypeFilters),
+        ...datasetFiltersToQuery(datasetFilters),
         ...classificationFiltersToQuery(classificationFilters),
         ...threatenedFiltersToQuery(threatenedFilters),
         ...bushfireRecoveryFiltersToQuery(bushfireRecoveryFilters),
@@ -143,6 +148,15 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips, 
     if (onFilterChips) {
       onFilterChips([
         ...renderBoolFilterChips(dataTypeFilters, ["Has", "Missing"], setDataTypeFilters),
+        ...renderBoolFilterChips(
+          datasetFilters,
+          ["In dataset", "Not in dataset"],
+          setDatasetFilters,
+          ((values?.datasets as { name: string; id: string }[]) || []).reduce(
+            (prev, { name, id }) => ({ ...prev, [id]: name }),
+            {}
+          )
+        ),
         ...renderTaxonFilterChips(classificationFilters, setClassificationFilters),
         ...renderBoolFilterChips(
           threatenedFilters,
@@ -157,6 +171,7 @@ export function FiltersDrawer({ types, defaultFilters, onFilter, onFilterChips, 
     }
   }, [
     dataTypeFilters,
+    datasetFilters,
     classificationFilters,
     threatenedFilters,
     bushfireRecoveryFilters,

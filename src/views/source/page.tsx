@@ -56,6 +56,7 @@ const GET_DETAILS = gql`
       }
 
       datasets {
+        id
         name
         shortName
         description
@@ -600,6 +601,7 @@ export default function SourcePage(props: SourceProps) {
                   download: DOWNLOAD_SPECIES,
                   variables: { name: source, filters },
                 }}
+                values={{ datasets: data?.source.datasets }}
               />
             </Paper>
             <Paper p="xl" radius="lg" withBorder>
