@@ -1,7 +1,7 @@
 import { Button, Drawer, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAdjustments } from "@tabler/icons-react";
-import { ReactElement, useEffect, useState } from "react";
+import { memo, ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { FilterItem } from "./filters/common";
 
 // Filter groups
@@ -57,7 +57,7 @@ interface FiltersDrawerProps {
   onSearchFilter?: (items: InputQueryAttribute[]) => void;
 }
 
-export function FiltersDrawer({ types, values, onFilter, onFilterChips, onSearchFilter }: FiltersDrawerProps) {
+export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onSearchFilter }: FiltersDrawerProps) => {
   const [opened, handlers] = useDisclosure(false);
 
   // Filter states
@@ -78,6 +78,21 @@ export function FiltersDrawer({ types, values, onFilter, onFilterChips, onSearch
     DEFAULT_SEARCH_DATA_TYPE_FILTERS
   );
 
+  // Memoize callback handlers to prevent child re-renders
+  const memoizedSetters = useMemo(
+    () => ({
+      setDataTypeFilters,
+      setDatasetFilters,
+      setThreatenedFilters,
+      setBushfireRecoveryFilters,
+      setClassificationFilters,
+      setVernacularGroupFilter,
+      setIndustryCommerceFilters,
+      setSearchDataTypeFilters,
+    }),
+    []
+  );
+
   useEffect(() => {
     setDatasetFilters(
       ((values?.datasets || []) as { id: string; name: string }[]).map((dataset) => ({
@@ -90,104 +105,176 @@ export function FiltersDrawer({ types, values, onFilter, onFilterChips, onSearch
     );
   }, [values?.datasets]);
 
-  const uniqueTypes = Array.from(new Set(types));
+  // Memoize expensive computations
+  const uniqueTypes = useMemo(() => Array.from(new Set(types)), [types]);
 
-  const renderFilter = (type: FilterType) => {
-    switch (type) {
-      case "dataType":
-        return <DataTypeFilters key={type} filters={dataTypeFilters} onChange={setDataTypeFilters} />;
-      case "dataset":
-        return (
-          <DatasetFilters
-            key={type}
-            filters={datasetFilters}
-            onChange={setDatasetFilters}
-            loading={!datasetFilters.length}
-          />
-        );
-      case "classification":
-        return <ClassificationFilters key={type} filters={classificationFilters} onChange={setClassificationFilters} />;
-      case "threatened":
-        return <ThreatenedFilters key={type} filters={threatenedFilters} onChange={setThreatenedFilters} />;
-      case "bushfireRecovery":
-        return (
-          <BushfireRecoveryFilters key={type} filters={bushfireRecoveryFilters} onChange={setBushfireRecoveryFilters} />
-        );
-      case "vernacularGroup":
-        return <VernacularGroupFilter key={type} filter={vernacularGroupFilter} onChange={setVernacularGroupFilter} />;
-      case "industryCommerce":
-        return (
-          <IndustryCommerceFilter key={type} filters={industryCommerceFilters} onChange={setIndustryCommerceFilters} />
-        );
-      // Search filters
-      case "searchDataType":
-        return (
-          <DataTypeFilters
-            key={type}
-            filters={searchDataTypeFilters}
-            onChange={setSearchDataTypeFilters}
-            boolOptions={["Include", "Exclude"]}
-          />
-        );
-    }
-  };
+  const datasetLabelMap = useMemo(() => {
+    return ((values?.datasets as { name: string; id: string }[]) || []).reduce(
+      (prev, { name, id }) => ({ ...prev, [id]: name }),
+      {}
+    );
+  }, [values?.datasets]);
+
+  const renderFilter = useCallback(
+    (type: FilterType) => {
+      switch (type) {
+        case "dataType":
+          return <DataTypeFilters key={type} filters={dataTypeFilters} onChange={memoizedSetters.setDataTypeFilters} />;
+        case "dataset":
+          return (
+            <DatasetFilters
+              key={type}
+              filters={datasetFilters}
+              onChange={memoizedSetters.setDatasetFilters}
+              loading={!datasetFilters.length}
+            />
+          );
+        case "classification":
+          return (
+            <ClassificationFilters
+              key={type}
+              filters={classificationFilters}
+              onChange={memoizedSetters.setClassificationFilters}
+            />
+          );
+        case "threatened":
+          return (
+            <ThreatenedFilters key={type} filters={threatenedFilters} onChange={memoizedSetters.setThreatenedFilters} />
+          );
+        case "bushfireRecovery":
+          return (
+            <BushfireRecoveryFilters
+              key={type}
+              filters={bushfireRecoveryFilters}
+              onChange={memoizedSetters.setBushfireRecoveryFilters}
+            />
+          );
+        case "vernacularGroup":
+          return (
+            <VernacularGroupFilter
+              key={type}
+              filter={vernacularGroupFilter}
+              onChange={memoizedSetters.setVernacularGroupFilter}
+            />
+          );
+        case "industryCommerce":
+          return (
+            <IndustryCommerceFilter
+              key={type}
+              filters={industryCommerceFilters}
+              onChange={memoizedSetters.setIndustryCommerceFilters}
+            />
+          );
+        // Search filters
+        case "searchDataType":
+          return (
+            <DataTypeFilters
+              key={type}
+              filters={searchDataTypeFilters}
+              onChange={memoizedSetters.setSearchDataTypeFilters}
+              boolOptions={["Include", "Exclude"]}
+            />
+          );
+      }
+    },
+    [
+      dataTypeFilters,
+      datasetFilters,
+      classificationFilters,
+      threatenedFilters,
+      bushfireRecoveryFilters,
+      vernacularGroupFilter,
+      industryCommerceFilters,
+      searchDataTypeFilters,
+      memoizedSetters,
+    ]
+  );
+
+  // Memoize filter items computation
+  const filterItems = useMemo(
+    () => [
+      ...dataTypeFiltersToQuery(dataTypeFilters),
+      ...datasetFiltersToQuery(datasetFilters),
+      ...classificationFiltersToQuery(classificationFilters),
+      ...threatenedFiltersToQuery(threatenedFilters),
+      ...bushfireRecoveryFiltersToQuery(bushfireRecoveryFilters),
+      ...vernacularGroupFilterToQuery(vernacularGroupFilter),
+      ...industryCommerceFiltersToQuery(industryCommerceFilters),
+    ],
+    [
+      dataTypeFilters,
+      datasetFilters,
+      classificationFilters,
+      threatenedFilters,
+      bushfireRecoveryFilters,
+      vernacularGroupFilter,
+      industryCommerceFilters,
+    ]
+  );
+
+  // Memoize filter chips computation
+  const filterChips = useMemo(
+    () => [
+      ...renderBoolFilterChips(dataTypeFilters, ["Has", "Missing"], memoizedSetters.setDataTypeFilters),
+      ...renderBoolFilterChips(
+        datasetFilters,
+        ["In dataset", "Not in dataset"],
+        memoizedSetters.setDatasetFilters,
+        datasetLabelMap
+      ),
+      ...renderTaxonFilterChips(classificationFilters, memoizedSetters.setClassificationFilters),
+      ...renderBoolFilterChips(
+        threatenedFilters,
+        ["Includes", "Excludes"],
+        memoizedSetters.setThreatenedFilters,
+        DEFAULT_THREATENED_LABELS
+      ),
+      ...renderBoolFilterChips(
+        bushfireRecoveryFilters,
+        ["Includes", "Excludes"],
+        memoizedSetters.setBushfireRecoveryFilters
+      ),
+      ...renderVernacularGroupFilterChip(vernacularGroupFilter, memoizedSetters.setVernacularGroupFilter),
+      ...renderRefineFilterChip(industryCommerceFilters, memoizedSetters.setIndustryCommerceFilters),
+    ],
+    [
+      dataTypeFilters,
+      datasetFilters,
+      classificationFilters,
+      threatenedFilters,
+      bushfireRecoveryFilters,
+      vernacularGroupFilter,
+      industryCommerceFilters,
+      datasetLabelMap,
+      memoizedSetters,
+    ]
+  );
+
+  // Memoize search filter items computation
+  const searchFilterItems = useMemo(
+    () => [
+      ...searchDataTypeFiltersToQuery(searchDataTypeFilters),
+      ...searchClassificationFiltersToQuery(classificationFilters),
+    ],
+    [searchDataTypeFilters, classificationFilters]
+  );
 
   // Call onFilter when the filters change
   useEffect(() => {
     if (onFilter) {
-      onFilter([
-        ...dataTypeFiltersToQuery(dataTypeFilters),
-        ...datasetFiltersToQuery(datasetFilters),
-        ...classificationFiltersToQuery(classificationFilters),
-        ...threatenedFiltersToQuery(threatenedFilters),
-        ...bushfireRecoveryFiltersToQuery(bushfireRecoveryFilters),
-        ...vernacularGroupFilterToQuery(vernacularGroupFilter),
-        ...industryCommerceFiltersToQuery(industryCommerceFilters),
-      ]);
+      onFilter(filterItems);
     }
     if (onFilterChips) {
-      onFilterChips([
-        ...renderBoolFilterChips(dataTypeFilters, ["Has", "Missing"], setDataTypeFilters),
-        ...renderBoolFilterChips(
-          datasetFilters,
-          ["In dataset", "Not in dataset"],
-          setDatasetFilters,
-          ((values?.datasets as { name: string; id: string }[]) || []).reduce(
-            (prev, { name, id }) => ({ ...prev, [id]: name }),
-            {}
-          )
-        ),
-        ...renderTaxonFilterChips(classificationFilters, setClassificationFilters),
-        ...renderBoolFilterChips(
-          threatenedFilters,
-          ["Includes", "Excludes"],
-          setThreatenedFilters,
-          DEFAULT_THREATENED_LABELS
-        ),
-        ...renderBoolFilterChips(bushfireRecoveryFilters, ["Includes", "Excludes"], setBushfireRecoveryFilters),
-        ...renderVernacularGroupFilterChip(vernacularGroupFilter, setVernacularGroupFilter),
-        ...renderRefineFilterChip(industryCommerceFilters, setIndustryCommerceFilters),
-      ]);
+      onFilterChips(filterChips);
     }
-  }, [
-    dataTypeFilters,
-    datasetFilters,
-    classificationFilters,
-    threatenedFilters,
-    bushfireRecoveryFilters,
-    vernacularGroupFilter,
-    industryCommerceFilters,
-  ]);
+  }, [onFilter, onFilterChips, filterItems, filterChips]);
 
   // Call onSearchFilters when the search filters change
   useEffect(() => {
     if (onSearchFilter) {
-      onSearchFilter([
-        ...searchDataTypeFiltersToQuery(searchDataTypeFilters),
-        ...searchClassificationFiltersToQuery(classificationFilters),
-      ]);
+      onSearchFilter(searchFilterItems);
     }
-  }, [searchDataTypeFilters, classificationFilters]);
+  }, [onSearchFilter, searchFilterItems]);
 
   return (
     <>
@@ -205,4 +292,4 @@ export function FiltersDrawer({ types, values, onFilter, onFilterChips, onSearch
       </Button>
     </>
   );
-}
+});
