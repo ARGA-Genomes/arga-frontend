@@ -2,14 +2,14 @@
 
 import classes from "./significant-milestones.module.css";
 
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Paper, ScrollArea, Stack } from "@mantine/core";
-import { motion } from "framer-motion";
-import { useState } from "react";
-import { Group, Text, Image } from "@mantine/core";
 import { GroupedTimeline } from "@/components/grouped-timeline";
+import { Source } from "@/generated/types";
+import { gql, useQuery } from "@apollo/client";
+import { Box, Button, Center, Group, Image, Paper, ScrollArea, Stack, Text } from "@mantine/core";
 import { IconBook } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState } from "react";
 
 const TAXON_GROUP_COLOR: Record<string, string> = {
   mammals: "moss",
@@ -285,19 +285,22 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
 }
 
 export function SignificantMilestones() {
-  const { data } = useQuery<SignificantMilestonesQuery>(GET_SIGNIFICANT_MILESTONES);
+  const { data } = useQuery<{ source: Source }>(GET_SIGNIFICANT_MILESTONES);
 
   const milestones = data?.source.species.records
-    .map((record) => ({
-      canonicalName: record.taxonomy.canonicalName,
-      accession: getAccession(record.taxonomy.attributes),
-      date: getReleaseDate(record.taxonomy.attributes) || new Date(),
-      publicationDoi: getPublicationDOI(record.taxonomy.attributes),
-      vernacularName: getVernacularName(record.taxonomy.attributes),
-      firsts: getFirsts(record.taxonomy.attributes),
-      significance: getSignificance(record.taxonomy.attributes),
-      taxonGroup: getTaxonGroup(record.taxonomy.attributes),
-    }))
+    .map((record) => {
+      const attributes = (record.taxonomy.attributes || []) as Attribute[];
+      return {
+        canonicalName: record.taxonomy.canonicalName,
+        accession: getAccession(attributes),
+        date: getReleaseDate(attributes) || new Date(),
+        publicationDoi: getPublicationDOI(attributes),
+        vernacularName: getVernacularName(attributes),
+        firsts: getFirsts(attributes),
+        significance: getSignificance(attributes),
+        taxonGroup: getTaxonGroup(attributes),
+      };
+    })
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (

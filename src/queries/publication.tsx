@@ -15,17 +15,3 @@ export const PUBLICATION = gql`
     citation
   }
 `;
-
-export interface Publication {
-  entityId: string;
-  title: string;
-  authors: string[];
-  publishedYear: number;
-  publishedDate?: string;
-  language?: string;
-  publisher?: string;
-  doi?: string;
-  sourceUrls: string[];
-  publicationType?: string;
-  citation?: string;
-}

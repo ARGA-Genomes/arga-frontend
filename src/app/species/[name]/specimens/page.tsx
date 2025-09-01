@@ -13,7 +13,7 @@ import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { PaginationBar } from "@/components/pagination";
 import { RecordTable } from "@/components/RecordTable";
-import { Species, Specimen, SpecimenSummary } from "@/generated/types";
+import { Species, Specimen, SpecimenMapMarker, SpecimenSummary } from "@/generated/types";
 import { getVoucherColour, getVoucherRGBA, getVoucherStatus } from "@/helpers/colors";
 import { getEnumKeyByValue, SortOrder } from "@/queries/common";
 import {
@@ -21,7 +21,6 @@ import {
   getFilterValues,
   HasData,
   SpecimenFilterItem,
-  SpecimenMapMarker,
   SpecimenOptions,
   SpecimenSortable,
   SpecimenSorting,

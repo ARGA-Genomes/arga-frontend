@@ -51,7 +51,6 @@ import {
 } from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
 import { GET_NOMENCLATURAL_ACT_PROVENANCE } from "@/queries/provenance";
-import { Specimen } from "@/queries/specimen";
 
 import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import {
@@ -611,7 +610,7 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
   return 0;
 }
 
-function History({ taxonomy, specimens }: { taxonomy: Taxon; specimens?: Specimen[] }) {
+function History({ taxonomy }: { taxonomy: Taxon }) {
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;
 

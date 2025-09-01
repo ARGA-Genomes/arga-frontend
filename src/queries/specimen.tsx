@@ -15,17 +15,6 @@ export const ORGANISM = gql`
   }
 `;
 
-export interface Organism {
-  entityId: string;
-  organismId: string;
-  sex?: string;
-  genotypicSex?: string;
-  phenotypicSex?: string;
-  lifeStage?: string;
-  reproductiveCondition?: string;
-  behavior?: string;
-}
-
 export const SPECIMEN = gql`
   fragment SpecimenDetails on Specimen {
     entityId
@@ -33,12 +22,6 @@ export const SPECIMEN = gql`
     canonicalName
   }
 `;
-
-export interface Specimen {
-  entityId: string;
-  organismId: string;
-  canonicalName: string;
-}
 
 export const SPECIMEN_SUMMARY = gql`
   fragment SpecimenSummary on SpecimenSummary {
@@ -64,28 +47,6 @@ export const SPECIMEN_SUMMARY = gql`
   }
 `;
 
-export interface SpecimenSummary {
-  entityId: string;
-  collectionRepositoryId?: string;
-  collectionRepositoryCode?: string;
-  institutionCode?: string;
-  institutionName?: string;
-  typeStatus?: string;
-  country?: string;
-  latitude?: number;
-  longitude?: number;
-  collectedAt?: string;
-  sequences?: number;
-  loci?: number;
-  otherGenomic?: number;
-  fullGenomes?: number;
-  partialGenomes?: number;
-  completeGenomes?: number;
-  assemblyChromosomes?: number;
-  assemblyScaffolds?: number;
-  assemblyContigs?: number;
-}
-
 export const SPECIMEN_OVERVIEW = gql`
   fragment SpecimenOverviewDetails on SpecimensOverview {
     total
@@ -109,21 +70,6 @@ export const SPECIMEN_OVERVIEW = gql`
   }
 `;
 
-export interface SpecimenOverview {
-  total: number;
-  majorCollections: string[];
-  holotype?: string;
-  holotypeEntityId?: string;
-  otherTypes?: number;
-  formalVouchers?: number;
-  tissues?: number;
-  genomicDna?: number;
-  australianMaterial?: number;
-  nonAustralianMaterial?: number;
-  collectionYears: YearValue<number>[];
-  topCountries: StringValue<number>[];
-}
-
 export interface YearValue<T> {
   year: number;
   value: T;
@@ -144,15 +90,6 @@ export const SPECIMEN_MAP_MARKER = gql`
     longitude
   }
 `;
-
-export interface SpecimenMapMarker {
-  entityId: string;
-  collectionRepositoryId?: string | null;
-  institutionCode?: string | null;
-  typeStatus?: string | null;
-  latitude: number;
-  longitude: number;
-}
 
 export const COLLECTION_EVENT = gql`
   fragment CollectionEventDetails on CollectionEvent {
@@ -193,43 +130,6 @@ export const COLLECTION_EVENT = gql`
   }
 `;
 
-export interface CollectionEvent {
-  entityId: string;
-  fieldCollectingId?: string;
-  eventDate?: Date;
-  eventTime?: string;
-  collectedBy?: string;
-  collectionRemarks?: string;
-  identifiedBy?: string;
-  identifiedDate?: Date;
-  identificationRemarks?: string;
-  locality?: string;
-  country?: string;
-  countryCode?: string;
-  stateProvince?: string;
-  county?: string;
-  municipality?: string;
-  latitude?: number;
-  longitude?: number;
-  elevation?: number;
-  depth?: number;
-  elevationAccuracy?: number;
-  depthAccuracy?: number;
-  locationSource?: string;
-  preparation?: string;
-  environmentBroadScale?: string;
-  environmentLocalScale?: string;
-  environmentMedium?: string;
-  habitat?: string;
-  specificHost?: string;
-  individualCount?: string;
-  organismQuantity?: string;
-  organismQuantityType?: string;
-  strain?: string;
-  isolate?: string;
-  fieldNotes?: string;
-}
-
 export const ACCESSION_EVENT = gql`
   fragment AccessionEventDetails on AccessionEvent {
     entityId
@@ -251,25 +151,6 @@ export const ACCESSION_EVENT = gql`
   }
 `;
 
-export interface AccessionEvent {
-  entityId: string;
-  typeStatus?: string;
-  eventDate?: Date;
-  eventTime?: string;
-  collectionRepositoryId?: string;
-  collectionRepositoryCode?: string;
-  institutionName?: string;
-  institutionCode?: string;
-  disposition?: string;
-  preparation?: string;
-  accessionedBy?: string;
-  preparedBy?: string;
-  identifiedBy?: string;
-  identifiedDate?: Date;
-  identificationRemarks?: string;
-  otherCatalogNumbers?: string;
-}
-
 export const SPECIMEN_STATS = gql`
   fragment SpecimenStatsDetails on SpecimenStats {
     sequences
@@ -284,19 +165,6 @@ export const SPECIMEN_STATS = gql`
     assemblyContigs
   }
 `;
-
-export interface SpecimenStats {
-  sequences: number;
-  wholeGenomes: number;
-  loci: number;
-  otherGenomic: number;
-  fullGenomes: number;
-  partialGenomes: number;
-  completeGenomes: number;
-  assemblyChromosomes: number;
-  assemblyScaffolds: number;
-  assemblyContigs: number;
-}
 
 export enum HasData {
   Genomes = "GENOMES",
