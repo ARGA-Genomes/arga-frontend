@@ -293,3 +293,5 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
     </>
   );
 });
+
+FiltersDrawer.displayName = "FiltersDrawer";

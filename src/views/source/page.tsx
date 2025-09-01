@@ -398,7 +398,7 @@ function SourceDetails({ source }: { source?: Source }) {
       ? "lists.ala.org.au"
       : "lists.test.ala.org.au";
 
-  const loading = !Boolean(source);
+  const loading = !source;
   const license = source ? getLicense(source.license) : "";
 
   return (
