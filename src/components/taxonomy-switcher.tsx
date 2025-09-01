@@ -2,7 +2,6 @@
 
 import {
   Accordion,
-  Badge,
   Divider,
   Group,
   Modal,
@@ -220,11 +219,6 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
                   <Text fw={600} c={isActive ? "white" : undefined} fz={isActive ? 26 : "lg"}>
                     {taxon.dataset?.name || "Unknown Dataset"}
                   </Text>
-                  {taxon.originalCanonicalNames && (
-                    <Badge variant="white" color="midnight.8">
-                      DIFFERENT
-                    </Badge>
-                  )}
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>

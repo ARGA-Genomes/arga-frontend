@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Grid, Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
+import { Container, Divider, Grid, Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { useMemo } from "react";
 import { MAX_WIDTH } from "../app/constants";
@@ -51,11 +51,11 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
   );
 
   return (
-    <Paper py={30} pos="relative">
+    <Paper py={30}>
       <Container maw={MAX_WIDTH}>
         <Grid>
           <Grid.Col span="auto">
-            <Stack h="100%" justify="center" style={{ flexGrow: 1 }}>
+            <Stack>
               <Stack gap={0}>
                 <Text c="dimmed" fw={400}>
                   {rank}
@@ -87,6 +87,9 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
               <Image maw={180} alt={`${rank} ${classification} icon`} src={taxonIcon} />
             </Grid.Col>
           )}
+          <Grid.Col span={12}>
+            <Divider variant="dashed" my="sm" />
+          </Grid.Col>
           <Grid.Col span={12}>
             {rank !== "DOMAIN" && (
               <Group justify="space-between" align="flex-end">

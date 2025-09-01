@@ -491,7 +491,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   }, [params.name, pathname, setPreviousPage]);
 
   return (
-    <Stack mt={40} gap={0}>
+    <Stack mt="xl">
       <ClassificationHeader rank={rank} classification={params.name} taxon={taxonResults.data?.taxon} />
 
       <Paper py={30}>

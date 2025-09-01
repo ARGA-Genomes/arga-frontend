@@ -4,26 +4,22 @@ import { FilterGroup } from "../group";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
 import { FilterItem, FilterType } from "../filters/common";
 
-export const threatenedFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
+export const datasetFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
     .map(({ include, value }) => ({
-      filter: FilterType.Attribute,
+      filter: FilterType.Dataset,
       action: include ? "INCLUDE" : "EXCLUDE",
-      value: [
-        {
-          name: value,
-          value: true,
-        },
-      ],
+      value,
     }));
 
-interface ThreatenedFiltersProps {
+interface DatasetFiltersProps {
   filters: BoolFilterData[];
+  loading: boolean;
   onChange: (filters: BoolFilterData[]) => void;
 }
 
-export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps) {
+export function DatasetFilters({ filters, loading, onChange }: DatasetFiltersProps) {
   // Event handlers for filter chip bools
   const handleActiveToggle = (value: string, active: boolean) =>
     onChange(
@@ -54,9 +50,10 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
 
   return (
     <FilterGroup
-      title="Threatened"
-      description="Filter threatened species"
-      icon={"/icons/list-group/List group_ Threatened species.svg"}
+      title="Dataset"
+      description="Filter source datasets"
+      icon={"/icons/data-type/Data type_ Sequence Archive.svg"}
+      loading={loading}
     >
       {filters.map((filter) => (
         <BoolFilter
@@ -70,22 +67,3 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
     </FilterGroup>
   );
 }
-
-export const DEFAULT_THREATENED_LABELS: { [key: string]: string } = {
-  EPBC_act_category_CR: "EPBC Critically Endangered",
-  EPBC_act_category_EN: "EPBC Endangered",
-  EPBC_act_category_EW: "EPBC Extinct in the Wild",
-  EPBC_act_category_EX: "EPBC Extinct",
-  EPBC_act_category_VU: "EPBC Vulnerable",
-  EPBC_act_category_cd: "EPBC Conservation Dependent",
-};
-
-export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = Object.entries(DEFAULT_THREATENED_LABELS).map(
-  ([value, label]) => ({
-    value,
-    label,
-    active: false,
-    disabled: false,
-    include: true,
-  })
-);

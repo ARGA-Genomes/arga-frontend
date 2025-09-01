@@ -4,6 +4,7 @@ import { GenericFilter } from "../generic";
 
 export interface BoolFilterData {
   value: string;
+  label?: string;
   active: boolean;
   include: boolean;
   disabled: boolean;
@@ -13,7 +14,6 @@ interface BoolFilterProps extends BoolFilterData {
   onActiveToggle: (checked: boolean) => void;
   onIncludeToggle?: (include: boolean) => void;
   options: [string, string];
-  label?: string;
 }
 
 export function BoolFilter({
@@ -35,7 +35,7 @@ export function BoolFilter({
         disabled={disabled}
         onChange={(ev) => onActiveToggle(ev.currentTarget.checked)}
         label={
-          <Text size="sm" fw={600}>
+          <Text size="sm" fw={600} maw={500} truncate="end">
             {label || Humanize.capitalize(value.replaceAll("_", " "))}
           </Text>
         }

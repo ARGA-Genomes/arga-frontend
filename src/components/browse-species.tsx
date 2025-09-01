@@ -32,7 +32,7 @@ import { PaginationBar, PaginationSize } from "./pagination";
 import { DataItem, SpeciesCard } from "./species-card";
 import { TableCardLayout, TableCardSwitch } from "./table-card-switch";
 
-import { SpeciesCardPage, SpeciesCard as SpeciesCardType } from "@/generated/types";
+import { SpeciesCard as SpeciesCardType } from "@/generated/types";
 import { generateCSV } from "@/helpers/downloadCSV";
 import { saveAs } from "file-saver";
 import Link from "next/link";
@@ -47,6 +47,7 @@ interface BrowseSpeciesProps {
     download: DocumentNode;
     variables?: OperationVariables;
   };
+  values?: { [key: string]: unknown };
 }
 
 enum Sort {
@@ -81,8 +82,8 @@ const TABLE_HEADERS: TableHeader[] = [
   { name: "Specimens", description: "Number of specimens for this species", sort: Sort.Specimens, span: 1 },
 ];
 
-export function BrowseSpecies({ query }: BrowseSpeciesProps) {
-  const [data, setData] = useState<SpeciesCardPage>();
+export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
+  const [data, setData] = useState();
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<Sort>(Sort.ScientificName);
   const [sortDir, setSortDir] = useState<boolean>(true);
@@ -205,6 +206,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
             <FiltersDrawer
               types={[
                 "dataType",
+                "dataset",
                 "vernacularGroup",
                 "classification",
                 "threatened",
@@ -216,6 +218,7 @@ export function BrowseSpecies({ query }: BrowseSpeciesProps) {
                 setPage(1);
               }}
               onFilterChips={setFilterChips}
+              values={values}
             />
             <TableCardSwitch layout={layout} onChange={setLayout} />
             <Divider orientation="vertical" />
