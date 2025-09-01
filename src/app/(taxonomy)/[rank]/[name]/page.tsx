@@ -1,24 +1,24 @@
 "use client";
 
-import { useEffect, use } from "react";
-import * as Humanize from "humanize-plus";
-import { gql, OperationVariables, useQuery } from "@apollo/client";
-import { Paper, Title, Box, Text, Stack, Grid, Container, Group } from "@mantine/core";
-import ClassificationHeader from "@/components/classification-header";
 import { MAX_WIDTH } from "@/app/constants";
-import { Attribute, DataField } from "@/components/highlight-stack";
-import { TachoChart } from "@/components/graphing/tacho";
-import { BarChart } from "@/components/graphing/bar";
-import { DataTable, DataTableRow } from "@/components/data-table";
-import { usePreviousPage } from "@/components/navigation-history";
-import { usePathname } from "next/navigation";
-import { useDatasets } from "@/app/source-provider";
+import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
 import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-completion";
 import { GroupDetailRadial } from "@/app/genome-tracker/_components/grouping-completion";
-import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
+import { useDatasets } from "@/app/source-provider";
 import { BrowseSpecies } from "@/components/browse-species";
+import ClassificationHeader from "@/components/classification-header";
 import { DataNoteActions } from "@/components/data-note-actions";
+import { DataTable, DataTableRow } from "@/components/data-table";
+import { BarChart } from "@/components/graphing/bar";
+import { TachoChart } from "@/components/graphing/tacho";
+import { Attribute, DataField } from "@/components/highlight-stack";
+import { usePreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
+import { gql, OperationVariables, useQuery } from "@apollo/client";
+import { Box, Container, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import * as Humanize from "humanize-plus";
+import { usePathname } from "next/navigation";
+import { use, useEffect } from "react";
 
 const GET_SPECIES = gql`
   query TaxonSpecies(
@@ -538,7 +538,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   }, [params.name, pathname, setPreviousPage]);
 
   return (
-    <Stack mt={40} gap={0}>
+    <Stack mt="xl">
       <ClassificationHeader rank={rank} classification={params.name} taxon={taxonResults.data?.taxon} />
 
       <Paper py={30}>

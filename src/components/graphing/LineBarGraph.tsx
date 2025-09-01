@@ -84,9 +84,11 @@ export function LineBarGraph({ lineData, barData, dateDomain, width, height, dis
     // need at least to data points
     if (lineData.length <= 1) return;
 
-    const svgElement = event.currentTarget;
-    const rect = svgElement.getBoundingClientRect();
-    const coords = { x: event.clientX - rect.left - 50, y: event.clientY - rect.top };
+    const svgRect = event.currentTarget.getBoundingClientRect();
+    const coords = {
+      x: event.clientX - svgRect.left - 50, // 50 is the left margin from Group
+      y: event.clientY - svgRect.top,
+    };
 
     const date = xScale.invert(coords?.x || 0);
     const idx = bisectDate(lineData, date, 1);

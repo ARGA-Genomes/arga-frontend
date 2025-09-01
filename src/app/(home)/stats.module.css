@@ -29,6 +29,7 @@
 
 .stats:hover::after {
   opacity: 1;
+  backdrop-filter: blur(6px);
   cursor: pointer;
 }
 

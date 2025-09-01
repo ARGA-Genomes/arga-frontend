@@ -1,9 +1,7 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
 import {
   Accordion,
-  Badge,
   Divider,
   Group,
   Modal,
@@ -13,17 +11,18 @@ import {
   UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
+import * as Humanize from "humanize-plus";
 
 import accClasses from "./taxonomy-switcher-acc.module.css";
 
-import { Taxon, TaxonNode } from "@/queries/taxa";
-import { Attribute, AttributePill, AttributePillContainer, AttributePillValue } from "./data-fields";
 import { Dataset, useDatasets } from "@/app/source-provider";
-import { useMemo, useState } from "react";
-import { IconArrowUpRight } from "@tabler/icons-react";
-import { useQuery } from "@apollo/client";
 import { GET_TAXON_PROVENANCE, ProvenanceQuery } from "@/queries/provenance";
+import { Taxon, TaxonNode } from "@/queries/taxa";
+import { useQuery } from "@apollo/client";
 import { useDisclosure } from "@mantine/hooks";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
+import { Attribute, AttributePill, AttributePillContainer, AttributePillValue } from "./data-fields";
 import { LoadOverlay } from "./load-overlay";
 import RecordHistory from "./record-history";
 
@@ -227,11 +226,6 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
                   <Text fw={600} c={isActive ? "white" : undefined} fz={isActive ? 26 : "lg"}>
                     {taxon.dataset?.name || "Unknown Dataset"}
                   </Text>
-                  {taxon.originalCanonicalNames && (
-                    <Badge variant="white" color="midnight.8">
-                      DIFFERENT
-                    </Badge>
-                  )}
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>
