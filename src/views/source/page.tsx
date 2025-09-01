@@ -34,7 +34,7 @@ import classes from "../../components/record-list.module.css";
 // Icons data
 import { BrowseSpecies } from "@/components/browse-species";
 import { FilterItem } from "@/components/filtering-redux/filters/common";
-import { DatasetDetails, Source } from "@/generated/types";
+import { DatasetDetails, RankSummary, Source } from "@/generated/types";
 import { grouping as groupingData } from "../../app/(home)/_data";
 import { groupInclude, array as groupingExtra, GroupItem } from "../../app/browse/groups/_data/all";
 import DataHighlights from "./_components/data-highlights";
@@ -107,6 +107,10 @@ const GET_DETAILS = gql`
     }
   }
 `;
+
+export interface ExtendedSource extends Source {
+  speciesRankSummary: RankSummary;
+}
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
 
@@ -321,7 +325,7 @@ function DatasetRow({ dataset }: { dataset: DatasetDetails }) {
   );
 }
 
-function SourceDetails({ source }: { source?: Source }) {
+function SourceDetails({ source }: { source?: ExtendedSource }) {
   const theme = useMantineTheme();
 
   // Gross and hacky and terrible, to fix at a later date
@@ -481,7 +485,7 @@ export default function SourcePage(props: SourceProps) {
     [name]
   );
 
-  const { loading, error, data } = useQuery<{ source: Source }>(GET_DETAILS, {
+  const { loading, error, data } = useQuery<{ source: ExtendedSource }>(GET_DETAILS, {
     variables: { name: source, filters },
   });
 

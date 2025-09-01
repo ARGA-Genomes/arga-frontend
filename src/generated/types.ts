@@ -422,6 +422,7 @@ export type FilterType =
   | 'CLASS'
   | 'CLASSIS'
   | 'COHORT'
+  | 'DATASET'
   | 'DIVISION'
   | 'DOMAIN'
   | 'FAMILIA'
@@ -490,6 +491,13 @@ export type GenomeItem = {
   type: FullTextType;
 };
 
+export type GenomeRelease = {
+  __typename?: 'GenomeRelease';
+  canonicalName: Scalars['String']['output'];
+  releaseDate?: Maybe<Scalars['NaiveDate']['output']>;
+  scientificName: Scalars['String']['output'];
+};
+
 export type GenomicComponent = {
   __typename?: 'GenomicComponent';
   accessRights?: Maybe<Scalars['String']['output']>;
@@ -523,6 +531,13 @@ export type HasData =
   | 'GENOMES'
   | 'GENOMIC_DATA'
   | 'LOCI';
+
+export type KingdomPhylumCount = {
+  __typename?: 'KingdomPhylumCount';
+  count: Scalars['Int']['output'];
+  kingdom: Scalars['String']['output'];
+  phylum: Scalars['String']['output'];
+};
 
 export type LocusItem = {
   __typename?: 'LocusItem';
@@ -891,6 +906,8 @@ export type RankSummary = {
   genomes: Scalars['Int']['output'];
   /** Total amount of taxa in the rank with any genomic data */
   genomicData: Scalars['Int']['output'];
+  /** Total amount of taxa in the rank with loci */
+  loci: Scalars['Int']['output'];
   /** Total amount of taxa in the rank */
   total: Scalars['Int']['output'];
 };
@@ -996,6 +1013,8 @@ export type Source = {
   contentType?: Maybe<SourceContentType>;
   datasets: Array<DatasetDetails>;
   id: Scalars['UUID']['output'];
+  latestGenomeReleases: Array<GenomeRelease>;
+  latestGenomeReleasesCsv: Scalars['String']['output'];
   license: Scalars['String']['output'];
   listsId?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
@@ -1003,6 +1022,16 @@ export type Source = {
   rightsHolder: Scalars['String']['output'];
   species: SpeciesCardPage;
   speciesCsv: Scalars['String']['output'];
+  speciesGenomesSummary: Array<DataBreakdown>;
+  speciesGenomesSummaryCsv: Scalars['String']['output'];
+  speciesGenomicDataSummary: Array<DataBreakdown>;
+  speciesGenomicDataSummaryCsv: Scalars['String']['output'];
+  speciesLociSummary: Array<DataBreakdown>;
+  speciesLociSummaryCsv: Scalars['String']['output'];
+  summary: RankSummary;
+  summaryCsv: Scalars['String']['output'];
+  taxonomicDiversity: Array<KingdomPhylumCount>;
+  taxonomicDiversityCsv: Scalars['String']['output'];
 };
 
 
@@ -1368,6 +1397,8 @@ export type Statistics = {
   __typename?: 'Statistics';
   completeGenomesByYear: Array<CompleteGenomesByYearStatistic>;
   completeGenomesByYearCsv: Scalars['String']['output'];
+  completeGenomesByYearForSource: Array<CompleteGenomesByYearStatistic>;
+  completeGenomesByYearForSourceCsv: Scalars['String']['output'];
   dataset: DatasetStatistics;
   species: SpeciesStatistics;
   taxonBreakdown: Array<TaxonTreeNodeStatistics>;
@@ -1385,6 +1416,18 @@ export type StatisticsCompleteGenomesByYearArgs = {
 export type StatisticsCompleteGenomesByYearCsvArgs = {
   taxonCanonicalName: Scalars['String']['input'];
   taxonRank: TaxonomicRank;
+};
+
+
+export type StatisticsCompleteGenomesByYearForSourceArgs = {
+  filters?: InputMaybe<Array<FilterItem>>;
+  name: Scalars['String']['input'];
+};
+
+
+export type StatisticsCompleteGenomesByYearForSourceCsvArgs = {
+  filters?: InputMaybe<Array<FilterItem>>;
+  name: Scalars['String']['input'];
 };
 
 
