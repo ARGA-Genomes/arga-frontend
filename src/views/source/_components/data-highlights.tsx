@@ -1,7 +1,7 @@
 "use client";
 
 import { Source } from "@/generated/types";
-import { Flex, Paper, Skeleton, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Flex, Group, Paper, Skeleton, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconStarFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -70,19 +70,19 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
   );
 
   return (
-    <Stack
-      justify="center"
+    <Group
       align="center"
       px="xl"
       py="md"
       mb={34}
       bg="wheat.0"
       style={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
+      gap={48}
     >
       <Text fw="bold" c="wheat.7">
         Dataset highlights
       </Text>
-      <Flex direction="row" align="center" justify="center" mb={-48} gap="lg">
+      <Flex direction="row" align="center" justify="center" gap="lg">
         <Paper
           className={latestGenomeReleases?.[0] ? classes.stat : undefined}
           component={latestGenomeReleases?.[0] ? Link : undefined}
@@ -95,7 +95,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
         >
           <Stack gap={4}>
             <Text c="dimmed" size="xs" fw="bold">
-              LATEST GENOME RELEASE
+              Latest genome release
             </Text>
             <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
@@ -104,8 +104,8 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
             </Skeleton>
           </Stack>
         </Paper>
-        <ThemeIcon radius="xl" color="wheat" variant="white">
-          <IconStarFilled size="1rem" />
+        <ThemeIcon size="xl" radius="xl" color="wheat" variant="white">
+          <IconStarFilled size="1.5rem" />
         </ThemeIcon>
         <Paper
           className={speciesGenomes?.[0] ? classes.stat : undefined}
@@ -119,7 +119,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
         >
           <Stack gap={4}>
             <Text c="dimmed" size="xs" fw="bold">
-              MOST GENOMES
+              Most genomes
             </Text>
             <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
@@ -128,8 +128,8 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
             </Skeleton>
           </Stack>
         </Paper>
-        <ThemeIcon radius="xl" color="wheat" variant="white">
-          <IconStarFilled size="1rem" />
+        <ThemeIcon size="xl" radius="xl" color="wheat" variant="white">
+          <IconStarFilled size="1.5rem" />
         </ThemeIcon>
         <Paper
           className={speciesLoci?.[0] ? classes.stat : undefined}
@@ -143,7 +143,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
         >
           <Stack gap={4}>
             <Text c="dimmed" size="xs" fw="bold">
-              MOST LOCI
+              Most loci
             </Text>
             <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
@@ -152,8 +152,8 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
             </Skeleton>
           </Stack>
         </Paper>
-        <ThemeIcon radius="xl" color="wheat" variant="white">
-          <IconStarFilled size="1rem" />
+        <ThemeIcon size="xl" radius="xl" color="wheat" variant="white">
+          <IconStarFilled size="1.5rem" />
         </ThemeIcon>
         <Paper
           className={speciesOther?.[0] ? classes.stat : undefined}
@@ -167,7 +167,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
         >
           <Stack gap={4}>
             <Text c="dimmed" size="xs" fw="bold">
-              MOST DATA
+              Most data
             </Text>
             <Skeleton radius="lg" visible={loading}>
               <Text fw="bold" fs="italic" c="shellfish.9">
@@ -177,6 +177,6 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
           </Stack>
         </Paper>
       </Flex>
-    </Stack>
+    </Group>
   );
 }

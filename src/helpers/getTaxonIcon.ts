@@ -1,6 +1,7 @@
 const ICONS = [
   "Taxon_ All eukaryote species (Eukaryota).svg",
   "Taxon_ Anemones corals and jellyfishes (Cnidaria).svg",
+  "Taxon_ Annelid worms (Annelida).svg",
   "Taxon_ Animals (Kingdom Animalia).svg",
   "Taxon_ Bacteria (Prokaryota_Bacteria).svg",
   "Taxon_ Bats (Chiroptera).svg",
@@ -34,10 +35,12 @@ const ICONS = [
   "Taxon_ Seaweeds and algae (red + brown + green + blue green).svg",
   "Taxon_ Sharks and rays (Subclass Elasmobranchii).svg",
   "Taxon_ Snails (Gastropoda).svg",
+  "Taxon_ Snakes (Serpentes).svg",
   "Taxon_ Spiders (Araneae).svg",
   "Taxon_ Sponges (Phylum Porifera).svg",
+  "Taxon_ Vertebrates (Vertebrata).svg",
   "Taxon_ Whales and dolphins (Order Cetacea).svg",
-  "Taxon_group_ Invertebrates (Animalia - Vertebrata).svg",
+  "Taxon_group_ Invertebrates (Animalia).svg",
 ];
 
 export const getTaxonIcon = (canonicalName: string): string | null => {
