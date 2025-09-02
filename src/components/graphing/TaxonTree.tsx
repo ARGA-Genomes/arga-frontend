@@ -6,13 +6,13 @@ import { gql, useLazyQuery } from "@apollo/client";
 import { Cluster } from "@visx/hierarchy";
 import { hierarchy } from "d3";
 
-import { TaxonStatTreeNode } from "@/queries/stats";
+import { Statistics, TaxonTreeNodeStatistics } from "@/generated/types";
 import { Group } from "@visx/group";
+import { HierarchyNode, HierarchyPointNode } from "@visx/hierarchy/lib/types";
 import { LinkVertical } from "@visx/shape";
 import { Text } from "@visx/text";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { HierarchyNode, HierarchyPointNode } from "@visx/hierarchy/lib/types";
 
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
@@ -31,12 +31,6 @@ const GET_TAXON_TREE_NODE = gql`
     }
   }
 `;
-
-interface TaxonTreeNodeQuery {
-  stats: {
-    taxonBreakdown: TaxonStatTreeNode[];
-  };
-}
 
 // A node in the tree. This represents the visual node of a taxon and maintains
 // a heirarchy of child tree nodes. It should contain both the data to present as
@@ -70,7 +64,7 @@ interface TaxonNodeProps {
 function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNodeProps) {
   const [childTree, setChildTree] = useState<Node[] | undefined>(data.children);
 
-  const [loadNode, query] = useLazyQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
+  const [loadNode, query] = useLazyQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE, {
     variables: {
       taxonRank: data.rank,
       taxonCanonicalName: data.canonicalName,
@@ -182,7 +176,7 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
 interface TaxonTreeProps {
   height: number;
   minWidth: number;
-  data: TaxonStatTreeNode;
+  data: TaxonTreeNodeStatistics;
   pinned?: string[];
   onTooltip?: (node: Node) => React.ReactNode;
 }
@@ -356,7 +350,7 @@ function nodeClassName(data: Node) {
 // Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
 // from the taxon tree statistics query into a presentable tree by injecting and
 // defaulting variables used for tree interaction.
-function convertToNode(node: TaxonStatTreeNode): Node {
+function convertToNode(node: TaxonTreeNodeStatistics): Node {
   const children = node.children?.map((child) => convertToNode(child));
 
   return {
@@ -367,10 +361,10 @@ function convertToNode(node: TaxonStatTreeNode): Node {
     rank: node.rank,
     species: node.species ?? 0,
     fullGenomesCoverage: node.fullGenomesCoverage ?? 0,
-    specimens: node.specimens,
-    loci: node.loci,
-    genomes: node.genomes,
-    totalGenomic: node.totalGenomic,
+    specimens: node.specimens ?? 0,
+    loci: node.loci ?? 0,
+    genomes: node.genomes ?? 0,
+    totalGenomic: node.totalGenomic ?? 0,
 
     // if the node is expanded then we want to convert all the children to nodes as well,
     // otherwise we add a stub node that will load the data when expanded

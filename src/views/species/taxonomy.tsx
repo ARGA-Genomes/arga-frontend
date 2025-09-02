@@ -1,32 +1,58 @@
 "use client";
 
-import classes from "../../components/record-list.module.css";
 import tabsClasses from "../../components/event-timeline-tabs.module.css";
+import classes from "../../components/record-list.module.css";
 
-import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import {
-  Button,
-  Grid,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  Tabs,
-  ScrollArea,
+  Badge,
   Box,
-  Popover,
-  Flex,
+  Button,
   Center,
   Divider,
-  ThemeIcon,
+  Flex,
+  Grid,
+  Group,
   Indicator,
-  Badge,
+  Paper,
+  Popover,
+  ScrollArea,
+  SimpleGrid,
+  Stack,
+  Tabs,
+  Text,
+  ThemeIcon,
 } from "@mantine/core";
 import { Layout } from "@nivo/tree";
-import { Taxonomy } from "@/app/type";
+import * as Humanize from "humanize-plus";
 
+import { Dataset, useDatasets } from "@/app/source-provider";
+import { ExternalLinkButton } from "@/components/button-link-external";
+import { InternalLinkButton } from "@/components/button-link-internal";
+import { AttributePillValue, DataField } from "@/components/data-fields";
+import { DataTable, DataTableRow } from "@/components/data-table";
+import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timeline";
+import HorizontalTimeline, { TimelineItem, TimelineItemType } from "@/components/graphing/horizontal-timeline";
+import { Node, TaxonTree } from "@/components/graphing/TaxonTree";
+import { LoadOverlay } from "@/components/load-overlay";
+import { AnalysisMap } from "@/components/mapping";
+import RecordHistory from "@/components/record-history";
+import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
+import {
+  NomenclaturalAct,
+  Provenance,
+  Statistics,
+  Taxa,
+  Taxon,
+  TaxonomicAct,
+  TaxonTreeNodeStatistics,
+  TypeSpecimen,
+  VernacularName,
+} from "@/generated/types";
+import { getCanonicalName } from "@/helpers/getCanonicalName";
+import { GET_NOMENCLATURAL_ACT_PROVENANCE } from "@/queries/provenance";
+
+import { useDisclosure, useResizeObserver } from "@mantine/hooks";
 import {
   IconArrowUpRight,
   IconBinaryTree2,
@@ -36,25 +62,6 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { LoadOverlay } from "@/components/load-overlay";
-import { DataTable, DataTableRow } from "@/components/data-table";
-import { AttributePillValue, DataField } from "@/components/data-fields";
-import { TaxonTree, Node } from "@/components/graphing/TaxonTree";
-import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timeline";
-import { useDisclosure, useResizeObserver } from "@mantine/hooks";
-import { TaxonStatTreeNode } from "@/queries/stats";
-import { TaxonomySwitcher } from "@/components/taxonomy-switcher";
-import { Taxon, TaxonNode } from "@/queries/taxa";
-import HorizontalTimeline, { TimelineItem, TimelineItemType } from "@/components/graphing/horizontal-timeline";
-import { Publication } from "@/queries/publication";
-import { AccessionEvent, CollectionEvent, Specimen } from "@/queries/specimen";
-import { AnalysisMap } from "@/components/mapping";
-import { ExternalLinkButton } from "@/components/button-link-external";
-import { getCanonicalName } from "@/helpers/getCanonicalName";
-import { InternalLinkButton } from "@/components/button-link-internal";
-import RecordHistory from "@/components/record-history";
-import { Action, GET_NOMENCLATURAL_ACT_PROVENANCE, Operation } from "@/queries/provenance";
-import { Dataset, useDatasets } from "@/app/source-provider";
 
 const GET_TAXA = gql`
   query TaxaTaxonomyPage($filters: [TaxaFilter]) {
@@ -73,16 +80,6 @@ const GET_TAXA = gql`
     }
   }
 `;
-
-interface TaxaRecordExtended extends Taxon {
-  hierarchy: TaxonNode[];
-}
-
-interface TaxaQuery {
-  taxa: {
-    records: TaxaRecordExtended[];
-  };
-}
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String, $datasetId: UUID) {
@@ -165,110 +162,10 @@ const GET_TYPE_SPECIMENS = gql`
   }
 `;
 
-interface ClassificationNode {
-  canonicalName: string;
-  rank: string;
-  depth: number;
-}
-
-interface TaxonomicAct {
-  entityId: string;
-  sourceUrl: string;
-  taxon: {
-    canonicalName: string;
-    authorship?: string;
-    status: string;
-  };
-}
-
-interface NomenclaturalAct {
-  entityId: string;
-  act: string;
-  sourceUrl: string;
-  publication: Publication;
-  name: {
-    scientificName: string;
-    canonicalName: string;
-    authorship?: string;
-    taxa: {
-      canonicalName: string;
-      authorship?: string;
-      status: string;
-      citation?: string;
-    }[];
-  };
-  actedOn: {
-    scientificName: string;
-    canonicalName: string;
-    authorship?: string;
-  };
-}
-
-interface ExtendedTaxon extends Taxon {
-  rank: string;
-  hierarchy: ClassificationNode[];
-  nomenclaturalActs: NomenclaturalAct[];
-  taxonomicActs: TaxonomicAct[];
-  typeSpecimens: {
-    accession: AccessionEvent;
-    collection: CollectionEvent;
-    name: { scientificName: string };
-  }[];
-}
-
-interface TaxonQuery {
-  taxon: ExtendedTaxon;
-}
-
-interface TypeSpecimen {
-  accession: AccessionEvent;
-  collection: CollectionEvent;
-  name: { scientificName: string };
-}
-
-interface TypeSpecimenQuery {
-  taxon: {
-    typeSpecimens: TypeSpecimen[];
-  };
-}
-
 interface SpecimenRecordNumbers {
   markers: number;
   sequences: number;
   wholeGenomes: number;
-}
-
-interface ProvenanceQuery {
-  provenance: {
-    nomenclaturalAct: Operation[];
-  };
-}
-
-interface VernacularName {
-  datasetId: string;
-  vernacularName: string;
-  citation?: string;
-  sourceUrl?: string;
-}
-
-interface Synonym {
-  scientificName: string;
-  canonicalName: string;
-  authorship?: string;
-}
-
-interface Species {
-  taxonomy: Taxonomy[];
-  vernacularNames: VernacularName[];
-  synonyms: Synonym[];
-  specimens: {
-    total: number;
-    records: Specimen[];
-  };
-}
-
-interface QueryResults {
-  species: Species;
 }
 
 const GET_TAXON_TREE_STATS = gql`
@@ -315,37 +212,6 @@ const GET_TAXON_TREE_STATS = gql`
   }
 `;
 
-const GET_SPECIMENS = gql`
-  query SpeciesSpecimens($canonicalName: String, $page: Int, $pageSize: Int) {
-    species(canonicalName: $canonicalName) {
-      specimens(page: $page, pageSize: $pageSize) {
-        total
-        records {
-          id
-          recordId
-          datasetName
-          accession
-          institutionCode
-          typeStatus
-          locality
-          country
-          sequences
-          wholeGenomes
-          markers
-          latitude
-          longitude
-        }
-      }
-    }
-  }
-`;
-
-interface TaxonTreeStatsQuery {
-  stats: {
-    taxonBreakdown: TaxonStatTreeNode[];
-  };
-}
-
 // Gets details for the specified taxon and the immediate decendants
 const GET_TAXON_TREE_NODE = gql`
   query TaxonTreeNode($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
@@ -372,12 +238,6 @@ const GET_TAXON_TREE_NODE = gql`
     }
   }
 `;
-
-interface TaxonTreeNodeQuery {
-  stats: {
-    taxonBreakdown: TaxonStatTreeNode[];
-  };
-}
 
 interface TaxonMatch {
   identifier: string;
@@ -438,7 +298,7 @@ function ExternalLinks({ canonicalName }: ExternalLinksProps) {
   );
 }
 
-function Synonyms({ taxonomy }: { taxonomy: ExtendedTaxon }) {
+function Synonyms({ taxonomy }: { taxonomy: Taxon }) {
   const acts = taxonomy.taxonomicActs.filter((act) => act.taxon.status !== "ACCEPTED");
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
@@ -496,17 +356,17 @@ function SourcePill({ value }: SourcePillProps) {
 }
 
 interface DetailsProps {
-  taxonomy: ExtendedTaxon;
+  taxonomy: Taxon;
   dataset: Dataset;
   commonNames: VernacularName[];
-  subspecies?: TaxonStatTreeNode[];
+  subspecies?: TaxonTreeNodeStatistics[];
   isSubspecies?: boolean;
 }
 
 function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: DetailsProps) {
   const typeSpecimens = taxonomy.typeSpecimens?.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher",
+      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher"
   );
 
   // TODO: change this to show multiple type specimens for things like syntypes
@@ -750,11 +610,11 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
   return 0;
 }
 
-function History({ taxonomy, specimens }: { taxonomy: ExtendedTaxon; specimens?: Specimen[] }) {
+function History({ taxonomy }: { taxonomy: Taxon }) {
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;
 
-  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+  const { loading, error, data } = useQuery<{ taxon: Taxon }>(GET_TAXON, {
     variables: {
       rank: taxonomy.rank,
       canonicalName: taxonomy.canonicalName,
@@ -858,11 +718,11 @@ interface NomenclaturalActBodyProps {
 }
 
 function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
-  const { loading, data } = useQuery<ProvenanceQuery>(GET_NOMENCLATURAL_ACT_PROVENANCE, {
+  const { loading, data } = useQuery<{ provenance: Provenance }>(GET_NOMENCLATURAL_ACT_PROVENANCE, {
     variables: { entityId: item.entityId },
   });
 
-  const specimens = useQuery<TypeSpecimenQuery>(GET_TYPE_SPECIMENS, {
+  const specimens = useQuery<{ taxon: Taxon }>(GET_TYPE_SPECIMENS, {
     variables: {
       rank: "SPECIES",
       canonicalName: item.name.canonicalName,
@@ -870,7 +730,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   });
 
   const holotype = specimens.data?.taxon.typeSpecimens.find(
-    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype",
+    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype"
   );
 
   function humanize(text: string) {
@@ -878,7 +738,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   }
 
   const act = humanize(item.act);
-  const items = data?.provenance.nomenclaturalAct.filter((item) => item.action !== Action.CREATE);
+  const items = data?.provenance.nomenclaturalAct.filter((item) => item.action !== "CREATE");
 
   return (
     <SimpleGrid cols={2} py="md">
@@ -957,7 +817,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
 }
 
 interface FamilyTaxonTreeProps {
-  family: TaxonStatTreeNode;
+  family: TaxonTreeNodeStatistics;
   datasetId: string;
   pinned?: string[];
 }
@@ -970,7 +830,7 @@ function FamilyTaxonTree({ family, datasetId, pinned }: FamilyTaxonTreeProps) {
   const includeRanks = ["CLASS", "FAMILY", "SUBFAMILY", "GENUS"];
   if ((family.species || 0) < 100) includeRanks.push("SPECIES");
 
-  const { loading, error, data } = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
+  const { loading, error, data } = useQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE, {
     variables: {
       taxonRank: "FAMILY",
       taxonCanonicalName: family.canonicalName,
@@ -1056,7 +916,7 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
 
   const canonicalName = getCanonicalName(params);
 
-  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+  const { loading, error, data } = useQuery<{ taxon: Taxon }>(GET_TAXON, {
     variables: { canonicalName, rank: "SPECIES", datasetId: dataset?.id },
   });
 
@@ -1065,13 +925,13 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
   const hierarchy = taxonomy?.hierarchy;
   const pinned = hierarchy ? [canonicalName, ...hierarchy.map((h) => h.canonicalName)] : [canonicalName];
 
-  const results = useQuery<TaxaQuery>(GET_TAXA, {
+  const results = useQuery<{ taxa: Taxa }>(GET_TAXA, {
     variables: { filters: [{ canonicalName }] },
   });
 
   const family = hierarchy?.find((node) => node.rank === "FAMILY" || node.rank === "FAMILIA");
 
-  const familyStats = useQuery<TaxonTreeNodeQuery>(GET_TAXON_TREE_NODE, {
+  const familyStats = useQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE, {
     variables: {
       taxonRank: "FAMILY",
       taxonCanonicalName: family?.canonicalName,
@@ -1080,7 +940,7 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
     },
   });
 
-  const subspecies = useQuery<TaxonTreeStatsQuery>(GET_TAXON_TREE_STATS, {
+  const subspecies = useQuery<{ stats: Statistics }>(GET_TAXON_TREE_STATS, {
     variables: {
       taxonRank: "SPECIES",
       taxonCanonicalName: canonicalName,

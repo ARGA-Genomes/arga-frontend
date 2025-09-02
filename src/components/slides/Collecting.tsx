@@ -1,4 +1,4 @@
-import { AccessionEvent, CollectionEvent } from "@/queries/specimen";
+import { AccessionEvent, CollectionEvent } from "@/generated/types";
 import { Box, Divider, Group, Paper, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { IconSpecimenCollection } from "../ArgaIcons";

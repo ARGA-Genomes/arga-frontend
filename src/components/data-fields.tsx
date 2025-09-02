@@ -1,15 +1,15 @@
 import {
   Center,
+  Group,
   MantineColor,
+  MantineStyleProp,
   Paper,
+  PaperProps,
   Popover,
   ScrollArea,
+  Skeleton,
   Stack,
   Text,
-  Group,
-  PaperProps,
-  MantineStyleProp,
-  Skeleton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -75,7 +75,7 @@ const BADGE_COLOURS: Record<string, string> = {
 };
 
 interface AttributePillValueProps {
-  value?: string | number;
+  value?: string | number | null;
   popoverLabel?: string | number | ReactNode;
   popoverDisabled?: boolean;
   italic?: boolean;

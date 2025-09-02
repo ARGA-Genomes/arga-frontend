@@ -1,41 +1,53 @@
 "use client";
 
-import { LoadOverlay } from "@/components/load-overlay";
+import {
+  AccessRightsStatus,
+  DataReuseStatus,
+  DatasetDetails,
+  SourceContentType,
+  Source as SourceRaw,
+} from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import {
-  Grid,
-  Paper,
-  Button,
-  Stack,
-  Container,
-  Text,
-  Group,
-  useMantineTheme,
   Accordion,
-  Center,
-  ScrollArea,
   Box,
-  SimpleGrid,
-  UnstyledButton,
+  Button,
+  Center,
   Chip,
+  Container,
+  Grid,
+  Group,
+  Paper,
+  ScrollArea,
+  SimpleGrid,
+  Stack,
+  Text,
+  UnstyledButton,
+  useMantineTheme,
 } from "@mantine/core";
-import Link from "next/link";
-import { DateTime } from "luxon";
-import { AttributePill } from "@/components/data-fields";
 import {
-  IconExternalLink,
-  IconArrowUpRight,
-  IconClockHour4,
   IconArrowsSort,
+  IconArrowUpRight,
   IconChevronDown,
+  IconClockHour4,
+  IconExternalLink,
 } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
+
+import { DateTime } from "luxon";
+import Link from "next/link";
+
+// Project components
+import { AttributePill } from "@/components/data-fields";
+import { LoadOverlay } from "@/components/load-overlay";
+import { DataPageCitation } from "@/components/page-citation";
+import { SortChip } from "@/components/sorting/sort-chips";
+import { TableCardLayout, TableCardSwitch } from "@/components/table-card-switch";
+
+// Local imports
+import styles from "../../components/record-list.module.css";
 import { MAX_WIDTH } from "../constants";
 import classes from "./page.module.css";
-import { useState, useMemo } from "react";
-import { SortChip } from "@/components/sorting/sort-chips";
-import { DataPageCitation } from "@/components/page-citation";
-import styles from "../../components/record-list.module.css";
-import { TableCardLayout, TableCardSwitch } from "@/components/table-card-switch";
 
 const GET_DATASETS = gql`
   query DatasetsAndSources {
@@ -68,32 +80,7 @@ const GET_DATASETS = gql`
   }
 `;
 
-interface Dataset {
-  name: string;
-  shortName?: string;
-  description?: string;
-  url?: string;
-  citation?: string;
-  license?: string;
-  rightsHolder?: string;
-  createdAt: string;
-  updatedAt: string;
-  reusePill?: ReusePillType;
-  accessPill?: AccessPillType;
-  publicationYear?: number;
-}
-
-interface Source {
-  name: string;
-  author: string;
-  rightsHolder: string;
-  accessRights: string;
-  license: string;
-  listsId: string | null;
-  reusePill?: ReusePillType;
-  accessPill?: AccessPillType;
-  contentType?: ContentType;
-  datasets: Dataset[];
+interface Source extends SourceRaw {
   lastUpdated?: string;
 }
 
@@ -102,41 +89,21 @@ interface GroupedSources {
   sources: Source[];
 }
 
-interface QueryResults {
-  sources: Source[];
-}
-
-type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
-
-const accessPillColours: Record<AccessPillType, string> = {
+const accessPillColours: Record<AccessRightsStatus, string> = {
   OPEN: "moss.3",
   RESTRICTED: "bushfire.4",
   CONDITIONAL: "wheat.3",
   VARIABLE: "wheat.3",
 };
 
-type ReusePillType = "LIMITED" | "NONE" | "UNLIMITED" | "VARIABLE";
-
-const reusePillColours: Record<ReusePillType, string> = {
+const reusePillColours: Record<DataReuseStatus, string> = {
   UNLIMITED: "moss.3",
   LIMITED: "wheat.3",
   NONE: "#d6e4ed",
   VARIABLE: "wheat.3",
 };
 
-type ContentType =
-  | "TAXONOMIC_BACKBONE"
-  | "ECOLOGICAL_TRAITS"
-  | "GENOMIC_DATA"
-  | "SPECIMENS"
-  | "NONGENOMIC_DATA"
-  | "MORPHOLOGICAL_TRAITS"
-  | "BIOCHEMICAL_TRAITS"
-  | "MIXED_DATATYPES"
-  | "FUNCTIONAL_TRAITS"
-  | "ETHNOBIOLOGY";
-
-const renameContentType: Record<ContentType, string> = {
+const renameContentType: Record<SourceContentType, string> = {
   GENOMIC_DATA: "Genomics sources",
   ECOLOGICAL_TRAITS: "Ecological traits sources",
   ETHNOBIOLOGY: "Ethnobiology sources",
@@ -149,7 +116,13 @@ const renameContentType: Record<ContentType, string> = {
   MORPHOLOGICAL_TRAITS: "Morphological traits sources",
 };
 
-function DatasetRow({ dataset, sourceLength, count }: { dataset: Dataset; sourceLength: number; count: number }) {
+interface DatasetRowProps {
+  dataset: DatasetDetails;
+  sourceLength: number;
+  count: number;
+}
+
+function DatasetRow({ dataset, sourceLength, count }: DatasetRowProps) {
   const theme = useMantineTheme();
 
   return (
@@ -477,7 +450,7 @@ function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) 
       <Accordion.Control>
         <Group justify="space-between" pr={30}>
           <Text fw="bold" fz="var(--mantine-h4-font-size)" c="black">
-            {renameContentType[contentType.contentType as ContentType]}
+            {renameContentType[contentType.contentType as SourceContentType]}
           </Text>
           <Group mt={15} gap={50} align="center">
             <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
@@ -505,7 +478,7 @@ function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) 
   );
 }
 
-function findSourceLastUpdated(datasets: Dataset[]): string {
+function findSourceLastUpdated(datasets: DatasetDetails[]): string {
   return datasets.reduce((latest, d) => {
     const updatedAt = d.updatedAt ? new Date(d.updatedAt).getTime() : 0;
     return updatedAt > new Date(latest).getTime() ? d.updatedAt : latest;
@@ -513,7 +486,7 @@ function findSourceLastUpdated(datasets: Dataset[]): string {
 }
 
 function groupByContentType(sources?: Source[]): GroupedSources[] {
-  const desiredOrder: ContentType[] = [
+  const desiredOrder: SourceContentType[] = [
     "GENOMIC_DATA",
     "ECOLOGICAL_TRAITS",
     "ETHNOBIOLOGY",
@@ -548,8 +521,8 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
         sources: grouped[contentType],
       }))
       .sort((a, b) => {
-        const indexA = desiredOrder.indexOf(a.contentType as ContentType);
-        const indexB = desiredOrder.indexOf(b.contentType as ContentType);
+        const indexA = desiredOrder.indexOf(a.contentType as SourceContentType);
+        const indexB = desiredOrder.indexOf(b.contentType as SourceContentType);
         return (indexA !== -1 ? indexA : desiredOrder.length) - (indexB !== -1 ? indexB : desiredOrder.length);
       });
   } else {
@@ -558,7 +531,7 @@ function groupByContentType(sources?: Source[]): GroupedSources[] {
 }
 
 export default function DatasetsPage() {
-  const { loading, data } = useQuery<QueryResults>(GET_DATASETS);
+  const { loading, data } = useQuery<{ sources: Source[] }>(GET_DATASETS);
   const theme = useMantineTheme();
 
   const filteredSources = data?.sources.map((source) => ({

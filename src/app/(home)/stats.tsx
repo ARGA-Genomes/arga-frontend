@@ -1,21 +1,19 @@
 "use client";
+// Types
+import { DataBreakdown, RankSummary, TaxonomicRankStatistic } from "@/generated/types";
 
-import { DataField } from "@/components/highlight-stack";
+// Imports
 import { DataTable, DataTableRow } from "@/components/data-table";
-import { TachoChart } from "@/components/graphing/tacho";
-import { gql, useQuery } from "@apollo/client";
-import { Grid, Paper, Stack, Title, Text, Skeleton, Box } from "@mantine/core";
-import * as Humanize from "humanize-plus";
 import { BarChart, StackedBarGraph } from "@/components/graphing/bar";
+import { TachoChart } from "@/components/graphing/tacho";
+import { DataField } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
-import { CircularPackingChart } from "@/components/graphing/circular-packing";
-import { SunburstChart } from "@/components/graphing/sunburst";
-import { useState } from "react";
-import { useDatasets } from "../source-provider";
-import { TaxonomicRankStatistic } from "@/queries/stats";
+import { gql, useQuery } from "@apollo/client";
+import { Box, Grid, Paper, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { IconArrowUpRight } from "@tabler/icons-react";
+import * as Humanize from "humanize-plus";
 import Link from "next/link";
-
+import { useDatasets } from "../source-provider";
 import classes from "./stats.module.css";
 
 const RANK_PLURALS: Record<string, string> = {
@@ -47,236 +45,10 @@ const GET_TAXON = gql`
   }
 `;
 
-interface DataBreakdown {
-  canonicalName: string;
-  genomes: number;
-  totalGenomic: number;
-}
-
-interface Taxonomy {
-  speciesGenomesSummary: DataBreakdown[];
-  speciesSummary: {
-    total: number;
-    genomes: number;
-    genomicData: number;
-  };
-}
-
 interface TaxonResults {
-  taxon: Taxonomy;
-}
-
-const GET_DESCENDANTS = gql`
-  query DescendantStats {
-    eukaryotaTaxon: taxon(rank: DOMAIN, canonicalName: "Eukaryota") {
-      canonicalName
-      summary {
-        species
-      }
-    }
-
-    animaliaTaxon: taxon(rank: KINGDOM, canonicalName: "Animalia") {
-      canonicalName
-      summary {
-        species
-      }
-      descendants(rank: PHYLUM) {
-        canonicalName
-        species
-      }
-    }
-
-    protistaTaxon: taxon(rank: SUPERKINGDOM, canonicalName: "Protista") {
-      canonicalName
-      summary {
-        species
-      }
-      descendants(rank: PHYLUM) {
-        canonicalName
-        species
-      }
-    }
-
-    fungiTaxon: taxon(rank: REGNUM, canonicalName: "Fungi") {
-      canonicalName
-      summary {
-        species
-      }
-      descendants(rank: DIVISION) {
-        canonicalName
-        species
-      }
-    }
-
-    plantaeTaxon: taxon(rank: REGNUM, canonicalName: "Plantae") {
-      canonicalName
-      summary {
-        species
-      }
-      descendants(rank: DIVISION) {
-        canonicalName
-        species
-      }
-    }
-
-    chromistaTaxon: taxon(rank: REGNUM, canonicalName: "Chromista") {
-      canonicalName
-      summary {
-        species
-      }
-      descendants(rank: DIVISION) {
-        canonicalName
-        species
-      }
-    }
-  }
-`;
-
-interface EukaryotaDescendantResults {
-  eukaryotaTaxon: {
-    canonicalName: string;
-    summary: {
-      species: number;
-    };
-  };
-  animaliaTaxon: {
-    canonicalName: string;
-    summary: {
-      species: number;
-    };
-    descendants: {
-      canonicalName: string;
-      species: number;
-    }[];
-  };
-  protistaTaxon: {
-    canonicalName: string;
-    summary: {
-      species: number;
-    };
-    descendants: {
-      canonicalName: string;
-      species: number;
-    }[];
-  };
-  fungiTaxon: {
-    canonicalName: string;
-    summary: {
-      species: number;
-    };
-    descendants: {
-      canonicalName: string;
-      species: number;
-    }[];
-  };
-  plantaeTaxon: {
-    canonicalName: string;
-    summary: {
-      species: number;
-    };
-    descendants: {
-      canonicalName: string;
-      species: number;
-    }[];
-  };
-  chromistaTaxon: {
-    canonicalName: string;
-    summary: {
-      species: number;
-    };
-    descendants: {
-      canonicalName: string;
-      species: number;
-    }[];
-  };
-}
-
-const GET_EUKARYOTA_TREE = gql`
-  query TaxonHierarchy {
-    animaliaTree: stats {
-      taxonBreakdown(taxonRank: KINGDOM, taxonCanonicalName: "Animalia", includeRanks: [PHYLUM, CLASS]) {
-        name: canonicalName
-        rank
-        children {
-          name: canonicalName
-          rank
-          value: species
-        }
-      }
-    }
-
-    plantaeTree: stats {
-      taxonBreakdown(taxonRank: REGNUM, taxonCanonicalName: "Plantae", includeRanks: [DIVISION, CLASSIS]) {
-        name: canonicalName
-        rank
-        children {
-          name: canonicalName
-          rank
-          value: species
-        }
-      }
-    }
-
-    fungiTree: stats {
-      taxonBreakdown(taxonRank: REGNUM, taxonCanonicalName: "Fungi", includeRanks: [DIVISION, CLASSIS]) {
-        name: canonicalName
-        rank
-        children {
-          name: canonicalName
-          rank
-          value: species
-        }
-      }
-    }
-
-    protistaTree: stats {
-      taxonBreakdown(taxonRank: KINGDOM, taxonCanonicalName: "Protista", includeRanks: [PHYLUM, CLASS]) {
-        name: canonicalName
-        rank
-        children {
-          name: canonicalName
-          rank
-          value: species
-        }
-      }
-    }
-
-    chromistaTree: stats {
-      taxonBreakdown(taxonRank: REGNUM, taxonCanonicalName: "Chromista", includeRanks: [DIVISION, CLASSIS]) {
-        name: canonicalName
-        rank
-        children {
-          name: canonicalName
-          rank
-          value: species
-        }
-      }
-    }
-  }
-`;
-
-interface TaxonTreeNode {
-  name: string;
-  rank: string;
-  value?: number;
-  children?: TaxonTreeNode[];
-}
-
-interface EukaryotaTreeResults {
-  animaliaTree: {
-    taxonBreakdown: TaxonTreeNode[];
-  };
-  plantaeTree: {
-    taxonBreakdown: TaxonTreeNode[];
-  };
-  fungiTree: {
-    taxonBreakdown: TaxonTreeNode[];
-  };
-  protistaTree: {
-    taxonBreakdown: TaxonTreeNode[];
-  };
-  chromistaTree: {
-    taxonBreakdown: TaxonTreeNode[];
+  taxon: {
+    speciesSummary: RankSummary;
+    speciesGenomesSummary: DataBreakdown[];
   };
 }
 
@@ -378,106 +150,6 @@ export function ShowStats() {
   );
 }
 
-interface TreeNode {
-  name: string;
-  value?: number;
-  color?: string;
-  children?: TreeNode[];
-}
-
-export function ShowCircularTaxonomy() {
-  const [treeData, setTreeData] = useState<TreeNode>();
-
-  const { loading } = useQuery<EukaryotaDescendantResults>(GET_DESCENDANTS, {
-    onCompleted: (data) => {
-      const kingdomsRegnaTaxa = [
-        data.animaliaTaxon,
-        data.protistaTaxon,
-        data.plantaeTaxon,
-        data.fungiTaxon,
-        data.chromistaTaxon,
-      ];
-      const tData: TreeNode = {
-        name: data.eukaryotaTaxon.canonicalName,
-        children: kingdomsRegnaTaxa.map((taxon) => {
-          return {
-            name: taxon.canonicalName,
-            children: taxon.descendants.map((descendant) => {
-              return {
-                name: descendant.canonicalName,
-                value: descendant.species,
-              };
-            }),
-          };
-        }),
-      };
-      setTreeData(tData);
-    },
-  });
-
-  if (loading) {
-    return <p>loading...</p>;
-  }
-
-  return (
-    <>
-      {treeData && (
-        // <CircularPacking data={treeData} width={1000} height={700} />
-
-        <CircularPackingChart data={treeData} width={520} height={520} />
-      )}
-    </>
-  );
-}
-
-export function ShowSunburstTaxonomy() {
-  const [treeData, setTreeData] = useState<TaxonTreeNode>();
-
-  const { loading } = useQuery<EukaryotaTreeResults>(GET_EUKARYOTA_TREE, {
-    onCompleted: (data) => {
-      const kingdomsRegnaTaxa = [
-        {
-          name: "Animalia",
-          rank: "KINGDOM",
-          children: data.animaliaTree.taxonBreakdown,
-        },
-        {
-          name: "Plantae",
-          rank: "REGNUM",
-          children: data.plantaeTree.taxonBreakdown,
-        },
-        {
-          name: "Fungi",
-          rank: "REGNUM",
-          children: data.fungiTree.taxonBreakdown,
-        },
-        {
-          name: "Protista",
-          rank: "KINGDOM",
-          children: data.protistaTree.taxonBreakdown,
-        },
-        {
-          name: "Chromista",
-          rank: "REGNUM",
-          children: data.chromistaTree.taxonBreakdown,
-        },
-      ];
-      const tData: TaxonTreeNode = {
-        name: "Eukaryota",
-        rank: "DOMAIN",
-        children: kingdomsRegnaTaxa,
-      };
-      setTreeData(tData);
-    },
-  });
-
-  return (
-    <Skeleton visible={loading} circle>
-      {treeData && <SunburstChart data={treeData} width={520} height={520} />}
-    </Skeleton>
-  );
-}
-
 const GET_TAXONOMIC_RANK_STATS = gql`
   query TaxonomicRankStats($ranks: [TaxonomicRank]) {
     stats {
@@ -515,7 +187,7 @@ const GET_TAXONOMIC_RANK_STATS = gql`
   }
 `;
 
-type TaxonomicRankStatsQuery = {
+interface TaxonomicRankStatsQuery {
   stats: {
     animalia: TaxonomicRankStatistic[];
     plantae: TaxonomicRankStatistic[];
@@ -523,7 +195,7 @@ type TaxonomicRankStatsQuery = {
     chromista: TaxonomicRankStatistic[];
     protista: TaxonomicRankStatistic[];
   };
-};
+}
 
 export function TaxonomicComposition() {
   const ranks = ["KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];

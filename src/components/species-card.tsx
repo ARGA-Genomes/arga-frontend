@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { Card, Text, Group, Stack, SimpleGrid, Box, Skeleton } from "@mantine/core";
+import { SpeciesCard as SpeciesCardType } from "@/generated/types";
+import { Box, Card, Group, SimpleGrid, Skeleton, Stack, Text } from "@mantine/core";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
+import Link from "next/link";
 import { SpeciesPhoto } from "./species-image";
-import { Photo } from "@/app/type";
 
 export interface Taxonomy {
   canonicalName: string;
@@ -13,12 +13,6 @@ export interface DataSummary {
   loci: number;
   specimens: number;
   other: number;
-}
-
-export interface Species {
-  taxonomy: Taxonomy;
-  photo?: Photo;
-  dataSummary: DataSummary;
 }
 
 export function DataItem({ name, count, textWidth }: { name?: string; count?: number; textWidth?: number }) {
@@ -35,7 +29,7 @@ export function DataItem({ name, count, textWidth }: { name?: string; count?: nu
   );
 }
 
-export function SpeciesCard({ species }: { species?: Species }) {
+export function SpeciesCard({ species }: { species?: SpeciesCardType }) {
   const itemLinkName = species?.taxonomy.canonicalName.replaceAll(" ", "_") || "";
   const height = 260;
 

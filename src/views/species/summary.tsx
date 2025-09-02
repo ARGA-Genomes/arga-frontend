@@ -1,19 +1,19 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
 import { gql, useQuery } from "@apollo/client";
 import { Grid, Group, Paper, Stack, Text } from "@mantine/core";
-import { Taxonomy, Photo } from "@/app/type";
+import * as Humanize from "humanize-plus";
 
-import { AttributePill as AttributePillStack } from "@/components/highlight-stack";
+import { useDatasets } from "@/app/source-provider";
+import { ExternalLinkButton } from "@/components/button-link-external";
 import { AttributePill } from "@/components/data-fields";
-import { useEffect, useState } from "react";
+import { AttributePill as AttributePillStack } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
 import { SpeciesPhoto } from "@/components/species-image";
-import { IconArrowUpRight } from "@tabler/icons-react";
-import { ExternalLinkButton } from "@/components/button-link-external";
+import { Species, SpeciesGenomicDataSummary, Taxon, Taxonomy } from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
-import { useDatasets } from "@/app/source-provider";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String, $datasetId: UUID) {
@@ -26,18 +26,6 @@ const GET_TAXON = gql`
     }
   }
 `;
-
-interface ClassificationNode {
-  canonicalName: string;
-  rank: string;
-  depth: number;
-}
-
-interface TaxonQuery {
-  taxon: {
-    hierarchy: ClassificationNode[];
-  };
-}
 
 const GET_SUMMARY = gql`
   query SpeciesSummary($canonicalName: String) {
@@ -60,22 +48,6 @@ const GET_SUMMARY = gql`
     }
   }
 `;
-
-interface speciesDataSummary {
-  genomes: number;
-  loci: number;
-}
-
-interface Species {
-  taxonomy: Taxonomy[];
-  photos: Photo[];
-  dataSummary: speciesDataSummary;
-}
-
-interface QueryResults {
-  species: Species;
-}
-
 interface TaxonMatch {
   identifier: string;
   name: string;
@@ -97,7 +69,7 @@ function SummaryInfo({ label, value }: SummaryInfoProps) {
   );
 }
 
-function DataSummary({ speciesData }: { speciesData: speciesDataSummary | undefined }) {
+function DataSummary({ speciesData }: { speciesData?: SpeciesGenomicDataSummary }) {
   return (
     <Paper radius={16} p="md" withBorder>
       <Text fw={700} size="lg" pb={10}>
@@ -240,7 +212,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   const { names } = useDatasets();
   const dataset = names.get("Atlas of Living Australia");
 
-  const { loading, error, data } = useQuery<TaxonQuery>(GET_TAXON, {
+  const { loading, error, data } = useQuery<{ taxon: Taxon }>(GET_TAXON, {
     variables: {
       rank: taxonomy.rank,
       canonicalName: taxonomy.canonicalName,
@@ -290,7 +262,7 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
 export default function SummaryPage({ params }: { params: { name: string } }) {
   const canonicalName = getCanonicalName(params);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_SUMMARY, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_SUMMARY, {
     variables: { canonicalName },
   });
 

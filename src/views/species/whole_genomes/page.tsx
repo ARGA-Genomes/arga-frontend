@@ -1,22 +1,23 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { useState, use } from "react";
-import { LoadOverlay } from "@/components/load-overlay";
-import { PaginationBar } from "@/components/pagination";
-import { AnalysisMap } from "@/components/mapping";
-import { RecordItem, RecordList } from "@/components/record-list";
-import { usePathname } from "next/navigation";
-import { IconEye } from "@tabler/icons-react";
-import Link from "next/link";
-import { Marker } from "@/components/mapping/analysis-map";
-import { FilterBar } from "@/components/filtering/filter-bar";
-import { SequenceFilters } from "@/components/filtering/sequence-filters";
-import { Filter, intoFilterItem } from "@/components/filtering/common";
 import { AttributePill, AttributePillValue, DataField } from "@/components/data-fields";
 import { DataTable, DataTableRow } from "@/components/data-table";
+import { Filter, intoFilterItem } from "@/components/filtering/common";
+import { FilterBar } from "@/components/filtering/filter-bar";
+import { SequenceFilters } from "@/components/filtering/sequence-filters";
+import { LoadOverlay } from "@/components/load-overlay";
+import { AnalysisMap } from "@/components/mapping";
+import { Marker } from "@/components/mapping/analysis-map";
+import { PaginationBar } from "@/components/pagination";
+import { RecordItem, RecordList } from "@/components/record-list";
+import { Species, WholeGenome as WholeGenomeType } from "@/generated/types";
+import { gql, useQuery } from "@apollo/client";
+import { Box, Button, Center, Drawer, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { IconEye } from "@tabler/icons-react";
+import * as Humanize from "humanize-plus";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { use, useState } from "react";
 
 const PAGE_SIZE = 5;
 
@@ -72,50 +73,7 @@ const GET_WHOLE_GENOMES = gql`
   }
 `;
 
-interface WholeGenome {
-  id: string;
-  dnaExtractId: string;
-  datasetName: string;
-  recordId: string;
-  accession?: string;
-  materialSampleId?: string;
-  name?: string;
-  quality?: string;
-  releaseType?: string;
-  releaseDate?: string;
-  representation?: string;
-  versionStatus?: string;
-  estimatedSize?: number;
-  excludedFromRefseq?: string;
-  assemblyType?: string;
-  genomeSize?: number;
-  dataType?: string;
-  sequencedBy?: string;
-  assembledBy?: string;
-  annotatedBy?: string;
-  depositedBy?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-interface Species {
-  wholeGenomes: {
-    total: number;
-    records: WholeGenome[];
-  };
-}
-
-interface QueryResults {
-  species: Species;
-}
-
-interface RefseqResults {
-  species: {
-    referenceGenome?: WholeGenome;
-  };
-}
-
-function LabeledValue({ label, value }: { label: string; value: string | undefined }) {
+function LabeledValue({ label, value }: { label: string; value?: string | null }) {
   return (
     <Group gap={20}>
       <Text fw={300} size="sm">
@@ -126,7 +84,7 @@ function LabeledValue({ label, value }: { label: string; value: string | undefin
   );
 }
 
-function RecordItemContent({ record }: { record: WholeGenome }) {
+function RecordItemContent({ record }: { record: WholeGenomeType }) {
   return (
     <Grid p={20}>
       <Grid.Col span={4}>
@@ -153,7 +111,7 @@ function RecordItemContent({ record }: { record: WholeGenome }) {
   );
 }
 
-function WholeGenomeList({ records }: { records: WholeGenome[] }) {
+function WholeGenomeList({ records }: { records: WholeGenomeType[] }) {
   const path = usePathname();
 
   return (
@@ -167,7 +125,7 @@ function WholeGenomeList({ records }: { records: WholeGenome[] }) {
   );
 }
 
-function toMarker(color: [number, number, number, number], records?: WholeGenome[]) {
+function toMarker(color: [number, number, number, number], records?: WholeGenomeType[]) {
   if (!records) return [];
   return records.map((r) => {
     return {
@@ -179,7 +137,7 @@ function toMarker(color: [number, number, number, number], records?: WholeGenome
   });
 }
 
-function WholeGenomeMap({ records }: { records: WholeGenome[] | undefined }) {
+function WholeGenomeMap({ records }: { records?: WholeGenomeType[] }) {
   const markers = toMarker([243, 117, 36, 220], records).filter((s) => s.latitude) as Marker<null>[];
 
   return (
@@ -195,7 +153,7 @@ function WholeGenomeMap({ records }: { records: WholeGenome[] | undefined }) {
 function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
   const path = usePathname();
 
-  const { loading, error, data } = useQuery<RefseqResults>(GET_REFERENCE_GENOME, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_REFERENCE_GENOME, {
     variables: { canonicalName },
   });
 
@@ -252,7 +210,7 @@ function ReferenceGenome({ canonicalName }: { canonicalName: string }) {
   );
 }
 
-function AssemblyStats({ genome }: { genome: WholeGenome | undefined }) {
+function AssemblyStats({ genome }: { genome?: WholeGenomeType }) {
   return (
     <Paper p="lg" radius="lg" pos="relative" withBorder>
       <LoadOverlay visible={false} />
@@ -299,7 +257,7 @@ export default function WholeGenome(props: { params: Promise<{ name: string }> }
   const [mapExpand, setMapExpand] = useState(false);
   const [page, setPage] = useState(1);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_WHOLE_GENOMES, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_WHOLE_GENOMES, {
     variables: {
       canonicalName,
       page,

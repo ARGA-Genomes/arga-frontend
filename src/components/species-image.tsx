@@ -1,15 +1,15 @@
 "use client";
 
+import { Maybe, SpeciesPhoto as SpeciesPhotoType } from "@/generated/types";
 import classes from "./species-image.module.css";
 
-import { BackgroundImage, Text, Group, Flex, BackgroundImageProps } from "@mantine/core";
+import { BackgroundImage, BackgroundImageProps, Flex, Group, Text } from "@mantine/core";
 import Link from "next/link";
-import { Photo } from "@/app/type";
 
 const FLAT_BOTTOM = { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 };
 
 interface SpeciesPhotoProps extends Omit<BackgroundImageProps, "src"> {
-  photo?: Photo;
+  photo?: Maybe<SpeciesPhotoType>;
   flatBottom?: boolean;
 }
 

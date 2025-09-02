@@ -1,3 +1,4 @@
+import { TaxonTreeNodeStatistics } from "@/generated/types";
 import { gql } from "@apollo/client";
 
 export const TAXON_TREE_NODE_STATISTICS = gql`
@@ -16,29 +17,7 @@ export const TAXON_TREE_NODE_STATISTICS = gql`
   }
 `;
 
-export interface TaxonStatTreeNode {
-  scientificName: string;
-  canonicalName: string;
-  rank: string;
-  loci?: number;
-  genomes?: number;
-  specimens?: number;
-  other?: number;
-  totalGenomic?: number;
-
-  species?: number;
-  fullGenomesCoverage?: number;
-  children?: TaxonStatTreeNode[];
-}
-
-export interface TaxonomicRankStatistic {
-  rank: string;
-  children: number;
-  coverage: number;
-  atLeastOne: number;
-}
-
-export function findChildren(root: TaxonStatTreeNode, scientificName: string): TaxonStatTreeNode[] {
+export function findChildren(root: TaxonTreeNodeStatistics, scientificName: string): TaxonTreeNodeStatistics[] {
   if (root.scientificName === scientificName) {
     return root.children || [];
   }
@@ -51,7 +30,7 @@ export function findChildren(root: TaxonStatTreeNode, scientificName: string): T
   return [];
 }
 
-export function findChildrenCanonical(root: TaxonStatTreeNode, canonicalName: string): TaxonStatTreeNode[] {
+export function findChildrenCanonical(root: TaxonTreeNodeStatistics, canonicalName: string): TaxonTreeNodeStatistics[] {
   if (root.canonicalName === canonicalName) {
     return root.children || [];
   }

@@ -2,13 +2,13 @@
 
 import classes from "./genome-composition.module.css";
 
-import * as Humanize from "humanize-plus";
+import { Statistics, TaxonomicRankStatistic } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
-import { TaxonomicRankStatistic } from "@/queries/stats";
 import { Group } from "@visx/group";
 import { Text } from "@visx/text";
 import { max } from "d3";
 import { motion } from "framer-motion";
+import * as Humanize from "humanize-plus";
 import { useState } from "react";
 
 const LEVEL_HEIGHT = 27;
@@ -39,12 +39,6 @@ const GET_TAXONOMIC_RANK_STATS = gql`
     }
   }
 `;
-
-type TaxonomicRankStatsQuery = {
-  stats: {
-    taxonomicRanks: TaxonomicRankStatistic[];
-  };
-};
 
 type Level = {
   label: string;
@@ -140,11 +134,9 @@ function SlantedBar({ level, maxWidth }: SlantedBarProps) {
         transition={transition}
         className={level.className}
       >
-        <Text
-          className={classes.levelText}
-          dy={midY - 2}
-          dx={midX}
-        >{`${Humanize.formatNumber(level.total)} ${RANK_PLURALS[level.label]}`}</Text>
+        <Text className={classes.levelText} dy={midY - 2} dx={midX}>{`${Humanize.formatNumber(level.total)} ${
+          RANK_PLURALS[level.label]
+        }`}</Text>
         <text className={classes.levelDescriptionText} dy={midY + 4} dx={midX}>
           <tspan>At least 1 genome from each {level.label.toLocaleLowerCase()}: </tspan>
           <tspan fontWeight={600}>{Math.round(level.coverage * 100)}% complete</tspan>
@@ -159,7 +151,7 @@ interface GenomeCompositionProps {
 }
 
 export const GenomeComposition = ({ ranks }: GenomeCompositionProps) => {
-  const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
+  const { data } = useQuery<{ stats: Statistics }>(GET_TAXONOMIC_RANK_STATS, {
     variables: {
       taxonRank: "DOMAIN",
       taxonCanonicalName: "Eukaryota",

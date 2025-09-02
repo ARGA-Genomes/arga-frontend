@@ -1,9 +1,15 @@
 "use client";
 
+import { CopyableData } from "@/components/data-fields";
+import { DataTable, DataTableRow } from "@/components/data-table";
+import { AttributePill, DataField } from "@/components/highlight-stack";
+import { LoadPanel } from "@/components/load-overlay";
+import { AnalysisMap } from "@/components/mapping";
+import { Marker } from "@/components/mapping/analysis-map";
+import { TraceData } from "@/components/traces/trace-data";
+import { Sequence, Specimen } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, ButtonProps, Center, Flex, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
-import { LoadPanel } from "@/components/load-overlay";
-import { AttributePill, DataField } from "@/components/highlight-stack";
 import {
   IconArrowNarrowLeft,
   IconCircleCheck,
@@ -11,15 +17,8 @@ import {
   IconCloudUpload,
   IconDownload,
   IconLink,
-  IconMicroscope,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { CopyableData } from "@/components/data-fields";
-import { DataDepositionEvent, Sequence, SequencingEvent, SequencingRunEvent } from "@/queries/sequence";
-import { AnalysisMap } from "@/components/mapping";
-import { DataTable, DataTableRow } from "@/components/data-table";
-import { TraceData } from "@/components/traces/trace-data";
-import { Marker } from "@/components/mapping/analysis-map";
 
 const GET_ASSEMBLY = gql`
   query MarkerFullData($recordId: String) {
@@ -67,31 +66,8 @@ const GET_ASSEMBLY = gql`
   }
 `;
 
-type SequenceDetails = Sequence & {
-  events: {
-    sequencing: SequencingEvent[];
-    sequencingRuns: SequencingRunEvent[];
-    dataDepositions: DataDepositionEvent[];
-  };
-};
-
-interface SpecimenDetails {
-  recordId: string;
-  collectionCode?: string;
-  latitude?: number;
-  longitude?: number;
-  events: {
-    accessions: { id: string }[];
-  };
-}
-
-interface SequenceQueryResults {
-  sequence: SequenceDetails[];
-  specimen: SpecimenDetails;
-}
-
 interface LinkButtonProps extends ButtonProps {
-  href?: string;
+  href?: string | null;
   children?: React.ReactNode;
 }
 
@@ -107,7 +83,7 @@ function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
   );
 }
 
-function MoleculeDetails({ sequence }: { sequence: SequenceDetails | undefined }) {
+function MoleculeDetails({ sequence }: { sequence?: Sequence }) {
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
@@ -200,13 +176,7 @@ function DataAvailabilityItem({ value, children }: { value: boolean | undefined;
   );
 }
 
-function DataAvailability({
-  sequence,
-  specimen,
-}: {
-  sequence: SequenceDetails | undefined;
-  specimen: SpecimenDetails | undefined;
-}) {
+function DataAvailability({ sequence, specimen }: { sequence?: Sequence; specimen?: Specimen }) {
   const sequencing = sequence?.events.sequencing[0];
   const sequencingRun = sequence?.events.sequencingRuns[0];
   const deposition = sequence?.events.dataDepositions[0];
@@ -221,12 +191,13 @@ function DataAvailability({
       <DataAvailabilityItem value={!!specimen?.events.accessions.length}>
         Specimen voucher accessioned
       </DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen?.latitude}>Specimen location available</DataAvailabilityItem>
+      {/* No longer exists on specimen type */}
+      {/* <DataAvailabilityItem value={!!specimen?.latitude}>Specimen location available</DataAvailabilityItem> */}
     </Stack>
   );
 }
 
-function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined }) {
+function DataProvenance({ sequence }: { sequence?: Sequence }) {
   const sequencing = sequence?.events.sequencing[0];
   const deposition = sequence?.events.dataDepositions[0];
 
@@ -248,7 +219,7 @@ function DataProvenance({ sequence }: { sequence: SequenceDetails | undefined })
   );
 }
 
-function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefined }) {
+function AmplificationMethods({ sequence }: { sequence?: Sequence }) {
   const sequencingRun = sequence?.events.sequencingRuns[0];
 
   return (
@@ -257,7 +228,7 @@ function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefi
         <DataField value={sequencingRun?.sequencePrimerForwardName} />
       </DataTableRow>
       <DataTableRow label="Primer reverse">
-        <DataField value={sequencingRun?.sequencingPrimerReverseName} />
+        <DataField value={sequencingRun?.sequencePrimerReverseName} />
       </DataTableRow>
       <DataTableRow label="Data source">
         <DataField value={sequence?.datasetName} />
@@ -266,7 +237,7 @@ function AmplificationMethods({ sequence }: { sequence: SequenceDetails | undefi
   );
 }
 
-function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }) {
+function SpecimenPreview({ specimen }: { specimen?: Specimen }) {
   return (
     <Grid>
       <Grid.Col span={7}>
@@ -275,19 +246,22 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
 
           <DataTable>
             <DataTableRow label="Sample ID">
-              <DataField value={specimen?.recordId} />
+              {/* <DataField value={specimen?.recordId} /> */}
+              No longer exists on Specimen type
             </DataTableRow>
             <DataTableRow label="Sequenced by">
-              <DataField value={specimen?.collectionCode} />
+              {/* <DataField value={specimen?.collectionCode} /> */}
+              No longer exists on Specimen type
             </DataTableRow>
           </DataTable>
 
           <Center>
-            <Link href={`../specimens/${specimen?.recordId}`}>
+            {/* <Link href={`../specimens/${specimen?.recordId}`}>
               <Button radius="md" color="midnight.10" leftSection={<IconMicroscope />}>
                 go to specimen
               </Button>
-            </Link>
+            </Link> */}
+            No longer exists on Specimen type
           </Center>
         </Stack>
       </Grid.Col>
@@ -298,14 +272,17 @@ function SpecimenPreview({ specimen }: { specimen: SpecimenDetails | undefined }
   );
 }
 
-function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
-  const position: [number, number] | undefined =
-    specimen?.latitude && specimen.longitude ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
+function SpecimenMap({ specimen }: { specimen?: Specimen }) {
+  // const position: [number, number] | undefined =
+  //  specimen?.latitude && specimen.longitude ? [Number(specimen.latitude), Number(specimen.longitude)] : undefined;
+  // latitude & longitude no longer exists on Specimen type
+  const position: [number, number] | undefined = undefined;
 
   const marker =
     position &&
     ({
-      tooltip: specimen?.recordId,
+      // tooltip: specimen?.recordId, // recordID no longer exists on Specimen type
+      tooltip: specimen?.entityId,
       latitude: position[0],
       longitude: position[1],
       color: [103, 151, 180, 220],
@@ -323,7 +300,7 @@ function SpecimenMap({ specimen }: { specimen: SpecimenDetails | undefined }) {
   );
 }
 
-function TraceDataList({ sequence }: { sequence: SequenceDetails | undefined }) {
+function TraceDataList({ sequence }: { sequence?: Sequence }) {
   return (
     <Stack>
       {sequence?.events.sequencingRuns.map((run, idx) => run.trace && <TraceData key={idx} trace={run.trace} />)}
@@ -332,7 +309,7 @@ function TraceDataList({ sequence }: { sequence: SequenceDetails | undefined }) 
 }
 
 export default function MarkerAccession({ params }: { params: { accession: string } }) {
-  const { loading, error, data } = useQuery<SequenceQueryResults>(GET_ASSEMBLY, {
+  const { loading, error, data } = useQuery<{ sequence: Sequence[]; specimen: Specimen }>(GET_ASSEMBLY, {
     variables: {
       recordId: params.accession,
     },

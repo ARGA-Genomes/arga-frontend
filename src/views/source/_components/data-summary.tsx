@@ -7,7 +7,7 @@ import { TachoChart } from "@/components/graphing/tacho";
 import { gql } from "@apollo/client";
 import { Box, Flex, Grid, Paper, Stack, Text, Title } from "@mantine/core";
 import * as Humanize from "humanize-plus";
-import { Source } from "../page";
+import { ExtendedSource } from "../page";
 import { GenomeCompletion } from "./genome-completion";
 import { TaxonomicDiversityGraph } from "./taxonomic-diversity-graph";
 
@@ -27,7 +27,7 @@ const DOWNLOAD_SUMMARY = gql`
   }
 `;
 
-export function DataSummary({ source, filters }: { source?: Source; filters: FilterItem[] }) {
+export function DataSummary({ source, filters }: { source?: ExtendedSource; filters: FilterItem[] }) {
   const minDate = new Date("2007-01-01");
   const maxDate = new Date(`${new Date().getFullYear() + 5}-01-01`);
 

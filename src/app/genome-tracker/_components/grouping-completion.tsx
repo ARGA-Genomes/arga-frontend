@@ -4,34 +4,35 @@ import classes from "./grouping-completion.module.css";
 
 import * as Humanize from "humanize-plus";
 
+import { useDatasets } from "@/app/source-provider";
+import { BarChart } from "@/components/graphing/bar";
 import { asPercentage, RadialBarDatum, RadialGraph } from "@/components/graphing/RadialBar";
+import { TachoChart } from "@/components/graphing/tacho";
+import { Statistics, Taxon } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import {
-  Text,
-  Image,
   Box,
   Center,
+  getThemeColor,
   Grid,
   Group,
+  Image,
+  MantineSize,
   Paper,
   SegmentedControl,
   SimpleGrid,
   Stack,
+  Text,
   Title,
   useMantineTheme,
-  getThemeColor,
-  MantineSize,
 } from "@mantine/core";
-import { useState } from "react";
+import { Circle } from "@visx/shape";
 import { Text as SvgText } from "@visx/text";
 import { motion } from "framer-motion";
-import { Circle } from "@visx/shape";
-import { CumulativeTracker } from "./cumulative-tracker";
-import { TachoChart } from "@/components/graphing/tacho";
-import { GenomeCompletion } from "./genome-completion";
-import { BarChart } from "@/components/graphing/bar";
-import { useDatasets } from "@/app/source-provider";
 import Link from "next/link";
+import { useState } from "react";
+import { CumulativeTracker } from "./cumulative-tracker";
+import { GenomeCompletion } from "./genome-completion";
 
 const GET_SPECIES_GENOME_SUMMARY = gql`
   query SpeciesGenomeSummary($rank: TaxonRank, $canonicalName: String, $datasetId: UUID) {
@@ -44,16 +45,6 @@ const GET_SPECIES_GENOME_SUMMARY = gql`
     }
   }
 `;
-
-export interface SpeciesGenomeSummary {
-  taxon: {
-    speciesGenomesSummary: {
-      canonicalName: string;
-      genomes: number;
-      totalGenomic: number;
-    }[];
-  };
-}
 
 const GET_COVERAGE_STATS = gql`
   query TaxonCoverageStats($taxonRank: TaxonomicRank, $taxonCanonicalName: String, $includeRanks: [TaxonomicRank]) {
@@ -193,7 +184,7 @@ interface GroupSelectionProps {
 function GroupSelection({ group, onSelected, selected }: GroupSelectionProps) {
   const query = QUERIES[group];
 
-  const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
+  const { data } = useQuery<{ stats: Statistics }>(GET_COVERAGE_STATS, {
     variables: {
       taxonRank: query.taxonRank,
       taxonCanonicalName: query.taxonCanonicalName,
@@ -246,7 +237,7 @@ export function GroupDetailRadial({
   const [showRaw, setShowRaw] = useState<boolean>(false);
   const [hoverItem, setHoverItem] = useState<RadialBarDatum | null>(null);
 
-  const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
+  const { data } = useQuery<{ stats: Statistics }>(GET_COVERAGE_STATS, {
     variables: {
       taxonRank: query.taxonRank,
       taxonCanonicalName: query.taxonCanonicalName,
@@ -274,7 +265,6 @@ export function GroupDetailRadial({
             {hoverItem && (
               <motion.g animate={{ scale: 2 }}>
                 <Circle r={radial || 40} className={classes[radialInner]} />
-
                 <SvgText fontSize={fontSize || 8} className={classes.text}>
                   {hoverItem.label}
                 </SvgText>
@@ -317,7 +307,7 @@ function SpeciesCoverageTacho({ group }: SpeciesCoverageTacho) {
   const theme = useMantineTheme();
   const query = QUERIES[group];
 
-  const { data } = useQuery<CoverageStatsQuery>(GET_COVERAGE_STATS, {
+  const { data } = useQuery<{ stats: Statistics }>(GET_COVERAGE_STATS, {
     variables: {
       taxonRank: query.taxonRank,
       taxonCanonicalName: query.taxonCanonicalName,
@@ -398,7 +388,7 @@ function SpeciesWithGenomes({ group }: { group: string }) {
   const { names } = useDatasets();
   const datasetId = names.get("Atlas of Living Australia")?.id;
 
-  const { data } = useQuery<SpeciesGenomeSummary>(GET_SPECIES_GENOME_SUMMARY, {
+  const { data } = useQuery<{ taxon: Taxon }>(GET_SPECIES_GENOME_SUMMARY, {
     variables: {
       datasetId,
       rank: query.taxonRank,
