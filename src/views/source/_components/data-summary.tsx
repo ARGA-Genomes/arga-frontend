@@ -92,7 +92,7 @@ export function DataSummary({ source, filters }: { source?: Source; filters: Fil
             <Text fw={300} size="sm">
               Taxonomic diversity of this dataset
             </Text>
-            <Box h={250}>
+            <Box h={280}>
               <TaxonomicDiversityGraph data={source?.taxonomicDiversity || []} />
             </Box>
           </Stack>

@@ -25,7 +25,7 @@ export const threatened = [
     image: "/icons/list-group/List group_ CITES.svg",
     source: "ARGA Threatened Species",
     filter: {
-      name: "EPBC_act_category_VU", // TODO: FIX
+      name: "EPBC_act_category_VU", // TODO: MISSING
       value: {
         bool: true,
       },
