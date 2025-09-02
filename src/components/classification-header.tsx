@@ -8,7 +8,6 @@ import { MAX_WIDTH } from "../app/constants";
 import { TaxonResult } from "@/app/(taxonomy)/[rank]/[name]/page";
 import { getTaxonIcon } from "@/helpers/getTaxonIcon";
 import { IconArrowUpRight } from "@tabler/icons-react";
-import { taxon as taxonOptions } from "../app/(home)/_data";
 import { AttributePill, AttributePillValue } from "./data-fields";
 
 interface ClassificationHeaderProps {
@@ -40,15 +39,7 @@ function SourcePill({ value }: SourcePillProps) {
 
 export default function ClassificationHeader({ rank, classification, taxon }: ClassificationHeaderProps) {
   const hierarchy = taxon?.hierarchy.toSorted((a, b) => b.depth - a.depth);
-  const taxonIcon = useMemo(
-    () =>
-      getTaxonIcon(classification) ||
-      taxonOptions.find((item) => {
-        const [itemRank, itemClassification] = item.link.substring(1).split("/");
-        return itemRank.toUpperCase() === rank && itemClassification === classification;
-      })?.image,
-    [rank, classification]
-  );
+  const taxonIcon = useMemo(() => getTaxonIcon(rank.toLowerCase(), classification), [rank, classification]);
 
   return (
     <Paper py={30}>
