@@ -1,5 +1,9 @@
 "use client";
 
+// Types
+import { RankSummary, Taxon } from "@/generated/types";
+
+// Imports
 import { MAX_WIDTH } from "@/app/constants";
 import { CompletionStepper } from "@/app/genome-tracker/_components/completion-stepper";
 import { GenomeCompletion } from "@/app/genome-tracker/_components/genome-completion";
@@ -74,6 +78,13 @@ const DOWNLOAD_SPECIES = gql`
   }
 `;
 
+export interface TaxonResult extends Taxon {
+  lowerRankSummary: RankSummary;
+  speciesRankSummary: RankSummary;
+}
+
+type TaxonQuery = { taxon: TaxonResult };
+
 const GET_TAXON = gql`
   query TaxonDetails($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $lowerRank: TaxonRank) {
     taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
@@ -135,64 +146,6 @@ const DOWNLOAD_SUMMARY = gql`
     }
   }
 `;
-
-interface DataBreakdown {
-  canonicalName: string;
-  genomes: number;
-  totalGenomic: number;
-}
-
-interface ClassificationNode {
-  scientificName: string;
-  canonicalName: string;
-  rank: string;
-  depth: number;
-}
-
-export interface Taxonomy {
-  scientificName: string;
-  scientificNameAuthorship: string;
-  canonicalName: string;
-  status: string;
-  nomenclaturalCode: string;
-  citation?: string;
-  source?: string;
-  sourceUrl?: string;
-  hierarchy: ClassificationNode[];
-  speciesGenomicDataSummary: DataBreakdown[];
-  speciesGenomesSummary: DataBreakdown[];
-  lowerRankSummary: {
-    total: number;
-    genomes: number;
-    genomicData: number;
-  };
-  speciesRankSummary: {
-    total: number;
-    genomes: number;
-    genomicData: number;
-  };
-  speciesSummary: {
-    total: number;
-    genomes: number;
-    totalGenomic: number;
-  };
-  descendants: {
-    canonicalName: string;
-    species: number;
-    speciesData: number;
-    speciesGenomes: number;
-  }[];
-}
-
-interface DataSummary {
-  genomes: number;
-  loci: number;
-  specimens: number;
-  other: number;
-}
-interface TaxonResults {
-  taxon: Taxonomy;
-}
 
 const CLASSIFICATIONS_CHILD_MAP: Record<string, string> = {
   DOMAIN: "kingdom",
@@ -268,7 +221,7 @@ function DataSummary({
   downloadVariables,
 }: {
   rank: string;
-  taxon: Taxonomy | undefined;
+  taxon: TaxonResult | undefined;
   downloadVariables: OperationVariables;
 }) {
   const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
@@ -529,7 +482,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
 
-  const taxonResults = useQuery<TaxonResults>(GET_TAXON, {
+  const taxonResults = useQuery<TaxonQuery>(GET_TAXON, {
     variables,
   });
 

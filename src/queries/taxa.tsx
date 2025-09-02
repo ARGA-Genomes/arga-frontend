@@ -26,30 +26,3 @@ export const TAXON_NODE = gql`
     depth
   }
 `;
-
-export interface TaxonName {
-  scientificName: string;
-  canonicalName: string;
-  authorship?: string;
-  status: string;
-  nomenclaturalCode: string;
-}
-
-export interface TaxonSource {
-  citation?: string;
-  source?: string;
-  sourceUrl?: string;
-}
-
-export interface TaxonNode {
-  scientificName: string;
-  canonicalName: string;
-  rank: string;
-  depth: number;
-}
-
-export type Taxon = TaxonName &
-  TaxonSource & {
-    datasetId: string;
-    entityId: string;
-  };

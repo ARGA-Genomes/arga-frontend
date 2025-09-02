@@ -10,14 +10,6 @@ export const SUBSAMPLE = gql`
   }
 `;
 
-export interface Subsample {
-  recordId: string,
-  materialSampleId?: string,
-  institutionName?: string,
-  institutionCode?: string,
-  typeStatus?: string,
-}
-
 export const SUBSAMPLE_EVENT = gql`
   fragment SubsampleEventDetails on SubsampleEvent {
     eventDate
@@ -26,10 +18,3 @@ export const SUBSAMPLE_EVENT = gql`
     preparationType
   }
 `;
-
-export interface SubsampleEvent {
-  eventDate?: string,
-  eventTime?: string,
-  subsampledBy?: string,
-  preparationType?: string,
-}

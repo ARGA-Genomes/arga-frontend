@@ -2,20 +2,20 @@
 
 import classes from "./RadialBar.module.css";
 
-import { ParentSize } from "@visx/responsive";
+import { CircleClipPath } from "@visx/clip-path";
 import { Group } from "@visx/group";
-import { scaleLinear, scaleBand } from "@visx/scale";
+import { ParentSize } from "@visx/responsive";
+import { scaleBand, scaleLinear } from "@visx/scale";
 import { Arc, Circle } from "@visx/shape";
+import { ArcProps } from "@visx/shape/lib/shapes/Arc";
 import { Text } from "@visx/text";
 import { max, min, ScaleLinear } from "d3";
-import { ArcProps } from "@visx/shape/lib/shapes/Arc";
-import { CircleClipPath } from "@visx/clip-path";
 import { useId } from "react";
 
 export interface RadialBarDatum {
   label: string;
   value: number;
-  total: number;
+  total?: number | null;
 }
 
 /* const toDegrees = (x: number) => (x * 180) / Math.PI; */
@@ -82,7 +82,7 @@ export function ThresholdGrid(props: ThresholdGridProps) {
 export function asPercentage(data: RadialBarDatum[]) {
   return data.map((datum) => ({
     label: datum.label,
-    value: (datum.value / datum.total) * 100 || 0,
+    value: (datum.value / (datum.total || 0)) * 100 || 0,
     total: 100,
   }));
 }
@@ -139,7 +139,7 @@ export function RadialGraph({ data, onHover, children }: RadialGraphProps) {
               {data.map((d, idx) => {
                 const startAngle = xScale(d.label) ?? 0;
                 const endAngle = startAngle + xScale.bandwidth();
-                const outerRadius = yScale(d.total) ?? 0;
+                const outerRadius = yScale(d.total || 0) ?? 0;
 
                 return (
                   <Group

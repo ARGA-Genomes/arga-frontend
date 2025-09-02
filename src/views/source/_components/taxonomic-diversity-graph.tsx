@@ -1,3 +1,4 @@
+import { KingdomPhylumCount } from "@/generated/types";
 import { Box, Group as MantineGroup, Text, Tooltip } from "@mantine/core";
 import { Group } from "@visx/group";
 import { ParentSize } from "@visx/responsive";
@@ -8,7 +9,6 @@ import { max } from "d3";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
-import { KingdomPhylumCount } from "../page";
 
 interface TaxonomicDiversityGraphProps {
   data: KingdomPhylumCount[];

@@ -16,8 +16,8 @@ import {
 
 import { useEffect, useState } from "react";
 
+import { Statistics, TaxonTreeNodeStatistics } from "@/generated/types";
 import { useListState } from "@mantine/hooks";
-import { TaxonStatTreeNode } from "@/queries/stats";
 import { motion } from "framer-motion";
 
 const NODE_WIDTH = 20;
@@ -40,12 +40,6 @@ const GET_TAXON_TREE_NODE = gql`
   }
 `;
 
-interface TaxonTreeNodeQuery {
-  stats: {
-    taxonBreakdown: TaxonStatTreeNode[];
-  };
-}
-
 // A node in the tree. This represents the visual node of a taxon and maintains
 // a heirarchy of child tree nodes. It should contain both the data to present as
 // well as transient functional data such as expansion or pinning.
@@ -60,11 +54,11 @@ interface Node {
   canonicalName: string;
   rank: string;
   family?: string;
-  loci?: number;
-  genomes?: number;
-  specimens?: number;
-  other?: number;
-  totalGenomic?: number;
+  loci?: number | null;
+  genomes?: number | null;
+  specimens?: number | null;
+  other?: number | null;
+  totalGenomic?: number | null;
 
   // whether or not to render a spinner to indicate the node is loading
   isLoader: boolean;
@@ -73,7 +67,7 @@ interface Node {
 // Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
 // from the taxon tree statistics query into a presentable tree by injecting and
 // defaulting variables used for tree interaction.
-function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: string[]): Node {
+function convertToNode(node: TaxonTreeNodeStatistics, expanded?: Node[], pinned?: string[]): Node {
   const shouldExpand =
     !!expanded?.find((n) => n.canonicalName === node.canonicalName) ||
     !!pinned?.find((name) => name === node.canonicalName) ||
@@ -132,9 +126,9 @@ function convertToNode(node: TaxonStatTreeNode, expanded?: Node[], pinned?: stri
 interface TaxonomyTreeProps {
   minWidth: number;
   layout: Layout;
-  data: TaxonStatTreeNode;
+  data: TaxonTreeNodeStatistics;
   pinned?: string[];
-  initialExpanded?: TaxonStatTreeNode[];
+  initialExpanded?: TaxonTreeNodeStatistics[];
 }
 
 // The interactive taxonomy tree. We use a nivo tree as the base but then also make
@@ -160,7 +154,7 @@ export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }
     if (item.data.expanded) {
       handlers.append(item.data);
 
-      const result = client.query<TaxonTreeNodeQuery>({
+      const result = client.query<{ stats: Statistics }>({
         query: GET_TAXON_TREE_NODE,
         variables: {
           taxonRank: item.data.rank,
@@ -413,7 +407,7 @@ function CustomNode({
   );
 }
 
-function StatBadge({ label, stat }: { label: string; stat?: number }) {
+function StatBadge({ label, stat }: { label: string; stat?: number | null }) {
   return (
     <Badge variant="light" color={stat || 0 > 0 ? "moss" : "bushfire"}>
       {label}: {stat || 0}

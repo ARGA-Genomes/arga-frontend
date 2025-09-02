@@ -34,6 +34,7 @@ import classes from "../../components/record-list.module.css";
 // Icons data
 import { BrowseSpecies } from "@/components/browse-species";
 import { FilterItem } from "@/components/filtering-redux/filters/common";
+import { DatasetDetails, RankSummary, Source } from "@/generated/types";
 import { grouping as groupingData } from "../../app/(home)/_data";
 import { groupInclude, array as groupingExtra, GroupItem } from "../../app/browse/groups/_data/all";
 import DataHighlights from "./_components/data-highlights";
@@ -107,19 +108,8 @@ const GET_DETAILS = gql`
   }
 `;
 
-interface Dataset {
-  name: string;
-  shortName?: string;
-  description?: string;
-  url?: string;
-  citation?: string;
-  license?: string;
-  rightsHolder?: string;
-  createdAt: string;
-  updatedAt: string;
-  reusePill?: ReusePillType;
-  accessPill?: AccessPillType;
-  publicationYear?: number;
+export interface ExtendedSource extends Source {
+  speciesRankSummary: RankSummary;
 }
 
 type AccessPillType = "OPEN" | "RESTRICTED" | "CONDITIONAL" | "VARIABLE";
@@ -139,60 +129,6 @@ const reusePillColours: Record<ReusePillType, string> = {
   NONE: "#d6e4ed",
   VARIABLE: "wheat.3",
 };
-
-interface SpeciesCount {
-  total: number;
-}
-
-interface DataBreakdown {
-  canonicalName: string;
-  genomes: number;
-  loci: number;
-  totalGenomic: number;
-}
-
-export interface KingdomPhylumCount {
-  kingdom: string;
-  phylum: string;
-  count: number;
-}
-
-export interface Source {
-  license: string;
-  accessRights: string;
-  rightsHolder: string;
-  author: string;
-  name: string;
-  listsId: string | null;
-  reusePill?: ReusePillType;
-  accessPill?: AccessPillType;
-  species: SpeciesCount;
-  datasets: Dataset[];
-  speciesGenomicDataSummary: DataBreakdown[];
-  speciesGenomesSummary: DataBreakdown[];
-  speciesLociSummary: DataBreakdown[];
-  speciesRankSummary: {
-    total: number;
-    genomes: number;
-    loci: number;
-    genomicData: number;
-  };
-  speciesSummary: {
-    total: number;
-    genomes: number;
-    totalGenomic: number;
-  };
-  latestGenomeReleases: {
-    scientificName: string;
-    canonicalName: string;
-    releaseDate: string;
-  }[];
-  taxonomicDiversity: KingdomPhylumCount[];
-}
-
-interface DetailsQueryResults {
-  source: Source;
-}
 
 const GET_SPECIES = gql`
   query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
@@ -262,7 +198,7 @@ function DatasetSort({ sortBy, setSortBy }: { sortBy: string | null; setSortBy: 
   );
 }
 
-function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
+function BrowseComponentDatasets({ datasets }: { datasets: DatasetDetails[] }) {
   const [sortBy, setSortBy] = useState<string | null>(null);
 
   const filteredDatasets = datasets.filter((dataset) => dataset.name.trim() !== "");
@@ -307,7 +243,7 @@ function BrowseComponentDatasets({ datasets }: { datasets: Dataset[] }) {
   );
 }
 
-function DatasetRow({ dataset }: { dataset: Dataset }) {
+function DatasetRow({ dataset }: { dataset: DatasetDetails }) {
   const theme = useMantineTheme();
 
   return (
@@ -389,7 +325,7 @@ function DatasetRow({ dataset }: { dataset: Dataset }) {
   );
 }
 
-function SourceDetails({ source }: { source?: Source }) {
+function SourceDetails({ source }: { source?: ExtendedSource }) {
   const theme = useMantineTheme();
 
   // Gross and hacky and terrible, to fix at a later date
@@ -549,7 +485,7 @@ export default function SourcePage(props: SourceProps) {
     [name]
   );
 
-  const { loading, error, data } = useQuery<DetailsQueryResults>(GET_DETAILS, {
+  const { loading, error, data } = useQuery<{ source: ExtendedSource }>(GET_DETAILS, {
     variables: { name: source, filters },
   });
 

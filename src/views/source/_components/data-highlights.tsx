@@ -1,10 +1,10 @@
 "use client";
 
+import { Source } from "@/generated/types";
 import { Flex, Paper, Skeleton, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconStarFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useMemo } from "react";
-import { Source } from "../page";
 import classes from "./data-highlights.module.css";
 
 export default function DataHighlights({ source, loading }: { source?: Source; loading: boolean }) {

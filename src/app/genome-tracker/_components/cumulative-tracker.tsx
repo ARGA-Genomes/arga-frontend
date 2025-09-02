@@ -2,15 +2,15 @@
 
 import classes from "./cumulative-tracker.module.css";
 
-import * as Humanize from "humanize-plus";
-import { useMemo } from "react";
+import { Statistics, TaxonomicRankStatistic } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
-import { TaxonomicRankStatistic } from "@/queries/stats";
+import { AxisBottom } from "@visx/axis";
 import { Group } from "@visx/group";
-import { Bar } from "@visx/shape";
 import { ParentSize } from "@visx/responsive";
 import { scaleLinear } from "@visx/scale";
-import { AxisBottom } from "@visx/axis";
+import { Bar } from "@visx/shape";
+import * as Humanize from "humanize-plus";
+import { useMemo } from "react";
 
 const PLURAL_RANKS: Record<string, string> = {
   DOMAIN: "Domains",
@@ -44,12 +44,6 @@ const GET_TAXONOMIC_RANK_STATS = gql`
   }
 `;
 
-type TaxonomicRankStatsQuery = {
-  stats: {
-    taxonomicRanks: TaxonomicRankStatistic[];
-  };
-};
-
 interface CoverageBarProps {
   y: number;
   width: number;
@@ -79,7 +73,7 @@ function Bars({ width, height, data }: BarsProps) {
         range: [0, barWidth],
         domain: [0, 100],
       }),
-    [barWidth],
+    [barWidth]
   );
 
   return (
@@ -118,7 +112,7 @@ interface CumulativeTrackerProps {
 }
 
 export function CumulativeTracker({ taxonRank, taxonCanonicalName, ranks }: CumulativeTrackerProps) {
-  const { data } = useQuery<TaxonomicRankStatsQuery>(GET_TAXONOMIC_RANK_STATS, {
+  const { data } = useQuery<{ stats: Statistics }>(GET_TAXONOMIC_RANK_STATS, {
     variables: {
       taxonRank,
       taxonCanonicalName,

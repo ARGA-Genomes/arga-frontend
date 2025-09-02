@@ -1,29 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import {
-  Grid,
-  Stack,
-  Text,
-  Title,
   Box,
-  Paper,
-  Group,
-  Switch,
-  SwitchProps,
-  ScrollArea,
   Divider,
   Flex,
+  Grid,
+  Group,
+  Paper,
+  ScrollArea,
+  Stack,
+  Switch,
+  SwitchProps,
+  Text,
+  Title,
 } from "@mantine/core";
+import { useEffect, useState } from "react";
 
+import { Layer } from "@/app/type";
+import { ExternalLinkButton } from "@/components/button-link-external";
 import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
-import { Layer } from "@/app/type";
-import { ExternalLinkButton } from "@/components/button-link-external";
-import { IconArrowUpRight } from "@tabler/icons-react";
+import { GenomicComponent, Regions, Species, SpeciesMarker, SpecimenSummary, WholeGenome } from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 const GET_DISTRIBUTION = gql`
   query SpeciesDistribution($canonicalName: String) {
@@ -78,47 +79,6 @@ const GET_DISTRIBUTION = gql`
     }
   }
 `;
-
-interface RegionDistribution {
-  names: string[];
-  dataset: { name: string };
-}
-
-interface Regions {
-  ibra: RegionDistribution[];
-  imcra: RegionDistribution[];
-}
-
-interface Specimen {
-  id: string;
-  recordId?: string;
-  latitude?: number;
-  longitude?: number;
-  color?: string;
-  type: Layer;
-}
-
-interface QueryResults {
-  species: {
-    regions: Regions;
-    specimens: {
-      total: number;
-      records: Specimen[];
-    };
-    wholeGenomes: {
-      total: number;
-      records: Specimen[];
-    };
-    markers: {
-      total: number;
-      records: Specimen[];
-    };
-    genomicComponents: {
-      total: number;
-      records: Specimen[];
-    };
-  };
-}
 
 const hasRegions = (regions: Regions) => {
   return regions.ibra.length > 0 || regions.imcra.length > 0;
@@ -267,11 +227,15 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
   );
 }
 
-function toMarker(color: [number, number, number, number], type: Layer, records?: Specimen[]) {
+function toMarker(
+  color: [number, number, number, number],
+  type: Layer,
+  records?: (SpecimenSummary | WholeGenome | GenomicComponent | SpeciesMarker)[]
+) {
   if (!records) return [];
   return records.map((r) => {
     return {
-      tooltip: r.recordId || "unknown",
+      tooltip: "recordId" in r && r.recordId ? r.recordId : "unknown",
       latitude: r.latitude,
       longitude: r.longitude,
       color: color,
@@ -290,7 +254,7 @@ export default function DistributionPage({ params }: { params: { name: string } 
   const [allSpecimens, setAllSpecimens] = useState<Marker<null>[]>([]);
   const canonicalName = getCanonicalName(params);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_DISTRIBUTION, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_DISTRIBUTION, {
     variables: { canonicalName },
   });
 
@@ -299,18 +263,18 @@ export default function DistributionPage({ params }: { params: { name: string } 
       ...toMarker(
         [103, 151, 180, 220],
         Layer.Specimens,
-        layers.specimens ? data?.species.specimens.records : undefined,
+        layers.specimens ? data?.species.specimens.records : undefined
       ),
       ...toMarker([123, 161, 63, 220], Layer.Loci, layers.loci ? data?.species.markers.records : undefined),
       ...toMarker(
         [243, 117, 36, 220],
         Layer.WholeGenome,
-        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined,
+        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined
       ),
       ...toMarker(
         [185, 210, 145, 220],
         Layer.OtherData,
-        layers.other ? data?.species.genomicComponents.records : undefined,
+        layers.other ? data?.species.genomicComponents.records : undefined
       ),
     ];
     // filter out null island as well as specimens without coords
