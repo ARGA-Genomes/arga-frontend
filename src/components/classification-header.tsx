@@ -73,9 +73,7 @@ export default function ClassificationHeader({ rank, classification, taxon }: Cl
                   </Group>
                   <Group>
                     <Skeleton h={31} style={{ display: "flex", alignItems: "center" }} visible={!taxon}>
-                      <Text fs="italic" fw={400}>
-                        {taxon?.scientificName || classification}
-                      </Text>
+                      <Text fw={400}>{taxon?.scientificName || classification}</Text>
                     </Skeleton>
                   </Group>
                 </Group>

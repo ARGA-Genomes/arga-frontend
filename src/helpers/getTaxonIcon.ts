@@ -1,6 +1,6 @@
 const ICONS = [
   "Taxon_ All eukaryote species (Eukaryota).svg",
-  "Taxon_ Anemones, corals and jellyfishes (Cnidaria).svg",
+  "Taxon_ Anemones corals and jellyfishes (Cnidaria).svg",
   "Taxon_ Animals (Kingdom Animalia).svg",
   "Taxon_ Bacteria (Prokaryota_Bacteria).svg",
   "Taxon_ Bats (Chiroptera).svg",
