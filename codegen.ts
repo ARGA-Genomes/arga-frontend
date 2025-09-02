@@ -1,7 +1,14 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
+import { config as dotenv } from "dotenv";
+
+// Load environment variables from .env files
+[".env.development", ".env.local", ".env"].forEach((path) => dotenv({ path }));
+
+const schema = process.env.NEXT_PUBLIC_ARGA_API_URL || "https://staging.arga.org.au/api";
+console.log("GraphQL CodeGen using schema URL:", schema);
 
 const config: CodegenConfig = {
-  schema: process.env.NEXT_PUBLIC_ARGA_API_URL || "https://staging.arga.org.au/api",
+  schema,
   ignoreNoDocuments: true,
   generates: {
     // Generate TypeScript types from schema only
