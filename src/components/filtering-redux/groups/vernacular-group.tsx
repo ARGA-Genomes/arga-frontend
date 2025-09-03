@@ -40,6 +40,7 @@ enum VernacularGroup {
   Chromists = "Chromists",
   ConifersAndCycads = "Conifers And Cycads",
   Ferns = "Ferns",
+  Lichens = "Lichens",
 }
 
 export const vernacularGroupFilterToQuery = (filter: BoolFilterData | null): FilterItem[] =>
