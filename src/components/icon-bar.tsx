@@ -188,7 +188,7 @@ export const TAXON_ICONS: Record<string, IconData> = {
   HIGHER_PLANTS: {
     image: "/icons/taxon/Taxon_ Plants (Regnum Plantae).svg",
     label: "Plants",
-    link: "/kingdom/Plantae",
+    link: "/regnum/Plantae",
     colour: "moss.4",
   },
   FLOWERING_PLANTS: {

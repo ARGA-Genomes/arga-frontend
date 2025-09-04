@@ -11,13 +11,13 @@ export const taxon: BrowseItem[] = [
     total: "plants",
     category: "Plants",
     image: "/icons/taxon/Taxon_ Plants (Regnum Plantae).svg",
-    link: "/kingdom/Plantae",
+    link: "/regnum/Plantae",
   },
   {
     total: "fungi",
     category: "Fungi",
     image: "/icons/taxon/Taxon_ Fungi (Fungi).svg",
-    link: "/kingdom/Fungi",
+    link: "/regnum/Fungi",
   },
   {
     total: "protista",
