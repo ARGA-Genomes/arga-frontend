@@ -1,24 +1,16 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  Grid,
-  Paper,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Box, Button, Center, Grid, Paper, Stack, Text, Title } from "@mantine/core";
 
-import React, { useState } from "react";
-import { LoadOverlay } from "@/components/load-overlay";
 import { Attribute, AttributePill, DataField } from "@/components/data-fields";
-import { RecordItem, RecordList } from "@/components/record-list";
+import { LoadOverlay } from "@/components/load-overlay";
 import { PaginationBar } from "@/components/pagination";
-import { IconExternalLink } from "@tabler/icons-react";
+import { RecordItem, RecordList } from "@/components/record-list";
+import { GenomicComponent, Species } from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
+import { IconExternalLink } from "@tabler/icons-react";
+import { useState } from "react";
 
 const PAGE_SIZE = 5;
 
@@ -47,32 +39,6 @@ const GET_SPECIES = gql`
     }
   }
 `;
-
-interface GenomicComponent {
-  sequenceId: string;
-  datasetName: string;
-  recordId: string;
-  accession?: string;
-  latitude?: number;
-  longitude?: number;
-  materialSampleId?: string;
-  sequencedBy?: string;
-  depositedBy?: string;
-  estimatedSize?: string;
-  releaseDate?: string;
-  dataType?: string;
-  accessRights?: string;
-  sourceUri?: string;
-}
-
-interface QueryResults {
-  species: {
-    genomicComponents: {
-      total: number;
-      records: GenomicComponent[];
-    };
-  };
-}
 
 function RecordItemContent({ record }: { record: GenomicComponent }) {
   return (
@@ -116,7 +82,7 @@ function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
       {records.map((record, idx) => (
         <RecordItem
           key={idx}
-          href={record.sourceUri}
+          href={record.sourceUri || "#"}
           target="_blank"
           rightSection={
             <Button
@@ -142,15 +108,11 @@ function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
   );
 }
 
-export default function GenomicComponents({
-  params,
-}: {
-  params: { name: string };
-}) {
+export default function GenomicComponents({ params }: { params: { name: string } }) {
   const canonicalName = getCanonicalName(params);
   const [page, setPage] = useState(1);
 
-  const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
+  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIES, {
     variables: {
       canonicalName,
       page,
@@ -171,9 +133,7 @@ export default function GenomicComponents({
           <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
             {data?.species.genomicComponents ? (
-              <GenomicComponentList
-                records={data.species.genomicComponents.records}
-              />
+              <GenomicComponentList records={data.species.genomicComponents.records} />
             ) : null}
           </Box>
         </Grid.Col>

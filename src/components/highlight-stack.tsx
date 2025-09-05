@@ -33,7 +33,7 @@ const BADGE_COLOURS: Record<string, string> = {
   Major: "moss.3",
 };
 
-export function AttributePill({ value }: { value: string | number | undefined }) {
+export function AttributePill({ value }: { value: string | number | undefined | null }) {
   value ||= "No data";
   const color = BADGE_COLOURS[value] || "#d6e4ed";
 
@@ -50,7 +50,7 @@ export function AttributePill({ value }: { value: string | number | undefined })
 
 interface AttributeProps {
   label: string;
-  value?: string | number;
+  value?: string | number | null;
   href?: string;
 }
 
@@ -72,7 +72,7 @@ export function Attribute({ label, value, href }: AttributeProps) {
 }
 
 interface DataFieldProps {
-  value?: string | number;
+  value?: string | number | null;
   fz?: string | number;
 }
 

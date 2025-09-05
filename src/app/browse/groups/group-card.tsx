@@ -2,7 +2,7 @@
 
 import classes from "./group-card.module.css";
 
-import { Image, Stack, Text, Paper } from "@mantine/core";
+import { Image, Paper, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 
 export interface GroupCardProps {
@@ -12,7 +12,7 @@ export interface GroupCardProps {
 
 function GroupCard({ category, image }: GroupCardProps) {
   const imageSize = 125;
-  const groupLink = `/browse/groups/${category.toLowerCase().replaceAll(" ", "-").replaceAll("'", "")}`;
+  const groupLink = `/browse/groups/${category}`;
 
   return (
     <Paper radius="xl" p={20} className={classes.card} maw={190}>

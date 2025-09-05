@@ -10,79 +10,18 @@ import { PaginationBar, PaginationSize } from "@/components/pagination";
 
 import { FiltersDrawer } from "@/components/filtering-redux/drawer";
 import { GenericFilter } from "@/components/filtering-redux/generic";
-import { buildTantivyQuery, getTooltipForAttribute, InputQueryAttribute, Search } from "@/components/search";
+import {
+  buildTantivyQuery,
+  getTooltipForAttribute,
+  InputQueryAttribute,
+  Search as SearchComponent,
+} from "@/components/search";
 import { TableCardLayout, TableCardSwitch } from "@/components/table-card-switch";
+import { Search } from "@/generated/types";
 import { parseAsAttribute } from "@/helpers/searchParamParser";
 import { Suspense, useEffect, useState } from "react";
 import { MAX_WIDTH } from "../constants";
 import { Results } from "./_components/result";
-
-interface Classification {
-  kingdom?: string;
-  phylum?: string;
-  class?: string;
-  order?: string;
-  family?: string;
-  genus?: string;
-  regnum?: string;
-  division?: string;
-  classis?: string;
-  ordo?: string;
-  familia?: string;
-}
-
-interface DataSummary {
-  genomes: number;
-  loci: number;
-  specimens: number;
-  other: number;
-  totalGenomic: number;
-}
-
-export interface Item {
-  type: string;
-  score: number;
-  status: string;
-  canonicalName: string;
-  rank: string;
-  subspecies?: string[];
-  synonyms?: string[];
-  commonNames?: string[];
-  classification?: Classification;
-  dataSummary: DataSummary;
-
-  accession?: string;
-  genomeRep?: string;
-  dataSource?: string;
-  level?: string;
-  assemblyType?: string;
-  referenceGenome?: boolean;
-  releaseDate?: string;
-  sourceUri?: string;
-
-  locusType?: string;
-  voucherStatus?: string;
-  eventDate?: string;
-  eventLocation?: string;
-
-  institutionCode?: string;
-  collectionCode?: string;
-  recordedBy?: string;
-  identifiedBy?: string;
-}
-
-interface FullTextResults {
-  records: Item[];
-  total: number;
-}
-
-interface SearchResults {
-  fullText: FullTextResults;
-}
-
-interface QueryResults {
-  search: SearchResults;
-}
 
 const SEARCH_FULLTEXT = gql`
   query FullTextSearch($query: String, $page: Int, $perPage: Int) {
@@ -181,7 +120,7 @@ function SearchPage() {
   const allAttributes = [...attributes, ...filters];
   const query = buildTantivyQuery(allAttributes, rawQuery);
 
-  const { loading, error, data } = useQuery<QueryResults>(SEARCH_FULLTEXT, {
+  const { loading, error, data } = useQuery<{ search: Search }>(SEARCH_FULLTEXT, {
     variables: {
       query,
       page,
@@ -221,7 +160,7 @@ function SearchPage() {
   return (
     <>
       <Box p="md">
-        <Search
+        <SearchComponent
           placeholder="e.g. sequence accession, species name"
           leftSectionWidth={60}
           size="xl"

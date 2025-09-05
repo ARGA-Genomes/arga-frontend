@@ -1,9 +1,7 @@
 "use client";
 
-import * as Humanize from "humanize-plus";
 import {
   Accordion,
-  Badge,
   Divider,
   Group,
   Modal,
@@ -13,24 +11,24 @@ import {
   UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
+import * as Humanize from "humanize-plus";
 
 import accClasses from "./taxonomy-switcher-acc.module.css";
 
-import { Taxon, TaxonNode } from "@/queries/taxa";
-import { Attribute, AttributePill, AttributePillContainer, AttributePillValue } from "./data-fields";
 import { Dataset, useDatasets } from "@/app/source-provider";
-import { useMemo, useState } from "react";
-import { IconArrowUpRight } from "@tabler/icons-react";
+import { Provenance, Taxon, TaxonNode } from "@/generated/types";
+import { GET_TAXON_PROVENANCE } from "@/queries/provenance";
 import { useQuery } from "@apollo/client";
-import { GET_TAXON_PROVENANCE, ProvenanceQuery } from "@/queries/provenance";
 import { useDisclosure } from "@mantine/hooks";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
+import { Attribute, AttributePill, AttributePillContainer, AttributePillValue } from "./data-fields";
 import { LoadOverlay } from "./load-overlay";
 import RecordHistory from "./record-history";
 
-interface ClassificationNode {
-  canonicalName: string;
-  rank: string;
-  depth: number;
+interface TaxonExtended extends Taxon {
+  dataset?: Dataset;
+  originalCanonicalNames?: TaxonMap;
 }
 
 interface TaxonomySwitcherProps {
@@ -38,12 +36,6 @@ interface TaxonomySwitcherProps {
 }
 
 type TaxonMap = Record<string, string>;
-
-interface TaxonExtended extends Taxon {
-  hierarchy: TaxonNode[];
-  dataset?: Dataset;
-  originalCanonicalNames?: TaxonMap;
-}
 
 // Define the rank mapping to standardize rank names
 const rankMapping: TaxonMap = {
@@ -171,7 +163,7 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
 
   const taxa = useMemo(() => processTaxa(rawTaxa, ids), [rawTaxa, ids]);
 
-  const { loading, data } = useQuery<ProvenanceQuery>(GET_TAXON_PROVENANCE, {
+  const { loading, data } = useQuery<{ provenance: Provenance }>(GET_TAXON_PROVENANCE, {
     variables: { entityId },
     skip: entityId === "",
   });
@@ -227,11 +219,6 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
                   <Text fw={600} c={isActive ? "white" : undefined} fz={isActive ? 26 : "lg"}>
                     {taxon.dataset?.name || "Unknown Dataset"}
                   </Text>
-                  {taxon.originalCanonicalNames && (
-                    <Badge variant="white" color="midnight.8">
-                      DIFFERENT
-                    </Badge>
-                  )}
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>
@@ -258,7 +245,7 @@ export function TaxonomySwitcher({ taxa: rawTaxa }: TaxonomySwitcherProps) {
                     {taxon.entityId && (
                       <UnstyledButton
                         onClick={() => {
-                          setEntityId(taxon.entityId);
+                          setEntityId(taxon.entityId || "");
                           open();
                         }}
                       >
@@ -288,7 +275,7 @@ function Hierarchy({
   hierarchy,
   originalCanonicalNames,
 }: {
-  hierarchy: ClassificationNode[];
+  hierarchy: TaxonNode[];
   originalCanonicalNames?: TaxonMap;
 }) {
   return (

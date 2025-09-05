@@ -1,8 +1,8 @@
+import { AccessionEvent, CollectionEvent } from "@/generated/types";
 import { Box, Divider, Group, Paper, SimpleGrid, Stack, Text } from "@mantine/core";
-import { DataTable } from "../data-table";
-import { IconSpecimenCollection } from "../ArgaIcons";
-import { CollectionEvent } from "@/queries/specimen";
 import { useState } from "react";
+import { IconSpecimenCollection } from "../ArgaIcons";
+import { DataTable } from "../data-table";
 
 interface CollectingSlideProps {
   collections: CollectionEvent[];

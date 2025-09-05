@@ -7,12 +7,6 @@ export const SEQUENCE = gql`
   }
 `;
 
-export interface Sequence {
-  id: string,
-  recordId: string,
-  datasetName: string,
-}
-
 export const SEQUENCING_EVENT = gql`
   fragment SequencingEventDetails on SequencingEvent {
     eventDate
@@ -28,20 +22,6 @@ export const SEQUENCING_EVENT = gql`
     dnaSequence
   }
 `;
-
-export interface SequencingEvent {
-  eventDate?: string,
-  eventTime?: string,
-  materialSampleId?: string,
-  sequencedBy?: string,
-  targetGene?: string,
-  ampliconSize?: string,
-  estimatedSize?: string,
-  concentration?: string,
-  baitSetName?: string,
-  baitSetReference?: string,
-  dnaSequence?: string,
-}
 
 export const SEQUENCING_RUN_EVENT = gql`
   fragment SequencingRunEventDetails on SequencingRunEvent {
@@ -62,29 +42,6 @@ export const SEQUENCING_RUN_EVENT = gql`
   }
 `;
 
-export interface Trace {
-  accession: string,
-  traceName?: string,
-  traceId?: string,
-  traceLink?: string,
-}
-
-export interface SequencingRunEvent {
-  targetGene?: string,
-  sequencingDate?: string,
-  sequencingEventId?: string,
-  sequencingMethod?: string,
-  sequencingCenter?: string,
-  sequencingCenterCode?: string,
-  sequencePrimerForwardName?: string,
-  sequencingPrimerReverseName?: string,
-  direction?: string,
-  analysisSoftware?: string,
-  analysisDescription?: string,
-  libraryProtocol?: string,
-  trace?: Trace,
-}
-
 export const ASSEMBLY_EVENT = gql`
   fragment AssemblyEventDetails on AssemblyEvent {
     eventDate
@@ -98,17 +55,6 @@ export const ASSEMBLY_EVENT = gql`
   }
 `;
 
-export interface AssemblyEvent {
-  eventDate?: string,
-  eventTime?: string,
-  name?: string,
-  quality?: string,
-  assemblyType?: string,
-  genomeSize?: number,
-  assembledBy?: string,
-  versionStatus?: string,
-}
-
 export const ANNOTATIONS_EVENT = gql`
   fragment AnnotationEventDetails on AnnotationEvent {
     eventDate
@@ -121,17 +67,6 @@ export const ANNOTATIONS_EVENT = gql`
     annotatedBy
   }
 `;
-
-export interface AnnotationEvent {
-  eventDate?: string,
-  eventTime?: string,
-  representation?: string,
-  releaseType?: string,
-  replicons?: string,
-  coverage?: string,
-  standardOperatingProcedures?: string,
-  annotatedBy?: string,
-}
 
 export const DATA_DEPOSITION_EVENT = gql`
   fragment DataDepositionEventDetails on DataDepositionEvent {
@@ -157,25 +92,3 @@ export const DATA_DEPOSITION_EVENT = gql`
     sourceUri
   }
 `;
-
-export interface DataDepositionEvent {
-  eventDate?: string,
-  eventTime?: string,
-  accession?: string,
-  dataType?: string,
-  institutionName?: string,
-  collectionName?: string,
-  collectionCode?: string,
-  materialSampleId?: string,
-  submittedBy?: string,
-  asmNotLiveDate?: string,
-  excludedFromRefseq?: string,
-  lastUpdated?: string,
-  title?: string,
-  url?: string,
-  fundingAttribution?: string,
-  reference?: string,
-  accessRights?: string,
-  rightsHolder?: string,
-  sourceUri?: string,
-}

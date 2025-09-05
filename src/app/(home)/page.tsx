@@ -2,7 +2,7 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Flex, Group, Stack, Text, Title } from "@mantine/core";
-import { /* IconArrowUpRight,*/ IconSearch } from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { ShowStats, TaxonomicComposition } from "./stats";
 
@@ -16,24 +16,16 @@ import classes from "./page.module.css";
 
 // Browse data
 import { Search } from "@/components/search";
+import { Overview } from "@/generated/types";
 import { grouping, taxon, type } from "./_data";
 
-interface Counts {
+interface Counts extends Overview {
   animals: number;
   plants: number;
   fungi: number;
   protista: number;
   chromista: number;
   allSpecies: number;
-  wholeGenomes: number;
-  loci: number;
-  specimens: number;
-  sources: [
-    {
-      name: string;
-      total: number;
-    }
-  ];
 }
 
 const GET_COUNTS = gql`
@@ -67,9 +59,9 @@ export default function HomePage() {
           sources: data.overview.sources.reduce(
             (prev, cur) => ({
               ...prev,
-              [cur.name.replaceAll(" ", "_")]: cur.total,
+              [cur.name]: cur.total,
             }),
-            { ARGA_Threatened_Species: 0 }
+            { "ARGA Threatened Species": 0 }
           ),
         }
       : null;
