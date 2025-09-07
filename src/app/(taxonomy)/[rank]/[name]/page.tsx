@@ -1,7 +1,7 @@
 "use client";
 
 // Types
-import { RankSummary, Taxon } from "@/generated/types";
+import { Dataset, RankSummary, Taxon } from "@/generated/types";
 
 // Imports
 import { MAX_WIDTH } from "@/app/constants";
@@ -415,7 +415,8 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   const lowerRank = getChildRank(rank).toUpperCase() || "";
 
   const { names } = useDatasets();
-  const datasetId = names.get("Atlas of Living Australia")?.id;
+  const dataset = names.get("Atlas of Living Australia") as Dataset | undefined;
+  const datasetId = dataset?.id;
   const variables = {
     rank,
     datasetId,
@@ -455,9 +456,8 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   }, [name, pathname, setPreviousPage]);
 
   return (
-    <Stack mt="xl">
-      <ClassificationHeader rawRank={rawRank} taxon={taxonDetailsResults?.data?.taxon} />
-
+    <Stack mt="xl" gap={0}>
+      <ClassificationHeader rawRank={rawRank} taxon={taxonDetailsResults?.data?.taxon} dataset={dataset} />
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Stack>
@@ -477,7 +477,6 @@ export default function ClassificationPage(props: ClassificationPageProps) {
                 />
               )}
             </Paper>
-
             {datasetId && (
               <Paper p="xl" radius="lg" pos="relative" withBorder>
                 <BrowseSpecies

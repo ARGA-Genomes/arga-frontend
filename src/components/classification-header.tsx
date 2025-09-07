@@ -1,43 +1,22 @@
 "use client";
 
 import { Container, Divider, Grid, Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
-import * as Humanize from "humanize-plus";
 import { useMemo } from "react";
 import { MAX_WIDTH } from "../app/constants";
 
-import { TaxonResult } from "@/app/(taxonomy)/[rank]/[name]/page";
+import { Dataset, Taxon } from "@/generated/types";
 import { getTaxonIcon } from "@/helpers/getTaxonIcon";
 import { isLatin, latinilizeNormalRank, normalizeLatinRank } from "@/helpers/rankHelpers";
-import { IconArrowUpRight } from "@tabler/icons-react";
-import { AttributePill, AttributePillValue } from "./data-fields";
+import { AttributePillValue } from "./data-fields";
+import { Hierarchy } from "./hierarchy";
 
 interface ClassificationHeaderProps {
   rawRank: string;
-  taxon?: TaxonResult;
+  taxon?: Taxon;
+  dataset?: Dataset;
 }
 
-const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
-
-interface SourcePillProps {
-  value: string;
-}
-
-function SourcePill({ value }: SourcePillProps) {
-  return (
-    <AttributePillValue
-      color="transparent"
-      value={value}
-      textColor="shellfish"
-      style={{
-        border: "1px solid var(--mantine-color-shellfish-5)",
-        minWidth: 90,
-      }}
-      popoverDisabled
-    />
-  );
-}
-
-export default function ClassificationHeader({ taxon, rawRank }: ClassificationHeaderProps) {
+export default function ClassificationHeader({ taxon, rawRank, dataset }: ClassificationHeaderProps) {
   const details = useMemo(() => {
     if (taxon) {
       const latin = isLatin(taxon);
@@ -103,49 +82,7 @@ export default function ClassificationHeader({ taxon, rawRank }: ClassificationH
             <Divider variant="dashed" my="sm" />
           </Grid.Col>
           <Grid.Col span={12}>
-            {rawRank.toUpperCase() !== "DOMAIN" && (
-              <Group justify="space-between" align="flex-end">
-                <Group>
-                  {details
-                    ? details.hierarchy.map((node, idx) => (
-                        <AttributePill
-                          key={idx}
-                          label={
-                            details.latin && node.rank !== "DOMAIN"
-                              ? latinilizeNormalRank(node.rank)
-                              : Humanize.capitalize(node.rank.toLowerCase())
-                          }
-                          value={node.canonicalName}
-                          href={`/${(details.latin && node.rank !== "DOMAIN"
-                            ? latinilizeNormalRank(node.rank)
-                            : node.rank
-                          ).toLowerCase()}/${node.canonicalName}`}
-                          icon={IconArrowUpRight}
-                          popoverDisabled
-                          showIconOnHover
-                        />
-                      ))
-                    : ALL_RANKS.slice(0, ALL_RANKS.indexOf(normalizeLatinRank(rawRank).toUpperCase()) + 2).map(
-                        (skeletonRank) => (
-                          <AttributePill
-                            loading
-                            key={skeletonRank}
-                            label={Humanize.capitalize(skeletonRank)}
-                            value="Placeholder"
-                            icon={IconArrowUpRight}
-                            showIconOnHover
-                          />
-                        )
-                      )}
-                </Group>
-                <Group>
-                  <Text size="sm">Source</Text>
-                  <Group>
-                    <SourcePill value="Atlas of Living Australia" />
-                  </Group>
-                </Group>
-              </Group>
-            )}
+            {rawRank.toUpperCase() !== "DOMAIN" && <Hierarchy taxon={taxon} rawRank={rawRank} dataset={dataset} />}
           </Grid.Col>
         </Grid>
       </Container>
