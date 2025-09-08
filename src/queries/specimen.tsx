@@ -151,6 +151,25 @@ export const ACCESSION_EVENT = gql`
   }
 `;
 
+export const TISSUE = gql`
+  fragment TissueDetails on Tissue {
+    entityId
+    specimenId
+    materialSampleId
+    tissueId
+    identificationVerified
+    referenceMaterial
+    custodian
+    institution
+    institutionCode
+    samplingProtocol
+    tissueType
+    disposition
+    fixation
+    storage
+  }
+`;
+
 export const SPECIMEN_STATS = gql`
   fragment SpecimenStatsDetails on SpecimenStats {
     sequences

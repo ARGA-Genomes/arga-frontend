@@ -33,9 +33,9 @@ interface CardSliderCardProps extends PropsWithChildren {
 
 export function CardSliderCard({ title, children }: CardSliderCardProps) {
   return (
-    <Paper withBorder radius="xl" shadow="xl" mb={60} p="xl" w="80%" className={classes.card}>
+    <Paper withBorder radius="xl" shadow="xl" mb={60} w="80%" className={classes.card}>
       <Stack h="100%">
-        <Text fw={600} fz="md" c="midnight.9">
+        <Text mx="xl" mt="xl" fw={600} fz="md" c="midnight.9">
           {title}
         </Text>
         {children}

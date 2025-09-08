@@ -728,6 +728,7 @@ export type Organism = {
   phenotypicSex?: Maybe<Scalars['String']['output']>;
   reproductiveCondition?: Maybe<Scalars['String']['output']>;
   sex?: Maybe<Scalars['String']['output']>;
+  tissues: Array<Tissue>;
 };
 
 export type OrganismBy = {
@@ -1214,6 +1215,7 @@ export type Specimen = {
   organism: OrganismDetails;
   organismId: Scalars['String']['output'];
   stats: SpecimenStats;
+  tissues: Array<Tissue>;
 };
 
 export type SpecimenAtom = SpecimenAtomText;
@@ -1983,6 +1985,24 @@ export type Taxonomy = {
   synonyms: Array<Taxonomy>;
   traits?: Maybe<Array<Scalars['String']['output']>>;
   vernacularGroup?: Maybe<TaxonomicVernacularGroup>;
+};
+
+export type Tissue = {
+  __typename?: 'Tissue';
+  custodian?: Maybe<Scalars['String']['output']>;
+  disposition?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  fixation?: Maybe<Scalars['String']['output']>;
+  identificationVerified?: Maybe<Scalars['Boolean']['output']>;
+  institution?: Maybe<Scalars['String']['output']>;
+  institutionCode?: Maybe<Scalars['String']['output']>;
+  materialSampleId: Scalars['String']['output'];
+  referenceMaterial?: Maybe<Scalars['Boolean']['output']>;
+  samplingProtocol?: Maybe<Scalars['String']['output']>;
+  specimenId: Scalars['String']['output'];
+  storage?: Maybe<Scalars['String']['output']>;
+  tissueId: Scalars['String']['output'];
+  tissueType?: Maybe<Scalars['String']['output']>;
 };
 
 export type TraceData = {

@@ -1,7 +1,7 @@
 "use client";
 
 import classes from "@/components/data-table.module.css";
-import { Table, TableProps } from "@mantine/core";
+import { Table, TableProps, Text } from "@mantine/core";
 
 interface DataTableRowProps {
   label?: string;
@@ -29,4 +29,20 @@ export function DataTable({ children, ...tableProps }: DataTableProps | TablePro
   );
 }
 
+interface DataTableRowProps {
+  label?: string;
+  children?: React.ReactNode;
+}
+
+export function DataTableRowValue({ label, children }: DataTableRowProps) {
+  return (
+    <DataTable.Row label={label}>
+      <Text fw={600} fz="sm" c="midnight.8">
+        {children}
+      </Text>
+    </DataTable.Row>
+  );
+}
+
 DataTable.Row = DataTableRow;
+DataTable.RowValue = DataTableRowValue;

@@ -1,44 +1,56 @@
-import { AccessionEvent, CollectionEvent } from "@/generated/types";
+import classes from "./Slide.module.css";
+
+import { AccessionEvent, CollectionEvent, Organism } from "@/generated/types";
 import { Box, Divider, Group, Paper, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { IconSpecimenCollection } from "../ArgaIcons";
 import { DataTable } from "../data-table";
 
 interface CollectingSlideProps {
+  organism: Organism;
   collections: CollectionEvent[];
   accessions: AccessionEvent[];
 }
 
-export function CollectingSlide({ collections }: CollectingSlideProps) {
+export function CollectingSlide({ organism, collections }: CollectingSlideProps) {
   const [collection, setCollection] = useState(collections[0]);
+  const navWidth = 260;
 
   return (
     <Group wrap="nowrap" align="flex-start">
       <Box w={0} style={{ alignSelf: "flex-end", position: "relative" }}>
-        <IconSpecimenCollection size={200} />
+        <Box p={20}>
+          <IconSpecimenCollection size={200} />
+        </Box>
       </Box>
 
-      <DataTable w={200}>
+      <Stack w={navWidth} mb={240} mt="md" gap={0}>
         {collections.map((event) => (
           <Paper
             key={event.entityId}
             radius="xl"
+            my={5}
             p="xs"
             shadow="none"
-            bg={event === collection ? "midnight.1" : "none"}
+            bg={event === collection ? "midnight.1" : undefined}
+            className={classes.item}
+            onClick={() => setCollection(event)}
           >
-            <DataTable.Row label="Event date">
-              <Text fz="sm" fw={700} c="midnight.9">
+            <Group wrap="nowrap">
+              <Text fz="xs" fw={300} c="midnight.7">
+                Event date
+              </Text>
+              <Text fz="xs" fw={600} c="midnight.7" truncate="start">
                 {event.eventDate?.toString() ?? "No date"}
               </Text>
-            </DataTable.Row>
+            </Group>
           </Paper>
         ))}
-      </DataTable>
+      </Stack>
 
-      <Divider orientation="vertical" mx="md" />
+      <Divider orientation="vertical" mx="md" mb="md" size="sm" color="shellfishBg.1" />
 
-      <SimpleGrid cols={2} w="100%">
+      <SimpleGrid cols={2} w="100%" mr={80} mb="xl">
         <Stack>
           <EventDetails collection={collection} />
           <Collecting collection={collection} />
@@ -47,7 +59,7 @@ export function CollectingSlide({ collections }: CollectingSlideProps) {
         <Stack>
           <Publication />
           <Identification collection={collection} />
-          <Details collection={collection} />
+          <Details organism={organism} collection={collection} />
         </Stack>
       </SimpleGrid>
     </Group>
@@ -56,10 +68,10 @@ export function CollectingSlide({ collections }: CollectingSlideProps) {
 
 function EventDetails({ collection }: { collection: CollectionEvent }) {
   return (
-    <Paper radius="xl" bg="midnight.0" p="md" shadow="none">
+    <Paper radius="xl" bg="midnight.0" py="sm" px="xl" shadow="none" mr="auto">
       <DataTable>
-        <DataTable.Row label="ARGA event ID">{collection.entityId}</DataTable.Row>
-        <DataTable.Row label="Event date">{collection.eventDate?.toString() ?? "No date"}</DataTable.Row>
+        <DataTable.RowValue label="ARGA event ID">{collection.entityId}</DataTable.RowValue>
+        <DataTable.RowValue label="Event date">{collection.eventDate?.toString() ?? "No date"}</DataTable.RowValue>
       </DataTable>
     </Paper>
   );
@@ -72,12 +84,12 @@ function Collecting({ collection }: { collection: CollectionEvent }) {
         Field collecting
       </Text>
       <DataTable>
-        <DataTable.Row label="Field number">{collection.fieldCollectingId}</DataTable.Row>
-        <DataTable.Row label="Registered as"></DataTable.Row>
-        <DataTable.Row label="Field habitat">{collection.habitat}</DataTable.Row>
-        <DataTable.Row label="Sampling protocol"></DataTable.Row>
-        <DataTable.Row label="Sample size"></DataTable.Row>
-        <DataTable.Row label="Field notes">{collection.fieldNotes}</DataTable.Row>
+        <DataTable.RowValue label="Field number">{collection.fieldCollectingId}</DataTable.RowValue>
+        <DataTable.RowValue label="Registered as"></DataTable.RowValue>
+        <DataTable.RowValue label="Field habitat">{collection.habitat}</DataTable.RowValue>
+        <DataTable.RowValue label="Collecting protocol"></DataTable.RowValue>
+        <DataTable.RowValue label="Sample size"></DataTable.RowValue>
+        <DataTable.RowValue label="Field notes">{collection.fieldNotes}</DataTable.RowValue>
       </DataTable>
     </Stack>
   );
@@ -90,15 +102,15 @@ function Location({ collection }: { collection: CollectionEvent }) {
         Field location
       </Text>
       <DataTable>
-        <DataTable.Row label="Exact location">{collection.locality}</DataTable.Row>
-        <DataTable.Row label="Coordinates">
+        <DataTable.RowValue label="Exact location">{collection.locality}</DataTable.RowValue>
+        <DataTable.RowValue label="Coordinates">
           {collection.latitude}, {collection.longitude}
-        </DataTable.Row>
-        <DataTable.Row label="Elevation">{collection.elevation}</DataTable.Row>
-        <DataTable.Row label="Depth">{collection.depth}</DataTable.Row>
-        <DataTable.Row label="Collected by">{collection.collectedBy}</DataTable.Row>
-        <DataTable.Row label="Location generalisation"></DataTable.Row>
-        <DataTable.Row label="Permit or ethics code"></DataTable.Row>
+        </DataTable.RowValue>
+        <DataTable.RowValue label="Location generalisation"></DataTable.RowValue>
+        <DataTable.RowValue label="Elevation (m)">{collection.elevation}</DataTable.RowValue>
+        <DataTable.RowValue label="Depth (m)">{collection.depth}</DataTable.RowValue>
+        <DataTable.RowValue label="Collected by">{collection.collectedBy}</DataTable.RowValue>
+        <DataTable.RowValue label="Permit or ethics code"></DataTable.RowValue>
       </DataTable>
     </Stack>
   );
@@ -123,29 +135,31 @@ function Identification({ collection }: { collection: CollectionEvent }) {
         Field identification
       </Text>
       <DataTable>
-        <DataTable.Row label="Organism name"></DataTable.Row>
-        <DataTable.Row label="Identified by">{collection.identifiedBy}</DataTable.Row>
-        <DataTable.Row label="Identification date">{collection.identifiedDate?.toString()}</DataTable.Row>
+        <DataTable.RowValue label="Organism name"></DataTable.RowValue>
+        <DataTable.RowValue label="Identified by">{collection.identifiedBy}</DataTable.RowValue>
+        <DataTable.RowValue label="Identification date">{collection.identifiedDate?.toString()}</DataTable.RowValue>
       </DataTable>
     </Stack>
   );
 }
 
-function Details({ collection }: { collection: CollectionEvent }) {
+function Details({ organism, collection }: { organism: Organism; collection: CollectionEvent }) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
         Collecting details
       </Text>
       <DataTable>
-        <DataTable.Row label="Organism quantity">{collection.organismQuantity}</DataTable.Row>
-        <DataTable.Row label="Sex"></DataTable.Row>
-        <DataTable.Row label="Life stage"></DataTable.Row>
-        <DataTable.Row label="Reproductive condition"></DataTable.Row>
-        <DataTable.Row label="Establishment"></DataTable.Row>
-        <DataTable.Row label="Host organism"></DataTable.Row>
-        <DataTable.Row label="Fixation"></DataTable.Row>
-        <DataTable.Row label="Specimen disposition"></DataTable.Row>
+        <DataTable.RowValue label="Organism quantity">{collection.organismQuantity}</DataTable.RowValue>
+        <DataTable.RowValue label="Sex">{organism.sex}</DataTable.RowValue>
+        <DataTable.RowValue label="Life stage">{organism.lifeStage}</DataTable.RowValue>
+        <DataTable.RowValue label="Reproductive condition">{organism.reproductiveCondition}</DataTable.RowValue>
+        <DataTable.RowValue label="Organism life status"></DataTable.RowValue>
+        <DataTable.RowValue label="Establishment"></DataTable.RowValue>
+        <DataTable.RowValue label="Host organism"></DataTable.RowValue>
+        <DataTable.RowValue label="Field sample disposition"></DataTable.RowValue>
+        <DataTable.RowValue label="Collecting life status"></DataTable.RowValue>
+        <DataTable.RowValue label="Collecting kill method"></DataTable.RowValue>
       </DataTable>
     </Stack>
   );

@@ -8,8 +8,9 @@ import { AttributePillContainer } from "@/components/data-fields";
 import { CollectingSlide } from "@/components/slides/Collecting";
 import { LiveStateSlide } from "@/components/slides/LiveState";
 import { RegistrationsSlide } from "@/components/slides/Registrations";
+import { TissueSlide } from "@/components/slides/Tissues";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { AccessionEvent, CollectionEvent, Organism } from "@/generated/types";
+import { AccessionEvent, CollectionEvent, Organism, Tissue } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Center, Grid, Group, Paper, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { use, useState } from "react";
@@ -26,6 +27,10 @@ const GET_ORGANISM = gql`
       accessions {
         ...AccessionEventDetails
       }
+
+      tissues {
+        ...TissueDetails
+      }
     }
   }
 `;
@@ -34,6 +39,7 @@ interface OrganismQuery {
   organism: Organism & {
     collections: CollectionEvent[];
     accessions: AccessionEvent[];
+    tissues: Tissue[];
   };
 }
 
@@ -168,12 +174,15 @@ function Provenance({ entityId }: { entityId: string }) {
         </CardSlider.Card>
         <CardSlider.Card title="Collecting events">
           {error && <Text>{error.message}</Text>}
-          {data && <CollectingSlide accessions={[]} collections={data.organism.collections} />}
+          {data && <CollectingSlide organism={data.organism} accessions={[]} collections={data.organism.collections} />}
         </CardSlider.Card>
         <CardSlider.Card title="Registrations">
           <RegistrationsSlide />
         </CardSlider.Card>
-        <CardSlider.Card title="Subsamples and tissues"></CardSlider.Card>
+        <CardSlider.Card title="Subsamples and tissues">
+          {error && <Text>{error.message}</Text>}
+          {data && <TissueSlide tissues={data.organism.tissues} />}
+        </CardSlider.Card>
       </CardSlider>
     </Stack>
   );
