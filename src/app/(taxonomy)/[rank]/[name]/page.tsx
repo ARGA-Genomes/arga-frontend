@@ -1,7 +1,7 @@
 "use client";
 
 // Types
-import { RankSummary, Taxon } from "@/generated/types";
+import { Dataset, RankSummary, Taxon } from "@/generated/types";
 
 // Imports
 import { MAX_WIDTH } from "@/app/constants";
@@ -18,8 +18,9 @@ import { TachoChart } from "@/components/graphing/tacho";
 import { Attribute, DataField } from "@/components/highlight-stack";
 import { usePreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
+import { getChildRank, isLatin, latinilizeNormalRank, normalizeLatinRank, pluralizeRank } from "@/helpers/rankHelpers";
 import { gql, OperationVariables, useQuery } from "@apollo/client";
-import { Box, Container, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Box, Container, Flex, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { usePathname } from "next/navigation";
 import { use, useEffect } from "react";
@@ -85,25 +86,31 @@ export interface TaxonResult extends Taxon {
 
 type TaxonQuery = { taxon: TaxonResult };
 
-const GET_TAXON = gql`
-  query TaxonDetails($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $lowerRank: TaxonRank) {
+const GET_TAXON_DETAILS = gql`
+  query TaxonDetails($rank: TaxonRank, $canonicalName: String, $datasetId: UUID) {
     taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
       scientificName
       canonicalName
       authorship
       status
+      rank
       nomenclaturalCode
       citation
       source
       sourceUrl
-
       hierarchy {
         scientificName
         canonicalName
         rank
         depth
       }
+    }
+  }
+`;
 
+const GET_TAXON_STATS = gql`
+  query TaxonStats($rank: TaxonRank, $canonicalName: String, $datasetId: UUID, $lowerRank: TaxonRank) {
+    taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
       lowerRankSummary: summary(rank: $lowerRank) {
         total
         genomes
@@ -147,85 +154,18 @@ const DOWNLOAD_SUMMARY = gql`
   }
 `;
 
-const CLASSIFICATIONS_CHILD_MAP: Record<string, string> = {
-  DOMAIN: "kingdom",
-  SUPERKINGDOM: "kingdom",
-  KINGDOM: "phylum",
-  SUBKINGDOM: "phylum",
-  PHYLUM: "class",
-  SUBPHYLUM: "class",
-  SUPERCLASS: "class",
-  CLASS: "order",
-  SUBCLASS: "order",
-  INFRACLASS: "order",
-  SUPERORDER: "order",
-  ORDER: "family",
-  SUBORDER: "family",
-  INFRAORDER: "family",
-  SUPERFAMILY: "family",
-  FAMILY: "genus",
-  SUBFAMILY: "genus",
-  SUPERTRIBE: "genus",
-  TRIBE: "genus",
-  SUBTRIBE: "genus",
-  GENUS: "species",
-  SUBGENUS: "species",
-  SPECIES: "subspecies",
-  SUBSPECIES: "subspecies",
-
-  UNRANKED: "unranked",
-  HIGHERTAXON: "higher taxon",
-
-  AGGREGATEGENERA: "aggregate genera",
-  AGGREGATESPECIES: "aggregate species",
-  INCERTAESEDIS: "incertae sedis",
-
-  REGNUM: "division",
-  DIVISION: "classis",
-  SUBDIVISION: "classis",
-  CLASSIS: "ordo",
-  SUBCLASSIS: "ordo",
-  SUPERORDO: "ordo",
-  ORDO: "familia",
-  SUBORDO: "familia",
-  COHORT: "familia",
-  FAMILIA: "genus",
-  SUBFAMILIA: "genus",
-  SECTION: "species",
-  SECTIO: "species",
-  SERIES: "species",
-  VARIETAS: "subvarietas",
-  SUBVARIETAS: "subvarietas",
-  FORMA: "forma",
-
-  NOTHOVARIETAS: "nothovarietas",
-  INFRASPECIES: "infraspecies",
-  REGIO: "regio",
-  SPECIALFORM: "special form",
-};
-
-function pluralTaxon(rank: string) {
-  if (rank === "division") return "divisions";
-  else if (rank === "kingdom") return "kingdoms";
-  else if (rank === "phylum") return "phyla";
-  else if (rank === "class") return "classes";
-  else if (rank === "order") return "orders";
-  else if (rank === "family") return "families";
-  else if (rank === "genus") return "genera";
-  else return rank;
-}
-
 function DataSummary({
-  rank,
+  rawRank,
   taxon,
   downloadVariables,
 }: {
-  rank: string;
-  taxon: TaxonResult | undefined;
+  rawRank: string;
+  taxon?: TaxonResult | null;
   downloadVariables: OperationVariables;
 }) {
-  const childTaxon = CLASSIFICATIONS_CHILD_MAP[rank] || "";
-  const childTaxonLabel = pluralTaxon(childTaxon);
+  const rank = normalizeLatinRank(rawRank).toUpperCase();
+  const childTaxon = getChildRank(rawRank);
+  const childTaxonLabel = pluralizeRank(childTaxon).toLowerCase();
 
   const minDate = new Date("2009-01-01");
   const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
@@ -272,93 +212,97 @@ function DataSummary({
       <Grid.Col span={12}>
         <Title order={5}>Data summary</Title>
       </Grid.Col>
-      <Grid.Col span="content">
-        <Paper px="lg" pb="lg" w={430} h={560} radius="lg" withBorder>
-          <Stack h="100%" justify="space-between">
-            <GroupDetailRadial
-              height={400}
-              radial={25}
-              query={{
-                taxonRank: rank,
-                taxonCanonicalName: taxon?.canonicalName || "",
-                includeRanks: [rank, ALL_RANKS[ALL_RANKS.indexOf(rank) + 1]],
-                rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(rank) + 1),
-              }}
-              fontSize={7}
-              switcherGap="sm"
-              switcherSize="sm"
-              hideDescription
-            />
-            <Text fw={300} size="sm">
-              Total of species for which a whole genome has been sequenced and made available aggregated by higher
-              classification units.
-            </Text>
-          </Stack>
-        </Paper>
-      </Grid.Col>
-      <Grid.Col span="auto">
-        <Paper h={560} p="lg" radius="lg" withBorder>
-          <Stack data-downloadname="Aggregated total species" h="100%" justify="space-between">
-            <Box h={400}>
-              <GenomeCompletion
-                taxonRank={rank}
-                taxonCanonicalName={taxon?.canonicalName || ""}
-                domain={[minDate, maxDate]}
-              />
-            </Box>
-            <Text fw={300} size="sm">
-              This graph shows the aggregated total of species for which a whole genome has been sequenced and made
-              available. The first instance of a whole genome sequence for an individual species has been plotted as an
-              accumulated total. Statistics based on records indexed within ARGA.
-            </Text>
-          </Stack>
-        </Paper>
+      <Grid.Col span={12}>
+        <Flex gap="md" align="stretch">
+          <Box style={{ width: 430, flexShrink: 0 }}>
+            <Paper px="lg" pb="lg" w={430} h={560} radius="lg" withBorder>
+              <Stack h="100%" justify="space-between">
+                <GroupDetailRadial
+                  height={400}
+                  radial={25}
+                  query={{
+                    taxonRank: rank,
+                    taxonCanonicalName: taxon?.canonicalName || "",
+                    includeRanks: [rank, ALL_RANKS[ALL_RANKS.indexOf(rank) + 1]],
+                    rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(rank) + 1),
+                  }}
+                  fontSize={7}
+                  switcherGap="sm"
+                  switcherSize="sm"
+                  hideDescription
+                />
+                <Text fw={300} size="sm">
+                  Total of species for which a whole genome has been sequenced and made available aggregated by higher
+                  classification units.
+                </Text>
+              </Stack>
+            </Paper>
+          </Box>
+          <Box style={{ flexGrow: 1, minWidth: 0 }}>
+            <Paper h={560} p="lg" radius="lg" withBorder>
+              <Stack data-downloadname="Aggregated total species" h="100%" justify="space-between">
+                <Box h={400}>
+                  <GenomeCompletion
+                    taxonRank={rank}
+                    taxonCanonicalName={taxon?.canonicalName || ""}
+                    domain={[minDate, maxDate]}
+                  />
+                </Box>
+                <Text fw={300} size="sm">
+                  This graph shows the aggregated total of species for which a whole genome has been sequenced and made
+                  available. The first instance of a whole genome sequence for an individual species has been plotted as
+                  an accumulated total. Statistics based on records indexed within ARGA.
+                </Text>
+              </Stack>
+            </Paper>
+          </Box>
+          <Box style={{ width: 360, flexShrink: 0 }}>
+            <Paper h={560} p="xl" radius="lg" withBorder>
+              <Title order={5}>Taxonomic breakdown</Title>
+
+              <DataTable my={8}>
+                {rank !== "GENUS" && (
+                  <DataTableRow label={`Number of ${childTaxonLabel}`}>
+                    <DataField value={taxon?.lowerRankSummary?.total}></DataField>
+                  </DataTableRow>
+                )}
+                <DataTableRow label="Number of species/OTUs">
+                  <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.total || 0)} />
+                </DataTableRow>
+                {rank !== "GENUS" && (
+                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
+                    <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary?.genomes || 0)} />
+                  </DataTableRow>
+                )}
+                <DataTableRow label="Species with genomes">
+                  <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.genomes || 0)} />
+                </DataTableRow>
+                {rank !== "GENUS" && (
+                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
+                    <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary.genomicData || 0)} />
+                  </DataTableRow>
+                )}
+                <DataTableRow label="Species with data">
+                  <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.genomicData || 0)} />
+                </DataTableRow>
+              </DataTable>
+              <Stack mx={10} mt={5}>
+                <Attribute
+                  label="Species with most genomes"
+                  value={speciesGenomes?.[0]?.name}
+                  href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(" ", "_")}/taxonomy`}
+                />
+                <Attribute
+                  label="Species with most data"
+                  value={speciesOther?.[0]?.name}
+                  href={`/species/${speciesOther?.[0]?.name.replaceAll(" ", "_")}/taxonomy`}
+                />
+              </Stack>
+            </Paper>
+          </Box>
+        </Flex>
       </Grid.Col>
 
-      <Grid.Col span="content">
-        <Paper h={560} p="xl" radius="lg" withBorder>
-          <Title order={5}>Taxonomic breakdown</Title>
-
-          <DataTable my={8}>
-            {rank !== "GENUS" && (
-              <DataTableRow label={`Number of ${childTaxonLabel}`}>
-                <DataField value={taxon?.lowerRankSummary?.total}></DataField>
-              </DataTableRow>
-            )}
-            <DataTableRow label="Number of species/OTUs">
-              <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.total || 0)} />
-            </DataTableRow>
-            {rank !== "GENUS" && (
-              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
-                <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary?.genomes || 0)} />
-              </DataTableRow>
-            )}
-            <DataTableRow label="Species with genomes">
-              <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.genomes || 0)} />
-            </DataTableRow>
-            {rank !== "GENUS" && (
-              <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
-                <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary.genomicData || 0)} />
-              </DataTableRow>
-            )}
-            <DataTableRow label="Species with data">
-              <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.genomicData || 0)} />
-            </DataTableRow>
-          </DataTable>
-          <Stack mx={10} mt={5}>
-            <Attribute
-              label="Species with most genomes"
-              value={speciesGenomes?.[0]?.name}
-              href={`/species/${speciesGenomes?.[0]?.name?.replaceAll(" ", "_")}/taxonomy`}
-            />
-            <Attribute
-              label="Species with most data"
-              value={speciesOther?.[0]?.name}
-              href={`/species/${speciesOther?.[0]?.name.replaceAll(" ", "_")}/taxonomy`}
-            />
-          </Stack>
-        </Paper>
-      </Grid.Col>
       <Grid.Col span={12}>
         <Grid mt="xl">
           <Grid.Col data-downloadname="Complete genomes for representative species" span={12}>
@@ -466,50 +410,80 @@ interface ClassificationPageProps {
 const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
 
 export default function ClassificationPage(props: ClassificationPageProps) {
-  const params = use(props.params);
-  const rank = params.rank.toUpperCase();
-  const lowerRank = CLASSIFICATIONS_CHILD_MAP[rank]?.toUpperCase() || "";
+  const { rank: rawRank, name } = use(props.params);
+  const rank = normalizeLatinRank(rawRank).toUpperCase();
+  const lowerRank = getChildRank(rank).toUpperCase() || "";
 
   const { names } = useDatasets();
-  const datasetId = names.get("Atlas of Living Australia")?.id;
+  const dataset = names.get("Atlas of Living Australia") as Dataset | undefined;
+  const datasetId = dataset?.id;
   const variables = {
     rank,
     datasetId,
-    canonicalName: params.name,
+    canonicalName: name,
     lowerRank,
   };
 
   const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
 
-  const taxonResults = useQuery<TaxonQuery>(GET_TAXON, {
+  const taxonDetailsResults = useQuery<TaxonQuery>(GET_TAXON_DETAILS, {
     variables,
+    skip: !datasetId,
   });
 
+  const taxonStatsResults = useQuery<TaxonQuery>(GET_TAXON_STATS, {
+    variables,
+    skip: !datasetId || taxonDetailsResults.loading,
+  });
+
+  // Latin taxonomy redirect
   useEffect(() => {
-    setPreviousPage({ name: `browsing ${params.name}`, url: pathname });
-  }, [params.name, pathname, setPreviousPage]);
+    const taxon = taxonDetailsResults.data?.taxon;
+
+    if (taxon) {
+      const latinRank = latinilizeNormalRank(rawRank).toLowerCase();
+
+      // If this taxon is latin, but the user has supplied the normal rank string, replace the URL
+      if (isLatin(taxon) && rawRank.toLowerCase() !== latinRank) {
+        window.history.replaceState(null, "", `/${latinRank}/${name}`);
+      }
+    }
+  }, [taxonDetailsResults.data]);
+
+  useEffect(() => {
+    setPreviousPage({ name: `browsing ${name}`, url: pathname });
+  }, [name, pathname, setPreviousPage]);
 
   return (
-    <Stack mt="xl">
-      <ClassificationHeader rank={rank} classification={params.name} taxon={taxonResults.data?.taxon} />
-
+    <Stack mt="xl" gap={0}>
+      <ClassificationHeader rawRank={rawRank} taxon={taxonDetailsResults?.data?.taxon} dataset={dataset} />
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Stack>
             <Paper p="xl" radius="lg" pos="relative" withBorder>
-              {taxonResults.called && (
-                <DataSummary rank={rank} taxon={taxonResults.data?.taxon} downloadVariables={variables} />
+              {taxonStatsResults.called && (
+                <DataSummary
+                  rawRank={rawRank}
+                  taxon={
+                    taxonStatsResults.data
+                      ? {
+                          ...taxonStatsResults.data.taxon,
+                          ...taxonDetailsResults.data?.taxon,
+                        }
+                      : null
+                  }
+                  downloadVariables={variables}
+                />
               )}
             </Paper>
-
             {datasetId && (
               <Paper p="xl" radius="lg" pos="relative" withBorder>
                 <BrowseSpecies
                   query={{
                     content: GET_SPECIES,
                     download: DOWNLOAD_SPECIES,
-                    variables: { rank, canonicalName: params.name, datasetId },
+                    variables: { rank, canonicalName: name, datasetId },
                   }}
                 />
               </Paper>

@@ -121,14 +121,14 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
         case "dataType":
           return <DataTypeFilters key={type} filters={dataTypeFilters} onChange={memoizedSetters.setDataTypeFilters} />;
         case "dataset":
-          return (
+          return datasetFilters.length > 0 ? (
             <DatasetFilters
               key={type}
               filters={datasetFilters}
               onChange={memoizedSetters.setDatasetFilters}
               loading={!datasetFilters.length}
             />
-          );
+          ) : null;
         case "classification":
           return (
             <ClassificationFilters

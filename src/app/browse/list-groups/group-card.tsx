@@ -12,7 +12,7 @@ export interface GroupCardProps {
 
 function GroupCard({ category, image }: GroupCardProps) {
   const imageSize = 125;
-  const groupLink = `/browse/groups/${category}`;
+  const groupLink = `/browse/list-groups/${category}`;
 
   return (
     <Paper radius="xl" p={20} className={classes.card} maw={190}>

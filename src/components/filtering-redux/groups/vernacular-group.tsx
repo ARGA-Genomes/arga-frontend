@@ -1,13 +1,13 @@
 import { FilterGroup } from "../group";
 
-import { FilterType, FilterItem } from "../filters/common";
-import { BoolFilterData } from "../filters/bool";
 import { Group, Image, SegmentedControl, Select, SelectProps, Text } from "@mantine/core";
 import { useMemo } from "react";
+import { BoolFilterData } from "../filters/bool";
+import { FilterItem, FilterType } from "../filters/common";
 
-import classes from "./vernacular-group.module.css";
-import { VERNACULAR_GROUP_ICON } from "@/components/icon-bar";
+import { TAXON_ICONS } from "@/components/icon-bar";
 import { IconCheck } from "@tabler/icons-react";
+import classes from "./vernacular-group.module.css";
 
 enum VernacularGroup {
   FloweringPlants = "Flowering Plants",
@@ -40,6 +40,7 @@ enum VernacularGroup {
   Chromists = "Chromists",
   ConifersAndCycads = "Conifers And Cycads",
   Ferns = "Ferns",
+  Lichens = "Lichens",
 }
 
 export const vernacularGroupFilterToQuery = (filter: BoolFilterData | null): FilterItem[] =>
@@ -59,7 +60,7 @@ interface VernacularGroupFilterProps {
 }
 
 const renderSelectOption: SelectProps["renderOption"] = ({ option, checked }) => {
-  const group = VERNACULAR_GROUP_ICON[option.value.toUpperCase().replaceAll(" ", "_")];
+  const group = TAXON_ICONS[option.value.toUpperCase().replaceAll(" ", "_")];
 
   return (
     <Group justify="space-between" flex="1" style={{ flexGrow: 1 }} gap="xs">

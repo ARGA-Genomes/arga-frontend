@@ -1,46 +1,11 @@
-const ICONS = [
-  "Taxon_ All eukaryote species (Eukaryota).svg",
-  "Taxon_ Anemones, corals and jellyfishes (Cnidaria).svg",
-  "Taxon_ Animals (Kingdom Animalia).svg",
-  "Taxon_ Bacteria (Prokaryota_Bacteria).svg",
-  "Taxon_ Bats (Chiroptera).svg",
-  "Taxon_ Birds (Aves).svg",
-  "Taxon_ Blue-green algae (Cyanobacteria).svg",
-  "Taxon_ Brown algae (Phaeophyceae).svg",
-  "Taxon_ Chromists (Chromista).svg",
-  "Taxon_ Conifers and cycads (Pinales, Araucariales, Cupressales, Cycadales).svg",
-  "Taxon_ Crustaceans (Crustacea).svg",
-  "Taxon_ Diatoms (Bacillariophyta).svg",
-  "Taxon_ Echinoderms (Echinodermata).svg",
-  "Taxon_ Ferns (Polypodiidae).svg",
-  "Taxon_ Finfishes (Actinopterygii).svg",
-  "Taxon_ Flowering plants (Magnoliidae).svg",
-  "Taxon_ Frogs and toads (Anura).svg",
-  "Taxon_ Fungi (Fungi).svg",
-  "Taxon_ Green algae (Chlorophyta).svg",
-  "Taxon_ Hard corals (Order Scleractinia).svg",
-  "Taxon_ Hornworts (Anthocerotophyta).svg",
-  "Taxon_ Insects (Insecta).svg",
-  "Taxon_ Lichens.svg",
-  "Taxon_ Liverworts (Marchantiophyta).svg",
-  "Taxon_ Mammals (Mammalia).svg",
-  "Taxon_ Marsupials (Marsupialia).svg",
-  "Taxon_ Molluscs (Mollusca).svg",
-  "Taxon_ Mosses (Bryophyta).svg",
-  "Taxon_ Plants (Regnum Plantae).svg",
-  "Taxon_ Protozoa (Kingdom Protozoa).svg",
-  "Taxon_ Red algae (Rhodophyta).svg",
-  "Taxon_ Reptiles (Reptilia).svg",
-  "Taxon_ Seaweeds and algae (red + brown + green + blue green).svg",
-  "Taxon_ Sharks and rays (Subclass Elasmobranchii).svg",
-  "Taxon_ Snails (Gastropoda).svg",
-  "Taxon_ Spiders (Araneae).svg",
-  "Taxon_ Sponges (Phylum Porifera).svg",
-  "Taxon_ Whales and dolphins (Order Cetacea).svg",
-  "Taxon_group_ Invertebrates (Animalia - Vertebrata).svg",
-];
+import { TAXON_ICONS } from "@/components/icon-bar";
 
-export const getTaxonIcon = (canonicalName: string): string | null => {
-  const found = ICONS.find((icon) => icon.toLowerCase().includes(canonicalName.toLowerCase()));
-  return found ? `/icons/taxon/${found}` : null;
+const taxonIcons = Object.values(TAXON_ICONS).map((icon) => {
+  const [_, rank, canonicalName] = icon.link!.split("/");
+  return { rank, canonicalName, image: icon.image };
+});
+
+export const getTaxonIcon = (rank: string, canonicalName: string): string | null => {
+  const found = taxonIcons.find((icon) => icon.rank === rank && icon.canonicalName === canonicalName);
+  return found?.image || null;
 };

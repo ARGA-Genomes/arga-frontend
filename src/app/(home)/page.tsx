@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { ShowStats, TaxonomicComposition } from "./stats";
 
 // Project components
-// import { InternalLinkButton } from "@/components/button-link-internal";
+import { InternalLinkButton } from "@/components/button-link-internal";
 
 // Local components
 import RecentUpdatesContainer from "../../components/recent-updates-container";
@@ -15,7 +15,6 @@ import Browse from "./browse";
 import classes from "./page.module.css";
 
 // Browse data
-import { InternalLinkButton } from "@/components/button-link-internal";
 import { Search } from "@/components/search";
 import { Overview } from "@/generated/types";
 import { grouping, taxon, type } from "./_data";

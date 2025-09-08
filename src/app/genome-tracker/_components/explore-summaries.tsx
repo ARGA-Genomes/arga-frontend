@@ -1,4 +1,4 @@
-import { IconData, VERNACULAR_GROUP_ICON } from "@/components/icon-bar";
+import { IconData, TAXON_ICONS } from "@/components/icon-bar";
 import { Stack, Text } from "@mantine/core";
 import { Group } from "@visx/group";
 import { animate, motion, useMotionValue } from "framer-motion";
@@ -39,8 +39,8 @@ const PRODUCERS_BAR = [
 ];
 
 export const ExploreSummaries = () => {
-  const animals = ANIMAL_BAR.map((key) => VERNACULAR_GROUP_ICON[key]);
-  const producers = PRODUCERS_BAR.map((key) => VERNACULAR_GROUP_ICON[key]).reverse();
+  const animals = ANIMAL_BAR.map((key) => TAXON_ICONS[key]);
+  const producers = PRODUCERS_BAR.map((key) => TAXON_ICONS[key]).reverse();
 
   return (
     <Stack gap="sm">

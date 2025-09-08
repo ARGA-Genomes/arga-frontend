@@ -1,12 +1,11 @@
 "use client";
 
 import { BrowseCard } from "@/components/browse-card";
-import { Carousel } from "@mantine/carousel";
 import { Group, Text } from "@mantine/core";
 import get from "lodash-es/get";
 
-import "@mantine/carousel/styles.css";
 import { ApolloError } from "@apollo/client";
+import "@mantine/carousel/styles.css";
 
 export interface BrowseItem {
   total: string | null;
@@ -25,18 +24,14 @@ interface BrowseProps {
 
 export default function Browse({ items, data, error, disabled }: BrowseProps) {
   return (
-    <Carousel slideSize={150} slideGap="sm" slidesToScroll="auto" align="start" withControls={false}>
-      <Group justify="center" align="flex-start">
-        {error ? (
-          <Text>{error.message}</Text>
-        ) : (
-          items.map((item, idx) => (
-            <Carousel.Slide key={`${item.link}-${idx}`}>
-              <BrowseCard disabled={disabled} {...item} total={item.total ? get(data, item.total) : item.total} />
-            </Carousel.Slide>
-          ))
-        )}
-      </Group>
-    </Carousel>
+    <Group justify="center" align="flex-start">
+      {error ? (
+        <Text>{error.message}</Text>
+      ) : (
+        items.map((item, idx) => (
+          <BrowseCard key={idx} disabled={disabled} {...item} total={item.total ? get(data, item.total) : item.total} />
+        ))
+      )}
+    </Group>
   );
 }

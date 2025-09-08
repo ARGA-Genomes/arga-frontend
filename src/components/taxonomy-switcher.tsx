@@ -17,6 +17,7 @@ import accClasses from "./taxonomy-switcher-acc.module.css";
 
 import { Dataset, useDatasets } from "@/app/source-provider";
 import { Provenance, Taxon, TaxonNode } from "@/generated/types";
+import { normalizeLatinRank, RankMap } from "@/helpers/rankHelpers";
 import { GET_TAXON_PROVENANCE } from "@/queries/provenance";
 import { useQuery } from "@apollo/client";
 import { useDisclosure } from "@mantine/hooks";
@@ -28,59 +29,32 @@ import RecordHistory from "./record-history";
 
 interface TaxonExtended extends Taxon {
   dataset?: Dataset;
-  originalCanonicalNames?: TaxonMap;
+  originalCanonicalNames?: RankMap;
 }
 
 interface TaxonomySwitcherProps {
   taxa: TaxonExtended[];
 }
 
-type TaxonMap = Record<string, string>;
-
-// Define the rank mapping to standardize rank names
-const rankMapping: TaxonMap = {
-  Regnum: "Kingdom",
-  Division: "Phylum",
-  Classis: "Class",
-  Subclassis: "Subclass",
-  Superordo: "Superorder",
-  Ordo: "Order",
-  Familia: "Family",
-  Genus: "Genus",
-  Subgenus: "Subgenus",
-  Kingdom: "Kingdom",
-  Phylum: "Phylum",
-  Class: "Class",
-  Subclass: "Subclass",
-  Superorder: "Superorder",
-  Order: "Order",
-  Family: "Family",
-};
-
-// Helper function to normalize rank names
-function normalizeRank(rank: string) {
-  return rankMapping[rank] || rank;
-}
-
 function compareTaxons(taxa: TaxonExtended[], baseTaxon: TaxonExtended) {
   // Create a map of normalized rank to canonicalName for the baseTaxon hierarchy
-  const baseHierarchyMap: TaxonMap = {};
-  const baseRankNames: TaxonMap = {};
+  const baseHierarchyMap: RankMap = {};
+  const baseRankNames: RankMap = {};
   baseTaxon.hierarchy.forEach((node) => {
-    const normalizedRank = normalizeRank(node.rank);
+    const normalizedRank = normalizeLatinRank(node.rank);
     baseHierarchyMap[normalizedRank] = node.canonicalName;
     baseRankNames[normalizedRank] = node.rank;
   });
 
   // For each taxon in taxa
   taxa.forEach((taxon) => {
-    const differingRanks: TaxonMap = {};
+    const differingRanks: RankMap = {};
 
     // Create a map of normalized rank to canonicalName for this taxon's hierarchy
-    const taxonHierarchyMap: TaxonMap = {};
-    const taxonRankNames: TaxonMap = {}; // Map normalized rank to the taxon's original rank names
+    const taxonHierarchyMap: RankMap = {};
+    const taxonRankNames: RankMap = {}; // Map normalized rank to the taxon's original rank names
     taxon.hierarchy.forEach((node) => {
-      const normalizedRank = normalizeRank(node.rank);
+      const normalizedRank = normalizeLatinRank(node.rank);
       taxonHierarchyMap[normalizedRank] = node.canonicalName;
       taxonRankNames[normalizedRank] = node.rank;
     });
@@ -276,7 +250,7 @@ function Hierarchy({
   originalCanonicalNames,
 }: {
   hierarchy: TaxonNode[];
-  originalCanonicalNames?: TaxonMap;
+  originalCanonicalNames?: RankMap;
 }) {
   return (
     <Group gap="lg">

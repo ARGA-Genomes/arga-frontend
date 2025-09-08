@@ -1,8 +1,8 @@
-import { Stack, Select, Group, Avatar, Text } from "@mantine/core";
-import { forwardRef } from "react";
-import { Filter } from "./common";
+import { Avatar, Group, Select, Stack, Text } from "@mantine/core";
 import { constantCase } from "change-case";
-import { VERNACULAR_GROUP_ICON } from "../icon-bar";
+import { forwardRef } from "react";
+import { TAXON_ICONS } from "../icon-bar";
+import { Filter } from "./common";
 
 interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
   label: string;
@@ -27,7 +27,7 @@ interface VernacularGroupFiltersProps {
 }
 
 export function VernacularGroupFilters({ value, onChange }: VernacularGroupFiltersProps) {
-  const data = Object.entries(VERNACULAR_GROUP_ICON)
+  const data = Object.entries(TAXON_ICONS)
     .map(([key, value]) => {
       return { value: key, ...value };
     })

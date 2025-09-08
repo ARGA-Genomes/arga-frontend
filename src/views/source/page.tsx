@@ -36,7 +36,7 @@ import { BrowseSpecies } from "@/components/browse-species";
 import { FilterItem } from "@/components/filtering-redux/filters/common";
 import { DatasetDetails, RankSummary, Source } from "@/generated/types";
 import { grouping as groupingData } from "../../app/(home)/_data";
-import { groupInclude, array as groupingExtra, GroupItem } from "../../app/browse/groups/_data/all";
+import { groupInclude, array as groupingExtra, GroupItem } from "../../app/browse/list-groups/_data/all";
 import DataHighlights from "./_components/data-highlights";
 import { DataSummary } from "./_components/data-summary";
 

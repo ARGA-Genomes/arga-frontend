@@ -2,15 +2,14 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Grid, Group, Paper, Stack, Text } from "@mantine/core";
-import * as Humanize from "humanize-plus";
 
 import { useDatasets } from "@/app/source-provider";
 import { ExternalLinkButton } from "@/components/button-link-external";
-import { AttributePill } from "@/components/data-fields";
+import { Hierarchy } from "@/components/hierarchy";
 import { AttributePill as AttributePillStack } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
 import { SpeciesPhoto } from "@/components/species-image";
-import { Species, SpeciesGenomicDataSummary, Taxon, Taxonomy } from "@/generated/types";
+import { Dataset, Species, SpeciesGenomicDataSummary, Taxon, Taxonomy } from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -18,6 +17,7 @@ import { useEffect, useState } from "react";
 const GET_TAXON = gql`
   query TaxonSpecies($rank: TaxonomicRank, $canonicalName: String, $datasetId: UUID) {
     taxon(by: { classification: { rank: $rank, canonicalName: $canonicalName, datasetId: $datasetId } }) {
+      rank
       hierarchy {
         canonicalName
         rank
@@ -210,7 +210,7 @@ function ExternalResources(props: ExternalResourcesProps) {
 
 function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
   const { names } = useDatasets();
-  const dataset = names.get("Atlas of Living Australia");
+  const dataset = names.get("Atlas of Living Australia") as Dataset | undefined;
 
   const { loading, error, data } = useQuery<{ taxon: Taxon }>(GET_TAXON, {
     variables: {
@@ -220,41 +220,13 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
     },
   });
 
-  const hierarchy = data?.taxon.hierarchy.toSorted((a, b) => b.depth - a.depth);
-
   return (
     <Paper radius={16} p="md" withBorder>
       <LoadOverlay visible={loading} />
-
-      <Group justify="space-between" pb={20}>
-        <Text fw={700} size="lg">
-          Higher classification
-        </Text>
-        <Group>
-          <Text fw={300} size="xs">
-            Source
-          </Text>
-          <ExternalLinkButton url={dataset?.url} externalLinkName={dataset?.name} outline icon={IconArrowUpRight} />
-        </Group>
-      </Group>
-
-      <Group>
-        {error && <Text>{error.message}</Text>}
-        {hierarchy?.map((node, idx) => (
-          <AttributePill
-            key={idx}
-            labelColor="midnight.8"
-            popoverDisabled
-            hoverColor="midnight.0"
-            label={Humanize.capitalize(node.rank.toLowerCase())}
-            value={node.canonicalName}
-            href={`/${node.rank.toLowerCase()}/${node.canonicalName}`}
-            icon={IconArrowUpRight}
-            showIconOnHover
-            miw={100}
-          />
-        ))}
-      </Group>
+      <Text fw={700} size="lg" pb={20}>
+        Higher classification
+      </Text>
+      {error ? <Text>{error.message}</Text> : <Hierarchy taxon={data?.taxon} rawRank="SPECIES" dataset={dataset} />}
     </Paper>
   );
 }
