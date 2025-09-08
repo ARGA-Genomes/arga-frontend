@@ -2,12 +2,12 @@
 
 import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Flex, Group, Stack, Text, Title } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
+import { IconArrowUpRight, IconSearch } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { ShowStats, TaxonomicComposition } from "./stats";
 
 // Project components
-// import { InternalLinkButton } from "@/components/button-link-internal";
+import { InternalLinkButton } from "@/components/button-link-internal";
 
 // Local components
 import RecentUpdatesContainer from "../../components/recent-updates-container";
@@ -128,16 +128,16 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Browse by functional or ecological group
               </Title>
-              <Browse items={grouping} data={formattedData} error={error} disabled />
-              {/* <InternalLinkButton
-                url={`/browse/list-groups`}
+              <Browse items={grouping} data={formattedData} error={error} />
+              <InternalLinkButton
+                url={`/browse/groups`}
                 icon={IconArrowUpRight}
                 textColor="white"
                 textSize="md"
                 outline
               >
                 View all groups
-              </InternalLinkButton> */}
+              </InternalLinkButton>
             </Stack>
           </Stack>
           <Group gap={140} pb={80} align="flex-start" justify="center">
