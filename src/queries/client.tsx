@@ -6,6 +6,7 @@ import {
   COLLECTION_EVENT,
   ORGANISM,
   SPECIMEN,
+  TISSUE,
   SPECIMEN_SUMMARY,
   SPECIMEN_OVERVIEW,
   SPECIMEN_STATS,
@@ -29,6 +30,7 @@ export default function createClient() {
   const fragments = createFragmentRegistry(
     ORGANISM,
     SPECIMEN,
+    TISSUE,
     SPECIMEN_SUMMARY,
     SPECIMEN_OVERVIEW,
     SPECIMEN_STATS,
