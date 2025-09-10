@@ -1,11 +1,13 @@
 "use client";
 
 import { Source } from "@/generated/types";
-import { Flex, Group, Paper, Skeleton, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Flex, Paper, Skeleton, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconStarFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import classes from "./data-highlights.module.css";
+
+const HIGHLIGHT_WIDTH = 280;
 
 export default function DataHighlights({ source, loading }: { source?: Source; loading: boolean }) {
   const speciesGenomes = useMemo(
@@ -70,24 +72,31 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
   );
 
   return (
-    <Group
+    <Flex
+      direction={{ base: "column", lg: "row" }}
       align="center"
-      px="xl"
-      py="md"
       mb={34}
       bg="wheat.0"
       style={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
       gap={48}
     >
-      <Text fw="bold" c="wheat.7">
-        Dataset highlights
-      </Text>
-      <Flex direction="row" align="center" justify="center" gap="lg">
+      <Flex
+        px="xl"
+        py="md"
+        direction={{ base: "column", lg: "row" }}
+        align="center"
+        justify="center"
+        gap="lg"
+        style={{ overflowX: "auto" }}
+      >
+        <Text fw="bold" c="wheat.7" pr="xl">
+          Dataset highlights
+        </Text>
         <Paper
           className={latestGenomeReleases?.[0] ? classes.stat : undefined}
           component={latestGenomeReleases?.[0] ? Link : undefined}
           href={latestGenomeReleases?.[0]?.href || "#"}
-          miw={200}
+          w={HIGHLIGHT_WIDTH}
           radius="lg"
           p="xs"
           shadow="sm"
@@ -111,7 +120,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
           className={speciesGenomes?.[0] ? classes.stat : undefined}
           component={speciesGenomes?.[0] ? Link : undefined}
           href={speciesGenomes?.[0]?.href || "#"}
-          miw={200}
+          w={HIGHLIGHT_WIDTH}
           radius="lg"
           p="xs"
           shadow="sm"
@@ -135,7 +144,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
           className={speciesLoci?.[0] ? classes.stat : undefined}
           component={speciesLoci?.[0] ? Link : undefined}
           href={speciesLoci?.[0]?.href || "#"}
-          miw={200}
+          w={HIGHLIGHT_WIDTH}
           radius="lg"
           p="xs"
           shadow="sm"
@@ -159,7 +168,7 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
           className={speciesOther?.[0] ? classes.stat : undefined}
           component={speciesOther?.[0] ? Link : undefined}
           href={speciesOther?.[0]?.href || "#"}
-          miw={200}
+          w={HIGHLIGHT_WIDTH}
           radius="lg"
           p="xs"
           shadow="sm"
@@ -177,6 +186,6 @@ export default function DataHighlights({ source, loading }: { source?: Source; l
           </Stack>
         </Paper>
       </Flex>
-    </Group>
+    </Flex>
   );
 }
