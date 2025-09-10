@@ -10,7 +10,7 @@ export const taxon: BrowseItem[] = [
   {
     total: "plants",
     category: "Plants",
-    image: "/icons/taxon/Taxon_ Plants (Regnum Plantae).svg",
+    image: "/icons/taxon/Taxon_ Plants (Kingdom Plantae).svg",
     link: "/regnum/Plantae",
   },
   {

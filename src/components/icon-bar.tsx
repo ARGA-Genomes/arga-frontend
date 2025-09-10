@@ -186,9 +186,9 @@ export const TAXON_ICONS: Record<string, IconData> = {
     colour: "moss.4",
   },
   HIGHER_PLANTS: {
-    image: "/icons/taxon/Taxon_ Plants (Regnum Plantae).svg",
+    image: "/icons/taxon/Taxon_ Plants (Kingdom Plantae).svg",
     label: "Plants",
-    link: "/regnum/Plantae",
+    link: "/kingdom/Plantae",
     colour: "moss.4",
   },
   FLOWERING_PLANTS: {

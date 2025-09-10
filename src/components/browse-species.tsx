@@ -25,7 +25,7 @@ import {
 import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 // Local components
-import { get, range } from "lodash-es";
+import { get, range, isEqual } from "lodash-es";
 import { FiltersDrawer } from "./filtering-redux/drawer";
 import { FilterItem } from "./filtering-redux/filters/common";
 import { PaginationBar, PaginationSize } from "./pagination";
@@ -93,6 +93,7 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
 
   const [filters, setFilters] = useState<FilterItem[]>([]);
   const [filterChips, setFilterChips] = useState<ReactElement[] | null>(null);
+  const [previousFilters, setPreviousFilters] = useState<FilterItem[]>([]);
 
   const tableRef = useRef<HTMLTableElement>(null);
 
@@ -214,8 +215,12 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
                 "industryCommerce",
               ]}
               onFilter={(newFilters) => {
+                // Only reset page if filters have actually changed
+                if (!isEqual(newFilters, previousFilters)) {
+                  setPage(1);
+                  setPreviousFilters(newFilters);
+                }
                 setFilters(newFilters);
-                setPage(1);
               }}
               onFilterChips={setFilterChips}
               values={values}

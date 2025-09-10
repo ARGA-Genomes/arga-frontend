@@ -130,7 +130,7 @@ export default function HomePage() {
               </Title>
               <Browse items={grouping} data={formattedData} error={error} />
               <InternalLinkButton
-                url={`/browse/groups`}
+                url={`/browse/list-groups`}
                 icon={IconArrowUpRight}
                 textColor="white"
                 textSize="md"

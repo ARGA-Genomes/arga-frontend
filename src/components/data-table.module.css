@@ -12,6 +12,7 @@
                 padding-right: var(--mantine-spacing-xl);
                 font-size: var(--mantine-font-size-sm);
                 font-weight: 300;
+                color: var(--mantine-color-midnight-9);
             }
         }
     }
