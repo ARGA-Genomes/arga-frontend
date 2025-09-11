@@ -363,38 +363,34 @@ export type DateRange = {
 
 export type DnaExtract = {
   __typename?: 'DnaExtract';
-  events: DnaExtractEvents;
-  id: Scalars['UUID']['output'];
-  recordId: Scalars['String']['output'];
-  subsampleId: Scalars['UUID']['output'];
+  absorbance260230Ratio?: Maybe<Scalars['Float']['output']>;
+  absorbance260280Ratio?: Maybe<Scalars['Float']['output']>;
+  actionExtracted?: Maybe<Scalars['String']['output']>;
+  cellLysisMethod?: Maybe<Scalars['String']['output']>;
+  concentration?: Maybe<Scalars['Float']['output']>;
+  concentrationMethod?: Maybe<Scalars['String']['output']>;
+  concentrationUnit?: Maybe<Scalars['String']['output']>;
+  conformation?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
+  extractId: Scalars['String']['output'];
+  extractedBy?: Maybe<Scalars['String']['output']>;
+  extractionMethod?: Maybe<Scalars['String']['output']>;
+  materialExtractedBy?: Maybe<Scalars['String']['output']>;
+  nucleicAcidType?: Maybe<Scalars['String']['output']>;
+  numberOfExtractsPooled?: Maybe<Scalars['String']['output']>;
+  preparationType?: Maybe<Scalars['String']['output']>;
+  preservationMethod?: Maybe<Scalars['String']['output']>;
+  preservationType?: Maybe<Scalars['String']['output']>;
+  publication: Scalars['String']['output'];
+  quantification?: Maybe<Scalars['String']['output']>;
 };
 
 export type DnaExtractBy = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   recordId?: InputMaybe<Scalars['String']['input']>;
   specimenRecordId?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type DnaExtractEvents = {
-  __typename?: 'DnaExtractEvents';
-  dnaExtracts: Array<DnaExtractionEvent>;
-};
-
-export type DnaExtractionEvent = {
-  __typename?: 'DnaExtractionEvent';
-  absorbance260230?: Maybe<Scalars['Float']['output']>;
-  absorbance260280?: Maybe<Scalars['Float']['output']>;
-  concentration?: Maybe<Scalars['Float']['output']>;
-  concentrationMethod?: Maybe<Scalars['String']['output']>;
-  eventDate?: Maybe<Scalars['String']['output']>;
-  eventTime?: Maybe<Scalars['String']['output']>;
-  extractedBy?: Maybe<Scalars['String']['output']>;
-  extractionMethod?: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  measurementMethod?: Maybe<Scalars['String']['output']>;
-  preparationType?: Maybe<Scalars['String']['output']>;
-  preservationType?: Maybe<Scalars['String']['output']>;
-  quality?: Maybe<Scalars['String']['output']>;
 };
 
 export type FilterAction =
@@ -505,7 +501,7 @@ export type GenomicComponent = {
   dataType?: Maybe<Scalars['String']['output']>;
   datasetName: Scalars['String']['output'];
   depositedBy?: Maybe<Scalars['String']['output']>;
-  dnaExtractId: Scalars['UUID']['output'];
+  dnaExtractId: Scalars['String']['output'];
   estimatedSize?: Maybe<Scalars['String']['output']>;
   fundingAttribution?: Maybe<Scalars['String']['output']>;
   latitude?: Maybe<Scalars['Float']['output']>;
@@ -580,7 +576,7 @@ export type Marker = {
   accession?: Maybe<Scalars['String']['output']>;
   canonicalName: Scalars['String']['output'];
   datasetName: Scalars['String']['output'];
-  dnaExtractId: Scalars['UUID']['output'];
+  dnaExtractId: Scalars['String']['output'];
   materialSampleId?: Maybe<Scalars['String']['output']>;
   recordId: Scalars['String']['output'];
   sequenceId: Scalars['UUID']['output'];
@@ -728,6 +724,7 @@ export type Organism = {
   phenotypicSex?: Maybe<Scalars['String']['output']>;
   reproductiveCondition?: Maybe<Scalars['String']['output']>;
   sex?: Maybe<Scalars['String']['output']>;
+  subsamples: Array<SubsampleDetails>;
   tissues: Array<Tissue>;
 };
 
@@ -940,7 +937,7 @@ export type SearchFullTextArgs = {
 export type Sequence = {
   __typename?: 'Sequence';
   datasetName: Scalars['String']['output'];
-  dnaExtractId: Scalars['UUID']['output'];
+  dnaExtractId: Scalars['String']['output'];
   events: SequenceEvents;
   id: Scalars['UUID']['output'];
   recordId: Scalars['String']['output'];
@@ -1149,7 +1146,7 @@ export type SpeciesMarker = {
   __typename?: 'SpeciesMarker';
   accession?: Maybe<Scalars['String']['output']>;
   datasetName: Scalars['String']['output'];
-  dnaExtractId: Scalars['UUID']['output'];
+  dnaExtractId: Scalars['String']['output'];
   latitude?: Maybe<Scalars['Float']['output']>;
   longitude?: Maybe<Scalars['Float']['output']>;
   materialSampleId?: Maybe<Scalars['String']['output']>;
@@ -1471,34 +1468,67 @@ export type StringValue = {
 
 export type Subsample = {
   __typename?: 'Subsample';
-  events: SubsampleEvents;
-  id: Scalars['UUID']['output'];
+  cellLine?: Maybe<Scalars['String']['output']>;
+  cellType?: Maybe<Scalars['String']['output']>;
+  cloneName?: Maybe<Scalars['String']['output']>;
+  cultureMedia?: Maybe<Scalars['String']['output']>;
+  cultureMethod?: Maybe<Scalars['String']['output']>;
+  custodian?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
   institutionCode?: Maybe<Scalars['String']['output']>;
   institutionName?: Maybe<Scalars['String']['output']>;
-  materialSampleId?: Maybe<Scalars['String']['output']>;
-  recordId: Scalars['String']['output'];
+  labHost?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  preservationDuration?: Maybe<Scalars['String']['output']>;
+  preservationMethod?: Maybe<Scalars['String']['output']>;
+  preservationTemperature?: Maybe<Scalars['String']['output']>;
+  publication: Scalars['String']['output'];
+  quality?: Maybe<Scalars['String']['output']>;
+  samplePooling?: Maybe<Scalars['String']['output']>;
+  sampleProcessing?: Maybe<Scalars['String']['output']>;
+  sampleType?: Maybe<Scalars['String']['output']>;
   specimenId: Scalars['String']['output'];
-  typeStatus?: Maybe<Scalars['String']['output']>;
+  subsampleId: Scalars['String']['output'];
+  weightOrVolume?: Maybe<Scalars['String']['output']>;
 };
 
 export type SubsampleBy = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   recordId?: InputMaybe<Scalars['String']['input']>;
   specimenRecordId?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type SubsampleEvent = {
-  __typename?: 'SubsampleEvent';
-  eventDate?: Maybe<Scalars['String']['output']>;
-  eventTime?: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  preparationType?: Maybe<Scalars['String']['output']>;
-  subsampledBy?: Maybe<Scalars['String']['output']>;
-};
-
-export type SubsampleEvents = {
-  __typename?: 'SubsampleEvents';
-  subsamples: Array<SubsampleEvent>;
+export type SubsampleDetails = {
+  __typename?: 'SubsampleDetails';
+  cellLine?: Maybe<Scalars['String']['output']>;
+  cellType?: Maybe<Scalars['String']['output']>;
+  cloneName?: Maybe<Scalars['String']['output']>;
+  cultureMedia?: Maybe<Scalars['String']['output']>;
+  cultureMethod?: Maybe<Scalars['String']['output']>;
+  custodian?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
+  institutionCode?: Maybe<Scalars['String']['output']>;
+  institutionName?: Maybe<Scalars['String']['output']>;
+  labHost?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  preservationDuration?: Maybe<Scalars['String']['output']>;
+  preservationMethod?: Maybe<Scalars['String']['output']>;
+  preservationTemperature?: Maybe<Scalars['String']['output']>;
+  quality?: Maybe<Scalars['String']['output']>;
+  samplePooling?: Maybe<Scalars['String']['output']>;
+  sampleProcessing?: Maybe<Scalars['String']['output']>;
+  sampleType?: Maybe<Scalars['String']['output']>;
+  specimenId: Scalars['String']['output'];
+  subsampleId: Scalars['String']['output'];
+  weightOrVolume?: Maybe<Scalars['String']['output']>;
 };
 
 export type Synonym = {
@@ -2038,7 +2068,7 @@ export type WholeGenome = {
   dataType?: Maybe<Scalars['String']['output']>;
   datasetName: Scalars['String']['output'];
   depositedBy?: Maybe<Scalars['String']['output']>;
-  dnaExtractId: Scalars['UUID']['output'];
+  dnaExtractId: Scalars['String']['output'];
   estimatedSize?: Maybe<Scalars['String']['output']>;
   excludedFromRefseq?: Maybe<Scalars['String']['output']>;
   genomeSize?: Maybe<Scalars['Int']['output']>;
