@@ -1,18 +1,16 @@
 "use client";
 
-import classes from "./page.module.css";
-
 import { IconLiveState, IconSpecimenCollection, IconSpecimenRegistration, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
-import { AttributePillContainer } from "@/components/data-fields";
 import { CollectingSlide } from "@/components/slides/Collecting";
+import { ExtractionSlide } from "@/components/slides/Extraction";
 import { LiveStateSlide } from "@/components/slides/LiveState";
 import { RegistrationsSlide } from "@/components/slides/Registrations";
 import { TissueSlide } from "@/components/slides/Tissues";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { AccessionEvent, CollectionEvent, Organism, Tissue } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
-import { Center, Grid, Group, Paper, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Stack, Text, Title } from "@mantine/core";
 import { use, useState } from "react";
 
 const GET_ORGANISM = gql`
@@ -52,91 +50,8 @@ export default function Page(props: PageProps) {
 
   return (
     <Stack gap="xl">
-      <Overview entityId={params.entityId} />
       <Provenance entityId={params.entityId} />
     </Stack>
-  );
-}
-
-function Overview({ entityId }: { entityId: string }) {
-  const { loading, error, data } = useQuery<OrganismQuery>(GET_ORGANISM, {
-    variables: { entityId },
-  });
-
-  return (
-    <Paper radius="lg" p={20} bg="wheatBg.0">
-      <Title order={3} c="wheat">
-        Organism overview
-      </Title>
-
-      {error?.message}
-
-      <Grid>
-        <Grid.Col span={6}>
-          <Grid>
-            <Grid.Col span={8}>
-              <Stack>
-                <OverviewBlock title="Scientific name" loading={loading}>
-                  <AttributePillContainer className={classes.pill} color="white">
-                    {data?.organism.entityId}
-                  </AttributePillContainer>
-                </OverviewBlock>
-                <Group>
-                  <AttributePillContainer
-                    className={classes.holotypePill}
-                    color="white"
-                    withBorder={false}
-                  ></AttributePillContainer>
-                </Group>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Stack>
-                <Stack gap="sm">
-                  <Text fw={700} c="midnight" fz="xs">
-                    Source organism scope
-                  </Text>
-                  <Center></Center>
-                </Stack>
-                <Stack gap="sm">
-                  <Text fw={700} c="midnight" fz="xs">
-                    Biome
-                  </Text>
-                  <Center></Center>
-                </Stack>
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <OverviewBlock title="Associated organisms" loading={loading}></OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <OverviewBlock title="External links" loading={loading}></OverviewBlock>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  );
-}
-
-interface OverviewBlockProps {
-  title: string;
-  children?: React.ReactNode;
-  loading: boolean;
-}
-
-function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
-  return (
-    <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
-      <Paper radius="lg" p={20} bg="wheatBg.0" withBorder style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}>
-        <Stack gap="sm">
-          <Text fw={700} c="midnight" fz="xs">
-            {title}
-          </Text>
-          <Center>{children}</Center>
-        </Stack>
-      </Paper>
-    </Skeleton>
   );
 }
 
@@ -166,6 +81,11 @@ function Provenance({ entityId }: { entityId: string }) {
           icon={<IconSubsample size={60} />}
           onClick={() => setCard(3)}
         />
+        <TimelineNavbar.Item
+          label="Nucleic acid extraction"
+          icon={<IconSubsample size={60} />}
+          onClick={() => setCard(4)}
+        />
       </TimelineNavbar>
 
       <CardSlider card={card}>
@@ -182,6 +102,10 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Subsamples and tissues">
           {error && <Text>{error.message}</Text>}
           {data && <TissueSlide tissues={data.organism.tissues} />}
+        </CardSlider.Card>
+        <CardSlider.Card title="Nucleic acid extraction">
+          {error && <Text>{error.message}</Text>}
+          {data && <ExtractionSlide subsamples={[]} />}
         </CardSlider.Card>
       </CardSlider>
     </Stack>

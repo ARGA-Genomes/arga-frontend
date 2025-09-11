@@ -1,0 +1,13 @@
+.skeletonOverview:where([data-visible])::before {
+    background-color: var(--mantine-color-wheat-2);
+}
+
+.skeletonOverview:where([data-visible])::after {
+    background-color: var(--mantine-color-wheat-1);
+}
+
+.pill {
+    color: var(--mantine-color-midnight-7);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 700;
+}
