@@ -22,8 +22,7 @@ import { getChildRank, isLatin, latinilizeNormalRank, normalizeLatinRank, plural
 import { gql, OperationVariables, useQuery } from "@apollo/client";
 import { Box, Container, Flex, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import * as Humanize from "humanize-plus";
-import { usePathname } from "next/navigation";
-import { use, useEffect } from "react";
+import { use, useEffect, useMemo } from "react";
 
 const GET_SPECIES = gql`
   query TaxonSpecies(
@@ -155,17 +154,20 @@ const DOWNLOAD_SUMMARY = gql`
 `;
 
 function DataSummary({
-  rawRank,
+  normalRank,
+  rankDetails,
   taxon,
   downloadVariables,
 }: {
-  rawRank: string;
+  normalRank: string;
+  rankDetails: TaxonRankDetails | null;
   taxon?: TaxonResult | null;
   downloadVariables: OperationVariables;
 }) {
-  const rank = normalizeLatinRank(rawRank).toUpperCase();
-  const childTaxon = getChildRank(rawRank);
-  const childTaxonLabel = pluralizeRank(childTaxon).toLowerCase();
+  // const childTaxon = getChildRank(normalRank.toLowerCase());
+  const childTaxonLabel = rankDetails
+    ? pluralizeRank(getChildRank(rankDetails.rank.toLowerCase())).toLowerCase()
+    : null;
 
   const minDate = new Date("2009-01-01");
   const maxDate = new Date(`${new Date().getFullYear() + 10}-01-01`);
@@ -221,10 +223,10 @@ function DataSummary({
                   height={400}
                   radial={25}
                   query={{
-                    taxonRank: rank,
+                    taxonRank: normalRank,
                     taxonCanonicalName: taxon?.canonicalName || "",
-                    includeRanks: [rank, ALL_RANKS[ALL_RANKS.indexOf(rank) + 1]],
-                    rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(rank) + 1),
+                    includeRanks: [normalRank, ALL_RANKS[ALL_RANKS.indexOf(normalRank) + 1]],
+                    rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(normalRank) + 1),
                   }}
                   fontSize={7}
                   switcherGap="sm"
@@ -243,7 +245,7 @@ function DataSummary({
               <Stack data-downloadname="Aggregated total species" h="100%" justify="space-between">
                 <Box h={400}>
                   <GenomeCompletion
-                    taxonRank={rank}
+                    taxonRank={normalRank}
                     taxonCanonicalName={taxon?.canonicalName || ""}
                     domain={[minDate, maxDate]}
                   />
@@ -261,24 +263,24 @@ function DataSummary({
               <Title order={5}>Taxonomic breakdown</Title>
 
               <DataTable my={8}>
-                {rank !== "GENUS" && (
-                  <DataTableRow label={`Number of ${childTaxonLabel}`}>
+                {normalRank !== "GENUS" && (
+                  <DataTableRow label={`Number of ${childTaxonLabel || "unknown"}`}>
                     <DataField value={taxon?.lowerRankSummary?.total}></DataField>
                   </DataTableRow>
                 )}
                 <DataTableRow label="Number of species/OTUs">
                   <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.total || 0)} />
                 </DataTableRow>
-                {rank !== "GENUS" && (
-                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with genomes`}>
+                {normalRank !== "GENUS" && (
+                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel || "unknown")} with genomes`}>
                     <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary?.genomes || 0)} />
                   </DataTableRow>
                 )}
                 <DataTableRow label="Species with genomes">
                   <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.genomes || 0)} />
                 </DataTableRow>
-                {rank !== "GENUS" && (
-                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel)} with data`}>
+                {normalRank !== "GENUS" && (
+                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel || "unknown")} with data`}>
                     <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary.genomicData || 0)} />
                   </DataTableRow>
                 )}
@@ -311,7 +313,7 @@ function DataSummary({
                 Complete genome for at least one representative species from each:
               </Text>
               <Group grow px="lg">
-                <CompletionStepper rank={rank} canonicalName={taxon?.canonicalName} />
+                <CompletionStepper rank={normalRank} canonicalName={taxon?.canonicalName} />
               </Group>
             </Stack>
           </Grid.Col>
@@ -400,6 +402,12 @@ function DataSummary({
   );
 }
 
+interface TaxonRankDetails {
+  latin: boolean;
+  normalRank: string;
+  latinRank: string;
+  rank: string;
+}
 interface ClassificationPageProps {
   params: Promise<{
     rank: string;
@@ -411,20 +419,19 @@ const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "G
 
 export default function ClassificationPage(props: ClassificationPageProps) {
   const { rank: rawRank, name } = use(props.params);
-  const rank = normalizeLatinRank(rawRank).toUpperCase();
-  const lowerRank = getChildRank(rank).toUpperCase() || "";
+  const normalRank = normalizeLatinRank(rawRank).toUpperCase();
+  const lowerRank = getChildRank(normalRank).toUpperCase() || "";
 
   const { names } = useDatasets();
   const dataset = names.get("Atlas of Living Australia") as Dataset | undefined;
   const datasetId = dataset?.id;
   const variables = {
-    rank,
+    rank: normalRank,
     datasetId,
     canonicalName: name,
     lowerRank,
   };
 
-  const pathname = usePathname();
   const [_, setPreviousPage] = usePreviousPage();
 
   const taxonDetailsResults = useQuery<TaxonQuery>(GET_TAXON_DETAILS, {
@@ -437,23 +444,41 @@ export default function ClassificationPage(props: ClassificationPageProps) {
     skip: !datasetId || taxonDetailsResults.loading,
   });
 
-  // Latin taxonomy redirect
-  useEffect(() => {
-    const taxon = taxonDetailsResults.data?.taxon;
+  const taxonRank: TaxonRankDetails | null = useMemo(() => {
+    if (taxonDetailsResults.data) {
+      const { taxon } = taxonDetailsResults.data;
+      const latin = isLatin(taxon);
+      const normalRank = normalizeLatinRank(taxon.rank);
+      const latinRank = latinilizeNormalRank(taxon.rank);
+      const rank = (latin ? latinRank : normalRank).toLowerCase();
 
-    if (taxon) {
-      const latinRank = latinilizeNormalRank(rawRank).toLowerCase();
-
-      // If this taxon is latin, but the user has supplied the normal rank string, replace the URL
-      if (isLatin(taxon) && rawRank.toLowerCase() !== latinRank) {
-        window.history.replaceState(null, "", `/${latinRank}/${name}`);
-      }
+      return {
+        latin,
+        normalRank,
+        latinRank,
+        rank,
+      };
     }
+
+    return null;
   }, [taxonDetailsResults.data]);
 
+  // Correct taxonomy redirect
   useEffect(() => {
-    setPreviousPage({ name: `browsing ${name}`, url: pathname });
-  }, [name, pathname, setPreviousPage]);
+    if (taxonRank) {
+      // If this taxon is latin but the supplied rank isn't (or vice versa), correct the URL
+      if (taxonRank.latin && rawRank.toLowerCase() !== taxonRank.rank) {
+        window.history.replaceState(null, "", `/${taxonRank.rank}/${name}`);
+      }
+    }
+  }, [taxonRank]);
+
+  // Set previous page
+  useEffect(() => {
+    if (taxonRank) {
+      setPreviousPage({ name: `browsing ${name}`, url: `/${taxonRank.rank}/${name}` });
+    }
+  }, [name, taxonRank, setPreviousPage]);
 
   return (
     <Stack mt="xl" gap={0}>
@@ -462,20 +487,19 @@ export default function ClassificationPage(props: ClassificationPageProps) {
         <Container maw={MAX_WIDTH}>
           <Stack>
             <Paper p="xl" radius="lg" pos="relative" withBorder>
-              {taxonStatsResults.called && (
-                <DataSummary
-                  rawRank={rawRank}
-                  taxon={
-                    taxonStatsResults.data
-                      ? {
-                          ...taxonStatsResults.data.taxon,
-                          ...taxonDetailsResults.data?.taxon,
-                        }
-                      : null
-                  }
-                  downloadVariables={variables}
-                />
-              )}
+              <DataSummary
+                normalRank={normalRank}
+                rankDetails={taxonRank}
+                taxon={
+                  taxonStatsResults.data && taxonDetailsResults.data
+                    ? {
+                        ...taxonStatsResults.data.taxon,
+                        ...taxonDetailsResults.data?.taxon,
+                      }
+                    : null
+                }
+                downloadVariables={variables}
+              />
             </Paper>
             {datasetId && (
               <Paper p="xl" radius="lg" pos="relative" withBorder>
@@ -483,7 +507,7 @@ export default function ClassificationPage(props: ClassificationPageProps) {
                   query={{
                     content: GET_SPECIES,
                     download: DOWNLOAD_SPECIES,
-                    variables: { rank, canonicalName: name, datasetId },
+                    variables: { rank: normalRank, canonicalName: name, datasetId },
                   }}
                 />
               </Paper>

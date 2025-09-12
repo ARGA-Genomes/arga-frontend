@@ -27,7 +27,7 @@ const latinToNormal: RankMap = {
   regio: "Region",
 
   // added from childRankMap coverage
-  divsion: "Phylum",
+  division: "Phylum",
   subdivision: "Subphylum",
   superclassis: "Superclass",
   infraordo: "Infraorder",

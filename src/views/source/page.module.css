@@ -1,0 +1,7 @@
+.gotoSource {
+  transition: opacity ease 200ms;
+
+  &:hover {
+    opacity: 0.6;
+  }
+}

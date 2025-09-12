@@ -126,7 +126,7 @@ function DatasetRow({ dataset, sourceLength, count }: DatasetRowProps) {
   const theme = useMantineTheme();
 
   return (
-    <Paper radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
+    <Paper shadow="none" radius="lg" withBorder mb={count === sourceLength ? 0 : 20}>
       <Grid>
         <Grid.Col span={3} p="lg">
           <Stack gap={3}>
@@ -206,7 +206,7 @@ function DatasetRow({ dataset, sourceLength, count }: DatasetRowProps) {
 
 function CollectionCard({ collection }: { collection: Source }) {
   return (
-    <Paper radius="lg" withBorder className={classes.collectionCard}>
+    <Paper shadow="md" radius="lg" withBorder className={classes.collectionCard}>
       <Stack gap={10}>
         <UnstyledButton>
           <Link href={`/browse/sources/${collection.name}`}>
@@ -295,11 +295,11 @@ function CollectionCard({ collection }: { collection: Source }) {
 
 function CollectionRow({ collection }: { collection: Source }) {
   return (
-    <Paper radius="lg" withBorder>
+    <Paper shadow="md" radius="lg" withBorder>
       <Stack>
         <UnstyledButton>
           <Link href={`/browse/sources/${collection.name}`}>
-            <Paper radius="lg" w="100%" className={classes.collectionHeader}>
+            <Paper shadow="none" radius="lg" w="100%" className={classes.collectionHeader}>
               <Grid>
                 <Grid.Col span={3} p="lg">
                   <Stack gap={1}>
@@ -361,7 +361,6 @@ function CollectionRow({ collection }: { collection: Source }) {
                   />
                 </Grid.Col>
                 <Grid.Col span={2} p="lg" style={{ cursor: "default" }}>
-                  {" "}
                   <AttributePill label="Number of records" labelColor="white" popoverDisabled textColor="black" />
                 </Grid.Col>
                 <Grid.Col span={1}>
@@ -549,12 +548,17 @@ export default function DatasetsPage() {
   const groupedSources = groupByContentType(sourcesWithLastUpdated).filter((group) => group.contentType !== "Unknown");
 
   return (
-    <Stack gap="xl" my="xl">
-      <Paper py={5} pos="relative">
+    <Stack gap="md" my="xl">
+      <Paper py={30}>
         <Container maw={MAX_WIDTH}>
-          <Text fz={38} fw={700}>
-            Data sources indexed in ARGA
-          </Text>
+          <Stack gap={0}>
+            <Text c="dimmed" fw={400}>
+              DATA SOURCES
+            </Text>
+            <Text fz={38} fw={700}>
+              ARGA Indexed Data Sources
+            </Text>
+          </Stack>
         </Container>
       </Paper>
 
@@ -566,13 +570,14 @@ export default function DatasetsPage() {
             radius="lg"
             classNames={classes}
             chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
+            mb="md"
           >
             {groupedSources.map((group) => (
               <ContentTypeContainer contentType={group} key={group.contentType} />
             ))}
           </Accordion>
+          <DataPageCitation />
         </Container>
-        <DataPageCitation />
       </Paper>
     </Stack>
   );

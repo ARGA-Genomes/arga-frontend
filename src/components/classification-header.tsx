@@ -22,10 +22,11 @@ export default function ClassificationHeader({ taxon, rawRank, dataset }: Classi
       const latin = isLatin(taxon);
       const normalRank = normalizeLatinRank(taxon.rank);
       const latinRank = latinilizeNormalRank(taxon.rank);
+      const rank = (latin ? latinRank : normalRank).toUpperCase();
 
       return {
-        rank: (latin ? latinRank : normalRank).toUpperCase(),
-        icon: getTaxonIcon(latinRank.toLowerCase(), taxon.canonicalName),
+        rank,
+        icon: getTaxonIcon(rank.toLowerCase(), taxon.canonicalName),
         hierarchy: taxon.hierarchy.toSorted((a, b) => b.depth - a.depth),
         latin,
         latinRank,

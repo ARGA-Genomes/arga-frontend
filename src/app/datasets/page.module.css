@@ -1,110 +1,113 @@
 .item {
-    background-color: white;
-    border: 1px solid var(--mantine-color-gray-2);
+  background-color: white;
+  border: 1px solid var(--mantine-color-gray-2);
 }
 
 .browseSpeciesLink:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .bIcon {
-    position: relative;
-    transition: all .2s ease;
+  position: relative;
+  transition: all 0.2s ease;
 }
 
 .bIcon::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius: 28px;
-    background: var(--mantine-color-midnight-11);
-    width: 35px;
-    height: 35px;
-    transition: all .3s ease;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 28px;
+  background: var(--mantine-color-midnight-11);
+  width: 35px;
+  height: 35px;
+  transition: all 0.3s ease;
 }
 
 .browseSpeciesBtn {
-    position: relative;
-    transition: all .2s ease;
+  position: relative;
+  transition: all 0.2s ease;
 }
 
 .browseSpeciesBtn::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius: 28px;
-    background: var(--mantine-color-midnight-11);
-    width: 35px;
-    height: 35px;
-    transition: all .3s ease;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 28px;
+  background: var(--mantine-color-midnight-11);
+  width: 35px;
+  height: 35px;
+  transition: all 0.3s ease;
 }
 
 .browseSpeciesBtn:hover::before {
-    width: calc(100% + 10px);
-    background: var(--mantine-color-midnight-11);
+  width: calc(100% + 10px);
+  background: var(--mantine-color-midnight-11);
 }
 
 .browseSpeciesBtn:hover .browseSpeciesText {
-    color: white;
+  color: white;
 }
 
-.browseSpeciesSpan
- {
-    position: relative;
+.browseSpeciesSpan {
+  position: relative;
 }
 
 .browseSpeciesIcon {
-    color: white;
+  color: white;
 }
 
 .browseSpeciesText {
-    color: var(--mantine-color-midnight-11);
+  color: var(--mantine-color-midnight-11);
 }
 
 .collectionArrowBtn {
-    padding-right: 10px;
-    padding-top: 10px;
-    transition: all .3s ease;
+  padding-right: 10px;
+  padding-top: 10px;
+  transition: all 0.3s ease;
 }
 
 .collectionArrowRowBtn {
-    padding-right: 10px;
-    padding-top: 5px;
-    transition: all .3s ease;
+  padding-right: 10px;
+  padding-top: 5px;
+  transition: all 0.3s ease;
 }
 
 .collectionHeader {
-    background-color: var(--mantine-color-shellfish-7);
-    border-radius: 16px 16px 0 0;
+  transition: background-color ease 200ms;
+  background-color: var(--mantine-color-shellfish-7);
+  border-radius: 16px 16px 0 0;
 }
 
 .collectionHeader:hover {
-    background-color: var(--mantine-color-shellfish-6);
+  background-color: var(--mantine-color-shellfish-6);
 
-    .collectionArrowBtn {
-        padding-right: 5px;
-        padding-top: 5px;
-    }
+  .collectionArrowBtn {
+    padding-right: 5px;
+    padding-top: 5px;
+  }
 
-    .collectionArrowRowBtn {
-        padding-right: 5px;
-        padding-top: 0;
-    }
+  .collectionArrowRowBtn {
+    padding-right: 5px;
+    padding-top: 0;
+  }
+}
+
+.collectionCard {
+  transition: all 0.3s ease;
 }
 
 .collectionCard:hover {
-    transform: scale(1.025);
-    transition: all .3s ease;
+  transform: scale(1.025);
 }
 
 .cardLayoutViewBtn:hover {
-    fill: var(--mantine-color-midnight-10);
+  fill: var(--mantine-color-midnight-10);
 }
 
 .tableLayoutViewBtn:hover {
-    fill: var(--mantine-color-midnight-10);
-    stroke: white;
-    /* stroke-width: 1.75; */
+  fill: var(--mantine-color-midnight-10);
+  stroke: white;
+  /* stroke-width: 1.75; */
 }

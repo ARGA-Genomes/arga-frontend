@@ -164,7 +164,7 @@ export const TAXON_ICONS: Record<string, IconData> = {
   FUNGI: {
     image: "/icons/taxon/Taxon_ Fungi (Fungi).svg",
     label: "Mushrooms and other fungi",
-    link: "/kingdom/Fungi",
+    link: "/regnum/Fungi",
     colour: "bushfire.4",
   },
   BROWN_ALGAE: {
@@ -188,31 +188,31 @@ export const TAXON_ICONS: Record<string, IconData> = {
   HIGHER_PLANTS: {
     image: "/icons/taxon/Taxon_ Plants (Kingdom Plantae).svg",
     label: "Plants",
-    link: "/kingdom/Plantae",
+    link: "/regnum/Plantae",
     colour: "moss.4",
   },
   FLOWERING_PLANTS: {
     image: "/icons/taxon/Taxon_ Flowering plants (Magnoliidae).svg",
     label: "Flowering plants",
-    link: "/subclass/Magnoliidae",
+    link: "/subclassis/Magnoliidae",
     colour: "moss.4",
   },
   MOSSES: {
     image: "/icons/taxon/Taxon_ Mosses (Bryophyta).svg",
     label: "Mosses",
-    link: "/class/Bryopsida",
+    link: "/classis/Bryopsida",
     colour: "moss.4",
   },
   LIVERWORTS: {
     image: "/icons/taxon/Taxon_ Liverworts (Marchantiophyta).svg",
     label: "Liverworts",
-    link: "/phylum/Marchantiophyta",
+    link: "/division/Marchantiophyta",
     colour: "moss.4",
   },
   HORNWORTS: {
     image: "/icons/taxon/Taxon_ Hornworts (Anthocerotophyta).svg",
     label: "Hornworts",
-    link: "/phylum/Anthocerotophyta",
+    link: "/division/Anthocerotophyta",
     colour: "moss.4",
   },
   LICHENS: {
@@ -224,7 +224,7 @@ export const TAXON_ICONS: Record<string, IconData> = {
   FERNS: {
     image: "/icons/taxon/Taxon_ Ferns (Polypodiidae).svg",
     label: "Ferns",
-    link: "/subclass/Polypodiidae",
+    link: "/subclassis/Polypodiidae",
     colour: "moss.4",
   },
   CONIFERS_AND_CYCADS: {
