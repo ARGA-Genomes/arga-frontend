@@ -18,7 +18,15 @@ function GroupCard({ category, image }: GroupCardProps) {
     <Paper radius="xl" p={20} className={classes.card} maw={190}>
       <Link href={groupLink}>
         <Stack align="center" gap="md">
-          <Image src={image} height={imageSize} width={imageSize} mah={imageSize} maw={imageSize} alt={category} />
+          <Image
+            className={classes.image}
+            src={image}
+            height={imageSize}
+            width={imageSize}
+            mah={imageSize}
+            maw={imageSize}
+            alt={category}
+          />
           <Text fw="bold" size="sm" ta={"center"} c="midnight.9">
             {category}
           </Text>

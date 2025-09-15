@@ -1,11 +1,12 @@
 "use client";
 
 import classes from "./browse-card.module.css";
-import skelClasses from "./browse-card-skel.module.css";
 
+import { Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
 import * as Humanize from "humanize-plus";
-import { Image, Stack, Text, Skeleton, Paper } from "@mantine/core";
 import Link from "next/link";
+
+import skelClasses from "./browse-card-skel.module.css";
 
 export interface BrowseCardProps {
   total?: number | null;
@@ -27,36 +28,41 @@ function BrowseCard({ link, category, total, image, disabled }: BrowseCardProps)
           if (disabled) e.preventDefault();
         }}
       >
-        <Stack align="center" gap={5}>
-          <Skeleton
-            classNames={skelClasses}
-            visible={loading}
-            circle
-            width={imageSize}
+        <Stack align="center" gap="lg">
+          <Image
+            className={classes.image}
+            src={image}
             height={imageSize}
-            miw={imageSize}
-            mih={imageSize}
-          >
-            <Image src={image} height={imageSize} width={imageSize} alt={category} />
-          </Skeleton>
-          <Skeleton classNames={skelClasses} visible={loading} mt="xs">
+            width={imageSize}
+            maw={imageSize}
+            mah={imageSize}
+            alt={category}
+          />
+          <Stack gap={2}>
             <Text size="md" fw={450} ta={"center"} c="white">
               {category}
             </Text>
-          </Skeleton>
-          {disabled ? (
-            <Text size="sm" fw={400} ta={"center"} c="attribute">
-              Coming soon
-            </Text>
-          ) : (
-            total !== null && (
-              <Skeleton classNames={skelClasses} visible={loading}>
-                <Text size="sm" fw={400} ta={"center"} c="attribute">
-                  {Humanize.compactInteger(total || 0, 2)} records
-                </Text>
-              </Skeleton>
-            )
-          )}
+            {disabled ? (
+              <Text size="sm" fw={400} ta={"center"} c="attribute">
+                Coming soon
+              </Text>
+            ) : (
+              total !== null && (
+                <Group justify="center" ta="center" gap={4} w="100%">
+                  {loading ? (
+                    <Skeleton opacity={0.6} classNames={skelClasses} w={50} h={20.3} />
+                  ) : (
+                    <Text fw="bold" size="sm" c="attribute">
+                      {Humanize.compactInteger(total || 0, 2)}
+                    </Text>
+                  )}
+                  <Text size="sm" fw={400} c="attribute">
+                    records
+                  </Text>
+                </Group>
+              )
+            )}
+          </Stack>
         </Stack>
       </Link>
     </Paper>

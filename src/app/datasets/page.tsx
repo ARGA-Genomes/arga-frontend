@@ -424,7 +424,6 @@ function DatasetSort({ sortBy, setSortBy }: { sortBy: string | null; setSortBy: 
 }
 
 function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) {
-  const theme = useMantineTheme();
   const [layoutView, setLayoutView] = useState<TableCardLayout>("card");
   const [sortBy, setSortBy] = useState<string | null>(null);
 
@@ -451,7 +450,7 @@ function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) 
           <Text fw="bold" fz="var(--mantine-h4-font-size)" c="black">
             {renameContentType[contentType.contentType as SourceContentType]}
           </Text>
-          <Group mt={15} gap={50} align="center">
+          <Group gap={50} align="center">
             <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
             <TableCardSwitch layout={layoutView} onChange={setLayoutView} />
           </Group>
@@ -565,17 +564,21 @@ export default function DatasetsPage() {
       <Paper py="lg">
         <Container maw={MAX_WIDTH} pb={16}>
           <LoadOverlay visible={loading} />
-          <Accordion
-            variant="separated"
-            radius="lg"
-            classNames={classes}
-            chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
-            mb="md"
-          >
-            {groupedSources.map((group) => (
-              <ContentTypeContainer contentType={group} key={group.contentType} />
-            ))}
-          </Accordion>
+          {!loading && (
+            <Accordion
+              variant="separated"
+              radius="lg"
+              classNames={classes}
+              chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
+              mb="md"
+              defaultValue={[groupedSources[0].contentType]}
+              multiple
+            >
+              {groupedSources.map((group) => (
+                <ContentTypeContainer contentType={group} key={group.contentType} />
+              ))}
+            </Accordion>
+          )}
           <DataPageCitation />
         </Container>
       </Paper>

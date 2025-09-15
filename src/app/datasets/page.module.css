@@ -1,6 +1,7 @@
 .item {
   background-color: white;
   border: 1px solid var(--mantine-color-gray-2);
+  box-shadow: var(--mantine-shadow-sm);
 }
 
 .browseSpeciesLink:hover {
@@ -95,6 +96,7 @@
 }
 
 .collectionCard {
+  background-color: #f2faf9;
   transition: all 0.3s ease;
 }
 
