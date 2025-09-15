@@ -2,6 +2,7 @@ import { SpeciesCard as SpeciesCardType } from "@/generated/types";
 import { Box, Card, Group, SimpleGrid, Skeleton, Stack, Text } from "@mantine/core";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 import Link from "next/link";
+import classes from "./species-card.module.css";
 import { SpeciesPhoto } from "./species-image";
 
 export interface Taxonomy {
@@ -34,22 +35,26 @@ export function SpeciesCard({ species }: { species?: SpeciesCardType }) {
   const height = 260;
 
   return (
-    <Card shadow="sm" radius="lg" withBorder miw={313}>
+    <Card
+      component={Link}
+      href={`/species/${itemLinkName}`}
+      shadow="sm"
+      radius="lg"
+      withBorder
+      miw={313}
+      className={classes.card}
+    >
       <Card.Section bg="#a6c0cf" h={height} mah={height}>
-        <Link href={`/species/${itemLinkName}`}>
-          <Box h={height} mah={height}>
-            <SpeciesPhoto photo={species?.photo} flatBottom />
-          </Box>
-        </Link>
+        <Box h={height} mah={height}>
+          <SpeciesPhoto photo={species?.photo} flatBottom />
+        </Box>
       </Card.Section>
 
       <Stack gap={5} mt="sm">
         <Skeleton visible={!species}>
-          <Link href={`/species/${itemLinkName}`}>
-            <Text fz="sm" fw={700} fs="italic">
-              {species?.taxonomy.canonicalName || "Name"}
-            </Text>
-          </Link>
+          <Text c="midnight.7" fz="sm" fw={700} fs="italic">
+            {species?.taxonomy.canonicalName || "Name"}
+          </Text>
         </Skeleton>
         <SimpleGrid cols={2}>
           <Skeleton visible={!species}>

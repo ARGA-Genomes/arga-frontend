@@ -194,20 +194,20 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
 
         <Grid.Col span="auto">
           <Group>
-            {filters.length === 0 ? (
-              <Text fz="sm" fw={500} c="dimmed">
-                No filters
-              </Text>
-            ) : (
-              <Group gap="xs">{filterChips}</Group>
-            )}
-            <Divider orientation="vertical" />
             {!loading ? (
               <Text size="sm">
                 <b>{Humanize.formatNumber(count || 0)}</b> records
               </Text>
             ) : (
               <Skeleton w={90} h={20.3} />
+            )}
+            <Divider orientation="vertical" />
+            {filters.length === 0 ? (
+              <Text fz="sm" fw={500} c="dimmed">
+                No filters
+              </Text>
+            ) : (
+              <Group gap="xs">{filterChips}</Group>
             )}
           </Group>
         </Grid.Col>
