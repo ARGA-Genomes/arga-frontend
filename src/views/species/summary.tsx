@@ -250,7 +250,10 @@ export default function SummaryPage({ params }: { params: { name: string } }) {
     <Grid>
       <LoadOverlay visible={loading} />
       <Grid.Col span={{ base: 12, xl: "auto" }}>
-        <SpeciesPhoto photo={data?.species.photos[0]} />
+        <SpeciesPhoto
+          photo={data?.species.photos[0]}
+          style={{ borderRadius: "var(--mantine-radius-lg)", overflow: "hidden" }}
+        />
       </Grid.Col>
       <Grid.Col span={{ base: 12, sm: "content" }}>
         <DataSummary speciesData={data?.species.dataSummary} />
