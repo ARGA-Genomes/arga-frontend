@@ -25,7 +25,7 @@ import {
 import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 // Local components
-import { get, range, isEqual } from "lodash-es";
+import { get, isEqual, range } from "lodash-es";
 import { FiltersDrawer } from "./filtering-redux/drawer";
 import { FilterItem } from "./filtering-redux/filters/common";
 import { PaginationBar, PaginationSize } from "./pagination";
@@ -35,6 +35,7 @@ import { TableCardLayout, TableCardSwitch } from "./table-card-switch";
 import { SpeciesCard as SpeciesCardType } from "@/generated/types";
 import { generateCSV } from "@/helpers/downloadCSV";
 import { saveAs } from "file-saver";
+import * as Humanize from "humanize-plus";
 import Link from "next/link";
 import classes from "./browse-species.module.css";
 import { ExternalLinkButton } from "./button-link-external";
@@ -121,14 +122,18 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
   const download = useCallback(async () => {
     setDownloading(true);
 
-    const { data: raw } = await fetchCSV();
+    const { data: raw } = await fetchCSV({
+      ...(query.variables || {}),
+      filters,
+    });
+
     saveAs(
       new Blob([await generateCSV(get(raw, "download.csv"))], { type: "text/csv;charset=utf-8;" }),
       `arga-species-${new Date().toLocaleString()}.csv`
     );
 
     setDownloading(false);
-  }, []);
+  }, [query.variables, filters]);
 
   useEffect(() => {
     if (rawData) setData(rawData);
@@ -145,6 +150,7 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
   }, [layout]);
 
   const records: SpeciesCardType[] = get(data, "browse.species.records") || [];
+  const count: number | null = get(data, "browse.species.total") || null;
   const dataSummarySize = 140;
 
   // Handle table header highlighting
@@ -188,12 +194,21 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
 
         <Grid.Col span="auto">
           <Group>
-            {filters.length === 0 && (
+            {filters.length === 0 ? (
               <Text fz="sm" fw={500} c="dimmed">
                 No filters
               </Text>
+            ) : (
+              <Group gap="xs">{filterChips}</Group>
             )}
-            <Group gap="xs">{filterChips}</Group>
+            <Divider orientation="vertical" />
+            {!loading ? (
+              <Text size="sm">
+                <b>{Humanize.formatNumber(count || 0)}</b> records
+              </Text>
+            ) : (
+              <Skeleton w={90} h={20.3} />
+            )}
           </Group>
         </Grid.Col>
 

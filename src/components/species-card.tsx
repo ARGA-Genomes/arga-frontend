@@ -20,7 +20,7 @@ export function DataItem({ name, count, textWidth }: { name?: string; count?: nu
   const label = [...[count === undefined ? [] : [count.toString()]], ...[!name ? [] : [name]]].join(" ");
 
   return (
-    <Group gap="sm" justify="center">
+    <Group gap="sm">
       {hasData ? <IconCircleCheck color="green" /> : <IconCircleX color="red" />}
       <Text fw={300} w={textWidth} fz="xs">
         {label}
@@ -38,7 +38,7 @@ export function SpeciesCard({ species }: { species?: SpeciesCardType }) {
       <Card.Section bg="#a6c0cf" h={height} mah={height}>
         <Link href={`/species/${itemLinkName}`}>
           <Box h={height} mah={height}>
-            <SpeciesPhoto photo={species?.photo} mah={height} flatBottom />
+            <SpeciesPhoto photo={species?.photo} flatBottom />
           </Box>
         </Link>
       </Card.Section>

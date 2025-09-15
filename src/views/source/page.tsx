@@ -134,9 +134,16 @@ const reusePillColours: Record<ReusePillType, string> = {
 };
 
 const GET_SPECIES = gql`
-  query SourceSpecies($name: String, $page: Int, $pageSize: Int, $filters: [FilterItem]) {
+  query SourceSpecies(
+    $name: String
+    $page: Int
+    $pageSize: Int
+    $filters: [FilterItem]
+    $sort: SpeciesSort
+    $sortDirection: SortDirection
+  ) {
     browse: source(by: { name: $name }, filters: $filters) {
-      species(page: $page, pageSize: $pageSize) {
+      species(page: $page, pageSize: $pageSize, sort: $sort, sortDirection: $sortDirection) {
         total
         records {
           taxonomy {
