@@ -12,7 +12,7 @@ interface TissueSlideProps {
 }
 
 export function TissueSlide({ tissues }: TissueSlideProps) {
-  const [tissue, setTissue] = useState(tissues[0]);
+  const [tissue, setTissue] = useState(tissues.at(0));
   const navWidth = 260;
 
   return (
@@ -50,17 +50,19 @@ export function TissueSlide({ tissues }: TissueSlideProps) {
 
       <Divider orientation="vertical" mx="md" mb="md" size="sm" color="shellfishBg.1" />
 
-      <SimpleGrid cols={2} w="100%" mr={80} mb="xl">
-        <Stack>
-          <EventDetails tissue={tissue} />
-          <TissueDetails tissue={tissue} />
-        </Stack>
-        <Stack>
-          <Publication />
-          <CollectionDetails tissue={tissue} />
-          <ReferenceMaterialStatus tissue={tissue} />
-        </Stack>
-      </SimpleGrid>
+      {tissue && (
+        <SimpleGrid cols={2} w="100%" mr={80} mb="xl">
+          <Stack>
+            <EventDetails tissue={tissue} />
+            <TissueDetails tissue={tissue} />
+          </Stack>
+          <Stack>
+            <Publication />
+            <CollectionDetails tissue={tissue} />
+            <ReferenceMaterialStatus tissue={tissue} />
+          </Stack>
+        </SimpleGrid>
+      )}
     </Group>
   );
 }
