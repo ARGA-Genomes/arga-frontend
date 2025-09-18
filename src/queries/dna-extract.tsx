@@ -1,24 +1,28 @@
 import { gql } from "@apollo/client";
 
 export const DNA_EXTRACT = gql`
-  fragment DnaExtractDetails on DnaExtract {
-    recordId
-  }
-`;
-
-export const DNA_EXTRACTION_EVENT = gql`
-  fragment DnaExtractionEventDetails on DnaExtractionEvent {
+  fragment DnaExtractDetails on DnaExtractDetails {
+    entityId
+    extractId
+    subsampleId
     eventDate
     eventTime
     extractedBy
-    extractionMethod
-    measurementMethod
+    materialExtractedBy
+    nucleicAcidType
     preparationType
     preservationType
-    concentration
+    preservationMethod
+    extractionMethod
     concentrationMethod
-    quality
-    absorbance260230
-    absorbance260280
+    conformation
+    concentration
+    concentrationUnit
+    quantification
+    absorbance260230Ratio
+    absorbance260280Ratio
+    cellLysisMethod
+    actionExtracted
+    numberOfExtractsPooled
   }
 `;

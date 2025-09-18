@@ -1,17 +1,18 @@
 import classes from "./Slide.module.css";
 
-import { Subsample } from "@/generated/types";
-import { Box, Center, Divider, Group, Paper, SimpleGrid, Stack, Table, Text } from "@mantine/core";
+import { DnaExtractDetails, Subsample } from "@/generated/types";
+import { Box, Center, Divider, Group, Paper, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { IconSubsample } from "../ArgaIcons";
 import { DataTable } from "../data-table";
 
 interface ExtractionSlideProps {
   subsamples: Subsample[];
+  extractions: DnaExtractDetails[];
 }
 
-export function ExtractionSlide({ subsamples }: ExtractionSlideProps) {
-  const [subsample, setSubsample] = useState(subsamples.at(0));
+export function ExtractionSlide({ subsamples, extractions }: ExtractionSlideProps) {
+  const [extraction, setExtraction] = useState(extractions.at(0));
   const navWidth = 260;
 
   return (
@@ -23,7 +24,7 @@ export function ExtractionSlide({ subsamples }: ExtractionSlideProps) {
       </Box>
 
       <Stack w={navWidth} mb={240} mt="md" gap={0}>
-        {subsamples.map((record) => (
+        {extractions.map((record) => (
           <Paper
             maw={navWidth}
             key={record.entityId}
@@ -31,16 +32,16 @@ export function ExtractionSlide({ subsamples }: ExtractionSlideProps) {
             shadow="none"
             my={5}
             p="xs"
-            bg={record === subsample ? "midnight.1" : undefined}
+            bg={record === extraction ? "midnight.1" : undefined}
             className={classes.item}
-            onClick={() => setSubsample(record)}
+            onClick={() => setExtraction(record)}
           >
             <Group wrap="nowrap">
               <Text fz="xs" fw={300} c="midnight.7">
-                Tissue ID
+                Lab Sample ID
               </Text>
               <Text fz="xs" fw={600} c="midnight.7" truncate="start">
-                {record.subsampleId}
+                {record.extractId}
               </Text>
             </Group>
           </Paper>
@@ -49,26 +50,26 @@ export function ExtractionSlide({ subsamples }: ExtractionSlideProps) {
 
       <Divider orientation="vertical" mx="md" mb="md" size="sm" color="shellfishBg.1" />
 
-      {subsample && (
+      {extraction && (
         <Stack w="100%">
           <Group>
-            <EventDetails subsample={subsample} />
+            <EventDetails extraction={extraction} />
             <Publication />
           </Group>
-          <SubsampleDetails subsample={subsample} />
-          <ExtractionDetails extraction={subsample} />
+          <SubsampleDetails subsample={subsamples[0]} />
+          <ExtractionDetails extraction={extraction} />
         </Stack>
       )}
     </Group>
   );
 }
 
-function EventDetails({ subsample }: { subsample: Subsample }) {
+function EventDetails({ extraction }: { extraction: DnaExtractDetails }) {
   return (
     <Paper radius="xl" bg="midnight.0" py="sm" px="xl" shadow="none" mr="auto">
       <DataTable>
-        <DataTable.RowValue label="ARGA event ID">{subsample.subsampleId}</DataTable.RowValue>
-        <DataTable.RowValue label="Event date">{subsample.eventDate}</DataTable.RowValue>
+        <DataTable.RowValue label="ARGA event ID">{extraction.extractId}</DataTable.RowValue>
+        <DataTable.RowValue label="Event date">{extraction.eventDate}</DataTable.RowValue>
       </DataTable>
     </Paper>
   );
@@ -144,7 +145,7 @@ function SubsampleDetails({ subsample }: { subsample: Subsample }) {
   );
 }
 
-function ExtractionDetails({ extraction }: { extraction: Subsample }) {
+function ExtractionDetails({ extraction }: { extraction: DnaExtractDetails }) {
   return (
     <Stack>
       <Text fw={700} fz="md" c="midnight.7">
@@ -154,15 +155,15 @@ function ExtractionDetails({ extraction }: { extraction: Subsample }) {
         <tbody>
           <tr>
             <th>Extract number</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.extractId}</td>
             <th>Nucleic acid type</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.nucleicAcidType}</td>
           </tr>
           <tr>
             <th>Extracted by</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.extractedBy}</td>
             <th>Extracted date</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.eventDate}</td>
           </tr>
           <tr>
             <th>Laboratory/Facility</th>
@@ -170,27 +171,27 @@ function ExtractionDetails({ extraction }: { extraction: Subsample }) {
           </tr>
           <tr>
             <th>Extraction method</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.extractionMethod}</td>
             <th>Lysis method</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.cellLysisMethod}</td>
           </tr>
           <tr>
             <th>Nucleic acid concentration</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.concentration}</td>
             <th>Quantification method</th>
-            <td width="50%"></td>
+            <td width="50%">{extraction.quantification}</td>
           </tr>
           <tr>
             <th>Number of extracts pooled</th>
-            <td colSpan={3}></td>
+            <td colSpan={3}>{extraction.numberOfExtractsPooled}</td>
           </tr>
           <tr>
             <th>Extract preservation</th>
-            <td colSpan={3}></td>
+            <td colSpan={3}>{extraction.preservationMethod}</td>
           </tr>
           <tr>
             <th>Nucleic acid conformation</th>
-            <td colSpan={3}></td>
+            <td colSpan={3}>{extraction.conformation}</td>
           </tr>
         </tbody>
       </table>

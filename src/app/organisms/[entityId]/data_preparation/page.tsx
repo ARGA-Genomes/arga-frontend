@@ -2,19 +2,22 @@
 
 import { IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
-import { TissueSlide } from "@/components/slides/Tissues";
+import { ExtractionSlide } from "@/components/slides/Extraction";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { Tissue } from "@/generated/types";
+import { DnaExtractDetails, Subsample } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { use, useState } from "react";
 
-const GET_SUBSAMPLES = gql`
-  query OrganismSubsamples($entityId: String) {
+const GET_EXTRACTIONS = gql`
+  query OrganismExtractions($entityId: String) {
     organism(by: { entityId: $entityId }) {
-      tissues {
-        ...TissueDetails
+      subsamples {
+        ...SubsampleDetails
+      }
+      extractions {
+        ...DnaExtractDetails
       }
     }
   }
@@ -22,7 +25,8 @@ const GET_SUBSAMPLES = gql`
 
 interface OrganismQuery {
   organism: {
-    tissues: Tissue[];
+    subsamples: Subsample[];
+    extractions: DnaExtractDetails[];
   };
 }
 
@@ -41,7 +45,7 @@ export default function Page(props: PageProps) {
 }
 
 function Provenance({ entityId }: { entityId: string }) {
-  const { loading, error, data } = useQuery<OrganismQuery>(GET_SUBSAMPLES, {
+  const { loading, error, data } = useQuery<OrganismQuery>(GET_EXTRACTIONS, {
     variables: { entityId },
   });
 
@@ -50,26 +54,24 @@ function Provenance({ entityId }: { entityId: string }) {
     <Stack>
       <Title order={3}>Organism subsampling timeline</Title>
       <TimelineNavbar>
-        <Link href="source">
-          <TimelineNavbar.Item label="Source organism" icon={<IconSubsample size={60} />} />
+        <Link href="subsamples_and_tissues">
+          <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
         </Link>
         <TimelineNavbar.Item
-          label="Subsamples and tissues"
+          label="Nucleic acid extraction"
           icon={<IconSubsample size={60} />}
           onClick={() => setCard(1)}
         />
-        <Link href="data_preparation">
-          <TimelineNavbar.Item label="Genetic data products" icon={<IconSubsample size={60} />} />
-        </Link>
+        <TimelineNavbar.Item label="Genetic data products" icon={<IconSubsample size={60} />} />
       </TimelineNavbar>
 
       <CardSlider card={card}>
-        <CardSlider.Card title="Source organism" />
-        <CardSlider.Card title="Subsamples and tissues">
+        <CardSlider.Card title="Subsamples and tissues"></CardSlider.Card>
+        <CardSlider.Card title="Nucleic acid extraction">
           {error && <Text>{error.message}</Text>}
-          {data && <TissueSlide tissues={data.organism.tissues} />}
+          {data && <ExtractionSlide subsamples={data.organism.subsamples} extractions={data.organism.extractions} />}
         </CardSlider.Card>
-        <CardSlider.Card title="Nucleic acid extraction" />
+        <CardSlider.Card title="Genetic data products"></CardSlider.Card>
       </CardSlider>
     </Stack>
   );

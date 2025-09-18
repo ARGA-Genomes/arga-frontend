@@ -11,6 +11,7 @@ import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { AccessionEvent, CollectionEvent, Organism, Tissue } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Stack, Text, Title } from "@mantine/core";
+import Link from "next/link";
 import { use, useState } from "react";
 
 const GET_ORGANISM = gql`
@@ -76,36 +77,21 @@ function Provenance({ entityId }: { entityId: string }) {
           icon={<IconSpecimenRegistration size={60} />}
           onClick={() => setCard(2)}
         />
-        <TimelineNavbar.Item
-          label="Subsamples and tissues"
-          icon={<IconSubsample size={60} />}
-          onClick={() => setCard(3)}
-        />
-        <TimelineNavbar.Item
-          label="Nucleic acid extraction"
-          icon={<IconSubsample size={60} />}
-          onClick={() => setCard(4)}
-        />
+        <Link href="subsamples_and_tissues">
+          <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
+        </Link>
       </TimelineNavbar>
 
       <CardSlider card={card}>
         <CardSlider.Card title="Live state">
           <LiveStateSlide />
         </CardSlider.Card>
-        <CardSlider.Card title="Collecting events">
+        <CardSlider.Card title="Collecting">
           {error && <Text>{error.message}</Text>}
           {data && <CollectingSlide organism={data.organism} accessions={[]} collections={data.organism.collections} />}
         </CardSlider.Card>
         <CardSlider.Card title="Registrations">
           <RegistrationsSlide />
-        </CardSlider.Card>
-        <CardSlider.Card title="Subsamples and tissues">
-          {error && <Text>{error.message}</Text>}
-          {data && <TissueSlide tissues={data.organism.tissues} />}
-        </CardSlider.Card>
-        <CardSlider.Card title="Nucleic acid extraction">
-          {error && <Text>{error.message}</Text>}
-          {data && <ExtractionSlide subsamples={[]} />}
         </CardSlider.Card>
       </CardSlider>
     </Stack>

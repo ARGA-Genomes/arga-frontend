@@ -54,8 +54,8 @@ function DataTabs({ entityId, children }: { entityId: string; children: React.Re
         <Tabs.List>
           <Tabs.Tab value="source">Source organism</Tabs.Tab>
           <Tabs.Tab value="subsamples_and_tissues">Subsamples and tissues</Tabs.Tab>
-          <Tabs.Tab value="genomic_and_genetic_data_processing">Genomic and genetic data processing</Tabs.Tab>
-          <Tabs.Tab value="genomic_and_genetic_data_products">Genomic and genetic data products</Tabs.Tab>
+          <Tabs.Tab value="data_preparation">Genomic and genetic data processing</Tabs.Tab>
+          <Tabs.Tab value="data_products">Genomic and genetic data products</Tabs.Tab>
         </Tabs.List>
       </Container>
 

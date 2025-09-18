@@ -385,12 +385,39 @@ export type DnaExtract = {
   preservationType?: Maybe<Scalars['String']['output']>;
   publication: Scalars['String']['output'];
   quantification?: Maybe<Scalars['String']['output']>;
+  subsampleId: Scalars['String']['output'];
 };
 
 export type DnaExtractBy = {
   id?: InputMaybe<Scalars['String']['input']>;
   recordId?: InputMaybe<Scalars['String']['input']>;
   specimenRecordId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DnaExtractDetails = {
+  __typename?: 'DnaExtractDetails';
+  absorbance260230Ratio?: Maybe<Scalars['Float']['output']>;
+  absorbance260280Ratio?: Maybe<Scalars['Float']['output']>;
+  actionExtracted?: Maybe<Scalars['String']['output']>;
+  cellLysisMethod?: Maybe<Scalars['String']['output']>;
+  concentration?: Maybe<Scalars['Float']['output']>;
+  concentrationMethod?: Maybe<Scalars['String']['output']>;
+  concentrationUnit?: Maybe<Scalars['String']['output']>;
+  conformation?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
+  extractId: Scalars['String']['output'];
+  extractedBy?: Maybe<Scalars['String']['output']>;
+  extractionMethod?: Maybe<Scalars['String']['output']>;
+  materialExtractedBy?: Maybe<Scalars['String']['output']>;
+  nucleicAcidType?: Maybe<Scalars['String']['output']>;
+  numberOfExtractsPooled?: Maybe<Scalars['String']['output']>;
+  preparationType?: Maybe<Scalars['String']['output']>;
+  preservationMethod?: Maybe<Scalars['String']['output']>;
+  preservationType?: Maybe<Scalars['String']['output']>;
+  quantification?: Maybe<Scalars['String']['output']>;
+  subsampleId: Scalars['String']['output'];
 };
 
 export type FilterAction =
@@ -718,6 +745,7 @@ export type Organism = {
   behavior?: Maybe<Scalars['String']['output']>;
   collections: Array<CollectionEvent>;
   entityId: Scalars['String']['output'];
+  extractions: Array<DnaExtractDetails>;
   genotypicSex?: Maybe<Scalars['String']['output']>;
   lifeStage?: Maybe<Scalars['String']['output']>;
   organismId: Scalars['String']['output'];
