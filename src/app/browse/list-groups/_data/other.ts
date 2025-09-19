@@ -1,4 +1,6 @@
-export const other = [
+import { GroupItem } from "./all";
+
+export const other: GroupItem[] = [
   {
     category: "Native Species",
     image: "/icons/list-group/List group_ native.svg",
@@ -10,13 +12,30 @@ export const other = [
     source: "ARGA Migratory Species",
   },
   {
-    category: "Crop Wild Relatives",
-    image: "/icons/list-group/List group_ crop wild relative.svg",
-    source: "ARGA Crop Wild Relatives",
-  },
-  {
     category: "Invasives and Pests",
     image: "/icons/list-group/List group_ invasives and pests.svg",
     source: "ARGA Exotic Species",
+  },
+  {
+    category: "Venomous and Poisonous",
+    image: "/icons/list-group/List group_ Venomous and poisonous.svg",
+    source: "ARGA Venomous and Poisonous Species",
+  },
+  {
+    category: "Edible Species",
+    image: "/icons/list-group/List group_ edible wild species.svg",
+    source: "ARGA Edible Species",
+  },
+  {
+    category: "Iconic Australian Species",
+    image: "/icons/list-group/List group_ Australian iconic species.svg",
+    source: "ARGA Edible Species",
+    disabled: true,
+  },
+  {
+    category: "Genomics Milestones",
+    image: "/icons/list-group/List group_ milestone species.svg",
+    source: "N/A",
+    href: "/genome-tracker",
   },
 ];

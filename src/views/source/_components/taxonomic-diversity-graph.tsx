@@ -1,3 +1,5 @@
+"use client";
+
 import { KingdomPhylumCount } from "@/generated/types";
 import { Box, Group as MantineGroup, Text, Tooltip } from "@mantine/core";
 import { Group } from "@visx/group";

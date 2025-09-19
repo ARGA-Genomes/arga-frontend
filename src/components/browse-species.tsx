@@ -1,3 +1,5 @@
+"use client";
+
 import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
 import {
   ActionIcon,

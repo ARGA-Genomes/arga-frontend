@@ -1,4 +1,6 @@
-export const threatened = [
+import { GroupItem } from "./all";
+
+export const threatened: GroupItem[] = [
   {
     category: "All Threatened",
     image: "/icons/list-group/List group_ Threatened species.svg",
@@ -8,7 +10,8 @@ export const threatened = [
     category: "Australia's 110 Priority Threatened Species",
     image: "/icons/list-group/List group_ Threatened (Top 110 Species).svg",
     source: "ARGA Threatened Species",
-    filters: {
+    disabled: true,
+    filter: {
       name: "top_110_species_icon",
       value: {
         bool: true,
@@ -24,6 +27,7 @@ export const threatened = [
     category: "CITES Listing",
     image: "/icons/list-group/List group_ CITES.svg",
     source: "ARGA Threatened Species",
+    disabled: true,
     filter: {
       name: "EPBC_act_category_VU", // TODO: MISSING
       value: {
@@ -32,7 +36,7 @@ export const threatened = [
     },
   },
   {
-    category: "Extinct",
+    category: "EPBC Extinct",
     image: "/icons/list-group/List group_ EPBC_ extinct.svg",
     source: "ARGA Threatened Species",
     filter: {
@@ -41,9 +45,13 @@ export const threatened = [
         bool: true,
       },
     },
+    display: {
+      order: 1,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Extinct in the Wild",
+    category: "EPBC Extinct in the Wild",
     image: "/icons/list-group/List group_ EPBC_ extinct in the wild.svg",
     source: "ARGA Threatened Species",
     filter: {
@@ -52,68 +60,100 @@ export const threatened = [
         bool: true,
       },
     },
+    display: {
+      order: 1,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Critically Endangered",
+    category: "EPBC Critically Endangered",
     image: "/icons/list-group/List group_ EPBC_ critically endangered.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_CR",
       value: true,
     },
+    display: {
+      order: 2,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Endangered",
+    category: "EPBC Endangered",
     image: "/icons/list-group/List group_ EPBC_ endangered.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_EN",
       value: true,
     },
+    display: {
+      order: 2,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Vulnerable",
+    category: "EPBC Vulnerable",
     image: "/icons/list-group/List group_ EPBC_ vulnerable.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_VU",
       value: true,
     },
+    display: {
+      order: 2,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Conservation Dependent",
+    category: "EPBC Conservation Dependent",
     image: "/icons/list-group/List group_ EPBC_ conservation dependent.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_cd",
       value: true,
     },
+    display: {
+      order: 3,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Not Threatened",
+    category: "EPBC Not Threatened",
     image: "/icons/list-group/List group_ EPBC_ not threatened.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_nt",
       value: true,
     },
+    display: {
+      order: 3,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Least Concern",
+    category: "EPBC Least Concern",
     image: "/icons/list-group/List group_ EPBC_ least concern.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_lc",
       value: true,
     },
+    display: {
+      order: 3,
+      subcategory: "EPBC Act",
+    },
   },
   {
-    category: "Unlisted Status",
+    category: "EPBC Unlisted Status",
     image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_ul",
       value: true,
+    },
+    display: {
+      order: 3,
+      subcategory: "EPBC Act",
     },
   },
 ];

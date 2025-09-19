@@ -1,7 +1,7 @@
 import { Group, Text } from "@mantine/core";
 import { useSessionStorage } from "@mantine/hooks";
-import Link from "next/link";
 import { IconArrowNarrowLeft } from "@tabler/icons-react";
+import Link from "next/link";
 
 export interface Page {
   name: string;
@@ -9,7 +9,7 @@ export interface Page {
 }
 
 export function PreviousPage() {
-  const [previousPage, _setSession] = useSessionStorage<Page | undefined>({
+  const [previousPage] = useSessionStorage<Page | undefined>({
     key: "previous-page",
     defaultValue: undefined,
   });

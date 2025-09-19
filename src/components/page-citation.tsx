@@ -1,16 +1,16 @@
 "use client";
 
-import { ActionIcon, Container, Flex, Paper, Stack, Text, Tooltip } from "@mantine/core";
-import { DataTable, DataTableRow } from "./data-table";
-import { useParams, usePathname } from "next/navigation";
-import { gql, useQuery } from "@apollo/client";
-import { LoadOverlay } from "./load-overlay";
-import { Taxonomy } from "@/app/type";
 import { MAX_WIDTH } from "@/app/constants";
-import * as Humanize from "humanize-plus";
+import { Taxonomy } from "@/app/type";
+import { gql, useQuery } from "@apollo/client";
+import { ActionIcon, Container, Flex, Paper, Stack, Text, Title, Tooltip } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
-import { useRef } from "react";
 import { IconCopy } from "@tabler/icons-react";
+import * as Humanize from "humanize-plus";
+import { useParams, usePathname } from "next/navigation";
+import { useRef } from "react";
+import { DataTable, DataTableRow } from "./data-table";
+import { LoadOverlay } from "./load-overlay";
 
 interface QueryResults {
   species: {
@@ -55,11 +55,11 @@ export function PageCitation() {
     <Paper pb="lg">
       <LoadOverlay visible={loading} />
       <Container maw={MAX_WIDTH}>
-        <Paper p="md" radius="lg" withBorder>
+        <Paper p="xl" radius="lg" withBorder>
           <Stack>
-            <Text size="lg" fw="bold">
+            <Title order={5} fw="bold">
               Page information
-            </Text>
+            </Title>
             <DataTable>
               <DataTableRow label="Citation">
                 <Flex align="center" gap="sm">
@@ -106,11 +106,11 @@ export function DataPageCitation() {
 
   return (
     <Paper pb="lg">
-      <Paper p="md" radius="lg" withBorder>
+      <Paper p="xl" radius="lg" withBorder>
         <Stack>
-          <Text size="lg" fw="bold">
+          <Title order={5} fw="bold">
             Page information
-          </Text>
+          </Title>
           <DataTable>
             <DataTableRow label="Citation">
               <Flex align="center" gap="sm">

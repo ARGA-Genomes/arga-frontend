@@ -22,6 +22,7 @@ import {
   SimpleGrid,
   Stack,
   Text,
+  Title,
   UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
@@ -445,11 +446,11 @@ function ContentTypeContainer({ contentType }: { contentType: GroupedSources }) 
 
   return (
     <Accordion.Item key={contentType.contentType} value={contentType.contentType}>
-      <Accordion.Control>
+      <Accordion.Control pl="lg" py={4}>
         <Group justify="space-between" pr={30}>
-          <Text fw="bold" fz="var(--mantine-h4-font-size)" c="black">
+          <Title order={4} fw="bold" c="midnight.10">
             {renameContentType[contentType.contentType as SourceContentType]}
-          </Text>
+          </Title>
           <Group gap={50} align="center">
             <DatasetSort sortBy={sortBy} setSortBy={setSortBy} />
             <TableCardSwitch layout={layoutView} onChange={setLayoutView} />
@@ -567,7 +568,7 @@ export default function DatasetsPage() {
           {!loading && (
             <Accordion
               variant="separated"
-              radius="lg"
+              radius="xl"
               classNames={classes}
               chevron={<IconChevronDown color={theme.colors.midnight[10]} />}
               mb="md"

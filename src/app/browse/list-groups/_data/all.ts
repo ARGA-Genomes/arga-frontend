@@ -9,10 +9,16 @@ export interface GroupItem {
   category: string;
   image: string;
   source: string;
+  disabled?: boolean;
   filter?: {
     name: string;
-    value: string | boolean;
+    value: string | boolean | { [key: string]: string | boolean };
   };
+  display?: {
+    subcategory?: string;
+    order?: number;
+  };
+  href?: string;
 }
 
 const array: GroupItem[] = [...commercial, ...ecosystems, ...iek, ...other, ...phenotypic, ...threatened];

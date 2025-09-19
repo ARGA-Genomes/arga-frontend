@@ -1,0 +1,4 @@
+.item {
+  background-color: white;
+  border: 1px solid var(--mantine-color-gray-2);
+}

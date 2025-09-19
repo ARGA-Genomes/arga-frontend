@@ -2,7 +2,6 @@
   transition: all cubic-bezier(0.3, 0, 0, 0.75) 200ms;
 
   &:hover {
-    transform: scale(1.025);
-    opacity: 0.6;
+    transform: scale(1.05);
   }
 }

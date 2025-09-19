@@ -4,18 +4,21 @@ import classes from "./group-card.module.css";
 
 import { Image, Paper, Stack, Text } from "@mantine/core";
 import Link from "next/link";
+import { memo } from "react";
 
 export interface GroupCardProps {
   category: string;
   image: string;
+  href?: string;
+  disabled?: boolean;
 }
 
-function GroupCard({ category, image }: GroupCardProps) {
+function GroupCard({ category, image, href, disabled }: GroupCardProps) {
   const imageSize = 125;
-  const groupLink = `/browse/list-groups/${category}`;
+  const groupLink = href ?? `/browse/list-groups/${category}`;
 
   return (
-    <Paper radius="xl" p={20} className={classes.card} maw={190}>
+    <Paper radius="xl" p={20} className={`${classes.card} ${disabled ? classes.disabled : ""}`} maw={190}>
       <Link href={groupLink}>
         <Stack align="center" gap="md">
           <Image
@@ -36,4 +39,7 @@ function GroupCard({ category, image }: GroupCardProps) {
   );
 }
 
-export { GroupCard };
+// Memoize GroupCard to prevent unnecessary re-renders when props haven't changed
+const MemoizedGroupCard = memo(GroupCard);
+
+export { MemoizedGroupCard as GroupCard };
