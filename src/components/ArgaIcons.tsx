@@ -30,3 +30,7 @@ export function IconSpecimenRegistration({ size }: IconProps) {
 export function IconSubsample({ size }: IconProps) {
   return <IconImage size={size} src="/icons/slides/subsamples_and_tissues.svg" />;
 }
+
+export function IconOrcid({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/orcid.svg" />;
+}

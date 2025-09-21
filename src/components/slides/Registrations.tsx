@@ -1,49 +1,49 @@
-import { Box, Divider, Grid, Group, Paper, Stack, Text } from "@mantine/core";
+import { Grid, Group, Paper, Stack, Text } from "@mantine/core";
 import { DataTable } from "../data-table";
 import { IconSpecimenRegistration } from "../ArgaIcons";
+import { Registration } from "@/generated/types";
+import { useState } from "react";
+import { EventDetails, PublicationDetails, SlideNavigation } from "./common";
 
-export function RegistrationsSlide() {
-  return (
-    <Group wrap="nowrap" align="flex-start">
-      <Box w={0} style={{ alignSelf: "flex-end", position: "relative" }}>
-        <IconSpecimenRegistration size={200} />
-      </Box>
-
-      <DataTable w={200}>
-        <DataTable.Row label="Catalog number"></DataTable.Row>
-      </DataTable>
-
-      <Divider orientation="vertical" mx="md" />
-
-      <Grid w="100%">
-        <Grid.Col span={6}>
-          <Stack>
-            <EventDetails />
-            <Collection />
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <Stack>
-            <Publication />
-            <Associated />
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={12}>
-          <Status />
-        </Grid.Col>
-      </Grid>
-    </Group>
-  );
+interface RegistrationSlideProps {
+  registrations: Registration[];
 }
 
-function EventDetails() {
+export function RegistrationSlide({ registrations }: RegistrationSlideProps) {
+  const [registration, setRegistration] = useState(registrations.at(0));
+
   return (
-    <Paper radius="xl" bg="midnight.0" p="md" shadow="none">
-      <DataTable>
-        <DataTable.Row label="ARGA event ID"></DataTable.Row>
-        <DataTable.Row label="Event date"></DataTable.Row>
-      </DataTable>
-    </Paper>
+    <SlideNavigation
+      icon={<IconSpecimenRegistration size={200} />}
+      records={registrations}
+      selected={registration}
+      onSelected={(record) => setRegistration(record)}
+      getLabel={(record) => record.specimenId}
+    >
+      {registration && (
+        <Grid w="100%" mr="xl" mb="xl">
+          <Grid.Col span={12}>
+            <Group grow>
+              <EventDetails version="" />
+              <PublicationDetails publication={registration.publication} />
+            </Group>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Stack>
+              <Collection />
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Stack>
+              <Associated />
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Status />
+          </Grid.Col>
+        </Grid>
+      )}
+    </SlideNavigation>
   );
 }
 
@@ -74,18 +74,6 @@ function Associated() {
         </Text>
       </Stack>
     </Paper>
-  );
-}
-
-function Publication() {
-  return (
-    <Stack>
-      <Text fw={600} fz="sm" c="midnight.9">
-        Publication source
-      </Text>
-      <Text>publication</Text>
-      <Text>doi</Text>
-    </Stack>
   );
 }
 

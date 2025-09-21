@@ -1,22 +1,31 @@
-import { Box, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Box, Group, SimpleGrid, Stack, Text } from "@mantine/core";
 import { DataTable } from "../data-table";
 import { IconLiveState } from "../ArgaIcons";
+import { Organism } from "@/generated/types";
+import { PublicationDetails } from "./common";
 
-export function LiveStateSlide() {
+interface LiveStateSlideProps {
+  organism: Organism;
+}
+
+export function LiveStateSlide({ organism }: LiveStateSlideProps) {
   return (
-    <Stack>
+    <Stack px="xl" pb="xl">
       <Box h={0} style={{ alignSelf: "flex-end" }}>
         <IconLiveState size={200} />
       </Box>
-      <Identification />
-      <Disposition />
+      <Group>
+        <Identification organism={organism} />
+        <PublicationDetails publication={organism.publication} />
+      </Group>
+      <Disposition organism={organism} />
       <Environment />
       <Provenance />
     </Stack>
   );
 }
 
-function Identification() {
+function Identification({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
@@ -32,7 +41,7 @@ function Identification() {
   );
 }
 
-function Disposition() {
+function Disposition({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
@@ -40,9 +49,9 @@ function Disposition() {
       </Text>
       <DataTable>
         <DataTable.Row label="Disposed as"></DataTable.Row>
-        <DataTable.Row label="Data first observed"></DataTable.Row>
+        <DataTable.Row label="Date first observed"></DataTable.Row>
         <DataTable.Row label="Last known alive"></DataTable.Row>
-        <DataTable.Row label="Sex"></DataTable.Row>
+        <DataTable.Row label="Sex">{organism.sex}</DataTable.Row>
       </DataTable>
     </Stack>
   );
@@ -57,11 +66,12 @@ function Environment() {
       <SimpleGrid cols={2}>
         <DataTable>
           <DataTable.Row label="Biome"></DataTable.Row>
-          <DataTable.Row label="Source population"></DataTable.Row>
+          <DataTable.Row label="Bioregion"></DataTable.Row>
+          <DataTable.Row label="Habitat"></DataTable.Row>
           <DataTable.Row label="Source location"></DataTable.Row>
         </DataTable>
         <DataTable>
-          <DataTable.Row label="Habitat"></DataTable.Row>
+          <DataTable.Row label="IBRA/IMCRA region"></DataTable.Row>
           <DataTable.Row label="Habitat (original)"></DataTable.Row>
           <DataTable.Row label="Elevation (m)"></DataTable.Row>
           <DataTable.Row label="Depth (m)"></DataTable.Row>

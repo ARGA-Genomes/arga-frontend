@@ -5,3 +5,27 @@
         background: var(--mantine-color-midnight-0);
     }
 }
+
+.table {
+    th {
+        font-size: var(--mantine-font-size-sm);
+        font-weight: 300;
+        color: var(--mantine-color-midnight-9);
+        text-align: left;
+        width: 1px;
+        padding-right: var(--mantine-spacing-xl);
+        padding-top: var(--mantine-spacing-xs);
+        padding-bottom: var(--mantine-spacing-xs);
+    }
+
+    td {
+        font-size: var(--mantine-font-size-sm);
+        font-weight: 600;
+        color: var(--mantine-color-midnight-7);
+        text-align: left;
+        padding-top: var(--mantine-spacing-xs);
+        padding-bottom: var(--mantine-spacing-xs);
+        word-wrap: break-word;
+        white-space: normal;
+    }
+}
