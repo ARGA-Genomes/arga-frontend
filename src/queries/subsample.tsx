@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const SUBSAMPLE = gql`
-  fragment SubsampleDetails on SubsampleDetails {
+  fragment SubsampleDetails on Subsample {
     entityId
     subsampleId
     eventDate
