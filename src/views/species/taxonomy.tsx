@@ -366,7 +366,7 @@ interface DetailsProps {
 function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: DetailsProps) {
   const typeSpecimens = taxonomy.typeSpecimens?.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher"
+      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher",
   );
 
   // TODO: change this to show multiple type specimens for things like syntypes
@@ -635,14 +635,14 @@ function History({ taxonomy }: { taxonomy: Taxon }) {
   for (const item of acts) {
     const date =
       (item.publication.publishedDate && new Date(item.publication.publishedDate)) ||
-      new Date(item.publication.publishedYear, 0, 1);
+      new Date(item.publication.publishedYear ?? 0, 0, 1);
 
     const key = `${date}-${item.act}-${item.name.canonicalName}`;
 
     itemSet.set(key, {
       label: item.name.canonicalName,
       subtitle: ACT_LABEL[item.act],
-      year: item.publication.publishedYear,
+      year: item.publication.publishedYear ?? 0,
       act: item.act,
       date,
       type: TimelineItemType.Instant,
@@ -730,7 +730,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   });
 
   const holotype = specimens.data?.taxon.typeSpecimens.find(
-    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype"
+    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype",
   );
 
   function humanize(text: string) {
@@ -764,7 +764,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
                 {item.publication.title}
               </Flex>
             }
-            href={item.publication.sourceUrls[0]}
+            href={item.publication.sourceUrls?.at(0)}
           />
         </DataTableRow>
         <DataTableRow label="Protonym/Basionym">
