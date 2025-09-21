@@ -25,5 +25,7 @@
         text-align: left;
         padding-top: var(--mantine-spacing-xs);
         padding-bottom: var(--mantine-spacing-xs);
+        word-wrap: break-word;
+        white-space: normal;
     }
 }

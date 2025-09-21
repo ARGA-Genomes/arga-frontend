@@ -4,7 +4,7 @@ import { IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { ExtractionSlide } from "@/components/slides/Extraction";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { DnaExtractDetails, Subsample } from "@/generated/types";
+import { DnaExtract, Subsample } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
@@ -18,6 +18,16 @@ const GET_EXTRACTIONS = gql`
       }
       extractions {
         ...DnaExtractDetails
+
+        publication {
+          doi
+          citation
+        }
+
+        extractedBy {
+          fullName
+          orcid
+        }
       }
     }
   }
@@ -26,7 +36,7 @@ const GET_EXTRACTIONS = gql`
 interface OrganismQuery {
   organism: {
     subsamples: Subsample[];
-    extractions: DnaExtractDetails[];
+    extractions: DnaExtract[];
   };
 }
 

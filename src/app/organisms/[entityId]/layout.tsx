@@ -3,7 +3,7 @@ import { use } from "react";
 
 import classes from "./layout.module.css";
 
-import { Center, Container, Grid, Group, Paper, Skeleton, Stack, Tabs, Title, Text, Box } from "@mantine/core";
+import { Center, Container, Grid, Group, Paper, Skeleton, Stack, Tabs, Title, Text } from "@mantine/core";
 import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";

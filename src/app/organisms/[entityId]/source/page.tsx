@@ -3,12 +3,10 @@
 import { IconLiveState, IconSpecimenCollection, IconSpecimenRegistration, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { CollectingSlide } from "@/components/slides/Collecting";
-import { ExtractionSlide } from "@/components/slides/Extraction";
 import { LiveStateSlide } from "@/components/slides/LiveState";
-import { RegistrationsSlide } from "@/components/slides/Registrations";
-import { TissueSlide } from "@/components/slides/Tissues";
+import { RegistrationSlide } from "@/components/slides/Registrations";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { AccessionEvent, CollectionEvent, Organism, Tissue } from "@/generated/types";
+import { Registration, Collection, Organism, Tissue } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
@@ -21,14 +19,34 @@ const GET_ORGANISM = gql`
 
       collections {
         ...CollectionEventDetails
+
+        publication {
+          doi
+          citation
+        }
       }
 
-      accessions {
-        ...AccessionEventDetails
+      registrations {
+        ...RegistrationDetails
+
+        publication {
+          doi
+          citation
+        }
       }
 
       tissues {
         ...TissueDetails
+
+        publication {
+          doi
+          citation
+        }
+      }
+
+      publication {
+        doi
+        citation
       }
     }
   }
@@ -36,8 +54,8 @@ const GET_ORGANISM = gql`
 
 interface OrganismQuery {
   organism: Organism & {
-    collections: CollectionEvent[];
-    accessions: AccessionEvent[];
+    collections: Collection[];
+    accessions: Registration[];
     tissues: Tissue[];
   };
 }
@@ -84,14 +102,21 @@ function Provenance({ entityId }: { entityId: string }) {
 
       <CardSlider card={card}>
         <CardSlider.Card title="Live state">
-          <LiveStateSlide />
+          {error && <Text>{error.message}</Text>}
+          {data && <LiveStateSlide organism={data.organism} />}
         </CardSlider.Card>
         <CardSlider.Card title="Collecting">
           {error && <Text>{error.message}</Text>}
-          {data && <CollectingSlide organism={data.organism} accessions={[]} collections={data.organism.collections} />}
+          {data && (
+            <CollectingSlide
+              organism={data.organism}
+              registrations={data.organism.registrations}
+              collections={data.organism.collections}
+            />
+          )}
         </CardSlider.Card>
         <CardSlider.Card title="Registrations">
-          <RegistrationsSlide />
+          <RegistrationSlide registrations={[]} />
         </CardSlider.Card>
       </CardSlider>
     </Stack>

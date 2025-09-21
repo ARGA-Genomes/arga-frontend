@@ -1,14 +1,12 @@
 import { gql } from "@apollo/client";
 
 export const DNA_EXTRACT = gql`
-  fragment DnaExtractDetails on DnaExtractDetails {
+  fragment DnaExtractDetails on DnaExtract {
     entityId
     extractId
     subsampleId
     eventDate
     eventTime
-    extractedBy
-    materialExtractedBy
     nucleicAcidType
     preparationType
     preservationType
