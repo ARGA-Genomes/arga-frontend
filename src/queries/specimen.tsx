@@ -151,6 +151,66 @@ export const ACCESSION_EVENT = gql`
   }
 `;
 
+export const COLLECTION = gql`
+  fragment CollectionDetails on Collection {
+    entityId
+    fieldCollectingId
+    eventDate
+    eventTime
+    collectedBy
+    collectionRemarks
+    identifiedBy
+    identifiedDate
+    identificationRemarks
+    locality
+    country
+    countryCode
+    stateProvince
+    county
+    municipality
+    latitude
+    longitude
+    elevation
+    depth
+    elevationAccuracy
+    depthAccuracy
+    locationSource
+    preparation
+    environmentBroadScale
+    environmentLocalScale
+    environmentMedium
+    habitat
+    specificHost
+    individualCount
+    organismQuantity
+    organismQuantityType
+    strain
+    isolate
+    fieldNotes
+  }
+`;
+
+export const REGISTRATION = gql`
+  fragment RegistrationDetails on Registration {
+    entityId
+    typeStatus
+    eventDate
+    eventTime
+    collectionRepositoryId
+    collectionRepositoryCode
+    institutionName
+    institutionCode
+    disposition
+    preparation
+    accessionedBy
+    preparedBy
+    identifiedBy
+    identifiedDate
+    identificationRemarks
+    otherCatalogNumbers
+  }
+`;
+
 export const TISSUE = gql`
   fragment TissueDetails on Tissue {
     entityId

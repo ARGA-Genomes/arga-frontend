@@ -18,7 +18,7 @@ const GET_ORGANISM = gql`
       ...OrganismDetails
 
       collections {
-        ...CollectionEventDetails
+        ...CollectionDetails
 
         publication {
           doi
