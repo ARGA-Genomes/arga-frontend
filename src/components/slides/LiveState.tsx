@@ -1,4 +1,4 @@
-import { Box, Group, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Group, SimpleGrid, Stack, Text } from "@mantine/core";
 import { DataTable } from "../data-table";
 import { IconLiveState } from "../ArgaIcons";
 import { Organism } from "@/generated/types";
@@ -12,14 +12,14 @@ interface LiveStateSlideProps {
 export function LiveStateSlide({ organism }: LiveStateSlideProps) {
   return (
     <Stack px="xl" pb="xl">
-      <Box h={0} style={{ alignSelf: "flex-end" }}>
-        <IconLiveState size={200} />
-      </Box>
-      <Group>
+      <Group justify="space-between" align="flex-start" grow>
         <Identification organism={organism} />
         <PublicationDetails publication={organism.publication} />
       </Group>
-      <Disposition organism={organism} />
+      <Group justify="space-between">
+        <Disposition organism={organism} />
+        <IconLiveState size={200} />
+      </Group>
       <Environment organism={organism} />
       <Provenance organism={organism} />
     </Stack>
