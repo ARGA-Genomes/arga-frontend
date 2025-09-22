@@ -17,6 +17,11 @@ const GET_ORGANISM = gql`
     organism(by: { entityId: $entityId }) {
       ...OrganismDetails
 
+      publication {
+        doi
+        citation
+      }
+
       collections {
         ...CollectionDetails
 
@@ -43,21 +48,12 @@ const GET_ORGANISM = gql`
           citation
         }
       }
-
-      publication {
-        doi
-        citation
-      }
     }
   }
 `;
 
 interface OrganismQuery {
-  organism: Organism & {
-    collections: Collection[];
-    accessions: Registration[];
-    tissues: Tissue[];
-  };
+  organism: Organism;
 }
 
 interface PageProps {
