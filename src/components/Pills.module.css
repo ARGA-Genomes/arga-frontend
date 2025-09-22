@@ -1,3 +1,13 @@
+.common {
+    color: var(--mantine-color-attribute-6);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--mantine-color-attribute-5);
+    background-color: var(--mantine-color-attribute-1);
+}
+
 .doi {
     color: var(--mantine-color-shellfish-5);
     font-weight: 700;
@@ -9,4 +19,14 @@
     &:hover {
         background-color: var(--mantine-color-shellfishBg-0);
     }
+}
+
+.coordSystem {
+    color: var(--mantine-color-moss-6);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--mantine-color-moss-5);
+    background-color: var(--mantine-color-moss-1);
 }
