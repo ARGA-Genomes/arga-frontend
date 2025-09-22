@@ -15,6 +15,14 @@ export function Pill({ className, children }: PillProps) {
   );
 }
 
+Pill.Common = function PillCommon({ value }: { value?: string }) {
+  return (
+    <Pill className={classes.common}>
+      <>{value}</>
+    </Pill>
+  );
+};
+
 Pill.Doi = function PillDoi({ url }: { url: string }) {
   const doi = url.substring(url.lastIndexOf("doi.org/") + 8);
   return (
@@ -23,5 +31,13 @@ Pill.Doi = function PillDoi({ url }: { url: string }) {
         <>DOI: {doi}</>
       </Pill>
     </a>
+  );
+};
+
+Pill.CoordinateSystem = function PillCoordinateSystem({ value }: { value?: string }) {
+  return (
+    <Pill className={classes.coordSystem}>
+      <>{value}</>
+    </Pill>
   );
 };
