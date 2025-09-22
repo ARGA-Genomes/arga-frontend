@@ -6,7 +6,7 @@ import { CollectingSlide } from "@/components/slides/Collecting";
 import { LiveStateSlide } from "@/components/slides/LiveState";
 import { RegistrationSlide } from "@/components/slides/Registrations";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { Registration, Collection, Organism, Tissue } from "@/generated/types";
+import { Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";

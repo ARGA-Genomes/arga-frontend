@@ -1,4 +1,4 @@
-import { Box, Center, Group, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Box, Group, SimpleGrid, Stack, Text } from "@mantine/core";
 import { DataTable } from "../data-table";
 import { IconLiveState } from "../ArgaIcons";
 import { Organism } from "@/generated/types";
