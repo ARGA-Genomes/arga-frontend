@@ -12,6 +12,26 @@ export const ORGANISM = gql`
     lifeStage
     reproductiveCondition
     behavior
+    liveState
+    remarks
+    identifiedBy
+    identificationDate
+    disposition
+    firstObservedAt
+    lastKnownAliveAt
+    biome
+    habitat
+    bioregion
+    ibraImcra
+    latitude
+    longitude
+    coordinateSystem
+    locationSource
+    holding
+    holdingId
+    holdingPermit
+    recordCreatedAt
+    recordUpdatedAt
   }
 `;
 

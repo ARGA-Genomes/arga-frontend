@@ -19,8 +19,8 @@ export function LiveStateSlide({ organism }: LiveStateSlideProps) {
         <PublicationDetails publication={organism.publication} />
       </Group>
       <Disposition organism={organism} />
-      <Environment />
-      <Provenance />
+      <Environment organism={organism} />
+      <Provenance organism={organism} />
     </Stack>
   );
 }
@@ -34,8 +34,8 @@ function Identification({ organism }: LiveStateSlideProps) {
       <DataTable>
         <DataTable.Row label="Organism name"></DataTable.Row>
         <DataTable.Row label="Scientific name"></DataTable.Row>
-        <DataTable.Row label="Identified by"></DataTable.Row>
-        <DataTable.Row label="Identification date"></DataTable.Row>
+        <DataTable.Row label="Identified by">{organism.identifiedBy}</DataTable.Row>
+        <DataTable.Row label="Identification date">{organism.identificationDate}</DataTable.Row>
       </DataTable>
     </Stack>
   );
@@ -48,16 +48,16 @@ function Disposition({ organism }: LiveStateSlideProps) {
         Live Disposition
       </Text>
       <DataTable>
-        <DataTable.Row label="Disposed as"></DataTable.Row>
-        <DataTable.Row label="Date first observed"></DataTable.Row>
-        <DataTable.Row label="Last known alive"></DataTable.Row>
+        <DataTable.Row label="Disposed as">{organism.disposition}</DataTable.Row>
+        <DataTable.Row label="Date first observed">{organism.firstObservedAt}</DataTable.Row>
+        <DataTable.Row label="Last known alive">{organism.lastKnownAliveAt}</DataTable.Row>
         <DataTable.Row label="Sex">{organism.sex}</DataTable.Row>
       </DataTable>
     </Stack>
   );
 }
 
-function Environment() {
+function Environment({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
@@ -65,14 +65,14 @@ function Environment() {
       </Text>
       <SimpleGrid cols={2}>
         <DataTable>
-          <DataTable.Row label="Biome"></DataTable.Row>
-          <DataTable.Row label="Bioregion"></DataTable.Row>
-          <DataTable.Row label="Habitat"></DataTable.Row>
-          <DataTable.Row label="Source location"></DataTable.Row>
+          <DataTable.Row label="Biome">{organism.biome}</DataTable.Row>
+          <DataTable.Row label="Bioregion">{organism.bioregion}</DataTable.Row>
+          <DataTable.Row label="Habitat">{organism.habitat}</DataTable.Row>
+          <DataTable.Row label="Source location">{organism.locationSource}</DataTable.Row>
         </DataTable>
         <DataTable>
-          <DataTable.Row label="IBRA/IMCRA region"></DataTable.Row>
-          <DataTable.Row label="Habitat (original)"></DataTable.Row>
+          <DataTable.Row label="IBRA/IMCRA region">{organism.ibraImcra}</DataTable.Row>
+          <DataTable.Row label="Habitat (original)">{organism.habitat}</DataTable.Row>
           <DataTable.Row label="Elevation (m)"></DataTable.Row>
           <DataTable.Row label="Depth (m)"></DataTable.Row>
         </DataTable>
@@ -81,16 +81,16 @@ function Environment() {
   );
 }
 
-function Provenance() {
+function Provenance({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
         Provenance and holding
       </Text>
       <DataTable>
-        <DataTable.Row label="Held at"></DataTable.Row>
-        <DataTable.Row label="Holding ID"></DataTable.Row>
-        <DataTable.Row label="Permit or ethics code"></DataTable.Row>
+        <DataTable.Row label="Held at">{organism.holding}</DataTable.Row>
+        <DataTable.Row label="Holding ID">{organism.holdingId}</DataTable.Row>
+        <DataTable.Row label="Permit or ethics code">{organism.holdingPermit}</DataTable.Row>
       </DataTable>
     </Stack>
   );
