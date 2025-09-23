@@ -1,7 +1,7 @@
 import { NameDetails } from "@/generated/types";
 import classes from "./Pills.module.css";
 
-import { Paper, Group, Text } from "@mantine/core";
+import { Paper, Group } from "@mantine/core";
 
 interface PillCommonProps {
   variant?: "overview";
