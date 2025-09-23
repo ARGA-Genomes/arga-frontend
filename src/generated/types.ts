@@ -786,6 +786,7 @@ export type Organism = {
   liveState?: Maybe<Scalars['String']['output']>;
   locationSource?: Maybe<Scalars['String']['output']>;
   longitude?: Maybe<Scalars['Float']['output']>;
+  name: NameDetails;
   organismId: Scalars['String']['output'];
   phenotypicSex?: Maybe<Scalars['String']['output']>;
   publication?: Maybe<Publication>;

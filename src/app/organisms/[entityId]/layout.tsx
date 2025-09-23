@@ -11,11 +11,17 @@ import { PreviousPage } from "@/components/navigation-history";
 import { Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { AttributePillContainer } from "@/components/data-fields";
+import { Pill } from "@/components/Pills";
 
 const GET_ORGANISM_OVERVIEW = gql`
   query OrganismOverview($entityId: String) {
     organism(by: { entityId: $entityId }) {
       ...OrganismDetails
+
+      name {
+        canonicalName
+        authorship
+      }
     }
   }
 `;
@@ -108,9 +114,14 @@ function Overview({ entityId }: { entityId: string }) {
             <Grid.Col span={8}>
               <Stack>
                 <OverviewBlock title="Scientific name" loading={loading}>
-                  <AttributePillContainer className={classes.pill} color="white">
-                    {data?.organism.entityId}
-                  </AttributePillContainer>
+                  <Stack>
+                    {data && <Pill.ScientificName name={data.organism.name} variant="overview" />}
+                    <Group>
+                      <Text fz="xs" fw={700} c="midnight">
+                        Identification verified
+                      </Text>
+                    </Group>
+                  </Stack>
                 </OverviewBlock>
                 <Group>
                   <AttributePillContainer
@@ -127,13 +138,13 @@ function Overview({ entityId }: { entityId: string }) {
                   <Text fw={700} c="midnight" fz="xs">
                     Source organism scope
                   </Text>
-                  <Center></Center>
+                  <Pill.Common value={data?.organism.disposition ?? undefined} variant="overview" />
                 </Stack>
                 <Stack gap="sm">
                   <Text fw={700} c="midnight" fz="xs">
                     Biome
                   </Text>
-                  <Center></Center>
+                  <Pill.Common value={data?.organism.biome ?? undefined} variant="overview" />
                 </Stack>
               </Stack>
             </Grid.Col>
@@ -164,7 +175,7 @@ function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
           <Text fw={700} c="midnight" fz="xs">
             {title}
           </Text>
-          <Center>{children}</Center>
+          {children}
         </Stack>
       </Paper>
     </Skeleton>

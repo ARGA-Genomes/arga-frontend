@@ -1,6 +1,11 @@
+import { NameDetails } from "@/generated/types";
 import classes from "./Pills.module.css";
 
-import { Paper } from "@mantine/core";
+import { Paper, Group, Text } from "@mantine/core";
+
+interface PillCommonProps {
+  variant?: "overview";
+}
 
 interface PillProps {
   className?: string;
@@ -15,10 +20,21 @@ export function Pill({ className, children }: PillProps) {
   );
 }
 
-Pill.Common = function PillCommon({ value }: { value?: string }) {
+Pill.Common = function PillCommon({ value, variant }: { value?: string } & PillCommonProps) {
   return (
-    <Pill className={classes.common}>
+    <Pill className={variant ? classes[variant] : classes.common}>
       <>{value}</>
+    </Pill>
+  );
+};
+
+Pill.ScientificName = function PillScientificName({ name, variant }: { name: NameDetails } & PillCommonProps) {
+  return (
+    <Pill className={variant ? classes[variant] : classes.common}>
+      <Group wrap="nowrap">
+        <i>{name.canonicalName}</i>
+        {name.authorship}
+      </Group>
     </Pill>
   );
 };
