@@ -4,6 +4,8 @@ import { createFragmentRegistry } from "@apollo/client/cache";
 import {
   ACCESSION_EVENT,
   COLLECTION_EVENT,
+  COLLECTION,
+  REGISTRATION,
   ORGANISM,
   SPECIMEN,
   TISSUE,
@@ -12,8 +14,8 @@ import {
   SPECIMEN_STATS,
   SPECIMEN_MAP_MARKER,
 } from "./specimen";
-import { SUBSAMPLE, SUBSAMPLE_EVENT } from "./subsample";
-import { DNA_EXTRACT, DNA_EXTRACTION_EVENT } from "./dna-extract";
+import { SUBSAMPLE } from "./subsample";
+import { DNA_EXTRACT } from "./dna-extract";
 import { TAXON_TREE_NODE_STATISTICS } from "./stats";
 import {
   ANNOTATIONS_EVENT,
@@ -30,6 +32,8 @@ export default function createClient() {
   const fragments = createFragmentRegistry(
     ORGANISM,
     SPECIMEN,
+    COLLECTION,
+    REGISTRATION,
     TISSUE,
     SPECIMEN_SUMMARY,
     SPECIMEN_OVERVIEW,
@@ -40,8 +44,6 @@ export default function createClient() {
     SEQUENCE,
     COLLECTION_EVENT,
     ACCESSION_EVENT,
-    SUBSAMPLE_EVENT,
-    DNA_EXTRACTION_EVENT,
     SEQUENCING_EVENT,
     SEQUENCING_RUN_EVENT,
     ASSEMBLY_EVENT,

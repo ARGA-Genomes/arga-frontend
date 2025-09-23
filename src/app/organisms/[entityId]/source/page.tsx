@@ -1,18 +1,15 @@
 "use client";
 
-import classes from "./page.module.css";
-
 import { IconLiveState, IconSpecimenCollection, IconSpecimenRegistration, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
-import { AttributePillContainer } from "@/components/data-fields";
 import { CollectingSlide } from "@/components/slides/Collecting";
 import { LiveStateSlide } from "@/components/slides/LiveState";
-import { RegistrationsSlide } from "@/components/slides/Registrations";
-import { TissueSlide } from "@/components/slides/Tissues";
+import { RegistrationSlide } from "@/components/slides/Registrations";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { AccessionEvent, CollectionEvent, Organism, Tissue } from "@/generated/types";
+import { Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
-import { Center, Grid, Group, Paper, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Stack, Text, Title } from "@mantine/core";
+import Link from "next/link";
 import { use, useState } from "react";
 
 const GET_ORGANISM = gql`
@@ -20,27 +17,43 @@ const GET_ORGANISM = gql`
     organism(by: { entityId: $entityId }) {
       ...OrganismDetails
 
-      collections {
-        ...CollectionEventDetails
+      publication {
+        doi
+        citation
       }
 
-      accessions {
-        ...AccessionEventDetails
+      collections {
+        ...CollectionDetails
+
+        publication {
+          doi
+          citation
+        }
+      }
+
+      registrations {
+        ...RegistrationDetails
+
+        publication {
+          doi
+          citation
+        }
       }
 
       tissues {
         ...TissueDetails
+
+        publication {
+          doi
+          citation
+        }
       }
     }
   }
 `;
 
 interface OrganismQuery {
-  organism: Organism & {
-    collections: CollectionEvent[];
-    accessions: AccessionEvent[];
-    tissues: Tissue[];
-  };
+  organism: Organism;
 }
 
 interface PageProps {
@@ -52,91 +65,8 @@ export default function Page(props: PageProps) {
 
   return (
     <Stack gap="xl">
-      <Overview entityId={params.entityId} />
       <Provenance entityId={params.entityId} />
     </Stack>
-  );
-}
-
-function Overview({ entityId }: { entityId: string }) {
-  const { loading, error, data } = useQuery<OrganismQuery>(GET_ORGANISM, {
-    variables: { entityId },
-  });
-
-  return (
-    <Paper radius="lg" p={20} bg="wheatBg.0">
-      <Title order={3} c="wheat">
-        Organism overview
-      </Title>
-
-      {error?.message}
-
-      <Grid>
-        <Grid.Col span={6}>
-          <Grid>
-            <Grid.Col span={8}>
-              <Stack>
-                <OverviewBlock title="Scientific name" loading={loading}>
-                  <AttributePillContainer className={classes.pill} color="white">
-                    {data?.organism.entityId}
-                  </AttributePillContainer>
-                </OverviewBlock>
-                <Group>
-                  <AttributePillContainer
-                    className={classes.holotypePill}
-                    color="white"
-                    withBorder={false}
-                  ></AttributePillContainer>
-                </Group>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Stack>
-                <Stack gap="sm">
-                  <Text fw={700} c="midnight" fz="xs">
-                    Source organism scope
-                  </Text>
-                  <Center></Center>
-                </Stack>
-                <Stack gap="sm">
-                  <Text fw={700} c="midnight" fz="xs">
-                    Biome
-                  </Text>
-                  <Center></Center>
-                </Stack>
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <OverviewBlock title="Associated organisms" loading={loading}></OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <OverviewBlock title="External links" loading={loading}></OverviewBlock>
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  );
-}
-
-interface OverviewBlockProps {
-  title: string;
-  children?: React.ReactNode;
-  loading: boolean;
-}
-
-function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
-  return (
-    <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
-      <Paper radius="lg" p={20} bg="wheatBg.0" withBorder style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}>
-        <Stack gap="sm">
-          <Text fw={700} c="midnight" fz="xs">
-            {title}
-          </Text>
-          <Center>{children}</Center>
-        </Stack>
-      </Paper>
-    </Skeleton>
   );
 }
 
@@ -161,27 +91,28 @@ function Provenance({ entityId }: { entityId: string }) {
           icon={<IconSpecimenRegistration size={60} />}
           onClick={() => setCard(2)}
         />
-        <TimelineNavbar.Item
-          label="Subsamples and tissues"
-          icon={<IconSubsample size={60} />}
-          onClick={() => setCard(3)}
-        />
+        <Link href="subsamples_and_tissues">
+          <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
+        </Link>
       </TimelineNavbar>
 
       <CardSlider card={card}>
         <CardSlider.Card title="Live state">
-          <LiveStateSlide />
-        </CardSlider.Card>
-        <CardSlider.Card title="Collecting events">
           {error && <Text>{error.message}</Text>}
-          {data && <CollectingSlide organism={data.organism} accessions={[]} collections={data.organism.collections} />}
+          {data && <LiveStateSlide organism={data.organism} />}
+        </CardSlider.Card>
+        <CardSlider.Card title="Collecting">
+          {error && <Text>{error.message}</Text>}
+          {data && (
+            <CollectingSlide
+              organism={data.organism}
+              registrations={data.organism.registrations}
+              collections={data.organism.collections}
+            />
+          )}
         </CardSlider.Card>
         <CardSlider.Card title="Registrations">
-          <RegistrationsSlide />
-        </CardSlider.Card>
-        <CardSlider.Card title="Subsamples and tissues">
-          {error && <Text>{error.message}</Text>}
-          {data && <TissueSlide tissues={data.organism.tissues} />}
+          <RegistrationSlide registrations={[]} />
         </CardSlider.Card>
       </CardSlider>
     </Stack>

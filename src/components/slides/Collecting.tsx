@@ -1,83 +1,44 @@
-import classes from "./Slide.module.css";
-
-import { AccessionEvent, CollectionEvent, Organism } from "@/generated/types";
-import { Box, Divider, Group, Paper, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Registration, Collection, Organism } from "@/generated/types";
+import { SimpleGrid, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { IconSpecimenCollection } from "../ArgaIcons";
 import { DataTable } from "../data-table";
+import { EventDetails, PublicationDetails, SlideNavigation } from "./common";
 
 interface CollectingSlideProps {
   organism: Organism;
-  collections: CollectionEvent[];
-  accessions: AccessionEvent[];
+  collections: Collection[];
+  registrations: Registration[];
 }
 
 export function CollectingSlide({ organism, collections }: CollectingSlideProps) {
   const [collection, setCollection] = useState(collections[0]);
-  const navWidth = 260;
 
   return (
-    <Group wrap="nowrap" align="flex-start">
-      <Box w={0} style={{ alignSelf: "flex-end", position: "relative" }}>
-        <Box p={20}>
-          <IconSpecimenCollection size={200} />
-        </Box>
-      </Box>
-
-      <Stack w={navWidth} mb={240} mt="md" gap={0}>
-        {collections.map((event) => (
-          <Paper
-            key={event.entityId}
-            radius="xl"
-            my={5}
-            p="xs"
-            shadow="none"
-            bg={event === collection ? "midnight.1" : undefined}
-            className={classes.item}
-            onClick={() => setCollection(event)}
-          >
-            <Group wrap="nowrap">
-              <Text fz="xs" fw={300} c="midnight.7">
-                Event date
-              </Text>
-              <Text fz="xs" fw={600} c="midnight.7" truncate="start">
-                {event.eventDate?.toString() ?? "No date"}
-              </Text>
-            </Group>
-          </Paper>
-        ))}
-      </Stack>
-
-      <Divider orientation="vertical" mx="md" mb="md" size="sm" color="shellfishBg.1" />
-
+    <SlideNavigation
+      icon={<IconSpecimenCollection size={200} />}
+      records={collections}
+      selected={collection}
+      onSelected={(record) => setCollection(record)}
+      getLabel={(record) => record.eventDate ?? "No date"}
+    >
       <SimpleGrid cols={2} w="100%" mr={80} mb="xl">
         <Stack>
-          <EventDetails collection={collection} />
+          <EventDetails version="" />
           <Collecting collection={collection} />
           <Location collection={collection} />
         </Stack>
         <Stack>
-          <Publication />
+          <PublicationDetails publication={collection.publication} />
           <Identification collection={collection} />
           <Details organism={organism} collection={collection} />
         </Stack>
       </SimpleGrid>
-    </Group>
+    </SlideNavigation>
   );
 }
 
-function EventDetails({ collection }: { collection: CollectionEvent }) {
-  return (
-    <Paper radius="xl" bg="midnight.0" py="sm" px="xl" shadow="none" mr="auto">
-      <DataTable>
-        <DataTable.RowValue label="ARGA event ID">{collection.entityId}</DataTable.RowValue>
-        <DataTable.RowValue label="Event date">{collection.eventDate?.toString() ?? "No date"}</DataTable.RowValue>
-      </DataTable>
-    </Paper>
-  );
-}
-
-function Collecting({ collection }: { collection: CollectionEvent }) {
+function Collecting({ collection }: { collection: Collection }) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
@@ -95,7 +56,7 @@ function Collecting({ collection }: { collection: CollectionEvent }) {
   );
 }
 
-function Location({ collection }: { collection: CollectionEvent }) {
+function Location({ collection }: { collection: Collection }) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
@@ -116,19 +77,7 @@ function Location({ collection }: { collection: CollectionEvent }) {
   );
 }
 
-function Publication() {
-  return (
-    <Stack>
-      <Text fw={600} fz="sm" c="midnight.9">
-        Publication source
-      </Text>
-      <Text>publication</Text>
-      <Text>doi</Text>
-    </Stack>
-  );
-}
-
-function Identification({ collection }: { collection: CollectionEvent }) {
+function Identification({ collection }: { collection: Collection }) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
@@ -143,7 +92,7 @@ function Identification({ collection }: { collection: CollectionEvent }) {
   );
 }
 
-function Details({ organism, collection }: { organism: Organism; collection: CollectionEvent }) {
+function Details({ organism, collection }: { organism: Organism; collection: Collection }) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">

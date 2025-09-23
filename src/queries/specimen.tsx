@@ -12,6 +12,26 @@ export const ORGANISM = gql`
     lifeStage
     reproductiveCondition
     behavior
+    liveState
+    remarks
+    identifiedBy
+    identificationDate
+    disposition
+    firstObservedAt
+    lastKnownAliveAt
+    biome
+    habitat
+    bioregion
+    ibraImcra
+    latitude
+    longitude
+    coordinateSystem
+    locationSource
+    holding
+    holdingId
+    holdingPermit
+    recordCreatedAt
+    recordUpdatedAt
   }
 `;
 
@@ -132,6 +152,66 @@ export const COLLECTION_EVENT = gql`
 
 export const ACCESSION_EVENT = gql`
   fragment AccessionEventDetails on AccessionEvent {
+    entityId
+    typeStatus
+    eventDate
+    eventTime
+    collectionRepositoryId
+    collectionRepositoryCode
+    institutionName
+    institutionCode
+    disposition
+    preparation
+    accessionedBy
+    preparedBy
+    identifiedBy
+    identifiedDate
+    identificationRemarks
+    otherCatalogNumbers
+  }
+`;
+
+export const COLLECTION = gql`
+  fragment CollectionDetails on Collection {
+    entityId
+    fieldCollectingId
+    eventDate
+    eventTime
+    collectedBy
+    collectionRemarks
+    identifiedBy
+    identifiedDate
+    identificationRemarks
+    locality
+    country
+    countryCode
+    stateProvince
+    county
+    municipality
+    latitude
+    longitude
+    elevation
+    depth
+    elevationAccuracy
+    depthAccuracy
+    locationSource
+    preparation
+    environmentBroadScale
+    environmentLocalScale
+    environmentMedium
+    habitat
+    specificHost
+    individualCount
+    organismQuantity
+    organismQuantityType
+    strain
+    isolate
+    fieldNotes
+  }
+`;
+
+export const REGISTRATION = gql`
+  fragment RegistrationDetails on Registration {
     entityId
     typeStatus
     eventDate

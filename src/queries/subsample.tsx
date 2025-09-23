@@ -2,19 +2,29 @@ import { gql } from "@apollo/client";
 
 export const SUBSAMPLE = gql`
   fragment SubsampleDetails on Subsample {
-    recordId
-    materialSampleId
-    institutionName
-    institutionCode
-    typeStatus
-  }
-`;
-
-export const SUBSAMPLE_EVENT = gql`
-  fragment SubsampleEventDetails on SubsampleEvent {
+    entityId
+    subsampleId
     eventDate
     eventTime
-    subsampledBy
-    preparationType
+    institutionName
+    institutionCode
+    sampleType
+    name
+    custodian
+    description
+    notes
+    cultureMedia
+    cultureMethod
+    weightOrVolume
+    preservationMethod
+    preservationTemperature
+    preservationDuration
+    quality
+    cellType
+    cellLine
+    cloneName
+    labHost
+    sampleProcessing
+    samplePooling
   }
 `;

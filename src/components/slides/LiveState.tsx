@@ -1,54 +1,64 @@
-import { Box, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Group, SimpleGrid, Stack, Text } from "@mantine/core";
 import { DataTable } from "../data-table";
 import { IconLiveState } from "../ArgaIcons";
+import { Organism } from "@/generated/types";
+import { PublicationDetails } from "./common";
+import { Pill } from "../Pills";
 
-export function LiveStateSlide() {
+interface LiveStateSlideProps {
+  organism: Organism;
+}
+
+export function LiveStateSlide({ organism }: LiveStateSlideProps) {
   return (
-    <Stack>
-      <Box h={0} style={{ alignSelf: "flex-end" }}>
+    <Stack px="xl" pb="xl">
+      <Group justify="space-between" align="flex-start" grow>
+        <Identification organism={organism} />
+        <PublicationDetails publication={organism.publication} />
+      </Group>
+      <Group justify="space-between">
+        <Disposition organism={organism} />
         <IconLiveState size={200} />
-      </Box>
-      <Identification />
-      <Disposition />
-      <Environment />
-      <Provenance />
+      </Group>
+      <Environment organism={organism} />
+      <Provenance organism={organism} />
     </Stack>
   );
 }
 
-function Identification() {
+function Identification({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
         Live identification
       </Text>
       <DataTable>
-        <DataTable.Row label="Organism name"></DataTable.Row>
-        <DataTable.Row label="Scientific name"></DataTable.Row>
-        <DataTable.Row label="Identified by"></DataTable.Row>
-        <DataTable.Row label="Identification date"></DataTable.Row>
+        <DataTable.RowValue label="Organism name"></DataTable.RowValue>
+        <DataTable.RowValue label="Scientific name"></DataTable.RowValue>
+        <DataTable.RowValue label="Identified by">{organism.identifiedBy}</DataTable.RowValue>
+        <DataTable.RowValue label="Identification date">{organism.identificationDate}</DataTable.RowValue>
       </DataTable>
     </Stack>
   );
 }
 
-function Disposition() {
+function Disposition({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
         Live Disposition
       </Text>
       <DataTable>
-        <DataTable.Row label="Disposed as"></DataTable.Row>
-        <DataTable.Row label="Data first observed"></DataTable.Row>
-        <DataTable.Row label="Last known alive"></DataTable.Row>
-        <DataTable.Row label="Sex"></DataTable.Row>
+        <DataTable.RowValue label="Disposed as">{organism.disposition}</DataTable.RowValue>
+        <DataTable.RowValue label="Date first observed">{organism.firstObservedAt}</DataTable.RowValue>
+        <DataTable.RowValue label="Last known alive">{organism.lastKnownAliveAt}</DataTable.RowValue>
+        <DataTable.RowValue label="Sex">{organism.sex}</DataTable.RowValue>
       </DataTable>
     </Stack>
   );
 }
 
-function Environment() {
+function Environment({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
@@ -56,31 +66,38 @@ function Environment() {
       </Text>
       <SimpleGrid cols={2}>
         <DataTable>
-          <DataTable.Row label="Biome"></DataTable.Row>
-          <DataTable.Row label="Source population"></DataTable.Row>
-          <DataTable.Row label="Source location"></DataTable.Row>
+          <DataTable.RowValue label="Biome">{organism.biome}</DataTable.RowValue>
+          <DataTable.RowValue label="Bioregion">{organism.bioregion}</DataTable.RowValue>
+          <DataTable.RowValue label="Habitat">{organism.habitat}</DataTable.RowValue>
+          <DataTable.RowValue label="Source location">
+            {organism.latitude}, {organism.longitude}
+            <Group>
+              <Pill.CoordinateSystem value={organism.coordinateSystem ?? ""} />
+              <Pill.Common value={organism.locationSource ?? ""} />
+            </Group>
+          </DataTable.RowValue>
         </DataTable>
         <DataTable>
-          <DataTable.Row label="Habitat"></DataTable.Row>
-          <DataTable.Row label="Habitat (original)"></DataTable.Row>
-          <DataTable.Row label="Elevation (m)"></DataTable.Row>
-          <DataTable.Row label="Depth (m)"></DataTable.Row>
+          <DataTable.RowValue label="IBRA/IMCRA region">{organism.ibraImcra}</DataTable.RowValue>
+          <DataTable.RowValue label="Habitat (original)">{organism.habitat}</DataTable.RowValue>
+          <DataTable.RowValue label="Elevation (m)"></DataTable.RowValue>
+          <DataTable.RowValue label="Depth (m)"></DataTable.RowValue>
         </DataTable>
       </SimpleGrid>
     </Stack>
   );
 }
 
-function Provenance() {
+function Provenance({ organism }: LiveStateSlideProps) {
   return (
     <Stack>
       <Text fw={600} fz="sm" c="midnight.9">
         Provenance and holding
       </Text>
       <DataTable>
-        <DataTable.Row label="Held at"></DataTable.Row>
-        <DataTable.Row label="Holding ID"></DataTable.Row>
-        <DataTable.Row label="Permit or ethics code"></DataTable.Row>
+        <DataTable.RowValue label="Held at">{organism.holding}</DataTable.RowValue>
+        <DataTable.RowValue label="Holding ID">{organism.holdingId}</DataTable.RowValue>
+        <DataTable.RowValue label="Permit or ethics code">{organism.holdingPermit}</DataTable.RowValue>
       </DataTable>
     </Stack>
   );
