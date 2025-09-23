@@ -92,7 +92,7 @@ export function ContainedImage({ photo, style }: ContainedImageProps) {
                       </Text>
                     }
                   >
-                    <Link href={license.url}>
+                    <Link href={license.url} target="_blank">
                       <Group gap="xs">
                         {license.icons.map((icon) => (
                           <CCIcon key={icon} type={icon} colour="white" size={18} style={{ opacity: 0.6 }} />
