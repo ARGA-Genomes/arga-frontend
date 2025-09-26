@@ -139,6 +139,7 @@ const GET_SPECIES = gql`
         records {
           taxonomy {
             canonicalName
+            vernacularGroup
           }
           photo {
             url

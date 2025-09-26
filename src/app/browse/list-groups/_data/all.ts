@@ -4,15 +4,17 @@ import { other } from "./other";
 import { phenotypic } from "./phenotypic";
 import { threatened } from "./threatened";
 
+type GroupFilter = {
+  name: string;
+  value?: string | boolean | { [key: string]: string | boolean };
+};
+
 export interface GroupItem {
   category: string;
   image: string;
   source: string;
   disabled?: boolean;
-  filter?: {
-    name: string;
-    value: string | boolean | { [key: string]: string | boolean };
-  };
+  filter?: GroupFilter | GroupFilter[];
   display?: {
     subcategory?: string;
     order?: number;
@@ -35,7 +37,7 @@ const groupInclude = ({ filter }: GroupItem) =>
         {
           filter: "ATTRIBUTE",
           action: "INCLUDE",
-          value: [filter],
+          value: Array.isArray(filter) ? filter : [filter],
         },
       ]
     : [];

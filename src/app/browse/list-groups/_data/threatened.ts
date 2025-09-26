@@ -24,23 +24,20 @@ export const threatened: GroupItem[] = [
     category: "CITES Listing",
     image: "/icons/list-group/List group_ CITES.svg",
     source: "ARGA Threatened Species",
-    disabled: true,
+    disabled: false,
     filter: {
-      name: "EPBC_act_category_VU", // TODO: MISSING
-      value: {
-        bool: true,
-      },
+      name: "cites",
+      // value: true
     },
   },
+  // EPBC
   {
     category: "EPBC Extinct",
     image: "/icons/list-group/List group_ EPBC_ extinct.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_EX",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
     display: {
       order: 1,
@@ -53,9 +50,7 @@ export const threatened: GroupItem[] = [
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC_act_category_EW",
-      value: {
-        bool: true,
-      },
+      value: true,
     },
     display: {
       order: 1,
@@ -151,6 +146,133 @@ export const threatened: GroupItem[] = [
     display: {
       order: 3,
       subcategory: "EPBC Act",
+    },
+  },
+  // IUCN
+  {
+    category: "IUCN Extinct",
+    image: "/icons/list-group/List group_ IUCN_ extinct.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_EX",
+      value: true,
+    },
+    display: {
+      order: 1,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Extinct in the wild",
+    image: "/icons/list-group/List group_ IUCN_ extinct in the wild.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_EW",
+      value: true,
+    },
+    display: {
+      order: 1,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Critically Endangered",
+    image: "/icons/list-group/List group_ IUCN_ critically endangered.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_CR",
+      value: true,
+    },
+    display: {
+      order: 2,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Endangered",
+    image: "/icons/list-group/List group_ IUCN_ endangered.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_EN",
+      value: true,
+    },
+    display: {
+      order: 2,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Vulnerable",
+    image: "/icons/list-group/List group_ IUCN_ vulnerable.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_VU",
+      value: true,
+    },
+    display: {
+      order: 2,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Near Threatened",
+    image: "/icons/list-group/List group_ IUCN_ near threatened.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_NT",
+      value: true,
+    },
+    display: {
+      order: 3,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Least Concern",
+    image: "/icons/list-group/List group_ IUCN_ least concern.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_LC",
+      value: true,
+    },
+    display: {
+      order: 3,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Data Deficient",
+    image: "/icons/list-group/List group_ IUCN_ data deficient.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_dd",
+      value: true,
+    },
+    display: {
+      order: 3,
+      subcategory: "IUCN",
+    },
+  },
+  {
+    category: "IUCN Not Evaluated",
+    image: "/icons/list-group/List group_ IUCN_ not evaluated.svg",
+    source: "ARGA IUCN Species",
+    disabled: true,
+    filter: {
+      name: "IUCN_red_list_LC",
+      value: true,
+    },
+    display: {
+      order: 3,
+      subcategory: "IUCN",
     },
   },
 ];
