@@ -10,12 +10,9 @@ export const threatened: GroupItem[] = [
     category: "Australia's 110 Priority Threatened Species",
     image: "/icons/list-group/List group_ Threatened (Top 110 Species).svg",
     source: "ARGA Threatened Species",
-    disabled: true,
     filter: {
-      name: "top_110_species_icon",
-      value: {
-        bool: true,
-      },
+      name: "top_110_species",
+      value: true,
     },
   },
   {

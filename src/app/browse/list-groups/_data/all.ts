@@ -1,6 +1,5 @@
 import { commercial } from "./commercial";
 import { ecosystems } from "./ecosystems";
-import { iek } from "./iek";
 import { other } from "./other";
 import { phenotypic } from "./phenotypic";
 import { threatened } from "./threatened";
@@ -21,7 +20,7 @@ export interface GroupItem {
   href?: string;
 }
 
-const array: GroupItem[] = [...commercial, ...ecosystems, ...iek, ...other, ...phenotypic, ...threatened];
+const array: GroupItem[] = [...commercial, ...ecosystems, ...other, ...phenotypic, ...threatened];
 const map = array.reduce(
   (prev, group) => ({
     ...prev,

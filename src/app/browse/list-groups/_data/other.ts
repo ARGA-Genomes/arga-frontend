@@ -29,8 +29,11 @@ export const other: GroupItem[] = [
   {
     category: "Iconic Australian Species",
     image: "/icons/list-group/List group_ Australian iconic species.svg",
-    source: "ARGA Edible Species",
-    disabled: true,
+    source: "Atlas of Living Australia",
+    filter: {
+      name: "australian_iconic_species",
+      value: true,
+    },
   },
   {
     category: "Genomics Milestones",

@@ -20,7 +20,6 @@ import { IconChevronDown } from "@tabler/icons-react";
 
 import { commercial } from "./_data/commercial";
 import { ecosystems } from "./_data/ecosystems";
-import { iek } from "./_data/iek";
 import { other } from "./_data/other";
 import { phenotypic } from "./_data/phenotypic";
 import { threatened } from "./_data/threatened";
@@ -33,7 +32,6 @@ import outerAccordionClasses from "./outer-accordion.module.css";
 const groups = {
   Ecosystems: ecosystems,
   "Industry Applications": commercial,
-  "Indigenous Ecological Knowledge": iek,
   "Ethnobiology and Phenotypic Traits": phenotypic,
   "Threatened and Vulnerable": threatened,
   "Other Traits": other,

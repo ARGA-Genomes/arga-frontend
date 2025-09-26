@@ -165,7 +165,7 @@ interface DataSummary {
   other: number;
 }
 
-function SourceDetails({ source }: { source?: ExtendedSource }) {
+function SourceDetails({ source, group }: { source?: ExtendedSource; group?: GroupItem }) {
   const theme = useMantineTheme();
 
   // Gross and hacky and terrible, to fix at a later date
@@ -198,7 +198,7 @@ function SourceDetails({ source }: { source?: ExtendedSource }) {
             size="xs"
             href={`https://${LISTS_URL}/list/${source?.listsId}`}
           >
-            View on ALA Lists <IconExternalLink size="0.8rem" />
+            View {group ? "full list" : "list"} on ALA Lists <IconExternalLink size="0.8rem" />
           </Anchor>
         </Skeleton>
         <Group mt="lg">
@@ -348,7 +348,7 @@ export default function SourcePage(props: SourceProps) {
                 <Text fz={38} fw={700}>
                   {group ? group.category : source}
                 </Text>
-                {error ? <Text fw="bold">{error.message}</Text> : <SourceDetails source={data?.source} />}
+                {error ? <Text fw="bold">{error.message}</Text> : <SourceDetails source={data?.source} group={group} />}
               </Stack>
             </Grid.Col>
             {sourceIcon && (
@@ -379,15 +379,17 @@ export default function SourcePage(props: SourceProps) {
                 values={{ datasets: data?.source.datasets }}
               />
             </Paper>
-            <Paper p="xl" radius="lg" withBorder>
-              {error ? (
-                <Center>
-                  <Text>{error.message}</Text>
-                </Center>
-              ) : (
-                <ComponentDatasets datasets={data?.source.datasets} />
-              )}
-            </Paper>
+            {!group && (
+              <Paper p="xl" radius="lg" withBorder>
+                {error ? (
+                  <Center>
+                    <Text>{error.message}</Text>
+                  </Center>
+                ) : (
+                  <ComponentDatasets datasets={data?.source.datasets} />
+                )}
+              </Paper>
+            )}
             <DataPageCitation />
           </Stack>
         </Container>
