@@ -71,6 +71,35 @@ export type AnnotationEvent = {
   standardOperatingProcedures?: Maybe<Scalars['String']['output']>;
 };
 
+export type AssemblyDetails = {
+  __typename?: 'AssemblyDetails';
+  assemblyId: Scalars['String']['output'];
+  assemblyN50?: Maybe<Scalars['String']['output']>;
+  completeness?: Maybe<Scalars['String']['output']>;
+  completenessMethod?: Maybe<Scalars['String']['output']>;
+  computationalInfrastructure?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
+  genomeCoverage?: Maybe<Scalars['String']['output']>;
+  hybrid?: Maybe<Scalars['String']['output']>;
+  hybridInformation?: Maybe<Scalars['String']['output']>;
+  method?: Maybe<Scalars['String']['output']>;
+  methodLink?: Maybe<Scalars['String']['output']>;
+  methodVersion?: Maybe<Scalars['String']['output']>;
+  minimumGapLength?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  numberOfScaffolds?: Maybe<Scalars['String']['output']>;
+  polishingOrScaffoldingData?: Maybe<Scalars['String']['output']>;
+  polishingOrScaffoldingMethod?: Maybe<Scalars['String']['output']>;
+  referenceGenomeLink?: Maybe<Scalars['String']['output']>;
+  referenceGenomeUsed?: Maybe<Scalars['String']['output']>;
+  size?: Maybe<Scalars['String']['output']>;
+  sourceMolecule?: Maybe<Scalars['String']['output']>;
+  systemUsed?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+};
+
 export type AssemblyEvent = {
   __typename?: 'AssemblyEvent';
   assembledBy?: Maybe<Scalars['String']['output']>;
@@ -82,6 +111,12 @@ export type AssemblyEvent = {
   name?: Maybe<Scalars['String']['output']>;
   quality?: Maybe<Scalars['String']['output']>;
   versionStatus?: Maybe<Scalars['String']['output']>;
+};
+
+export type AssemblyPage = {
+  __typename?: 'AssemblyPage';
+  records: Array<AssemblyDetails>;
+  total: Scalars['Int']['output'];
 };
 
 export type AttributeCategory =
@@ -1173,6 +1208,7 @@ export type SourceContentType =
 
 export type Species = {
   __typename?: 'Species';
+  assemblies: AssemblyPage;
   attributes: Array<NameAttribute>;
   dataSummary: SpeciesGenomicDataSummary;
   genomicComponents: GenomicComponentPage;
@@ -1187,6 +1223,12 @@ export type Species = {
   taxonomy: Array<Taxonomy>;
   vernacularNames: Array<VernacularName>;
   wholeGenomes: WholeGenomePage;
+};
+
+
+export type SpeciesAssembliesArgs = {
+  page: Scalars['Int']['input'];
+  pageSize: Scalars['Int']['input'];
 };
 
 

@@ -40,3 +40,13 @@
     border-color: var(--mantine-color-moss-5);
     background-color: var(--mantine-color-moss-1);
 }
+
+.pillIdTitle {
+    color: var(--mantine-color-midnight-9);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-lg);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--mantine-color-attribute-5);
+    background-color: var(--mantine-color-attribute-1);
+}

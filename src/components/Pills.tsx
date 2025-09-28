@@ -57,3 +57,11 @@ Pill.CoordinateSystem = function PillCoordinateSystem({ value }: { value?: strin
     </Pill>
   );
 };
+
+Pill.IdTitle = function PillIdTitle({ value }: { value?: string }) {
+  return (
+    <Pill className={classes.pillIdTitle}>
+      <>{value}</>
+    </Pill>
+  );
+};
