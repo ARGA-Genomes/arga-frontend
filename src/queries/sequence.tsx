@@ -92,3 +92,31 @@ export const DATA_DEPOSITION_EVENT = gql`
     sourceUri
   }
 `;
+
+export const ASSEMBLY = gql`
+  fragment AssemblyDetails on Assembly {
+    assemblyId
+    eventDate
+    eventTime
+    type
+    method
+    methodVersion
+    methodLink
+    size
+    minimumGapLength
+    completeness
+    completenessMethod
+    sourceMolecule
+    referenceGenomeUsed
+    referenceGenomeLink
+    numberOfScaffolds
+    genomeCoverage
+    hybrid
+    hybridInformation
+    polishingOrScaffoldingData
+    polishingOrScaffoldingMethod
+    computationalInfrastructure
+    systemUsed
+    assemblyN50
+  }
+`;

@@ -24,6 +24,7 @@ import {
   SEQUENCE,
   SEQUENCING_EVENT,
   SEQUENCING_RUN_EVENT,
+  ASSEMBLY,
 } from "./sequence";
 import { TAXON_NAME, TAXON_SOURCE, TAXON_NODE } from "./taxa";
 import { PUBLICATION } from "./publication";
@@ -42,6 +43,7 @@ export default function createClient() {
     SUBSAMPLE,
     DNA_EXTRACT,
     SEQUENCE,
+    ASSEMBLY,
     COLLECTION_EVENT,
     ACCESSION_EVENT,
     SEQUENCING_EVENT,
