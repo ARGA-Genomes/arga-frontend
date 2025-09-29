@@ -101,7 +101,6 @@ export default function Page() {
 
 function Overview() {
   const { details } = { ...useSpecies() };
-  if (!details) return;
 
   const { loading, error, data } = useQuery<SpeciesAssembliesQuery>(GET_ASSEMBLIES, {
     skip: !details,
@@ -140,7 +139,11 @@ function Overview() {
         </Grid.Col>
         <Grid.Col span={10}>
           <ScrollArea>
-            <Stack>{data?.species.assemblies.records.map((record) => <OverviewItem assembly={record} />)}</Stack>
+            <Stack>
+              {data?.species.assemblies.records.map((record) => (
+                <OverviewItem key={record.entityId} assembly={record} />
+              ))}
+            </Stack>
           </ScrollArea>
         </Grid.Col>
       </Grid>
@@ -414,7 +417,6 @@ interface AllAssembliesProps {
 
 function AllAssemblies({ onSelected }: AllAssembliesProps) {
   const { details } = { ...useSpecies() };
-  if (!details) return;
 
   const [pageSize, setPageSize] = useState<number>(100);
   const [page, setPage] = useState(1);

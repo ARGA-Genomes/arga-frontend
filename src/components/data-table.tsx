@@ -1,7 +1,7 @@
 "use client";
 
 import classes from "@/components/data-table.module.css";
-import { Box, Center, Group, Table, TableProps, Text } from "@mantine/core";
+import { Group, Table, TableProps, Text } from "@mantine/core";
 
 interface DataTableRowProps {
   label?: string;
