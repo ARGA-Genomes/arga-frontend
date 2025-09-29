@@ -29,8 +29,6 @@ export function ContainedImage({ photo, style }: ContainedImageProps) {
   const src = photo?.url.replace("original", "medium");
   const license = photo?.license ? getLicense(photo.license) : null;
 
-  console.log(license?.icons, license?.url);
-
   return (
     <Box pos="relative" h={height} style={{ borderRadius: "var(--mantine-radius-lg)", ...(style || {}) }}>
       {photo ? (

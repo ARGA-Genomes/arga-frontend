@@ -27,7 +27,7 @@ import { BrowseSpecies } from "@/components/browse-species";
 import { FilterItem } from "@/components/filtering-redux/filters/common";
 import { RankSummary, Source } from "@/generated/types";
 import { grouping as groupingData } from "../../app/(home)/_data";
-import { groupInclude, array as groupingExtra, GroupItem } from "../../app/browse/list-groups/_data/all";
+import { groupInclude, GroupItem } from "../../app/browse/list-groups/_data/all";
 import DataHighlights from "./_components/data-highlights";
 import { DataSummary } from "./_components/data-summary";
 
@@ -315,22 +315,14 @@ export default function SourcePage(props: SourceProps) {
     });
   }, [source, name, group, setPreviousPage]);
 
-  const sourceIcon = useMemo(
-    () =>
-      [
-        ...groupingData,
-        ...groupingExtra
-          .filter((item) => !item.filter)
-          .map((item) => ({
-            image: item.image,
-            link: `/${item.source}`,
-          })),
-      ].find((item) => {
-        const link = item.link.substring(item.link.lastIndexOf("/") + 1);
-        return name.includes(link);
-      })?.image,
-    [name]
-  );
+  const sourceIcon = useMemo(() => {
+    if (group) return group.image;
+
+    return groupingData.find((item) => {
+      const link = item.link.substring(item.link.lastIndexOf("/") + 1);
+      return name.includes(link);
+    })?.image;
+  }, [name, group]);
 
   const { loading, error, data } = useQuery<{ source: ExtendedSource }>(GET_DETAILS, {
     variables: { name: source, filters },
