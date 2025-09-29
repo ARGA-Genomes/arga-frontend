@@ -1,4 +1,4 @@
-import { NameDetails } from "@/generated/types";
+import { Maybe, NameDetails } from "@/generated/types";
 import classes from "./Pills.module.css";
 
 import { Paper, Group } from "@mantine/core";
@@ -9,7 +9,7 @@ interface PillCommonProps {
 
 interface PillProps {
   className?: string;
-  children: React.ReactElement | string;
+  children?: React.ReactElement | Maybe<string>;
 }
 
 export function Pill({ className, children }: PillProps) {
@@ -20,17 +20,24 @@ export function Pill({ className, children }: PillProps) {
   );
 }
 
-Pill.Common = function PillCommon({ value, variant }: { value?: string } & PillCommonProps) {
-  return (
-    <Pill className={variant ? classes[variant] : classes.common}>
-      <>{value}</>
-    </Pill>
-  );
+Pill.Common = function PillCommon({ value, variant }: { value?: Maybe<string> } & PillCommonProps) {
+  return <Pill className={variant ? classes[variant] : classes.common}>{value}</Pill>;
 };
 
-Pill.ScientificName = function PillScientificName({ name, variant }: { name: NameDetails } & PillCommonProps) {
+Pill.StandardText = function PillStandardText({ value }: { value?: Maybe<string> }) {
+  return <Pill className={classes.standard}>{value ?? "no data"}</Pill>;
+};
+
+Pill.StandardNumber = function PillStandardNumber({ value, variant }: { value?: Maybe<number> } & PillCommonProps) {
+  return <Pill className={variant ? classes[variant] : classes.standard}>{value?.toString() ?? "no data"}</Pill>;
+};
+
+Pill.ScientificName = function PillScientificName({
+  name,
+  variant,
+}: { name: Pick<NameDetails, "canonicalName" | "authorship"> } & PillCommonProps) {
   return (
-    <Pill className={variant ? classes[variant] : classes.common}>
+    <Pill className={variant ? classes[variant] : classes.standard}>
       <Group wrap="nowrap">
         <i>{name.canonicalName}</i>
         {name.authorship}
@@ -51,17 +58,13 @@ Pill.Doi = function PillDoi({ url }: { url: string }) {
 };
 
 Pill.CoordinateSystem = function PillCoordinateSystem({ value }: { value?: string }) {
-  return (
-    <Pill className={classes.coordSystem}>
-      <>{value}</>
-    </Pill>
-  );
+  return <Pill className={classes.coordSystem}>{value}</Pill>;
 };
 
 Pill.IdTitle = function PillIdTitle({ value }: { value?: string }) {
-  return (
-    <Pill className={classes.pillIdTitle}>
-      <>{value}</>
-    </Pill>
-  );
+  return <Pill className={classes.idTitle}>{value}</Pill>;
+};
+
+Pill.AssemblyType = function PillAssemblyType({ value }: { value?: Maybe<string> }) {
+  return <Pill className={classes.standard}>{value}</Pill>;
 };
