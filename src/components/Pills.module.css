@@ -18,6 +18,46 @@
     background-color: var(--mantine-color-attribute-1);
 }
 
+.mossOutline {
+    color: var(--mantine-color-moss-5);
+    border: solid 1px var(--mantine-color-moss-5);
+}
+
+.mossFill {
+    color: white;
+    background-color: var(--mantine-color-moss-5);
+}
+
+.wheatOutline {
+    color: var(--mantine-color-midnight-9);
+    border: solid 1px var(--mantine-color-wheat-5);
+}
+
+.wheatFill {
+    color: var(--mantine-color-midnight-9);
+    background-color: var(--mantine-color-wheat-5);
+}
+
+.bushfireOutline {
+    color: var(--mantine-color-bushfire-5);
+    border: solid 1px var(--mantine-color-bushfire-5);
+}
+
+.bushfireFill {
+    color: white;
+    background-color: var(--mantine-color-bushfire-5);
+}
+
+.shellfishOutline {
+    color: var(--mantine-color-shellfish-5);
+    border: solid 1px var(--mantine-color-shellfish-5);
+}
+
+.shellfishFill {
+    color: white;
+    background-color: var(--mantine-color-shellfish-5);
+}
+
 .standard {
     color: var(--mantine-color-midnight-8);
     font-weight: 600;
@@ -55,4 +95,10 @@
     font-size: var(--mantine-font-size-lg);
     border: none;
     background-color: var(--mantine-color-attribute-1);
+}
+
+.outline {
+    border-style: solid;
+    border-width: 1px;
+    background-color: transparent;
 }

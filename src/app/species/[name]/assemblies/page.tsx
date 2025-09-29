@@ -246,7 +246,7 @@ function Details({ assembly }: { assembly: Assembly }) {
               {releaseDate?.toLocaleString({ year: "numeric", month: "long", day: "numeric" })}
             </DataTable.RowValue>
             <DataTable.RowValue label="Sequencing platform">
-              <Pill.StandardText value={assembly.systemUsed} />
+              <Pill.StandardText />
             </DataTable.RowValue>
             <DataTable.RowValue label="Assembly method">
               <Pill.StandardText value={assembly.method} />

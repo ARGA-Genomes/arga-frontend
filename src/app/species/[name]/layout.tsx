@@ -42,7 +42,7 @@ function DataTabs({ name, children }: { name: string; children: React.ReactNode 
         <Tabs.List>
           <Tabs.Tab value="summary">Summary</Tabs.Tab>
           <Tabs.Tab value="distribution">Data distribution</Tabs.Tab>
-          <Tabs.Tab value="whole_genomes">Genome assemblies</Tabs.Tab>
+          <Tabs.Tab value="assemblies">Genome assemblies</Tabs.Tab>
           <Tabs.Tab value="components">Gene libraries</Tabs.Tab>
           <Tabs.Tab value="variants">Variants and population sets</Tabs.Tab>
           <Tabs.Tab value="organelle">Organelle chromosomes</Tabs.Tab>
