@@ -31,6 +31,7 @@ import {
 } from "./groups/bushfire-recovery";
 import { DatasetFilters, datasetFiltersToQuery } from "./groups/dataset";
 import { IndustryCommerceFilter, industryCommerceFiltersToQuery } from "./groups/industry-commerce";
+import { DEFAULT_OTHER_FILTERS, DEFAULT_OTHER_LABELS, OtherFilters, otherFiltersToQuery } from "./groups/other";
 import {
   DEFAULT_THREATENED_FILTERS,
   DEFAULT_THREATENED_LABELS,
@@ -47,6 +48,7 @@ type FilterType =
   | "bushfireRecovery"
   | "vernacularGroup"
   | "threatened"
+  | "other"
   | "industryCommerce";
 
 interface FiltersDrawerProps {
@@ -64,6 +66,7 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
   const [dataTypeFilters, setDataTypeFilters] = useState<BoolFilterData[]>(DEFAULT_DATA_TYPE_FILTERS);
   const [datasetFilters, setDatasetFilters] = useState<BoolFilterData[]>([]);
   const [threatenedFilters, setThreatenedFilters] = useState<BoolFilterData[]>(DEFAULT_THREATENED_FILTERS);
+  const [otherFilters, setOtherFilters] = useState<BoolFilterData[]>(DEFAULT_OTHER_FILTERS);
 
   const [bushfireRecoveryFilters, setBushfireRecoveryFilters] = useState<BoolFilterData[]>(
     DEFAULT_BUSHFIRE_RECOVERY_FILTERS
@@ -84,6 +87,7 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
       setDataTypeFilters,
       setDatasetFilters,
       setThreatenedFilters,
+      setOtherFilters,
       setBushfireRecoveryFilters,
       setClassificationFilters,
       setVernacularGroupFilter,
@@ -141,6 +145,8 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
           return (
             <ThreatenedFilters key={type} filters={threatenedFilters} onChange={memoizedSetters.setThreatenedFilters} />
           );
+        case "other":
+          return <OtherFilters key={type} filters={otherFilters} onChange={memoizedSetters.setOtherFilters} />;
         case "bushfireRecovery":
           return (
             <BushfireRecoveryFilters
@@ -182,6 +188,7 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
       datasetFilters,
       classificationFilters,
       threatenedFilters,
+      otherFilters,
       bushfireRecoveryFilters,
       vernacularGroupFilter,
       industryCommerceFilters,
@@ -197,6 +204,7 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
       ...datasetFiltersToQuery(datasetFilters),
       ...classificationFiltersToQuery(classificationFilters),
       ...threatenedFiltersToQuery(threatenedFilters),
+      ...otherFiltersToQuery(otherFilters),
       ...bushfireRecoveryFiltersToQuery(bushfireRecoveryFilters),
       ...vernacularGroupFilterToQuery(vernacularGroupFilter),
       ...industryCommerceFiltersToQuery(industryCommerceFilters),
@@ -206,6 +214,7 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
       datasetFilters,
       classificationFilters,
       threatenedFilters,
+      otherFilters,
       bushfireRecoveryFilters,
       vernacularGroupFilter,
       industryCommerceFilters,
@@ -230,6 +239,12 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
         DEFAULT_THREATENED_LABELS
       ),
       ...renderBoolFilterChips(
+        otherFilters,
+        ["Includes", "Excludes"],
+        memoizedSetters.setOtherFilters,
+        DEFAULT_OTHER_LABELS
+      ),
+      ...renderBoolFilterChips(
         bushfireRecoveryFilters,
         ["Includes", "Excludes"],
         memoizedSetters.setBushfireRecoveryFilters
@@ -242,6 +257,7 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
       datasetFilters,
       classificationFilters,
       threatenedFilters,
+      otherFilters,
       bushfireRecoveryFilters,
       vernacularGroupFilter,
       industryCommerceFilters,

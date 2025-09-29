@@ -230,6 +230,7 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
                 "threatened",
                 "bushfireRecovery",
                 "industryCommerce",
+                "other",
               ]}
               onFilter={(newFilters) => {
                 // Only reset page if filters have actually changed

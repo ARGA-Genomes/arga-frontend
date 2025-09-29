@@ -4,7 +4,7 @@ import { FilterGroup } from "../group";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
 import { FilterItem, FilterType } from "../filters/common";
 
-export const threatenedFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
+export const otherFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
     .map(({ include, value }) => ({
@@ -18,12 +18,12 @@ export const threatenedFiltersToQuery = (filters: BoolFilterData[]): FilterItem[
       ],
     }));
 
-interface ThreatenedFiltersProps {
+interface OtherFiltersProps {
   filters: BoolFilterData[];
   onChange: (filters: BoolFilterData[]) => void;
 }
 
-export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps) {
+export function OtherFilters({ filters, onChange }: OtherFiltersProps) {
   // Event handlers for filter chip bools
   const handleActiveToggle = (value: string, active: boolean) =>
     onChange(
@@ -54,9 +54,9 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
 
   return (
     <FilterGroup
-      title="Threatened"
-      description="Filter threatened species"
-      icon={"/icons/list-group/List group_ Threatened species.svg"}
+      title="Other"
+      description="Filter for other attributes"
+      icon={"/icons/list-group/List group_ Australian iconic species.svg"}
     >
       {filters.map((filter) => (
         <BoolFilter
@@ -71,22 +71,14 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
   );
 }
 
-export const DEFAULT_THREATENED_LABELS: { [key: string]: string } = {
-  top_110_species: "Top 110 Species",
-  EPBC_act_category_CR: "EPBC Critically Endangered",
-  EPBC_act_category_EN: "EPBC Endangered",
-  EPBC_act_category_EW: "EPBC Extinct in the Wild",
-  EPBC_act_category_EX: "EPBC Extinct",
-  EPBC_act_category_VU: "EPBC Vulnerable",
-  EPBC_act_category_cd: "EPBC Conservation Dependent",
+export const DEFAULT_OTHER_LABELS: { [key: string]: string } = {
+  australian_iconic_species: "Australian Iconic Species",
 };
 
-export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = Object.entries(DEFAULT_THREATENED_LABELS).map(
-  ([value, label]) => ({
-    value,
-    label,
-    active: false,
-    disabled: false,
-    include: true,
-  })
-);
+export const DEFAULT_OTHER_FILTERS: BoolFilterData[] = Object.entries(DEFAULT_OTHER_LABELS).map(([value, label]) => ({
+  value,
+  label,
+  active: false,
+  disabled: false,
+  include: true,
+}));
