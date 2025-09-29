@@ -98,6 +98,7 @@ export type Assembly = {
   referenceGenomeUsed?: Maybe<Scalars['String']['output']>;
   size?: Maybe<Scalars['String']['output']>;
   sourceMolecule?: Maybe<Scalars['String']['output']>;
+  specimens: Array<Specimen>;
   systemUsed?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Scalars['String']['output']>;
 };
@@ -1580,6 +1581,7 @@ export type SpecimenSummary = {
   latitude?: Maybe<Scalars['Float']['output']>;
   loci: Scalars['Int']['output'];
   longitude?: Maybe<Scalars['Float']['output']>;
+  organismId: Scalars['String']['output'];
   otherGenomic: Scalars['Int']['output'];
   partialGenomes: Scalars['Int']['output'];
   sequences: Scalars['Int']['output'];

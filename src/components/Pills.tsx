@@ -1,7 +1,8 @@
-import { Maybe, NameDetails } from "@/generated/types";
+import { AccessionEvent, Maybe, NameDetails } from "@/generated/types";
 import classes from "./Pills.module.css";
 
 import { Paper, Group } from "@mantine/core";
+import { getVoucherColour, getVoucherStatus } from "@/helpers/colors";
 
 interface PillCommonProps {
   variant?: "overview";
@@ -67,4 +68,15 @@ Pill.IdTitle = function PillIdTitle({ value }: { value?: string }) {
 
 Pill.AssemblyType = function PillAssemblyType({ value }: { value?: Maybe<string> }) {
   return <Pill className={classes.standard}>{value}</Pill>;
+};
+
+Pill.SpecimenRegistration = function PillRegistration({ accession }: { accession?: Maybe<AccessionEvent> }) {
+  const color = getVoucherColour(accession?.typeStatus, accession?.collectionRepositoryId);
+  return <Pill className={classes[`${color}Outline`]}>{accession?.collectionRepositoryId}</Pill>;
+};
+
+Pill.SpecimenStatus = function PillRegistration({ accession }: { accession?: Maybe<AccessionEvent> }) {
+  const status = getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId);
+  const color = getVoucherColour(accession?.typeStatus, accession?.collectionRepositoryId);
+  return <Pill className={classes[`${color}Fill`]}>{status}</Pill>;
 };

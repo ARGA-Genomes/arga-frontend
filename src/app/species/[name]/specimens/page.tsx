@@ -12,6 +12,7 @@ import { LoadOverlay, LoadPanel } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { PaginationBar } from "@/components/pagination";
+import { Pill } from "@/components/Pills";
 import { RecordTable } from "@/components/RecordTable";
 import { Species, Specimen, SpecimenMapMarker, SpecimenSummary } from "@/generated/types";
 import { getVoucherColour, getVoucherRGBA, getVoucherStatus } from "@/helpers/colors";
@@ -63,6 +64,7 @@ import { scaleBand, scaleLinear } from "@visx/scale";
 import { max, min } from "d3";
 import { motion } from "framer-motion";
 import { DateTime } from "luxon";
+import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
 
 const GET_SPECIMENS_OVERVIEW = gql`
@@ -92,6 +94,8 @@ const GET_SPECIMEN_MAP_MARKERS = gql`
 const GET_SPECIMEN_CARD = gql`
   query SpecimenCard($entityId: String) {
     specimen(by: { entityId: $entityId }) {
+      organismId
+
       collections {
         ...CollectionEventDetails
       }
@@ -104,6 +108,11 @@ const GET_SPECIMEN_CARD = gql`
     }
   }
 `;
+
+type SpecimenCard = Pick<Specimen, "organismId" | "collections" | "accessions" | "stats">;
+type SpecimenQuery = {
+  specimen: SpecimenCard;
+};
 
 const GET_SPECIMENS = gql`
   query SpeciesSpecimens(
@@ -428,7 +437,7 @@ function HolotypeCard() {
 }
 
 function SpecimenCard({ entityId }: { entityId?: string }) {
-  const { loading, error, data } = useQuery<{ specimen: Specimen }>(GET_SPECIMEN_CARD, {
+  const { loading, error, data } = useQuery<SpecimenQuery>(GET_SPECIMEN_CARD, {
     skip: !entityId,
     variables: { entityId },
   });
@@ -445,8 +454,14 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
         <Table variant="vertical" withRowBorders={false} className={classes.cardTable}>
           <Table.Tbody>
             <Table.Tr>
-              <Table.Th>Registration number</Table.Th>
-              <Table.Td>{accession?.collectionRepositoryId}</Table.Td>
+              <Table.Th>Catalogue number</Table.Th>
+              <Table.Td>
+                <Group>
+                  <Link href={`/organisms/${data?.specimen.organismId}/source`}>
+                    <Pill.SpecimenRegistration accession={accession} />
+                  </Link>
+                </Group>
+              </Table.Td>
             </Table.Tr>
             <Table.Tr>
               <Table.Th>Institution</Table.Th>
@@ -454,7 +469,9 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
             </Table.Tr>
             <Table.Tr>
               <Table.Th>Specimen status</Table.Th>
-              <Table.Td>{data && getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId)}</Table.Td>
+              <Table.Td>
+                <Group>{data && <Pill.SpecimenStatus accession={accession} />}</Group>
+              </Table.Td>
             </Table.Tr>
             <Table.Tr>
               <Table.Th>Preparation type</Table.Th>
@@ -699,9 +716,11 @@ function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
           <DataCheckIcon value={record.fullGenomes} />
           <DataCheckIcon value={record.loci} />
           <DataCheckIcon value={record.otherGenomic} />
-          <Button color="midnight.9" radius="lg">
-            <IconMicroscope />
-          </Button>
+          <Link href={`/organisms/${record.organismId}/source`}>
+            <Button color="midnight.9" radius="lg">
+              <IconMicroscope />
+            </Button>
+          </Link>
           <Button color="shellfish" variant="outline" bg="white" radius="lg">
             <IconMicroscope />
           </Button>
@@ -750,7 +769,7 @@ function Filter({ filters, options, onApply }: FilterProps) {
           DateTime.fromFormat(collectedBetween.after, "yyyy-mm-dd").year,
           DateTime.fromFormat(collectedBetween.before, "yyyy-mm-dd").year,
         ]
-      : undefined
+      : undefined,
   );
 
   function setData(values: string[]) {

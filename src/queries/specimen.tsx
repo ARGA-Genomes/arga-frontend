@@ -46,6 +46,7 @@ export const SPECIMEN = gql`
 export const SPECIMEN_SUMMARY = gql`
   fragment SpecimenSummary on SpecimenSummary {
     entityId
+    organismId
     collectionRepositoryId
     collectionRepositoryCode
     institutionCode
