@@ -10,7 +10,7 @@ export const datasetFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =
     .map(({ include, value }) => ({
       filter: FilterType.Dataset,
       action: include ? "INCLUDE" : "EXCLUDE",
-      value,
+      value: value as string,
     }));
 
 interface DatasetFiltersProps {
@@ -21,10 +21,10 @@ interface DatasetFiltersProps {
 
 export function DatasetFilters({ filters, loading, onChange }: DatasetFiltersProps) {
   // Event handlers for filter chip bools
-  const handleActiveToggle = (value: string, active: boolean) =>
+  const handleActiveToggle = (name: string, active: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               active,
@@ -33,10 +33,10 @@ export function DatasetFilters({ filters, loading, onChange }: DatasetFiltersPro
       )
     );
 
-  const handleIncludeToggle = (value: string, include: boolean) =>
+  const handleIncludeToggle = (name: string, include: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               include,
@@ -58,10 +58,10 @@ export function DatasetFilters({ filters, loading, onChange }: DatasetFiltersPro
       {filters.map((filter) => (
         <BoolFilter
           {...filter}
-          key={filter.value}
+          key={filter.name}
           options={["Include", "Exclude"]}
-          onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
-          onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
+          onActiveToggle={(checked) => handleActiveToggle(filter.name, checked)}
+          onIncludeToggle={(include) => handleIncludeToggle(filter.name, include)}
         />
       ))}
     </FilterGroup>
