@@ -49,7 +49,7 @@ export const vernacularGroupFilterToQuery = (filter: BoolFilterData | null): Fil
         {
           filter: FilterType.VernacularGroup,
           action: filter.include ? "INCLUDE" : "EXCLUDE",
-          value: filter.value.replaceAll(" ", ""),
+          value: (filter.value as string).replaceAll(" ", ""),
         },
       ]
     : [];
@@ -95,7 +95,7 @@ export function VernacularGroupFilter({ filter, onChange }: VernacularGroupFilte
     >
       <Group>
         <Select
-          value={filter?.value || null}
+          value={(filter?.value as string) || null}
           classNames={classes}
           radius="lg"
           data={data}
@@ -103,7 +103,8 @@ export function VernacularGroupFilter({ filter, onChange }: VernacularGroupFilte
             onChange(
               value
                 ? {
-                    value,
+                    name: value,
+                    value: value,
                     active: true,
                     include: true,
                     disabled: false,

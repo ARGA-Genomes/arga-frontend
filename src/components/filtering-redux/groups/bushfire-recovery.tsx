@@ -1,19 +1,19 @@
 import { useEffect } from "react";
 import { FilterGroup } from "../group";
 
-import { FilterType, FilterItem } from "../filters/common";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
+import { FilterItem, FilterType } from "../filters/common";
 
 export const bushfireRecoveryFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
-    .map(({ include, value }) => ({
+    .map(({ include, name, value }) => ({
       filter: FilterType.Attribute,
       action: include ? "INCLUDE" : "EXCLUDE",
       value: [
         {
-          name: value,
-          value: true,
+          name,
+          value,
         },
       ],
     }));
@@ -25,10 +25,10 @@ interface BushfireRecoveryFiltersProps {
 
 export function BushfireRecoveryFilters({ filters, onChange }: BushfireRecoveryFiltersProps) {
   // Event handlers for filter chip bools
-  const handleActiveToggle = (value: string, active: boolean) =>
+  const handleActiveToggle = (name: string, active: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               active,
@@ -37,10 +37,10 @@ export function BushfireRecoveryFilters({ filters, onChange }: BushfireRecoveryF
       )
     );
 
-  const handleIncludeToggle = (value: string, include: boolean) =>
+  const handleIncludeToggle = (name: string, include: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               include,
@@ -60,33 +60,63 @@ export function BushfireRecoveryFilters({ filters, onChange }: BushfireRecoveryF
     >
       {filters.map((filter) => (
         <BoolFilter
-          key={filter.value}
+          key={filter.name}
           {...filter}
           options={["Include", "Exclude"]}
-          onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
-          onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
+          onActiveToggle={(checked) => handleActiveToggle(filter.name, checked)}
+          onIncludeToggle={(include) => handleIncludeToggle(filter.name, include)}
         />
       ))}
     </FilterGroup>
   );
 }
 
-const DEFAULT_TRAITS = [
-  "vulnerable_wildfire",
-  "Interactive effects of fire and drought",
-  "Fire-disease interactions",
-  "High fire severity",
-  "Weed invasion",
-  "Elevated winter temperatures or changed temperature regimes",
-  "Fire sensitivity",
-  "Post-fire erosion",
-  "Post-fire herbivore impacts",
-  "Cumulative exposure to high risks",
-  "Other plausible threats or expert-driven nominations",
+const DEFAULT_BUSHFIRE = [
+  {
+    name: "wildfire_vulnerable_icon",
+    label: "Wildfire vulnerable",
+  },
+  {
+    name: "interactive_effects_of_fire_and_drought",
+    label: "Interactice effect of fire and drought",
+  },
+  {
+    name: "fire_disease_interactions",
+    label: "Fire/disease interactions",
+  },
+  {
+    name: "high_fire_severity",
+    label: "High fire severity",
+  },
+  {
+    name: "weed_invasion",
+    label: "Weed invasion",
+  },
+  {
+    name: "elevated_winter_temperature_or_changed_temperature_regimes",
+    label: "Elevanted winter temps/changes temp regimes",
+  },
+  {
+    name: "fire_sensitivity",
+    label: "Fire sensitivity",
+  },
+  {
+    name: "post_fire_erosion",
+    label: "Post-fire erosion",
+  },
+  {
+    name: "cumulative_exposure_to_high_risks",
+    label: "Cumulative exposure to high risks",
+  },
+  {
+    name: "other_plausible_threats_or_expert_driven_nominations",
+    label: "Other plausible threats or expert driven nominations",
+  },
 ];
 
-export const DEFAULT_BUSHFIRE_RECOVERY_FILTERS: BoolFilterData[] = DEFAULT_TRAITS.map((value) => ({
-  value,
+export const DEFAULT_BUSHFIRE_RECOVERY_FILTERS: BoolFilterData[] = DEFAULT_BUSHFIRE.map((filter) => ({
+  ...filter,
+  value: true,
   active: false,
   disabled: false,
   include: true,
