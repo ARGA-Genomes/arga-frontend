@@ -18,44 +18,67 @@
     background-color: var(--mantine-color-attribute-1);
 }
 
+.empty {
+    color: var(--mantine-color-midnight-2);
+    font-weight: 600;
+    font-size: var(--mantine-font-size-xs);
+    background-color: #d6e4ed;
+}
+
 .mossOutline {
     color: var(--mantine-color-moss-5);
     border: solid 1px var(--mantine-color-moss-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .mossFill {
     color: white;
     background-color: var(--mantine-color-moss-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .wheatOutline {
     color: var(--mantine-color-midnight-9);
     border: solid 1px var(--mantine-color-wheat-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .wheatFill {
     color: var(--mantine-color-midnight-9);
     background-color: var(--mantine-color-wheat-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .bushfireOutline {
     color: var(--mantine-color-bushfire-5);
     border: solid 1px var(--mantine-color-bushfire-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .bushfireFill {
     color: white;
     background-color: var(--mantine-color-bushfire-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .shellfishOutline {
     color: var(--mantine-color-shellfish-5);
     border: solid 1px var(--mantine-color-shellfish-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .shellfishFill {
     color: white;
     background-color: var(--mantine-color-shellfish-5);
+    font-weight: 700;
+    font-size: var(--mantine-font-size-sm);
 }
 
 .standard {
