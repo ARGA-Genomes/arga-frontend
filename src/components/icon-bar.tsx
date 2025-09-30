@@ -377,7 +377,7 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
     label: "Migratory",
     link: "/browse/sources/ARGA Migratory Species",
   },
-  top_110_species_icon: {
+  top_110_species: {
     image: "/icons/list-group/List group_ Threatened (Top 110 Species).svg",
     label: "Threatened",
     link: "/browse/sources/ARGA Threatened Species",
@@ -426,6 +426,51 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
     image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
     label: "EPBC Act Status: Unlisted",
     link: "/browse/sources/ARGA Threatened Species",
+  },
+  iucn_redlist_EX: {
+    label: "IUCN Extinct",
+    image: "/icons/list-group/List group_ IUCN_ extinct.svg",
+    link: "/browse/list-groups/IUCN Extinct",
+  },
+  iucn_redlist_EW: {
+    label: "IUCN Extinct in the wild",
+    image: "/icons/list-group/List group_ IUCN_ extinct in the wild.svg",
+    link: "/browse/list-groups/IUCN Extinct in the wild",
+  },
+  iucn_redlist_CR: {
+    label: "IUCN Critically Endangered",
+    image: "/icons/list-group/List group_ IUCN_ critically endangered.svg",
+    link: "/browse/list-groups/IUCN Critically Endangered",
+  },
+  iucn_redlist_EN: {
+    label: "IUCN Endangered",
+    image: "/icons/list-group/List group_ IUCN_ endangered.svg",
+    link: "/browse/list-groups/IUCN Endangered",
+  },
+  iucn_redlist_VU: {
+    label: "IUCN Vulnerable",
+    image: "/icons/list-group/List group_ IUCN_ vulnerable.svg",
+    link: "/browse/list-groups/IUCN Vulnerable",
+  },
+  iucn_redlist_NT: {
+    label: "IUCN Near Threatened",
+    image: "/icons/list-group/List group_ IUCN_ near threatened.svg",
+    link: "/browse/list-groups/IUCN Near Threatened",
+  },
+  iucn_redlist_LC: {
+    label: "IUCN Least Concern",
+    image: "/icons/list-group/List group_ IUCN_ least concern.svg",
+    link: "/browse/list-groups/IUCN Least Concern",
+  },
+  iucn_redlist_DD: {
+    label: "IUCN Data Deficient",
+    image: "/icons/list-group/List group_ IUCN_ data deficient.svg",
+    link: "/browse/list-groups/IUCN Data Deficient",
+  },
+  iucn_redlist_NE: {
+    label: "IUCN Not Evaluated",
+    image: "/icons/list-group/List group_ IUCN_ not evaluated.svg",
+    link: "/browse/list-groups/IUCN Not Evaluated",
   },
   is_medicinal_and_bioactive_icon: {
     image: "/icons/list-group/List group_ medicinal and bioactive.svg",

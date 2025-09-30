@@ -1,9 +1,9 @@
 import { Checkbox, Flex, SegmentedControl, Text } from "@mantine/core";
-import * as Humanize from "humanize-plus";
 import { GenericFilter } from "../generic";
 
 export interface BoolFilterData {
-  value: string;
+  name: string;
+  value: string | boolean;
   label?: string;
   active: boolean;
   include: boolean;
@@ -19,8 +19,8 @@ interface BoolFilterProps extends BoolFilterData {
 export function BoolFilter({
   active,
   include,
-  value,
   label,
+  name,
   disabled,
   options,
   onActiveToggle,
@@ -36,7 +36,7 @@ export function BoolFilter({
         onChange={(ev) => onActiveToggle(ev.currentTarget.checked)}
         label={
           <Text size="sm" fw={600} maw={500} truncate="end">
-            {label || Humanize.capitalize(value.replaceAll("_", " "))}
+            {label || name}
           </Text>
         }
       />
@@ -57,16 +57,15 @@ export function BoolFilter({
 export function renderBoolFilterChips(
   filters: BoolFilterData[],
   options: [string, string],
-  onChange: (filters: BoolFilterData[]) => void,
-  labelMap?: { [key: string]: string }
+  onChange: (filters: BoolFilterData[]) => void
 ) {
   const handleRemove = (currentFilter: BoolFilterData) =>
-    onChange(filters.map((filter) => (filter.value === currentFilter.value ? { ...filter, active: false } : filter)));
+    onChange(filters.map((filter) => (filter.name === currentFilter.name ? { ...filter, active: false } : filter)));
 
   const handleSwitch = (currentFilter: BoolFilterData) =>
     onChange(
       filters.map((filter) =>
-        filter.value === currentFilter.value ? { ...filter, include: !currentFilter.include } : filter
+        filter.name === currentFilter.name ? { ...filter, include: !currentFilter.include } : filter
       )
     );
 
@@ -74,8 +73,8 @@ export function renderBoolFilterChips(
     .filter(({ active }) => active)
     .map((filter) => (
       <GenericFilter
-        key={filter.value}
-        name={(labelMap || {})[filter.value] || filter.value}
+        key={filter.name}
+        name={filter.label || filter.name}
         value={filter.include ? options[0] : options[1]}
         include={filter.include}
         onSwitch={() => handleSwitch(filter)}
@@ -91,9 +90,9 @@ export function renderVernacularGroupFilterChip(
   return filter
     ? [
         <GenericFilter
-          key={filter.value}
+          key={filter.name}
           name="Vernacular group"
-          value={filter.value}
+          value={filter.value.toString()}
           include={filter.include}
           onSwitch={() =>
             onChange({

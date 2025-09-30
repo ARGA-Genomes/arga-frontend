@@ -31,13 +31,8 @@ import {
 } from "./groups/bushfire-recovery";
 import { DatasetFilters, datasetFiltersToQuery } from "./groups/dataset";
 import { IndustryCommerceFilter, industryCommerceFiltersToQuery } from "./groups/industry-commerce";
-import { DEFAULT_OTHER_FILTERS, DEFAULT_OTHER_LABELS, OtherFilters, otherFiltersToQuery } from "./groups/other";
-import {
-  DEFAULT_THREATENED_FILTERS,
-  DEFAULT_THREATENED_LABELS,
-  ThreatenedFilters,
-  threatenedFiltersToQuery,
-} from "./groups/threatened";
+import { DEFAULT_OTHER_FILTERS, OtherFilters, otherFiltersToQuery } from "./groups/other";
+import { DEFAULT_THREATENED_FILTERS, ThreatenedFilters, threatenedFiltersToQuery } from "./groups/threatened";
 import { VernacularGroupFilter, vernacularGroupFilterToQuery } from "./groups/vernacular-group";
 
 type FilterType =
@@ -101,6 +96,7 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
     setDatasetFilters(
       ((values?.datasets || []) as { id: string; name: string }[]).map((dataset) => ({
         value: dataset.id,
+        name: dataset.name,
         label: dataset.name,
         active: false,
         disabled: false,
@@ -225,25 +221,10 @@ export const FiltersDrawer = memo(({ types, values, onFilter, onFilterChips, onS
   const filterChips = useMemo(
     () => [
       ...renderBoolFilterChips(dataTypeFilters, ["Has", "Missing"], memoizedSetters.setDataTypeFilters),
-      ...renderBoolFilterChips(
-        datasetFilters,
-        ["In dataset", "Not in dataset"],
-        memoizedSetters.setDatasetFilters,
-        datasetLabelMap
-      ),
+      ...renderBoolFilterChips(datasetFilters, ["In dataset", "Not in dataset"], memoizedSetters.setDatasetFilters),
       ...renderTaxonFilterChips(classificationFilters, memoizedSetters.setClassificationFilters),
-      ...renderBoolFilterChips(
-        threatenedFilters,
-        ["Includes", "Excludes"],
-        memoizedSetters.setThreatenedFilters,
-        DEFAULT_THREATENED_LABELS
-      ),
-      ...renderBoolFilterChips(
-        otherFilters,
-        ["Includes", "Excludes"],
-        memoizedSetters.setOtherFilters,
-        DEFAULT_OTHER_LABELS
-      ),
+      ...renderBoolFilterChips(threatenedFilters, ["Includes", "Excludes"], memoizedSetters.setThreatenedFilters),
+      ...renderBoolFilterChips(otherFilters, ["Includes", "Excludes"], memoizedSetters.setOtherFilters),
       ...renderBoolFilterChips(
         bushfireRecoveryFilters,
         ["Includes", "Excludes"],

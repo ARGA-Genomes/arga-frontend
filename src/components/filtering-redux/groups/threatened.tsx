@@ -1,19 +1,20 @@
 import { useEffect } from "react";
 import { FilterGroup } from "../group";
 
+import { threatened } from "@/app/browse/list-groups/_data/threatened";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
 import { FilterItem, FilterType } from "../filters/common";
 
 export const threatenedFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
-    .map(({ include, value }) => ({
+    .map(({ include, name, value }) => ({
       filter: FilterType.Attribute,
       action: include ? "INCLUDE" : "EXCLUDE",
       value: [
         {
-          name: value,
-          value: true,
+          name,
+          value,
         },
       ],
     }));
@@ -25,10 +26,10 @@ interface ThreatenedFiltersProps {
 
 export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps) {
   // Event handlers for filter chip bools
-  const handleActiveToggle = (value: string, active: boolean) =>
+  const handleActiveToggle = (name: string, active: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               active,
@@ -37,10 +38,10 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
       )
     );
 
-  const handleIncludeToggle = (value: string, include: boolean) =>
+  const handleIncludeToggle = (name: string, include: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               include,
@@ -61,32 +62,35 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
       {filters.map((filter) => (
         <BoolFilter
           {...filter}
-          key={filter.value}
+          key={filter.name}
           options={["Include", "Exclude"]}
-          onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
-          onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
+          onActiveToggle={(checked) => handleActiveToggle(filter.name, checked)}
+          onIncludeToggle={(include) => handleIncludeToggle(filter.name, include)}
         />
       ))}
     </FilterGroup>
   );
 }
 
-export const DEFAULT_THREATENED_LABELS: { [key: string]: string } = {
-  top_110_species: "Top 110 Species",
-  EPBC_act_category_CR: "EPBC Critically Endangered",
-  EPBC_act_category_EN: "EPBC Endangered",
-  EPBC_act_category_EW: "EPBC Extinct in the Wild",
-  EPBC_act_category_EX: "EPBC Extinct",
-  EPBC_act_category_VU: "EPBC Vulnerable",
-  EPBC_act_category_cd: "EPBC Conservation Dependent",
-};
+const DEFAULT_THREATENED = [
+  {
+    name: "top_110_species",
+    label: "Top 110 Species",
+    value: true,
+  },
+  // EPBC & IUCN
+  ...threatened
+    .filter((item) => item.category.startsWith("IUCN") || item.category.startsWith("EPBC"))
+    .map((item) => ({
+      name: (item.filter as { name: string }).name,
+      label: item.category,
+      value: true,
+    })),
+];
 
-export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = Object.entries(DEFAULT_THREATENED_LABELS).map(
-  ([value, label]) => ({
-    value,
-    label,
-    active: false,
-    disabled: false,
-    include: true,
-  })
-);
+export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = DEFAULT_THREATENED.map((filter) => ({
+  ...filter,
+  active: false,
+  disabled: false,
+  include: true,
+}));

@@ -24,12 +24,12 @@ import {
   IconSortAscending,
   IconSortDescending,
 } from "@tabler/icons-react";
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // Local components
 import { get, isEqual, range } from "lodash-es";
 import { FiltersDrawer } from "./filtering-redux/drawer";
-import { FilterItem } from "./filtering-redux/filters/common";
+import { FilterItem, FilterItemAttribute } from "./filtering-redux/filters/common";
 import { PaginationBar, PaginationSize } from "./pagination";
 import { DataItem, SpeciesCard } from "./species-card";
 import { TableCardLayout, TableCardSwitch } from "./table-card-switch";
@@ -151,6 +151,18 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
     }
   }, [layout]);
 
+  // Disable downloading for specific sources / filters
+  const downloadDisabled = useMemo(() => {
+    if (query.variables) {
+      const disallowedFilters = (query.variables.filters || []).filter(
+        (filter: FilterItem) => (filter.value[0] as FilterItemAttribute).name === "cites"
+      );
+      return query.variables.name === "ARGA IUCN Red List" || disallowedFilters.length > 0;
+    }
+
+    return false;
+  }, [query.variables]);
+
   const records: SpeciesCardType[] = get(data, "browse.species.records") || [];
   const count: number | null = get(data, "browse.species.total") || null;
   const dataSummarySize = 140;
@@ -245,8 +257,11 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
             />
             <TableCardSwitch layout={layout} onChange={setLayout} />
             <Divider orientation="vertical" />
-            <Tooltip position="bottom" label="Download data as CSV spreadsheet">
-              <DownloadButton loading={downloading} onClick={download} />
+            <Tooltip
+              position="bottom"
+              label={downloadDisabled ? "Cannot download IUCN/CITES data" : "Download data as CSV spreadsheet"}
+            >
+              <DownloadButton disabled={downloadDisabled} loading={downloading} onClick={download} />
             </Tooltip>
           </Group>
         </Grid.Col>

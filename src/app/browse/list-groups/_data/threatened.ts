@@ -32,6 +32,19 @@ export const threatened: GroupItem[] = [
   },
   // EPBC
   {
+    category: "EPBC All",
+    image: "/icons/list-group/List group_ EPBC.svg",
+    source: "ARGA Threatened Species",
+    filter: {
+      name: "EPBC",
+      value: true,
+    },
+    display: {
+      order: 1,
+      subcategory: "EPBC Act",
+    },
+  },
+  {
     category: "EPBC Extinct",
     image: "/icons/list-group/List group_ EPBC_ extinct.svg",
     source: "ARGA Threatened Species",
@@ -150,12 +163,24 @@ export const threatened: GroupItem[] = [
   },
   // IUCN
   {
+    category: "IUCN All",
+    image: "/icons/list-group/List group_ IUCN.svg",
+    source: "ARGA IUCN Red List",
+    filter: {
+      name: "iucn_redlist",
+      value: true,
+    },
+    display: {
+      order: 1,
+      subcategory: "IUCN",
+    },
+  },
+  {
     category: "IUCN Extinct",
     image: "/icons/list-group/List group_ IUCN_ extinct.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_EX",
+      name: "iucn_redlist_EX",
       value: true,
     },
     display: {
@@ -166,10 +191,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Extinct in the wild",
     image: "/icons/list-group/List group_ IUCN_ extinct in the wild.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_EW",
+      name: "iucn_redlist_EW",
       value: true,
     },
     display: {
@@ -180,10 +204,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Critically Endangered",
     image: "/icons/list-group/List group_ IUCN_ critically endangered.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_CR",
+      name: "iucn_redlist_CR",
       value: true,
     },
     display: {
@@ -194,10 +217,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Endangered",
     image: "/icons/list-group/List group_ IUCN_ endangered.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_EN",
+      name: "iucn_redlist_EN",
       value: true,
     },
     display: {
@@ -208,10 +230,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Vulnerable",
     image: "/icons/list-group/List group_ IUCN_ vulnerable.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_VU",
+      name: "iucn_redlist_VU",
       value: true,
     },
     display: {
@@ -222,10 +243,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Near Threatened",
     image: "/icons/list-group/List group_ IUCN_ near threatened.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_NT",
+      name: "iucn_redlist_NT",
       value: true,
     },
     display: {
@@ -236,10 +256,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Least Concern",
     image: "/icons/list-group/List group_ IUCN_ least concern.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_LC",
+      name: "iucn_redlist_LC",
       value: true,
     },
     display: {
@@ -250,10 +269,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Data Deficient",
     image: "/icons/list-group/List group_ IUCN_ data deficient.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_dd",
+      name: "iucn_redlist_DD",
       value: true,
     },
     display: {
@@ -264,10 +282,9 @@ export const threatened: GroupItem[] = [
   {
     category: "IUCN Not Evaluated",
     image: "/icons/list-group/List group_ IUCN_ not evaluated.svg",
-    source: "ARGA IUCN Species",
-    disabled: true,
+    source: "ARGA IUCN Red List",
     filter: {
-      name: "IUCN_red_list_LC",
+      name: "iucn_redlist_NE",
       value: true,
     },
     display: {

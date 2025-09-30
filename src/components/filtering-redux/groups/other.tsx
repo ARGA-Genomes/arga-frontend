@@ -7,13 +7,13 @@ import { FilterItem, FilterType } from "../filters/common";
 export const otherFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
-    .map(({ include, value }) => ({
+    .map(({ include, name, value }) => ({
       filter: FilterType.Attribute,
       action: include ? "INCLUDE" : "EXCLUDE",
       value: [
         {
-          name: value,
-          value: true,
+          name,
+          value,
         },
       ],
     }));
@@ -25,10 +25,10 @@ interface OtherFiltersProps {
 
 export function OtherFilters({ filters, onChange }: OtherFiltersProps) {
   // Event handlers for filter chip bools
-  const handleActiveToggle = (value: string, active: boolean) =>
+  const handleActiveToggle = (name: string, active: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               active,
@@ -37,10 +37,10 @@ export function OtherFilters({ filters, onChange }: OtherFiltersProps) {
       )
     );
 
-  const handleIncludeToggle = (value: string, include: boolean) =>
+  const handleIncludeToggle = (name: string, include: boolean) =>
     onChange(
       filters.map((newFilter) =>
-        newFilter.value === value
+        newFilter.name === name
           ? {
               ...newFilter,
               include,
@@ -61,23 +61,26 @@ export function OtherFilters({ filters, onChange }: OtherFiltersProps) {
       {filters.map((filter) => (
         <BoolFilter
           {...filter}
-          key={filter.value}
+          key={filter.name}
           options={["Include", "Exclude"]}
-          onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
-          onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
+          onActiveToggle={(checked) => handleActiveToggle(filter.name, checked)}
+          onIncludeToggle={(include) => handleIncludeToggle(filter.name, include)}
         />
       ))}
     </FilterGroup>
   );
 }
 
-export const DEFAULT_OTHER_LABELS: { [key: string]: string } = {
-  australian_iconic_species: "Australian Iconic Species",
-};
+const DEFAULT_OTHER = [
+  {
+    name: "australian_iconic_species",
+    label: "Australian Iconic Species",
+    value: true,
+  },
+];
 
-export const DEFAULT_OTHER_FILTERS: BoolFilterData[] = Object.entries(DEFAULT_OTHER_LABELS).map(([value, label]) => ({
-  value,
-  label,
+export const DEFAULT_OTHER_FILTERS: BoolFilterData[] = DEFAULT_OTHER.map((filter) => ({
+  ...filter,
   active: false,
   disabled: false,
   include: true,

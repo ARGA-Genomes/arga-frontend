@@ -181,10 +181,22 @@ function SourceDetails({ source, group }: { source?: ExtendedSource; group?: Gro
   return (
     <Box w="100%">
       <Stack gap={4}>
-        <Skeleton visible={loading} maw={loading ? 100 : undefined}>
-          <Text fw="bold" c="dimmed" size="xs">
-            {source?.author || "Author"}
-          </Text>
+        <Skeleton visible={loading} maw={loading ? 150 : undefined}>
+          <Group gap={0}>
+            <Text fw="bold" c="dimmed" size="xs">
+              {source?.author || "Author"}
+            </Text>
+            {group && (
+              <>
+                <Text c="dimmed" size="xs" mr={4}>
+                  , from
+                </Text>
+                <Anchor size="xs" href={`/browse/sources/${source?.name}`}>
+                  {source?.name}
+                </Anchor>
+              </>
+            )}
+          </Group>
         </Skeleton>
         <Skeleton visible={loading} maw={loading ? 650 : undefined}>
           <Text c="dimmed" size="xs">
@@ -192,16 +204,18 @@ function SourceDetails({ source, group }: { source?: ExtendedSource; group?: Gro
           </Text>
         </Skeleton>
 
-        <Skeleton visible={loading} mt="sm" maw={loading ? 140 : undefined}>
-          <Anchor
-            style={{ display: "flex", alignItems: "center", gap: 8 }}
-            target="_blank"
-            size="xs"
-            href={`https://${LISTS_URL}/list/${source?.listsId}`}
-          >
-            View {group ? "full list" : "list"} on ALA Lists <IconExternalLink size="0.8rem" />
-          </Anchor>
-        </Skeleton>
+        <Group>
+          <Skeleton visible={loading} mt="sm" maw={200}>
+            <Anchor
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+              target="_blank"
+              size="xs"
+              href={`https://${LISTS_URL}/list/${source?.listsId}`}
+            >
+              View {group ? "full list" : "list"} on ALA Lists <IconExternalLink size="0.8rem" />
+            </Anchor>
+          </Skeleton>
+        </Group>
         <Group mt="lg">
           {loading ? (
             [0, 1, 2, 3, 4].map((index) => <Skeleton key={index} w={110} h={30.8} radius="xl" />)
