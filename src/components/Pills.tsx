@@ -25,6 +25,10 @@ Pill.Common = function PillCommon({ value, variant }: { value?: Maybe<string> } 
   return <Pill className={variant ? classes[variant] : classes.common}>{value}</Pill>;
 };
 
+Pill.Empty = function PillEmpty() {
+  return <Pill className={classes.empty}>no data</Pill>;
+};
+
 Pill.StandardText = function PillStandardText({ value }: { value?: Maybe<string> }) {
   return <Pill className={classes.standard}>{value ?? "no data"}</Pill>;
 };
@@ -70,12 +74,15 @@ Pill.AssemblyType = function PillAssemblyType({ value }: { value?: Maybe<string>
   return <Pill className={classes.standard}>{value}</Pill>;
 };
 
-Pill.SpecimenRegistration = function PillRegistration({ accession }: { accession?: Maybe<AccessionEvent> }) {
+type SpecimenAccession = Pick<AccessionEvent, "typeStatus" | "institutionCode" | "collectionRepositoryId">;
+
+Pill.SpecimenRegistration = function PillRegistration({ accession }: { accession?: SpecimenAccession }) {
   const color = getVoucherColour(accession?.typeStatus, accession?.collectionRepositoryId);
-  return <Pill className={classes[`${color}Outline`]}>{accession?.collectionRepositoryId}</Pill>;
+  const registration = [accession?.institutionCode, accession?.collectionRepositoryId].join(" ");
+  return <Pill className={classes[`${color}Outline`]}>{registration}</Pill>;
 };
 
-Pill.SpecimenStatus = function PillRegistration({ accession }: { accession?: Maybe<AccessionEvent> }) {
+Pill.SpecimenStatus = function PillRegistration({ accession }: { accession?: SpecimenAccession }) {
   const status = getVoucherStatus(accession?.typeStatus, accession?.collectionRepositoryId);
   const color = getVoucherColour(accession?.typeStatus, accession?.collectionRepositoryId);
   return <Pill className={classes[`${color}Fill`]}>{status}</Pill>;

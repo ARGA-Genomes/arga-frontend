@@ -71,15 +71,13 @@ export const SPECIMEN_SUMMARY = gql`
 export const SPECIMEN_OVERVIEW = gql`
   fragment SpecimenOverviewDetails on SpecimensOverview {
     total
-    majorCollections
-    holotype
-    holotypeEntityId
     otherTypes
     formalVouchers
     tissues
     genomicDna
     australianMaterial
     nonAustralianMaterial
+
     collectionYears {
       year
       value

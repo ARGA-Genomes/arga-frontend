@@ -14,7 +14,14 @@ import { Marker } from "@/components/mapping/analysis-map";
 import { PaginationBar } from "@/components/pagination";
 import { Pill } from "@/components/Pills";
 import { RecordTable } from "@/components/RecordTable";
-import { Species, Specimen, SpecimenMapMarker, SpecimenSummary } from "@/generated/types";
+import {
+  AccessionEvent,
+  Species,
+  SpeciesOverview,
+  Specimen,
+  SpecimenMapMarker,
+  SpecimenSummary,
+} from "@/generated/types";
 import { getVoucherColour, getVoucherRGBA, getVoucherStatus } from "@/helpers/colors";
 import { getEnumKeyByValue, SortOrder } from "@/queries/common";
 import {
@@ -74,10 +81,27 @@ const GET_SPECIMENS_OVERVIEW = gql`
         specimens {
           ...SpecimenOverviewDetails
         }
+
+        accessions {
+          entityId
+          typeStatus
+          institutionCode
+          collectionRepositoryId
+        }
+
+        majorCollections
       }
     }
   }
 `;
+
+type SpeciesOverviewQuery = {
+  species: {
+    overview: Pick<SpeciesOverview, "specimens" | "majorCollections"> & {
+      accessions: Pick<AccessionEvent, "entityId" | "typeStatus" | "institutionCode" | "collectionRepositoryId">[];
+    };
+  };
+};
 
 const GET_SPECIMEN_MAP_MARKERS = gql`
   query SpeciesSpecimenMapMarkers($canonicalName: String) {
@@ -159,8 +183,15 @@ interface OverviewBlockProps {
 
 function OverviewBlock({ title, children, loading, hasData }: OverviewBlockProps) {
   return (
-    <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
-      <Paper radius="lg" p={20} bg="wheatBg.0" withBorder style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}>
+    <Skeleton h="100%" visible={loading} radius="md" className={classes.skeletonOverview}>
+      <Paper
+        h="100%"
+        radius="lg"
+        p={20}
+        bg="wheatBg.0"
+        withBorder
+        style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}
+      >
         <Stack gap="sm">
           <Group justify="space-between" wrap="nowrap">
             <Text fw={700} c="midnight" fz="xs">
@@ -176,7 +207,7 @@ function OverviewBlock({ title, children, loading, hasData }: OverviewBlockProps
 }
 
 function Overview({ name }: { name: string }) {
-  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIMENS_OVERVIEW, {
+  const { loading, error, data } = useQuery<SpeciesOverviewQuery>(GET_SPECIMENS_OVERVIEW, {
     variables: { canonicalName: name },
   });
 
@@ -184,6 +215,10 @@ function Overview({ name }: { name: string }) {
   function col<T, R>(value?: T, retValue?: R): R | undefined {
     return value ? retValue : undefined;
   }
+
+  const holotypes = data?.species.overview.accessions.filter(
+    (accession) => accession.typeStatus?.toLowerCase() === "holotype",
+  );
 
   return (
     <Paper radius="lg" p={20} bg="wheatBg.0">
@@ -231,7 +266,7 @@ function Overview({ name }: { name: string }) {
         <Grid.Col span={2}>
           <OverviewBlock title="Major collections" loading={loading}>
             <Grid>
-              {specimens?.majorCollections.map((collection) => (
+              {data?.species.overview.majorCollections.map((collection) => (
                 <Grid.Col span={6} key={collection}>
                   <AttributePillContainer color="white" className={classes.pill}>
                     {collection}
@@ -243,14 +278,10 @@ function Overview({ name }: { name: string }) {
         </Grid.Col>
 
         <Grid.Col span={1}>
-          <OverviewBlock title="Holotype" loading={loading} hasData={!!specimens?.holotype}>
-            <AttributePillContainer
-              className={classes.holotypePill}
-              color={col(specimens?.holotype, "white")}
-              withBorder={!!specimens?.holotype}
-            >
-              {specimens?.holotype}
-            </AttributePillContainer>
+          <OverviewBlock title="Holotype" loading={loading} hasData={!!holotypes?.length}>
+            {holotypes?.map((accession) => (
+              <Pill.SpecimenRegistration key={accession.entityId} accession={accession} />
+            ))}
           </OverviewBlock>
         </Grid.Col>
         <Grid.Col span={1}>
@@ -360,14 +391,17 @@ function Explorer({ name }: { name: string }) {
 function HolotypeCard() {
   const { details } = { ...useSpecies() };
 
-  const overviewResult = useQuery<{ species: Species }>(GET_SPECIMENS_OVERVIEW, {
+  const overviewResult = useQuery<SpeciesOverviewQuery>(GET_SPECIMENS_OVERVIEW, {
     skip: !details,
     variables: { canonicalName: details?.name },
   });
 
+  const accessions = overviewResult.data?.species.overview.accessions;
+
+  // dont get detailed specimen data unless we have accessions from the overview
   const { loading, error, data } = useQuery<{ specimen: Specimen }>(GET_SPECIMEN_CARD, {
-    skip: !overviewResult.data,
-    variables: { entityId: overviewResult.data?.species.overview.specimens.holotypeEntityId },
+    skip: !accessions || accessions.length === 0,
+    variables: { entityId: accessions && accessions[0] && accessions[0].entityId },
   });
 
   const collection = data?.specimen.collections[0];
@@ -383,7 +417,13 @@ function HolotypeCard() {
             <Table.Tr>
               <Table.Th>Catalogue number</Table.Th>
               <Table.Td>
-                {accession?.institutionCode} {accession?.collectionRepositoryId}
+                {accession && (
+                  <Group>
+                    <Link href={`/organisms/${data?.specimen.organismId}/source`}>
+                      <Pill.SpecimenRegistration accession={accession} />
+                    </Link>
+                  </Group>
+                )}
               </Table.Td>
             </Table.Tr>
             <Table.Tr>
@@ -456,11 +496,13 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
             <Table.Tr>
               <Table.Th>Catalogue number</Table.Th>
               <Table.Td>
-                <Group>
-                  <Link href={`/organisms/${data?.specimen.organismId}/source`}>
-                    <Pill.SpecimenRegistration accession={accession} />
-                  </Link>
-                </Group>
+                {accession && (
+                  <Group>
+                    <Link href={`/organisms/${data?.specimen.organismId}/source`}>
+                      <Pill.SpecimenRegistration accession={accession} />
+                    </Link>
+                  </Group>
+                )}
               </Table.Td>
             </Table.Tr>
             <Table.Tr>

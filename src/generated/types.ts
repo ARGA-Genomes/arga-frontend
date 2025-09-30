@@ -1395,6 +1395,14 @@ export type SpeciesMarkerPage = {
 
 export type SpeciesOverview = {
   __typename?: 'SpeciesOverview';
+  /**
+   * The specimen accessions, if any. There should only ever be one holotype
+   * per species but conflicting data sources can give us multiple and rather than
+   * hiding it we surface all possible accessions here.
+   */
+  accessions: Array<AccessionEvent>;
+  /** A list of the collections that have the most specimens for the species */
+  majorCollections: Array<Scalars['String']['output']>;
   specimens: SpecimensOverview;
 };
 
@@ -1605,12 +1613,6 @@ export type SpecimensOverview = {
   formalVouchers: Scalars['Int']['output'];
   /** The total amount of genomic DNA resulting from a specimen */
   genomicDna: Scalars['Int']['output'];
-  /** The accession of the holotype, if any */
-  holotype?: Maybe<Scalars['String']['output']>;
-  /** The entity_id of the holotype, if any */
-  holotypeEntityId?: Maybe<Scalars['String']['output']>;
-  /** A list of the collections that have the most specimens for the species */
-  majorCollections: Array<Scalars['String']['output']>;
   /** The total amount of material located elsewhere */
   nonAustralianMaterial: Scalars['Int']['output'];
   /** The total amount of type specimens that are not the holotype */
