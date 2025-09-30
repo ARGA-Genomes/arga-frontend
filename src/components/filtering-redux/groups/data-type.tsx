@@ -11,7 +11,7 @@ export const dataTypeFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] 
     .map(({ include, value }) => ({
       filter: FilterType.HasData,
       action: include ? "INCLUDE" : "EXCLUDE",
-      value,
+      value: value.toString(),
     }));
 
 export const searchDataTypeFiltersToQuery = (filters: BoolFilterData[]): InputQueryAttribute[] =>
@@ -19,7 +19,7 @@ export const searchDataTypeFiltersToQuery = (filters: BoolFilterData[]): InputQu
     .filter(({ active }) => active)
     .map(({ include, value }) => ({
       ...SEARCH_ATTRIBUTES_MAP["data_type"],
-      value: value,
+      value: value.toString(),
       include,
     }));
 
@@ -66,11 +66,11 @@ export function DataTypeFilters({ filters, boolOptions, onChange }: DataTypeFilt
     >
       {filters.map((filter) => (
         <BoolFilter
-          key={filter.value}
+          key={filter.name}
           {...filter}
           options={boolOptions || ["Has", "Missing"]}
-          onActiveToggle={(checked) => handleActiveToggle(filter.value, checked)}
-          onIncludeToggle={(include) => handleIncludeToggle(filter.value, include)}
+          onActiveToggle={(checked) => handleActiveToggle(filter.name, checked)}
+          onIncludeToggle={(include) => handleIncludeToggle(filter.name, include)}
         />
       ))}
     </FilterGroup>
@@ -78,6 +78,7 @@ export function DataTypeFilters({ filters, boolOptions, onChange }: DataTypeFilt
 }
 
 export const DEFAULT_DATA_TYPE_FILTERS = ["Genome", "Locus", "Specimen", "Other"].map((value) => ({
+  name: value,
   value,
   active: false,
   disabled: false,
@@ -85,6 +86,7 @@ export const DEFAULT_DATA_TYPE_FILTERS = ["Genome", "Locus", "Specimen", "Other"
 }));
 
 export const DEFAULT_SEARCH_DATA_TYPE_FILTERS = ["Taxon", "Genome", "Locus", "Specimen"].map((value) => ({
+  name: value,
   value,
   active: false,
   disabled: false,

@@ -53,7 +53,7 @@ export function ContainedImage({ photo, style }: ContainedImageProps) {
             align="flex-end"
             w="inherit"
             h="inherit"
-            style={{ zIndex: 1000, bottom: 0, left: 0, right: 0 }}
+            style={{ zIndex: 200, bottom: 0, left: 0, right: 0 }}
           >
             <Stack
               py={5}

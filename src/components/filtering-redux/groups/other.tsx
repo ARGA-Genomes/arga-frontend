@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { FilterGroup } from "../group";
 
-import { threatened } from "@/app/browse/list-groups/_data/threatened";
 import { BoolFilter, BoolFilterData } from "../filters/bool";
 import { FilterItem, FilterType } from "../filters/common";
 
-export const threatenedFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
+export const otherFiltersToQuery = (filters: BoolFilterData[]): FilterItem[] =>
   filters
     .filter(({ active }) => active)
     .map(({ include, name, value }) => ({
@@ -19,12 +18,12 @@ export const threatenedFiltersToQuery = (filters: BoolFilterData[]): FilterItem[
       ],
     }));
 
-interface ThreatenedFiltersProps {
+interface OtherFiltersProps {
   filters: BoolFilterData[];
   onChange: (filters: BoolFilterData[]) => void;
 }
 
-export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps) {
+export function OtherFilters({ filters, onChange }: OtherFiltersProps) {
   // Event handlers for filter chip bools
   const handleActiveToggle = (name: string, active: boolean) =>
     onChange(
@@ -55,9 +54,9 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
 
   return (
     <FilterGroup
-      title="Threatened"
-      description="Filter threatened species"
-      icon={"/icons/list-group/List group_ Threatened species.svg"}
+      title="Other"
+      description="Filter for other attributes"
+      icon={"/icons/list-group/List group_ Australian iconic species.svg"}
     >
       {filters.map((filter) => (
         <BoolFilter
@@ -72,23 +71,15 @@ export function ThreatenedFilters({ filters, onChange }: ThreatenedFiltersProps)
   );
 }
 
-const DEFAULT_THREATENED = [
+const DEFAULT_OTHER = [
   {
-    name: "top_110_species",
-    label: "Top 110 Species",
+    name: "australian_iconic_species",
+    label: "Australian Iconic Species",
     value: true,
   },
-  // EPBC & IUCN
-  ...threatened
-    .filter((item) => item.category.startsWith("IUCN") || item.category.startsWith("EPBC"))
-    .map((item) => ({
-      name: (item.filter as { name: string }).name,
-      label: item.category,
-      value: true,
-    })),
 ];
 
-export const DEFAULT_THREATENED_FILTERS: BoolFilterData[] = DEFAULT_THREATENED.map((filter) => ({
+export const DEFAULT_OTHER_FILTERS: BoolFilterData[] = DEFAULT_OTHER.map((filter) => ({
   ...filter,
   active: false,
   disabled: false,
