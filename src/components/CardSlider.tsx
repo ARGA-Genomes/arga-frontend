@@ -29,11 +29,21 @@ export function CardSlider({ card, children }: CardSliderProps) {
 
 interface CardSliderCardProps extends PropsWithChildren {
   title: string;
+  selected?: boolean;
 }
 
-export function CardSliderCard({ title, children }: CardSliderCardProps) {
+export function CardSliderCard({ title, selected, children }: CardSliderCardProps) {
   return (
-    <Paper withBorder radius="xl" shadow="xl" mb={60} w="80%" className={classes.card}>
+    <Paper
+      bg={selected ? undefined : "midnight.0"}
+      withBorder
+      radius="xl"
+      shadow="xl"
+      mb={60}
+      w="80%"
+      mih={600}
+      className={classes.card}
+    >
       <Stack h="100%">
         <Text mx="xl" mt="xl" fw={600} fz="md" c="midnight.9">
           {title}

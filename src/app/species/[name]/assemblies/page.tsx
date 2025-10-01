@@ -35,6 +35,9 @@ import {
 } from "@tabler/icons-react";
 import { AnalysisMap } from "@/components/mapping";
 import { DataField } from "@/components/data-fields";
+import { TimelineNavbar } from "@/components/TimelineNavbar";
+import { IconSubsample } from "@/components/ArgaIcons";
+import { CardSlider } from "@/components/CardSlider";
 
 const GET_ASSEMBLY = gql`
   query Assembly($entityId: String) {
@@ -94,6 +97,7 @@ export default function Page() {
     <Stack gap="xl">
       <Overview />
       <Viewer entityId={assembly?.entityId} />
+      <Provenance />
       <AllAssemblies onSelected={setAssembly} />
     </Stack>
   );
@@ -408,6 +412,76 @@ function MetadataCheck({ assembly }: { assembly?: Assembly }) {
         <DataCheck label="Genome publication" value={false} />
       </Stack>
     </Paper>
+  );
+}
+
+function Provenance() {
+  const [card, setCard] = useState(0);
+  return (
+    <Stack>
+      <Title order={3}>Assembly provenance timeline</Title>
+      <TimelineNavbar>
+        <TimelineNavbar.Item
+          label="Library preparation"
+          icon={<IconSubsample size={60} />}
+          selected={card === 0}
+          onClick={() => setCard(0)}
+        />
+        <TimelineNavbar.Item
+          label="Contigs"
+          icon={<IconSubsample size={60} />}
+          selected={card === 1}
+          onClick={() => setCard(1)}
+        />
+        <TimelineNavbar.Item
+          label="Scaffolds"
+          icon={<IconSubsample size={60} />}
+          selected={card === 2}
+          onClick={() => setCard(2)}
+        />
+        <TimelineNavbar.Item
+          label="Hi-C"
+          icon={<IconSubsample size={60} />}
+          selected={card === 3}
+          onClick={() => setCard(3)}
+        />
+        <TimelineNavbar.Item
+          label="Chromosomes"
+          icon={<IconSubsample size={60} />}
+          selected={card === 4}
+          onClick={() => setCard(4)}
+        />
+        <TimelineNavbar.Item
+          label="Assemblies"
+          icon={<IconSubsample size={60} />}
+          selected={card === 5}
+          onClick={() => setCard(5)}
+        />
+        <TimelineNavbar.Item
+          label="Annotations"
+          icon={<IconSubsample size={60} />}
+          selected={card === 6}
+          onClick={() => setCard(6)}
+        />
+        <TimelineNavbar.Item
+          label="Public release"
+          icon={<IconSubsample size={60} />}
+          selected={card === 7}
+          onClick={() => setCard(7)}
+        />
+      </TimelineNavbar>
+
+      <CardSlider card={card}>
+        <CardSlider.Card title="Library preparation" selected={card === 0}></CardSlider.Card>
+        <CardSlider.Card title="Contigs" selected={card === 1}></CardSlider.Card>
+        <CardSlider.Card title="Scaffolds" selected={card === 2}></CardSlider.Card>
+        <CardSlider.Card title="Hi-C" selected={card === 3}></CardSlider.Card>
+        <CardSlider.Card title="Chromosomes" selected={card === 4}></CardSlider.Card>
+        <CardSlider.Card title="Assemblies" selected={card === 5}></CardSlider.Card>
+        <CardSlider.Card title="Annotations" selected={card === 6}></CardSlider.Card>
+        <CardSlider.Card title="Public release" selected={card === 7}></CardSlider.Card>
+      </CardSlider>
+    </Stack>
   );
 }
 
