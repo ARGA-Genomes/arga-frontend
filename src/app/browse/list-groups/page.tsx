@@ -5,6 +5,8 @@ import {
   AccordionPanel,
   Badge,
   Container,
+  Grid,
+  GridCol,
   Group,
   Paper,
   Stack,
@@ -24,7 +26,7 @@ import { other } from "./_data/other";
 import { phenotypic } from "./_data/phenotypic";
 import { threatened } from "./_data/threatened";
 
-import { groupBy, orderBy } from "lodash-es";
+import { groupBy } from "lodash-es";
 
 import innerAccordionClasses from "./inner-accordion.module.css";
 import outerAccordionClasses from "./outer-accordion.module.css";
@@ -75,17 +77,10 @@ const processedGroups = Object.entries(groups)
       ),
     }));
 
-    // Sort subcategories: explicitly named subcategories first, then "all"
-    const sortedSubcategoryGroups = orderBy(
-      subcategoryGroups,
-      [(group) => (group.subcategory === "all" ? 1 : 0)],
-      ["asc"]
-    );
-
     return {
       name,
-      subcategoryGroups: sortedSubcategoryGroups.filter(({ isAll }) => !isAll),
-      allGroup: sortedSubcategoryGroups.find(({ isAll }) => isAll)!,
+      subcategoryGroups: subcategoryGroups.filter(({ isAll }) => !isAll),
+      allGroup: subcategoryGroups.find(({ isAll }) => isAll)!,
       count: data.length,
     };
   });
@@ -130,40 +125,44 @@ export default function AllGroups() {
                     </Group>
                   </AccordionControl>
                   <AccordionPanel>
+                    <Stack gap="xs">
+                      {allGroup.orderGroups.map(({ order, items }) => (
+                        <Group key={order} gap="xs" align="flex-start">
+                          {items.map((group) => (
+                            <GroupCard key={group.category} {...group} />
+                          ))}
+                        </Group>
+                      ))}
+                    </Stack>
                     <Stack>
                       {subcategoryGroups.length > 0 && (
-                        <Accordion classNames={innerAccordionClasses} variant="separated" radius="lg">
+                        <Grid mt="sm">
                           {subcategoryGroups.map(({ subcategory, orderGroups }) => (
-                            <AccordionItem key={subcategory} value={subcategory}>
-                              <AccordionControl>
-                                <Text size="md" fw="bold" c="midnight.6">
-                                  {subcategory}
-                                </Text>
-                              </AccordionControl>
-                              <AccordionPanel>
-                                <Stack gap="xs">
-                                  {orderGroups.map(({ order, items }) => (
-                                    <Group key={order} gap="xs" align="flex-start">
-                                      {items.map((group) => (
-                                        <GroupCard key={group.category} {...group} />
+                            <GridCol span={{ md: 12, lg: 6 }}>
+                              <Accordion classNames={innerAccordionClasses} variant="separated" radius="lg">
+                                <AccordionItem key={subcategory} value={subcategory}>
+                                  <AccordionControl>
+                                    <Text size="md" fw="bold" c="midnight.6">
+                                      {subcategory}
+                                    </Text>
+                                  </AccordionControl>
+                                  <AccordionPanel>
+                                    <Stack gap="xs">
+                                      {orderGroups.map(({ order, items }) => (
+                                        <Group key={order} gap="xs" align="flex-start">
+                                          {items.map((group) => (
+                                            <GroupCard key={group.category} {...group} />
+                                          ))}
+                                        </Group>
                                       ))}
-                                    </Group>
-                                  ))}
-                                </Stack>
-                              </AccordionPanel>
-                            </AccordionItem>
+                                    </Stack>
+                                  </AccordionPanel>
+                                </AccordionItem>
+                              </Accordion>
+                            </GridCol>
                           ))}
-                        </Accordion>
+                        </Grid>
                       )}
-                      <Stack gap="xs">
-                        {allGroup.orderGroups.map(({ order, items }) => (
-                          <Group key={order} gap="xs" align="flex-start">
-                            {items.map((group) => (
-                              <GroupCard key={group.category} {...group} />
-                            ))}
-                          </Group>
-                        ))}
-                      </Stack>
                     </Stack>
                   </AccordionPanel>
                 </AccordionItem>
