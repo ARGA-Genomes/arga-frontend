@@ -6,24 +6,18 @@ import { Box, Center, Group, Paper, Stack, Text } from "@mantine/core";
 const HighlightContext = createContext(false);
 
 interface TimelineNavbarProps {
+  selected?: number;
   onSelected?: (index: number) => void;
   children: React.ReactNode[];
 }
 
-export function TimelineNavbar({ onSelected, children }: TimelineNavbarProps) {
-  const [selected, setSelected] = useState(0);
-
-  function onClick(idx: number) {
-    setSelected(idx);
-    if (onSelected) onSelected(idx);
-  }
-
+export function TimelineNavbar({ selected, onSelected, children }: TimelineNavbarProps) {
   return (
     <Paper radius="lg" p={"xs"} className={classes.navbar}>
       <Group justify="space-evenly">
         {children.map((child, idx) => (
           <HighlightContext key={idx} value={idx === selected}>
-            <Box onClick={() => onClick(idx)}>{child}</Box>
+            <Box onClick={() => onSelected && onSelected(idx)}>{child}</Box>
           </HighlightContext>
         ))}
       </Group>

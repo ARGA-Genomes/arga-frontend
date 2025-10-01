@@ -1,6 +1,6 @@
 "use client";
 
-import { IconSubsample } from "@/components/ArgaIcons";
+import { IconGenomicDataProcessing, IconSourceOrganism, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { TissueSlide } from "@/components/slides/Tissues";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
@@ -49,13 +49,16 @@ function Provenance({ entityId }: { entityId: string }) {
   return (
     <Stack>
       <Title order={3}>Organism subsampling timeline</Title>
-      <TimelineNavbar onSelected={setCard}>
+      <TimelineNavbar selected={card} onSelected={setCard}>
         <Link href="source">
-          <TimelineNavbar.Item label="Source organism" icon={<IconSubsample size={60} />} />
+          <TimelineNavbar.Item label="Source organism" icon={<IconSourceOrganism size={60} />} />
         </Link>
         <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
         <Link href="data_preparation">
-          <TimelineNavbar.Item label="Genetic data products" icon={<IconSubsample size={60} />} />
+          <TimelineNavbar.Item
+            label="Genomic and genetic data processing"
+            icon={<IconGenomicDataProcessing size={60} />}
+          />
         </Link>
       </TimelineNavbar>
 

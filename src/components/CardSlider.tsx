@@ -17,11 +17,11 @@ interface CardSliderProps {
 }
 
 export function CardSlider({ card, children }: CardSliderProps) {
-  const width = children.reduce((acc, cur) => (acc += SIZE[cur.props.size ?? "md"]), 0);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const idx = card ?? 0;
+
     const offset = children.reduce((acc, cur, curIdx) => (acc += curIdx < idx ? SIZE[cur.props.size ?? "md"] : 0), 0);
     const centre = ref.current!.clientWidth / 2;
     const halfWidth = SIZE[children[idx].props.size ?? "md"] / 2;
