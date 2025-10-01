@@ -79,29 +79,21 @@ function Provenance({ entityId }: { entityId: string }) {
   return (
     <Stack>
       <Title order={3}>Organism provenance timeline</Title>
-      <TimelineNavbar>
-        <TimelineNavbar.Item label="Live state" icon={<IconLiveState size={60} />} onClick={() => setCard(0)} />
-        <TimelineNavbar.Item
-          label="Collecting"
-          icon={<IconSpecimenCollection size={60} />}
-          onClick={() => setCard(1)}
-        />
-        <TimelineNavbar.Item
-          label="Registration"
-          icon={<IconSpecimenRegistration size={60} />}
-          onClick={() => setCard(2)}
-        />
+      <TimelineNavbar onSelected={setCard}>
+        <TimelineNavbar.Item label="Live state" icon={<IconLiveState size={60} />} />
+        <TimelineNavbar.Item label="Collecting" icon={<IconSpecimenCollection size={60} />} />
+        <TimelineNavbar.Item label="Registration" icon={<IconSpecimenRegistration size={60} />} />
         <Link href="subsamples_and_tissues">
           <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
         </Link>
       </TimelineNavbar>
 
       <CardSlider card={card}>
-        <CardSlider.Card title="Live state">
+        <CardSlider.Card title="Live state" size="lg">
           {error && <Text>{error.message}</Text>}
           {data && <LiveStateSlide organism={data.organism} />}
         </CardSlider.Card>
-        <CardSlider.Card title="Collecting">
+        <CardSlider.Card title="Collecting" size="lg">
           {error && <Text>{error.message}</Text>}
           {data && (
             <CollectingSlide
@@ -111,7 +103,7 @@ function Provenance({ entityId }: { entityId: string }) {
             />
           )}
         </CardSlider.Card>
-        <CardSlider.Card title="Registrations">
+        <CardSlider.Card title="Registrations" size="lg">
           <RegistrationSlide registrations={[]} />
         </CardSlider.Card>
       </CardSlider>

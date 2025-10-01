@@ -63,15 +63,11 @@ function Provenance({ entityId }: { entityId: string }) {
   return (
     <Stack>
       <Title order={3}>Organism subsampling timeline</Title>
-      <TimelineNavbar>
+      <TimelineNavbar onSelected={setCard}>
         <Link href="subsamples_and_tissues">
           <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
         </Link>
-        <TimelineNavbar.Item
-          label="Nucleic acid extraction"
-          icon={<IconSubsample size={60} />}
-          onClick={() => setCard(1)}
-        />
+        <TimelineNavbar.Item label="Nucleic acid extraction" icon={<IconSubsample size={60} />} />
         <TimelineNavbar.Item label="Genetic data products" icon={<IconSubsample size={60} />} />
       </TimelineNavbar>
 
