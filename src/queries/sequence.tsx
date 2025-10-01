@@ -93,6 +93,37 @@ export const DATA_DEPOSITION_EVENT = gql`
   }
 `;
 
+export const LIBRARY = gql`
+  fragment LibraryDetails on Library {
+    entityId
+    libraryId
+    eventDate
+    eventTime
+    preparedBy
+    concentration
+    concentrationUnit
+    pcrCycles
+    layout
+    selection
+    baitSetName
+    baitSetReference
+    constructionProtocol
+    source
+    insertSize
+    designDescription
+    strategy
+    indexTag
+    indexDualTag
+    indexOligo
+    indexDualOligo
+    location
+    remarks
+    dnaTreatment
+    numberOfLibrariesPooled
+    pcrReplicates
+  }
+`;
+
 export const ASSEMBLY = gql`
   fragment AssemblyDetails on Assembly {
     assemblyId

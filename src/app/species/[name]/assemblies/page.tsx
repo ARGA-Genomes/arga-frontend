@@ -20,7 +20,7 @@ import classes from "./page.module.css";
 import { useSpecies } from "@/app/species-provider";
 import { gql, useQuery } from "@apollo/client";
 import { useState } from "react";
-import { AssemblyDetails, NameDetails } from "@/generated/types";
+import { AssemblyDetails, Library, NameDetails, Specimen } from "@/generated/types";
 import { DataTable } from "@/components/data-table";
 import { DateTime } from "luxon";
 import { Pill } from "@/components/Pills";
@@ -38,6 +38,7 @@ import { DataField } from "@/components/data-fields";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
+import { LibrarySlide } from "@/components/slides/Library";
 
 const GET_ASSEMBLY = gql`
   query Assembly($entityId: String) {
@@ -52,11 +53,19 @@ const GET_ASSEMBLY = gql`
       specimens {
         entityId
       }
+
+      libraries {
+        ...LibraryDetails
+      }
     }
   }
 `;
 
-type Assembly = AssemblyDetails & { name: Pick<NameDetails, "canonicalName" | "authorship"> };
+type Assembly = AssemblyDetails & {
+  name: Pick<NameDetails, "canonicalName" | "authorship">;
+  specimens: Pick<Specimen, "entityId">;
+  libraries: Library[];
+};
 
 type AssemblyQuery = {
   assembly: Assembly;
@@ -96,8 +105,12 @@ export default function Page() {
   return (
     <Stack gap="xl">
       <Overview />
-      <Viewer entityId={assembly?.entityId} />
-      <Provenance />
+      {assembly?.entityId && (
+        <>
+          <Viewer entityId={assembly.entityId} />
+          <Provenance entityId={assembly.entityId} />
+        </>
+      )}
       <AllAssemblies onSelected={setAssembly} />
     </Stack>
   );
@@ -415,71 +428,42 @@ function MetadataCheck({ assembly }: { assembly?: Assembly }) {
   );
 }
 
-function Provenance() {
+function Provenance({ entityId }: { entityId: string }) {
   const [card, setCard] = useState(0);
+
+  const { loading, error, data } = useQuery<AssemblyQuery>(GET_ASSEMBLY, {
+    skip: !entityId,
+    variables: { entityId },
+  });
+
+  const assembly = data?.assembly;
+  if (!assembly) return <></>;
+
   return (
     <Stack>
       <Title order={3}>Assembly provenance timeline</Title>
-      <TimelineNavbar>
-        <TimelineNavbar.Item
-          label="Library preparation"
-          icon={<IconSubsample size={60} />}
-          selected={card === 0}
-          onClick={() => setCard(0)}
-        />
-        <TimelineNavbar.Item
-          label="Contigs"
-          icon={<IconSubsample size={60} />}
-          selected={card === 1}
-          onClick={() => setCard(1)}
-        />
-        <TimelineNavbar.Item
-          label="Scaffolds"
-          icon={<IconSubsample size={60} />}
-          selected={card === 2}
-          onClick={() => setCard(2)}
-        />
-        <TimelineNavbar.Item
-          label="Hi-C"
-          icon={<IconSubsample size={60} />}
-          selected={card === 3}
-          onClick={() => setCard(3)}
-        />
-        <TimelineNavbar.Item
-          label="Chromosomes"
-          icon={<IconSubsample size={60} />}
-          selected={card === 4}
-          onClick={() => setCard(4)}
-        />
-        <TimelineNavbar.Item
-          label="Assemblies"
-          icon={<IconSubsample size={60} />}
-          selected={card === 5}
-          onClick={() => setCard(5)}
-        />
-        <TimelineNavbar.Item
-          label="Annotations"
-          icon={<IconSubsample size={60} />}
-          selected={card === 6}
-          onClick={() => setCard(6)}
-        />
-        <TimelineNavbar.Item
-          label="Public release"
-          icon={<IconSubsample size={60} />}
-          selected={card === 7}
-          onClick={() => setCard(7)}
-        />
+      <TimelineNavbar onSelected={setCard}>
+        <TimelineNavbar.Item label="Library preparation" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Contigs" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Scaffolds" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Hi-C" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Chromosomes" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Assemblies" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Annotations" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Public release" icon={<IconSubsample size={60} />} />
       </TimelineNavbar>
 
       <CardSlider card={card}>
-        <CardSlider.Card title="Library preparation" selected={card === 0}></CardSlider.Card>
-        <CardSlider.Card title="Contigs" selected={card === 1}></CardSlider.Card>
-        <CardSlider.Card title="Scaffolds" selected={card === 2}></CardSlider.Card>
-        <CardSlider.Card title="Hi-C" selected={card === 3}></CardSlider.Card>
-        <CardSlider.Card title="Chromosomes" selected={card === 4}></CardSlider.Card>
-        <CardSlider.Card title="Assemblies" selected={card === 5}></CardSlider.Card>
-        <CardSlider.Card title="Annotations" selected={card === 6}></CardSlider.Card>
-        <CardSlider.Card title="Public release" selected={card === 7}></CardSlider.Card>
+        <CardSlider.Card title="Library preparation" size="sm">
+          <LibrarySlide libraries={assembly.libraries} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Contigs" size="sm"></CardSlider.Card>
+        <CardSlider.Card title="Scaffolds" size="sm"></CardSlider.Card>
+        <CardSlider.Card title="Hi-C" size="sm"></CardSlider.Card>
+        <CardSlider.Card title="Chromosomes" size="sm"></CardSlider.Card>
+        <CardSlider.Card title="Assemblies" size="sm"></CardSlider.Card>
+        <CardSlider.Card title="Annotations" size="sm"></CardSlider.Card>
+        <CardSlider.Card title="Public release" size="sm"></CardSlider.Card>
       </CardSlider>
     </Stack>
   );
