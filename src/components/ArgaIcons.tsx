@@ -31,6 +31,22 @@ export function IconSubsample({ size }: IconProps) {
   return <IconImage size={size} src="/icons/slides/subsamples_and_tissues.svg" />;
 }
 
+export function IconSourceOrganism({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/source_organism.svg" />;
+}
+
+export function IconExtraction({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/extraction.svg" />;
+}
+
+export function IconGenomicDataProcessing({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/genomic_data_processing.svg" />;
+}
+
+export function IconGenomicDataProducts({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/genomic_data_processing.svg" />;
+}
+
 export function IconOrcid({ size }: IconProps) {
   return <IconImage size={size} src="/icons/orcid.svg" />;
 }

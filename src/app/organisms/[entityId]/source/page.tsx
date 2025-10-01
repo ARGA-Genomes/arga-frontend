@@ -79,7 +79,7 @@ function Provenance({ entityId }: { entityId: string }) {
   return (
     <Stack>
       <Title order={3}>Organism provenance timeline</Title>
-      <TimelineNavbar onSelected={setCard}>
+      <TimelineNavbar selected={card} onSelected={setCard}>
         <TimelineNavbar.Item label="Live state" icon={<IconLiveState size={60} />} />
         <TimelineNavbar.Item label="Collecting" icon={<IconSpecimenCollection size={60} />} />
         <TimelineNavbar.Item label="Registration" icon={<IconSpecimenRegistration size={60} />} />
@@ -106,6 +106,7 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Registrations" size="lg">
           <RegistrationSlide registrations={[]} />
         </CardSlider.Card>
+        <CardSlider.Card title="Subsamples and tissues" />
       </CardSlider>
     </Stack>
   );
