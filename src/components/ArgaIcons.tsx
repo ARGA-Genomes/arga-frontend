@@ -47,6 +47,38 @@ export function IconGenomicDataProducts({ size }: IconProps) {
   return <IconImage size={size} src="/icons/slides/genomic_data_processing.svg" />;
 }
 
+export function IconLibrary({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/library.svg" />;
+}
+
+export function IconContigs({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/contigs.svg" />;
+}
+
+export function IconScaffolds({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/scaffolds.svg" />;
+}
+
+export function IconHiC({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/hi_c.svg" />;
+}
+
+export function IconChromosomes({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/chromosomes.svg" />;
+}
+
+export function IconAssembly({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/assembly.svg" />;
+}
+
+export function IconAnnotation({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/annotation.svg" />;
+}
+
+export function IconDeposition({ size }: IconProps) {
+  return <IconImage size={size} src="/icons/slides/deposition.svg" />;
+}
+
 export function IconOrcid({ size }: IconProps) {
   return <IconImage size={size} src="/icons/orcid.svg" />;
 }
