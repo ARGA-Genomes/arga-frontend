@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
 import classes from "./TimelineNavbar.module.css";
 
 import { Box, Center, Group, Paper, Stack, Text } from "@mantine/core";

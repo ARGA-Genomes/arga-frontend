@@ -36,7 +36,16 @@ import {
 import { AnalysisMap } from "@/components/mapping";
 import { DataField } from "@/components/data-fields";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { IconSubsample } from "@/components/ArgaIcons";
+import {
+  IconAnnotation,
+  IconAssembly,
+  IconChromosomes,
+  IconContigs,
+  IconDeposition,
+  IconHiC,
+  IconLibrary,
+  IconScaffolds,
+} from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { LibrarySlide } from "@/components/slides/Library";
 
@@ -245,12 +254,12 @@ function Details({ assembly }: { assembly: Assembly }) {
       <Grid>
         <Grid.Col span={5}>
           <DataTable>
-            <DataTable.RowValue label="Genome status"></DataTable.RowValue>
+            <DataTable.RowValue label="Genome status">{assembly.representation}</DataTable.RowValue>
             <DataTable.RowValue label="Release type"></DataTable.RowValue>
             <DataTable.RowValue label="Assembly type">
               <Pill.AssemblyType value={assembly.type} />
             </DataTable.RowValue>
-            <DataTable.RowValue label="Assembly name"></DataTable.RowValue>
+            <DataTable.RowValue label="Assembly name">{assembly.assemblyName}</DataTable.RowValue>
           </DataTable>
         </Grid.Col>
 
@@ -343,7 +352,7 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <StatisticItem label="Genome size">{assembly?.size}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Ungapped length"></StatisticItem>
+          <StatisticItem label="Ungapped length">{assembly?.sizeUngapped}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
           <StatisticItem label="Number of chromosomes"></StatisticItem>
@@ -355,13 +364,13 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <Divider size="sm" color="shellfishBg.1" />
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Assembly level"></StatisticItem>
+          <StatisticItem label="Assembly level">{assembly?.level}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Genome coverage">{assembly?.genomeCoverage}</StatisticItem>
+          <StatisticItem label="Genome coverage">{assembly?.coverage}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="GC percentage"></StatisticItem>
+          <StatisticItem label="GC percentage">{assembly?.guanineCytosinePercent}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
           <StatisticItem label="BUSCO score">{assembly?.completeness}</StatisticItem>
@@ -379,7 +388,7 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <StatisticItem label="Scaffold L50"></StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Number of contigs"></StatisticItem>
+          <StatisticItem label="Number of contigs">{assembly?.numberOfContigs}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
           <StatisticItem label="Contig N50"></StatisticItem>
@@ -443,14 +452,14 @@ function Provenance({ entityId }: { entityId: string }) {
     <Stack>
       <Title order={3}>Assembly provenance timeline</Title>
       <TimelineNavbar onSelected={setCard}>
-        <TimelineNavbar.Item label="Library preparation" icon={<IconSubsample size={60} />} />
-        <TimelineNavbar.Item label="Contigs" icon={<IconSubsample size={60} />} />
-        <TimelineNavbar.Item label="Scaffolds" icon={<IconSubsample size={60} />} />
-        <TimelineNavbar.Item label="Hi-C" icon={<IconSubsample size={60} />} />
-        <TimelineNavbar.Item label="Chromosomes" icon={<IconSubsample size={60} />} />
-        <TimelineNavbar.Item label="Assemblies" icon={<IconSubsample size={60} />} />
-        <TimelineNavbar.Item label="Annotations" icon={<IconSubsample size={60} />} />
-        <TimelineNavbar.Item label="Public release" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item label="Library preparation" icon={<IconLibrary size={60} />} />
+        <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
+        <TimelineNavbar.Item label="Scaffolds" icon={<IconScaffolds size={60} />} />
+        <TimelineNavbar.Item label="Hi-C" icon={<IconHiC size={60} />} />
+        <TimelineNavbar.Item label="Chromosomes" icon={<IconChromosomes size={60} />} />
+        <TimelineNavbar.Item label="Assemblies" icon={<IconAssembly size={60} />} />
+        <TimelineNavbar.Item label="Annotations" icon={<IconAnnotation size={60} />} />
+        <TimelineNavbar.Item label="Public release" icon={<IconDeposition size={60} />} />
       </TimelineNavbar>
 
       <CardSlider card={card}>

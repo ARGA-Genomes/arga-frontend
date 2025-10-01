@@ -130,18 +130,25 @@ export const ASSEMBLY = gql`
     eventDate
     eventTime
     type
+    assemblyName
+    level
     method
     methodVersion
     methodLink
     size
+    sizeUngapped
     minimumGapLength
+    guanineCytosinePercent
     completeness
     completenessMethod
+    coverage
+    representation
     sourceMolecule
     referenceGenomeUsed
     referenceGenomeLink
     numberOfScaffolds
-    genomeCoverage
+    numberOfContigs
+    numberOfReplicons
     hybrid
     hybridInformation
     polishingOrScaffoldingData
