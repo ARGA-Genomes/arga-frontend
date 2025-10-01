@@ -18,7 +18,7 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
-import { IconExternalLink } from "@tabler/icons-react";
+import { IconArrowNarrowLeft, IconExternalLink } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
 
@@ -344,6 +344,16 @@ export default function SourcePage(props: SourceProps) {
 
   return (
     <Stack mt="xl">
+      {group && (
+        <Container maw={MAX_WIDTH} mb="sm" w="100%">
+          <Link href={"/browse/list-groups"}>
+            <Group gap={5}>
+              <IconArrowNarrowLeft />
+              <Text fz={18}>Back to all list groups</Text>
+            </Group>
+          </Link>
+        </Container>
+      )}
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Grid align="center">
