@@ -17,12 +17,21 @@ export function TimelineNavbar({ children }: TimelineNavbarProps) {
 interface TimelineNavbarItemProps {
   icon?: React.ReactNode;
   label: string;
+  selected?: boolean;
   onClick?: () => void;
 }
 
-function TimelineNavbarItem({ icon, label, onClick }: TimelineNavbarItemProps) {
+function TimelineNavbarItem({ icon, label, selected, onClick }: TimelineNavbarItemProps) {
   return (
-    <Paper radius="xl" p={"xl"} w={160} h={160} className={classes.item} onClick={onClick}>
+    <Paper
+      bg={selected ? "midnight.1" : undefined}
+      radius="xl"
+      p={"xl"}
+      w={160}
+      h={160}
+      className={classes.item}
+      onClick={onClick}
+    >
       <Stack justify="space-between">
         <Center h={60}>{icon}</Center>
         <Text className={classes.label}>{label}</Text>
