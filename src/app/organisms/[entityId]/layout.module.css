@@ -47,3 +47,9 @@
   font-size: var(--mantine-font-size-xs);
   font-weight: 700;
 }
+
+.overviewContent {
+  color: var(--mantine-color-midnight-7);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 700;
+}

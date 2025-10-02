@@ -39,10 +39,6 @@ export function IconExtraction({ size }: IconProps) {
   return <IconImage size={size} src="/icons/slides/extraction.svg" />;
 }
 
-export function IconGenomicDataProcessing({ size }: IconProps) {
-  return <IconImage size={size} src="/icons/slides/genomic_data_processing.svg" />;
-}
-
 export function IconGenomicDataProducts({ size }: IconProps) {
   return <IconImage size={size} src="/icons/slides/genomic_data_processing.svg" />;
 }

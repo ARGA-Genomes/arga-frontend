@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_WIDTH } from "@/app/constants";
 import classes from "./page.module.css";
 
 import { useSpecies } from "@/app/species-provider";
@@ -41,6 +42,7 @@ import {
   Button,
   Center,
   Checkbox,
+  Container,
   Grid,
   Group,
   Image,
@@ -197,7 +199,7 @@ function OverviewBlock({ title, children, loading, hasData }: OverviewBlockProps
             <Text fw={700} c="midnight" fz="xs">
               {title}
             </Text>
-            <DataCheckIcon value={hasData} />
+            {hasData !== undefined && <DataCheckIcon value={hasData} />}
           </Group>
           <Center>{children}</Center>
         </Stack>
@@ -221,112 +223,114 @@ function Overview({ name }: { name: string }) {
   );
 
   return (
-    <Paper radius="lg" p={20} bg="wheatBg.0">
-      <Title order={3} c="wheat">
-        Specimens overview
-      </Title>
+    <Paper py="lg" bg="wheatBg.0">
+      <Container maw={MAX_WIDTH} className={classes.overviewContent}>
+        <Title order={3} c="wheat">
+          Specimens overview
+        </Title>
 
-      {error?.message}
+        {error?.message}
 
-      <Grid columns={7}>
-        <Grid.Col span={5}>
-          <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
-            <Paper
-              radius="lg"
-              p={20}
-              bg="wheatBg.0"
-              withBorder
-              style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}
-            >
-              <Grid gutter={50}>
-                <Grid.Col span={2}>
-                  <Text fw={700} c="midnight" fz="xs" mb="sm">
-                    Total number of specimens
-                  </Text>
-                  <AttributePillContainer color="white" className={classes.pill}>
-                    {specimens?.total}
-                  </AttributePillContainer>
-                </Grid.Col>
-                <Grid.Col span={7}>
-                  <Text fw={700} c="midnight" fz="xs" mb="sm">
-                    Collection years
-                  </Text>
-                  <Box h={100}>{specimens && <CollectionYearsGraph data={specimens?.collectionYears} />}</Box>
-                </Grid.Col>
-                <Grid.Col span={3}>
-                  <Text fw={700} c="midnight" fz="xs" mb="sm">
-                    Top 5 countries
-                  </Text>
-                  <Box h={100}>{specimens && <TopCountriesGraph data={specimens?.topCountries} />}</Box>
-                </Grid.Col>
+        <Grid columns={7}>
+          <Grid.Col span={5}>
+            <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
+              <Paper
+                radius="lg"
+                p={20}
+                bg="wheatBg.0"
+                withBorder
+                style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}
+              >
+                <Grid gutter={50}>
+                  <Grid.Col span={2}>
+                    <Stack gap="xs">
+                      Total number of specimens
+                      <Pill.StandardNumber value={specimens?.total} variant="overview" />
+                    </Stack>
+                  </Grid.Col>
+                  <Grid.Col span={7}>
+                    <Stack gap="xs">
+                      Collection years
+                      <Box h={100}>{specimens && <CollectionYearsGraph data={specimens?.collectionYears} />}</Box>
+                    </Stack>
+                  </Grid.Col>
+                  <Grid.Col span={3}>
+                    <Stack gap="xs">
+                      Top 5 countries
+                      <Box h={100}>{specimens && <TopCountriesGraph data={specimens?.topCountries} />}</Box>
+                    </Stack>
+                  </Grid.Col>
+                </Grid>
+              </Paper>
+            </Skeleton>
+          </Grid.Col>
+          <Grid.Col span={2}>
+            <OverviewBlock title="Major collections" loading={loading}>
+              <Grid>
+                {data?.species.overview.majorCollections.map((collection) => (
+                  <Grid.Col span={6} key={collection}>
+                    <Pill.StandardText value={collection} variant="overview" />
+                  </Grid.Col>
+                ))}
               </Grid>
-            </Paper>
-          </Skeleton>
-        </Grid.Col>
-        <Grid.Col span={2}>
-          <OverviewBlock title="Major collections" loading={loading}>
-            <Grid>
-              {data?.species.overview.majorCollections.map((collection) => (
-                <Grid.Col span={6} key={collection}>
-                  <AttributePillContainer color="white" className={classes.pill}>
-                    {collection}
-                  </AttributePillContainer>
-                </Grid.Col>
-              ))}
-            </Grid>
-          </OverviewBlock>
-        </Grid.Col>
+            </OverviewBlock>
+          </Grid.Col>
 
-        <Grid.Col span={1}>
-          <OverviewBlock title="Holotype" loading={loading} hasData={!!holotypes?.length}>
-            {holotypes?.map((accession) => (
-              <Pill.SpecimenRegistration key={accession.entityId} accession={accession} />
-            ))}
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Other types" loading={loading} hasData={!!specimens?.otherTypes}>
-            <AttributePillContainer className={classes.pill} color={col(specimens?.otherTypes, "white")}>
-              {specimens?.otherTypes}
-            </AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Formal vouchers" loading={loading} hasData={!!specimens?.formalVouchers}>
-            <AttributePillContainer className={classes.pill} color={col(specimens?.formalVouchers, "white")}>
-              {specimens?.formalVouchers}
-            </AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Tissue available" loading={loading} hasData={!!specimens?.tissues}>
-            <AttributePillContainer className={classes.pill} color={col(specimens?.tissues, "white")}>
-              {specimens?.tissues}
-            </AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Genomic DNA available" loading={loading} hasData={!!specimens?.genomicDna}>
-            <AttributePillContainer className={classes.pill} color={col(specimens?.genomicDna, "white")}>
-              {specimens?.genomicDna}
-            </AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Australian material" loading={loading} hasData={!!specimens?.australianMaterial}>
-            <AttributePillContainer className={classes.pill} color={col(specimens?.australianMaterial, "white")}>
-              {specimens?.australianMaterial}
-            </AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <OverviewBlock title="Non-Australian material" loading={loading} hasData={!!specimens?.nonAustralianMaterial}>
-            <AttributePillContainer className={classes.pill} color={col(specimens?.nonAustralianMaterial, "white")}>
-              {specimens?.nonAustralianMaterial}
-            </AttributePillContainer>
-          </OverviewBlock>
-        </Grid.Col>
-      </Grid>
+          <Grid.Col span={1}>
+            <OverviewBlock title="Holotype" loading={loading} hasData={!!holotypes?.length}>
+              {holotypes?.map((accession) => (
+                <Pill.SpecimenRegistration key={accession.entityId} accession={accession} />
+              ))}
+            </OverviewBlock>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <OverviewBlock title="Other types" loading={loading} hasData={!!specimens?.otherTypes}>
+              <AttributePillContainer className={classes.pill} color={col(specimens?.otherTypes, "white")}>
+                {specimens?.otherTypes}
+              </AttributePillContainer>
+            </OverviewBlock>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <OverviewBlock title="Formal vouchers" loading={loading} hasData={!!specimens?.formalVouchers}>
+              <AttributePillContainer className={classes.pill} color={col(specimens?.formalVouchers, "white")}>
+                {specimens?.formalVouchers}
+              </AttributePillContainer>
+            </OverviewBlock>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <OverviewBlock title="Tissue available" loading={loading} hasData={!!specimens?.tissues}>
+              <AttributePillContainer className={classes.pill} color={col(specimens?.tissues, "white")}>
+                {specimens?.tissues}
+              </AttributePillContainer>
+            </OverviewBlock>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <OverviewBlock title="Genomic DNA available" loading={loading} hasData={!!specimens?.genomicDna}>
+              <AttributePillContainer className={classes.pill} color={col(specimens?.genomicDna, "white")}>
+                {specimens?.genomicDna}
+              </AttributePillContainer>
+            </OverviewBlock>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <OverviewBlock title="Australian material" loading={loading} hasData={!!specimens?.australianMaterial}>
+              <AttributePillContainer className={classes.pill} color={col(specimens?.australianMaterial, "white")}>
+                {specimens?.australianMaterial}
+              </AttributePillContainer>
+            </OverviewBlock>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <OverviewBlock
+              title="Non-Australian material"
+              loading={loading}
+              hasData={!!specimens?.nonAustralianMaterial}
+            >
+              <AttributePillContainer className={classes.pill} color={col(specimens?.nonAustralianMaterial, "white")}>
+                {specimens?.nonAustralianMaterial}
+              </AttributePillContainer>
+            </OverviewBlock>
+          </Grid.Col>
+        </Grid>
+      </Container>
     </Paper>
   );
 }
@@ -365,7 +369,7 @@ function Explorer({ name }: { name: string }) {
   }
 
   return (
-    <Paper>
+    <Container maw={MAX_WIDTH} w="100%">
       <Title order={3} mb="lg">
         Interactive specimen explorer
       </Title>
@@ -384,7 +388,7 @@ function Explorer({ name }: { name: string }) {
           </Stack>
         </Grid.Col>
       </Grid>
-    </Paper>
+    </Container>
   );
 }
 
@@ -541,37 +545,37 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
         </Table>
 
         {data && (
-          <Paper bg="moss.1" p="lg" radius="xl" w={300}>
-            <Stack gap="xs">
+          <Paper bg="mossBg.1" p="lg" radius="xl" w={300}>
+            <Stack gap={4}>
               <Text fw={600} fz={18}>
                 Data indexed
               </Text>
               <Group wrap="nowrap" justify="space-between" ml="sm">
-                <Text fz="md" fw={600} c="midnight.8">
+                <Text fz="sm" fw={600} c="midnight.8">
                   Genome
                 </Text>
                 <DataCheckIcon value={stats?.fullGenomes} />
               </Group>
               <Group wrap="nowrap" justify="space-between" ml="sm">
-                <Text fz="md" fw={600} c="midnight.8">
+                <Text fz="sm" fw={600} c="midnight.8">
                   Libraries
                 </Text>
                 <DisabledDataCheckIcon />
               </Group>
               <Group wrap="nowrap" justify="space-between" ml="sm">
-                <Text fz="md" fw={600} c="midnight.8">
+                <Text fz="sm" fw={600} c="midnight.8">
                   Single loci
                 </Text>
                 <DataCheckIcon value={stats?.loci} />
               </Group>
               <Group wrap="nowrap" justify="space-between" ml="sm">
-                <Text fz="md" fw={600} c="midnight.8">
+                <Text fz="sm" fw={600} c="midnight.8">
                   SNPs
                 </Text>
                 <DisabledDataCheckIcon />
               </Group>
               <Group wrap="nowrap" justify="space-between" ml="sm">
-                <Text fz="md" fw={600} c="midnight.8">
+                <Text fz="sm" fw={600} c="midnight.8">
                   Other
                 </Text>
                 <DataCheckIcon value={stats?.otherGenomic} />
@@ -608,91 +612,93 @@ function AllSpecimens() {
   }
 
   return (
-    <LoadPanel visible={loading} error={error} radius="lg" p="lg" bg="shellfishBg.0" mih={500}>
-      <Stack>
-        <Title order={3} c="shellfish">
-          All specimens
-        </Title>
+    <LoadPanel visible={loading} error={error} py="lg" bg="shellfishBg.0" mih={500}>
+      <Container maw={MAX_WIDTH}>
+        <Stack>
+          <Title order={3} c="shellfish">
+            All specimens
+          </Title>
 
-        <Group justify="space-between">
-          <Group gap="xl">
-            <Text fw={700} fz="xs" c="midnight.9">
-              Showing {specimens?.records.length} of {specimens?.total} specimens
-            </Text>
+          <Group justify="space-between">
+            <Group gap="xl">
+              <Text fw={700} fz="xs" c="midnight.9">
+                Showing {specimens?.records.length} of {specimens?.total} specimens
+              </Text>
 
-            {filters.length && (
-              <Group>
-                <Text fw={700} fz="xs" c="midnight.9">
-                  Filters:
-                </Text>
-                {filters.map((filter) => (
-                  <FilterBadge filter={filter} onRemove={removeFilter} key={Object.keys(filter).join()} />
-                ))}
-              </Group>
-            )}
+              {filters.length && (
+                <Group>
+                  <Text fw={700} fz="xs" c="midnight.9">
+                    Filters:
+                  </Text>
+                  {filters.map((filter) => (
+                    <FilterBadge filter={filter} onRemove={removeFilter} key={Object.keys(filter).join()} />
+                  ))}
+                </Group>
+              )}
+            </Group>
+
+            <Group>
+              <Select
+                size="xs"
+                color="midnight.7"
+                radius="xl"
+                data={[
+                  { value: "20", label: "20 records" },
+                  { value: "50", label: "50 records" },
+                  { value: "100", label: "100 records" },
+                ]}
+                defaultValue="100"
+                readOnly={false}
+                onChange={(value) => {
+                  setPage(1);
+                  if (value) setPageSize(parseInt(value, 10));
+                }}
+              />
+
+              <Button
+                size="xs"
+                color="midnight.7"
+                radius="xl"
+                variant={opened ? "filled" : "outline"}
+                leftSection={<IconAdjustments size="1rem" />}
+                onClick={() => setOpened(!opened)}
+              >
+                Filters
+              </Button>
+
+              <Button variant="subtle" color="mantine.7" radius="xl" disabled>
+                <Stack gap={0}>
+                  <Center>
+                    <IconDownload size={16} />
+                  </Center>
+                  <Text fz="xs" fw={500}>
+                    Download
+                  </Text>
+                </Stack>
+              </Button>
+            </Group>
           </Group>
 
-          <Group>
-            <Select
-              size="xs"
-              color="midnight.7"
-              radius="xl"
-              data={[
-                { value: "20", label: "20 records" },
-                { value: "50", label: "50 records" },
-                { value: "100", label: "100 records" },
-              ]}
-              defaultValue="100"
-              readOnly={false}
-              onChange={(value) => {
-                setPage(1);
-                if (value) setPageSize(parseInt(value, 10));
-              }}
-            />
+          <Box h={700}>
+            <FilterDrawer opened={opened} onClose={() => setOpened(false)}>
+              <Filter
+                filters={filters}
+                options={specimens?.options}
+                onApply={(filters) => {
+                  setOpened(false);
+                  setFilters(filters);
+                }}
+              />
+            </FilterDrawer>
 
-            <Button
-              size="xs"
-              color="midnight.7"
-              radius="xl"
-              variant={opened ? "filled" : "outline"}
-              leftSection={<IconAdjustments size="1rem" />}
-              onClick={() => setOpened(!opened)}
-            >
-              Filters
-            </Button>
+            <ScrollArea h="inherit" type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
+              <SpecimenTable specimens={specimens?.records} sorting={sorting} onSort={setSorting} />
+            </ScrollArea>
+          </Box>
 
-            <Button variant="subtle" color="mantine.7" radius="xl" disabled>
-              <Stack gap={0}>
-                <Center>
-                  <IconDownload size={16} />
-                </Center>
-                <Text fz="xs" fw={500}>
-                  Download
-                </Text>
-              </Stack>
-            </Button>
-          </Group>
-        </Group>
-
-        <Box h={700}>
-          <FilterDrawer opened={opened} onClose={() => setOpened(false)}>
-            <Filter
-              filters={filters}
-              options={specimens?.options}
-              onApply={(filters) => {
-                setOpened(false);
-                setFilters(filters);
-              }}
-            />
-          </FilterDrawer>
-
-          <ScrollArea h="inherit" type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
-            <SpecimenTable specimens={specimens?.records} sorting={sorting} onSort={setSorting} />
-          </ScrollArea>
-        </Box>
-
-        <PaginationBar total={specimens?.total} page={page} pageSize={pageSize} onChange={setPage} />
-      </Stack>
+          <PaginationBar total={specimens?.total} page={page} pageSize={pageSize} onChange={setPage} />
+        </Stack>
+      </Container>
     </LoadPanel>
   );
 }

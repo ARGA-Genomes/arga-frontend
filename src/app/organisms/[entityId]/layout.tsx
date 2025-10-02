@@ -10,7 +10,6 @@ import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 import { Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
-import { AttributePillContainer } from "@/components/data-fields";
 import { Pill } from "@/components/Pills";
 import OrganismHeader from "@/components/OrganismHeader";
 
@@ -61,14 +60,16 @@ function DataTabs({ entityId, children }: { entityId: string; children: React.Re
         <Tabs.List>
           <Tabs.Tab value="source">Source organism</Tabs.Tab>
           <Tabs.Tab value="subsamples_and_tissues">Subsamples and tissues</Tabs.Tab>
-          <Tabs.Tab value="data_preparation">Genomic and genetic data processing</Tabs.Tab>
+          <Tabs.Tab value="data_preparation">Nucleic acid extracts</Tabs.Tab>
           <Tabs.Tab value="data_products">Genomic and genetic data products</Tabs.Tab>
         </Tabs.List>
       </Container>
 
       <Paper pos="relative" py="md">
-        <Overview entityId={entityId} />
-        {children}
+        <Stack>
+          <Overview entityId={entityId} />
+          {children}
+        </Stack>
       </Paper>
     </Tabs>
   );
@@ -102,62 +103,53 @@ function Overview({ entityId }: { entityId: string }) {
   });
 
   return (
-    <Paper p="xl" mb="xl" bg="wheatBg.0">
-      <Title order={3} c="wheat">
-        Organism overview
-      </Title>
+    <Paper py="lg" bg="wheatBg.0" className={classes.overviewContent}>
+      <Container maw={MAX_WIDTH}>
+        <Title order={3} c="wheat">
+          Organism overview
+        </Title>
 
-      {error?.message}
+        {error?.message}
 
-      <Grid>
-        <Grid.Col span={6}>
-          <Grid>
-            <Grid.Col span={8}>
-              <Stack>
-                <OverviewBlock title="Scientific name" loading={loading}>
-                  <Stack>
-                    {data && <Pill.ScientificName name={data.organism.name} variant="overview" />}
-                    <Group>
-                      <Text fz="xs" fw={700} c="midnight">
-                        Identification verified
-                      </Text>
-                    </Group>
-                  </Stack>
-                </OverviewBlock>
-                <Group>
-                  <AttributePillContainer
-                    className={classes.holotypePill}
-                    color="white"
-                    withBorder={false}
-                  ></AttributePillContainer>
-                </Group>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Stack>
-                <Stack gap="sm">
-                  <Text fw={700} c="midnight" fz="xs">
+        <Grid>
+          <Grid.Col span={6}>
+            <Grid>
+              <Grid.Col span={8}>
+                <Stack>
+                  <OverviewBlock title="Scientific name" loading={loading}>
+                    <Stack>
+                      {data && <Pill.ScientificName name={data.organism.name} variant="overview" />}
+                      <Group>Identification verified</Group>
+                    </Stack>
+                  </OverviewBlock>
+                  <Group justify="space-between">
+                    <Group></Group>
+                    <Pill.SpecimenStatus />
+                  </Group>
+                </Stack>
+              </Grid.Col>
+              <Grid.Col span={4}>
+                <Stack>
+                  <Stack gap="sm">
                     Source organism scope
-                  </Text>
-                  <Pill.Common value={data?.organism.disposition ?? undefined} variant="overview" />
-                </Stack>
-                <Stack gap="sm">
-                  <Text fw={700} c="midnight" fz="xs">
+                    <Pill.StandardText value={data?.organism.disposition} variant="overview" />
+                  </Stack>
+                  <Stack gap="sm">
                     Biome
-                  </Text>
-                  <Pill.Common value={data?.organism.biome ?? undefined} variant="overview" />
+                    <Pill.StandardText value={data?.organism.biome} variant="overview" />
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <OverviewBlock title="Associated organisms" loading={loading}></OverviewBlock>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <OverviewBlock title="External links" loading={loading}></OverviewBlock>
-        </Grid.Col>
-      </Grid>
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <OverviewBlock title="Associated organisms" loading={loading}></OverviewBlock>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <OverviewBlock title="External links" loading={loading}></OverviewBlock>
+          </Grid.Col>
+        </Grid>
+      </Container>
     </Paper>
   );
 }
