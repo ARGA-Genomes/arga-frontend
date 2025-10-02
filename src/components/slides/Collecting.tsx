@@ -41,7 +41,7 @@ export function CollectingSlide({ organism, collections }: CollectingSlideProps)
 function Collecting({ collection }: { collection: Collection }) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Field collecting
       </Text>
       <DataTable>
@@ -59,7 +59,7 @@ function Collecting({ collection }: { collection: Collection }) {
 function Location({ collection }: { collection: Collection }) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Field location
       </Text>
       <DataTable>
@@ -80,7 +80,7 @@ function Location({ collection }: { collection: Collection }) {
 function Identification({ collection }: { collection: Collection }) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Field identification
       </Text>
       <DataTable>
@@ -95,7 +95,7 @@ function Identification({ collection }: { collection: Collection }) {
 function Details({ organism, collection }: { organism: Organism; collection: Collection }) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Collecting details
       </Text>
       <DataTable>

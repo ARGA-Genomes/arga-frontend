@@ -39,7 +39,7 @@ export function ExtractionSlide({ subsamples, extractions }: ExtractionSlideProp
 function SubsampleDetails({ subsample }: { subsample: Subsample }) {
   return (
     <Stack gap={5}>
-      <Text fw={700} fz="md" c="midnight.7">
+      <Text fw={700} fz="xs" c="midnight.7">
         Nucleic acid extract sample material
       </Text>
       <table className={classes.table}>
@@ -109,7 +109,7 @@ function SubsampleDetails({ subsample }: { subsample: Subsample }) {
 function ExtractionDetails({ extraction }: { extraction: DnaExtract }) {
   return (
     <Stack gap={5}>
-      <Text fw={700} fz="md" c="midnight.7">
+      <Text fw={700} fz="xs" c="midnight.7">
         Nucleic acid extract
       </Text>
       <table className={classes.table}>

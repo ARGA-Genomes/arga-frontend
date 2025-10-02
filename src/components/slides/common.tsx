@@ -8,10 +8,10 @@ import { DataTable } from "../data-table";
 export function PublicationDetails({ publication }: { publication?: Publication | null }) {
   return (
     <Stack>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Data source
       </Text>
-      <Text fz="sm" fw={600} c="midnight.7" style={{ whiteSpace: "normal", wordWrap: "break-word" }}>
+      <Text fz="xs" fw={600} c="midnight.7" style={{ whiteSpace: "normal", wordWrap: "break-word" }}>
         {publication?.citation}
       </Text>
       <Center>{publication?.doi && <Pill.Doi url={publication.doi} />}</Center>

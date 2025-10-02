@@ -41,7 +41,7 @@ export function TissueSlide({ tissues }: TissueSlideProps) {
 function TissueDetails({ tissue }: { tissue: Tissue }) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Tissue deposition
       </Text>
       <DataTable>
@@ -64,7 +64,7 @@ function TissueDetails({ tissue }: { tissue: Tissue }) {
 function CollectionDetails({ tissue }: { tissue: Tissue }) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Collection
       </Text>
       <DataTable>
@@ -79,20 +79,20 @@ function CollectionDetails({ tissue }: { tissue: Tissue }) {
 function ReferenceMaterialStatus({ tissue }: { tissue: Tissue }) {
   return (
     <Paper p="lg" ml="auto" shadow="none" radius="xl" bg="mossBg.1">
-      <Text fw={600} fz="sm" c="midnight.7">
+      <Text fw={600} fz="xs" c="midnight.7">
         Reference material status
       </Text>
 
       <Stack pl="xs" pt="md" gap="xs">
         <Group justify="space-between" wrap="nowrap">
-          <Text fw={600} fz="sm" c="midnight.7">
+          <Text fw={600} fz="xs" c="midnight.7">
             Designated reference material
           </Text>
           <DataCheckIcon value={tissue.referenceMaterial} />
         </Group>
 
         <Group justify="space-between" wrap="nowrap">
-          <Text fw={600} fz="sm" c="midnight.7">
+          <Text fw={600} fz="xs" c="midnight.7">
             Identification verified
           </Text>
           <DataCheckIcon value={tissue.identificationVerified} />

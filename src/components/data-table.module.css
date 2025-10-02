@@ -8,7 +8,7 @@
                 white-space: nowrap;
                 width: 1px;
                 padding-right: var(--mantine-spacing-xl);
-                font-size: var(--mantine-font-size-sm);
+                font-size: var(--mantine-font-size-xs);
                 font-weight: 300;
                 color: var(--mantine-color-midnight-9);
             }
@@ -25,7 +25,7 @@
             white-space: nowrap;
             width: 1;
             padding-right: var(--mantine-spacing-xl);
-            font-size: var(--mantine-font-size-sm);
+            font-size: var(--mantine-font-size-xs);
             font-weight: 300;
         }
     }

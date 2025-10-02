@@ -38,7 +38,7 @@ interface DataTableRowProps {
 export function DataTableRowValue({ label, children, grow }: DataTableRowProps) {
   return (
     <DataTable.Row label={label}>
-      <Text fw={600} fz="sm" c="midnight.8">
+      <Text fw={600} fz="xs" c="midnight.8">
         {grow && children}
         {!grow && <Group>{children}</Group>}
       </Text>
