@@ -71,6 +71,84 @@ export type AnnotationEvent = {
   standardOperatingProcedures?: Maybe<Scalars['String']['output']>;
 };
 
+export type Assembly = {
+  __typename?: 'Assembly';
+  assemblyId: Scalars['String']['output'];
+  assemblyN50?: Maybe<Scalars['String']['output']>;
+  assemblyName?: Maybe<Scalars['String']['output']>;
+  completeness?: Maybe<Scalars['String']['output']>;
+  completenessMethod?: Maybe<Scalars['String']['output']>;
+  computationalInfrastructure?: Maybe<Scalars['String']['output']>;
+  coverage?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
+  guanineCytosinePercent?: Maybe<Scalars['Float']['output']>;
+  hybrid?: Maybe<Scalars['String']['output']>;
+  hybridInformation?: Maybe<Scalars['String']['output']>;
+  level?: Maybe<Scalars['String']['output']>;
+  libraries: Array<Library>;
+  method?: Maybe<Scalars['String']['output']>;
+  methodLink?: Maybe<Scalars['String']['output']>;
+  methodVersion?: Maybe<Scalars['String']['output']>;
+  minimumGapLength?: Maybe<Scalars['Int']['output']>;
+  name: NameDetails;
+  numberOfContigs?: Maybe<Scalars['Int']['output']>;
+  numberOfReplicons?: Maybe<Scalars['Int']['output']>;
+  numberOfScaffolds?: Maybe<Scalars['Int']['output']>;
+  polishingOrScaffoldingData?: Maybe<Scalars['String']['output']>;
+  polishingOrScaffoldingMethod?: Maybe<Scalars['String']['output']>;
+  publication?: Maybe<Publication>;
+  referenceGenomeLink?: Maybe<Scalars['String']['output']>;
+  referenceGenomeUsed?: Maybe<Scalars['String']['output']>;
+  representation?: Maybe<Scalars['String']['output']>;
+  size?: Maybe<Scalars['Int']['output']>;
+  sizeUngapped?: Maybe<Scalars['Int']['output']>;
+  sourceMolecule?: Maybe<Scalars['String']['output']>;
+  specimens: Array<Specimen>;
+  systemUsed?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+};
+
+export type AssemblyBy = {
+  entityId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AssemblyDetails = {
+  __typename?: 'AssemblyDetails';
+  assemblyId: Scalars['String']['output'];
+  assemblyN50?: Maybe<Scalars['String']['output']>;
+  assemblyName?: Maybe<Scalars['String']['output']>;
+  completeness?: Maybe<Scalars['String']['output']>;
+  completenessMethod?: Maybe<Scalars['String']['output']>;
+  computationalInfrastructure?: Maybe<Scalars['String']['output']>;
+  coverage?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
+  guanineCytosinePercent?: Maybe<Scalars['Float']['output']>;
+  hybrid?: Maybe<Scalars['String']['output']>;
+  hybridInformation?: Maybe<Scalars['String']['output']>;
+  level?: Maybe<Scalars['String']['output']>;
+  method?: Maybe<Scalars['String']['output']>;
+  methodLink?: Maybe<Scalars['String']['output']>;
+  methodVersion?: Maybe<Scalars['String']['output']>;
+  minimumGapLength?: Maybe<Scalars['Int']['output']>;
+  numberOfContigs?: Maybe<Scalars['Int']['output']>;
+  numberOfReplicons?: Maybe<Scalars['Int']['output']>;
+  numberOfScaffolds?: Maybe<Scalars['Int']['output']>;
+  polishingOrScaffoldingData?: Maybe<Scalars['String']['output']>;
+  polishingOrScaffoldingMethod?: Maybe<Scalars['String']['output']>;
+  referenceGenomeLink?: Maybe<Scalars['String']['output']>;
+  referenceGenomeUsed?: Maybe<Scalars['String']['output']>;
+  representation?: Maybe<Scalars['String']['output']>;
+  size?: Maybe<Scalars['Int']['output']>;
+  sizeUngapped?: Maybe<Scalars['Int']['output']>;
+  sourceMolecule?: Maybe<Scalars['String']['output']>;
+  systemUsed?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+};
+
 export type AssemblyEvent = {
   __typename?: 'AssemblyEvent';
   assembledBy?: Maybe<Scalars['String']['output']>;
@@ -82,6 +160,12 @@ export type AssemblyEvent = {
   name?: Maybe<Scalars['String']['output']>;
   quality?: Maybe<Scalars['String']['output']>;
   versionStatus?: Maybe<Scalars['String']['output']>;
+};
+
+export type AssemblyPage = {
+  __typename?: 'AssemblyPage';
+  records: Array<AssemblyDetails>;
+  total: Scalars['Int']['output'];
 };
 
 export type AttributeCategory =
@@ -584,6 +668,38 @@ export type KingdomPhylumCount = {
   phylum: Scalars['String']['output'];
 };
 
+export type Library = {
+  __typename?: 'Library';
+  baitSetName?: Maybe<Scalars['String']['output']>;
+  baitSetReference?: Maybe<Scalars['String']['output']>;
+  concentration?: Maybe<Scalars['Float']['output']>;
+  concentrationUnit?: Maybe<Scalars['String']['output']>;
+  constructionProtocol?: Maybe<Scalars['String']['output']>;
+  designDescription?: Maybe<Scalars['String']['output']>;
+  dnaTreatment?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  eventTime?: Maybe<Scalars['NaiveTime']['output']>;
+  indexDualOligo?: Maybe<Scalars['String']['output']>;
+  indexDualTag?: Maybe<Scalars['String']['output']>;
+  indexOligo?: Maybe<Scalars['String']['output']>;
+  indexTag?: Maybe<Scalars['String']['output']>;
+  insertSize?: Maybe<Scalars['String']['output']>;
+  layout?: Maybe<Scalars['String']['output']>;
+  libraryId: Scalars['String']['output'];
+  location?: Maybe<Scalars['String']['output']>;
+  name: NameDetails;
+  numberOfLibrariesPooled?: Maybe<Scalars['Int']['output']>;
+  pcrCycles?: Maybe<Scalars['Int']['output']>;
+  pcrReplicates?: Maybe<Scalars['Int']['output']>;
+  preparedBy?: Maybe<Scalars['String']['output']>;
+  publication?: Maybe<Publication>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  selection?: Maybe<Scalars['String']['output']>;
+  source?: Maybe<Scalars['String']['output']>;
+  strategy?: Maybe<Scalars['String']['output']>;
+};
+
 export type LocusItem = {
   __typename?: 'LocusItem';
   accession: Scalars['String']['output'];
@@ -908,6 +1024,7 @@ export type PublicationType =
 
 export type Query = {
   __typename?: 'Query';
+  assembly: Assembly;
   dataset: Dataset;
   dnaExtract?: Maybe<DnaExtract>;
   maps: Maps;
@@ -926,6 +1043,11 @@ export type Query = {
   subsample?: Maybe<Subsample>;
   taxa: Taxa;
   taxon: Taxon;
+};
+
+
+export type QueryAssemblyArgs = {
+  by: AssemblyBy;
 };
 
 
@@ -1173,6 +1295,7 @@ export type SourceContentType =
 
 export type Species = {
   __typename?: 'Species';
+  assemblies: AssemblyPage;
   attributes: Array<NameAttribute>;
   dataSummary: SpeciesGenomicDataSummary;
   genomicComponents: GenomicComponentPage;
@@ -1187,6 +1310,12 @@ export type Species = {
   taxonomy: Array<Taxonomy>;
   vernacularNames: Array<VernacularName>;
   wholeGenomes: WholeGenomePage;
+};
+
+
+export type SpeciesAssembliesArgs = {
+  page: Scalars['Int']['input'];
+  pageSize: Scalars['Int']['input'];
 };
 
 
@@ -1279,6 +1408,14 @@ export type SpeciesMarkerPage = {
 
 export type SpeciesOverview = {
   __typename?: 'SpeciesOverview';
+  /**
+   * The specimen accessions, if any. There should only ever be one holotype
+   * per species but conflicting data sources can give us multiple and rather than
+   * hiding it we surface all possible accessions here.
+   */
+  accessions: Array<AccessionEvent>;
+  /** A list of the collections that have the most specimens for the species */
+  majorCollections: Array<Scalars['String']['output']>;
   specimens: SpecimensOverview;
 };
 
@@ -1465,6 +1602,7 @@ export type SpecimenSummary = {
   latitude?: Maybe<Scalars['Float']['output']>;
   loci: Scalars['Int']['output'];
   longitude?: Maybe<Scalars['Float']['output']>;
+  organismId: Scalars['String']['output'];
   otherGenomic: Scalars['Int']['output'];
   partialGenomes: Scalars['Int']['output'];
   sequences: Scalars['Int']['output'];
@@ -1488,12 +1626,6 @@ export type SpecimensOverview = {
   formalVouchers: Scalars['Int']['output'];
   /** The total amount of genomic DNA resulting from a specimen */
   genomicDna: Scalars['Int']['output'];
-  /** The accession of the holotype, if any */
-  holotype?: Maybe<Scalars['String']['output']>;
-  /** The entity_id of the holotype, if any */
-  holotypeEntityId?: Maybe<Scalars['String']['output']>;
-  /** A list of the collections that have the most specimens for the species */
-  majorCollections: Array<Scalars['String']['output']>;
   /** The total amount of material located elsewhere */
   nonAustralianMaterial: Scalars['Int']['output'];
   /** The total amount of type specimens that are not the holotype */
@@ -2068,6 +2200,7 @@ export type TaxonomicVernacularGroup =
   | 'HIGHER_PLANTS'
   | 'HORNWORTS'
   | 'INSECTS'
+  | 'INVERTEBRATES'
   | 'LIVERWORTS'
   | 'MAMMALS'
   | 'MOLLUSCS'

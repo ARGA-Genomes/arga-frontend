@@ -109,7 +109,7 @@ export default function AllGroups() {
               classNames={outerAccordionClasses}
               chevron={<IconChevronDown style={{ color: "var(--mantine-color-midnight-10)" }} />}
               mb="md"
-              defaultValue={["Ecosystems"]}
+              defaultValue={["Industry Applications"]}
               multiple
             >
               {processedGroups.map(({ name, count, allGroup, subcategoryGroups }) => (
