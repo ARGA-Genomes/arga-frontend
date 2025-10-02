@@ -44,16 +44,8 @@ function DataTabs({ name, children }: { name: string; children: React.ReactNode 
           <Tabs.Tab value="distribution">Data distribution</Tabs.Tab>
           <Tabs.Tab value="assemblies">Genome assemblies</Tabs.Tab>
           <Tabs.Tab value="components">Gene libraries</Tabs.Tab>
-          <Tabs.Tab value="variants">Variants and population sets</Tabs.Tab>
-          <Tabs.Tab value="organelle">Organelle chromosomes</Tabs.Tab>
           <Tabs.Tab value="markers">Single loci</Tabs.Tab>
-          <Tabs.Tab value="other">Other genetic data</Tabs.Tab>
-          {/* <Tabs.Tab value="annotations">Genome annotations</Tabs.Tab> */}
-          {/* <Tabs.Tab value="other">Other genomic data</Tabs.Tab> */}
-          {/* <Tabs.Tab value="protocols">Protocols</Tabs.Tab> */}
           <Tabs.Tab value="specimens">Specimens</Tabs.Tab>
-          {/* <Tabs.Tab value="gallery">Gallery</Tabs.Tab> */}
-          {/* <Tabs.Tab value="publications">Publications</Tabs.Tab> */}
           <Tabs.Tab value="taxonomy">Taxonomy</Tabs.Tab>
         </Tabs.List>
       </Container>
@@ -85,9 +77,7 @@ export default function SpeciesLayout(props: SpeciesLayoutProps) {
           <PreviousPage />
         </Container>
         <SpeciesHeader canonicalName={canonicalName} />
-        <DataTabs name={name}>
-          <Container maw={MAX_WIDTH}>{children}</Container>
-        </DataTabs>
+        <DataTabs name={name}>{children}</DataTabs>
         <PageCitation />
       </Stack>
     </SpeciesProvider>

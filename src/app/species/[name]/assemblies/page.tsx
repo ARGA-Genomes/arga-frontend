@@ -14,6 +14,7 @@ import {
   Divider,
   Box,
   useMantineTheme,
+  Container,
 } from "@mantine/core";
 import classes from "./page.module.css";
 
@@ -48,6 +49,7 @@ import {
 } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { LibrarySlide } from "@/components/slides/Library";
+import { MAX_WIDTH } from "@/app/constants";
 
 const GET_ASSEMBLY = gql`
   query Assembly($entityId: String) {
@@ -114,12 +116,16 @@ export default function Page() {
   return (
     <Stack gap="xl">
       <Overview />
+
       {assembly?.entityId && (
         <>
-          <Viewer entityId={assembly.entityId} />
+          <Container maw={MAX_WIDTH}>
+            <Viewer entityId={assembly.entityId} />
+          </Container>
           <Provenance entityId={assembly.entityId} />
         </>
       )}
+
       <AllAssemblies onSelected={setAssembly} />
     </Stack>
   );
@@ -134,45 +140,49 @@ function Overview() {
   });
 
   return (
-    <Paper radius="lg" p={20} bg="wheatBg.0">
-      <Title order={3} c="wheat">
-        Genomic overview
-      </Title>
+    <Paper radius="lg" bg="wheatBg.0">
+      <Container maw={MAX_WIDTH} py="xl">
+        <Title order={3} c="wheat">
+          Genomic overview
+        </Title>
 
-      <Grid>
-        <Grid.Col span={2}>
-          <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
-            <Paper
-              radius="lg"
-              p={20}
-              bg="wheatBg.0"
-              withBorder
-              style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}
-            >
-              <Stack>
-                <Text fw={700} c="midnight" fz="xs" mb="sm">
-                  INSDC reference genome available
-                </Text>
-                <Group>
-                  <Text my="auto" fw={700} c="midnight" fz="xs" mb="sm">
-                    Total number of assemblies
+        <Grid>
+          <Grid.Col span={2}>
+            <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
+              <Paper
+                radius="lg"
+                p={20}
+                bg="wheatBg.0"
+                withBorder
+                style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}
+              >
+                <Stack>
+                  <Text fw={700} c="midnight" fz="xs" mb="sm">
+                    INSDC reference genome available
                   </Text>
-                  <Pill.StandardNumber variant="overview" value={data?.species.assemblies.total} />
-                </Group>
+                  <Group>
+                    <Text my="auto" fw={700} c="midnight" fz="xs">
+                      Total number of assemblies
+                    </Text>
+                    <Text fz="xs" fw={700}>
+                      <Pill.StandardNumber variant="overview" value={data?.species.assemblies.total} />
+                    </Text>
+                  </Group>
+                </Stack>
+              </Paper>
+            </Skeleton>
+          </Grid.Col>
+          <Grid.Col span={10}>
+            <ScrollArea>
+              <Stack>
+                {data?.species.assemblies.records.map((record) => (
+                  <OverviewItem key={record.entityId} assembly={record} />
+                ))}
               </Stack>
-            </Paper>
-          </Skeleton>
-        </Grid.Col>
-        <Grid.Col span={10}>
-          <ScrollArea>
-            <Stack>
-              {data?.species.assemblies.records.map((record) => (
-                <OverviewItem key={record.entityId} assembly={record} />
-              ))}
-            </Stack>
-          </ScrollArea>
-        </Grid.Col>
-      </Grid>
+            </ScrollArea>
+          </Grid.Col>
+        </Grid>
+      </Container>
     </Paper>
   );
 }
@@ -184,7 +194,9 @@ function OverviewItem({ assembly }: { assembly: AssemblyOverview }) {
         <Grid.Col span={3}>
           <Group>
             Estimated size
-            <Pill.StandardText value={assembly.size?.toString()} />
+            <Text fz="xs" fw={700}>
+              <Pill.StandardText value={assembly.size?.toString()} />
+            </Text>
           </Group>
         </Grid.Col>
 
@@ -227,7 +239,9 @@ function Viewer({ entityId }: { entityId?: string }) {
       <Stack>
         <Group>
           <Title order={3}>Genome assembly viewer</Title>
-          <Pill.IdTitle value={assembly.assemblyId} />
+          <Title order={4}>
+            <Pill.Id value={assembly.assemblyId} />
+          </Title>
         </Group>
 
         <Grid>
@@ -450,7 +464,9 @@ function Provenance({ entityId }: { entityId: string }) {
 
   return (
     <Stack>
-      <Title order={3}>Assembly provenance timeline</Title>
+      <Container w="100%" maw={MAX_WIDTH}>
+        <Title order={3}>Assembly provenance timeline</Title>
+      </Container>
       <TimelineNavbar onSelected={setCard}>
         <TimelineNavbar.Item label="Library preparation" icon={<IconLibrary size={60} />} />
         <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
@@ -496,19 +512,21 @@ function AllAssemblies({ onSelected }: AllAssembliesProps) {
   const assemblies = data?.species.assemblies;
 
   return (
-    <Paper p="xl" bg="shellfishBg.0">
-      <Stack>
-        <Title order={3} c="shellfish">
-          All genomes
-        </Title>
-        <ScrollArea>
-          <Group wrap="nowrap">
-            {assemblies?.records.map((assembly) => (
-              <AssemblyItem assembly={assembly} key={assembly.assemblyId} onSelected={onSelected} />
-            ))}
-          </Group>
-        </ScrollArea>
-      </Stack>
+    <Paper bg="shellfishBg.0">
+      <Container maw={MAX_WIDTH} py="xl">
+        <Stack>
+          <Title order={3} c="shellfish">
+            All genomes
+          </Title>
+          <ScrollArea>
+            <Group wrap="nowrap">
+              {assemblies?.records.map((assembly) => (
+                <AssemblyItem assembly={assembly} key={assembly.assemblyId} onSelected={onSelected} />
+              ))}
+            </Group>
+          </ScrollArea>
+        </Stack>
+      </Container>
     </Paper>
   );
 }

@@ -14,7 +14,11 @@ export function PublicationDetails({ publication }: { publication?: Publication 
       <Text fz="xs" fw={600} c="midnight.7" style={{ whiteSpace: "normal", wordWrap: "break-word" }}>
         {publication?.citation}
       </Text>
-      <Center>{publication?.doi && <Pill.Doi url={publication.doi} />}</Center>
+      <Center>
+        <Text fz="xs" fw={700}>
+          {publication?.doi && <Pill.Doi url={publication.doi} />}
+        </Text>
+      </Center>
     </Stack>
   );
 }

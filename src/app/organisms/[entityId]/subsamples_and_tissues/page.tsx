@@ -1,7 +1,7 @@
 "use client";
 
 import { MAX_WIDTH } from "@/app/constants";
-import { IconGenomicDataProcessing, IconSourceOrganism, IconSubsample } from "@/components/ArgaIcons";
+import { IconExtraction, IconSourceOrganism, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { TissueSlide } from "@/components/slides/Tissues";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
@@ -58,10 +58,7 @@ function Provenance({ entityId }: { entityId: string }) {
         </Link>
         <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
         <Link href="data_preparation">
-          <TimelineNavbar.Item
-            label="Genomic and genetic data processing"
-            icon={<IconGenomicDataProcessing size={60} />}
-          />
+          <TimelineNavbar.Item label="Nucleic acid extracts" icon={<IconExtraction size={60} />} />
         </Link>
       </TimelineNavbar>
 

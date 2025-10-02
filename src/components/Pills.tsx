@@ -1,7 +1,7 @@
 import { AccessionEvent, Maybe, NameDetails } from "@/generated/types";
 import classes from "./Pills.module.css";
 
-import { Paper, Group } from "@mantine/core";
+import { Paper, Group, Center } from "@mantine/core";
 import { getVoucherColour, getVoucherStatus } from "@/helpers/colors";
 
 interface PillCommonProps {
@@ -29,12 +29,24 @@ Pill.Empty = function PillEmpty() {
   return <Pill className={classes.empty}>no data</Pill>;
 };
 
-Pill.StandardText = function PillStandardText({ value }: { value?: Maybe<string> }) {
-  return <Pill className={classes.standard}>{value ?? "no data"}</Pill>;
+Pill.StandardText = function PillStandardText({ value, variant }: { value?: Maybe<string> } & PillCommonProps) {
+  if (value) {
+    return (
+      <Pill className={variant ? classes[variant] : classes.standard}>
+        <Center>{value}</Center>
+      </Pill>
+    );
+  } else {
+    return <Pill.Empty />;
+  }
 };
 
 Pill.StandardNumber = function PillStandardNumber({ value, variant }: { value?: Maybe<number> } & PillCommonProps) {
-  return <Pill className={variant ? classes[variant] : classes.standard}>{value?.toString() ?? "no data"}</Pill>;
+  return (
+    <Pill className={variant ? classes[variant] : classes.standard}>
+      <Center>{value?.toString() ?? "no data"}</Center>
+    </Pill>
+  );
 };
 
 Pill.ScientificName = function PillScientificName({
@@ -66,8 +78,8 @@ Pill.CoordinateSystem = function PillCoordinateSystem({ value }: { value?: strin
   return <Pill className={classes.coordSystem}>{value}</Pill>;
 };
 
-Pill.IdTitle = function PillIdTitle({ value }: { value?: string }) {
-  return <Pill className={classes.idTitle}>{value}</Pill>;
+Pill.Id = function PillIdTitle({ value }: { value?: string }) {
+  return <Pill className={classes.standard}>{value}</Pill>;
 };
 
 Pill.AssemblyType = function PillAssemblyType({ value }: { value?: Maybe<string> }) {

@@ -51,13 +51,14 @@
 
 .filterDrawer {
     position: absolute;
+    right: var(--mantine-spacing-xl);
     z-index: 10;
     width: 100%;
     height: inherit;
     display: flex;
     justify-content: flex-end;
     background-color: rgba(0, 0, 0, 0.4);
-    border-radius: var(--mantine-radius-lg);
+    border-radius: 0 var(--mantine-radius-lg) var(--mantine-radius-lg) 0;
 }
 
 .filterPane {
@@ -121,4 +122,10 @@
 
 .filterBadgeRemove {
     cursor: pointer;
+}
+
+.overviewContent {
+    color: var(--mantine-color-midnight-7);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 700;
 }

@@ -1,4 +1,6 @@
+import { MAX_WIDTH } from "@/app/constants";
 import SummaryPage from "@/views/species/summary";
+import { Container } from "@mantine/core";
 
 interface PageProps {
   params: Promise<{
@@ -8,5 +10,9 @@ interface PageProps {
 
 export default async function Page(props: PageProps) {
   const params = await props.params;
-  return <SummaryPage params={params} />;
+  return (
+    <Container w="100%" maw={MAX_WIDTH}>
+      <SummaryPage params={params} />
+    </Container>
+  );
 }
