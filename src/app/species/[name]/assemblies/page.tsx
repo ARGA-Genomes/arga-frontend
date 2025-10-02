@@ -184,7 +184,7 @@ function OverviewItem({ assembly }: { assembly: AssemblyOverview }) {
         <Grid.Col span={3}>
           <Group>
             Estimated size
-            <Pill.StandardText value={assembly.size} />
+            <Pill.StandardText value={assembly.size?.toString()} />
           </Group>
         </Grid.Col>
 
@@ -528,7 +528,7 @@ function AssemblyItem({ assembly, onSelected }: AssemblyItemProps) {
           <DataTable.RowValue label="Accession">{assembly.assemblyId}</DataTable.RowValue>
           <DataTable.RowValue label="Genome size">
             <Group>
-              <Pill.Common value={assembly.size ?? ""} />
+              <Pill.Common value={assembly.size?.toString() ?? ""} />
             </Group>
           </DataTable.RowValue>
           <DataTable.RowValue label="Release date">
