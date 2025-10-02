@@ -5,17 +5,15 @@ import classes from "./group-card.module.css";
 import { Image, Paper, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 import { memo } from "react";
+import { GroupItem } from "../_data/all";
 
-export interface GroupCardProps {
-  category: string;
-  image: string;
-  href?: string;
+export interface GroupCardProps extends GroupItem {
   disabled?: boolean;
 }
 
-function GroupCard({ category, image, href, disabled }: GroupCardProps) {
+function GroupCard({ category, image, href, source, filter, disabled }: GroupCardProps) {
   const imageSize = 125;
-  const groupLink = href ?? `/browse/list-groups/${category}`;
+  const groupLink = href ?? filter ? `/browse/list-groups/${category}` : `/browse/sources/${source}`;
 
   return (
     <Paper radius="xl" p={20} className={`${classes.card} ${disabled ? classes.disabled : ""}`} maw={190}>

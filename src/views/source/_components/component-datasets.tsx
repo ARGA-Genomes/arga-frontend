@@ -137,7 +137,7 @@ export function ComponentDatasets({ datasets }: { datasets?: DatasetDetails[] })
 
 function ViewSourceButton({ dataset }: { dataset?: DatasetDetails }) {
   return (
-    <UnstyledButton className={pageClasses.gotoSource} component={Link} href={dataset?.url || "#"}>
+    <UnstyledButton className={pageClasses.gotoSource} component={Link} href={dataset?.url || "#"} target="_blank">
       <Paper radius="lg" pl="sm" pr={1} withBorder>
         <Group gap="xs" h={30.8}>
           <Text fw="bold" c="dimmed" size="xs">

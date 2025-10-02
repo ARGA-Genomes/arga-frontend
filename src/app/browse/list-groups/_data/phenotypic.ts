@@ -5,9 +5,8 @@ export const phenotypic: GroupItem[] = [
     category: "Medicinal and Bioactive",
     image: "/icons/list-group/List group_ medicinal and bioactive.svg",
     source: "ARGA Useful Species", // TODO: MISSING
-    disabled: true,
     filter: {
-      name: "isMedicinalAndBioactive",
+      name: "is_medicinal_and_bioactive_icon",
       value: true,
     },
   },

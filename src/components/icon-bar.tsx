@@ -380,52 +380,52 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   top_110_species: {
     image: "/icons/list-group/List group_ Threatened (Top 110 Species).svg",
     label: "Threatened",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/Australia's 110 Priority Threatened Species",
   },
   EPBC_act_category_EX: {
     image: "/icons/list-group/List group_ EPBC_ extinct.svg",
     label: "EPBC Act Status: Extinct",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Extinct",
   },
   EPBC_act_category_EW: {
     image: "/icons/list-group/List group_ EPBC_ extinct in the wild.svg",
     label: "EPBC Act Status: Extinct in the wild",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Extinct in the Wild",
   },
   EPBC_act_category_CR: {
     image: "/icons/list-group/List group_ EPBC_ critically endangered.svg",
     label: "EPBC Act Status: Critically endangered",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Critically Endangered",
   },
   EPBC_act_category_EN: {
     image: "/icons/list-group/List group_ EPBC_ endangered.svg",
     label: "EPBC Act Status: Endangered",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Endangered",
   },
   EPBC_act_category_VU: {
     image: "/icons/list-group/List group_ EPBC_ vulnerable.svg",
     label: "EPBC Act Status: Vulnerable",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Vulnerable",
   },
   EPBC_act_category_cd: {
     image: "/icons/list-group/List group_ EPBC_ conservation dependent.svg",
     label: "EPBC Act Status: Conservation dependent",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Conservation Dependent",
   },
   EPBC_act_category_nt: {
     image: "/icons/list-group/List group_ EPBC_ not threatened.svg",
     label: "EPBC Act Status: Not threatened",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Not Threatened",
   },
   EPBC_act_category_lc: {
     image: "/icons/list-group/List group_ EPBC_ least concern.svg",
     label: "EPBC Act Status: Least concern",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Least Concern",
   },
   EPBC_act_category_ul: {
     image: "/icons/list-group/List group_ EPBC_ unlisted.svg",
     label: "EPBC Act Status: Unlisted",
-    link: "/browse/sources/ARGA Threatened Species",
+    link: "/browse/list-groups/EPBC Unlisted Status",
   },
   iucn_redlist_EX: {
     label: "IUCN Extinct",
@@ -475,46 +475,47 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   is_medicinal_and_bioactive_icon: {
     image: "/icons/list-group/List group_ medicinal and bioactive.svg",
     label: "Medicinal and bioactive",
+    link: "/browse/list-groups/Medicinal and Bioactive",
   },
   agriculture: {
     image: "/icons/list-group/List group_ Agriculture.svg",
     label: "Agriculture",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Agriculture",
   },
   aquaculture: {
     image: "/icons/list-group/List group_ Aquaculture.svg",
     label: "Aquaculture",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Aquaculture",
   },
   "horticultural crop": {
     image: "/icons/list-group/List group_ Horticultural crops.svg",
     label: "Horticultural crop",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Horticulture",
   },
   "crops and cereals": {
     image: "/icons/list-group/List group_ Cereals and crops.svg",
     label: "Crops and cereals",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Crops and Cereals",
   },
   forestry: {
     image: "/icons/list-group/List group_ Forestry timber and textiles.svg",
     label: "Forestry and timber industry",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Forestry and Timber",
   },
   livestock: {
     image: "/icons/list-group/List group_ Livestock.svg",
     label: "Livestock industry",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Livestock",
   },
   commercial_and_trade_fisheries_icon: {
     image: "/icons/list-group/List group_ Commercial and trade fishes.svg",
     label: "Commercial and trade fisheries",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Commercial Fishing",
   },
   managed_fisheries_icon: {
     image: "/icons/list-group/List group_ Managed fisheries.svg",
     label: "Managed fisheries",
-    link: "/browse/sources/ARGA Commercial Species",
+    link: "/browse/list-groups/Managed Fisheries",
   },
 };
 
