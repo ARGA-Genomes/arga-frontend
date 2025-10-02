@@ -23,7 +23,7 @@ interface DataTableProps {
 
 export function DataTable({ children, ...tableProps }: DataTableProps | TableProps) {
   return (
-    <Table withRowBorders={false} className={classes["data-table"]} {...tableProps}>
+    <Table withRowBorders={false} verticalSpacing={4} className={classes["data-table"]} {...tableProps}>
       <Table.Tbody>{children}</Table.Tbody>
     </Table>
   );

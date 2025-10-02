@@ -12,6 +12,7 @@ import { Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { AttributePillContainer } from "@/components/data-fields";
 import { Pill } from "@/components/Pills";
+import OrganismHeader from "@/components/OrganismHeader";
 
 const GET_ORGANISM_OVERVIEW = gql`
   query OrganismOverview($entityId: String) {
@@ -88,9 +89,9 @@ export default function OrganismLayout(props: OrganismLayoutProps) {
         <PreviousPage />
       </Container>
 
-      <DataTabs entityId={params.entityId}>
-        <Container maw={MAX_WIDTH}>{children}</Container>
-      </DataTabs>
+      <OrganismHeader entityId={params.entityId} />
+
+      <DataTabs entityId={params.entityId}>{children}</DataTabs>
     </Stack>
   );
 }

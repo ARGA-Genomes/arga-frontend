@@ -6,3 +6,7 @@
     display: inline-block;
     margin-left: 20px;
 }
+
+.card:first-child {
+    margin-left: 300px;
+}

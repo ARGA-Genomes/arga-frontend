@@ -14,8 +14,8 @@
         text-align: left;
         width: 1px;
         padding-right: var(--mantine-spacing-xl);
-        padding-top: var(--mantine-spacing-xs);
-        padding-bottom: var(--mantine-spacing-xs);
+        padding-top: 2;
+        padding-bottom: 2;
     }
 
     td {
@@ -23,8 +23,8 @@
         font-weight: 600;
         color: var(--mantine-color-midnight-7);
         text-align: left;
-        padding-top: var(--mantine-spacing-xs);
-        padding-bottom: var(--mantine-spacing-xs);
+        padding-top: 2;
+        padding-bottom: 2;
         word-wrap: break-word;
         white-space: normal;
     }

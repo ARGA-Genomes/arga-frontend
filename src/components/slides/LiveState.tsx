@@ -18,7 +18,7 @@ export function LiveStateSlide({ organism }: LiveStateSlideProps) {
       </Group>
       <Group justify="space-between">
         <Disposition organism={organism} />
-        <IconLiveState size={200} />
+        <IconLiveState size={110} />
       </Group>
       <Environment organism={organism} />
       <Provenance organism={organism} />
@@ -28,7 +28,7 @@ export function LiveStateSlide({ organism }: LiveStateSlideProps) {
 
 function Identification({ organism }: LiveStateSlideProps) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={600} fz="sm" c="midnight.9">
         Live identification
       </Text>
@@ -44,7 +44,7 @@ function Identification({ organism }: LiveStateSlideProps) {
 
 function Disposition({ organism }: LiveStateSlideProps) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={600} fz="sm" c="midnight.9">
         Live Disposition
       </Text>
@@ -60,7 +60,7 @@ function Disposition({ organism }: LiveStateSlideProps) {
 
 function Environment({ organism }: LiveStateSlideProps) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={600} fz="sm" c="midnight.9">
         Natural environment and location
       </Text>
@@ -90,7 +90,7 @@ function Environment({ organism }: LiveStateSlideProps) {
 
 function Provenance({ organism }: LiveStateSlideProps) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={600} fz="sm" c="midnight.9">
         Provenance and holding
       </Text>
