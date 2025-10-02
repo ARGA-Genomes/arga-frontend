@@ -138,9 +138,9 @@ export default function AllGroups() {
                       {subcategoryGroups.length > 0 && (
                         <Grid mt="sm">
                           {subcategoryGroups.map(({ subcategory, orderGroups }) => (
-                            <GridCol span={{ md: 12, lg: 6 }}>
+                            <GridCol key={subcategory} span={{ md: 12, lg: 6 }}>
                               <Accordion classNames={innerAccordionClasses} variant="separated" radius="lg">
-                                <AccordionItem key={subcategory} value={subcategory}>
+                                <AccordionItem value={subcategory}>
                                   <AccordionControl>
                                     <Text size="md" fw="bold" c="midnight.6">
                                       {subcategory}
