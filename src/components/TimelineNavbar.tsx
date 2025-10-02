@@ -13,7 +13,7 @@ interface TimelineNavbarProps {
 
 export function TimelineNavbar({ selected, onSelected, children }: TimelineNavbarProps) {
   return (
-    <Paper radius="lg" p={"xs"} className={classes.navbar}>
+    <Paper className={classes.navbar}>
       <Group justify="space-evenly">
         {children.map((child, idx) => (
           <HighlightContext key={idx} value={idx === selected}>
@@ -34,8 +34,8 @@ function TimelineNavbarItem({ icon, label }: TimelineNavbarItemProps) {
   const selected = useContext(HighlightContext);
 
   return (
-    <Paper bg={selected ? "midnight.1" : undefined} radius="xl" p={"xl"} w={160} h={160} className={classes.item}>
-      <Stack justify="space-between">
+    <Paper bg={selected ? "midnight.1" : undefined} radius="lg" p="md" className={classes.item}>
+      <Stack justify="space-between" gap={4}>
         <Center h={60}>{icon}</Center>
         <Text className={classes.label}>{label}</Text>
       </Stack>

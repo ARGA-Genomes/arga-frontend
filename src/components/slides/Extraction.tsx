@@ -23,7 +23,7 @@ export function ExtractionSlide({ subsamples, extractions }: ExtractionSlideProp
       getLabel={(record) => record.extractId}
     >
       {extraction && (
-        <Stack w="100%">
+        <Stack w="100%" mb="xl">
           <Group wrap="nowrap">
             <EventDetails version="" />
             <PublicationDetails publication={extraction.publication} />
@@ -38,7 +38,7 @@ export function ExtractionSlide({ subsamples, extractions }: ExtractionSlideProp
 
 function SubsampleDetails({ subsample }: { subsample: Subsample }) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={700} fz="md" c="midnight.7">
         Nucleic acid extract sample material
       </Text>
@@ -108,7 +108,7 @@ function SubsampleDetails({ subsample }: { subsample: Subsample }) {
 
 function ExtractionDetails({ extraction }: { extraction: DnaExtract }) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={700} fz="md" c="midnight.7">
         Nucleic acid extract
       </Text>

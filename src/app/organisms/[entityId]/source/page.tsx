@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_WIDTH } from "@/app/constants";
 import { IconLiveState, IconSpecimenCollection, IconSpecimenRegistration, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { CollectingSlide } from "@/components/slides/Collecting";
@@ -8,12 +9,12 @@ import { RegistrationSlide } from "@/components/slides/Registrations";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
-import { Stack, Text, Title } from "@mantine/core";
+import { Container, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { use, useState } from "react";
 
 const GET_ORGANISM = gql`
-  query SpeciesSpecimens($entityId: String) {
+  query Organism($entityId: String) {
     organism(by: { entityId: $entityId }) {
       ...OrganismDetails
 
@@ -65,6 +66,9 @@ export default function Page(props: PageProps) {
 
   return (
     <Stack gap="xl">
+      <Container w="100%" maw={MAX_WIDTH}>
+        <Title order={3}>Organism provenance timeline</Title>
+      </Container>
       <Provenance entityId={params.entityId} />
     </Stack>
   );
@@ -78,7 +82,6 @@ function Provenance({ entityId }: { entityId: string }) {
   const [card, setCard] = useState(0);
   return (
     <Stack>
-      <Title order={3}>Organism provenance timeline</Title>
       <TimelineNavbar selected={card} onSelected={setCard}>
         <TimelineNavbar.Item label="Live state" icon={<IconLiveState size={60} />} />
         <TimelineNavbar.Item label="Collecting" icon={<IconSpecimenCollection size={60} />} />
@@ -89,7 +92,7 @@ function Provenance({ entityId }: { entityId: string }) {
       </TimelineNavbar>
 
       <CardSlider card={card}>
-        <CardSlider.Card title="Live state" size="lg">
+        <CardSlider.Card title="Live state" size="md">
           {error && <Text>{error.message}</Text>}
           {data && <LiveStateSlide organism={data.organism} />}
         </CardSlider.Card>

@@ -40,7 +40,7 @@ export function TissueSlide({ tissues }: TissueSlideProps) {
 
 function TissueDetails({ tissue }: { tissue: Tissue }) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={600} fz="sm" c="midnight.9">
         Tissue deposition
       </Text>
@@ -63,7 +63,7 @@ function TissueDetails({ tissue }: { tissue: Tissue }) {
 
 function CollectionDetails({ tissue }: { tissue: Tissue }) {
   return (
-    <Stack>
+    <Stack gap={5}>
       <Text fw={600} fz="sm" c="midnight.9">
         Collection
       </Text>
@@ -78,7 +78,7 @@ function CollectionDetails({ tissue }: { tissue: Tissue }) {
 
 function ReferenceMaterialStatus({ tissue }: { tissue: Tissue }) {
   return (
-    <Paper p="lg" ml="auto" shadow="none" radius="xl" bg="moss.1">
+    <Paper p="lg" ml="auto" shadow="none" radius="xl" bg="mossBg.1">
       <Text fw={600} fz="sm" c="midnight.7">
         Reference material status
       </Text>

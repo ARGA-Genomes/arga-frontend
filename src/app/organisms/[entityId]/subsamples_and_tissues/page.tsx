@@ -1,12 +1,13 @@
 "use client";
 
+import { MAX_WIDTH } from "@/app/constants";
 import { IconGenomicDataProcessing, IconSourceOrganism, IconSubsample } from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { TissueSlide } from "@/components/slides/Tissues";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { Tissue } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
-import { Stack, Text, Title } from "@mantine/core";
+import { Container, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { use, useState } from "react";
 
@@ -35,6 +36,9 @@ export default function Page(props: PageProps) {
 
   return (
     <Stack gap="xl">
+      <Container w="100%" maw={MAX_WIDTH}>
+        <Title order={3}>Organism subsampling timeline</Title>
+      </Container>
       <Provenance entityId={params.entityId} />
     </Stack>
   );
@@ -48,7 +52,6 @@ function Provenance({ entityId }: { entityId: string }) {
   const [card, setCard] = useState(1);
   return (
     <Stack>
-      <Title order={3}>Organism subsampling timeline</Title>
       <TimelineNavbar selected={card} onSelected={setCard}>
         <Link href="source">
           <TimelineNavbar.Item label="Source organism" icon={<IconSourceOrganism size={60} />} />
@@ -64,7 +67,7 @@ function Provenance({ entityId }: { entityId: string }) {
 
       <CardSlider card={card}>
         <CardSlider.Card title="Source organism" />
-        <CardSlider.Card title="Subsamples and tissues">
+        <CardSlider.Card title="Subsamples and tissues" size="lg">
           {error && <Text>{error.message}</Text>}
           {data && <TissueSlide tissues={data.organism.tissues} />}
         </CardSlider.Card>

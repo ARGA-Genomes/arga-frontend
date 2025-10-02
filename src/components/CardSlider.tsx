@@ -27,7 +27,7 @@ export function CardSlider({ card, children }: CardSliderProps) {
     const halfWidth = SIZE[children[idx].props.size ?? "md"] / 2;
     const padding = 20 * idx;
 
-    const left = offset - centre + halfWidth + padding;
+    const left = offset - centre + halfWidth + padding + 300;
     ref.current!.scrollTo({ left, behavior: "smooth" });
   }, [card]);
 

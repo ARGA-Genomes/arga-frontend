@@ -2,8 +2,6 @@
     height: 1px;
 
     tbody tr {
-        height: 10;
-
         td {
             &:first-child {
                 text-align: left;
