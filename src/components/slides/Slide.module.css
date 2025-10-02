@@ -8,7 +8,7 @@
 
 .table {
     th {
-        font-size: var(--mantine-font-size-sm);
+        font-size: var(--mantine-font-size-xs);
         font-weight: 300;
         color: var(--mantine-color-midnight-9);
         text-align: left;
@@ -19,7 +19,7 @@
     }
 
     td {
-        font-size: var(--mantine-font-size-sm);
+        font-size: var(--mantine-font-size-xs);
         font-weight: 600;
         color: var(--mantine-color-midnight-7);
         text-align: left;

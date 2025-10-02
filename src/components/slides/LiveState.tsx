@@ -29,7 +29,7 @@ export function LiveStateSlide({ organism }: LiveStateSlideProps) {
 function Identification({ organism }: LiveStateSlideProps) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Live identification
       </Text>
       <DataTable>
@@ -45,7 +45,7 @@ function Identification({ organism }: LiveStateSlideProps) {
 function Disposition({ organism }: LiveStateSlideProps) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Live Disposition
       </Text>
       <DataTable>
@@ -61,7 +61,7 @@ function Disposition({ organism }: LiveStateSlideProps) {
 function Environment({ organism }: LiveStateSlideProps) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Natural environment and location
       </Text>
       <SimpleGrid cols={2}>
@@ -91,7 +91,7 @@ function Environment({ organism }: LiveStateSlideProps) {
 function Provenance({ organism }: LiveStateSlideProps) {
   return (
     <Stack gap={5}>
-      <Text fw={600} fz="sm" c="midnight.9">
+      <Text fw={600} fz="xs" c="midnight.9">
         Provenance and holding
       </Text>
       <DataTable>
