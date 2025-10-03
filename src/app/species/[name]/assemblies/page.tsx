@@ -195,7 +195,7 @@ function OverviewItem({ assembly }: { assembly: AssemblyOverview }) {
           <Group>
             Estimated size
             <Text fz="xs" fw={700}>
-              <Pill.StandardText value={assembly.size?.toString()} />
+              <Pill.StandardText value={assembly.size?.toString()} variant="overview" />
             </Text>
           </Group>
         </Grid.Col>

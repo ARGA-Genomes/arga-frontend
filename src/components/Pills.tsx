@@ -25,8 +25,8 @@ Pill.Common = function PillCommon({ value, variant }: { value?: Maybe<string> } 
   return <Pill className={variant ? classes[variant] : classes.common}>{value}</Pill>;
 };
 
-Pill.Empty = function PillEmpty() {
-  return <Pill className={classes.empty}>no data</Pill>;
+Pill.Empty = function PillEmpty({ variant }: PillCommonProps) {
+  return <Pill className={variant ? classes[`empty-${variant}`] : classes.empty}>{"no data"}</Pill>;
 };
 
 Pill.StandardText = function PillStandardText({ value, variant }: { value?: Maybe<string> } & PillCommonProps) {
@@ -37,7 +37,7 @@ Pill.StandardText = function PillStandardText({ value, variant }: { value?: Mayb
       </Pill>
     );
   } else {
-    return <Pill.Empty />;
+    return <Pill.Empty variant={variant} />;
   }
 };
 

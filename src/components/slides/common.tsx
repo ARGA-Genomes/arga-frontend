@@ -1,6 +1,6 @@
 import classes from "./Slide.module.css";
 
-import { Publication } from "@/generated/types";
+import { Maybe, Publication } from "@/generated/types";
 import { Stack, Text, Center, Paper, Group, Box, Divider } from "@mantine/core";
 import { Pill } from "../Pills";
 import { DataTable } from "../data-table";
@@ -24,7 +24,7 @@ export function PublicationDetails({ publication }: { publication?: Publication 
 }
 
 interface EventDetailsProps {
-  eventDate?: string;
+  eventDate?: string | Maybe<string>;
   version: string;
 }
 
