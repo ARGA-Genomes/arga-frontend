@@ -19,6 +19,10 @@ interface DatasetFiltersProps {
   onChange: (filters: BoolFilterData[]) => void;
 }
 
+const DISABLED_DATASETS = [
+  "Species listed in the Convention on the Conservation of Migratory Species of Wild Animals (CMS), and/or related agreements and MoUs",
+];
+
 export function DatasetFilters({ filters, loading, onChange }: DatasetFiltersProps) {
   // Event handlers for filter chip bools
   const handleActiveToggle = (name: string, active: boolean) =>
@@ -55,15 +59,17 @@ export function DatasetFilters({ filters, loading, onChange }: DatasetFiltersPro
       icon={"/icons/data-type/Data type_ Sequence Archive.svg"}
       loading={loading}
     >
-      {filters.map((filter) => (
-        <BoolFilter
-          {...filter}
-          key={filter.name}
-          options={["Include", "Exclude"]}
-          onActiveToggle={(checked) => handleActiveToggle(filter.name, checked)}
-          onIncludeToggle={(include) => handleIncludeToggle(filter.name, include)}
-        />
-      ))}
+      {filters
+        .filter(({ name }) => !DISABLED_DATASETS.includes(name))
+        .map((filter) => (
+          <BoolFilter
+            {...filter}
+            key={filter.name}
+            options={["Include", "Exclude"]}
+            onActiveToggle={(checked) => handleActiveToggle(filter.name, checked)}
+            onIncludeToggle={(include) => handleIncludeToggle(filter.name, include)}
+          />
+        ))}
     </FilterGroup>
   );
 }
