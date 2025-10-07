@@ -35,13 +35,11 @@ export function ContainedImage({ photo, style }: ContainedImageProps) {
         <>
           <Image pos="absolute" src={src} height={height} />
           <Overlay blur={8} backgroundOpacity={0.3} color="#ffffff" center>
-            <Image
+            <img
+              style={{ objectFit: "contain", width: "100%", height: "100%" }}
               src={src}
-              height={height}
-              fit="contain"
-              styles={{ root: { margin: 0 } }}
               onLoad={() => setLoaded(true)}
-            />
+            ></img>
           </Overlay>
           {!loaded && (
             <Overlay opacity={0.4} center>

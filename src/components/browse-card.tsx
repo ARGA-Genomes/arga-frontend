@@ -6,18 +6,20 @@ import { Group, Image, Paper, Skeleton, Stack, Text } from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import Link from "next/link";
 
+import { get } from "lodash-es";
 import skelClasses from "./browse-card-skel.module.css";
 
 export interface BrowseCardProps {
-  total?: number | null;
+  total?: string;
+  data?: unknown;
   category: string;
   image: string;
   link: string;
   disabled?: boolean;
 }
 
-function BrowseCard({ link, category, total, image, disabled }: BrowseCardProps) {
-  const loading = total === undefined;
+function BrowseCard({ link, category, total, data, image, disabled }: BrowseCardProps) {
+  const isLoading = !data;
   const imageSize = 150;
 
   return (
@@ -47,13 +49,13 @@ function BrowseCard({ link, category, total, image, disabled }: BrowseCardProps)
                 Coming soon
               </Text>
             ) : (
-              total !== null && (
+              total && (
                 <Group justify="center" ta="center" gap={4} w="100%">
-                  {loading ? (
+                  {isLoading ? (
                     <Skeleton opacity={0.6} classNames={skelClasses} w={50} h={20.3} />
                   ) : (
                     <Text fw="bold" size="sm" c="attribute">
-                      {Humanize.compactInteger(total || 0, 2)}
+                      {Humanize.compactInteger(get(data, total) || 0, 2)}
                     </Text>
                   )}
                   <Text size="sm" fw={400} c="attribute">
