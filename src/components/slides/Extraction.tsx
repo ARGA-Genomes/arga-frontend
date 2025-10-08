@@ -3,7 +3,7 @@ import classes from "./Slide.module.css";
 import { DnaExtract, Subsample } from "@/generated/types";
 import { Center, Divider, Group, Stack, Text } from "@mantine/core";
 import { useState } from "react";
-import { IconOrcid, IconSubsample } from "../ArgaIcons";
+import { IconExtraction, IconOrcid } from "../ArgaIcons";
 import { EventDetails, PublicationDetails, SlideNavigation } from "./common";
 
 interface ExtractionSlideProps {
@@ -16,7 +16,7 @@ export function ExtractionSlide({ subsamples, extractions }: ExtractionSlideProp
 
   return (
     <SlideNavigation
-      icon={<IconSubsample size={200} />}
+      icon={<IconExtraction size={200} />}
       records={extractions}
       selected={extraction}
       onSelected={(record) => setExtraction(record)}

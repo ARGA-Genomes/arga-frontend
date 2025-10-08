@@ -71,7 +71,9 @@ function Provenance({ entityId }: { entityId: string }) {
           <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
         </Link>
         <TimelineNavbar.Item label="Nucleic acid extraction" icon={<IconExtraction size={60} />} />
-        <TimelineNavbar.Item label="Genomic and genetic data products" icon={<IconGenomicDataProducts size={60} />} />
+        <Link href="data_products">
+          <TimelineNavbar.Item label="Genomic and genetic data products" icon={<IconGenomicDataProducts size={60} />} />
+        </Link>
       </TimelineNavbar>
 
       <CardSlider card={card}>
