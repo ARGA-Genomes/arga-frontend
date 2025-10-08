@@ -1,0 +1,3 @@
+onlyBuiltDependencies:
+  - '@vaadin/vaadin-usage-statistics'
+  - sharp
