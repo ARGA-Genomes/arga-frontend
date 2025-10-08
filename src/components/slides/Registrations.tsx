@@ -23,7 +23,7 @@ export function RegistrationSlide({ registrations }: RegistrationSlideProps) {
       <Grid w="100%" mr="xl" mb="xl">
         <Grid.Col span={12}>
           <Group grow>
-            <EventDetails version="" />
+            <EventDetails eventDate={registration?.eventDate} version="" />
             <PublicationDetails publication={registration?.publication} />
           </Group>
         </Grid.Col>
