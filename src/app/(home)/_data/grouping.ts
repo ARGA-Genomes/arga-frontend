@@ -20,6 +20,18 @@ export const grouping: BrowseItem[] = [
     link: "/browse/list-groups/Crop Wild Relatives",
   },
   {
+    // total: "sources.ARGA Commercial Species",
+    category: "Medicinal and Bioactive",
+    image: "/icons/list-group/List group_ medicinal and bioactive.svg",
+    link: "/browse/list-groups/Medicinal and Bioactive",
+  },
+  {
+    // total: "sources.ARGA Venomous and Poisonous Species",
+    category: "Venomous and Poisonous",
+    image: "/icons/list-group/List group_ Venomous and poisonous.svg",
+    link: "/browse/sources/ARGA Venomous and Poisonous Species",
+  },
+  {
     // total: "sources.ARGA Threatened Species",
     category: "Threatened",
     image: "/icons/list-group/List group_ Threatened species.svg",
@@ -27,20 +39,8 @@ export const grouping: BrowseItem[] = [
   },
   {
     // total: "sources.ARGA Bushfire Recovery",
-    category: "Bushfire Recovery",
+    category: "Bushfire Vulnerable",
     image: "/icons/list-group/List group_ Bushfire vulnerable.svg",
     link: "/browse/sources/ARGA Bushfire Recovery",
-  },
-  {
-    // total: "sources.ARGA Commercial Species",
-    category: "Commercial",
-    image: "/icons/list-group/List group_ Commercial and trade fishes.svg",
-    link: "/browse/sources/ARGA Commercial Species",
-  },
-  {
-    // total: "sources.ARGA Venomous and Poisonous Species",
-    category: "Venomous and Poisonous",
-    image: "/icons/list-group/List group_ Venomous and poisonous.svg",
-    link: "/browse/sources/ARGA Venomous and Poisonous Species",
   },
 ];
