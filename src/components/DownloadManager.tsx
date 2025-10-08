@@ -67,7 +67,7 @@ export function SavedDataManagerButton() {
       </Drawer>
       <Indicator inline label={saved.length} size={16} color="bushfire" disabled={!saved.length}>
         <ActionIcon size="lg" onClick={toggle} radius="md" variant="subtle" color="midnight.2">
-          <Image src="/icons/misc/file-leaf.svg" width={26} height={26} />
+          <Image src="/icons/misc/file-leaf.svg" width={26} height={26} style={{ minWidth: 26, minHeight: 26 }} />
         </ActionIcon>
       </Indicator>
     </>

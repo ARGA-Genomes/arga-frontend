@@ -15,9 +15,9 @@ export const grouping: BrowseItem[] = [
   },
   {
     // total: "sources.ARGA Commercial Species",
-    category: "Terrestrial",
-    image: "/icons/list-group/List group_ Terrestrial.svg",
-    link: "/browse/list-groups/Terrestrial",
+    category: "Crop Wild Relatives",
+    image: "/icons/list-group/List group_ crop wild relative.svg",
+    link: "/browse/list-groups/Crop Wild Relatives",
   },
   {
     // total: "sources.ARGA Threatened Species",
