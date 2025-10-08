@@ -1,15 +1,16 @@
-import { Button, DefaultMantineColor, getThemeColor, MantineSize, Text, useMantineTheme } from "@mantine/core";
-import { IconExternalLink } from "@tabler/icons-react";
+"use client";
 
-import classes from "./button-link-internal.module.css";
-import { PropsWithChildren } from "react";
-import Link from "next/link";
+import { Button, DefaultMantineColor, getThemeColor, MantineSize, Text, useMantineTheme } from "@mantine/core";
+
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { Url } from "next/dist/shared/lib/router/router";
+import Link from "next/link";
+import { PropsWithChildren } from "react";
+import classes from "./button-link-internal.module.css";
 
 interface InternalLinkButtonProps {
   url: Url;
   outline?: boolean;
-  icon: typeof IconExternalLink;
   acronym?: boolean;
   color?: DefaultMantineColor;
   textColor?: DefaultMantineColor;
@@ -22,7 +23,6 @@ interface InternalLinkButtonProps {
 export function InternalLinkButton({
   url,
   outline,
-  icon: Icon,
   color,
   textColor,
   textSize,
@@ -52,7 +52,7 @@ export function InternalLinkButton({
       >
         {children}
       </Text>
-      {Icon && <Icon color={getThemeColor(textColor, theme)} className={classes.icon} size={16} strokeWidth={3} />}
+      <IconArrowUpRight color={getThemeColor(textColor, theme)} className={classes.icon} size={16} strokeWidth={3} />
     </Button>
   );
 }

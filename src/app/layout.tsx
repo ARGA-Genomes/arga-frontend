@@ -1,16 +1,12 @@
-"use client";
-
 import "@mantine/core/styles.css";
 import "./global.css";
 import classes from "./layout.module.css";
 
-import { ApolloProvider } from "@apollo/client";
-import createClient from "../queries/client";
-
-import { AppShell, MantineProvider } from "@mantine/core";
+import { AppShell, AppShellHeader, AppShellMain, MantineProvider } from "@mantine/core";
 
 import Fathom from "@/components/fathom";
 import { TraceLoaderProvider } from "@/components/traces/context";
+import { ApolloWrapper } from "@/lib/ApolloWrapper";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { theme } from "../theme";
 import { Footer } from "./footer";
@@ -18,14 +14,11 @@ import { SourceProvider } from "./source-provider";
 import { TopNav } from "./top-nav";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // make the apollo graphql client available on all pages
-  const client = createClient();
-
   return (
     <html lang="en">
       <body>
         <Fathom />
-        <ApolloProvider client={client}>
+        <ApolloWrapper>
           <MantineProvider theme={theme}>
             <SourceProvider>
               <TraceLoaderProvider>
@@ -35,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </TraceLoaderProvider>
             </SourceProvider>
           </MantineProvider>
-        </ApolloProvider>
+        </ApolloWrapper>
         <script src="/workers.js" async></script>
       </body>
     </html>
@@ -49,11 +42,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <AppShell header={{ height: 130 }} zIndex={2000} withBorder={false}>
-      <AppShell.Header className={classes.header}>
+      <AppShellHeader className={classes.header}>
         <TopNav />
-      </AppShell.Header>
+      </AppShellHeader>
 
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShellMain>{children}</AppShellMain>
 
       <Footer />
     </AppShell>

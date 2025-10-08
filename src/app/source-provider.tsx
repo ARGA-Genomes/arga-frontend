@@ -1,5 +1,8 @@
+"use client";
+
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import React, { ReactNode } from "react";
-import { gql, useQuery } from "@apollo/client";
 
 const GET_DETAILS = gql`
   query SourcesCache {

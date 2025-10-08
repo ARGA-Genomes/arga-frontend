@@ -1,10 +1,8 @@
-"use client";
-
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Box, Center, Flex, Group, Stack, Text, Title } from "@mantine/core";
-import { IconArrowUpRight, IconSearch } from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 import { useMemo } from "react";
-import { ShowStats, TaxonomicComposition } from "./stats";
+import { ShowStats } from "./stats";
 
 // Project components
 import { InternalLinkButton } from "@/components/button-link-internal";
@@ -17,7 +15,9 @@ import classes from "./page.module.css";
 // Browse data
 import { Search } from "@/components/search";
 import { Overview } from "@/generated/types";
+import { getClient } from "@/lib/ApolloClient";
 import { grouping, taxon, type } from "./_data";
+import { TaxonomicComposition } from "./composition";
 
 interface Counts extends Overview {
   animals: number;
@@ -48,8 +48,11 @@ const GET_COUNTS = gql`
   }
 `;
 
+const client = getClient();
+const { error, data } = await client.query<{ overview: Counts }>({ query: GET_COUNTS });
+
 export default function HomePage() {
-  const { error, data } = useQuery<{ overview: Counts }>(GET_COUNTS);
+  // const { error, data } = useQuery<{ overview: Counts }>(GET_COUNTS);
 
   // Format the data
   const formattedData = useMemo(() => {
@@ -129,13 +132,7 @@ export default function HomePage() {
                 Browse by functional or ecological group
               </Title>
               <Browse items={grouping} data={formattedData} error={error} />
-              <InternalLinkButton
-                url={`/browse/list-groups`}
-                icon={IconArrowUpRight}
-                textColor="white"
-                textSize="md"
-                outline
-              >
+              <InternalLinkButton url={`/browse/list-groups`} textColor="white" textSize="md" outline>
                 View all groups
               </InternalLinkButton>
             </Stack>

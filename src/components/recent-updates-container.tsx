@@ -1,4 +1,4 @@
-import { Grid, Text, ScrollArea, Paper } from "@mantine/core";
+import { Grid, GridCol, Paper, ScrollArea, Text } from "@mantine/core";
 import updatesData from "../../public/public-changelog.json";
 import classes from "./recent-updates-container.module.css";
 
@@ -10,16 +10,16 @@ interface UpdateItem {
 function RecentUpdatesItem({ update }: { update: UpdateItem }) {
   return (
     <>
-      <Grid.Col span={1}>
+      <GridCol span={1}>
         <Text c="shellfish.6">{update.date}</Text>
-      </Grid.Col>
-      <Grid.Col key={`desc-${update.date}`} span={2}>
+      </GridCol>
+      <GridCol key={`desc-${update.date}`} span={2}>
         {update.updates.map((updateMsg) => {
           return (
             <Text key={`${update.date}-${updateMsg}`} c="midnight.3" dangerouslySetInnerHTML={{ __html: updateMsg }} />
           );
         })}
-      </Grid.Col>
+      </GridCol>
     </>
   );
 }

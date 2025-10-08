@@ -1,6 +1,7 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Alert, Box, Container, Divider, Group, Paper, Stack, Text } from "@mantine/core";
 import { IconExclamationMark, IconSearch } from "@tabler/icons-react";
 import * as Humanize from "humanize-plus";

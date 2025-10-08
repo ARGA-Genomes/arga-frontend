@@ -10,7 +10,8 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@apollo/client": "^3.12.9",
+        "@apollo/client": "^4.0.7",
+        "@apollo/client-integration-nextjs": "^0.13.2",
         "@arga/trace-file-parser-wasm": "^0.1.0",
         "@emotion/react": "^11.14.0",
         "@emotion/server": "^11.11.0",

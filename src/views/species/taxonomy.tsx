@@ -366,7 +366,7 @@ interface DetailsProps {
 function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: DetailsProps) {
   const typeSpecimens = taxonomy.typeSpecimens?.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher",
+      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher"
   );
 
   // TODO: change this to show multiple type specimens for things like syntypes
@@ -508,7 +508,6 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
                         <InternalLinkButton
                           key={`${species.scientificName}-${idx}`}
                           url={`/subspecies/${species.scientificName}`}
-                          icon={IconArrowUpRight}
                           color={"#d6e4ed"}
                           textColor="midnight.8"
                         >
@@ -730,7 +729,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   });
 
   const holotype = specimens.data?.taxon.typeSpecimens.find(
-    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype",
+    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype"
   );
 
   function humanize(text: string) {
@@ -1004,7 +1003,6 @@ function TypeSpecimenPill({ specimen, records }: { specimen: TypeSpecimen; recor
         >
           <InternalLinkButton
             url={`specimens/${recordId}`}
-            icon={IconArrowUpRight}
             color={"#d6e4ed"}
             textColor="midnight.8"
             onMouseEnter={hasData ? open : undefined}
