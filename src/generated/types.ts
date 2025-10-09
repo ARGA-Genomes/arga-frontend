@@ -349,6 +349,7 @@ export type CollectionEvent = {
   locality?: Maybe<Scalars['String']['output']>;
   locationSource?: Maybe<Scalars['String']['output']>;
   longitude?: Maybe<Scalars['Float']['output']>;
+  materialSampleId?: Maybe<Scalars['String']['output']>;
   municipality?: Maybe<Scalars['String']['output']>;
   organismId: Scalars['String']['output'];
   organismQuantity?: Maybe<Scalars['String']['output']>;
@@ -1625,6 +1626,7 @@ export type SpecimenSummary = {
   otherGenomic: Scalars['Int']['output'];
   partialGenomes: Scalars['Int']['output'];
   sequences: Scalars['Int']['output'];
+  specimenId?: Maybe<Scalars['String']['output']>;
   typeStatus?: Maybe<Scalars['String']['output']>;
 };
 

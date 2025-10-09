@@ -750,7 +750,7 @@ function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
             popoverDisabled
           />
           <Text fw={600} c="midnight">
-            {record.collectionRepositoryId}
+            {record.specimenId}
           </Text>
           {record.institutionCode}
           {record.country}

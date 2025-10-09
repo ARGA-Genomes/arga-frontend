@@ -46,6 +46,7 @@ export const SPECIMEN = gql`
 export const SPECIMEN_SUMMARY = gql`
   fragment SpecimenSummary on SpecimenSummary {
     entityId
+    specimenId
     organismId
     collectionRepositoryId
     collectionRepositoryCode
@@ -113,6 +114,7 @@ export const SPECIMEN_MAP_MARKER = gql`
 export const COLLECTION_EVENT = gql`
   fragment CollectionEventDetails on CollectionEvent {
     entityId
+    materialSampleId
     fieldCollectingId
     eventDate
     eventTime
