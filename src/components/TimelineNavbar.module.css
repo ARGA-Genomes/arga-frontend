@@ -17,3 +17,25 @@
     color: var(--mantine-color-midnight-9);
     text-align: center;
 }
+
+.icon {
+    z-index: 1;
+}
+
+.connector {
+    position: relative;
+    height: 0;
+}
+
+.connectorLine {
+    fill: var(--mantine-color-midnight-9);
+    stroke: var(--mantine-color-midnight-9);
+}
+
+.arrow {
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke: var(--mantine-color-midnight-9);
+    fill: var(--mantine-color-midnight-9);
+}
