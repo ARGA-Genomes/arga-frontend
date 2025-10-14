@@ -10,7 +10,6 @@ import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { Organism } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Container, Stack, Text, Title } from "@mantine/core";
-import Link from "next/link";
 import { use, useState } from "react";
 
 const GET_ORGANISM = gql`
@@ -86,9 +85,11 @@ function Provenance({ entityId }: { entityId: string }) {
         <TimelineNavbar.Item label="Live state" icon={<IconLiveState size={60} />} />
         <TimelineNavbar.Item label="Collecting" icon={<IconSpecimenCollection size={60} />} />
         <TimelineNavbar.Item label="Registration" icon={<IconSpecimenRegistration size={60} />} />
-        <Link href="subsamples_and_tissues">
-          <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
-        </Link>
+        <TimelineNavbar.Item
+          label="Subsamples and tissues"
+          icon={<IconSubsample size={60} />}
+          href="subsamples_and_tissues"
+        />
       </TimelineNavbar>
 
       <CardSlider card={card}>

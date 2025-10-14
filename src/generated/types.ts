@@ -349,6 +349,7 @@ export type CollectionEvent = {
   locality?: Maybe<Scalars['String']['output']>;
   locationSource?: Maybe<Scalars['String']['output']>;
   longitude?: Maybe<Scalars['Float']['output']>;
+  materialSampleId?: Maybe<Scalars['String']['output']>;
   municipality?: Maybe<Scalars['String']['output']>;
   organismId: Scalars['String']['output'];
   organismQuantity?: Maybe<Scalars['String']['output']>;
@@ -398,6 +399,24 @@ export type DataDepositionEvent = {
   sourceUri?: Maybe<Scalars['String']['output']>;
   submittedBy?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type DataProduct = {
+  __typename?: 'DataProduct';
+  access?: Maybe<Scalars['String']['output']>;
+  context?: Maybe<Scalars['String']['output']>;
+  custodian?: Maybe<Agent>;
+  entityId: Scalars['String']['output'];
+  extractId?: Maybe<Scalars['String']['output']>;
+  fileType?: Maybe<Scalars['String']['output']>;
+  licence?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  publication?: Maybe<Publication>;
+  sequenceAnalysisId?: Maybe<Scalars['String']['output']>;
+  sequenceRunId?: Maybe<Scalars['String']['output']>;
+  sequenceSampleId?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
   url?: Maybe<Scalars['String']['output']>;
 };
 
@@ -884,6 +903,7 @@ export type Organism = {
   bioregion?: Maybe<Scalars['String']['output']>;
   collections: Array<Collection>;
   coordinateSystem?: Maybe<Scalars['String']['output']>;
+  dataProducts: Array<DataProduct>;
   disposition?: Maybe<Scalars['String']['output']>;
   entityId: Scalars['String']['output'];
   extractions: Array<DnaExtract>;
@@ -1606,6 +1626,7 @@ export type SpecimenSummary = {
   otherGenomic: Scalars['Int']['output'];
   partialGenomes: Scalars['Int']['output'];
   sequences: Scalars['Int']['output'];
+  specimenId?: Maybe<Scalars['String']['output']>;
   typeStatus?: Maybe<Scalars['String']['output']>;
 };
 

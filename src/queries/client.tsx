@@ -27,6 +27,7 @@ import {
   LIBRARY,
   ASSEMBLY,
 } from "./sequence";
+import { DATA_PRODUCT } from "./data-product";
 import { TAXON_NAME, TAXON_SOURCE, TAXON_NODE } from "./taxa";
 import { PUBLICATION } from "./publication";
 
@@ -43,6 +44,7 @@ export default function createClient() {
     SPECIMEN_MAP_MARKER,
     SUBSAMPLE,
     DNA_EXTRACT,
+    DATA_PRODUCT,
     SEQUENCE,
     LIBRARY,
     ASSEMBLY,

@@ -33,7 +33,7 @@ export const threatened: GroupItem[] = [
   // EPBC
   {
     category: "EPBC All",
-    image: "/icons/list-group/List group_ EPBC.svg",
+    image: "/icons/list-group/List group_ EPBC_ group page.svg",
     source: "ARGA Threatened Species",
     filter: {
       name: "EPBC",
