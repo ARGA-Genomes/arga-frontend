@@ -769,7 +769,7 @@ function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
               <IconMicroscope />
             </Button>
           </Link>
-          <Button color="shellfish" variant="outline" bg="white" radius="lg">
+          <Button color="shellfish" variant="outline" bg="white" radius="lg" disabled>
             <IconMicroscope />
           </Button>
         </RecordTable.Row>
@@ -872,7 +872,7 @@ function Filter({ filters, options, onApply }: FilterProps) {
                     <div>
                       <Text className={classes.checkboxLabel}>Genomes</Text>
                       <Text className={classes.checkboxDescription}>
-                        Include specimens that have at least on full genome that has been derived from it
+                        Include specimens that have at least one full genome that have been derived from it
                       </Text>
                     </div>
                   </Group>
@@ -884,7 +884,7 @@ function Filter({ filters, options, onApply }: FilterProps) {
                     <div>
                       <Text className={classes.checkboxLabel}>Loci</Text>
                       <Text className={classes.checkboxDescription}>
-                        Include specimens that have at least on loci that has been derived from it
+                        Include specimens that have at least one locus that have been derived from it
                       </Text>
                     </div>
                   </Group>
@@ -896,7 +896,7 @@ function Filter({ filters, options, onApply }: FilterProps) {
                     <div>
                       <Text className={classes.checkboxLabel}>Genomic data</Text>
                       <Text className={classes.checkboxDescription}>
-                        Include specimens that have any genomic data that has been derived from it
+                        Include specimens that have any genomic data that have been derived from it
                       </Text>
                     </div>
                   </Group>
@@ -1116,8 +1116,8 @@ function SmallScore({ specimen }: { specimen: SpecimenSummary }) {
           <SmallScorePip value={!!isRegistered} yes="Specimen is registered" no="Specimen is not registered" />
           <SmallScorePip
             value={!!hasCollectionData}
-            yes="Specimen has date and location details"
-            no="Specimen does not have date and location details"
+            yes="Specimen has date and/or location details"
+            no="Specimen does not have date nor location details"
           />
           <SmallScorePip
             value={!!hasGenomicData}
