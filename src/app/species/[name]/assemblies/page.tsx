@@ -484,7 +484,7 @@ function Provenance({ entityId }: { entityId: string }) {
         <TimelineNavbar.Item label="Public release" icon={<IconDeposition size={60} />} />
       </TimelineNavbar>
 
-      <CardSlider card={card}>
+      <CardSlider card={card} onSelected={setCard}>
         <CardSlider.Card title="Library preparation" size="sm">
           <LibrarySlide libraries={assembly.libraries} />
         </CardSlider.Card>

@@ -1,6 +1,8 @@
 import classes from "./CardSlider.module.css";
 
-import { Text, Paper, Stack, ScrollArea } from "@mantine/core";
+import { Text, Paper, Stack, ScrollArea, Group, Button } from "@mantine/core";
+import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
+import Link from "next/link";
 import { createContext, PropsWithChildren, useContext, useEffect, useRef } from "react";
 
 const SIZE: Record<string, number> = {
@@ -9,14 +11,23 @@ const SIZE: Record<string, number> = {
   lg: 1200,
 };
 
+interface CardNav {
+  index: number;
+  previous?: CardSliderCardProps;
+  next?: CardSliderCardProps;
+  onChange?: (index: number) => void;
+}
+
 const HighlightContext = createContext(false);
+const CardNavContext = createContext<CardNav>({ index: 0 });
 
 interface CardSliderProps {
   card?: number;
+  onSelected: (index: number) => void;
   children: React.ReactElement<CardSliderCardProps>[];
 }
 
-export function CardSlider({ card, children }: CardSliderProps) {
+export function CardSlider({ card, onSelected, children }: CardSliderProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,7 +46,17 @@ export function CardSlider({ card, children }: CardSliderProps) {
     <ScrollArea scrollbars={false} viewportRef={ref} className={classes.container}>
       {children.map((child, idx) => (
         <HighlightContext key={idx} value={idx === card}>
-          {child}
+          <CardNavContext
+            key={idx}
+            value={{
+              index: idx,
+              previous: children[idx - 1]?.props,
+              next: children[idx + 1]?.props,
+              onChange: onSelected,
+            }}
+          >
+            {child}
+          </CardNavContext>
         </HighlightContext>
       ))}
     </ScrollArea>
@@ -45,10 +66,12 @@ export function CardSlider({ card, children }: CardSliderProps) {
 interface CardSliderCardProps extends PropsWithChildren {
   title: string;
   size?: "sm" | "md" | "lg";
+  href?: string;
 }
 
-export function CardSliderCard({ title, size, children }: CardSliderCardProps) {
+export function CardSliderCard({ title, size, href, children }: CardSliderCardProps) {
   const selected = useContext(HighlightContext);
+  const nav = useContext(CardNavContext);
   const width = SIZE[size ?? "md"];
 
   return (
@@ -67,6 +90,39 @@ export function CardSliderCard({ title, size, children }: CardSliderCardProps) {
           {title}
         </Text>
         {children}
+
+        <Group className={classes.navigation} grow>
+          <Group>
+            {nav.previous && (
+              <Button
+                component={nav.previous.href ? Link : undefined}
+                href={nav.previous.href ?? "#"}
+                variant="subtle"
+                color="mantine.4"
+                disabled={!selected}
+                leftSection={<IconArrowNarrowLeft />}
+                onClick={() => nav.onChange && nav.onChange(nav.index - 1)}
+              >
+                {nav.previous.title}
+              </Button>
+            )}
+          </Group>
+          <Group justify="end">
+            {nav.next && (
+              <Button
+                component={nav.next.href ? Link : undefined}
+                href={nav.next.href ?? "#"}
+                variant="subtle"
+                color="mantine.4"
+                disabled={!selected}
+                rightSection={<IconArrowNarrowRight />}
+                onClick={() => nav.onChange && nav.onChange(nav.index + 1)}
+              >
+                {nav.next.title}
+              </Button>
+            )}
+          </Group>
+        </Group>
       </Stack>
     </Paper>
   );

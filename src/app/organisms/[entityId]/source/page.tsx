@@ -92,7 +92,7 @@ function Provenance({ entityId }: { entityId: string }) {
         />
       </TimelineNavbar>
 
-      <CardSlider card={card}>
+      <CardSlider card={card} onSelected={setCard}>
         <CardSlider.Card title="Live state" size="md">
           {error && <Text>{error.message}</Text>}
           {data && <LiveStateSlide organism={data.organism} />}
@@ -110,7 +110,7 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Registrations" size="lg">
           {data && <RegistrationSlide registrations={data.organism.registrations} />}
         </CardSlider.Card>
-        <CardSlider.Card title="Subsamples and tissues" />
+        <CardSlider.Card title="Subsamples and tissues" href="subsamples_and_tissues" />
       </CardSlider>
     </Stack>
   );
