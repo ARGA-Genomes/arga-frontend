@@ -4,6 +4,8 @@
     border-width: 1px;
     border-color: var(--mantine-color-attribute-0);
     background-color: white;
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 700;
 }
 
 .common {
