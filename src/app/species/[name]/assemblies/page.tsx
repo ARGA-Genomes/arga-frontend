@@ -15,12 +15,13 @@ import {
   Box,
   useMantineTheme,
   Container,
+  Accordion,
 } from "@mantine/core";
 import classes from "./page.module.css";
 
 import { useSpecies } from "@/app/species-provider";
 import { gql, useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AssemblyDetails, Library, NameDetails, Specimen } from "@/generated/types";
 import { DataTable } from "@/components/data-table";
 import { DateTime } from "luxon";
@@ -122,7 +123,19 @@ export default function Page() {
           <Container maw={MAX_WIDTH}>
             <Viewer entityId={assembly.entityId} />
           </Container>
-          <Provenance entityId={assembly.entityId} />
+
+          <Accordion variant="contained">
+            <Accordion.Item value="photos">
+              <Accordion.Control>
+                <Container w="100%" maw={MAX_WIDTH}>
+                  <Title order={3}>Assembly provenance timeline</Title>
+                </Container>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Provenance entityId={assembly.entityId} />
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
         </>
       )}
 
@@ -164,9 +177,7 @@ function Overview() {
                     <Text my="auto" fw={700} c="midnight" fz="xs">
                       Total number of assemblies
                     </Text>
-                    <Text fz="xs" fw={700}>
-                      <Pill.StandardNumber variant="overview" value={data?.species.assemblies.total} />
-                    </Text>
+                    <Pill.StandardNumber variant="overview" value={data?.species.assemblies.total} />
                   </Group>
                 </Stack>
               </Paper>
@@ -194,9 +205,7 @@ function OverviewItem({ assembly }: { assembly: AssemblyOverview }) {
         <Grid.Col span={3}>
           <Group>
             Estimated size
-            <Text fz="xs" fw={700}>
-              <Pill.StandardText value={assembly.size?.toString()} variant="overview" />
-            </Text>
+            <Pill.StandardText value={assembly.size?.toString()} variant="overview" />
           </Group>
         </Grid.Col>
 
@@ -464,9 +473,6 @@ function Provenance({ entityId }: { entityId: string }) {
 
   return (
     <Stack>
-      <Container w="100%" maw={MAX_WIDTH}>
-        <Title order={3}>Assembly provenance timeline</Title>
-      </Container>
       <TimelineNavbar onSelected={setCard}>
         <TimelineNavbar.Item label="Library preparation" icon={<IconLibrary size={60} />} />
         <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
@@ -501,6 +507,7 @@ interface AllAssembliesProps {
 function AllAssemblies({ onSelected }: AllAssembliesProps) {
   const { details } = { ...useSpecies() };
 
+  const [selected, setSelected] = useState<AssemblyOverview>();
   const [pageSize, setPageSize] = useState<number>(100);
   const [page, setPage] = useState(1);
 
@@ -510,6 +517,17 @@ function AllAssemblies({ onSelected }: AllAssembliesProps) {
   });
 
   const assemblies = data?.species.assemblies;
+
+  // auto select the first assembly
+  useEffect(() => {
+    if (assemblies && assemblies.total > 0) {
+      const first = assemblies.records.at(0);
+      if (first) {
+        onSelected(first);
+        setSelected(first);
+      }
+    }
+  }, [data]);
 
   return (
     <Paper bg="shellfishBg.0">
@@ -521,7 +539,12 @@ function AllAssemblies({ onSelected }: AllAssembliesProps) {
           <ScrollArea>
             <Group wrap="nowrap">
               {assemblies?.records.map((assembly) => (
-                <AssemblyItem assembly={assembly} key={assembly.assemblyId} onSelected={onSelected} />
+                <AssemblyItem
+                  assembly={assembly}
+                  key={assembly.assemblyId}
+                  selected={selected === assembly}
+                  onSelected={onSelected}
+                />
               ))}
             </Group>
           </ScrollArea>
@@ -534,13 +557,16 @@ function AllAssemblies({ onSelected }: AllAssembliesProps) {
 interface AssemblyItemProps {
   assembly: AssemblyOverview;
   onSelected: (assembly: AssemblyOverview) => void;
+  selected?: boolean;
 }
 
-function AssemblyItem({ assembly, onSelected }: AssemblyItemProps) {
+function AssemblyItem({ assembly, onSelected, selected }: AssemblyItemProps) {
   const releaseDate = assembly.eventDate && DateTime.fromFormat(assembly.eventDate, "yyyy-mm-dd");
 
+  const borderColor = selected ? "var(--mantine-color-wheat-5)" : "var(--mantine-color-shellfishBg-2)";
+
   return (
-    <Paper radius="lg" py="xs" style={{ borderColor: "var(--mantine-color-shellfishBg-2)" }} withBorder>
+    <Paper radius="lg" py="xs" style={{ borderColor }} withBorder>
       <Stack>
         <DataTable>
           <DataTable.RowValue label="Accession">{assembly.assemblyId}</DataTable.RowValue>

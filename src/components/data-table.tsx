@@ -1,7 +1,7 @@
 "use client";
 
 import classes from "@/components/data-table.module.css";
-import { Group, Table, TableProps, Text } from "@mantine/core";
+import { Box, Group, Table, TableProps } from "@mantine/core";
 
 interface DataTableRowProps {
   label?: string;
@@ -38,10 +38,10 @@ interface DataTableRowProps {
 export function DataTableRowValue({ label, children, grow }: DataTableRowProps) {
   return (
     <DataTable.Row label={label}>
-      <Text fw={600} fz="xs" c="midnight.8">
+      <Box className={classes.rowValue}>
         {grow && children}
         {!grow && <Group>{children}</Group>}
-      </Text>
+      </Box>
     </DataTable.Row>
   );
 }

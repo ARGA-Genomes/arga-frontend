@@ -25,7 +25,7 @@ export function TimelineNavbar({ selected, onSelected, children }: TimelineNavba
     <Paper className={classes.navbar}>
       <Container maw={MAX_WIDTH} px="xl" ref={ref}>
         <Connector width={width} linkStart={linkStart} linkEnd={linkEnd} />
-        <Group justify="space-between">
+        <Group justify="space-between" wrap="nowrap">
           {children.map((child, idx) => (
             <HighlightContext key={idx} value={idx === selected}>
               <Box onClick={() => onSelected && onSelected(idx)}>{child}</Box>
@@ -49,7 +49,7 @@ function TimelineNavbarItem({ icon, label, href }: TimelineNavbarItemProps) {
   return (
     <Paper
       component={href ? Link : undefined}
-      href={href ?? ""}
+      href={href ?? "#"}
       w={ITEM_WIDTH}
       bg={selected ? "midnight.1" : undefined}
       radius="lg"
