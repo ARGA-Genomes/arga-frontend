@@ -84,6 +84,8 @@ export function CardSliderCard({ title, size, href, children }: CardSliderCardPr
       w={width}
       mih={600}
       className={classes.card}
+      onClick={() => !selected && nav.onChange && nav.onChange(nav.index)}
+      style={{ cursor: !selected ? "pointer" : "auto" }}
     >
       <Stack>
         <Text mx="xl" mt="xl" fw={600} fz="md" c="midnight.9">
@@ -129,3 +131,30 @@ export function CardSliderCard({ title, size, href, children }: CardSliderCardPr
 }
 
 CardSlider.Card = CardSliderCard;
+
+export function CardSliderLinkedCard({ title, size, href }: CardSliderCardProps) {
+  const width = SIZE[size ?? "md"];
+
+  return (
+    <Paper
+      component={href ? Link : undefined}
+      href={href ?? "#"}
+      bg="midnight.0"
+      withBorder
+      radius="xl"
+      shadow="xl"
+      mb={60}
+      w={width}
+      mih={600}
+      className={classes.card}
+    >
+      <Stack>
+        <Text mx="xl" mt="xl" fw={600} fz="md" c="midnight.9">
+          {title}
+        </Text>
+      </Stack>
+    </Paper>
+  );
+}
+
+CardSlider.LinkedCard = CardSliderLinkedCard;

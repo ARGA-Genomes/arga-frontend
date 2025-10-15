@@ -11,6 +11,10 @@
     margin-left: 300px;
 }
 
+.card:last-child {
+    margin-right: 300px;
+}
+
 .navigation {
     padding-left: var(--mantine-spacing-xl);
     padding-right: var(--mantine-spacing-xl);

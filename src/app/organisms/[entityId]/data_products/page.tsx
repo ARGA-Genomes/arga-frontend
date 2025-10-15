@@ -69,7 +69,7 @@ function Provenance({ entityId }: { entityId: string }) {
       </TimelineNavbar>
 
       <CardSlider card={card} onSelected={setCard}>
-        <CardSlider.Card title="Nucleic acid extraction" href="data_preparation"></CardSlider.Card>
+        <CardSlider.LinkedCard title="Nucleic acid extraction" href="data_preparation" />
         <CardSlider.Card title="Genetic data products">
           {error && <Text>{error.message}</Text>}
           {data && <DataProductSlide products={data.organism.dataProducts} />}

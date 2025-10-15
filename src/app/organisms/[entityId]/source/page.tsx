@@ -110,7 +110,7 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Registrations" size="lg">
           {data && <RegistrationSlide registrations={data.organism.registrations} />}
         </CardSlider.Card>
-        <CardSlider.Card title="Subsamples and tissues" href="subsamples_and_tissues" />
+        <CardSlider.LinkedCard title="Subsamples and tissues" href="subsamples_and_tissues" />
       </CardSlider>
     </Stack>
   );
