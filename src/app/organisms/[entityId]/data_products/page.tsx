@@ -68,13 +68,12 @@ function Provenance({ entityId }: { entityId: string }) {
         <TimelineNavbar.Item label="Genomic and genetic data products" icon={<IconGenomicDataProducts size={60} />} />
       </TimelineNavbar>
 
-      <CardSlider card={card}>
-        <CardSlider.Card title="Nucleic acid extraction"></CardSlider.Card>
+      <CardSlider card={card} onSelected={setCard}>
+        <CardSlider.Card title="Nucleic acid extraction" href="data_preparation"></CardSlider.Card>
         <CardSlider.Card title="Genetic data products">
           {error && <Text>{error.message}</Text>}
           {data && <DataProductSlide products={data.organism.dataProducts} />}
         </CardSlider.Card>
-        <CardSlider.Card title="" />
       </CardSlider>
     </Stack>
   );

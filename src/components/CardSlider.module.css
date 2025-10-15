@@ -10,3 +10,21 @@
 .card:first-child {
     margin-left: 300px;
 }
+
+.navigation {
+    padding-left: var(--mantine-spacing-xl);
+    padding-right: var(--mantine-spacing-xl);
+    padding-bottom: var(--mantine-spacing-xs);
+
+    button,
+    a {
+        color: var(--mantine-color-midnight-4);
+        font-size: var(--mantine-font-size-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+
+        &:hover {
+            color: var(--mantine-color-midnight-9);
+        }
+    }
+}
