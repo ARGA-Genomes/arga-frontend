@@ -8,10 +8,11 @@ import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
-import { Organism } from "@/generated/types";
+import { Name, OrganismDetails, Registration } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Pill } from "@/components/Pills";
 import OrganismHeader from "@/components/OrganismHeader";
+import { IconCollection, IconInstitution } from "@/components/ArgaIcons";
 
 const GET_ORGANISM_OVERVIEW = gql`
   query OrganismOverview($entityId: String) {
@@ -22,9 +23,26 @@ const GET_ORGANISM_OVERVIEW = gql`
         canonicalName
         authorship
       }
+
+      registrations {
+        collectionRepositoryCode
+        collectionRepositoryId
+        institutionCode
+        institutionName
+      }
     }
   }
 `;
+
+type RegistrationCodes = Pick<
+  Registration,
+  "collectionRepositoryCode" | "collectionRepositoryId" | "institutionCode" | "institutionName"
+>;
+
+type Organism = OrganismDetails & {
+  name: Pick<Name, "canonicalName" | "authorship">;
+  registrations: RegistrationCodes[];
+};
 
 interface OrganismQuery {
   organism: Organism;
@@ -102,6 +120,8 @@ function Overview({ entityId }: { entityId: string }) {
     variables: { entityId },
   });
 
+  const registration = data?.organism.registrations.at(0);
+
   return (
     <Paper py="lg" bg="wheatBg.0" className={classes.overviewContent}>
       <Container maw={MAX_WIDTH}>
@@ -122,8 +142,11 @@ function Overview({ entityId }: { entityId: string }) {
                       <Group>Identification verified</Group>
                     </Stack>
                   </OverviewBlock>
-                  <Group justify="space-between">
-                    <Group></Group>
+                  <Group justify="space-between" px="xl">
+                    <Group gap="xl">
+                      <RegistrationInstitution registration={registration} />
+                      <RegistrationCollection registration={registration} />
+                    </Group>
                     <Pill.SpecimenStatus />
                   </Group>
                 </Stack>
@@ -173,4 +196,14 @@ function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
       </Paper>
     </Skeleton>
   );
+}
+
+function RegistrationInstitution({ registration }: { registration?: RegistrationCodes }) {
+  const hasData = registration?.institutionCode || registration?.institutionName;
+  return <IconInstitution size={60} bg={hasData ? "bushfire" : "disabled"} />;
+}
+
+function RegistrationCollection({ registration }: { registration?: RegistrationCodes }) {
+  const hasData = registration?.collectionRepositoryCode || registration?.collectionRepositoryId;
+  return <IconCollection size={60} bg={hasData ? "wheat" : "disabled"} />;
 }
