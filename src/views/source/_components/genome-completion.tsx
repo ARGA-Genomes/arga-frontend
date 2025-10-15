@@ -2,7 +2,8 @@
 
 import { FilterItem } from "@/components/filtering-redux/filters/common";
 import { LineBarGraph } from "@/components/graphing/LineBarGraph";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { ParentSize } from "@visx/responsive";
 
 const GET_COMPLETE_GENOMES_YEAR_STATS = gql`
@@ -33,18 +34,28 @@ interface GenomeCompletionProps {
   disabledHighlight?: boolean;
 }
 
-export function GenomeCompletion({ name, filters, domain, disabledHighlight }: GenomeCompletionProps) {
-  const { data } = useQuery<CompleteGenomesYearStatsQuery>(GET_COMPLETE_GENOMES_YEAR_STATS, {
-    variables: {
-      name,
-      filters,
+export function GenomeCompletion({
+  name,
+  filters,
+  domain,
+  disabledHighlight,
+}: GenomeCompletionProps) {
+  const { data } = useQuery<CompleteGenomesYearStatsQuery>(
+    GET_COMPLETE_GENOMES_YEAR_STATS,
+    {
+      variables: {
+        name,
+        filters,
+      },
+      skip: !name,
     },
-    skip: !name,
-  });
+  );
   let accum = 0;
 
   const stats = data?.stats.completeGenomesByYearForSource.filter(
-    (stat) => stat.year >= domain[0].getFullYear() && stat.year <= domain[1].getFullYear()
+    (stat) =>
+      stat.year >= domain[0].getFullYear() &&
+      stat.year <= domain[1].getFullYear(),
   );
 
   const lineData = stats?.map((stat) => ({

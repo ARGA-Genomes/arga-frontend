@@ -2,13 +2,30 @@
 
 import { DataTable, DataTableRow } from "@/components/data-table";
 import { useSavedData } from "@/components/DownloadManager";
-import { Attribute, AttributePill, DataField } from "@/components/highlight-stack";
+import {
+  Attribute,
+  AttributePill,
+  DataField,
+} from "@/components/highlight-stack";
 import { LoadPanel } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { Sequence, Specimen } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, ButtonProps, Center, Grid, Group, Paper, Stack, Table, Text, Title } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Center,
+  Grid,
+  Group,
+  Paper,
+  Stack,
+  Table,
+  Text,
+  Title,
+} from "@mantine/core";
 import {
   IconArrowNarrowLeft,
   IconCircleCheck,
@@ -161,13 +178,28 @@ function GenomeDetails({ canonicalName, sequence }: GenomeDetailsProps) {
             >
               {inCart ? "added to list" : "add to list"}
             </Button>
-            <LinkButton color="midnight.10" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>
+            <LinkButton
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconDownload />}
+              href={deposition?.sourceUri}
+            >
               get data
             </LinkButton>
-            <LinkButton color="midnight.10" radius="md" leftSection={<IconLink />} href={deposition?.url}>
+            <LinkButton
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconLink />}
+              href={deposition?.url}
+            >
               go to source
             </LinkButton>
-            <Button color="midnight.10" radius="md" leftSection={<IconCloudUpload />} disabled>
+            <Button
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconCloudUpload />}
+              disabled
+            >
               send to Galaxy
             </Button>
           </Stack>
@@ -185,7 +217,10 @@ function AssemblyStats({ sequence }: { sequence?: Sequence }) {
       <Table.Tbody>
         <Table.Tr>
           <Table.Td valign="bottom">
-            <Attribute label="Genome size" value={Humanize.compactInteger(assembly?.genomeSize ?? 0, 3)} />
+            <Attribute
+              label="Genome size"
+              value={Humanize.compactInteger(assembly?.genomeSize ?? 0, 3)}
+            />
           </Table.Td>
           <Table.Td valign="bottom">
             <Attribute label="Number of chromosomes" value={undefined} />
@@ -193,7 +228,10 @@ function AssemblyStats({ sequence }: { sequence?: Sequence }) {
         </Table.Tr>
         <Table.Tr>
           <Table.Td valign="bottom">
-            <Attribute label="Ungapped length" value={Humanize.compactInteger(0)} />
+            <Attribute
+              label="Ungapped length"
+              value={Humanize.compactInteger(0)}
+            />
           </Table.Td>
           <Table.Td valign="bottom">
             <Attribute label="Number of organelles" value={undefined} />
@@ -244,7 +282,13 @@ function AssemblyStats({ sequence }: { sequence?: Sequence }) {
   );
 }
 
-function DataAvailabilityItem({ value, children }: { value: boolean | undefined; children: React.ReactNode }) {
+function DataAvailabilityItem({
+  value,
+  children,
+}: {
+  value: boolean | undefined;
+  children: React.ReactNode;
+}) {
   return (
     <Group wrap="nowrap">
       {value ? <IconCircleCheck color="green" /> : <IconCircleX color="red" />}
@@ -255,18 +299,34 @@ function DataAvailabilityItem({ value, children }: { value: boolean | undefined;
   );
 }
 
-function DataAvailability({ sequence, specimen }: { sequence?: Sequence; specimen?: Specimen }) {
+function DataAvailability({
+  sequence,
+  specimen,
+}: {
+  sequence?: Sequence;
+  specimen?: Specimen;
+}) {
   const sequencing = sequence?.events.sequencing[0];
   const assembly = sequence?.events.assemblies[0];
   const deposition = sequence?.events.dataDepositions[0];
 
   return (
     <Stack>
-      <DataAvailabilityItem value={!!sequencing}>Genome data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!assembly}>Assembly data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!deposition?.sourceUri}>Assembly source files available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!deposition?.url}>Genome publication available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencing}>
+        Genome data available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!assembly}>
+        Assembly data available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!deposition?.sourceUri}>
+        Assembly source files available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!deposition?.url}>
+        Genome publication available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen}>
+        Specimen collection data available
+      </DataAvailabilityItem>
       <DataAvailabilityItem value={!!specimen?.events.accessions.length}>
         Specimen voucher accessioned
       </DataAvailabilityItem>
@@ -379,7 +439,10 @@ export default function AccessionPage(props: AccessionPageProps) {
   const name = decodeURIComponent(params.name);
   const canonicalName = name.replaceAll("_", " ");
 
-  const { loading, error, data } = useQuery<{ sequence: Sequence[]; specimen: Specimen }>(GET_ASSEMBLY, {
+  const { loading, error, data } = useQuery<{
+    sequence: Sequence[];
+    specimen: Specimen;
+  }>(GET_ASSEMBLY, {
     variables: {
       accession: decodeURIComponent(params.accession),
     },
@@ -404,7 +467,10 @@ export default function AccessionPage(props: AccessionPageProps) {
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${accession ?? ""}`}</Title>
+          <Title
+            order={3}
+            mb={10}
+          >{`Full data view: ${accession ?? ""}`}</Title>
           <Text fz="sm" c="dimmed">
             Source
           </Text>
@@ -419,7 +485,10 @@ export default function AccessionPage(props: AccessionPageProps) {
               <Grid.Col span={8}>
                 <LoadPanel visible={loading} h={450}>
                   <Title order={5}>Genome details</Title>
-                  <GenomeDetails sequence={sequence} canonicalName={canonicalName} />
+                  <GenomeDetails
+                    sequence={sequence}
+                    canonicalName={canonicalName}
+                  />
                 </LoadPanel>
               </Grid.Col>
               <Grid.Col span={4}>
@@ -427,7 +496,10 @@ export default function AccessionPage(props: AccessionPageProps) {
                   <Title order={5} mb={10}>
                     Data availability
                   </Title>
-                  <DataAvailability sequence={sequence} specimen={data?.specimen} />
+                  <DataAvailability
+                    sequence={sequence}
+                    specimen={data?.specimen}
+                  />
                 </LoadPanel>
               </Grid.Col>
 

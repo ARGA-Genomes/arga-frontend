@@ -5,8 +5,21 @@ import DataTypeHeader from "@/components/data-type-header";
 import { LoadOverlay } from "@/components/load-overlay";
 import { usePreviousPage } from "@/components/navigation-history";
 import { Taxa, Taxon } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Container, Drawer, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Box,
+  Button,
+  Center,
+  Container,
+  Drawer,
+  Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconFilter } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -53,20 +66,29 @@ function Species() {
 
   // const [filters, setFilters] = useState<Filters>({}); // filters implpementation
 
-  const { loading, error, data, previousData } = useQuery<{ taxa: Taxa }>(GET_SPECIES, {
-    variables: {
-      page,
-      perPage: PAGE_SIZE,
-      filters: [],
+  const { loading, error, data, previousData } = useQuery<{ taxa: Taxa }>(
+    GET_SPECIES,
+    {
+      variables: {
+        page,
+        perPage: PAGE_SIZE,
+        filters: [],
+      },
     },
-  });
+  );
 
   // const records = data?.taxa.species.records || previousData?.taxa.species.records;
   const records: Taxon[] = []; // taxa.species no longer exists in the GraphQL schema
 
   return (
     <Stack>
-      <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" size="xl">
+      <Drawer
+        opened={opened}
+        onClose={close}
+        withCloseButton={false}
+        position="right"
+        size="xl"
+      >
         <Box pt={200}>{/* filters implementation */}</Box>
       </Drawer>
 

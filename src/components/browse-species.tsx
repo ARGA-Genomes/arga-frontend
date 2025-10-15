@@ -1,6 +1,7 @@
 "use client";
 
-import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client";
+import type { DocumentNode, OperationVariables } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import {
   ActionIcon,
   Center,
@@ -24,17 +25,27 @@ import {
   IconSortAscending,
   IconSortDescending,
 } from "@tabler/icons-react";
-import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 // Local components
 import { get, isEqual, range } from "lodash-es";
 import { FiltersDrawer } from "./filtering-redux/drawer";
-import { FilterItem, FilterItemAttribute } from "./filtering-redux/filters/common";
+import type {
+  FilterItem,
+  FilterItemAttribute,
+} from "./filtering-redux/filters/common";
 import { PaginationBar, PaginationSize } from "./pagination";
 import { DataItem, SpeciesCard } from "./species-card";
-import { TableCardLayout, TableCardSwitch } from "./table-card-switch";
+import { type TableCardLayout, TableCardSwitch } from "./table-card-switch";
 
-import { SpeciesCard as SpeciesCardType } from "@/generated/types";
+import type { SpeciesCard as SpeciesCardType, Taxon } from "@/generated/types";
 import { generateCSV } from "@/helpers/downloadCSV";
 import { saveAs } from "file-saver";
 import * as Humanize from "humanize-plus";
@@ -77,22 +88,49 @@ interface TableHeader {
 }
 
 const TABLE_HEADERS: TableHeader[] = [
-  { name: "Species name", description: "Name of the species", sort: Sort.ScientificName, span: 2 },
+  {
+    name: "Species name",
+    description: "Name of the species",
+    sort: Sort.ScientificName,
+    span: 2,
+  },
   { name: "Group", description: "Informal grouping of this species", span: 1 },
-  { name: "Genomes", description: "Number of genome assemblies for this species", sort: Sort.Genomes, span: 1 },
-  { name: "Libraries", description: "Number of genome libraries for this species", sort: Sort.Other, span: 1 },
-  { name: "Loci", description: "Number of loci for this species", sort: Sort.Loci, span: 1 },
-  { name: "Specimens", description: "Number of specimens for this species", sort: Sort.Specimens, span: 1 },
+  {
+    name: "Genomes",
+    description: "Number of genome assemblies for this species",
+    sort: Sort.Genomes,
+    span: 1,
+  },
+  {
+    name: "Libraries",
+    description: "Number of genome libraries for this species",
+    sort: Sort.Other,
+    span: 1,
+  },
+  {
+    name: "Loci",
+    description: "Number of loci for this species",
+    sort: Sort.Loci,
+    span: 1,
+  },
+  {
+    name: "Specimens",
+    description: "Number of specimens for this species",
+    sort: Sort.Specimens,
+    span: 1,
+  },
 ];
 
 export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
-  const [data, setData] = useState();
+  const [data, setData] = useState<{ browse: Taxon } | null>(null);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<Sort>(Sort.ScientificName);
   const [sortDir, setSortDir] = useState<boolean>(true);
 
   const [layout, setLayout] = useState<TableCardLayout>("card");
-  const [pageSize, setPageSize] = useState<number>(layout === "card" ? 10 : 100);
+  const [pageSize, setPageSize] = useState<number>(
+    layout === "card" ? 10 : 100,
+  );
 
   const [filters, setFilters] = useState<FilterItem[]>([]);
   const [filterChips, setFilterChips] = useState<ReactElement[] | null>(null);
@@ -101,7 +139,9 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
   const tableRef = useRef<HTMLTableElement>(null);
 
   // Species query
-  const [, { loading, error, data: rawData, refetch: fetchData }] = useLazyQuery(query.content);
+  const [, { loading, error, data: rawData, refetch: fetchData }] =
+    useLazyQuery<{ browse: Taxon }>(query.content);
+
   const [downloading, setDownloading] = useState<boolean>(false);
 
   // Effect hook to load the data when variables change
@@ -117,9 +157,9 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
   }, [page, pageSize, sort, sortDir, filters]);
 
   // Download query
-  const [, { refetch: fetchCSV }] = useLazyQuery(query.download, {
-    variables: query.variables,
-  });
+  const [, { refetch: fetchCSV }] = useLazyQuery<{ download: Taxon }>(
+    query.download,
+  );
 
   const download = useCallback(async () => {
     setDownloading(true);
@@ -130,8 +170,13 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
     });
 
     saveAs(
-      new Blob([await generateCSV(get(raw, "download.csv"))], { type: "text/csv;charset=utf-8;" }),
-      `arga-species-${new Date().toLocaleString()}.csv`
+      new Blob(
+        [await generateCSV(get(raw, "download.csv") as unknown as string)],
+        {
+          type: "text/csv;charset=utf-8;",
+        },
+      ),
+      `arga-species-${new Date().toLocaleString()}.csv`,
     );
 
     setDownloading(false);
@@ -155,9 +200,13 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
   const downloadDisabled = useMemo(() => {
     if (query.variables) {
       const disallowedFilters = (query.variables.filters || []).filter(
-        (filter: FilterItem) => (filter.value[0] as FilterItemAttribute).name === "cites"
+        (filter: FilterItem) =>
+          (filter.value[0] as FilterItemAttribute).name === "cites",
       );
-      return query.variables.name === "ARGA IUCN Red List" || disallowedFilters.length > 0;
+      return (
+        query.variables.name === "ARGA IUCN Red List" ||
+        disallowedFilters.length > 0
+      );
     }
 
     return false;
@@ -174,7 +223,8 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
       let lastCol: string | undefined = undefined;
 
       tableRef.current.onmousemove = () => {
-        const col = (document.querySelector("td:hover") as HTMLTableCellElement).dataset.col;
+        const col = (document.querySelector("td:hover") as HTMLTableCellElement)
+          .dataset.col;
         if (lastCol !== col) {
           lastCol = col;
 
@@ -196,7 +246,7 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
         setSortDir(!sortDir);
       }
     },
-    [sort, sortDir]
+    [sort, sortDir],
   );
 
   return (
@@ -259,9 +309,17 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
             <Divider orientation="vertical" />
             <Tooltip
               position="bottom"
-              label={downloadDisabled ? "Cannot download IUCN/CITES data" : "Download data as CSV spreadsheet"}
+              label={
+                downloadDisabled
+                  ? "Cannot download IUCN/CITES data"
+                  : "Download data as CSV spreadsheet"
+              }
             >
-              <DownloadButton disabled={downloadDisabled} loading={downloading} onClick={download} />
+              <DownloadButton
+                disabled={downloadDisabled}
+                loading={downloading}
+                onClick={download}
+              />
             </Tooltip>
           </Group>
         </Grid.Col>
@@ -286,89 +344,131 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
         } else if (layout === "table") {
           return (
             <ScrollArea h={500} style={{ borderRadius: 14 }}>
-              <Table ref={tableRef} classNames={classes} highlightOnHover highlightOnHoverColor="wheat.0" striped>
+              <Table
+                ref={tableRef}
+                classNames={classes}
+                highlightOnHover
+                highlightOnHoverColor="wheat.0"
+                striped
+              >
                 <Table.Thead pos="sticky">
                   <Table.Tr bg="midnight.9">
-                    {TABLE_HEADERS.map(({ name, span, sort: colSort, description }) => (
-                      <Tooltip key={name} radius="md" position="bottom" withArrow label={description}>
-                        <Table.Td colSpan={span} fw="bold" c="white" py="sm">
-                          <Flex gap="xs" align="center" justify="center">
-                            {name}
-                            {colSort && (
-                              <ActionIcon variant="subtle" color="midnight.3" onClick={() => handleSort(colSort)}>
-                                {sort !== colSort ? (
-                                  <IconArrowsSort size="1rem" />
-                                ) : sortDir ? (
-                                  <IconSortAscending size="1rem" />
-                                ) : (
-                                  <IconSortDescending size="1rem" />
-                                )}
-                              </ActionIcon>
-                            )}
-                          </Flex>
-                        </Table.Td>
-                      </Tooltip>
-                    ))}
+                    {TABLE_HEADERS.map(
+                      ({ name, span, sort: colSort, description }) => (
+                        <Tooltip
+                          key={name}
+                          radius="md"
+                          position="bottom"
+                          withArrow
+                          label={description}
+                        >
+                          <Table.Td colSpan={span} fw="bold" c="white" py="sm">
+                            <Flex gap="xs" align="center" justify="center">
+                              {name}
+                              {colSort && (
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="midnight.3"
+                                  onClick={() => handleSort(colSort)}
+                                >
+                                  {sort !== colSort ? (
+                                    <IconArrowsSort size="1rem" />
+                                  ) : sortDir ? (
+                                    <IconSortAscending size="1rem" />
+                                  ) : (
+                                    <IconSortDescending size="1rem" />
+                                  )}
+                                </ActionIcon>
+                              )}
+                            </Flex>
+                          </Table.Td>
+                        </Tooltip>
+                      ),
+                    )}
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {(loading ? range(0, pageSize).map(() => null) : records).map((record, idx) => (
-                    <Table.Tr key={idx}>
-                      <Table.Td w={110} data-col={1}>
-                        <Skeleton visible={loading} radius="lg">
-                          <ExternalLinkButton
-                            style={{ width: 100 }}
-                            url={record?.taxonomy.sourceUrl || "https://ala.org.au"}
-                            externalLinkName={record?.taxonomy.source || "ALA"}
-                            outline
-                            icon={IconArrowUpRight}
-                          />
-                        </Skeleton>
-                      </Table.Td>
-                      <Table.Td data-col={2}>
-                        <Skeleton visible={loading}>
-                          <Text
-                            component={Link}
-                            size="sm"
-                            fw={600}
-                            fs="italic"
-                            href={`/species/${record?.taxonomy.canonicalName}`}
-                          >
-                            {record?.taxonomy.canonicalName || "Canonical Name"}
-                          </Text>
-                        </Skeleton>
-                      </Table.Td>
-                      <Table.Td data-col={3} w={300} px="xl">
-                        <Skeleton visible={loading} radius="lg">
-                          <VernacularGroupChip group={record?.taxonomy.vernacularGroup || "Unknown"} />
-                        </Skeleton>
-                      </Table.Td>
-                      <Table.Td data-col={4} w={dataSummarySize} p={0}>
-                        <Center h={46} px={10} bg="rgba(0,0,0,0.05)">
-                          <Skeleton visible={loading}>
-                            <DataItem textWidth={17} count={record?.dataSummary.genomes || 0} />
+                  {(loading ? range(0, pageSize).map(() => null) : records).map(
+                    (record, idx) => (
+                      <Table.Tr key={idx}>
+                        <Table.Td w={110} data-col={1}>
+                          <Skeleton visible={loading} radius="lg">
+                            <ExternalLinkButton
+                              style={{ width: 100 }}
+                              url={
+                                record?.taxonomy.sourceUrl ||
+                                "https://ala.org.au"
+                              }
+                              externalLinkName={
+                                record?.taxonomy.source || "ALA"
+                              }
+                              outline
+                              icon={IconArrowUpRight}
+                            />
                           </Skeleton>
-                        </Center>
-                      </Table.Td>
-                      <Table.Td data-col={5} w={dataSummarySize}>
-                        <Skeleton visible={loading}>
-                          <DataItem textWidth={17} count={record?.dataSummary.other || 0} />
-                        </Skeleton>
-                      </Table.Td>
-                      <Table.Td data-col={6} w={dataSummarySize} p={0}>
-                        <Center h={46} px={10} bg="rgba(0,0,0,0.05)">
+                        </Table.Td>
+                        <Table.Td data-col={2}>
                           <Skeleton visible={loading}>
-                            <DataItem textWidth={17} count={record?.dataSummary.loci || 0} />
+                            <Text
+                              component={Link}
+                              size="sm"
+                              fw={600}
+                              fs="italic"
+                              href={`/species/${record?.taxonomy.canonicalName}`}
+                            >
+                              {record?.taxonomy.canonicalName ||
+                                "Canonical Name"}
+                            </Text>
                           </Skeleton>
-                        </Center>
-                      </Table.Td>
-                      <Table.Td data-col={7} w={dataSummarySize}>
-                        <Skeleton visible={loading}>
-                          <DataItem textWidth={17} count={record?.dataSummary.specimens || 0} />
-                        </Skeleton>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
+                        </Table.Td>
+                        <Table.Td data-col={3} w={300} px="xl">
+                          <Skeleton visible={loading} radius="lg">
+                            <VernacularGroupChip
+                              group={
+                                record?.taxonomy.vernacularGroup || "Unknown"
+                              }
+                            />
+                          </Skeleton>
+                        </Table.Td>
+                        <Table.Td data-col={4} w={dataSummarySize} p={0}>
+                          <Center h={46} px={10} bg="rgba(0,0,0,0.05)">
+                            <Skeleton visible={loading}>
+                              <DataItem
+                                textWidth={17}
+                                count={record?.dataSummary.genomes || 0}
+                              />
+                            </Skeleton>
+                          </Center>
+                        </Table.Td>
+                        <Table.Td data-col={5} w={dataSummarySize}>
+                          <Skeleton visible={loading}>
+                            <DataItem
+                              textWidth={17}
+                              count={record?.dataSummary.other || 0}
+                            />
+                          </Skeleton>
+                        </Table.Td>
+                        <Table.Td data-col={6} w={dataSummarySize} p={0}>
+                          <Center h={46} px={10} bg="rgba(0,0,0,0.05)">
+                            <Skeleton visible={loading}>
+                              <DataItem
+                                textWidth={17}
+                                count={record?.dataSummary.loci || 0}
+                              />
+                            </Skeleton>
+                          </Center>
+                        </Table.Td>
+                        <Table.Td data-col={7} w={dataSummarySize}>
+                          <Skeleton visible={loading}>
+                            <DataItem
+                              textWidth={17}
+                              count={record?.dataSummary.specimens || 0}
+                            />
+                          </Skeleton>
+                        </Table.Td>
+                      </Table.Tr>
+                    ),
+                  )}
                 </Table.Tbody>
               </Table>
             </ScrollArea>
@@ -378,21 +478,32 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
             <Grid>
               {loading
                 ? range(0, pageSize).map((idx) => (
-                    <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
-                      <SpeciesCard />
-                    </Grid.Col>
-                  ))
+                  <Grid.Col
+                    key={idx}
+                    span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}
+                  >
+                    <SpeciesCard />
+                  </Grid.Col>
+                ))
                 : records.map((record, idx) => (
-                    <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
-                      <SpeciesCard species={record} />
-                    </Grid.Col>
-                  ))}
+                  <Grid.Col
+                    key={idx}
+                    span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}
+                  >
+                    <SpeciesCard species={record} />
+                  </Grid.Col>
+                ))}
             </Grid>
           );
         }
       })()}
 
-      <PaginationBar total={get(data, "browse.species.total")} page={page} pageSize={pageSize} onChange={setPage} />
+      <PaginationBar
+        total={get(data, "browse.species.total")}
+        page={page}
+        pageSize={pageSize}
+        onChange={setPage}
+      />
     </Stack>
   );
 }

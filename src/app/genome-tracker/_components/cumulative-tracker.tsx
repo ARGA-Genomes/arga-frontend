@@ -3,7 +3,8 @@
 import classes from "./cumulative-tracker.module.css";
 
 import { Statistics, TaxonomicRankStatistic } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { AxisBottom } from "@visx/axis";
 import { Group } from "@visx/group";
 import { ParentSize } from "@visx/responsive";
@@ -53,8 +54,17 @@ interface CoverageBarProps {
 function CoverageBar({ y, width, coverage }: CoverageBarProps) {
   return (
     <Group top={y}>
-      <rect width={width} height={BAR_HEIGHT} className={classes.coverageBarBg} />
-      <Bar width={coverage} height={BAR_HEIGHT} className={classes.coverageBar} />;
+      <rect
+        width={width}
+        height={BAR_HEIGHT}
+        className={classes.coverageBarBg}
+      />
+      <Bar
+        width={coverage}
+        height={BAR_HEIGHT}
+        className={classes.coverageBar}
+      />
+      ;
     </Group>
   );
 }
@@ -73,13 +83,17 @@ function Bars({ width, height, data }: BarsProps) {
         range: [0, barWidth],
         domain: [0, 100],
       }),
-    [barWidth]
+    [barWidth],
   );
 
   return (
     <>
       {data.map((stat, idx) => (
-        <text y={idx * ROW_HEIGHT + ROW_HEIGHT / 2} className={classes.barLabel} key={stat.rank}>
+        <text
+          y={idx * ROW_HEIGHT + ROW_HEIGHT / 2}
+          className={classes.barLabel}
+          key={stat.rank}
+        >
           {Humanize.formatNumber(stat.children)} {PLURAL_RANKS[stat.rank]}
         </text>
       ))}
@@ -88,7 +102,9 @@ function Bars({ width, height, data }: BarsProps) {
           <CoverageBar
             y={idx * ROW_HEIGHT}
             width={barWidth}
-            coverage={xScale(Math.min(stat.atLeastOne / stat.children, 1.0) * 100)}
+            coverage={xScale(
+              Math.min(stat.atLeastOne / stat.children, 1.0) * 100,
+            )}
             key={stat.rank}
           />
         ))}
@@ -111,7 +127,11 @@ interface CumulativeTrackerProps {
   ranks: string[];
 }
 
-export function CumulativeTracker({ taxonRank, taxonCanonicalName, ranks }: CumulativeTrackerProps) {
+export function CumulativeTracker({
+  taxonRank,
+  taxonCanonicalName,
+  ranks,
+}: CumulativeTrackerProps) {
   const { data } = useQuery<{ stats: Statistics }>(GET_TAXONOMIC_RANK_STATS, {
     variables: {
       taxonRank,

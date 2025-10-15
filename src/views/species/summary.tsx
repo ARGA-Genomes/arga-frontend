@@ -1,6 +1,7 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Grid, Group, Paper, Stack, Text } from "@mantine/core";
 
 import { useDatasets } from "@/app/source-provider";
@@ -9,7 +10,13 @@ import { Hierarchy } from "@/components/hierarchy";
 import { AttributePill as AttributePillStack } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
 import { SpeciesPhoto } from "@/components/species-image";
-import { Dataset, Species, SpeciesGenomicDataSummary, Taxon, Taxonomy } from "@/generated/types";
+import {
+  Dataset,
+  Species,
+  SpeciesGenomicDataSummary,
+  Taxon,
+  Taxonomy,
+} from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -69,7 +76,11 @@ function SummaryInfo({ label, value }: SummaryInfoProps) {
   );
 }
 
-function DataSummary({ speciesData }: { speciesData?: SpeciesGenomicDataSummary }) {
+function DataSummary({
+  speciesData,
+}: {
+  speciesData?: SpeciesGenomicDataSummary;
+}) {
   return (
     <Paper radius={16} p="md" withBorder>
       <Text fw={700} size="lg" pb={10}>
@@ -84,10 +95,19 @@ function DataSummary({ speciesData }: { speciesData?: SpeciesGenomicDataSummary 
                   Whole genome data
                 </Text>
                 <Stack justify="space-between" pl={10}>
-                  <SummaryInfo label="Whole genome assemblies" value={speciesData?.genomes} />
-                  <SummaryInfo label="Partial genome assemblies" value="No data" />
+                  <SummaryInfo
+                    label="Whole genome assemblies"
+                    value={speciesData?.genomes}
+                  />
+                  <SummaryInfo
+                    label="Partial genome assemblies"
+                    value="No data"
+                  />
                   <SummaryInfo label="Genome annotations" value="No data" />
-                  <SummaryInfo label="Organellar genome assemblies" value="No data" />
+                  <SummaryInfo
+                    label="Organellar genome assemblies"
+                    value="No data"
+                  />
                 </Stack>
               </Stack>
               <Stack>
@@ -96,7 +116,10 @@ function DataSummary({ speciesData }: { speciesData?: SpeciesGenomicDataSummary 
                 </Text>
                 <Stack justify="space-between" pl={10}>
                   <SummaryInfo label="Sequence read files" value="No data" />
-                  <SummaryInfo label="Sequence alignment files" value="No data" />
+                  <SummaryInfo
+                    label="Sequence alignment files"
+                    value="No data"
+                  />
                 </Stack>
               </Stack>
               <Stack>
@@ -166,9 +189,13 @@ function ExternalResources(props: ExternalResourcesProps) {
   useEffect(() => {
     async function matchTaxon() {
       try {
-        const response = await fetch(`https://api.ala.org.au/species/guid/${encodeURIComponent(props.canonicalName)}`);
+        const response = await fetch(
+          `https://api.ala.org.au/species/guid/${encodeURIComponent(props.canonicalName)}`,
+        );
         const matches = (await response.json()) as TaxonMatch[];
-        setMatchedTaxon(matches.map(({ acceptedIdentifier }) => acceptedIdentifier));
+        setMatchedTaxon(
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
+        );
       } catch {
         setMatchedTaxon([]);
       }
@@ -226,7 +253,11 @@ function Classification({ taxonomy }: { taxonomy: Taxonomy }) {
       <Text fw={700} size="lg" pb={20}>
         Higher classification
       </Text>
-      {error ? <Text>{error.message}</Text> : <Hierarchy taxon={data?.taxon} rawRank="SPECIES" dataset={dataset} />}
+      {error ? (
+        <Text>{error.message}</Text>
+      ) : (
+        <Hierarchy taxon={data?.taxon} rawRank="SPECIES" dataset={dataset} />
+      )}
     </Paper>
   );
 }
@@ -252,14 +283,20 @@ export default function SummaryPage({ params }: { params: { name: string } }) {
       <Grid.Col span={{ base: 12, xl: "auto" }}>
         <SpeciesPhoto
           photo={data?.species.photos[0]}
-          style={{ borderRadius: "var(--mantine-radius-lg)", overflow: "hidden" }}
+          style={{
+            borderRadius: "var(--mantine-radius-lg)",
+            overflow: "hidden",
+          }}
         />
       </Grid.Col>
       <Grid.Col span={{ base: 12, sm: "content" }}>
         <DataSummary speciesData={data?.species.dataSummary} />
       </Grid.Col>
       <Grid.Col span={{ base: "auto", xl: 3 }}>
-        <ExternalResources canonicalName={canonicalName} species={data?.species} />
+        <ExternalResources
+          canonicalName={canonicalName}
+          species={data?.species}
+        />
       </Grid.Col>
       {taxonomy && (
         <Grid.Col span={12}>

@@ -5,10 +5,16 @@ import classes from "./analysis-map.module.css";
 
 import { Map } from "@vis.gl/react-maplibre";
 
-import DeckGL, { GeoJsonLayer, MapView, PickingInfo, ScatterplotLayer } from "deck.gl";
+import DeckGL, {
+  GeoJsonLayer,
+  MapView,
+  PickingInfo,
+  ScatterplotLayer,
+} from "deck.gl";
 import { useState } from "react";
 import { GeoJSON } from "geojson";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Text, Paper, Center } from "@mantine/core";
 import { Layer } from "@/app/type";
 
@@ -68,7 +74,9 @@ export default function AnalysisMap<T>({
   onMarkerClick,
 }: AnalysisMapProps<T>) {
   const [tolerance, _setTolerance] = useState(0.01);
-  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined);
+  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(
+    undefined,
+  );
 
   const { data } = useQuery<QueryResults>(GET_GEOMETRY, {
     variables: {
@@ -171,7 +179,8 @@ function bioRegionLayers(regions: BioRegions) {
   const ibra = new GeoJsonLayer({
     id: "ibra-layer",
     data: regions.ibra || [],
-    getFillColor: (d) => (d.properties?.name === regions.selected ? ibraHover : ibraColor),
+    getFillColor: (d) =>
+      d.properties?.name === regions.selected ? ibraHover : ibraColor,
     getLineColor: [254, 195, 55, 200],
     pickable: true,
     filled: true,
@@ -182,7 +191,8 @@ function bioRegionLayers(regions: BioRegions) {
   const imcra = new GeoJsonLayer({
     id: "imcra-layer",
     data: regions.imcra || [],
-    getFillColor: (d) => (d.properties?.name === regions.selected ? imcraHover : imcraColor),
+    getFillColor: (d) =>
+      d.properties?.name === regions.selected ? imcraHover : imcraColor,
     getLineColor: [88, 163, 157, 200],
     pickable: true,
     filled: true,

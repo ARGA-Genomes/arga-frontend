@@ -2221,7 +2221,6 @@ export type TaxonomicVernacularGroup =
   | 'HIGHER_PLANTS'
   | 'HORNWORTS'
   | 'INSECTS'
-  | 'INVERTEBRATES'
   | 'LIVERWORTS'
   | 'MAMMALS'
   | 'MOLLUSCS'

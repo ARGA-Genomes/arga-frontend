@@ -1,8 +1,15 @@
 import "@mantine/core/styles.css";
+import "@mantine/carousel/styles.css";
+
 import "./global.css";
 import classes from "./layout.module.css";
 
-import { AppShell, AppShellHeader, AppShellMain, MantineProvider } from "@mantine/core";
+import {
+  AppShell,
+  AppShellHeader,
+  AppShellMain,
+  MantineProvider,
+} from "@mantine/core";
 
 import Fathom from "@/components/fathom";
 import { TraceLoaderProvider } from "@/components/traces/context";
@@ -12,8 +19,22 @@ import { theme } from "../theme";
 import { Footer } from "./footer";
 import { SourceProvider } from "./source-provider";
 import { TopNav } from "./top-nav";
+import type { Metadata } from "next";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const metadata: Metadata = {
+  title: {
+    template: "ARGA - %s",
+    default: "ARGA",
+  },
+  description:
+    "The Australian Reference Genome Atlas, an indexing service for aggregating, discovering, filtering and accessing complex life science data.",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>

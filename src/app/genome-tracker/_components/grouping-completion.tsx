@@ -6,10 +6,15 @@ import * as Humanize from "humanize-plus";
 
 import { useDatasets } from "@/app/source-provider";
 import { BarChart } from "@/components/graphing/bar";
-import { asPercentage, RadialBarDatum, RadialGraph } from "@/components/graphing/RadialBar";
+import {
+  asPercentage,
+  RadialBarDatum,
+  RadialGraph,
+} from "@/components/graphing/RadialBar";
 import { TachoChart } from "@/components/graphing/tacho";
 import { Statistics, Taxon } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   Box,
   Center,
@@ -208,9 +213,13 @@ function GroupSelection({ group, onSelected, selected }: GroupSelectionProps) {
       withBorder
     >
       <Center>
-        <Text className={classes.groupButtonLabel}>{Humanize.capitalize(group)}</Text>
+        <Text className={classes.groupButtonLabel}>
+          {Humanize.capitalize(group)}
+        </Text>
       </Center>
-      <Box h={200}>{coverage && <RadialGraph data={asPercentage(coverage)} />}</Box>
+      <Box h={200}>
+        {coverage && <RadialGraph data={asPercentage(coverage)} />}
+      </Box>
     </Paper>
   );
 }
@@ -261,15 +270,24 @@ export function GroupDetailRadial({
     coverage && (
       <Stack gap={switcherGap || "xl"}>
         <Box h={height || 600}>
-          <RadialGraph data={showRaw ? coverage : asPercentage(coverage)} onHover={setHoverItem}>
+          <RadialGraph
+            data={showRaw ? coverage : asPercentage(coverage)}
+            onHover={setHoverItem}
+          >
             {hoverItem && (
               <motion.g animate={{ scale: 2 }}>
                 <Circle r={radial || 40} className={classes[radialInner]} />
                 <SvgText fontSize={fontSize || 8} className={classes.text}>
                   {hoverItem.label}
                 </SvgText>
-                <SvgText fontSize={fontSize || 8} y={10} className={classes.text}>
-                  {showRaw ? `${hoverItem.value} / ${hoverItem.total}` : `${Math.round(hoverItem.value)}%`}
+                <SvgText
+                  fontSize={fontSize || 8}
+                  y={10}
+                  className={classes.text}
+                >
+                  {showRaw
+                    ? `${hoverItem.value} / ${hoverItem.total}`
+                    : `${Math.round(hoverItem.value)}%`}
                 </SvgText>
               </motion.g>
             )}
@@ -290,8 +308,8 @@ export function GroupDetailRadial({
         </Center>
         {!hideDescription && (
           <Text c="midnight.11" size="sm">
-            Total of species for which a whole genome has been sequenced and made available aggregated by higher
-            classification units.
+            Total of species for which a whole genome has been sequenced and
+            made available aggregated by higher classification units.
           </Text>
         )}
       </Stack>
@@ -324,7 +342,13 @@ function SpeciesCoverageTacho({ group }: SpeciesCoverageTacho) {
     { name: "", color: getThemeColor("moss.5", theme), start: 75, end: 100 },
   ];
 
-  return <TachoChart thresholds={thresholds} value={Math.round(value || 0)} h={150} />;
+  return (
+    <TachoChart
+      thresholds={thresholds}
+      value={Math.round(value || 0)}
+      h={150}
+    />
+  );
 }
 
 interface GroupDetailExtraProps {
@@ -357,8 +381,9 @@ function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
             />
           </Box>
           <Text c="midnight.11" size="sm">
-            Rate of genome completion over time. The first instance of a whole genome sequence for an individual species
-            has been plotted as an accumulated total, shown on a logarithmic scale.
+            Rate of genome completion over time. The first instance of a whole
+            genome sequence for an individual species has been plotted as an
+            accumulated total, shown on a logarithmic scale.
           </Text>
         </Stack>
       </Paper>
@@ -373,8 +398,8 @@ function GroupDetailExtra({ group, domain }: GroupDetailExtraProps) {
             />
           </Box>
           <Text c="midnight.11" size="sm">
-            Percentage of taxonomic group coverage, where there is a complete genome for at least one representative
-            species from each grouping.
+            Percentage of taxonomic group coverage, where there is a complete
+            genome for at least one representative species from each grouping.
           </Text>
         </Stack>
       </Paper>
@@ -399,7 +424,9 @@ function SpeciesWithGenomes({ group }: { group: string }) {
   const speciesGenomes = data?.taxon.speciesGenomesSummary
     .filter((summary) => summary.genomes > 0)
     .map((summary) => {
-      const linkName = encodeURIComponent(summary.canonicalName.replaceAll(" ", "_"));
+      const linkName = encodeURIComponent(
+        summary.canonicalName.replaceAll(" ", "_"),
+      );
       return {
         name: summary.canonicalName || "",
         value: summary.genomes,
@@ -408,7 +435,11 @@ function SpeciesWithGenomes({ group }: { group: string }) {
     })
     .sort((a, b) => b.value - a.value);
 
-  return speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />;
+  return (
+    speciesGenomes && (
+      <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />
+    )
+  );
 }
 
 interface GroupDetailProps {
@@ -428,20 +459,25 @@ function GroupDetail({ group, domain }: GroupDetailProps) {
               <GroupDetailRadial query={query} />
 
               <Stack>
-                <Text className={classes.groupButtonLabel}>Species with genomes</Text>
+                <Text className={classes.groupButtonLabel}>
+                  Species with genomes
+                </Text>
                 <SpeciesWithGenomes group={group} />
               </Stack>
             </Stack>
           </Grid.Col>
           <Grid.Col span={6}>
             <Group justify="center" my="lg">
-              <Link href={`/${query.taxonRank.toLocaleLowerCase()}/${query.taxonCanonicalName}`}>
+              <Link
+                href={`/${query.taxonRank.toLocaleLowerCase()}/${query.taxonCanonicalName}`}
+              >
                 <Image w={100} h={100} src={ICONS[group]} alt={group} />
               </Link>
               <Stack gap={0}>
                 <Title order={2}>{Humanize.capitalize(group)}</Title>
                 <Text fz="xl">
-                  {Humanize.capitalize(query.taxonRank.toLocaleLowerCase())} {query.taxonCanonicalName}
+                  {Humanize.capitalize(query.taxonRank.toLocaleLowerCase())}{" "}
+                  {query.taxonCanonicalName}
                 </Text>
               </Stack>
             </Group>
@@ -466,16 +502,56 @@ export function GroupingCompletion({ dateDomain }: GroupingCompletionProps) {
       <Grid>
         <Grid.Col span={4}>
           <SimpleGrid cols={2}>
-            <GroupSelection onSelected={setGroup} group="mammals" selected={group == "mammals"} />
-            <GroupSelection onSelected={setGroup} group="birds" selected={group == "birds"} />
-            <GroupSelection onSelected={setGroup} group="reptiles" selected={group == "reptiles"} />
-            <GroupSelection onSelected={setGroup} group="amphibians" selected={group == "amphibians"} />
-            <GroupSelection onSelected={setGroup} group="fin fishes" selected={group == "fin fishes"} />
-            <GroupSelection onSelected={setGroup} group="insects" selected={group == "insects"} />
-            <GroupSelection onSelected={setGroup} group="snails" selected={group == "snails"} />
-            <GroupSelection onSelected={setGroup} group="corals" selected={group == "corals"} />
-            <GroupSelection onSelected={setGroup} group="flowering plants" selected={group == "flowering plants"} />
-            <GroupSelection onSelected={setGroup} group="fungi" selected={group == "fungi"} />
+            <GroupSelection
+              onSelected={setGroup}
+              group="mammals"
+              selected={group == "mammals"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="birds"
+              selected={group == "birds"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="reptiles"
+              selected={group == "reptiles"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="amphibians"
+              selected={group == "amphibians"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="fin fishes"
+              selected={group == "fin fishes"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="insects"
+              selected={group == "insects"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="snails"
+              selected={group == "snails"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="corals"
+              selected={group == "corals"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="flowering plants"
+              selected={group == "flowering plants"}
+            />
+            <GroupSelection
+              onSelected={setGroup}
+              group="fungi"
+              selected={group == "fungi"}
+            />
           </SimpleGrid>
         </Grid.Col>
         <Grid.Col span={8}>

@@ -19,9 +19,15 @@ import {
 import classes from "./page.module.css";
 
 import { useSpecies } from "@/app/species-provider";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { useState } from "react";
-import { AssemblyDetails, Library, NameDetails, Specimen } from "@/generated/types";
+import {
+  AssemblyDetails,
+  Library,
+  NameDetails,
+  Specimen,
+} from "@/generated/types";
 import { DataTable } from "@/components/data-table";
 import { DateTime } from "luxon";
 import { Pill } from "@/components/Pills";
@@ -99,7 +105,10 @@ const GET_ASSEMBLIES = gql`
   }
 `;
 
-type AssemblyOverview = Pick<AssemblyDetails, "entityId" | "assemblyId" | "size" | "type" | "eventDate">;
+type AssemblyOverview = Pick<
+  AssemblyDetails,
+  "entityId" | "assemblyId" | "size" | "type" | "eventDate"
+>;
 
 type SpeciesAssembliesQuery = {
   species: {
@@ -111,7 +120,9 @@ type SpeciesAssembliesQuery = {
 };
 
 export default function Page() {
-  const [assembly, setAssembly] = useState<AssemblyOverview | undefined>(undefined);
+  const [assembly, setAssembly] = useState<AssemblyOverview | undefined>(
+    undefined,
+  );
 
   return (
     <Stack gap="xl">
@@ -134,10 +145,13 @@ export default function Page() {
 function Overview() {
   const { details } = { ...useSpecies() };
 
-  const { loading, error, data } = useQuery<SpeciesAssembliesQuery>(GET_ASSEMBLIES, {
-    skip: !details,
-    variables: { canonicalName: details?.name, page: 1, pageSize: 10 },
-  });
+  const { loading, error, data } = useQuery<SpeciesAssembliesQuery>(
+    GET_ASSEMBLIES,
+    {
+      skip: !details,
+      variables: { canonicalName: details?.name, page: 1, pageSize: 10 },
+    },
+  );
 
   return (
     <Paper radius="lg" bg="wheatBg.0">
@@ -148,7 +162,11 @@ function Overview() {
 
         <Grid>
           <Grid.Col span={2}>
-            <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
+            <Skeleton
+              visible={loading}
+              radius="md"
+              className={classes.skeletonOverview}
+            >
               <Paper
                 radius="lg"
                 p={20}
@@ -165,7 +183,10 @@ function Overview() {
                       Total number of assemblies
                     </Text>
                     <Text fz="xs" fw={700}>
-                      <Pill.StandardNumber variant="overview" value={data?.species.assemblies.total} />
+                      <Pill.StandardNumber
+                        variant="overview"
+                        value={data?.species.assemblies.total}
+                      />
                     </Text>
                   </Group>
                 </Stack>
@@ -189,13 +210,23 @@ function Overview() {
 
 function OverviewItem({ assembly }: { assembly: AssemblyOverview }) {
   return (
-    <Paper className={classes.overviewItem} bg="wheatBg.0" radius="lg" px={20} py={10} withBorder>
+    <Paper
+      className={classes.overviewItem}
+      bg="wheatBg.0"
+      radius="lg"
+      px={20}
+      py={10}
+      withBorder
+    >
       <Grid>
         <Grid.Col span={3}>
           <Group>
             Estimated size
             <Text fz="xs" fw={700}>
-              <Pill.StandardText value={assembly.size?.toString()} variant="overview" />
+              <Pill.StandardText
+                value={assembly.size?.toString()}
+                variant="overview"
+              />
             </Text>
           </Group>
         </Grid.Col>
@@ -261,19 +292,24 @@ function Viewer({ entityId }: { entityId?: string }) {
 }
 
 function Details({ assembly }: { assembly: Assembly }) {
-  const releaseDate = assembly.eventDate && DateTime.fromFormat(assembly.eventDate, "yyyy-mm-dd");
+  const releaseDate =
+    assembly.eventDate && DateTime.fromFormat(assembly.eventDate, "yyyy-mm-dd");
 
   return (
     <Stack>
       <Grid>
         <Grid.Col span={5}>
           <DataTable>
-            <DataTable.RowValue label="Genome status">{assembly.representation}</DataTable.RowValue>
+            <DataTable.RowValue label="Genome status">
+              {assembly.representation}
+            </DataTable.RowValue>
             <DataTable.RowValue label="Release type"></DataTable.RowValue>
             <DataTable.RowValue label="Assembly type">
               <Pill.AssemblyType value={assembly.type} />
             </DataTable.RowValue>
-            <DataTable.RowValue label="Assembly name">{assembly.assemblyName}</DataTable.RowValue>
+            <DataTable.RowValue label="Assembly name">
+              {assembly.assemblyName}
+            </DataTable.RowValue>
           </DataTable>
         </Grid.Col>
 
@@ -283,7 +319,11 @@ function Details({ assembly }: { assembly: Assembly }) {
               <Pill.ScientificName name={assembly.name} />
             </DataTable.RowValue>
             <DataTable.RowValue label="Release date">
-              {releaseDate?.toLocaleString({ year: "numeric", month: "long", day: "numeric" })}
+              {releaseDate?.toLocaleString({
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </DataTable.RowValue>
             <DataTable.RowValue label="Sequencing platform">
               <Pill.StandardText />
@@ -310,16 +350,30 @@ function DataAccess() {
     <Paper p="lg" radius="md" h="100%" withBorder>
       <Stack>
         <Title order={5}>Data access</Title>
-        <Button radius="md" color="midnight.9" leftSection={<IconCircleCheck />}>
+        <Button
+          radius="md"
+          color="midnight.9"
+          leftSection={<IconCircleCheck />}
+        >
           add to list
         </Button>
         <Button radius="md" color="midnight.9" leftSection={<IconDownload />}>
           get data
         </Button>
-        <Button radius="md" color="midnight.9" leftSection={<IconLink />} disabled>
+        <Button
+          radius="md"
+          color="midnight.9"
+          leftSection={<IconLink />}
+          disabled
+        >
           go to source
         </Button>
-        <Button radius="md" color="midnight.9" leftSection={<IconCloudUpload />} disabled>
+        <Button
+          radius="md"
+          color="midnight.9"
+          leftSection={<IconCloudUpload />}
+          disabled
+        >
           send to Galaxy
         </Button>
       </Stack>
@@ -340,13 +394,24 @@ function SpecimenDetails() {
               <DataTable.RowValue label="Sample ID"></DataTable.RowValue>
               <DataTable.RowValue label="Sample name"></DataTable.RowValue>
             </DataTable>
-            <Button mt="auto" radius="md" variant="subtle" color="midnight.9" leftSection={<IconMicroscope />}>
+            <Button
+              mt="auto"
+              radius="md"
+              variant="subtle"
+              color="midnight.9"
+              leftSection={<IconMicroscope />}
+            >
               view specimen
             </Button>
           </Stack>
         </Grid.Col>
         <Grid.Col span={5}>
-          <Paper pos="relative" radius="xl" style={{ overflow: "hidden" }} h="100%">
+          <Paper
+            pos="relative"
+            radius="xl"
+            style={{ overflow: "hidden" }}
+            h="100%"
+          >
             <AnalysisMap markers={[]} />
           </Paper>
         </Grid.Col>
@@ -366,7 +431,9 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <StatisticItem label="Genome size">{assembly?.size}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Ungapped length">{assembly?.sizeUngapped}</StatisticItem>
+          <StatisticItem label="Ungapped length">
+            {assembly?.sizeUngapped}
+          </StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
           <StatisticItem label="Number of chromosomes"></StatisticItem>
@@ -378,22 +445,32 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <Divider size="sm" color="shellfishBg.1" />
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Assembly level">{assembly?.level}</StatisticItem>
+          <StatisticItem label="Assembly level">
+            {assembly?.level}
+          </StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Genome coverage">{assembly?.coverage}</StatisticItem>
+          <StatisticItem label="Genome coverage">
+            {assembly?.coverage}
+          </StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="GC percentage">{assembly?.guanineCytosinePercent}</StatisticItem>
+          <StatisticItem label="GC percentage">
+            {assembly?.guanineCytosinePercent}
+          </StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="BUSCO score">{assembly?.completeness}</StatisticItem>
+          <StatisticItem label="BUSCO score">
+            {assembly?.completeness}
+          </StatisticItem>
         </Grid.Col>
         <Grid.Col span={12}>
           <Divider size="sm" color="shellfishBg.1" />
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Number of scaffolds">{assembly?.numberOfScaffolds}</StatisticItem>
+          <StatisticItem label="Number of scaffolds">
+            {assembly?.numberOfScaffolds}
+          </StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
           <StatisticItem label="Scaffold N50"></StatisticItem>
@@ -402,7 +479,9 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <StatisticItem label="Scaffold L50"></StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Number of contigs">{assembly?.numberOfContigs}</StatisticItem>
+          <StatisticItem label="Number of contigs">
+            {assembly?.numberOfContigs}
+          </StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
           <StatisticItem label="Contig N50"></StatisticItem>
@@ -468,14 +547,32 @@ function Provenance({ entityId }: { entityId: string }) {
         <Title order={3}>Assembly provenance timeline</Title>
       </Container>
       <TimelineNavbar onSelected={setCard}>
-        <TimelineNavbar.Item label="Library preparation" icon={<IconLibrary size={60} />} />
+        <TimelineNavbar.Item
+          label="Library preparation"
+          icon={<IconLibrary size={60} />}
+        />
         <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
-        <TimelineNavbar.Item label="Scaffolds" icon={<IconScaffolds size={60} />} />
+        <TimelineNavbar.Item
+          label="Scaffolds"
+          icon={<IconScaffolds size={60} />}
+        />
         <TimelineNavbar.Item label="Hi-C" icon={<IconHiC size={60} />} />
-        <TimelineNavbar.Item label="Chromosomes" icon={<IconChromosomes size={60} />} />
-        <TimelineNavbar.Item label="Assemblies" icon={<IconAssembly size={60} />} />
-        <TimelineNavbar.Item label="Annotations" icon={<IconAnnotation size={60} />} />
-        <TimelineNavbar.Item label="Public release" icon={<IconDeposition size={60} />} />
+        <TimelineNavbar.Item
+          label="Chromosomes"
+          icon={<IconChromosomes size={60} />}
+        />
+        <TimelineNavbar.Item
+          label="Assemblies"
+          icon={<IconAssembly size={60} />}
+        />
+        <TimelineNavbar.Item
+          label="Annotations"
+          icon={<IconAnnotation size={60} />}
+        />
+        <TimelineNavbar.Item
+          label="Public release"
+          icon={<IconDeposition size={60} />}
+        />
       </TimelineNavbar>
 
       <CardSlider card={card}>
@@ -504,10 +601,13 @@ function AllAssemblies({ onSelected }: AllAssembliesProps) {
   const [pageSize, setPageSize] = useState<number>(100);
   const [page, setPage] = useState(1);
 
-  const { loading, error, data } = useQuery<SpeciesAssembliesQuery>(GET_ASSEMBLIES, {
-    skip: !details,
-    variables: { canonicalName: details?.name, page, pageSize },
-  });
+  const { loading, error, data } = useQuery<SpeciesAssembliesQuery>(
+    GET_ASSEMBLIES,
+    {
+      skip: !details,
+      variables: { canonicalName: details?.name, page, pageSize },
+    },
+  );
 
   const assemblies = data?.species.assemblies;
 
@@ -521,7 +621,11 @@ function AllAssemblies({ onSelected }: AllAssembliesProps) {
           <ScrollArea>
             <Group wrap="nowrap">
               {assemblies?.records.map((assembly) => (
-                <AssemblyItem assembly={assembly} key={assembly.assemblyId} onSelected={onSelected} />
+                <AssemblyItem
+                  assembly={assembly}
+                  key={assembly.assemblyId}
+                  onSelected={onSelected}
+                />
               ))}
             </Group>
           </ScrollArea>
@@ -537,20 +641,32 @@ interface AssemblyItemProps {
 }
 
 function AssemblyItem({ assembly, onSelected }: AssemblyItemProps) {
-  const releaseDate = assembly.eventDate && DateTime.fromFormat(assembly.eventDate, "yyyy-mm-dd");
+  const releaseDate =
+    assembly.eventDate && DateTime.fromFormat(assembly.eventDate, "yyyy-mm-dd");
 
   return (
-    <Paper radius="lg" py="xs" style={{ borderColor: "var(--mantine-color-shellfishBg-2)" }} withBorder>
+    <Paper
+      radius="lg"
+      py="xs"
+      style={{ borderColor: "var(--mantine-color-shellfishBg-2)" }}
+      withBorder
+    >
       <Stack>
         <DataTable>
-          <DataTable.RowValue label="Accession">{assembly.assemblyId}</DataTable.RowValue>
+          <DataTable.RowValue label="Accession">
+            {assembly.assemblyId}
+          </DataTable.RowValue>
           <DataTable.RowValue label="Genome size">
             <Group>
               <Pill.Common value={assembly.size?.toString() ?? ""} />
             </Group>
           </DataTable.RowValue>
           <DataTable.RowValue label="Release date">
-            {releaseDate?.toLocaleString({ year: "numeric", month: "long", day: "numeric" })}
+            {releaseDate?.toLocaleString({
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
           </DataTable.RowValue>
         </DataTable>
 
@@ -581,13 +697,21 @@ function DataCheck({ label, value }: { label: string; value: boolean }) {
   );
 }
 
-function DataCheckIcon({ value }: { value?: number | string | boolean | null | undefined }) {
+function DataCheckIcon({
+  value,
+}: {
+  value?: number | string | boolean | null | undefined;
+}) {
   const theme = useMantineTheme();
   const size = 35;
 
   return (
     <Paper radius="xl" p={0} m={0} h={size} w={size}>
-      {value ? <IconCircleCheck color={theme.colors.moss[5]} size={size} /> : <IconCircleX color="red" size={size} />}
+      {value ? (
+        <IconCircleCheck color={theme.colors.moss[5]} size={size} />
+      ) : (
+        <IconCircleX color="red" size={size} />
+      )}
     </Paper>
   );
 }

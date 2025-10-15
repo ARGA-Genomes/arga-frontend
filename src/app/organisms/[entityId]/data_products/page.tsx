@@ -1,11 +1,15 @@
 "use client";
 
 import { MAX_WIDTH } from "@/app/constants";
-import { IconExtraction, IconGenomicDataProducts } from "@/components/ArgaIcons";
+import {
+  IconExtraction,
+  IconGenomicDataProducts,
+} from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { DataProductSlide, Product } from "@/components/slides/DataProduct";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Container, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { use, useState } from "react";
@@ -63,9 +67,15 @@ function Provenance({ entityId }: { entityId: string }) {
     <Stack>
       <TimelineNavbar selected={card} onSelected={setCard}>
         <Link href="data_preparation">
-          <TimelineNavbar.Item label="Nucleic acid extraction" icon={<IconExtraction size={60} />} />
+          <TimelineNavbar.Item
+            label="Nucleic acid extraction"
+            icon={<IconExtraction size={60} />}
+          />
         </Link>
-        <TimelineNavbar.Item label="Genomic and genetic data products" icon={<IconGenomicDataProducts size={60} />} />
+        <TimelineNavbar.Item
+          label="Genomic and genetic data products"
+          icon={<IconGenomicDataProducts size={60} />}
+        />
       </TimelineNavbar>
 
       <CardSlider card={card}>

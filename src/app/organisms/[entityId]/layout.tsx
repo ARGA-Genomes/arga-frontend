@@ -3,13 +3,24 @@ import { use } from "react";
 
 import classes from "./layout.module.css";
 
-import { Container, Grid, Group, Paper, Skeleton, Stack, Tabs, Title, Text } from "@mantine/core";
+import {
+  Container,
+  Grid,
+  Group,
+  Paper,
+  Skeleton,
+  Stack,
+  Tabs,
+  Title,
+  Text,
+} from "@mantine/core";
 import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
 import { PreviousPage } from "@/components/navigation-history";
 import { Organism } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Pill } from "@/components/Pills";
 import OrganismHeader from "@/components/OrganismHeader";
 
@@ -30,7 +41,13 @@ interface OrganismQuery {
   organism: Organism;
 }
 
-function DataTabs({ entityId, children }: { entityId: string; children: React.ReactNode }) {
+function DataTabs({
+  entityId,
+  children,
+}: {
+  entityId: string;
+  children: React.ReactNode;
+}) {
   const path = usePathname();
   const router = useRouter();
 
@@ -59,9 +76,13 @@ function DataTabs({ entityId, children }: { entityId: string; children: React.Re
       <Container maw={MAX_WIDTH}>
         <Tabs.List>
           <Tabs.Tab value="source">Source organism</Tabs.Tab>
-          <Tabs.Tab value="subsamples_and_tissues">Subsamples and tissues</Tabs.Tab>
+          <Tabs.Tab value="subsamples_and_tissues">
+            Subsamples and tissues
+          </Tabs.Tab>
           <Tabs.Tab value="data_preparation">Nucleic acid extracts</Tabs.Tab>
-          <Tabs.Tab value="data_products">Genomic and genetic data products</Tabs.Tab>
+          <Tabs.Tab value="data_products">
+            Genomic and genetic data products
+          </Tabs.Tab>
         </Tabs.List>
       </Container>
 
@@ -98,9 +119,12 @@ export default function OrganismLayout(props: OrganismLayoutProps) {
 }
 
 function Overview({ entityId }: { entityId: string }) {
-  const { loading, error, data } = useQuery<OrganismQuery>(GET_ORGANISM_OVERVIEW, {
-    variables: { entityId },
-  });
+  const { loading, error, data } = useQuery<OrganismQuery>(
+    GET_ORGANISM_OVERVIEW,
+    {
+      variables: { entityId },
+    },
+  );
 
   return (
     <Paper py="lg" bg="wheatBg.0" className={classes.overviewContent}>
@@ -118,7 +142,12 @@ function Overview({ entityId }: { entityId: string }) {
                 <Stack>
                   <OverviewBlock title="Scientific name" loading={loading}>
                     <Stack>
-                      {data && <Pill.ScientificName name={data.organism.name} variant="overview" />}
+                      {data && (
+                        <Pill.ScientificName
+                          name={data.organism.name}
+                          variant="overview"
+                        />
+                      )}
                       <Group>Identification verified</Group>
                     </Stack>
                   </OverviewBlock>
@@ -132,21 +161,33 @@ function Overview({ entityId }: { entityId: string }) {
                 <Stack>
                   <Stack gap="sm">
                     Source organism scope
-                    <Pill.StandardText value={data?.organism.disposition} variant="overview" />
+                    <Pill.StandardText
+                      value={data?.organism.disposition}
+                      variant="overview"
+                    />
                   </Stack>
                   <Stack gap="sm">
                     Biome
-                    <Pill.StandardText value={data?.organism.biome} variant="overview" />
+                    <Pill.StandardText
+                      value={data?.organism.biome}
+                      variant="overview"
+                    />
                   </Stack>
                 </Stack>
               </Grid.Col>
             </Grid>
           </Grid.Col>
           <Grid.Col span={3}>
-            <OverviewBlock title="Associated organisms" loading={loading}></OverviewBlock>
+            <OverviewBlock
+              title="Associated organisms"
+              loading={loading}
+            ></OverviewBlock>
           </Grid.Col>
           <Grid.Col span={3}>
-            <OverviewBlock title="External links" loading={loading}></OverviewBlock>
+            <OverviewBlock
+              title="External links"
+              loading={loading}
+            ></OverviewBlock>
           </Grid.Col>
         </Grid>
       </Container>
@@ -162,8 +203,18 @@ interface OverviewBlockProps {
 
 function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
   return (
-    <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
-      <Paper radius="lg" p={20} bg="wheatBg.0" withBorder style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}>
+    <Skeleton
+      visible={loading}
+      radius="md"
+      className={classes.skeletonOverview}
+    >
+      <Paper
+        radius="lg"
+        p={20}
+        bg="wheatBg.0"
+        withBorder
+        style={{ borderColor: "var(--mantine-color-wheatBg-1)" }}
+      >
         <Stack gap="sm">
           <Text fw={700} c="midnight" fz="xs">
             {title}

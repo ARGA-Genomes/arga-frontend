@@ -1,5 +1,5 @@
 // Import and initialize brotli-wasm
-import { ApolloQueryResult } from "@apollo/client";
+import { ApolloClient } from "@apollo/client";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import get from "lodash-es/get";
@@ -30,14 +30,16 @@ export const generateCSV = async (base64: string) => {
 
 export const downloadCSV = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fetch: () => Promise<ApolloQueryResult<any>>,
+  fetch: () => Promise<ApolloClient.QueryResult<unknown>>,
   name: string,
-  fields: { key: string; name: string }[]
+  fields: { key: string; name: string }[],
 ) => {
   const { data: raw } = await fetch();
 
   // Generate the content for all of the CSV files
-  const csvFiles = await Promise.all(fields.map(({ key }) => generateCSV(get(raw, key))));
+  const csvFiles = await Promise.all(
+    fields.map(({ key }) => generateCSV(get(raw, key))),
+  );
 
   // Create a ZIP archive and add CSV files
   const zip = new JSZip();

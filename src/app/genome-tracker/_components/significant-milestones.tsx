@@ -4,8 +4,19 @@ import classes from "./significant-milestones.module.css";
 
 import { GroupedTimeline } from "@/components/grouped-timeline";
 import { Source } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Group, Image, Paper, ScrollArea, Stack, Text } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Box,
+  Button,
+  Center,
+  Group,
+  Image,
+  Paper,
+  ScrollArea,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { IconBook } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -114,8 +125,17 @@ function MilestoneItemDetails({ milestone, onFlip }: MilestoneItemDetails) {
     <Stack justify="space-between" py="md" h="100%">
       <Stack gap={0}>
         <Group wrap="nowrap" justify="space-between" mb="sm">
-          <Paper radius="xl" px="md" py={4} w="80%" bg={`${colour}.1`} c={colour}>
-            <Text className={classes.itemDetailsHeader}>{milestone.taxonGroup?.toUpperCase()}</Text>
+          <Paper
+            radius="xl"
+            px="md"
+            py={4}
+            w="80%"
+            bg={`${colour}.1`}
+            c={colour}
+          >
+            <Text className={classes.itemDetailsHeader}>
+              {milestone.taxonGroup?.toUpperCase()}
+            </Text>
           </Paper>
 
           <Stack
@@ -143,8 +163,17 @@ function MilestoneItemDetails({ milestone, onFlip }: MilestoneItemDetails) {
 
         <Box pl="lg">
           <div style={{ position: "relative", width: 0, height: 0 }}>
-            <svg width={10} height={10} style={{ position: "absolute", left: -20, top: 4 }}>
-              <circle cx={5} cy={5} r={5} fill={`var(--mantine-color-${colour}-5)`} />
+            <svg
+              width={10}
+              height={10}
+              style={{ position: "absolute", left: -20, top: 4 }}
+            >
+              <circle
+                cx={5}
+                cy={5}
+                r={5}
+                fill={`var(--mantine-color-${colour}-5)`}
+              />
             </svg>
           </div>
 
@@ -196,12 +225,22 @@ function MilestoneItemHeader({ milestone, onFlip }: MilestoneItemHeaderProps) {
       <Stack px="sm" pb="xs" gap="lg">
         <Stack gap={0}>
           <Text className={classes.text}>{milestone.vernacularName}</Text>
-          <Text component={motion.span} className={classes.text} fz="xs" fs="italic">
+          <Text
+            component={motion.span}
+            className={classes.text}
+            fz="xs"
+            fs="italic"
+          >
             {milestone.canonicalName}
           </Text>
         </Stack>
         {!DISABLED_ACCESSIONS.includes(milestone.accession) && (
-          <Button color="midnight.8" radius="xl" component={Link} href={genomeHref}>
+          <Button
+            color="midnight.8"
+            radius="xl"
+            component={Link}
+            href={genomeHref}
+          >
             <Text className={classes.buttonText}>view genome</Text>
           </Button>
         )}
@@ -214,7 +253,13 @@ function MilestoneItemHeader({ milestone, onFlip }: MilestoneItemHeaderProps) {
         className={classes.flipButton}
         onClick={onFlip}
       >
-        <Image src="/icons/misc/arrow.svg" w={30} h={30} alt="flip card" fit="contain" />
+        <Image
+          src="/icons/misc/arrow.svg"
+          w={30}
+          h={30}
+          alt="flip card"
+          fit="contain"
+        />
         <Center>
           <Text fz="xs" fw={700}>
             FLIP
@@ -261,7 +306,10 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
         }}
       >
         <Paper withBorder className={classes.item}>
-          <MilestoneItemHeader milestone={milestone} onFlip={() => setFlipped(true)} />
+          <MilestoneItemHeader
+            milestone={milestone}
+            onFlip={() => setFlipped(true)}
+          />
         </Paper>
       </motion.div>
       <motion.div
@@ -277,7 +325,10 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
         }}
       >
         <Paper withBorder className={classes.itemDetails} bg={`${colour}.0`}>
-          <MilestoneItemDetails milestone={milestone} onFlip={() => setFlipped(false)} />
+          <MilestoneItemDetails
+            milestone={milestone}
+            onFlip={() => setFlipped(false)}
+          />
         </Paper>
       </motion.div>
     </motion.div>
@@ -308,7 +359,12 @@ export function SignificantMilestones() {
       <Group wrap="nowrap" gap={0}>
         <GroupedTimeline height={540}>
           {milestones?.map((milestone, idx) => (
-            <GroupedTimeline.Item width={300} height={200} date={milestone.date} key={milestone.accession}>
+            <GroupedTimeline.Item
+              width={300}
+              height={200}
+              date={milestone.date}
+              key={milestone.accession}
+            >
               <MilestoneItem milestone={milestone} inverted={idx % 2 == 1} />
             </GroupedTimeline.Item>
           ))}

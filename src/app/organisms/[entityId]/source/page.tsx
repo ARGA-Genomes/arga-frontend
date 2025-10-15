@@ -1,14 +1,20 @@
 "use client";
 
 import { MAX_WIDTH } from "@/app/constants";
-import { IconLiveState, IconSpecimenCollection, IconSpecimenRegistration, IconSubsample } from "@/components/ArgaIcons";
+import {
+  IconLiveState,
+  IconSpecimenCollection,
+  IconSpecimenRegistration,
+  IconSubsample,
+} from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { CollectingSlide } from "@/components/slides/Collecting";
 import { LiveStateSlide } from "@/components/slides/LiveState";
 import { RegistrationSlide } from "@/components/slides/Registrations";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { Organism } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Container, Stack, Text, Title } from "@mantine/core";
 import { use, useState } from "react";
 
@@ -82,9 +88,18 @@ function Provenance({ entityId }: { entityId: string }) {
   return (
     <Stack>
       <TimelineNavbar selected={card} onSelected={setCard}>
-        <TimelineNavbar.Item label="Live state" icon={<IconLiveState size={60} />} />
-        <TimelineNavbar.Item label="Collecting" icon={<IconSpecimenCollection size={60} />} />
-        <TimelineNavbar.Item label="Registration" icon={<IconSpecimenRegistration size={60} />} />
+        <TimelineNavbar.Item
+          label="Live state"
+          icon={<IconLiveState size={60} />}
+        />
+        <TimelineNavbar.Item
+          label="Collecting"
+          icon={<IconSpecimenCollection size={60} />}
+        />
+        <TimelineNavbar.Item
+          label="Registration"
+          icon={<IconSpecimenRegistration size={60} />}
+        />
         <TimelineNavbar.Item
           label="Subsamples and tissues"
           icon={<IconSubsample size={60} />}
@@ -108,7 +123,9 @@ function Provenance({ entityId }: { entityId: string }) {
           )}
         </CardSlider.Card>
         <CardSlider.Card title="Registrations" size="lg">
-          {data && <RegistrationSlide registrations={data.organism.registrations} />}
+          {data && (
+            <RegistrationSlide registrations={data.organism.registrations} />
+          )}
         </CardSlider.Card>
         <CardSlider.Card title="Subsamples and tissues" />
       </CardSlider>

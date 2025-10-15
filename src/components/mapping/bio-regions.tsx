@@ -2,7 +2,8 @@
 
 import { GeoJSON, useMapEvent } from "react-leaflet";
 import { useEffect, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 
 const GET_GEOMETRY = gql`
   query BioRegions($regions: [String], $tolerance: Float) {

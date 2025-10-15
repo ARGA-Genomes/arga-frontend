@@ -3,7 +3,8 @@
 import tabsClasses from "../../components/event-timeline-tabs.module.css";
 import classes from "../../components/record-list.module.css";
 
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   Badge,
   Box,
@@ -31,8 +32,15 @@ import { ExternalLinkButton } from "@/components/button-link-external";
 import { InternalLinkButton } from "@/components/button-link-internal";
 import { AttributePillValue, DataField } from "@/components/data-fields";
 import { DataTable, DataTableRow } from "@/components/data-table";
-import { EventTimeline, LineStyle, TimelineIcon } from "@/components/event-timeline";
-import HorizontalTimeline, { TimelineItem, TimelineItemType } from "@/components/graphing/horizontal-timeline";
+import {
+  EventTimeline,
+  LineStyle,
+  TimelineIcon,
+} from "@/components/event-timeline";
+import HorizontalTimeline, {
+  TimelineItem,
+  TimelineItemType,
+} from "@/components/graphing/horizontal-timeline";
 import { Node, TaxonTree } from "@/components/graphing/TaxonTree";
 import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
@@ -259,9 +267,13 @@ function ExternalLinks({ canonicalName }: ExternalLinksProps) {
   useEffect(() => {
     async function matchTaxon() {
       try {
-        const response = await fetch(`https://api.ala.org.au/species/guid/${encodeURIComponent(canonicalName)}`);
+        const response = await fetch(
+          `https://api.ala.org.au/species/guid/${encodeURIComponent(canonicalName)}`,
+        );
         const matches = (await response.json()) as TaxonMatch[];
-        setMatchedTaxon(matches.map(({ acceptedIdentifier }) => acceptedIdentifier));
+        setMatchedTaxon(
+          matches.map(({ acceptedIdentifier }) => acceptedIdentifier),
+        );
       } catch {
         setMatchedTaxon([]);
       }
@@ -284,12 +296,22 @@ function ExternalLinks({ canonicalName }: ExternalLinksProps) {
         />
 
         {hasFrogID && (
-          <Button radius="md" color="midnight" size="xs" leftSection={<IconExternalLink size="1rem" />}>
+          <Button
+            radius="md"
+            color="midnight"
+            size="xs"
+            leftSection={<IconExternalLink size="1rem" />}
+          >
             View on&nbsp;<b>FrogID</b>
           </Button>
         )}
         {hasAFD && (
-          <Button radius="md" color="midnight" size="xs" leftSection={<IconExternalLink size="1rem" />}>
+          <Button
+            radius="md"
+            color="midnight"
+            size="xs"
+            leftSection={<IconExternalLink size="1rem" />}
+          >
             View on&nbsp;<b>AFD</b>
           </Button>
         )}
@@ -299,7 +321,9 @@ function ExternalLinks({ canonicalName }: ExternalLinksProps) {
 }
 
 function Synonyms({ taxonomy }: { taxonomy: Taxon }) {
-  const acts = taxonomy.taxonomicActs.filter((act) => act.taxon.status !== "ACCEPTED");
+  const acts = taxonomy.taxonomicActs.filter(
+    (act) => act.taxon.status !== "ACCEPTED",
+  );
 
   // Object.groupBy is not available for a es2017 target so we manually implement it here
   const synonyms: Record<string, TaxonomicAct[]> = {};
@@ -363,10 +387,17 @@ interface DetailsProps {
   isSubspecies?: boolean;
 }
 
-function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: DetailsProps) {
+function Details({
+  taxonomy,
+  dataset,
+  commonNames,
+  subspecies,
+  isSubspecies,
+}: DetailsProps) {
   const typeSpecimens = taxonomy.typeSpecimens?.filter(
     (typeSpecimen) =>
-      typeSpecimen.name.scientificName == taxonomy.scientificName && typeSpecimen.accession.typeStatus != "no voucher"
+      typeSpecimen.name.scientificName == taxonomy.scientificName &&
+      typeSpecimen.accession.typeStatus != "no voucher",
   );
 
   // TODO: change this to show multiple type specimens for things like syntypes
@@ -383,7 +414,12 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
           <Text fw={300} size="xs">
             Source
           </Text>
-          <ExternalLinkButton url={dataset.url} externalLinkName={dataset.name} outline icon={IconArrowUpRight} />
+          <ExternalLinkButton
+            url={dataset.url}
+            externalLinkName={dataset.name}
+            outline
+            icon={IconArrowUpRight}
+          />
         </Group>
       </Group>
       <Grid>
@@ -420,23 +456,35 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
               <DataTableRow label="Type location (from source)">
                 <Flex justify="space-between" align="center">
                   <DataField
-                    value={[typeCollection?.locality, typeCollection?.stateProvince, typeCollection?.country]
+                    value={[
+                      typeCollection?.locality,
+                      typeCollection?.stateProvince,
+                      typeCollection?.country,
+                    ]
                       .filter((t) => t)
                       .join(", ")}
                   />
-                  {typeCollection?.locationSource && <SourcePill value={typeCollection.locationSource} />}
+                  {typeCollection?.locationSource && (
+                    <SourcePill value={typeCollection.locationSource} />
+                  )}
                 </Flex>
               </DataTableRow>
               {typeCollection?.latitude && typeCollection.longitude && (
                 <DataTableRow label="Type location (geo)">
                   <Group>
                     <DataField
-                      value={[typeCollection.latitude, typeCollection.longitude].filter((t) => t).join(", ")}
+                      value={[typeCollection.latitude, typeCollection.longitude]
+                        .filter((t) => t)
+                        .join(", ")}
                     />
 
                     <Popover width={500} position="right" withArrow shadow="md">
                       <Popover.Target>
-                        <Button variant="subtle" leftSection={<IconSearch />} color="shellfish">
+                        <Button
+                          variant="subtle"
+                          leftSection={<IconSearch />}
+                          color="shellfish"
+                        >
                           View map
                         </Button>
                       </Popover.Target>
@@ -452,7 +500,8 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
                           <AnalysisMap
                             markers={[
                               {
-                                tooltip: typeAccession?.collectionRepositoryId ?? "",
+                                tooltip:
+                                  typeAccession?.collectionRepositoryId ?? "",
                                 latitude: typeCollection.latitude,
                                 longitude: typeCollection.longitude,
                                 color: [103, 151, 180, 220],
@@ -498,7 +547,11 @@ function Details({ taxonomy, dataset, commonNames, subspecies, isSubspecies }: D
             </Paper>
             {!isSubspecies && (
               <Paper radius={16} p="sm" withBorder>
-                <Text fw={300} fz="sm" pb={(subspecies || []).length > 0 ? "sm" : undefined}>
+                <Text
+                  fw={300}
+                  fz="sm"
+                  pb={(subspecies || []).length > 0 ? "sm" : undefined}
+                >
                   Subspecies
                 </Text>
                 {subspecies ? (
@@ -555,13 +608,18 @@ const ACT_TYPE_ORDER: Record<string, number> = {
 
 const ACT_ICON: Record<string, string> = {
   SPECIES_NOVA: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
-  SUBSPECIES_NOVA: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
-  GENUS_SPECIES_NOVA: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  SUBSPECIES_NOVA:
+    "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  GENUS_SPECIES_NOVA:
+    "/icons/taxonomic-act/Taxonomic act_ original description.svg",
   COMBINATIO_NOVA: "/icons/taxonomic-act/Taxonomic act_ recombination.svg",
-  REVIVED_STATUS: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  REVIVED_STATUS:
+    "/icons/taxonomic-act/Taxonomic act_ original description.svg",
   NAME_USAGE: "/icons/taxonomic-act/Taxonomic act_ name usage.svg",
-  SUBGENUS_PLACEMENT: "/icons/taxonomic-act/Taxonomic act_ subgenus assignment.svg",
-  ORIGINAL_DESCRIPTION: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
+  SUBGENUS_PLACEMENT:
+    "/icons/taxonomic-act/Taxonomic act_ subgenus assignment.svg",
+  ORIGINAL_DESCRIPTION:
+    "/icons/taxonomic-act/Taxonomic act_ original description.svg",
   REDESCRIPTION: "/icons/taxonomic-act/Taxonomic act_ original description.svg",
   DEMOTION: "/icons/taxonomic-act/Taxonomic act_ demotion in rank.svg",
   PROMOTION: "/icons/taxonomic-act/Taxonomic act_ promotion in rank.svg",
@@ -602,7 +660,8 @@ function compareAct(a: NomenclaturalAct, b: NomenclaturalAct): number {
     if (aYear < bYear) return -1;
 
     const order = ACT_TYPE_ORDER[a.act] - ACT_TYPE_ORDER[b.act];
-    if (order === 0) return a.name.scientificName.localeCompare(b.name.scientificName);
+    if (order === 0)
+      return a.name.scientificName.localeCompare(b.name.scientificName);
     return order;
   }
 
@@ -633,7 +692,8 @@ function History({ taxonomy }: { taxonomy: Taxon }) {
   const itemSet = new Map<string, TimelineItem>();
   for (const item of acts) {
     const date =
-      (item.publication.publishedDate && new Date(item.publication.publishedDate)) ||
+      (item.publication.publishedDate &&
+        new Date(item.publication.publishedDate)) ||
       new Date(item.publication.publishedYear ?? 0, 0, 1);
 
     const key = `${date}-${item.act}-${item.name.canonicalName}`;
@@ -661,16 +721,22 @@ function History({ taxonomy }: { taxonomy: Taxon }) {
           <Text fw={600} size="lg">
             Taxon History
           </Text>
-          {timelineItems.length === 0 && <Text className={classes.emptyList}>no data</Text>}
+          {timelineItems.length === 0 && (
+            <Text className={classes.emptyList}>no data</Text>
+          )}
 
-          {timelineItems.length > 0 && <HorizontalTimeline data={timelineItems} />}
+          {timelineItems.length > 0 && (
+            <HorizontalTimeline data={timelineItems} />
+          )}
         </Stack>
       </Paper>
       <Paper radius={16} p="md" withBorder>
         <Text fw={600} size="lg" pb="lg">
           Nomenclatural timeline
         </Text>
-        {acts.length === 0 && <Text className={classes.emptyList}>no data</Text>}
+        {acts.length === 0 && (
+          <Text className={classes.emptyList}>no data</Text>
+        )}
 
         <EventTimeline>
           {acts.map((act, idx) => (
@@ -679,7 +745,9 @@ function History({ taxonomy }: { taxonomy: Taxon }) {
               icon={
                 <TimelineIcon
                   icon={ACT_ICON[act.act]}
-                  lineStyle={idx < acts.length - 1 ? LineStyle.Solid : LineStyle.None}
+                  lineStyle={
+                    idx < acts.length - 1 ? LineStyle.Solid : LineStyle.None
+                  }
                 />
               }
               header={<NomenclaturalActHeader item={act} />}
@@ -717,9 +785,12 @@ interface NomenclaturalActBodyProps {
 }
 
 function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
-  const { loading, data } = useQuery<{ provenance: Provenance }>(GET_NOMENCLATURAL_ACT_PROVENANCE, {
-    variables: { entityId: item.entityId },
-  });
+  const { loading, data } = useQuery<{ provenance: Provenance }>(
+    GET_NOMENCLATURAL_ACT_PROVENANCE,
+    {
+      variables: { entityId: item.entityId },
+    },
+  );
 
   const specimens = useQuery<{ taxon: Taxon }>(GET_TYPE_SPECIMENS, {
     variables: {
@@ -729,7 +800,7 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   });
 
   const holotype = specimens.data?.taxon.typeSpecimens.find(
-    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype"
+    (specimen) => specimen.accession.typeStatus?.toLowerCase() == "holotype",
   );
 
   function humanize(text: string) {
@@ -737,7 +808,9 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
   }
 
   const act = humanize(item.act);
-  const items = data?.provenance.nomenclaturalAct.filter((item) => item.action !== "CREATE");
+  const items = data?.provenance.nomenclaturalAct.filter(
+    (item) => item.action !== "CREATE",
+  );
 
   return (
     <SimpleGrid cols={2} py="md">
@@ -773,7 +846,9 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
         </DataTableRow>
         <DataTableRow label="Current status">
           <Group>
-            {item.name.taxa[0]?.status == "SYNONYM" && <AttributePillValue value="Unaccepted" />}
+            {item.name.taxa[0]?.status == "SYNONYM" && (
+              <AttributePillValue value="Unaccepted" />
+            )}
             <AttributePillValue value={humanize(item.name.taxa[0]?.status)} />
           </Group>
         </DataTableRow>
@@ -781,7 +856,10 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
           <DataTableRow label="Type material" key={item.entityId}>
             <Group gap={12}>
               {specimens.data?.taxon.typeSpecimens?.map((specimen) => (
-                <TypeSpecimenPill key={specimen.accession.entityId} specimen={specimen} />
+                <TypeSpecimenPill
+                  key={specimen.accession.entityId}
+                  specimen={specimen}
+                />
               ))}
             </Group>
           </DataTableRow>
@@ -790,7 +868,9 @@ function NomenclaturalActBody({ item, protonym }: NomenclaturalActBodyProps) {
           <DataField value={holotype?.collection.locality} />
         </DataTableRow>
         <DataTableRow label="Type location (geo)">
-          <DataField value={`${holotype?.collection.latitude}, ${holotype?.collection.longitude}`} />
+          <DataField
+            value={`${holotype?.collection.latitude}, ${holotype?.collection.longitude}`}
+          />
         </DataTableRow>
       </DataTable>
 
@@ -829,14 +909,17 @@ function FamilyTaxonTree({ family, datasetId, pinned }: FamilyTaxonTreeProps) {
   const includeRanks = ["CLASS", "FAMILY", "SUBFAMILY", "GENUS"];
   if ((family.species || 0) < 100) includeRanks.push("SPECIES");
 
-  const { loading, error, data } = useQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE, {
-    variables: {
-      taxonRank: "FAMILY",
-      taxonCanonicalName: family.canonicalName,
-      includeRanks,
-      datasetId,
+  const { loading, error, data } = useQuery<{ stats: Statistics }>(
+    GET_TAXON_TREE_NODE,
+    {
+      variables: {
+        taxonRank: "FAMILY",
+        taxonCanonicalName: family.canonicalName,
+        includeRanks,
+        datasetId,
+      },
     },
-  });
+  );
 
   const treeData = data?.stats.taxonBreakdown[0];
 
@@ -850,13 +933,15 @@ function FamilyTaxonTree({ family, datasetId, pinned }: FamilyTaxonTreeProps) {
           color="midnight.8"
           radius="md"
           onClick={() => {
-            const newLayout = layout === "top-to-bottom" ? "right-to-left" : "top-to-bottom";
+            const newLayout =
+              layout === "top-to-bottom" ? "right-to-left" : "top-to-bottom";
             setLayout(newLayout);
           }}
         >
           <IconBinaryTree2
             style={{
-              transform: layout === "top-to-bottom" ? "rotate(90deg)" : "rotate(0deg)",
+              transform:
+                layout === "top-to-bottom" ? "rotate(90deg)" : "rotate(0deg)",
             }}
           />
         </Button>
@@ -909,7 +994,13 @@ function StatBadge({ label, stat }: { label: string; stat?: number }) {
   );
 }
 
-export default function TaxonomyPage({ params, isSubspecies }: { params: { name: string }; isSubspecies?: boolean }) {
+export default function TaxonomyPage({
+  params,
+  isSubspecies,
+}: {
+  params: { name: string };
+  isSubspecies?: boolean;
+}) {
   const { names } = useDatasets();
   const dataset = names.get("Atlas of Living Australia");
 
@@ -922,13 +1013,17 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
   // get the taxonomy and build the pinned taxonomy hierarchy path for the tree
   const taxonomy = data?.taxon;
   const hierarchy = taxonomy?.hierarchy;
-  const pinned = hierarchy ? [canonicalName, ...hierarchy.map((h) => h.canonicalName)] : [canonicalName];
+  const pinned = hierarchy
+    ? [canonicalName, ...hierarchy.map((h) => h.canonicalName)]
+    : [canonicalName];
 
   const results = useQuery<{ taxa: Taxa }>(GET_TAXA, {
     variables: { filters: [{ canonicalName }] },
   });
 
-  const family = hierarchy?.find((node) => node.rank === "FAMILY" || node.rank === "FAMILIA");
+  const family = hierarchy?.find(
+    (node) => node.rank === "FAMILY" || node.rank === "FAMILIA",
+  );
 
   const familyStats = useQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE, {
     variables: {
@@ -967,12 +1062,18 @@ export default function TaxonomyPage({ params, isSubspecies }: { params: { name:
                 isSubspecies={isSubspecies}
               />
             )}
-            {results.data && <TaxonomySwitcher taxa={results.data.taxa.records} />}
+            {results.data && (
+              <TaxonomySwitcher taxa={results.data.taxa.records} />
+            )}
           </Stack>
         </Grid.Col>
       </Grid>
       {familyStats.data && dataset && (
-        <FamilyTaxonTree family={familyStats.data.stats.taxonBreakdown[0]} datasetId={dataset.id} pinned={pinned} />
+        <FamilyTaxonTree
+          family={familyStats.data.stats.taxonBreakdown[0]}
+          datasetId={dataset.id}
+          pinned={pinned}
+        />
       )}
       <ExternalLinks canonicalName={canonicalName} />
 
@@ -985,14 +1086,26 @@ function humanize(text: string) {
   return Humanize.capitalize(text.toLowerCase().replaceAll("_", " "));
 }
 
-function TypeSpecimenPill({ specimen, records }: { specimen: TypeSpecimen; records?: SpecimenRecordNumbers }) {
+function TypeSpecimenPill({
+  specimen,
+  records,
+}: {
+  specimen: TypeSpecimen;
+  records?: SpecimenRecordNumbers;
+}) {
   const [opened, { close, open }] = useDisclosure(false);
 
   const hasData = Boolean(records);
   const recordId = `${specimen.accession.institutionCode} ${specimen.accession.collectionRepositoryId}`;
 
   return (
-    <Popover position="right" withArrow shadow="md" opened={opened && hasData} radius="md">
+    <Popover
+      position="right"
+      withArrow
+      shadow="md"
+      opened={opened && hasData}
+      radius="md"
+    >
       <Popover.Target>
         <Indicator
           disabled={!hasData}

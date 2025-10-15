@@ -18,9 +18,26 @@ import { TachoChart } from "@/components/graphing/tacho";
 import { Attribute, DataField } from "@/components/highlight-stack";
 import { usePreviousPage } from "@/components/navigation-history";
 import { PageCitation } from "@/components/page-citation";
-import { getChildRank, isLatin, latinilizeNormalRank, normalizeLatinRank, pluralizeRank } from "@/helpers/rankHelpers";
-import { gql, OperationVariables, useQuery } from "@apollo/client";
-import { Box, Container, Flex, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import {
+  getChildRank,
+  isLatin,
+  latinilizeNormalRank,
+  normalizeLatinRank,
+  pluralizeRank,
+} from "@/helpers/rankHelpers";
+import { gql, type OperationVariables } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Box,
+  Container,
+  Flex,
+  Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import * as Humanize from "humanize-plus";
 import { use, useEffect, useMemo } from "react";
 
@@ -181,7 +198,9 @@ function DataSummary({
   const speciesGenomes = taxon?.speciesGenomesSummary
     .filter((i) => i.genomes > 0)
     .map((summary) => {
-      const linkName = encodeURIComponent(summary.canonicalName.replaceAll(" ", "_"));
+      const linkName = encodeURIComponent(
+        summary.canonicalName.replaceAll(" ", "_"),
+      );
       return {
         name: summary.canonicalName || "",
         value: summary.genomes,
@@ -193,7 +212,9 @@ function DataSummary({
   const speciesOther = taxon?.speciesGenomicDataSummary
     .filter((i) => i.totalGenomic > 0)
     .map((summary) => {
-      const linkName = encodeURIComponent(summary.canonicalName.replaceAll(" ", "_"));
+      const linkName = encodeURIComponent(
+        summary.canonicalName.replaceAll(" ", "_"),
+      );
       return {
         name: summary.canonicalName || "",
         value: summary.totalGenomic,
@@ -202,8 +223,13 @@ function DataSummary({
     })
     .sort((a, b) => b.value - a.value);
 
-  const genomePercentile = taxon && (taxon.speciesRankSummary.genomes / taxon.speciesRankSummary.total) * 100;
-  const otherPercentile = taxon && (taxon.speciesRankSummary.genomicData / taxon.speciesRankSummary.total) * 100;
+  const genomePercentile =
+    taxon &&
+    (taxon.speciesRankSummary.genomes / taxon.speciesRankSummary.total) * 100;
+  const otherPercentile =
+    taxon &&
+    (taxon.speciesRankSummary.genomicData / taxon.speciesRankSummary.total) *
+    100;
 
   function collapsable(span: number) {
     return { base: span, xs: 12, sm: 12, md: span, lg: span, xl: span };
@@ -225,8 +251,13 @@ function DataSummary({
                   query={{
                     taxonRank: normalRank,
                     taxonCanonicalName: taxon?.canonicalName || "",
-                    includeRanks: [normalRank, ALL_RANKS[ALL_RANKS.indexOf(normalRank) + 1]],
-                    rankStats: ALL_RANKS.slice(ALL_RANKS.indexOf(normalRank) + 1),
+                    includeRanks: [
+                      normalRank,
+                      ALL_RANKS[ALL_RANKS.indexOf(normalRank) + 1],
+                    ],
+                    rankStats: ALL_RANKS.slice(
+                      ALL_RANKS.indexOf(normalRank) + 1,
+                    ),
                   }}
                   fontSize={7}
                   switcherGap="sm"
@@ -234,15 +265,19 @@ function DataSummary({
                   hideDescription
                 />
                 <Text fw={300} size="sm">
-                  Total of species for which a whole genome has been sequenced and made available aggregated by higher
-                  classification units.
+                  Total of species for which a whole genome has been sequenced
+                  and made available aggregated by higher classification units.
                 </Text>
               </Stack>
             </Paper>
           </Box>
           <Box style={{ flexGrow: 1, minWidth: 0 }}>
             <Paper h={560} p="lg" radius="lg" withBorder>
-              <Stack data-downloadname="Aggregated total species" h="100%" justify="space-between">
+              <Stack
+                data-downloadname="Aggregated total species"
+                h="100%"
+                justify="space-between"
+              >
                 <Box h={400}>
                   <GenomeCompletion
                     taxonRank={normalRank}
@@ -251,9 +286,11 @@ function DataSummary({
                   />
                 </Box>
                 <Text fw={300} size="sm">
-                  This graph shows the aggregated total of species for which a whole genome has been sequenced and made
-                  available. The first instance of a whole genome sequence for an individual species has been plotted as
-                  an accumulated total. Statistics based on records indexed within ARGA.
+                  This graph shows the aggregated total of species for which a
+                  whole genome has been sequenced and made available. The first
+                  instance of a whole genome sequence for an individual species
+                  has been plotted as an accumulated total. Statistics based on
+                  records indexed within ARGA.
                 </Text>
               </Stack>
             </Paper>
@@ -264,28 +301,56 @@ function DataSummary({
 
               <DataTable my={8}>
                 {normalRank !== "GENUS" && (
-                  <DataTableRow label={`Number of ${childTaxonLabel || "unknown"}`}>
-                    <DataField value={taxon?.lowerRankSummary?.total}></DataField>
+                  <DataTableRow
+                    label={`Number of ${childTaxonLabel || "unknown"}`}
+                  >
+                    <DataField
+                      value={taxon?.lowerRankSummary?.total}
+                    ></DataField>
                   </DataTableRow>
                 )}
                 <DataTableRow label="Number of species/OTUs">
-                  <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.total || 0)} />
+                  <DataField
+                    value={Humanize.formatNumber(
+                      taxon?.speciesRankSummary.total || 0,
+                    )}
+                  />
                 </DataTableRow>
                 {normalRank !== "GENUS" && (
-                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel || "unknown")} with genomes`}>
-                    <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary?.genomes || 0)} />
+                  <DataTableRow
+                    label={`${Humanize.capitalize(childTaxonLabel || "unknown")} with genomes`}
+                  >
+                    <DataField
+                      value={Humanize.formatNumber(
+                        taxon?.lowerRankSummary?.genomes || 0,
+                      )}
+                    />
                   </DataTableRow>
                 )}
                 <DataTableRow label="Species with genomes">
-                  <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.genomes || 0)} />
+                  <DataField
+                    value={Humanize.formatNumber(
+                      taxon?.speciesRankSummary.genomes || 0,
+                    )}
+                  />
                 </DataTableRow>
                 {normalRank !== "GENUS" && (
-                  <DataTableRow label={`${Humanize.capitalize(childTaxonLabel || "unknown")} with data`}>
-                    <DataField value={Humanize.formatNumber(taxon?.lowerRankSummary.genomicData || 0)} />
+                  <DataTableRow
+                    label={`${Humanize.capitalize(childTaxonLabel || "unknown")} with data`}
+                  >
+                    <DataField
+                      value={Humanize.formatNumber(
+                        taxon?.lowerRankSummary.genomicData || 0,
+                      )}
+                    />
                   </DataTableRow>
                 )}
                 <DataTableRow label="Species with data">
-                  <DataField value={Humanize.formatNumber(taxon?.speciesRankSummary.genomicData || 0)} />
+                  <DataField
+                    value={Humanize.formatNumber(
+                      taxon?.speciesRankSummary.genomicData || 0,
+                    )}
+                  />
                 </DataTableRow>
               </DataTable>
               <Stack mx={10} mt={5}>
@@ -307,19 +372,29 @@ function DataSummary({
 
       <Grid.Col span={12}>
         <Grid mt="xl">
-          <Grid.Col data-downloadname="Complete genomes for representative species" span={12}>
+          <Grid.Col
+            data-downloadname="Complete genomes for representative species"
+            span={12}
+          >
             <Stack>
               <Text fz="sm" fw={300}>
-                Complete genome for at least one representative species from each:
+                Complete genome for at least one representative species from
+                each:
               </Text>
               <Group grow px="lg">
-                <CompletionStepper rank={normalRank} canonicalName={taxon?.canonicalName} />
+                <CompletionStepper
+                  rank={normalRank}
+                  canonicalName={taxon?.canonicalName}
+                />
               </Group>
             </Stack>
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 12, md: 8, lg: 9, xl: 10 }}>
             <Grid>
-              <Grid.Col data-downloadname="Percentage of species with genomes" span={collapsable(4)}>
+              <Grid.Col
+                data-downloadname="Percentage of species with genomes"
+                span={collapsable(4)}
+              >
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Percentage of species with genomes
@@ -335,15 +410,27 @@ function DataSummary({
                   )}
                 </Stack>
               </Grid.Col>
-              <Grid.Col data-downloadname="Species with genomes" span={collapsable(8)}>
+              <Grid.Col
+                data-downloadname="Species with genomes"
+                span={collapsable(8)}
+              >
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Species with genomes
                   </Text>
-                  {speciesGenomes && <BarChart h={200} data={speciesGenomes.slice(0, 8)} spacing={0.1} />}
+                  {speciesGenomes && (
+                    <BarChart
+                      h={200}
+                      data={speciesGenomes.slice(0, 8)}
+                      spacing={0.1}
+                    />
+                  )}
                 </Stack>
               </Grid.Col>
-              <Grid.Col data-downloadname="Percentage of species with any genetic data" span={collapsable(4)}>
+              <Grid.Col
+                data-downloadname="Percentage of species with any genetic data"
+                span={collapsable(4)}
+              >
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Percentage of species with any genetic data
@@ -359,12 +446,21 @@ function DataSummary({
                   )}
                 </Stack>
               </Grid.Col>
-              <Grid.Col data-downloadname="Species with any genetic data" span={collapsable(8)}>
+              <Grid.Col
+                data-downloadname="Species with any genetic data"
+                span={collapsable(8)}
+              >
                 <Stack>
                   <Text fz="sm" fw={300}>
                     Species with any genetic data
                   </Text>
-                  {speciesOther && <BarChart h={200} data={speciesOther.slice(0, 8)} spacing={0.1} />}
+                  {speciesOther && (
+                    <BarChart
+                      h={200}
+                      data={speciesOther.slice(0, 8)}
+                      spacing={0.1}
+                    />
+                  )}
                 </Stack>
               </Grid.Col>
             </Grid>
@@ -415,7 +511,16 @@ interface ClassificationPageProps {
   }>;
 }
 
-const ALL_RANKS = ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"];
+const ALL_RANKS = [
+  "DOMAIN",
+  "KINGDOM",
+  "PHYLUM",
+  "CLASS",
+  "ORDER",
+  "FAMILY",
+  "GENUS",
+  "SPECIES",
+];
 
 export default function ClassificationPage(props: ClassificationPageProps) {
   const { rank: rawRank, name } = use(props.params);
@@ -476,13 +581,20 @@ export default function ClassificationPage(props: ClassificationPageProps) {
   // Set previous page
   useEffect(() => {
     if (taxonRank) {
-      setPreviousPage({ name: `browsing ${name}`, url: `/${taxonRank.rank}/${name}` });
+      setPreviousPage({
+        name: `browsing ${name}`,
+        url: `/${taxonRank.rank}/${name}`,
+      });
     }
   }, [name, taxonRank, setPreviousPage]);
 
   return (
     <Stack mt="xl" gap={0}>
-      <ClassificationHeader rawRank={rawRank} taxon={taxonDetailsResults?.data?.taxon} dataset={dataset} />
+      <ClassificationHeader
+        rawRank={rawRank}
+        taxon={taxonDetailsResults?.data?.taxon}
+        dataset={dataset}
+      />
       <Paper py={30}>
         <Container maw={MAX_WIDTH}>
           <Stack>
@@ -493,9 +605,9 @@ export default function ClassificationPage(props: ClassificationPageProps) {
                 taxon={
                   taxonStatsResults.data && taxonDetailsResults.data
                     ? {
-                        ...taxonStatsResults.data.taxon,
-                        ...taxonDetailsResults.data?.taxon,
-                      }
+                      ...taxonStatsResults.data.taxon,
+                      ...taxonDetailsResults.data?.taxon,
+                    }
                     : null
                 }
                 downloadVariables={variables}
@@ -507,7 +619,11 @@ export default function ClassificationPage(props: ClassificationPageProps) {
                   query={{
                     content: GET_SPECIES,
                     download: DOWNLOAD_SPECIES,
-                    variables: { rank: normalRank, canonicalName: name, datasetId },
+                    variables: {
+                      rank: normalRank,
+                      canonicalName: name,
+                      datasetId,
+                    },
                   }}
                 />
               </Paper>

@@ -1,8 +1,18 @@
 "use client";
 
 import { AnalysisMap } from "@/components/mapping";
-import { gql, useQuery } from "@apollo/client";
-import { Box, Grid, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Box,
+  Grid,
+  Group,
+  Paper,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 
 import { Attribute } from "@/components/highlight-stack";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -38,7 +48,10 @@ const GET_SPECIES = gql`
   }
 `;
 
-function toMarker(color: [number, number, number, number], records?: SpeciesMarker[]) {
+function toMarker(
+  color: [number, number, number, number],
+  records?: SpeciesMarker[],
+) {
   if (!records) return [];
   return records.map((r) => {
     return {
@@ -51,7 +64,9 @@ function toMarker(color: [number, number, number, number], records?: SpeciesMark
 }
 
 function MarkerMap({ records }: { records?: SpeciesMarker[] }) {
-  const markers = toMarker([123, 161, 63, 220], records).filter((s) => s.latitude) as Marker<null>[];
+  const markers = toMarker([123, 161, 63, 220], records).filter(
+    (s) => s.latitude,
+  ) as Marker<null>[];
 
   return (
     <Box pos="relative" h="100%">
@@ -63,7 +78,13 @@ function MarkerMap({ records }: { records?: SpeciesMarker[] }) {
   );
 }
 
-function LabeledValue({ label, value }: { label: string; value?: string | null }) {
+function LabeledValue({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | null;
+}) {
   return (
     <Group gap={20}>
       <Text fw={300} size="sm">
@@ -140,7 +161,9 @@ export default function Markers(props: { params: Promise<{ name: string }> }) {
         <Grid.Col span={8}>
           <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
-            {data?.species.markers ? <LociList records={data.species.markers.records} /> : null}
+            {data?.species.markers ? (
+              <LociList records={data.species.markers.records} />
+            ) : null}
           </Box>
         </Grid.Col>
         <Grid.Col span={4} mih={568}>
@@ -148,7 +171,12 @@ export default function Markers(props: { params: Promise<{ name: string }> }) {
         </Grid.Col>
 
         <Grid.Col span={8}>
-          <PaginationBar total={data?.species.markers.total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
+          <PaginationBar
+            total={data?.species.markers.total}
+            page={page}
+            pageSize={PAGE_SIZE}
+            onChange={setPage}
+          />
         </Grid.Col>
       </Grid>
     </Paper>

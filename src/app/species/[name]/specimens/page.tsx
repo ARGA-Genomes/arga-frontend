@@ -5,7 +5,10 @@ import classes from "./page.module.css";
 
 import { useSpecies } from "@/app/species-provider";
 import { AreaGraphInput } from "@/components/AreaGraphInput";
-import { AttributePillContainer, AttributePillValue } from "@/components/data-fields";
+import {
+  AttributePillContainer,
+  AttributePillValue,
+} from "@/components/data-fields";
 import { FilterGroup } from "@/components/filtering-redux/group";
 import SimpleBarGraph from "@/components/graphing/SimpleBarGraph";
 import SimpleVerticalBarGraph from "@/components/graphing/SimpleVerticalBarGraph";
@@ -23,7 +26,11 @@ import {
   SpecimenMapMarker,
   SpecimenSummary,
 } from "@/generated/types";
-import { getVoucherColour, getVoucherRGBA, getVoucherStatus } from "@/helpers/colors";
+import {
+  getVoucherColour,
+  getVoucherRGBA,
+  getVoucherStatus,
+} from "@/helpers/colors";
 import { getEnumKeyByValue, SortOrder } from "@/queries/common";
 import {
   getFilterLabel,
@@ -36,7 +43,8 @@ import {
   StringValue,
   YearValue,
 } from "@/queries/specimen";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -100,7 +108,10 @@ const GET_SPECIMENS_OVERVIEW = gql`
 type SpeciesOverviewQuery = {
   species: {
     overview: Pick<SpeciesOverview, "specimens" | "majorCollections"> & {
-      accessions: Pick<AccessionEvent, "entityId" | "typeStatus" | "institutionCode" | "collectionRepositoryId">[];
+      accessions: Pick<
+        AccessionEvent,
+        "entityId" | "typeStatus" | "institutionCode" | "collectionRepositoryId"
+      >[];
     };
   };
 };
@@ -135,7 +146,10 @@ const GET_SPECIMEN_CARD = gql`
   }
 `;
 
-type SpecimenCard = Pick<Specimen, "organismId" | "collections" | "accessions" | "stats">;
+type SpecimenCard = Pick<
+  Specimen,
+  "organismId" | "collections" | "accessions" | "stats"
+>;
 type SpecimenQuery = {
   specimen: SpecimenCard;
 };
@@ -183,9 +197,19 @@ interface OverviewBlockProps {
   hasData?: boolean;
 }
 
-function OverviewBlock({ title, children, loading, hasData }: OverviewBlockProps) {
+function OverviewBlock({
+  title,
+  children,
+  loading,
+  hasData,
+}: OverviewBlockProps) {
   return (
-    <Skeleton h="100%" visible={loading} radius="md" className={classes.skeletonOverview}>
+    <Skeleton
+      h="100%"
+      visible={loading}
+      radius="md"
+      className={classes.skeletonOverview}
+    >
       <Paper
         h="100%"
         radius="lg"
@@ -209,9 +233,12 @@ function OverviewBlock({ title, children, loading, hasData }: OverviewBlockProps
 }
 
 function Overview({ name }: { name: string }) {
-  const { loading, error, data } = useQuery<SpeciesOverviewQuery>(GET_SPECIMENS_OVERVIEW, {
-    variables: { canonicalName: name },
-  });
+  const { loading, error, data } = useQuery<SpeciesOverviewQuery>(
+    GET_SPECIMENS_OVERVIEW,
+    {
+      variables: { canonicalName: name },
+    },
+  );
 
   const specimens = data?.species.overview.specimens;
   function col<T, R>(value?: T, retValue?: R): R | undefined {
@@ -233,7 +260,11 @@ function Overview({ name }: { name: string }) {
 
         <Grid columns={7}>
           <Grid.Col span={5}>
-            <Skeleton visible={loading} radius="md" className={classes.skeletonOverview}>
+            <Skeleton
+              visible={loading}
+              radius="md"
+              className={classes.skeletonOverview}
+            >
               <Paper
                 radius="lg"
                 p={20}
@@ -245,19 +276,32 @@ function Overview({ name }: { name: string }) {
                   <Grid.Col span={2}>
                     <Stack gap="xs">
                       Total number of specimens
-                      <Pill.StandardNumber value={specimens?.total} variant="overview" />
+                      <Pill.StandardNumber
+                        value={specimens?.total}
+                        variant="overview"
+                      />
                     </Stack>
                   </Grid.Col>
                   <Grid.Col span={7}>
                     <Stack gap="xs">
                       Collection years
-                      <Box h={100}>{specimens && <CollectionYearsGraph data={specimens?.collectionYears} />}</Box>
+                      <Box h={100}>
+                        {specimens && (
+                          <CollectionYearsGraph
+                            data={specimens?.collectionYears}
+                          />
+                        )}
+                      </Box>
                     </Stack>
                   </Grid.Col>
                   <Grid.Col span={3}>
                     <Stack gap="xs">
                       Top 5 countries
-                      <Box h={100}>{specimens && <TopCountriesGraph data={specimens?.topCountries} />}</Box>
+                      <Box h={100}>
+                        {specimens && (
+                          <TopCountriesGraph data={specimens?.topCountries} />
+                        )}
+                      </Box>
                     </Stack>
                   </Grid.Col>
                 </Grid>
@@ -277,43 +321,85 @@ function Overview({ name }: { name: string }) {
           </Grid.Col>
 
           <Grid.Col span={1}>
-            <OverviewBlock title="Holotype" loading={loading} hasData={!!holotypes?.length}>
+            <OverviewBlock
+              title="Holotype"
+              loading={loading}
+              hasData={!!holotypes?.length}
+            >
               {holotypes?.map((accession) => (
-                <Pill.SpecimenRegistration key={accession.entityId} accession={accession} />
+                <Pill.SpecimenRegistration
+                  key={accession.entityId}
+                  accession={accession}
+                />
               ))}
             </OverviewBlock>
           </Grid.Col>
           <Grid.Col span={1}>
-            <OverviewBlock title="Other types" loading={loading} hasData={!!specimens?.otherTypes}>
-              <AttributePillContainer className={classes.pill} color={col(specimens?.otherTypes, "white")}>
+            <OverviewBlock
+              title="Other types"
+              loading={loading}
+              hasData={!!specimens?.otherTypes}
+            >
+              <AttributePillContainer
+                className={classes.pill}
+                color={col(specimens?.otherTypes, "white")}
+              >
                 {specimens?.otherTypes}
               </AttributePillContainer>
             </OverviewBlock>
           </Grid.Col>
           <Grid.Col span={1}>
-            <OverviewBlock title="Formal vouchers" loading={loading} hasData={!!specimens?.formalVouchers}>
-              <AttributePillContainer className={classes.pill} color={col(specimens?.formalVouchers, "white")}>
+            <OverviewBlock
+              title="Formal vouchers"
+              loading={loading}
+              hasData={!!specimens?.formalVouchers}
+            >
+              <AttributePillContainer
+                className={classes.pill}
+                color={col(specimens?.formalVouchers, "white")}
+              >
                 {specimens?.formalVouchers}
               </AttributePillContainer>
             </OverviewBlock>
           </Grid.Col>
           <Grid.Col span={1}>
-            <OverviewBlock title="Tissue available" loading={loading} hasData={!!specimens?.tissues}>
-              <AttributePillContainer className={classes.pill} color={col(specimens?.tissues, "white")}>
+            <OverviewBlock
+              title="Tissue available"
+              loading={loading}
+              hasData={!!specimens?.tissues}
+            >
+              <AttributePillContainer
+                className={classes.pill}
+                color={col(specimens?.tissues, "white")}
+              >
                 {specimens?.tissues}
               </AttributePillContainer>
             </OverviewBlock>
           </Grid.Col>
           <Grid.Col span={1}>
-            <OverviewBlock title="Genomic DNA available" loading={loading} hasData={!!specimens?.genomicDna}>
-              <AttributePillContainer className={classes.pill} color={col(specimens?.genomicDna, "white")}>
+            <OverviewBlock
+              title="Genomic DNA available"
+              loading={loading}
+              hasData={!!specimens?.genomicDna}
+            >
+              <AttributePillContainer
+                className={classes.pill}
+                color={col(specimens?.genomicDna, "white")}
+              >
                 {specimens?.genomicDna}
               </AttributePillContainer>
             </OverviewBlock>
           </Grid.Col>
           <Grid.Col span={1}>
-            <OverviewBlock title="Australian material" loading={loading} hasData={!!specimens?.australianMaterial}>
-              <AttributePillContainer className={classes.pill} color={col(specimens?.australianMaterial, "white")}>
+            <OverviewBlock
+              title="Australian material"
+              loading={loading}
+              hasData={!!specimens?.australianMaterial}
+            >
+              <AttributePillContainer
+                className={classes.pill}
+                color={col(specimens?.australianMaterial, "white")}
+              >
                 {specimens?.australianMaterial}
               </AttributePillContainer>
             </OverviewBlock>
@@ -324,7 +410,10 @@ function Overview({ name }: { name: string }) {
               loading={loading}
               hasData={!!specimens?.nonAustralianMaterial}
             >
-              <AttributePillContainer className={classes.pill} color={col(specimens?.nonAustralianMaterial, "white")}>
+              <AttributePillContainer
+                className={classes.pill}
+                color={col(specimens?.nonAustralianMaterial, "white")}
+              >
                 {specimens?.nonAustralianMaterial}
               </AttributePillContainer>
             </OverviewBlock>
@@ -336,14 +425,21 @@ function Overview({ name }: { name: string }) {
 }
 
 function Explorer({ name }: { name: string }) {
-  const [selectedSpecimen, handlers] = useStateHistory<SpecimenMapMarker | null>(null);
+  const [selectedSpecimen, handlers] =
+    useStateHistory<SpecimenMapMarker | null>(null);
 
-  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIMEN_MAP_MARKERS, {
-    variables: { canonicalName: name },
-  });
+  const { loading, error, data } = useQuery<{ species: Species }>(
+    GET_SPECIMEN_MAP_MARKERS,
+    {
+      variables: { canonicalName: name },
+    },
+  );
 
   // sort the map markers so that holotypes and other more uncommon types are rendered last
-  function getRenderLayer(typeStatus?: string | null, collectionRepositoryId?: string | null) {
+  function getRenderLayer(
+    typeStatus?: string | null,
+    collectionRepositoryId?: string | null,
+  ) {
     const status = getVoucherStatus(typeStatus, collectionRepositoryId);
 
     if (status === "holotype") return 0;
@@ -359,8 +455,15 @@ function Explorer({ name }: { name: string }) {
       tooltip: specimen.institutionCode
         ? `${specimen.institutionCode} ${specimen.collectionRepositoryId}`
         : "not registered",
-      color: getVoucherRGBA(200, specimen.typeStatus, specimen.collectionRepositoryId),
-      renderLayer: getRenderLayer(specimen.typeStatus, specimen.collectionRepositoryId),
+      color: getVoucherRGBA(
+        200,
+        specimen.typeStatus,
+        specimen.collectionRepositoryId,
+      ),
+      renderLayer: getRenderLayer(
+        specimen.typeStatus,
+        specimen.collectionRepositoryId,
+      ),
       data: specimen,
     })) ?? [];
 
@@ -376,7 +479,12 @@ function Explorer({ name }: { name: string }) {
 
       <Grid>
         <Grid.Col span={7}>
-          <Paper pos="relative" radius="xl" style={{ overflow: "hidden" }} h="100%">
+          <Paper
+            pos="relative"
+            radius="xl"
+            style={{ overflow: "hidden" }}
+            h="100%"
+          >
             <LoadOverlay visible={loading} error={error} />
             <AnalysisMap markers={markers} onMarkerClick={onMarkerClick} />
           </Paper>
@@ -395,35 +503,55 @@ function Explorer({ name }: { name: string }) {
 function HolotypeCard() {
   const { details } = { ...useSpecies() };
 
-  const overviewResult = useQuery<SpeciesOverviewQuery>(GET_SPECIMENS_OVERVIEW, {
-    skip: !details,
-    variables: { canonicalName: details?.name },
-  });
+  const overviewResult = useQuery<SpeciesOverviewQuery>(
+    GET_SPECIMENS_OVERVIEW,
+    {
+      skip: !details,
+      variables: { canonicalName: details?.name },
+    },
+  );
 
   const accessions = overviewResult.data?.species.overview.accessions;
 
   // dont get detailed specimen data unless we have accessions from the overview
-  const { loading, error, data } = useQuery<{ specimen: Specimen }>(GET_SPECIMEN_CARD, {
-    skip: !accessions || accessions.length === 0,
-    variables: { entityId: accessions && accessions[0] && accessions[0].entityId },
-  });
+  const { loading, error, data } = useQuery<{ specimen: Specimen }>(
+    GET_SPECIMEN_CARD,
+    {
+      skip: !accessions || accessions.length === 0,
+      variables: {
+        entityId: accessions && accessions[0] && accessions[0].entityId,
+      },
+    },
+  );
 
   const collection = data?.specimen.collections[0];
   const accession = data?.specimen.accessions[0];
 
   return (
-    <LoadPanel visible={loading} error={error} radius="xl" p="lg" bg="bushfire.0">
+    <LoadPanel
+      visible={loading}
+      error={error}
+      radius="xl"
+      p="lg"
+      bg="bushfire.0"
+    >
       <Title order={4}>Holotype</Title>
 
       <Group wrap="nowrap">
-        <Table variant="vertical" withRowBorders={false} className={classes.cardTable}>
+        <Table
+          variant="vertical"
+          withRowBorders={false}
+          className={classes.cardTable}
+        >
           <Table.Tbody>
             <Table.Tr>
               <Table.Th>Catalogue number</Table.Th>
               <Table.Td>
                 {accession && (
                   <Group>
-                    <Link href={`/organisms/${data?.specimen.organismId}/source`}>
+                    <Link
+                      href={`/organisms/${data?.specimen.organismId}/source`}
+                    >
                       <Pill.SpecimenRegistration accession={accession} />
                     </Link>
                   </Group>
@@ -432,7 +560,9 @@ function HolotypeCard() {
             </Table.Tr>
             <Table.Tr>
               <Table.Th>Institution</Table.Th>
-              <Table.Td>{accession?.institutionName ?? accession?.institutionCode}</Table.Td>
+              <Table.Td>
+                {accession?.institutionName ?? accession?.institutionCode}
+              </Table.Td>
             </Table.Tr>
             <Table.Tr>
               <Table.Th>Collection</Table.Th>
@@ -470,7 +600,12 @@ function HolotypeCard() {
         </Table>
 
         <Stack>
-          <Image w={200} h={200} src="/icons/specimen-type/holotype_neotype_syntype.svg" alt="Holotype badge" />
+          <Image
+            w={200}
+            h={200}
+            src="/icons/specimen-type/holotype_neotype_syntype.svg"
+            alt="Holotype badge"
+          />
           <Button bg="midnight.9" radius="xl">
             record history
           </Button>
@@ -495,14 +630,20 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
       <Title order={4}>Specimen</Title>
 
       <Group wrap="nowrap">
-        <Table variant="vertical" withRowBorders={false} className={classes.cardTable}>
+        <Table
+          variant="vertical"
+          withRowBorders={false}
+          className={classes.cardTable}
+        >
           <Table.Tbody>
             <Table.Tr>
               <Table.Th>Catalogue number</Table.Th>
               <Table.Td>
                 {accession && (
                   <Group>
-                    <Link href={`/organisms/${data?.specimen.organismId}/source`}>
+                    <Link
+                      href={`/organisms/${data?.specimen.organismId}/source`}
+                    >
                       <Pill.SpecimenRegistration accession={accession} />
                     </Link>
                   </Group>
@@ -516,7 +657,9 @@ function SpecimenCard({ entityId }: { entityId?: string }) {
             <Table.Tr>
               <Table.Th>Specimen status</Table.Th>
               <Table.Td>
-                <Group>{data && <Pill.SpecimenStatus accession={accession} />}</Group>
+                <Group>
+                  {data && <Pill.SpecimenStatus accession={accession} />}
+                </Group>
               </Table.Td>
             </Table.Tr>
             <Table.Tr>
@@ -599,10 +742,19 @@ function AllSpecimens() {
   const [pageSize, setPageSize] = useState<number>(100);
   const [page, setPage] = useState(1);
 
-  const { loading, error, data } = useQuery<{ species: Species }>(GET_SPECIMENS, {
-    skip: !details,
-    variables: { canonicalName: details?.name, page, pageSize, filters, sorting },
-  });
+  const { loading, error, data } = useQuery<{ species: Species }>(
+    GET_SPECIMENS,
+    {
+      skip: !details,
+      variables: {
+        canonicalName: details?.name,
+        page,
+        pageSize,
+        filters,
+        sorting,
+      },
+    },
+  );
 
   const specimens = data?.species.specimens;
 
@@ -612,7 +764,13 @@ function AllSpecimens() {
   }
 
   return (
-    <LoadPanel visible={loading} error={error} py="lg" bg="shellfishBg.0" mih={500}>
+    <LoadPanel
+      visible={loading}
+      error={error}
+      py="lg"
+      bg="shellfishBg.0"
+      mih={500}
+    >
       <Container maw={MAX_WIDTH}>
         <Stack>
           <Title order={3} c="shellfish">
@@ -622,7 +780,8 @@ function AllSpecimens() {
           <Group justify="space-between">
             <Group gap="xl">
               <Text fw={700} fz="xs" c="midnight.9">
-                Showing {specimens?.records.length} of {specimens?.total} specimens
+                Showing {specimens?.records.length} of {specimens?.total}{" "}
+                specimens
               </Text>
 
               {filters.length && (
@@ -631,7 +790,11 @@ function AllSpecimens() {
                     Filters:
                   </Text>
                   {filters.map((filter) => (
-                    <FilterBadge filter={filter} onRemove={removeFilter} key={Object.keys(filter).join()} />
+                    <FilterBadge
+                      filter={filter}
+                      onRemove={removeFilter}
+                      key={Object.keys(filter).join()}
+                    />
                   ))}
                 </Group>
               )}
@@ -691,12 +854,25 @@ function AllSpecimens() {
               />
             </FilterDrawer>
 
-            <ScrollArea h="inherit" type="always" style={{ borderRadius: "var(--mantine-radius-lg)" }}>
-              <SpecimenTable specimens={specimens?.records} sorting={sorting} onSort={setSorting} />
+            <ScrollArea
+              h="inherit"
+              type="always"
+              style={{ borderRadius: "var(--mantine-radius-lg)" }}
+            >
+              <SpecimenTable
+                specimens={specimens?.records}
+                sorting={sorting}
+                onSort={setSorting}
+              />
             </ScrollArea>
           </Box>
 
-          <PaginationBar total={specimens?.total} page={page} pageSize={pageSize} onChange={setPage} />
+          <PaginationBar
+            total={specimens?.total}
+            page={page}
+            pageSize={pageSize}
+            onChange={setPage}
+          />
         </Stack>
       </Container>
     </LoadPanel>
@@ -716,12 +892,36 @@ function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
       onSort={onSort}
       sorting={sorting}
       columns={[
-        <RecordTable.Column key={1} value={SpecimenSortable.Status} label="Voucher status" />,
-        <RecordTable.Column key={2} value={SpecimenSortable.Voucher} label="Specimen number" />,
-        <RecordTable.Column key={3} value={SpecimenSortable.Institution} label="Institution" />,
-        <RecordTable.Column key={4} value={SpecimenSortable.Country} label="Country" />,
-        <RecordTable.Column key={5} value={SpecimenSortable.CollectionDate} label="Collection date" />,
-        <RecordTable.Column key={6} value={SpecimenSortable.MetadataScore} label="Collection metadata score" />,
+        <RecordTable.Column
+          key={1}
+          value={SpecimenSortable.Status}
+          label="Voucher status"
+        />,
+        <RecordTable.Column
+          key={2}
+          value={SpecimenSortable.Voucher}
+          label="Specimen number"
+        />,
+        <RecordTable.Column
+          key={3}
+          value={SpecimenSortable.Institution}
+          label="Institution"
+        />,
+        <RecordTable.Column
+          key={4}
+          value={SpecimenSortable.Country}
+          label="Country"
+        />,
+        <RecordTable.Column
+          key={5}
+          value={SpecimenSortable.CollectionDate}
+          label="Collection date"
+        />,
+        <RecordTable.Column
+          key={6}
+          value={SpecimenSortable.MetadataScore}
+          label="Collection metadata score"
+        />,
         <RecordTable.Column
           key={7}
           value={SpecimenSortable.Genomes}
@@ -729,7 +929,12 @@ function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
           width={1}
           color="shellfishBg.0"
         />,
-        <RecordTable.Column key={8} value={SpecimenSortable.Loci} label="Single loci" width={1} />,
+        <RecordTable.Column
+          key={8}
+          value={SpecimenSortable.Loci}
+          label="Single loci"
+          width={1}
+        />,
         <RecordTable.Column
           key={9}
           value={SpecimenSortable.GenomicData}
@@ -737,15 +942,31 @@ function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
           width={1}
           color="shellfishBg.0"
         />,
-        <RecordTable.Column key={10} value="view" label="View full record" width={1} />,
-        <RecordTable.Column key={11} value="ala" label="View in ALA" width={1} />,
+        <RecordTable.Column
+          key={10}
+          value="view"
+          label="View full record"
+          width={1}
+        />,
+        <RecordTable.Column
+          key={11}
+          value="ala"
+          label="View in ALA"
+          width={1}
+        />,
       ]}
     >
       {specimens?.map((record) => (
         <RecordTable.Row key={record.entityId}>
           <AttributePillValue
-            value={getVoucherStatus(record.typeStatus, record.collectionRepositoryId)}
-            color={getVoucherColour(record.typeStatus, record.collectionRepositoryId)}
+            value={getVoucherStatus(
+              record.typeStatus,
+              record.collectionRepositoryId,
+            )}
+            color={getVoucherColour(
+              record.typeStatus,
+              record.collectionRepositoryId,
+            )}
             textColor="white"
             popoverDisabled
           />
@@ -769,7 +990,13 @@ function SpecimenTable({ specimens, sorting, onSort }: SpecimenTableProps) {
               <IconMicroscope />
             </Button>
           </Link>
-          <Button color="shellfish" variant="outline" bg="white" radius="lg" disabled>
+          <Button
+            color="shellfish"
+            variant="outline"
+            bg="white"
+            radius="lg"
+            disabled
+          >
             <IconMicroscope />
           </Button>
         </RecordTable.Row>
@@ -788,7 +1015,13 @@ function FilterDrawer({ opened, onClose, children }: FilterDrawerProps) {
     <Transition mounted={opened} transition="fade-left" duration={200}>
       {(styles) => (
         <Box className={classes.filterDrawer} style={styles} onClick={onClose}>
-          <Paper shadow="xl" p="lg" w="30%" className={classes.filterPane} onClick={(e) => e.stopPropagation()}>
+          <Paper
+            shadow="xl"
+            p="lg"
+            w="30%"
+            className={classes.filterPane}
+            onClick={(e) => e.stopPropagation()}
+          >
             {children}
           </Paper>
         </Box>
@@ -805,18 +1038,24 @@ interface FilterProps {
 
 function Filter({ filters, options, onApply }: FilterProps) {
   const hasData = useSet<HasData>(filters?.find((f) => "data" in f)?.data);
-  const institutions = useSet<string>(filters?.find((f) => "institution" in f)?.institution);
-  const countries = useSet<string>(filters?.find((f) => "country" in f)?.country);
+  const institutions = useSet<string>(
+    filters?.find((f) => "institution" in f)?.institution,
+  );
+  const countries = useSet<string>(
+    filters?.find((f) => "country" in f)?.country,
+  );
 
   // none of the methods to save the filter settings is pretty here but this
   // one is particularly eggregious. it would be worth rethinking this
-  const collectedBetween = filters?.find((f) => "collectedBetween" in f)?.collectedBetween;
+  const collectedBetween = filters?.find(
+    (f) => "collectedBetween" in f,
+  )?.collectedBetween;
   const [yearRange, setYearRange] = useState<[number, number] | undefined>(
     collectedBetween
       ? [
-          DateTime.fromFormat(collectedBetween.after, "yyyy-mm-dd").year,
-          DateTime.fromFormat(collectedBetween.before, "yyyy-mm-dd").year,
-        ]
+        DateTime.fromFormat(collectedBetween.after, "yyyy-mm-dd").year,
+        DateTime.fromFormat(collectedBetween.before, "yyyy-mm-dd").year,
+      ]
       : undefined,
   );
 
@@ -850,7 +1089,12 @@ function Filter({ filters, options, onApply }: FilterProps) {
     if (institutions.size) filters.push({ institution: [...institutions] });
     if (countries.size) filters.push({ country: [...countries] });
     if (yearRange)
-      filters.push({ collectedBetween: { after: `${yearRange[0]}-12-31`, before: `${yearRange[1]}-01-01` } });
+      filters.push({
+        collectedBetween: {
+          after: `${yearRange[0]}-12-31`,
+          before: `${yearRange[1]}-01-01`,
+        },
+      });
 
     onApply(filters);
   }
@@ -866,37 +1110,54 @@ function Filter({ filters, options, onApply }: FilterProps) {
           >
             <Checkbox.Group value={[...hasData]} onChange={setData}>
               <Stack pt="md" gap="xs">
-                <Checkbox.Card className={classes.checkbox} radius="xl" value={HasData.Genomes}>
+                <Checkbox.Card
+                  className={classes.checkbox}
+                  radius="xl"
+                  value={HasData.Genomes}
+                >
                   <Group wrap="nowrap" align="flex-start">
                     <Checkbox.Indicator color="moss.3" />
                     <div>
                       <Text className={classes.checkboxLabel}>Genomes</Text>
                       <Text className={classes.checkboxDescription}>
-                        Include specimens that have at least one full genome that have been derived from it
+                        Include specimens that have at least one full genome
+                        that have been derived from it
                       </Text>
                     </div>
                   </Group>
                 </Checkbox.Card>
 
-                <Checkbox.Card className={classes.checkbox} radius="xl" value={HasData.Loci}>
+                <Checkbox.Card
+                  className={classes.checkbox}
+                  radius="xl"
+                  value={HasData.Loci}
+                >
                   <Group wrap="nowrap" align="flex-start">
                     <Checkbox.Indicator color="moss.3" />
                     <div>
                       <Text className={classes.checkboxLabel}>Loci</Text>
                       <Text className={classes.checkboxDescription}>
-                        Include specimens that have at least one locus that have been derived from it
+                        Include specimens that have at least one locus that have
+                        been derived from it
                       </Text>
                     </div>
                   </Group>
                 </Checkbox.Card>
 
-                <Checkbox.Card className={classes.checkbox} radius="xl" value={HasData.GenomicData}>
+                <Checkbox.Card
+                  className={classes.checkbox}
+                  radius="xl"
+                  value={HasData.GenomicData}
+                >
                   <Group wrap="nowrap" align="flex-start">
                     <Checkbox.Indicator color="moss.3" />
                     <div>
-                      <Text className={classes.checkboxLabel}>Genomic data</Text>
+                      <Text className={classes.checkboxLabel}>
+                        Genomic data
+                      </Text>
                       <Text className={classes.checkboxDescription}>
-                        Include specimens that have any genomic data that have been derived from it
+                        Include specimens that have any genomic data that have
+                        been derived from it
                       </Text>
                     </div>
                   </Group>
@@ -955,7 +1216,12 @@ interface YearRangeInputProps {
   value?: [number, number];
   onChange?: (range: [number, number]) => void;
 }
-function YearRangeInput({ label, description, value, onChange }: YearRangeInputProps) {
+function YearRangeInput({
+  label,
+  description,
+  value,
+  onChange,
+}: YearRangeInputProps) {
   // for the collection years to restrict the range for the collection date range filter.
   // this uses the existing overview query which should already be cached on this page
   const { details } = { ...useSpecies() };
@@ -991,10 +1257,21 @@ function FilterBadge({ filter, onRemove }: FilterBadgeProps) {
 
   return (
     <Group wrap="nowrap" gap={0}>
-      <Paper px="sm" className={highlight ? classes.filterBadgeLabelHover : classes.filterBadgeLabel}>
+      <Paper
+        px="sm"
+        className={
+          highlight ? classes.filterBadgeLabelHover : classes.filterBadgeLabel
+        }
+      >
         <Text fz="xs">{getFilterLabel(filter)}</Text>
       </Paper>
-      <Paper pl="sm" pr={5} className={highlight ? classes.filterBadgeValueHover : classes.filterBadgeValue}>
+      <Paper
+        pl="sm"
+        pr={5}
+        className={
+          highlight ? classes.filterBadgeValueHover : classes.filterBadgeValue
+        }
+      >
         <Group gap="xs">
           <Text fz="xs" fw={300}>
             {getFilterValues(filter)}
@@ -1083,13 +1360,21 @@ function TopCountriesGraph({ data }: TopCountriesGraphProps) {
   );
 }
 
-function DataCheckIcon({ value }: { value?: number | string | boolean | null | undefined }) {
+function DataCheckIcon({
+  value,
+}: {
+  value?: number | string | boolean | null | undefined;
+}) {
   const theme = useMantineTheme();
   const size = 35;
 
   return (
     <Paper radius="xl" p={0} m={0} h={size} w={size}>
-      {value ? <IconCircleCheck color={theme.colors.moss[5]} size={size} /> : <IconCircleX color="red" size={size} />}
+      {value ? (
+        <IconCircleCheck color={theme.colors.moss[5]} size={size} />
+      ) : (
+        <IconCircleX color="red" size={size} />
+      )}
     </Paper>
   );
 }
@@ -1106,14 +1391,26 @@ function DisabledDataCheckIcon() {
 
 function SmallScore({ specimen }: { specimen: SpecimenSummary }) {
   const isRegistered = specimen.collectionRepositoryId;
-  const hasCollectionData = specimen.collectedAt && specimen.latitude && specimen.longitude;
+  const hasCollectionData =
+    specimen.collectedAt && specimen.latitude && specimen.longitude;
   const hasGenomicData = specimen.sequences && specimen.sequences > 0;
 
   return (
     <Center>
-      <Paper radius="xl" c="moss" p={8} px="lg" className={classes.scoreContainer} withBorder>
+      <Paper
+        radius="xl"
+        c="moss"
+        p={8}
+        px="lg"
+        className={classes.scoreContainer}
+        withBorder
+      >
         <Group gap={10}>
-          <SmallScorePip value={!!isRegistered} yes="Specimen is registered" no="Specimen is not registered" />
+          <SmallScorePip
+            value={!!isRegistered}
+            yes="Specimen is registered"
+            no="Specimen is not registered"
+          />
           <SmallScorePip
             value={!!hasCollectionData}
             yes="Specimen has date and/or location details"
@@ -1140,7 +1437,12 @@ function SmallScorePip({ value, yes, no }: SmallScorePipProps) {
   return (
     <Tooltip position="bottom" label={value ? yes : no} withArrow>
       <motion.svg width={20} height={20} whileHover={{ scale: 2.0 }}>
-        <circle cx={10} cy={10} r={5} className={value ? classes.scoreYes : classes.scoreNo} />
+        <circle
+          cx={10}
+          cy={10}
+          r={5}
+          className={value ? classes.scoreYes : classes.scoreNo}
+        />
       </motion.svg>
     </Tooltip>
   );

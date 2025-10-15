@@ -9,14 +9,15 @@ import {
   Text,
   ThemeIcon,
   UnstyledButton,
-  UnstyledButtonProps,
+  type UnstyledButtonProps,
 } from "@mantine/core";
 import Link from "next/link";
 import { ReactElement, useCallback, useState } from "react";
 
 import { downloadCSV } from "@/helpers/downloadCSV";
 import { downloadImages } from "@/helpers/downloadImages";
-import { DocumentNode, gql, OperationVariables, useLazyQuery } from "@apollo/client";
+import { DocumentNode, gql, OperationVariables } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import { IconDownload } from "@tabler/icons-react";
 
 function getCurrentDate() {
@@ -48,7 +49,13 @@ interface ActionButtonProps extends UnstyledButtonProps {
   onClick?: () => void;
 }
 
-function ActionButton({ label, icon, disabled, onClick, ...rest }: ActionButtonProps) {
+function ActionButton({
+  label,
+  icon,
+  disabled,
+  onClick,
+  ...rest
+}: ActionButtonProps) {
   return (
     <UnstyledButton onClick={onClick} {...rest}>
       <Flex gap={12} align="center">
@@ -90,9 +97,9 @@ export function DataNoteActions({ query }: DataNoteActionProps) {
   const [downloadingImages, setDownloadingImages] = useState<boolean>(false);
 
   // Download query
-  const [, { refetch: fetchCSV }] = useLazyQuery(query?.download || GET_DETAILS, {
-    variables: query?.variables,
-  });
+  const [, { refetch: fetchCSV }] = useLazyQuery(
+    query?.download || GET_DETAILS,
+  );
 
   const handleDownloadData = useCallback(() => {
     async function download() {
@@ -100,7 +107,11 @@ export function DataNoteActions({ query }: DataNoteActionProps) {
 
       setDownloadingData(true);
       console.log(query);
-      await downloadCSV(fetchCSV, query.name.replaceAll(" ", "-").toLowerCase(), query.fields);
+      await downloadCSV(
+        fetchCSV,
+        query.name.replaceAll(" ", "-").toLowerCase(),
+        query.fields,
+      );
       setDownloadingData(false);
     }
 
@@ -124,29 +135,39 @@ export function DataNoteActions({ query }: DataNoteActionProps) {
           Note:
         </Text>
         <Text c="midnight.11" size="xs">
-          For the purposes of these data summaries, a “whole genome” is interpreted as being an entire assembly of the
-          genome, with or without chromosome assemblies (i.e. assemblies which are at least represented as “scaffold
-          assemblies” in the{" "}
-          <Link href="https://www.ncbi.nlm.nih.gov/home/genomes/" target="_blank">
+          For the purposes of these data summaries, a “whole genome” is
+          interpreted as being an entire assembly of the genome, with or without
+          chromosome assemblies (i.e. assemblies which are at least represented
+          as “scaffold assemblies” in the{" "}
+          <Link
+            href="https://www.ncbi.nlm.nih.gov/home/genomes/"
+            target="_blank"
+          >
             NCBI GenBank Genomes Database
           </Link>
           ).
         </Text>
         <Text c="midnight.11" size="xs">
-          The higher classification of Australia&apos;s biodiversity is driven by the taxonomic system managed by the{" "}
+          The higher classification of Australia&apos;s biodiversity is driven
+          by the taxonomic system managed by the{" "}
           <Link href="https://ala.org.au" target="_blank">
             Atlas of Living Australia
           </Link>
-          . The Atlas of Living Australia hosts a record of all of the species that appear on the{" "}
+          . The Atlas of Living Australia hosts a record of all of the species
+          that appear on the{" "}
           <Link href="https://biodiversity.org.au/nsl/" target="_blank">
             Australian National Species List
           </Link>
           , and services nationally agreed nomenclature for these species.
         </Text>
         <Text c="midnight.11" size="xs">
-          The data used to generate the page statistics and graphics are accurate to {getCurrentDate()}. Data and
-          graphics on this page may be shared under a{" "}
-          <Link href="https://creativecommons.org/licenses/by/4.0/deed.en" target="_blank">
+          The data used to generate the page statistics and graphics are
+          accurate to {getCurrentDate()}. Data and graphics on this page may be
+          shared under a{" "}
+          <Link
+            href="https://creativecommons.org/licenses/by/4.0/deed.en"
+            target="_blank"
+          >
             CC BY 4.0 licence
           </Link>
           .
@@ -157,9 +178,19 @@ export function DataNoteActions({ query }: DataNoteActionProps) {
             disabled={downloadingData || !query}
             onClick={handleDownloadData}
             label="Download raw data as CSV"
-            icon={downloadingData ? <Loader color="white" size="1rem" /> : <IconDownload size="1rem" />}
+            icon={
+              downloadingData ? (
+                <Loader color="white" size="1rem" />
+              ) : (
+                <IconDownload size="1rem" />
+              )
+            }
           />
-          <ActionButton disabled={true} label="Download graphics as PNG file" icon={<IconDownload size="1rem" />} />
+          <ActionButton
+            disabled={true}
+            label="Download graphics as PNG file"
+            icon={<IconDownload size="1rem" />}
+          />
         </Stack>
       </Stack>
     </Paper>

@@ -1,12 +1,17 @@
 "use client";
 
 import { MAX_WIDTH } from "@/app/constants";
-import { IconExtraction, IconSourceOrganism, IconSubsample } from "@/components/ArgaIcons";
+import {
+  IconExtraction,
+  IconSourceOrganism,
+  IconSubsample,
+} from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { TissueSlide } from "@/components/slides/Tissues";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { Tissue } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Container, Stack, Text, Title } from "@mantine/core";
 import { use, useState } from "react";
 
@@ -52,8 +57,15 @@ function Provenance({ entityId }: { entityId: string }) {
   return (
     <Stack>
       <TimelineNavbar selected={card} onSelected={setCard}>
-        <TimelineNavbar.Item label="Source organism" icon={<IconSourceOrganism size={60} />} href="source" />
-        <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
+        <TimelineNavbar.Item
+          label="Source organism"
+          icon={<IconSourceOrganism size={60} />}
+          href="source"
+        />
+        <TimelineNavbar.Item
+          label="Subsamples and tissues"
+          icon={<IconSubsample size={60} />}
+        />
         <TimelineNavbar.Item
           label="Nucleic acid extracts"
           icon={<IconExtraction size={60} />}

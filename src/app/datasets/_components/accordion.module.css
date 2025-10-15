@@ -1,0 +1,10 @@
+.item {
+  background-color: white;
+  border: 1px solid var(--mantine-color-gray-2);
+  box-shadow: var(--mantine-shadow-sm);
+}
+
+.control {
+  width: auto !important;
+  flex-grow: 1;
+}

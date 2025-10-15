@@ -1,12 +1,17 @@
 "use client";
 
 import { MAX_WIDTH } from "@/app/constants";
-import { IconExtraction, IconGenomicDataProducts, IconSubsample } from "@/components/ArgaIcons";
+import {
+  IconExtraction,
+  IconGenomicDataProducts,
+  IconSubsample,
+} from "@/components/ArgaIcons";
 import { CardSlider } from "@/components/CardSlider";
 import { ExtractionSlide } from "@/components/slides/Extraction";
 import { TimelineNavbar } from "@/components/TimelineNavbar";
 import { DnaExtract, Subsample } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Container, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { use, useState } from "react";
@@ -68,11 +73,20 @@ function Provenance({ entityId }: { entityId: string }) {
     <Stack>
       <TimelineNavbar selected={card} onSelected={setCard}>
         <Link href="subsamples_and_tissues">
-          <TimelineNavbar.Item label="Subsamples and tissues" icon={<IconSubsample size={60} />} />
+          <TimelineNavbar.Item
+            label="Subsamples and tissues"
+            icon={<IconSubsample size={60} />}
+          />
         </Link>
-        <TimelineNavbar.Item label="Nucleic acid extraction" icon={<IconExtraction size={60} />} />
+        <TimelineNavbar.Item
+          label="Nucleic acid extraction"
+          icon={<IconExtraction size={60} />}
+        />
         <Link href="data_products">
-          <TimelineNavbar.Item label="Genomic and genetic data products" icon={<IconGenomicDataProducts size={60} />} />
+          <TimelineNavbar.Item
+            label="Genomic and genetic data products"
+            icon={<IconGenomicDataProducts size={60} />}
+          />
         </Link>
       </TimelineNavbar>
 
@@ -80,7 +94,12 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Subsamples and tissues"></CardSlider.Card>
         <CardSlider.Card title="Nucleic acid extraction" size="lg">
           {error && <Text>{error.message}</Text>}
-          {data && <ExtractionSlide subsamples={data.organism.subsamples} extractions={data.organism.extractions} />}
+          {data && (
+            <ExtractionSlide
+              subsamples={data.organism.subsamples}
+              extractions={data.organism.extractions}
+            />
+          )}
         </CardSlider.Card>
         <CardSlider.Card title="Genetic data products"></CardSlider.Card>
       </CardSlider>

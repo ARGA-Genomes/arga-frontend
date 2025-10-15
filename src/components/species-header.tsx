@@ -2,8 +2,16 @@
 
 import { MAX_WIDTH } from "@/app/constants";
 import { Taxonomy } from "@/app/type";
-import { gql, useQuery } from "@apollo/client";
-import { Container, Flex, Group, Paper, Text, useMantineTheme } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Container,
+  Flex,
+  Group,
+  Paper,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
 import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 import IconBar from "./icon-bar";
 import { LoadOverlay } from "./load-overlay";
@@ -56,7 +64,9 @@ interface HeaderProps {
 function Header({ taxonomy, referenceGenome, attributes }: HeaderProps) {
   const theme = useMantineTheme();
 
-  const details = taxonomy.find((t) => t.source === "Atlas of Living Australia");
+  const details = taxonomy.find(
+    (t) => t.source === "Atlas of Living Australia",
+  );
 
   return (
     // Original format
@@ -84,7 +94,14 @@ function Header({ taxonomy, referenceGenome, attributes }: HeaderProps) {
         gap={{ base: "md", lg: "xl" }}
         align={{ base: "normal", lg: "center" }}
       >
-        {details && <IconBar taxonomy={details} conservation={[]} traits={[]} attributes={attributes} />}
+        {details && (
+          <IconBar
+            taxonomy={details}
+            conservation={[]}
+            traits={[]}
+            attributes={attributes}
+          />
+        )}
 
         <Group h="100%" wrap="nowrap" gap={5}>
           <Text fw={700} c="dimmed" style={{ whiteSpace: "nowrap" }}>
@@ -101,7 +118,11 @@ function Header({ taxonomy, referenceGenome, attributes }: HeaderProps) {
   );
 }
 
-export default function SpeciesHeader({ canonicalName }: { canonicalName: string }) {
+export default function SpeciesHeader({
+  canonicalName,
+}: {
+  canonicalName: string;
+}) {
   const { loading, error, data } = useQuery<QueryResults>(GET_SPECIES, {
     variables: {
       canonicalName,
@@ -120,7 +141,13 @@ export default function SpeciesHeader({ canonicalName }: { canonicalName: string
     <Paper py={20} pos="relative">
       <LoadOverlay visible={loading} />
       <Container maw={MAX_WIDTH}>
-        {taxonomy ? <Header taxonomy={taxonomy} referenceGenome={referenceGenome} attributes={attributes} /> : null}
+        {taxonomy ? (
+          <Header
+            taxonomy={taxonomy}
+            referenceGenome={referenceGenome}
+            attributes={attributes}
+          />
+        ) : null}
       </Container>
     </Paper>
   );

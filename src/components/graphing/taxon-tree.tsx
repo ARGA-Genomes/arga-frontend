@@ -1,6 +1,6 @@
 "use client";
 
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Badge, Group, Paper, Text } from "@mantine/core";
 import { useTheme } from "@nivo/core";
 import {
@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { Statistics, TaxonTreeNodeStatistics } from "@/generated/types";
 import { useListState } from "@mantine/hooks";
 import { motion } from "framer-motion";
+import { useLazyQuery } from "@apollo/client/react";
 
 const NODE_WIDTH = 20;
 
@@ -67,7 +68,11 @@ interface Node {
 // Converts a `TreeStatTreeNode` into a `Node`. This essentially copies the data
 // from the taxon tree statistics query into a presentable tree by injecting and
 // defaulting variables used for tree interaction.
-function convertToNode(node: TaxonTreeNodeStatistics, expanded?: Node[], pinned?: string[]): Node {
+function convertToNode(
+  node: TaxonTreeNodeStatistics,
+  expanded?: Node[],
+  pinned?: string[],
+): Node {
   const shouldExpand =
     !!expanded?.find((n) => n.canonicalName === node.canonicalName) ||
     !!pinned?.find((name) => name === node.canonicalName) ||
@@ -77,16 +82,16 @@ function convertToNode(node: TaxonTreeNodeStatistics, expanded?: Node[], pinned?
   const children = loaded
     ? node.children?.map((child) => convertToNode(child, expanded))
     : node.rank !== "SPECIES" && [
-        {
-          visible: true,
-          expanded: false,
-          pinned: false,
-          loaded: false,
-          isLoader: true,
-          canonicalName: "Loading...",
-          rank: "",
-        },
-      ];
+      {
+        visible: true,
+        expanded: false,
+        pinned: false,
+        loaded: false,
+        isLoader: true,
+        canonicalName: "Loading...",
+        rank: "",
+      },
+    ];
 
   return {
     visible: true,
@@ -109,16 +114,16 @@ function convertToNode(node: TaxonTreeNodeStatistics, expanded?: Node[], pinned?
     children: shouldExpand
       ? children || []
       : [
-          {
-            visible: false,
-            expanded: false,
-            pinned: false,
-            loaded: false,
-            isLoader: false,
-            canonicalName: "Loading...",
-            rank: "",
-          },
-        ],
+        {
+          visible: false,
+          expanded: false,
+          pinned: false,
+          loaded: false,
+          isLoader: false,
+          canonicalName: "Loading...",
+          rank: "",
+        },
+      ],
   };
 }
 
@@ -134,9 +139,17 @@ interface TaxonomyTreeProps {
 // The interactive taxonomy tree. We use a nivo tree as the base but then also make
 // it responsive ourselves since we require certain min-width logic to allow for scrollbars
 // for very large taxon families.
-export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }: TaxonomyTreeProps) {
-  const [expanded, handlers] = useListState<Node>(initialExpanded?.map((n) => convertToNode(n, [])) || []);
-  const client = useApolloClient();
+export function TaxonomyTree({
+  minWidth,
+  layout,
+  data,
+  pinned,
+  initialExpanded,
+}: TaxonomyTreeProps) {
+  const [expanded, handlers] = useListState<Node>(
+    initialExpanded?.map((n) => convertToNode(n, [])) || [],
+  );
+  const [query] = useLazyQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE);
 
   // we maintain two trees for this graph. the graphql results are cached in tree which
   // gets updated when an incremental load of a tree node happens.
@@ -154,8 +167,7 @@ export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }
     if (item.data.expanded) {
       handlers.append(item.data);
 
-      const result = client.query<{ stats: Statistics }>({
-        query: GET_TAXON_TREE_NODE,
+      const result = query({
         variables: {
           taxonRank: item.data.rank,
           taxonCanonicalName: item.data.canonicalName,
@@ -165,11 +177,13 @@ export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }
 
       // slot the loaded data into the tree and kick of a re-render
       result.then((res) => {
-        const children = res.data.stats.taxonBreakdown[0]?.children || [];
+        const children = res.data?.stats.taxonBreakdown[0]?.children || [];
 
         // clone the underlying data tree and find the taxon node being loaded
         const newTree = structuredClone(tree);
-        const parent = newTree.children?.find((node) => node.canonicalName == item.data.canonicalName);
+        const parent = newTree.children?.find(
+          (node) => node.canonicalName === item.data.canonicalName,
+        );
 
         // if we found the loaded node we insert the children and reload
         // both the data cache and the tree root to effect the display changes
@@ -179,7 +193,9 @@ export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }
         }
       });
     } else {
-      handlers.remove(expanded.findIndex((n) => n.canonicalName == item.data.canonicalName));
+      handlers.remove(
+        expanded.findIndex((n) => n.canonicalName === item.data.canonicalName),
+      );
     }
   }
 
@@ -245,16 +261,19 @@ export function TaxonomyTree({ minWidth, layout, data, pinned, initialExpanded }
               </Group>
               <Group justify="center">
                 <StatBadge label="Other" stat={item.node.data.other} />
-                <StatBadge label="Total genomic" stat={item.node.data.totalGenomic} />
+                <StatBadge
+                  label="Total genomic"
+                  stat={item.node.data.totalGenomic}
+                />
               </Group>
             </Paper>
           )
         }
         onNodeClick={nodeClicked}
-        onLinkMouseEnter={() => {}}
-        onLinkMouseMove={() => {}}
-        onLinkMouseLeave={() => {}}
-        onLinkClick={() => {}}
+        onLinkMouseEnter={() => { }}
+        onLinkMouseMove={() => { }}
+        onLinkMouseLeave={() => { }}
+        onLinkClick={() => { }}
         /* @ts-expect-error: must specify a LinkTooltip<Node> type */
         linkTooltip={undefined}
         linkTooltipAnchor={"center"}

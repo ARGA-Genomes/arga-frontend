@@ -1,7 +1,8 @@
 "use client";
 
 import { MAX_WIDTH } from "@/app/constants";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Container, Flex, Paper, Text } from "@mantine/core";
 import { LoadOverlay } from "./load-overlay";
 
@@ -59,7 +60,9 @@ export default function OrganismHeader({ entityId }: { entityId: string }) {
   return (
     <Paper py={20} pos="relative">
       <LoadOverlay visible={loading} />
-      <Container maw={MAX_WIDTH}>{data && <Header organismId={data.organism.organismId} />}</Container>
+      <Container maw={MAX_WIDTH}>
+        {data && <Header organismId={data.organism.organismId} />}
+      </Container>
     </Paper>
   );
 }

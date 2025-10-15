@@ -3,7 +3,8 @@
 import classes from "./genome-composition.module.css";
 
 import { Statistics, TaxonomicRankStatistic } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Group } from "@visx/group";
 import { Text } from "@visx/text";
 import { max } from "d3";
@@ -117,7 +118,11 @@ function SlantedBar({ level, maxWidth }: SlantedBarProps) {
   return (
     <g onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
       <motion.g animate={hovered ? { opacity: 0.9 } : { opacity: 0.5 }}>
-        <path d={`M ${x1} ${y1} ${corner1} ${corner2} ${corner3} ${corner4}`} className={level.className} />;
+        <path
+          d={`M ${x1} ${y1} ${corner1} ${corner2} ${corner3} ${corner4}`}
+          className={level.className}
+        />
+        ;
         <motion.rect
           height={y3}
           rx={r}
@@ -134,12 +139,19 @@ function SlantedBar({ level, maxWidth }: SlantedBarProps) {
         transition={transition}
         className={level.className}
       >
-        <Text className={classes.levelText} dy={midY - 2} dx={midX}>{`${Humanize.formatNumber(level.total)} ${
-          RANK_PLURALS[level.label]
-        }`}</Text>
+        <Text
+          className={classes.levelText}
+          dy={midY - 2}
+          dx={midX}
+        >{`${Humanize.formatNumber(level.total)} ${RANK_PLURALS[level.label]
+          }`}</Text>
         <text className={classes.levelDescriptionText} dy={midY + 4} dx={midX}>
-          <tspan>At least 1 genome from each {level.label.toLocaleLowerCase()}: </tspan>
-          <tspan fontWeight={600}>{Math.round(level.coverage * 100)}% complete</tspan>
+          <tspan>
+            At least 1 genome from each {level.label.toLocaleLowerCase()}:{" "}
+          </tspan>
+          <tspan fontWeight={600}>
+            {Math.round(level.coverage * 100)}% complete
+          </tspan>
         </text>
       </motion.g>
     </g>
@@ -161,7 +173,8 @@ export const GenomeComposition = ({ ranks }: GenomeCompositionProps) => {
 
   const stats = data?.stats.taxonomicRanks;
 
-  const levels: Level[] = stats?.map((stat, idx) => fromRankStat(stat, idx + 1)) ?? [];
+  const levels: Level[] =
+    stats?.map((stat, idx) => fromRankStat(stat, idx + 1)) ?? [];
   const maxWidth = max(levels, (levels: Level) => levels.width) ?? 0;
   const center = maxWidth / 2;
 

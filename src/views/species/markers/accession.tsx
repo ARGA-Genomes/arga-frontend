@@ -8,8 +8,21 @@ import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
 import { TraceData } from "@/components/traces/trace-data";
 import { Sequence, Specimen } from "@/generated/types";
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, ButtonProps, Center, Flex, Grid, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Center,
+  Flex,
+  Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import {
   IconArrowNarrowLeft,
   IconCircleCheck,
@@ -88,7 +101,8 @@ function MoleculeDetails({ sequence }: { sequence?: Sequence }) {
   const deposition = sequence?.events.dataDepositions[0];
 
   const depositionBase =
-    sequence?.datasetName === "BOLD" && "https://www.boldsystems.org/index.php/Public_RecordView?processid=";
+    sequence?.datasetName === "BOLD" &&
+    "https://www.boldsystems.org/index.php/Public_RecordView?processid=";
 
   return (
     <Grid>
@@ -126,18 +140,31 @@ function MoleculeDetails({ sequence }: { sequence?: Sequence }) {
         <Paper p="lg" radius="lg" pos="relative" withBorder>
           <Stack>
             <Title order={5}>Original data</Title>
-            <LinkButton color="midnight.10" radius="md" leftSection={<IconDownload />} href={deposition?.sourceUri}>
+            <LinkButton
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconDownload />}
+              href={deposition?.sourceUri}
+            >
               get FASTA
             </LinkButton>
             <LinkButton
               color="midnight.10"
               radius="md"
               leftSection={<IconLink />}
-              href={deposition?.accession && `${depositionBase}${deposition.accession}`}
+              href={
+                deposition?.accession &&
+                `${depositionBase}${deposition.accession}`
+              }
             >
               go to source
             </LinkButton>
-            <Button color="midnight.10" radius="md" leftSection={<IconCloudUpload />} disabled>
+            <Button
+              color="midnight.10"
+              radius="md"
+              leftSection={<IconCloudUpload />}
+              disabled
+            >
               send to Galaxy
             </Button>
           </Stack>
@@ -165,7 +192,13 @@ function MoleculeDetails({ sequence }: { sequence?: Sequence }) {
   );
 }
 
-function DataAvailabilityItem({ value, children }: { value: boolean | undefined; children: React.ReactNode }) {
+function DataAvailabilityItem({
+  value,
+  children,
+}: {
+  value: boolean | undefined;
+  children: React.ReactNode;
+}) {
   return (
     <Group wrap="nowrap">
       {value ? <IconCircleCheck color="green" /> : <IconCircleX color="red" />}
@@ -176,18 +209,34 @@ function DataAvailabilityItem({ value, children }: { value: boolean | undefined;
   );
 }
 
-function DataAvailability({ sequence, specimen }: { sequence?: Sequence; specimen?: Specimen }) {
+function DataAvailability({
+  sequence,
+  specimen,
+}: {
+  sequence?: Sequence;
+  specimen?: Specimen;
+}) {
   const sequencing = sequence?.events.sequencing[0];
   const sequencingRun = sequence?.events.sequencingRuns[0];
   const deposition = sequence?.events.dataDepositions[0];
 
   return (
     <Stack>
-      <DataAvailabilityItem value={!!sequencing?.dnaSequence}>Marker data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={false}>Contig data available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!sequencingRun?.trace?.traceLink}>Trace files available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!deposition?.url}>Marker publication available</DataAvailabilityItem>
-      <DataAvailabilityItem value={!!specimen}>Specimen collection data available</DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencing?.dnaSequence}>
+        Marker data available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={false}>
+        Contig data available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!sequencingRun?.trace?.traceLink}>
+        Trace files available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!deposition?.url}>
+        Marker publication available
+      </DataAvailabilityItem>
+      <DataAvailabilityItem value={!!specimen}>
+        Specimen collection data available
+      </DataAvailabilityItem>
       <DataAvailabilityItem value={!!specimen?.events.accessions.length}>
         Specimen voucher accessioned
       </DataAvailabilityItem>
@@ -303,13 +352,22 @@ function SpecimenMap({ specimen }: { specimen?: Specimen }) {
 function TraceDataList({ sequence }: { sequence?: Sequence }) {
   return (
     <Stack>
-      {sequence?.events.sequencingRuns.map((run, idx) => run.trace && <TraceData key={idx} trace={run.trace} />)}
+      {sequence?.events.sequencingRuns.map(
+        (run, idx) => run.trace && <TraceData key={idx} trace={run.trace} />,
+      )}
     </Stack>
   );
 }
 
-export default function MarkerAccession({ params }: { params: { accession: string } }) {
-  const { loading, error, data } = useQuery<{ sequence: Sequence[]; specimen: Specimen }>(GET_ASSEMBLY, {
+export default function MarkerAccession({
+  params,
+}: {
+  params: { accession: string };
+}) {
+  const { loading, error, data } = useQuery<{
+    sequence: Sequence[];
+    specimen: Specimen;
+  }>(GET_ASSEMBLY, {
     variables: {
       recordId: params.accession,
     },
@@ -332,7 +390,10 @@ export default function MarkerAccession({ params }: { params: { accession: strin
 
       <Paper p="md" radius="lg" withBorder>
         <Group align="inherit">
-          <Title order={3} mb={10}>{`Full data view: ${sequence?.recordId}`}</Title>
+          <Title
+            order={3}
+            mb={10}
+          >{`Full data view: ${sequence?.recordId}`}</Title>
           <Text fz="sm" c="dimmed">
             Source
           </Text>

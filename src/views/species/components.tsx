@@ -1,7 +1,17 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, Grid, Paper, Stack, Text, Title } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  Box,
+  Button,
+  Center,
+  Grid,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 
 import { Attribute, AttributePill, DataField } from "@/components/data-fields";
 import { LoadOverlay } from "@/components/load-overlay";
@@ -108,7 +118,11 @@ function GenomicComponentList({ records }: { records: GenomicComponent[] }) {
   );
 }
 
-export default function GenomicComponents({ params }: { params: { name: string } }) {
+export default function GenomicComponents({
+  params,
+}: {
+  params: { name: string };
+}) {
   const canonicalName = getCanonicalName(params);
   const [page, setPage] = useState(1);
 
@@ -133,7 +147,9 @@ export default function GenomicComponents({ params }: { params: { name: string }
           <Box pos="relative" mih={568}>
             <LoadOverlay visible={loading} />
             {data?.species.genomicComponents ? (
-              <GenomicComponentList records={data.species.genomicComponents.records} />
+              <GenomicComponentList
+                records={data.species.genomicComponents.records}
+              />
             ) : null}
           </Box>
         </Grid.Col>

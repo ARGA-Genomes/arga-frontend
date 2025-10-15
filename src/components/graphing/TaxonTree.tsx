@@ -2,7 +2,8 @@
 
 import classes from "./TaxonTree.module.css";
 
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import { Cluster } from "@visx/hierarchy";
 import { hierarchy } from "d3";
 
@@ -61,16 +62,17 @@ interface TaxonNodeProps {
   onHover?: (data: Node | null) => void;
 }
 
-function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNodeProps) {
+function TaxonNode({
+  data,
+  depth,
+  pinned,
+  onToggle,
+  onLoad,
+  onHover,
+}: TaxonNodeProps) {
   const [childTree, setChildTree] = useState<Node[] | undefined>(data.children);
 
-  const [loadNode, query] = useLazyQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE, {
-    variables: {
-      taxonRank: data.rank,
-      taxonCanonicalName: data.canonicalName,
-      descendantRank: "SPECIES",
-    },
-  });
+  const [loadNode, query] = useLazyQuery<{ stats: Statistics }>(GET_TAXON_TREE_NODE);
 
   // there are two responsibilities for this function. the first is to load any children if the
   // node only has a placeholder. and the other is to collapse and expand the node by removing
@@ -80,8 +82,15 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
     if (node.rank === "SPECIES") return;
 
     if (!data.loaded && !query.called) {
-      loadNode().then((resp) => {
-        const loadedNode = resp.data && convertToNode(resp.data?.stats.taxonBreakdown[0]);
+      loadNode({
+        variables: {
+          taxonRank: data.rank,
+          taxonCanonicalName: data.canonicalName,
+          descendantRank: "SPECIES",
+        }
+      }).then((resp) => {
+        const loadedNode =
+          resp.data && convertToNode(resp.data?.stats.taxonBreakdown[0]);
 
         if (loadedNode) {
           setChildTree(loadedNode.children);
@@ -93,7 +102,11 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
       // as a child is needed for the dendrogram calculations in d3.
       // to avoid reloading the data we use the previously loaded `childTree` if we are expanding
       // the node
-      if (node.children && node.children.filter((n) => n.visible).length > 0 && !pinned) {
+      if (
+        node.children &&
+        node.children.filter((n) => n.visible).length > 0 &&
+        !pinned
+      ) {
         node.children = [nodePlaceholder()];
       } else {
         node.children = childTree;
@@ -125,7 +138,12 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
 
   // kick off a load if this node is marked as autoload. this should only be the case
   // for pinned paths where species can't be loaded due to the size of the tree
-  if (pinned && !query.called && children.length === 0 && data.rank != "SPECIES") {
+  if (
+    pinned &&
+    !query.called &&
+    children.length === 0 &&
+    data.rank != "SPECIES"
+  ) {
     toggleNode(data);
   }
 
@@ -136,14 +154,33 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
       onMouseOver={() => onHover && onHover(data)}
       onMouseOut={() => onHover && onHover(null)}
     >
-      <rect x={-10} y={inverted ? -180 : -50} width={40} height={inverted ? 200 : 300} style={{ opacity: 0.0 }} />
+      <rect
+        x={-10}
+        y={inverted ? -180 : -50}
+        width={40}
+        height={inverted ? 200 : 300}
+        style={{ opacity: 0.0 }}
+      />
       <circle r={6} fill="white" />
 
-      <motion.g variants={variants} animate={query.loading ? "loading" : "initial"}>
-        <circle r={6} className={nodeClassName(data)} strokeWidth={pinned ? 4 : 1} />
+      <motion.g
+        variants={variants}
+        animate={query.loading ? "loading" : "initial"}
+      >
+        <circle
+          r={6}
+          className={nodeClassName(data)}
+          strokeWidth={pinned ? 4 : 1}
+        />
 
         {depth === 0 && (
-          <Text dy={"-1.5em"} dominantBaseline="middle" textAnchor="middle" fontWeight={600} filter="url(#text-bg)">
+          <Text
+            dy={"-1.5em"}
+            dominantBaseline="middle"
+            textAnchor="middle"
+            fontWeight={600}
+            filter="url(#text-bg)"
+          >
             {data.canonicalName}
           </Text>
         )}
@@ -181,7 +218,13 @@ interface TaxonTreeProps {
   onTooltip?: (node: Node) => React.ReactNode;
 }
 
-export function TaxonTree({ height, minWidth, data, pinned, onTooltip }: TaxonTreeProps) {
+export function TaxonTree({
+  height,
+  minWidth,
+  data,
+  pinned,
+  onTooltip,
+}: TaxonTreeProps) {
   // we maintain two trees for this graph. the graphql results are cached in tree which
   // gets updated when an incremental load of a tree node happens.
   // a separate tree converted to interactive nodes is derived from the cached tree.
@@ -189,7 +232,9 @@ export function TaxonTree({ height, minWidth, data, pinned, onTooltip }: TaxonTr
   const [root, setRoot] = useState(hierarchy(tree));
   const [hoverPath, setHoverPath] = useState<HierarchyNode<Node>[]>([]);
   const [hoverNode, setHoverNode] = useState<HierarchyNode<Node> | null>(null);
-  const [hoverNodePos, setHoverNodePos] = useState<[number, number] | null>(null);
+  const [hoverNodePos, setHoverNodePos] = useState<[number, number] | null>(
+    null,
+  );
 
   const [totalWidth, setTotalWidth] = useState(0);
   const [rootOffset, setRootOffset] = useState(0);
@@ -253,7 +298,10 @@ export function TaxonTree({ height, minWidth, data, pinned, onTooltip }: TaxonTr
     }
   }
 
-  function nodeSeparator(a: HierarchyPointNode<Node>, b: HierarchyPointNode<Node>): number {
+  function nodeSeparator(
+    a: HierarchyPointNode<Node>,
+    b: HierarchyPointNode<Node>,
+  ): number {
     return a.parent === b.parent ? 2 : 4;
   }
 
@@ -279,9 +327,16 @@ export function TaxonTree({ height, minWidth, data, pinned, onTooltip }: TaxonTr
                     data={link}
                     className={linkClassName(link.target.data)}
                     strokeWidth={
-                      path.indexOf(link.target.data.canonicalName) > -1 || hoverPath.indexOf(link.target) > -1 ? 5 : 1
+                      path.indexOf(link.target.data.canonicalName) > -1 ||
+                        hoverPath.indexOf(link.target) > -1
+                        ? 5
+                        : 1
                     }
-                    strokeOpacity={path.indexOf(link.target.data.canonicalName) > -1 ? 1 : 0.4}
+                    strokeOpacity={
+                      path.indexOf(link.target.data.canonicalName) > -1
+                        ? 1
+                        : 0.4
+                    }
                   />
                 ))}
 
@@ -332,7 +387,10 @@ function findNode(children: Node[] | undefined, target: Node): Node | null {
 }
 
 function linkClassName(data: Node) {
-  const percent = data.species && data.fullGenomesCoverage ? data.species / data.fullGenomesCoverage : 0;
+  const percent =
+    data.species && data.fullGenomesCoverage
+      ? data.species / data.fullGenomesCoverage
+      : 0;
 
   if (percent >= 0.75) return classes.nodeLinkMoss;
   else if (percent >= 0.5) return classes.nodeLinkWheat;
@@ -340,7 +398,10 @@ function linkClassName(data: Node) {
 }
 
 function nodeClassName(data: Node) {
-  const percent = data.species && data.fullGenomesCoverage ? data.species / data.fullGenomesCoverage : 0;
+  const percent =
+    data.species && data.fullGenomesCoverage
+      ? data.species / data.fullGenomesCoverage
+      : 0;
 
   if (percent >= 0.75) return classes.nodeGlyphMoss;
   else if (percent >= 0.5) return classes.nodeGlyphWheat;
@@ -368,7 +429,10 @@ function convertToNode(node: TaxonTreeNodeStatistics): Node {
 
     // if the node is expanded then we want to convert all the children to nodes as well,
     // otherwise we add a stub node that will load the data when expanded
-    children: (children ?? []).length > 0 || node.rank === "SPECIES" ? children || [] : [nodePlaceholder()],
+    children:
+      (children ?? []).length > 0 || node.rank === "SPECIES"
+        ? children || []
+        : [nodePlaceholder()],
   };
 }
 

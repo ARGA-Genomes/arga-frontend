@@ -1,6 +1,7 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   Box,
   Divider,
@@ -22,7 +23,14 @@ import { ExternalLinkButton } from "@/components/button-link-external";
 import { LoadOverlay } from "@/components/load-overlay";
 import { AnalysisMap } from "@/components/mapping";
 import { Marker } from "@/components/mapping/analysis-map";
-import { GenomicComponent, Regions, Species, SpeciesMarker, SpecimenSummary, WholeGenome } from "@/generated/types";
+import {
+  GenomicComponent,
+  Regions,
+  Species,
+  SpeciesMarker,
+  SpecimenSummary,
+  WholeGenome,
+} from "@/generated/types";
 import { getCanonicalName } from "@/helpers/getCanonicalName";
 import { IconArrowUpRight } from "@tabler/icons-react";
 
@@ -113,7 +121,12 @@ interface MapFilterOptionProps extends SwitchProps {
   total: number;
 }
 
-function MapFilterOption({ label, count, total, ...switchProps }: MapFilterOptionProps) {
+function MapFilterOption({
+  label,
+  count,
+  total,
+  ...switchProps
+}: MapFilterOptionProps) {
   const checkboxStyle = {
     labelWrapper: { width: "100%" },
   };
@@ -230,7 +243,12 @@ function Summary({ regions, filters, onFilter }: SummaryProps) {
 function toMarker(
   color: [number, number, number, number],
   type: Layer,
-  records?: (SpecimenSummary | WholeGenome | GenomicComponent | SpeciesMarker)[]
+  records?: (
+    | SpecimenSummary
+    | WholeGenome
+    | GenomicComponent
+    | SpeciesMarker
+  )[],
 ) {
   if (!records) return [];
   return records.map((r) => {
@@ -244,7 +262,11 @@ function toMarker(
   });
 }
 
-export default function DistributionPage({ params }: { params: { name: string } }) {
+export default function DistributionPage({
+  params,
+}: {
+  params: { name: string };
+}) {
   const [layers, setLayers] = useState({
     wholeGenome: true,
     loci: true,
@@ -254,27 +276,34 @@ export default function DistributionPage({ params }: { params: { name: string } 
   const [allSpecimens, setAllSpecimens] = useState<Marker<null>[]>([]);
   const canonicalName = getCanonicalName(params);
 
-  const { loading, error, data } = useQuery<{ species: Species }>(GET_DISTRIBUTION, {
-    variables: { canonicalName },
-  });
+  const { loading, error, data } = useQuery<{ species: Species }>(
+    GET_DISTRIBUTION,
+    {
+      variables: { canonicalName },
+    },
+  );
 
   useEffect(() => {
     const combined = [
       ...toMarker(
         [103, 151, 180, 220],
         Layer.Specimens,
-        layers.specimens ? data?.species.specimens.records : undefined
+        layers.specimens ? data?.species.specimens.records : undefined,
       ),
-      ...toMarker([123, 161, 63, 220], Layer.Loci, layers.loci ? data?.species.markers.records : undefined),
+      ...toMarker(
+        [123, 161, 63, 220],
+        Layer.Loci,
+        layers.loci ? data?.species.markers.records : undefined,
+      ),
       ...toMarker(
         [243, 117, 36, 220],
         Layer.WholeGenome,
-        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined
+        layers.wholeGenome ? data?.species.wholeGenomes.records : undefined,
       ),
       ...toMarker(
         [185, 210, 145, 220],
         Layer.OtherData,
-        layers.other ? data?.species.genomicComponents.records : undefined
+        layers.other ? data?.species.genomicComponents.records : undefined,
       ),
     ];
     // filter out null island as well as specimens without coords
@@ -324,12 +353,21 @@ export default function DistributionPage({ params }: { params: { name: string } 
               <Stack gap={20} pos="relative">
                 <LoadOverlay visible={loading} />
                 <Box h={800} pos="relative">
-                  <DistributionAnalysis regions={data?.species.regions} markers={allSpecimens} />
+                  <DistributionAnalysis
+                    regions={data?.species.regions}
+                    markers={allSpecimens}
+                  />
                 </Box>
               </Stack>
             </Grid.Col>
             <Grid.Col span={{ xl: 3, lg: 4, md: 5, sm: 12, xs: 12 }} pb={0}>
-              {filters && <Summary regions={data?.species.regions} filters={filters} onFilter={onFilter} />}
+              {filters && (
+                <Summary
+                  regions={data?.species.regions}
+                  filters={filters}
+                  onFilter={onFilter}
+                />
+              )}
             </Grid.Col>
             <Grid.Col span={12} py={0}>
               <Divider />
@@ -352,9 +390,10 @@ export default function DistributionPage({ params }: { params: { name: string } 
           </Grid>
         </Paper>
         <Text c={"attribute.5"} pt="sm">
-          <b>Note:</b> location data may be generalised for sensitive species. Location data should be verified from
-          individual data point custodians. Please refer to the specimen page for full details of metadata provenance
-          for specific collection locations.
+          <b>Note:</b> location data may be generalised for sensitive species.
+          Location data should be verified from individual data point
+          custodians. Please refer to the specimen page for full details of
+          metadata provenance for specific collection locations.
         </Text>
       </Stack>
     </Paper>

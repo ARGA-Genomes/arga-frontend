@@ -18,6 +18,7 @@ import { Overview } from "@/generated/types";
 import { getClient } from "@/lib/ApolloClient";
 import { grouping, taxon, type } from "./_data";
 import { TaxonomicComposition } from "./composition";
+import { Metadata } from "next";
 
 interface Counts extends Overview {
   animals: number;
@@ -49,49 +50,62 @@ const GET_COUNTS = gql`
 `;
 
 const client = getClient();
-const { error, data } = await client.query<{ overview: Counts }>({ query: GET_COUNTS });
+const { error, data } = await client.query<{ overview: Counts }>({
+  query: GET_COUNTS,
+});
+
+export const metadata: Metadata = {
+  title: "Home",
+};
 
 export default function HomePage() {
-  // const { error, data } = useQuery<{ overview: Counts }>(GET_COUNTS);
-
   // Format the data
   const formattedData = useMemo(() => {
     return data
       ? {
-          ...data.overview,
-          sources: data.overview.sources.reduce(
-            (prev, cur) => ({
-              ...prev,
-              [cur.name]: cur.total,
-            }),
-            { "ARGA Threatened Species": 0 }
-          ),
-        }
+        ...data.overview,
+        sources: data.overview.sources.reduce(
+          (prev, cur) => ({
+            ...prev,
+            [cur.name]: cur.total,
+          }),
+          { "ARGA Threatened Species": 0 },
+        ),
+      }
       : null;
-  }, [data]);
+  }, []);
 
   return (
     <Stack gap={0}>
       <Box bg="midnight.9" w="100%">
         <Box m={60}>
           <Center>
-            <Flex direction={{ base: "column", xl: "row" }} gap={{ base: 30, xl: 80 }} align="center">
+            <Flex
+              direction={{ base: "column", xl: "row" }}
+              gap={{ base: 30, xl: 80 }}
+              align="center"
+            >
               <Stack gap={50} w={640}>
                 <Stack gap={30}>
                   <Title order={3} c="wheat.4" fz={24}>
                     deepen discovery — trawl traits — curate collections
                   </Title>
                   <Text c="white" fz={16}>
-                    For plants, animals, microbes and other species endemic or relevant to Australia, the Australian
-                    Reference Genome Atlas (ARGA) locates and aggregates genomic data, including:
+                    For plants, animals, microbes and other species endemic or
+                    relevant to Australia, the Australian Reference Genome Atlas
+                    (ARGA) locates and aggregates genomic data, including:
                   </Text>
                   <Text c="white" fw={700} fz={16}>
-                    &#x2022; reference genome assemblies &#x2022; genome annotations &#x2022; population and variant
-                    sets &#x2022; DNA barcodes &#x2022; coding and non-coding DNA sequences &#x2022; raw genomics data
+                    &#x2022; reference genome assemblies &#x2022; genome
+                    annotations &#x2022; population and variant sets &#x2022;
+                    DNA barcodes &#x2022; coding and non-coding DNA sequences
+                    &#x2022; raw genomics data
                   </Text>
                   <Text c="white" fz={16}>
-                    Search by species, higher classification, data type or ecological and phenotypic traits. Get started
-                    by entering any word in the search bar below, or scroll down to browse pre-filtered groupings.
+                    Search by species, higher classification, data type or
+                    ecological and phenotypic traits. Get started by entering
+                    any word in the search bar below, or scroll down to browse
+                    pre-filtered groupings.
                   </Text>
                 </Stack>
                 <Stack gap="lg">
@@ -119,7 +133,12 @@ export default function HomePage() {
               <Title order={3} c="moss.5" fz={28}>
                 Browse by data type
               </Title>
-              <Browse items={type} data={formattedData} error={error} disabled />
+              <Browse
+                items={type}
+                data={formattedData}
+                error={error}
+                disabled
+              />
             </Stack>
             <Stack gap={20} align="center">
               <Title order={3} c="moss.5" fz={28}>
@@ -132,7 +151,12 @@ export default function HomePage() {
                 Browse by functional or ecological group
               </Title>
               <Browse items={grouping} data={formattedData} error={error} />
-              <InternalLinkButton url={`/browse/list-groups`} textColor="white" textSize="md" outline>
+              <InternalLinkButton
+                url={`/browse/list-groups`}
+                textColor="white"
+                textSize="md"
+                outline
+              >
                 View all groups
               </InternalLinkButton>
             </Stack>

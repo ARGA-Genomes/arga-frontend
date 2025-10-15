@@ -1,8 +1,22 @@
-import { Conservation, IndigenousEcologicalKnowledge, Taxonomy } from "@/app/type";
-import { gql, useQuery } from "@apollo/client";
+import {
+  Conservation,
+  IndigenousEcologicalKnowledge,
+  Taxonomy,
+} from "@/app/type";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
-import { Box, Image, Paper, Text, ThemeIcon, Tooltip, getThemeColor, useMantineTheme } from "@mantine/core";
+import {
+  Box,
+  Image,
+  Paper,
+  Text,
+  ThemeIcon,
+  Tooltip,
+  getThemeColor,
+  useMantineTheme,
+} from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -228,7 +242,8 @@ export const TAXON_ICONS: Record<string, IconData> = {
     colour: "moss.4",
   },
   CONIFERS_AND_CYCADS: {
-    image: "/icons/taxon/Taxon_ Conifers and cycads (Pinales, Araucariales, Cupressales, Cycadales).svg",
+    image:
+      "/icons/taxon/Taxon_ Conifers and cycads (Pinales, Araucariales, Cupressales, Cycadales).svg",
     label: "Conifers and cycads",
     link: "/taxon_group/Conifers and Cycads", // Fix link
     colour: "moss.4",
@@ -288,7 +303,8 @@ export const TAXON_ICONS: Record<string, IconData> = {
     colour: "moss.4",
   },
   SEAWEEDS_AND_ALGAE: {
-    image: "/icons/taxon/Taxon_ Seaweeds and algae (red + brown + green + blue green).svg",
+    image:
+      "/icons/taxon/Taxon_ Seaweeds and algae (red + brown + green + blue green).svg",
     label: "Seaweeds and Algae",
     link: "/taxon_group/seaweeds_and_algae", // Fix link
     colour: "moss.4",
@@ -519,14 +535,23 @@ const ATTRIBUTE_GROUP_ICON: Record<string, IconData> = {
   },
 };
 
-function ConservationIcon({ status, source }: { status: string; source: string | undefined }) {
-  const icon = CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
+function ConservationIcon({
+  status,
+  source,
+}: {
+  status: string;
+  source: string | undefined;
+}) {
+  const icon =
+    CONSERVATION_STATUS_ICON[status] || CONSERVATION_STATUS_ICON.no_status;
   const tooltip = `${icon.label || status} | ${source}`;
 
   return (
     <Tooltip label={tooltip}>
       <ThemeIcon radius="xl" size={60} p={10} variant="transparent">
-        {icon.image && <Image src={icon.image} alt={icon.label || status} w={60} />}
+        {icon.image && (
+          <Image src={icon.image} alt={icon.label || status} w={60} />
+        )}
       </ThemeIcon>
     </Tooltip>
   );
@@ -538,7 +563,11 @@ interface VernacularGroupIconProps {
   size?: number;
 }
 
-function VernacularGroupIcon({ group, size, iconLink }: VernacularGroupIconProps) {
+function VernacularGroupIcon({
+  group,
+  size,
+  iconLink,
+}: VernacularGroupIconProps) {
   const icon = TAXON_ICONS[group];
   if (!icon) return null;
   if (!iconLink) {
@@ -669,7 +698,10 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
 
   const attributeHeaderIconsRaw = attributes
     ?.map((nameAttribute) => {
-      if (nameAttribute.name === "commercial_sector_icon" || nameAttribute.name === "agricultural_industry_icon") {
+      if (
+        nameAttribute.name === "commercial_sector_icon" ||
+        nameAttribute.name === "agricultural_industry_icon"
+      ) {
         return nameAttribute.valueStr;
       }
       if (ATTRIBUTE_GROUP_ICON[nameAttribute.name]) {
@@ -748,16 +780,40 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
   return (
     <Carousel
       slideSize={{
-        base: headerIcons.length <= 3 ? (100 / headerIcons.length).toString() + "%" : "33.333333%",
-        xs: headerIcons.length <= 4 ? (100 / headerIcons.length).toString() + "%" : "25%",
-        sm: headerIcons.length <= 5 ? (100 / headerIcons.length).toString() + "%" : "20%",
-        md: headerIcons.length <= 6 ? (100 / headerIcons.length).toString() + "%" : "16.66666666%",
+        base:
+          headerIcons.length <= 3
+            ? (100 / headerIcons.length).toString() + "%"
+            : "33.333333%",
+        xs:
+          headerIcons.length <= 4
+            ? (100 / headerIcons.length).toString() + "%"
+            : "25%",
+        sm:
+          headerIcons.length <= 5
+            ? (100 / headerIcons.length).toString() + "%"
+            : "20%",
+        md:
+          headerIcons.length <= 6
+            ? (100 / headerIcons.length).toString() + "%"
+            : "16.66666666%",
       }}
       maw={{
-        base: headerIcons.length <= 3 ? (70 * headerIcons.length).toString() + "px" : "306px",
-        xs: headerIcons.length <= 4 ? (70 * headerIcons.length).toString() + "px" : "376px",
-        sm: headerIcons.length <= 5 ? (70 * headerIcons.length).toString() + "px" : "446px",
-        md: headerIcons.length <= 6 ? (70 * headerIcons.length).toString() + "px" : "516px",
+        base:
+          headerIcons.length <= 3
+            ? (70 * headerIcons.length).toString() + "px"
+            : "306px",
+        xs:
+          headerIcons.length <= 4
+            ? (70 * headerIcons.length).toString() + "px"
+            : "376px",
+        sm:
+          headerIcons.length <= 5
+            ? (70 * headerIcons.length).toString() + "px"
+            : "446px",
+        md:
+          headerIcons.length <= 6
+            ? (70 * headerIcons.length).toString() + "px"
+            : "516px",
       }}
       pr={{
         base: headerIcons.length <= 3 ? "0" : "3em",
@@ -782,24 +838,31 @@ export default function IconBar({ taxonomy, attributes }: IconBarProps) {
             <Carousel.Slide pr="5px" pl="5px" key={index}>
               <Box w="100%" display="flex" style={{ justifyContent: "center" }}>
                 {icon === "CONIFERS_AND_CYCADS" ? (
-                  <VernacularGroupIcon group={icon} iconLink={coniferCycadLink} />
+                  <VernacularGroupIcon
+                    group={icon}
+                    iconLink={coniferCycadLink}
+                  />
                 ) : (
                   <VernacularGroupIcon group={icon} />
                 )}
               </Box>
             </Carousel.Slide>
-          )
+          ),
       )}
       {attributeHeaderIcons &&
         attributeHeaderIcons.map(
           (icon, index) =>
             icon && (
               <Carousel.Slide pr="5px" pl="5px" key={index}>
-                <Box w="100%" display="flex" style={{ justifyContent: "center" }}>
+                <Box
+                  w="100%"
+                  display="flex"
+                  style={{ justifyContent: "center" }}
+                >
                   <AttributeGroupIcon attribute={icon} />
                 </Box>
               </Carousel.Slide>
-            )
+            ),
         )}
     </Carousel>
   );

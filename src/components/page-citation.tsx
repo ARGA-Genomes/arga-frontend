@@ -2,8 +2,18 @@
 
 import { MAX_WIDTH } from "@/app/constants";
 import { Taxonomy } from "@/app/type";
-import { gql, useQuery } from "@apollo/client";
-import { ActionIcon, Container, Flex, Paper, Stack, Text, Title, Tooltip } from "@mantine/core";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import {
+  ActionIcon,
+  Container,
+  Flex,
+  Paper,
+  Stack,
+  Text,
+  Title,
+  Tooltip,
+} from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
 import { IconCopy } from "@tabler/icons-react";
 import * as Humanize from "humanize-plus";
@@ -33,7 +43,10 @@ const GET_SPECIES = gql`
 export function PageCitation() {
   const params = useParams();
   const location = usePathname();
-  const page = Humanize.capitalize(location.split("/").pop() || "").replaceAll("_", " ");
+  const page = Humanize.capitalize(location.split("/").pop() || "").replaceAll(
+    "_",
+    " ",
+  );
   const clipboard = useClipboard({ timeout: 500 });
   const citation = useRef<HTMLParagraphElement>(null);
   const name = decodeURIComponent(params.name as string);
@@ -81,10 +94,14 @@ export function PageCitation() {
                       {taxonomy?.canonicalName} {taxonomy?.authorship}, {page}
                     </i>
                     , The Australian Reference Genome Atlas. Accessed at:{" "}
-                    <a aria-label="Citation Link" href={`https://app.arga.org.au${location}`}>
+                    <a
+                      aria-label="Citation Link"
+                      href={`https://app.arga.org.au${location}`}
+                    >
                       {`https://app.arga.org.au${location}`}
                     </a>{" "}
-                    on {date.getDate()}-{date.getMonth() + 1}-{date.getFullYear()}.
+                    on {date.getDate()}-{date.getMonth() + 1}-
+                    {date.getFullYear()}.
                   </Text>
                 </Flex>
               </DataTableRow>
@@ -98,7 +115,10 @@ export function PageCitation() {
 
 export function DataPageCitation() {
   const location = usePathname();
-  const page = Humanize.capitalize(location.split("/").pop() || "").replaceAll("_", " ");
+  const page = Humanize.capitalize(location.split("/").pop() || "").replaceAll(
+    "_",
+    " ",
+  );
   const clipboard = useClipboard({ timeout: 500 });
   const citation = useRef<HTMLParagraphElement>(null);
 
@@ -127,12 +147,17 @@ export function DataPageCitation() {
                   </ActionIcon>
                 </Tooltip>
                 <Text fw={600} fz="sm" c="midnight.7" ref={citation}>
-                  Australian Reference Genome Atlas. {date.getFullYear()}. <i>{page}</i>, The Australian Reference
-                  Genome Atlas. Accessed at:{" "}
-                  <a aria-label="Citation Link" href={`https://app.arga.org.au${location}`}>
+                  Australian Reference Genome Atlas. {date.getFullYear()}.{" "}
+                  <i>{page}</i>, The Australian Reference Genome Atlas. Accessed
+                  at:{" "}
+                  <a
+                    aria-label="Citation Link"
+                    href={`https://app.arga.org.au${location}`}
+                  >
                     {`https://app.arga.org.au${location}`}
                   </a>{" "}
-                  on {date.getDate()}-{date.getMonth() + 1}-{date.getFullYear()}.
+                  on {date.getDate()}-{date.getMonth() + 1}-{date.getFullYear()}
+                  .
                 </Text>
               </Flex>
             </DataTableRow>

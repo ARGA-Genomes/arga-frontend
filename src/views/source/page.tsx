@@ -3,7 +3,8 @@
 import { MAX_WIDTH } from "@/app/constants";
 import { DataPageCitation } from "@/components/page-citation";
 import { getLicense } from "@/helpers/getLicense";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   Anchor,
   Box,
@@ -27,7 +28,10 @@ import { BrowseSpecies } from "@/components/browse-species";
 import { FilterItem } from "@/components/filtering-redux/filters/common";
 import { RankSummary, Source } from "@/generated/types";
 import { grouping as groupingData } from "../../app/(home)/_data";
-import { groupInclude, GroupItem } from "../../app/browse/list-groups/_data/all";
+import {
+  groupInclude,
+  GroupItem,
+} from "../../app/browse/list-groups/_data/all";
 import DataHighlights from "./_components/data-highlights";
 import { DataSummary } from "./_components/data-summary";
 
@@ -166,7 +170,13 @@ interface DataSummary {
   other: number;
 }
 
-function SourceDetails({ source, group }: { source?: ExtendedSource; group?: GroupItem }) {
+function SourceDetails({
+  source,
+  group,
+}: {
+  source?: ExtendedSource;
+  group?: GroupItem;
+}) {
   const theme = useMantineTheme();
 
   // Gross and hacky and terrible, to fix at a later date
@@ -212,13 +222,16 @@ function SourceDetails({ source, group }: { source?: ExtendedSource; group?: Gro
               size="xs"
               href={`https://${LISTS_URL}/list/${source?.listsId}`}
             >
-              View {group ? "full list" : "list"} on ALA Lists <IconExternalLink size="0.8rem" />
+              View {group ? "full list" : "list"} on ALA Lists{" "}
+              <IconExternalLink size="0.8rem" />
             </Anchor>
           </Skeleton>
         </Group>
         <Group mt="lg">
           {loading ? (
-            [0, 1, 2, 3, 4].map((index) => <Skeleton key={index} w={110} h={30.8} radius="xl" />)
+            [0, 1, 2, 3, 4].map((index) => (
+              <Skeleton key={index} w={110} h={30.8} radius="xl" />
+            ))
           ) : (
             <>
               <Paper miw={110} radius="lg" bg="#d6e4ed" px={10} py={3}>
@@ -238,7 +251,11 @@ function SourceDetails({ source, group }: { source?: ExtendedSource; group?: Gro
               <Paper
                 miw={110}
                 radius="lg"
-                bg={source?.accessPill ? accessPillColours[source.accessPill] : "#d6e4ed"}
+                bg={
+                  source?.accessPill
+                    ? accessPillColours[source.accessPill]
+                    : "#d6e4ed"
+                }
                 px={10}
                 py={3}
               >
@@ -258,7 +275,11 @@ function SourceDetails({ source, group }: { source?: ExtendedSource; group?: Gro
               <Paper
                 miw={110}
                 radius="lg"
-                bg={source?.reusePill ? reusePillColours[source.reusePill] : "#d6e4ed"}
+                bg={
+                  source?.reusePill
+                    ? reusePillColours[source.reusePill]
+                    : "#d6e4ed"
+                }
                 px={10}
                 py={3}
               >
@@ -289,7 +310,12 @@ function SourceDetails({ source, group }: { source?: ExtendedSource; group?: Gro
                 >
                   <Group gap={5} justify="center" wrap="nowrap">
                     <IconExternalLink size="0.8rem" />
-                    <Text fw="bold" size="xs" c={theme.colors.midnight[10]} p={4}>
+                    <Text
+                      fw="bold"
+                      size="xs"
+                      c={theme.colors.midnight[10]}
+                      p={4}
+                    >
                       {license.name.substring(1, license.name.length - 1)}
                     </Text>
                   </Group>
@@ -338,9 +364,12 @@ export default function SourcePage(props: SourceProps) {
     })?.image;
   }, [name, group]);
 
-  const { loading, error, data } = useQuery<{ source: ExtendedSource }>(GET_DETAILS, {
-    variables: { name: source, filters },
-  });
+  const { loading, error, data } = useQuery<{ source: ExtendedSource }>(
+    GET_DETAILS,
+    {
+      variables: { name: source, filters },
+    },
+  );
 
   return (
     <Stack mt="xl">
@@ -365,7 +394,11 @@ export default function SourcePage(props: SourceProps) {
                 <Text fz={38} fw={700}>
                   {group ? group.category : source}
                 </Text>
-                {error ? <Text fw="bold">{error.message}</Text> : <SourceDetails source={data?.source} group={group} />}
+                {error ? (
+                  <Text fw="bold">{error.message}</Text>
+                ) : (
+                  <SourceDetails source={data?.source} group={group} />
+                )}
               </Stack>
             </Grid.Col>
             {sourceIcon && (
@@ -383,7 +416,10 @@ export default function SourcePage(props: SourceProps) {
             <Paper radius="lg" pos="relative" withBorder>
               <DataHighlights source={data?.source} loading={loading} />
               <Box p="xl">
-                <DataSummary source={data?.source} filters={filters as FilterItem[]} />
+                <DataSummary
+                  source={data?.source}
+                  filters={filters as FilterItem[]}
+                />
               </Box>
             </Paper>
             <Paper p="xl" radius="lg" withBorder>
