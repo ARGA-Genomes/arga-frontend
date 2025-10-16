@@ -3,7 +3,21 @@ import { use } from "react";
 
 import classes from "./layout.module.css";
 
-import { Container, Grid, Group, Paper, Skeleton, Stack, Tabs, Title, Text } from "@mantine/core";
+import {
+  Container,
+  Grid,
+  Group,
+  Paper,
+  Skeleton,
+  Stack,
+  Tabs,
+  Title,
+  Text,
+  ScrollArea,
+  useMantineTheme,
+  Tooltip,
+  Box,
+} from "@mantine/core";
 import { RedirectType, redirect, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { MAX_WIDTH } from "@/app/constants";
@@ -13,6 +27,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Pill } from "@/components/Pills";
 import OrganismHeader from "@/components/OrganismHeader";
 import { IconCollection, IconInstitution } from "@/components/ArgaIcons";
+import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
 
 const GET_ORGANISM_OVERVIEW = gql`
   query OrganismOverview($entityId: String) {
@@ -139,7 +154,10 @@ function Overview({ entityId }: { entityId: string }) {
                   <OverviewBlock title="Scientific name" loading={loading}>
                     <Stack>
                       {data && <Pill.ScientificName name={data.organism.name} variant="overview" />}
-                      <Group>Identification verified</Group>
+                      <Group justify="space-between" wrap="nowrap">
+                        Identification verified
+                        <DataCheckIcon value={false} />
+                      </Group>
                     </Stack>
                   </OverviewBlock>
                   <Group justify="space-between" px="xl">
@@ -166,10 +184,26 @@ function Overview({ entityId }: { entityId: string }) {
             </Grid>
           </Grid.Col>
           <Grid.Col span={3}>
-            <OverviewBlock title="Associated organisms" loading={loading}></OverviewBlock>
+            <OverviewBlock title="Associated organisms" loading={loading}>
+              <ScrollArea.Autosize h={120}>
+                <Stack>
+                  <Text fz="xs" fw="400" c="dimmed">
+                    No associated organisms found
+                  </Text>
+                </Stack>
+              </ScrollArea.Autosize>
+            </OverviewBlock>
           </Grid.Col>
           <Grid.Col span={3}>
-            <OverviewBlock title="External links" loading={loading}></OverviewBlock>
+            <OverviewBlock title="External links" loading={loading}>
+              <ScrollArea.Autosize h={120}>
+                <Stack>
+                  <Text fz="xs" fw="400" c="dimmed">
+                    No external links found
+                  </Text>
+                </Stack>
+              </ScrollArea.Autosize>
+            </OverviewBlock>
           </Grid.Col>
         </Grid>
       </Container>
@@ -200,10 +234,35 @@ function OverviewBlock({ title, children, loading }: OverviewBlockProps) {
 
 function RegistrationInstitution({ registration }: { registration?: RegistrationCodes }) {
   const hasData = registration?.institutionCode || registration?.institutionName;
-  return <IconInstitution size={60} bg={hasData ? "bushfire" : "disabled"} />;
+  const code = `${registration?.institutionName ?? ""} (${registration?.institutionCode})`;
+  return (
+    <Tooltip label={hasData ? code : "Not registered in an institution"} withArrow>
+      <Box>
+        <IconInstitution size={60} bg={hasData ? "bushfire" : "disabled"} />
+      </Box>
+    </Tooltip>
+  );
 }
 
 function RegistrationCollection({ registration }: { registration?: RegistrationCodes }) {
   const hasData = registration?.collectionRepositoryCode || registration?.collectionRepositoryId;
-  return <IconCollection size={60} bg={hasData ? "wheat" : "disabled"} />;
+  const code = [registration?.collectionRepositoryCode, registration?.collectionRepositoryId].join(" ");
+  return (
+    <Tooltip label={hasData ? code : "Not registered in a collection"} withArrow>
+      <Box>
+        <IconCollection size={60} bg={hasData ? "wheat" : "disabled"} />
+      </Box>
+    </Tooltip>
+  );
+}
+
+function DataCheckIcon({ value }: { value?: number | string | boolean | null | undefined }) {
+  const theme = useMantineTheme();
+  const size = 35;
+
+  return (
+    <Paper radius="xl" p={0} m={0} h={size} w={size}>
+      {value ? <IconCircleCheck color={theme.colors.moss[5]} size={size} /> : <IconCircleX color="red" size={size} />}
+    </Paper>
+  );
 }
