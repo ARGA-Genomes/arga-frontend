@@ -35,4 +35,5 @@
     font-size: var(--mantine-font-size-xs);
     font-weight: 600;
     color: var(--mantine-color-midnight-8);
+    white-space: wrap;
 }
