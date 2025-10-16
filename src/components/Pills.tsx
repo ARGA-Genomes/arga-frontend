@@ -31,11 +31,7 @@ Pill.Empty = function PillEmpty({ variant }: PillCommonProps) {
 
 Pill.StandardText = function PillStandardText({ value, variant }: { value?: Maybe<string> } & PillCommonProps) {
   if (value) {
-    return (
-      <Pill className={variant ? classes[variant] : classes.standard}>
-        <Center>{value}</Center>
-      </Pill>
-    );
+    return <Pill className={variant ? classes[variant] : classes.standard}>{value}</Pill>;
   } else {
     return <Pill.Empty variant={variant} />;
   }
