@@ -69,7 +69,7 @@ interface CardSliderCardProps extends PropsWithChildren {
   href?: string;
 }
 
-export function CardSliderCard({ title, size, href, children }: CardSliderCardProps) {
+export function CardSliderCard({ title, size, children }: CardSliderCardProps) {
   const selected = useContext(HighlightContext);
   const nav = useContext(CardNavContext);
   const width = SIZE[size ?? "md"];
