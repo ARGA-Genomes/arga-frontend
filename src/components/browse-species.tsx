@@ -117,17 +117,17 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
   }, [page, pageSize, sort, sortDir, filters]);
 
   // Download query
-  const [, { refetch: fetchCSV }] = useLazyQuery(query.download, {
-    variables: query.variables,
+  const [fetchCSV] = useLazyQuery(query.download, {
+    variables: {
+      ...(query.variables || {}),
+      filters: [...(query.variables?.filters || []), ...filters]
+    }
   });
 
   const download = useCallback(async () => {
     setDownloading(true);
 
-    const { data: raw } = await fetchCSV({
-      ...(query.variables || {}),
-      filters,
-    });
+    const { data: raw } = await fetchCSV();
 
     saveAs(
       new Blob([await generateCSV(get(raw, "download.csv"))], { type: "text/csv;charset=utf-8;" }),
@@ -135,7 +135,7 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
     );
 
     setDownloading(false);
-  }, [query.variables, filters]);
+  }, [fetchCSV, filters]);
 
   useEffect(() => {
     if (rawData) setData(rawData);
@@ -378,15 +378,15 @@ export function BrowseSpecies({ query, values }: BrowseSpeciesProps) {
             <Grid>
               {loading
                 ? range(0, pageSize).map((idx) => (
-                    <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
-                      <SpeciesCard />
-                    </Grid.Col>
-                  ))
+                  <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
+                    <SpeciesCard />
+                  </Grid.Col>
+                ))
                 : records.map((record, idx) => (
-                    <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
-                      <SpeciesCard species={record} />
-                    </Grid.Col>
-                  ))}
+                  <Grid.Col key={idx} span={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 3 }}>
+                    <SpeciesCard species={record} />
+                  </Grid.Col>
+                ))}
             </Grid>
           );
         }
