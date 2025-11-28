@@ -1,30 +1,31 @@
-import { Scaffold } from "@/generated/types";
+import { AssemblyDetails } from "@/generated/types";
 import { Group, Stack } from "@mantine/core";
 import { IconScaffolds } from "../ArgaIcons";
 import { DataTable } from "../data-table";
+import { formatDate, formatNumber } from "@/helpers/formatters";
 
 interface ScaffoldSlideProps {
-  scaffold: Scaffold;
+  assembly: AssemblyDetails;
 }
 
-export function ScaffoldSlide({ scaffold }: ScaffoldSlideProps) {
+export function ScaffoldSlide({ assembly }: ScaffoldSlideProps) {
   return (
     <Stack px="xl">
-      <ScaffoldDetails scaffold={scaffold} />
+      <ScaffoldDetails assembly={assembly} />
     </Stack>
   );
 }
 
-function ScaffoldDetails({ scaffold }: { scaffold?: Scaffold }) {
+function ScaffoldDetails({ assembly }: { assembly?: AssemblyDetails }) {
   return (
     <Stack>
       <DataTable>
         <DataTable.RowValue label="Scaffold used" />
-        <DataTable.RowValue label="Assembly date" />
-        <DataTable.RowValue label="Scaffolding methods used" />
-        <DataTable.RowValue label="Number of contigs" />
+        <DataTable.RowValue label="Assembly date">{formatDate(assembly?.eventDate)}</DataTable.RowValue>
+        <DataTable.RowValue label="Scaffolding methods used">{assembly?.method}</DataTable.RowValue>
+        <DataTable.RowValue label="Number of contigs">{formatNumber(assembly?.numberOfContigs)}</DataTable.RowValue>
         <DataTable.RowValue label="Longest scaffold" />
-        <DataTable.RowValue label="Scaffold N50" />
+        <DataTable.RowValue label="Scaffold N50">{assembly?.assemblyN50}</DataTable.RowValue>
         <DataTable.RowValue label="Scaffold L50" />
       </DataTable>
       <Group>

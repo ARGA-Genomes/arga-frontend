@@ -1,20 +1,15 @@
-import { HiC } from "@/generated/types";
 import { Stack } from "@mantine/core";
 import { DataTable } from "../data-table";
 
-interface HiCSlideProps {
-  hiC: HiC;
-}
-
-export function HiCSlide({ hiC }: HiCSlideProps) {
+export function HiCSlide() {
   return (
     <Stack px="xl">
-      <HiCDetails hiC={hiC} />
+      <HiCDetails />
     </Stack>
   );
 }
 
-function HiCDetails({ hiC }: { hiC?: HiC }) {
+function HiCDetails() {
   return (
     <Stack>
       <DataTable>

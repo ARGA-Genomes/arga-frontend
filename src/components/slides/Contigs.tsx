@@ -1,31 +1,32 @@
-import { Contig } from "@/generated/types";
+import { AssemblyDetails } from "@/generated/types";
 import { Group, Stack } from "@mantine/core";
 import { IconContigs } from "../ArgaIcons";
 import { DataTable } from "../data-table";
+import { formatBases, formatDate, formatNumber } from "@/helpers/formatters";
 
 interface ContigSlideProps {
-  contig: Contig;
+  assembly: AssemblyDetails;
 }
 
-export function ContigSlide({ contig }: ContigSlideProps) {
+export function ContigSlide({ assembly }: ContigSlideProps) {
   return (
     <Stack px="xl">
-      <ContigDetails contig={contig} />
+      <ContigDetails assembly={assembly} />
     </Stack>
   );
 }
 
-function ContigDetails({ contig }: { contig?: Contig }) {
+function ContigDetails({ assembly }: { assembly?: AssemblyDetails }) {
   return (
     <Stack>
       <DataTable>
         <DataTable.RowValue label="Assembler used" />
-        <DataTable.RowValue label="Assembly date" />
+        <DataTable.RowValue label="Assembly date">{formatDate(assembly?.eventDate)}</DataTable.RowValue>
         <DataTable.RowValue label="Input data" />
         <DataTable.RowValue label="Coverage depth" />
-        <DataTable.RowValue label="Number of contigs" />
-        <DataTable.RowValue label="Total contig length" />
-        <DataTable.RowValue label="Contig N50" />
+        <DataTable.RowValue label="Number of contigs">{formatNumber(assembly?.numberOfContigs)}</DataTable.RowValue>
+        <DataTable.RowValue label="Total contig length">{formatBases(assembly?.size)}</DataTable.RowValue>
+        <DataTable.RowValue label="Contig N50">{assembly?.assemblyN50}</DataTable.RowValue>
         <DataTable.RowValue label="Contig L50" />
       </DataTable>
       <Group>
