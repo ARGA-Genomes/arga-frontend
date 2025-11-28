@@ -24,7 +24,6 @@ import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Annotation, AssemblyDetails, Library, NameDetails, Specimen } from "@/generated/types";
 import { DataTable } from "@/components/data-table";
-import { DateTime } from "luxon";
 import { Pill } from "@/components/Pills";
 import {
   IconCircleCheck,
@@ -58,6 +57,7 @@ import { ChromosomeSlide } from "@/components/slides/Chromosomes";
 import { AssemblyVersionsSlide } from "@/components/slides/AssemblyVersions";
 import { AnnotationSlide } from "@/components/slides/Annotations";
 import { DepositionSlide } from "@/components/slides/Depositions";
+import { formatBases, formatDate, formatNumber } from "@/helpers/formatters";
 
 const GET_ASSEMBLY = gql`
   query Assembly($entityId: String) {
@@ -217,7 +217,7 @@ function OverviewItem({ assembly }: { assembly: AssemblyOverview }) {
         <Grid.Col span={3}>
           <Group>
             Estimated size
-            <Pill.StandardText value={assembly.size?.toString()} variant="overview" />
+            <Pill.StandardText value={formatBases(assembly.size)} variant="overview" />
           </Group>
         </Grid.Col>
 
@@ -282,8 +282,6 @@ function Viewer({ entityId }: { entityId?: string }) {
 }
 
 function Details({ assembly }: { assembly: Assembly }) {
-  const releaseDate = assembly.eventDate && DateTime.fromFormat(assembly.eventDate, "yyyy-mm-dd");
-
   return (
     <Stack>
       <Grid>
@@ -303,9 +301,7 @@ function Details({ assembly }: { assembly: Assembly }) {
             <DataTable.RowValue label="Scientific name">
               <Pill.ScientificName name={assembly.name} />
             </DataTable.RowValue>
-            <DataTable.RowValue label="Release date">
-              {releaseDate?.toLocaleString({ year: "numeric", month: "long", day: "numeric" })}
-            </DataTable.RowValue>
+            <DataTable.RowValue label="Release date">{formatDate(assembly.eventDate)}</DataTable.RowValue>
             <DataTable.RowValue label="Sequencing platform">
               <Pill.StandardText />
             </DataTable.RowValue>
@@ -384,10 +380,10 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
       </Title>
       <Grid>
         <Grid.Col span={3}>
-          <StatisticItem label="Genome size">{assembly?.size}</StatisticItem>
+          <StatisticItem label="Genome size">{formatBases(assembly?.size)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Ungapped length">{assembly?.sizeUngapped}</StatisticItem>
+          <StatisticItem label="Ungapped length">{formatBases(assembly?.sizeUngapped)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
           <StatisticItem label="Number of chromosomes"></StatisticItem>
@@ -414,7 +410,7 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <Divider size="sm" color="shellfishBg.1" />
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Number of scaffolds">{assembly?.numberOfScaffolds}</StatisticItem>
+          <StatisticItem label="Number of scaffolds">{formatNumber(assembly?.numberOfScaffolds)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
           <StatisticItem label="Scaffold N50"></StatisticItem>
@@ -423,7 +419,7 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <StatisticItem label="Scaffold L50"></StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Number of contigs">{assembly?.numberOfContigs}</StatisticItem>
+          <StatisticItem label="Number of contigs">{formatNumber(assembly?.numberOfContigs)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
           <StatisticItem label="Contig N50"></StatisticItem>
@@ -487,8 +483,12 @@ function Provenance({ entityId }: { entityId: string }) {
     <Stack>
       <TimelineNavbar onSelected={setCard}>
         <TimelineNavbar.Item label="Library preparation" icon={<IconLibrary size={60} />} />
-        <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
-        <TimelineNavbar.Item label="Scaffolds" icon={<IconScaffolds size={60} />} />
+
+        {assembly.level === "Contig" ? (
+          <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
+        ) : (
+          <TimelineNavbar.Item label="Scaffolds" icon={<IconScaffolds size={60} />} />
+        )}
         <TimelineNavbar.Item label="Hi-C" icon={<IconHiC size={60} />} />
         <TimelineNavbar.Item label="Chromosomes" icon={<IconChromosomes size={60} />} />
         <TimelineNavbar.Item label="Assemblies" icon={<IconAssembly size={60} />} />
@@ -500,20 +500,23 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Library preparation" size="sm">
           <LibrarySlide libraries={assembly.libraries} />
         </CardSlider.Card>
-        <CardSlider.Card title="Contigs" size="sm">
-          <ContigSlide contig={assembly.contig} />
-        </CardSlider.Card>
-        <CardSlider.Card title="Scaffolds" size="sm">
-          <ScaffoldSlide scaffold={assembly.scaffold} />
-        </CardSlider.Card>
+        {assembly.level === "Contig" ? (
+          <CardSlider.Card title="Contigs" size="sm">
+            <ContigSlide assembly={assembly} />
+          </CardSlider.Card>
+        ) : (
+          <CardSlider.Card title="Scaffolds" size="sm">
+            <ScaffoldSlide assembly={assembly} />
+          </CardSlider.Card>
+        )}
         <CardSlider.Card title="Hi-C" size="sm">
-          <HiCSlide hiC={assembly.hiC} />
+          <HiCSlide />
         </CardSlider.Card>
         <CardSlider.Card title="Chromosomes" size="sm">
-          <ChromosomeSlide chromosome={assembly.chromosome} />
+          <ChromosomeSlide />
         </CardSlider.Card>
         <CardSlider.Card title="Assemblies" size="sm">
-          <AssemblyVersionsSlide assemblies={assembly.versions} />
+          <AssemblyVersionsSlide assemblies={[assembly]} />
         </CardSlider.Card>
         <CardSlider.Card title="Annotations" size="sm">
           <AnnotationSlide annotation={assembly.annotations[0]} />
@@ -587,8 +590,6 @@ interface AssemblyItemProps {
 }
 
 function AssemblyItem({ assembly, onSelected, selected }: AssemblyItemProps) {
-  const releaseDate = assembly.eventDate && DateTime.fromFormat(assembly.eventDate, "yyyy-mm-dd");
-
   const borderColor = selected ? "var(--mantine-color-wheat-5)" : "var(--mantine-color-shellfishBg-2)";
 
   return (
@@ -601,9 +602,7 @@ function AssemblyItem({ assembly, onSelected, selected }: AssemblyItemProps) {
               <Pill.Common value={assembly.size?.toString() ?? ""} />
             </Group>
           </DataTable.RowValue>
-          <DataTable.RowValue label="Release date">
-            {releaseDate?.toLocaleString({ year: "numeric", month: "long", day: "numeric" })}
-          </DataTable.RowValue>
+          <DataTable.RowValue label="Release date">{formatDate(assembly.eventDate)}</DataTable.RowValue>
         </DataTable>
 
         <Center>

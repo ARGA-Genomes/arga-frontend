@@ -1,21 +1,16 @@
-import { Chromosomes } from "@/generated/types";
 import { Group, Stack } from "@mantine/core";
 import { IconChromosomes } from "../ArgaIcons";
 import { DataTable } from "../data-table";
 
-interface ChromosomeSlideProps {
-  chromosome: Chromosomes;
-}
-
-export function ChromosomeSlide({ chromosome }: ChromosomeSlideProps) {
+export function ChromosomeSlide() {
   return (
     <Stack px="xl">
-      <ChromosomeDetails chromosome={chromosome} />
+      <ChromosomeDetails />
     </Stack>
   );
 }
 
-function ChromosomeDetails({ chromosome }: { chromosome?: Chromosome }) {
+function ChromosomeDetails() {
   return (
     <Stack>
       <DataTable>
