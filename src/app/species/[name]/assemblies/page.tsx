@@ -522,7 +522,7 @@ function Provenance({ entityId }: { entityId: string }) {
           <AnnotationSlide annotation={assembly.annotations[0]} />
         </CardSlider.Card>
         <CardSlider.Card title="Public release" size="sm">
-          <DepositionSlide deposition={assembly.deposition} />
+          <DepositionSlide assembly={assembly} />
         </CardSlider.Card>
       </CardSlider>
     </Stack>
