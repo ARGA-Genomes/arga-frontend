@@ -22,7 +22,7 @@ import classes from "./page.module.css";
 import { useSpecies } from "@/app/species-provider";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { AssemblyDetails, Library, NameDetails, Specimen } from "@/generated/types";
+import { Annotation, AssemblyDetails, Library, NameDetails, Specimen } from "@/generated/types";
 import { DataTable } from "@/components/data-table";
 import { DateTime } from "luxon";
 import { Pill } from "@/components/Pills";
@@ -51,6 +51,13 @@ import {
 import { CardSlider } from "@/components/CardSlider";
 import { LibrarySlide } from "@/components/slides/Library";
 import { MAX_WIDTH } from "@/app/constants";
+import { ContigSlide } from "@/components/slides/Contigs";
+import { ScaffoldSlide } from "@/components/slides/Scaffolds";
+import { HiCSlide } from "@/components/slides/HiC";
+import { ChromosomeSlide } from "@/components/slides/Chromosomes";
+import { AssemblyVersionsSlide } from "@/components/slides/AssemblyVersions";
+import { AnnotationSlide } from "@/components/slides/Annotations";
+import { DepositionSlide } from "@/components/slides/Depositions";
 
 const GET_ASSEMBLY = gql`
   query Assembly($entityId: String) {
@@ -69,6 +76,10 @@ const GET_ASSEMBLY = gql`
       libraries {
         ...LibraryDetails
       }
+
+      annotations {
+        ...AnnotationDetails
+      }
     }
   }
 `;
@@ -77,6 +88,7 @@ type Assembly = AssemblyDetails & {
   name: Pick<NameDetails, "canonicalName" | "authorship">;
   specimens: Pick<Specimen, "entityId">;
   libraries: Library[];
+  annotations: Annotation[];
 };
 
 type AssemblyQuery = {
@@ -488,13 +500,27 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Library preparation" size="sm">
           <LibrarySlide libraries={assembly.libraries} />
         </CardSlider.Card>
-        <CardSlider.Card title="Contigs" size="sm"></CardSlider.Card>
-        <CardSlider.Card title="Scaffolds" size="sm"></CardSlider.Card>
-        <CardSlider.Card title="Hi-C" size="sm"></CardSlider.Card>
-        <CardSlider.Card title="Chromosomes" size="sm"></CardSlider.Card>
-        <CardSlider.Card title="Assemblies" size="sm"></CardSlider.Card>
-        <CardSlider.Card title="Annotations" size="sm"></CardSlider.Card>
-        <CardSlider.Card title="Public release" size="sm"></CardSlider.Card>
+        <CardSlider.Card title="Contigs" size="sm">
+          <ContigSlide contig={assembly.contig} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Scaffolds" size="sm">
+          <ScaffoldSlide scaffold={assembly.scaffold} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Hi-C" size="sm">
+          <HiCSlide hiC={assembly.hiC} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Chromosomes" size="sm">
+          <ChromosomeSlide chromosome={assembly.chromosome} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Assemblies" size="sm">
+          <AssemblyVersionsSlide assemblies={assembly.versions} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Annotations" size="sm">
+          <AnnotationSlide annotation={assembly.annotations[0]} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Public release" size="sm">
+          <DepositionSlide deposition={assembly.deposition} />
+        </CardSlider.Card>
       </CardSlider>
     </Stack>
   );

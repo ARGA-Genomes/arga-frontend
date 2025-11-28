@@ -158,3 +158,15 @@ export const ASSEMBLY = gql`
     assemblyN50
   }
 `;
+
+export const ANNOTATION = gql`
+  fragment AnnotationDetails on Annotation {
+    entityId
+    assemblyId
+    name
+    provider
+    eventDate
+    numberOfGenes
+    numberOfProteins
+  }
+`;

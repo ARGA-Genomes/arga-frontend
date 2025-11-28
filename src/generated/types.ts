@@ -58,6 +58,18 @@ export type Agent = {
   orcid?: Maybe<Scalars['String']['output']>;
 };
 
+export type Annotation = {
+  __typename?: 'Annotation';
+  assemblyId: Scalars['String']['output'];
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  numberOfGenes?: Maybe<Scalars['Int']['output']>;
+  numberOfProteins?: Maybe<Scalars['Int']['output']>;
+  provider?: Maybe<Scalars['String']['output']>;
+  publication?: Maybe<Publication>;
+};
+
 export type AnnotationEvent = {
   __typename?: 'AnnotationEvent';
   annotatedBy?: Maybe<Scalars['String']['output']>;
@@ -73,6 +85,7 @@ export type AnnotationEvent = {
 
 export type Assembly = {
   __typename?: 'Assembly';
+  annotations: Array<Annotation>;
   assemblyId: Scalars['String']['output'];
   assemblyN50?: Maybe<Scalars['String']['output']>;
   assemblyName?: Maybe<Scalars['String']['output']>;

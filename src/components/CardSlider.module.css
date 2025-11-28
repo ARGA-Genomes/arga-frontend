@@ -5,6 +5,7 @@
 .card {
     display: inline-block;
     margin-left: 20px;
+    white-space: collapse;
 }
 
 .card:first-child {

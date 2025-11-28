@@ -26,6 +26,7 @@ import {
   SEQUENCING_RUN_EVENT,
   LIBRARY,
   ASSEMBLY,
+  ANNOTATION,
 } from "./sequence";
 import { DATA_PRODUCT } from "./data-product";
 import { TAXON_NAME, TAXON_SOURCE, TAXON_NODE } from "./taxa";
@@ -48,6 +49,7 @@ export default function createClient() {
     SEQUENCE,
     LIBRARY,
     ASSEMBLY,
+    ANNOTATION,
     COLLECTION_EVENT,
     ACCESSION_EVENT,
     SEQUENCING_EVENT,
