@@ -29,7 +29,7 @@ function AssemblyVersionsDetails({ assemblies }: { assemblies: AssemblyDetails[]
   return (
     <Stack>
       {assemblies.map((assembly) => (
-        <Version assembly={assembly} />
+        <Version key={assembly.entityId} assembly={assembly} />
       ))}
     </Stack>
   );
