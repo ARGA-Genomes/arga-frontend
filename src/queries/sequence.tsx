@@ -170,3 +170,13 @@ export const ANNOTATION = gql`
     numberOfProteins
   }
 `;
+
+export const DEPOSITION = gql`
+  fragment DepositionDetails on Deposition {
+    entityId
+    assemblyId
+    eventDate
+    url
+    institution
+  }
+`;

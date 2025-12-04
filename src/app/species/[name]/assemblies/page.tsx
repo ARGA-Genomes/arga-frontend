@@ -16,13 +16,14 @@ import {
   useMantineTheme,
   Container,
   Accordion,
+  ButtonProps,
 } from "@mantine/core";
 import classes from "./page.module.css";
 
 import { useSpecies } from "@/app/species-provider";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { Annotation, AssemblyDetails, Library, NameDetails, Specimen } from "@/generated/types";
+import { Annotation, AssemblyDetails, Deposition, Library, NameDetails, Specimen } from "@/generated/types";
 import { DataTable } from "@/components/data-table";
 import { Pill } from "@/components/Pills";
 import {
@@ -58,6 +59,7 @@ import { AssemblyVersionsSlide } from "@/components/slides/AssemblyVersions";
 import { AnnotationSlide } from "@/components/slides/Annotations";
 import { DepositionSlide } from "@/components/slides/Depositions";
 import { formatBases, formatDate, formatNumber } from "@/helpers/formatters";
+import { useSavedData } from "@/components/DownloadManager";
 
 const GET_ASSEMBLY = gql`
   query Assembly($entityId: String) {
@@ -80,6 +82,10 @@ const GET_ASSEMBLY = gql`
       annotations {
         ...AnnotationDetails
       }
+
+      depositions {
+        ...DepositionDetails
+      }
     }
   }
 `;
@@ -89,6 +95,7 @@ type Assembly = AssemblyDetails & {
   specimens: Pick<Specimen, "entityId">;
   libraries: Library[];
   annotations: Annotation[];
+  depositions: Deposition[];
 };
 
 type AssemblyQuery = {
@@ -312,7 +319,7 @@ function Details({ assembly }: { assembly: Assembly }) {
         </Grid.Col>
 
         <Grid.Col span={3}>
-          <DataAccess />
+          <DataAccess assembly={assembly} />
         </Grid.Col>
         <Grid.Col span={9}>
           <SpecimenDetails />
@@ -322,17 +329,53 @@ function Details({ assembly }: { assembly: Assembly }) {
   );
 }
 
-function DataAccess() {
+interface LinkButtonProps extends ButtonProps {
+  href?: string | null;
+  children?: React.ReactNode;
+}
+
+function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
+  return href ? (
+    <Button component="a" href={href} target="_blank" {...buttonProps}>
+      {children}
+    </Button>
+  ) : (
+    <Button {...buttonProps} disabled>
+      {children}
+    </Button>
+  );
+}
+
+function DataAccess({ assembly }: { assembly: Assembly }) {
+  const [saved, setSaved] = useSavedData();
+  const deposition = assembly.depositions.at(0);
+
+  const saveToList = () => {
+    if (deposition?.url && assembly.assemblyId) {
+      setSaved([
+        ...saved,
+        {
+          url: deposition.url,
+          label: assembly.assemblyId,
+          dataType: "whole genome",
+          scientificName: assembly.name.canonicalName,
+          datePublished: deposition.eventDate || "Unknown",
+          dataset: { id: "", name: "" },
+        },
+      ]);
+    }
+  };
+
   return (
     <Paper p="lg" radius="md" h="100%" withBorder>
       <Stack>
         <Title order={5}>Data access</Title>
-        <Button radius="md" color="midnight.9" leftSection={<IconCircleCheck />}>
+        <Button radius="md" color="midnight.9" leftSection={<IconCircleCheck />} onClick={saveToList}>
           add to list
         </Button>
-        <Button radius="md" color="midnight.9" leftSection={<IconDownload />}>
+        <LinkButton radius="md" color="midnight.9" leftSection={<IconDownload />} href={deposition?.url}>
           get data
-        </Button>
+        </LinkButton>
         <Button radius="md" color="midnight.9" leftSection={<IconLink />} disabled>
           go to source
         </Button>
@@ -460,7 +503,7 @@ function MetadataCheck({ assembly }: { assembly?: Assembly }) {
         <DataCheck label="Voucher accession" value={false} />
         <DataCheck label="Sequence read files" value={false} />
         <DataCheck label="Sequencing platform" value={false} />
-        <DataCheck label="Assembly method" value={false} />
+        <DataCheck label="Assembly method" value={!!assembly?.method} />
         <DataCheck label="Assembly statistics" value={false} />
         <DataCheck label="Genome publication" value={false} />
       </Stack>

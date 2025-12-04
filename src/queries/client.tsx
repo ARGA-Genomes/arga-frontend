@@ -27,6 +27,7 @@ import {
   LIBRARY,
   ASSEMBLY,
   ANNOTATION,
+  DEPOSITION,
 } from "./sequence";
 import { DATA_PRODUCT } from "./data-product";
 import { TAXON_NAME, TAXON_SOURCE, TAXON_NODE } from "./taxa";
@@ -50,6 +51,7 @@ export default function createClient() {
     LIBRARY,
     ASSEMBLY,
     ANNOTATION,
+    DEPOSITION,
     COLLECTION_EVENT,
     ACCESSION_EVENT,
     SEQUENCING_EVENT,

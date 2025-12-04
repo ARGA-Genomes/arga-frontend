@@ -93,6 +93,7 @@ export type Assembly = {
   completenessMethod?: Maybe<Scalars['String']['output']>;
   computationalInfrastructure?: Maybe<Scalars['String']['output']>;
   coverage?: Maybe<Scalars['String']['output']>;
+  depositions: Array<Deposition>;
   entityId: Scalars['String']['output'];
   eventDate?: Maybe<Scalars['NaiveDate']['output']>;
   eventTime?: Maybe<Scalars['NaiveTime']['output']>;
@@ -523,6 +524,16 @@ export type DatasetVersion = {
 export type DateRange = {
   after: Scalars['NaiveDate']['input'];
   before: Scalars['NaiveDate']['input'];
+};
+
+export type Deposition = {
+  __typename?: 'Deposition';
+  assemblyId: Scalars['String']['output'];
+  entityId: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  institution?: Maybe<Scalars['String']['output']>;
+  publication?: Maybe<Publication>;
+  url?: Maybe<Scalars['String']['output']>;
 };
 
 export type DnaExtract = {
@@ -2234,7 +2245,6 @@ export type TaxonomicVernacularGroup =
   | 'HIGHER_PLANTS'
   | 'HORNWORTS'
   | 'INSECTS'
-  | 'INVERTEBRATES'
   | 'LIVERWORTS'
   | 'MAMMALS'
   | 'MOLLUSCS'

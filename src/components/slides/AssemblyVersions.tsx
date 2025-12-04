@@ -1,6 +1,6 @@
 import { AssemblyDetails } from "@/generated/types";
 import { formatBases, formatDate } from "@/helpers/formatters";
-import { Button, Group, Paper, Stack, Text } from "@mantine/core";
+import { Button, ButtonProps, Group, Paper, Stack, Text } from "@mantine/core";
 import { IconCircleCheck, IconDownload, IconLink } from "@tabler/icons-react";
 
 interface AssemblyVersionSlideProps {
@@ -52,12 +52,12 @@ function Version({ assembly }: { assembly: AssemblyDetails }) {
         </Group>
 
         <Group justify="space-evenly" px="md" grow>
-          <Button radius="md" color="midnight.9" leftSection={<IconCircleCheck />}>
+          <Button radius="md" color="midnight.9" leftSection={<IconCircleCheck />} disabled>
             add to list
           </Button>
-          <Button radius="md" color="midnight.9" leftSection={<IconDownload />}>
+          <LinkButton radius="md" color="midnight.9" leftSection={<IconDownload />}>
             get data
-          </Button>
+          </LinkButton>
           <Button radius="md" color="midnight.9" leftSection={<IconLink />} disabled>
             go to source
           </Button>
@@ -93,5 +93,22 @@ function Version({ assembly }: { assembly: AssemblyDetails }) {
         </Group>
       </Stack>
     </Paper>
+  );
+}
+
+interface LinkButtonProps extends ButtonProps {
+  href?: string | null;
+  children?: React.ReactNode;
+}
+
+function LinkButton({ href, children, ...buttonProps }: LinkButtonProps) {
+  return href ? (
+    <Button component="a" href={href} target="_blank" {...buttonProps}>
+      {children}
+    </Button>
+  ) : (
+    <Button {...buttonProps} disabled>
+      {children}
+    </Button>
   );
 }
