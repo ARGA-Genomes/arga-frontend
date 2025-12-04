@@ -4,9 +4,9 @@ import classes from "./top-nav.module.css";
 
 import { SavedDataManagerButton } from "@/components/DownloadManager";
 import { Search } from "@/components/search";
-import { Burger, Collapse, Flex, Group, Image, Modal, NavLink, Stack, Text } from "@mantine/core";
+import { Alert, Burger, Collapse, Flex, Group, Image, Modal, NavLink, Stack, Text } from "@mantine/core";
 import { useDisclosure, useLocalStorage } from "@mantine/hooks";
-import { IconExternalLink, IconSearch } from "@tabler/icons-react";
+import { IconExternalLink, IconInfoCircle, IconSearch } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -75,6 +75,16 @@ export function TopNav() {
           >
             <Image p="md" src="/arga-logo.svg" h={110} w="auto" alt="Australian Reference Genome Atlas" />
           </Link>
+
+          <Alert
+            radius="lg"
+            variant="filled"
+            color="wheatBg.5"
+            title="Service under maintenance"
+            icon={<IconInfoCircle />}
+          >
+            <Stack>ARGA is currently in the process of being updated with a new release. Please bear with us.</Stack>
+          </Alert>
 
           <div className={classes.actionsWrapper}>
             <Flex gap="lg" align="center" justify="space-between" mr={20} wrap="nowrap">
