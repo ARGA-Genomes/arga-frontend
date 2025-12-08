@@ -91,13 +91,12 @@ const SEARCH_FULLTEXT = gql`
             score
             canonicalName
             accession
-            dataSource
             institutionCode
-            collectionCode
-            recordedBy
+            collectionRepositoryCode
+            collectionRepositoryId
+            collectedBy
             identifiedBy
             eventDate
-            eventLocation
           }
         }
       }
@@ -141,20 +140,20 @@ function SearchPage() {
   const handleAttributeSwitch = (
     item: InputQueryAttribute,
     items: InputQueryAttribute[],
-    setItems: (items: InputQueryAttribute[]) => void
+    setItems: (items: InputQueryAttribute[]) => void,
   ) =>
     setItems(
       items.map((filterAttr) =>
         item.field === filterAttr.field && item.value === filterAttr.value
           ? { ...filterAttr, include: !filterAttr.include }
-          : filterAttr
-      )
+          : filterAttr,
+      ),
     );
 
   const handleAttributeRemove = (
     item: InputQueryAttribute,
     items: InputQueryAttribute[],
-    setItems: (items: InputQueryAttribute[]) => void
+    setItems: (items: InputQueryAttribute[]) => void,
   ) => setItems(items.filter((filterAttr) => !(item.field === filterAttr.field && item.value === filterAttr.value)));
 
   return (

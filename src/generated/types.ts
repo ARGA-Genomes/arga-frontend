@@ -1557,13 +1557,12 @@ export type SpecimenItem = {
   __typename?: 'SpecimenItem';
   accession: Scalars['String']['output'];
   canonicalName?: Maybe<Scalars['String']['output']>;
-  collectionCode?: Maybe<Scalars['String']['output']>;
-  dataSource?: Maybe<Scalars['String']['output']>;
+  collectedBy?: Maybe<Scalars['String']['output']>;
+  collectionRepositoryCode?: Maybe<Scalars['String']['output']>;
+  collectionRepositoryId?: Maybe<Scalars['String']['output']>;
   eventDate?: Maybe<Scalars['String']['output']>;
-  eventLocation?: Maybe<Scalars['String']['output']>;
   identifiedBy?: Maybe<Scalars['String']['output']>;
   institutionCode?: Maybe<Scalars['String']['output']>;
-  recordedBy?: Maybe<Scalars['String']['output']>;
   score: Scalars['Float']['output'];
   status: Scalars['String']['output'];
   type: FullTextType;
