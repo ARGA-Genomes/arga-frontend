@@ -258,13 +258,6 @@ const TableSpecimenDetails = ({ item, link }: ResultProps<SpecimenItem>) => {
           {item.accession}
         </Text>
       </Supertext>
-      <Flex justify="flex-start" align="center" w={200} h="100%">
-        <Paper py={5} px={15} radius="xl" style={{ border: `1px solid ${theme.colors["shellfish"][2]}` }}>
-          <Text size="sm" fw={600} c="shellfish.8">
-            {item.dataSource}
-          </Text>
-        </Paper>
-      </Flex>
       <Supertext w={150} label="Collection date">
         <Text fw="bold" c="midnight.9">
           {item.eventDate || "Unknown"}
@@ -272,7 +265,7 @@ const TableSpecimenDetails = ({ item, link }: ResultProps<SpecimenItem>) => {
       </Supertext>
       <Supertext w={100} label="Location">
         <Text fw="bold" c="midnight.9">
-          {item.eventLocation || "Unknown"}
+          Unknown
         </Text>
       </Supertext>
     </Flex>
@@ -298,18 +291,13 @@ const CardSpecimenDetails = ({ item, link }: ResultProps<SpecimenItem>) => {
                 {item.accession}
               </Text>
             </Supertext>
-            <Paper py={5} px={15} radius="xl" style={{ border: `1px solid var(--mantine-color-shellfish-2)` }}>
-              <Text size="sm" fw={600} c="shellfish.8">
-                {item.dataSource}
-              </Text>
-            </Paper>
           </Stack>
         </Paper>
       </Stack>
       <SimpleGrid mt="md" cols={2}>
         <Supertext label="Location">
           <Text size="sm" fw="bold" c="midnight.9">
-            {item.eventLocation || "no data"}
+            no data
           </Text>
         </Supertext>
         <Supertext label="Collection year">
