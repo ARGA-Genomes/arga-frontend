@@ -7,7 +7,7 @@ import { Source } from "@/generated/types";
 import { gql, useQuery } from "@apollo/client";
 import { Box, Button, Center, Group, Image, Paper, ScrollArea, Stack, Text } from "@mantine/core";
 import { IconBook } from "@tabler/icons-react";
-import { motion } from "framer-motion";
+import { motion, Transition } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -238,7 +238,7 @@ function MilestoneItem({ milestone, inverted }: MilestoneItemProps) {
     type: "spring",
     stiffness: 300,
     damping: 40,
-  };
+  } as unknown as Transition;
 
   return (
     <motion.div

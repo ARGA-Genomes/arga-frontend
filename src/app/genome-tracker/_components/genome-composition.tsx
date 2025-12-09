@@ -7,7 +7,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Group } from "@visx/group";
 import { Text } from "@visx/text";
 import { max } from "d3";
-import { motion } from "framer-motion";
+import { motion, Transition } from "framer-motion";
 import * as Humanize from "humanize-plus";
 import { useState } from "react";
 
@@ -112,7 +112,7 @@ function SlantedBar({ level, maxWidth }: SlantedBarProps) {
   const transition = {
     duration: 0.2,
     ease: [0, 0.71, 0.2, 1.01],
-  };
+  } as unknown as Transition;
 
   return (
     <g onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>

@@ -11,7 +11,7 @@ import { Group } from "@visx/group";
 import { HierarchyNode, HierarchyPointNode } from "@visx/hierarchy/lib/types";
 import { LinkVertical } from "@visx/shape";
 import { Text } from "@visx/text";
-import { motion } from "framer-motion";
+import { motion, Transition } from "framer-motion";
 import { useEffect, useState } from "react";
 
 // Gets details for the specified taxon and the immediate decendants
@@ -112,7 +112,7 @@ function TaxonNode({ data, depth, pinned, onToggle, onLoad, onHover }: TaxonNode
         duration: 0.5,
         repeat: Infinity,
         ease: "linear",
-      },
+      } as unknown as Transition,
     },
   };
 
