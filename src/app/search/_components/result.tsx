@@ -602,7 +602,7 @@ const resultType: ResultDetails = {
         : "HIGHER TAXON",
     colour: "moss",
     icon: "Data type_ Species (and subspecies) report.svg",
-    link: (item) => `/${(item as TaxonItem).rank}/${item.canonicalName}`,
+    link: (item) => `/species/${item.canonicalName}`,
     tableComponent: TableTaxonDetails,
     cardComponent: CardTaxonDetails,
   },
