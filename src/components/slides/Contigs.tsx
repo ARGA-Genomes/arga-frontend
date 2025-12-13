@@ -20,14 +20,14 @@ function ContigDetails({ assembly }: { assembly?: AssemblyDetails }) {
   return (
     <Stack>
       <DataTable>
-        <DataTable.RowValue label="Assembler used" />
+        <DataTable.RowValue label="Assembler used">{assembly?.method}</DataTable.RowValue>
         <DataTable.RowValue label="Assembly date">{formatDate(assembly?.eventDate)}</DataTable.RowValue>
         <DataTable.RowValue label="Input data" />
         <DataTable.RowValue label="Coverage depth" />
         <DataTable.RowValue label="Number of contigs">{formatNumber(assembly?.numberOfContigs)}</DataTable.RowValue>
-        <DataTable.RowValue label="Total contig length">{formatBases(assembly?.size)}</DataTable.RowValue>
-        <DataTable.RowValue label="Contig N50">{assembly?.assemblyN50}</DataTable.RowValue>
-        <DataTable.RowValue label="Contig L50" />
+        <DataTable.RowValue label="Total contig length">{formatBases(assembly?.totalContigSize)}</DataTable.RowValue>
+        <DataTable.RowValue label="Contig N50">{formatBases(assembly?.contigN50)}</DataTable.RowValue>
+        <DataTable.RowValue label="Contig L50">{formatBases(assembly?.contigL50)}</DataTable.RowValue>
       </DataTable>
       <Group>
         <IconContigs size={200} />

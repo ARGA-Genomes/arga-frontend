@@ -2,7 +2,7 @@ import { AssemblyDetails } from "@/generated/types";
 import { Group, Stack } from "@mantine/core";
 import { IconScaffolds } from "../ArgaIcons";
 import { DataTable } from "../data-table";
-import { formatDate, formatNumber } from "@/helpers/formatters";
+import { formatBases, formatDate, formatNumber } from "@/helpers/formatters";
 
 interface ScaffoldSlideProps {
   assembly: AssemblyDetails;
@@ -24,9 +24,9 @@ function ScaffoldDetails({ assembly }: { assembly?: AssemblyDetails }) {
         <DataTable.RowValue label="Assembly date">{formatDate(assembly?.eventDate)}</DataTable.RowValue>
         <DataTable.RowValue label="Scaffolding methods used">{assembly?.method}</DataTable.RowValue>
         <DataTable.RowValue label="Number of contigs">{formatNumber(assembly?.numberOfContigs)}</DataTable.RowValue>
-        <DataTable.RowValue label="Longest scaffold" />
-        <DataTable.RowValue label="Scaffold N50">{assembly?.assemblyN50}</DataTable.RowValue>
-        <DataTable.RowValue label="Scaffold L50" />
+        <DataTable.RowValue label="Longest scaffold">{formatBases(assembly?.longestScaffold)}</DataTable.RowValue>
+        <DataTable.RowValue label="Scaffold N50">{formatBases(assembly?.scaffoldN50)}</DataTable.RowValue>
+        <DataTable.RowValue label="Scaffold L50">{formatBases(assembly?.scaffoldL50)}</DataTable.RowValue>
       </DataTable>
       <Group>
         <IconScaffolds size={200} />

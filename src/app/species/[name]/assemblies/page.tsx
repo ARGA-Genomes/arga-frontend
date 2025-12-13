@@ -310,7 +310,7 @@ function Details({ assembly }: { assembly: Assembly }) {
             </DataTable.RowValue>
             <DataTable.RowValue label="Release date">{formatDate(assembly.eventDate)}</DataTable.RowValue>
             <DataTable.RowValue label="Sequencing platform">
-              <Pill.StandardText />
+              <Pill.StandardText value={assembly.systemUsed} />
             </DataTable.RowValue>
             <DataTable.RowValue label="Assembly method">
               <Pill.StandardText value={assembly.method} />
@@ -429,10 +429,10 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <StatisticItem label="Ungapped length">{formatBases(assembly?.sizeUngapped)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Number of chromosomes"></StatisticItem>
+          <StatisticItem label="Number of chromosomes">{formatBases(assembly?.numberOfChromosomes)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={3}>
-          <StatisticItem label="Number of organelles"></StatisticItem>
+          <StatisticItem label="Number of organelles">{formatBases(assembly?.numberOfOrganelles)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={12}>
           <Divider size="sm" color="shellfishBg.1" />
@@ -456,19 +456,19 @@ function Statistics({ assembly }: { assembly?: Assembly }) {
           <StatisticItem label="Number of scaffolds">{formatNumber(assembly?.numberOfScaffolds)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Scaffold N50"></StatisticItem>
+          <StatisticItem label="Scaffold N50">{formatBases(assembly?.scaffoldN50)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Scaffold L50"></StatisticItem>
+          <StatisticItem label="Scaffold L50">{formatBases(assembly?.scaffoldL50)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
           <StatisticItem label="Number of contigs">{formatNumber(assembly?.numberOfContigs)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Contig N50"></StatisticItem>
+          <StatisticItem label="Contig N50">{formatBases(assembly?.contigN50)}</StatisticItem>
         </Grid.Col>
         <Grid.Col span={4}>
-          <StatisticItem label="Contig L50"></StatisticItem>
+          <StatisticItem label="Contig L50">{formatBases(assembly?.contigL50)}</StatisticItem>
         </Grid.Col>
       </Grid>
     </Paper>
@@ -527,11 +527,8 @@ function Provenance({ entityId }: { entityId: string }) {
       <TimelineNavbar onSelected={setCard}>
         <TimelineNavbar.Item label="Library preparation" icon={<IconLibrary size={60} />} />
 
-        {assembly.level === "Contig" ? (
-          <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
-        ) : (
-          <TimelineNavbar.Item label="Scaffolds" icon={<IconScaffolds size={60} />} />
-        )}
+        <TimelineNavbar.Item label="Contigs" icon={<IconContigs size={60} />} />
+        <TimelineNavbar.Item label="Scaffolds" icon={<IconScaffolds size={60} />} />
         <TimelineNavbar.Item label="Hi-C" icon={<IconHiC size={60} />} />
         <TimelineNavbar.Item label="Chromosomes" icon={<IconChromosomes size={60} />} />
         <TimelineNavbar.Item label="Assemblies" icon={<IconAssembly size={60} />} />
@@ -543,15 +540,12 @@ function Provenance({ entityId }: { entityId: string }) {
         <CardSlider.Card title="Library preparation" size="sm">
           <LibrarySlide libraries={assembly.libraries} />
         </CardSlider.Card>
-        {assembly.level === "Contig" ? (
-          <CardSlider.Card title="Contigs" size="sm">
-            <ContigSlide assembly={assembly} />
-          </CardSlider.Card>
-        ) : (
-          <CardSlider.Card title="Scaffolds" size="sm">
-            <ScaffoldSlide assembly={assembly} />
-          </CardSlider.Card>
-        )}
+        <CardSlider.Card title="Contigs" size="sm">
+          <ContigSlide assembly={assembly} />
+        </CardSlider.Card>
+        <CardSlider.Card title="Scaffolds" size="sm">
+          <ScaffoldSlide assembly={assembly} />
+        </CardSlider.Card>
         <CardSlider.Card title="Hi-C" size="sm">
           <HiCSlide />
         </CardSlider.Card>

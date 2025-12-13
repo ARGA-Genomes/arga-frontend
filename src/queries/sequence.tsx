@@ -149,6 +149,12 @@ export const ASSEMBLY = gql`
     numberOfScaffolds
     numberOfContigs
     numberOfReplicons
+    numberOfChromosomes
+    numberOfComponentSequences
+    numberOfOrganelles
+    numberOfGapsBetweenScaffolds
+    numberOfGuanineCytosine
+    numberOfAtgc
     hybrid
     hybridInformation
     polishingOrScaffoldingData
@@ -156,6 +162,14 @@ export const ASSEMBLY = gql`
     computationalInfrastructure
     systemUsed
     assemblyN50
+    contigN50
+    contigL50
+    scaffoldN50
+    scaffoldL50
+    longestContig
+    longestScaffold
+    totalContigSize
+    totalScaffoldSize
   }
 `;
 
