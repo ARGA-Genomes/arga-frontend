@@ -1,6 +1,11 @@
 {
   "changelog": [
     {
+      "date": "16 December 2025",
+      "updates": ["<b>New feature releases:</b> Narrative views of genomes and specimens, and new organism page",
+        "UI version 0.3.0"
+      ]
+    },{
       "date": "29 May 2025",
       "updates": ["<b>Feature update:</b> Genome Tracker – version 1.1.0",
         "Fixes: saved data functionality",
