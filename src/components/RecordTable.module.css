@@ -1,11 +1,11 @@
 .header {
     color: white;
-    background-color: var(--mantine-color-midnight-9);
 
     th {
         padding: var(--mantine-spacing-xl);
         font-weight: 600;
         text-align: center;
+        background-color: var(--mantine-color-midnight-9);
     }
 
     tr {
