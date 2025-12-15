@@ -40,6 +40,7 @@ const GET_ORGANISM_OVERVIEW = gql`
       }
 
       registrations {
+        typeStatus
         collectionRepositoryCode
         collectionRepositoryId
         institutionCode
@@ -51,7 +52,7 @@ const GET_ORGANISM_OVERVIEW = gql`
 
 type RegistrationCodes = Pick<
   Registration,
-  "collectionRepositoryCode" | "collectionRepositoryId" | "institutionCode" | "institutionName"
+  "typeStatus" | "collectionRepositoryCode" | "collectionRepositoryId" | "institutionCode" | "institutionName"
 >;
 
 type Organism = OrganismDetails & {
@@ -165,7 +166,7 @@ function Overview({ entityId }: { entityId: string }) {
                       <RegistrationInstitution registration={registration} />
                       <RegistrationCollection registration={registration} />
                     </Group>
-                    <Pill.SpecimenStatus />
+                    <Pill.SpecimenStatus accession={registration} />
                   </Group>
                 </Stack>
               </Grid.Col>
