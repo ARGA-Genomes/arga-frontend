@@ -85,15 +85,18 @@ export function TopNav() {
             p="xs"
           >
             <Stack gap={0}>
+              <Text fz="xs">Thank you for visiting ARGA. The ARGA Team is taking a break until 12 January 2026. </Text>
               <Text fz="xs">
-                Thank you for visiting ARGA. The ARGA Team is taking a break until 12 January 2026. For urgent matters,
-                please contact: support@ala.org.au. For general enquiries, please use our contact page:
-                arga.org.au/contact.
+                For urgent matters, please contact: support@ala.org.au. For general enquiries, please use our{" "}
+                <a href="http://arga.org.au/contact" target="_blank">
+                  contact page
+                </a>
+                .
               </Text>
               <Text fz="xs">
-                We look forward to working with you again in the new year. Best wishes for your happy holidays,
+                We look forward to working with you again in the new year. Best wishes for your happy holidays, - ARGA
+                Team.
               </Text>
-              <Text fz="xs">ARGA Team.</Text>
             </Stack>
           </Alert>
 
