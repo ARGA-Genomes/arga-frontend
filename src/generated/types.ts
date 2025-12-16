@@ -63,11 +63,19 @@ export type Annotation = {
   assemblyId: Scalars['String']['output'];
   entityId: Scalars['String']['output'];
   eventDate?: Maybe<Scalars['NaiveDate']['output']>;
+  method?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  numberOfCodingProteins?: Maybe<Scalars['Int']['output']>;
   numberOfGenes?: Maybe<Scalars['Int']['output']>;
-  numberOfProteins?: Maybe<Scalars['Int']['output']>;
+  numberOfNonCodingProteins?: Maybe<Scalars['Int']['output']>;
+  numberOfOtherGenes?: Maybe<Scalars['Int']['output']>;
+  numberOfPseudogenes?: Maybe<Scalars['Int']['output']>;
   provider?: Maybe<Scalars['String']['output']>;
   publication?: Maybe<Publication>;
+  software?: Maybe<Scalars['String']['output']>;
+  softwareVersion?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['String']['output']>;
 };
 
 export type AnnotationEvent = {

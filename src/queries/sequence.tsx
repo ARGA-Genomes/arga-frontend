@@ -181,7 +181,10 @@ export const ANNOTATION = gql`
     provider
     eventDate
     numberOfGenes
-    numberOfProteins
+    numberOfCodingProteins
+    numberOfNonCodingProteins
+    numberOfOtherGenes
+    numberOfPseudogenes
   }
 `;
 
