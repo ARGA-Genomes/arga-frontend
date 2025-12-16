@@ -203,7 +203,7 @@ function Overview() {
             </Skeleton>
           </Grid.Col>
           <Grid.Col span={10}>
-            <ScrollArea>
+            <ScrollArea h={120} type="always">
               <Stack>
                 {data?.species.assemblies.records.map((record) => (
                   <OverviewItem key={record.entityId} assembly={record} />
