@@ -189,7 +189,7 @@ const DISABLED_ACCESSIONS = [
 ];
 
 function MilestoneItemHeader({ milestone, onFlip }: MilestoneItemHeaderProps) {
-  const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/whole_genomes/${milestone.accession}`;
+  const genomeHref = `/species/${milestone.canonicalName.replaceAll(" ", "_")}/assemblies/`;
 
   return (
     <Center h="inherit">
