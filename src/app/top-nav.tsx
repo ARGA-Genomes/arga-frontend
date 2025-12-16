@@ -80,10 +80,21 @@ export function TopNav() {
             radius="lg"
             variant="filled"
             color="wheatBg.5"
-            title="Service under maintenance"
+            title="Service delays over holidays."
             icon={<IconInfoCircle />}
+            p="xs"
           >
-            <Stack>ARGA is currently in the process of being updated with a new release. Please bear with us.</Stack>
+            <Stack gap={0}>
+              <Text fz="xs">
+                Thank you for visiting ARGA. The ARGA Team is taking a break until 12 January 2026. For urgent matters,
+                please contact: support@ala.org.au. For general enquiries, please use our contact page:
+                arga.org.au/contact.
+              </Text>
+              <Text fz="xs">
+                We look forward to working with you again in the new year. Best wishes for your happy holidays,
+              </Text>
+              <Text fz="xs">ARGA Team.</Text>
+            </Stack>
           </Alert>
 
           <div className={classes.actionsWrapper}>

@@ -23,7 +23,7 @@ function Summary({ annotation }: { annotation?: Annotation }) {
       <Stack>
         <SummaryItem>{annotation?.numberOfGenes ?? 0} genes</SummaryItem>
         <SummaryItem>0 transcripts</SummaryItem>
-        <SummaryItem>{annotation?.numberOfProteins ?? 0} proteins</SummaryItem>
+        <SummaryItem>{annotation?.numberOfCodingProteins ?? 0} proteins</SummaryItem>
       </Stack>
     </Paper>
   );
