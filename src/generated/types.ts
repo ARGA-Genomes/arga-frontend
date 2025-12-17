@@ -1542,6 +1542,7 @@ export type Specimen = {
   events: SpecimenEvents;
   organism: OrganismDetails;
   organismId: Scalars['String']['output'];
+  specimenId?: Maybe<Scalars['String']['output']>;
   stats: SpecimenStats;
   tissues: Array<TissueDetails>;
 };

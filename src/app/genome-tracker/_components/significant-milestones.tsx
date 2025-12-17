@@ -201,7 +201,7 @@ function MilestoneItemHeader({ milestone, onFlip }: MilestoneItemHeaderProps) {
           </Text>
         </Stack>
         {!DISABLED_ACCESSIONS.includes(milestone.accession) && (
-          <Button color="midnight.8" radius="xl" component={Link} href={genomeHref}>
+          <Button color="midnight.8" radius="xl" component={Link} href={genomeHref} target="_blank">
             <Text className={classes.buttonText}>view genome</Text>
           </Button>
         )}

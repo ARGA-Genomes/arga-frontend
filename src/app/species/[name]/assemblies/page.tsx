@@ -23,7 +23,7 @@ import classes from "./page.module.css";
 import { useSpecies } from "@/app/species-provider";
 import { gql, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { Annotation, AssemblyDetails, Deposition, Library, NameDetails, Specimen } from "@/generated/types";
+import { Annotation, AssemblyDetails, Collection, Deposition, Library, NameDetails, Specimen } from "@/generated/types";
 import { DataTable } from "@/components/data-table";
 import { Pill } from "@/components/Pills";
 import {
@@ -60,6 +60,9 @@ import { AnnotationSlide } from "@/components/slides/Annotations";
 import { DepositionSlide } from "@/components/slides/Depositions";
 import { formatBases, formatDate, formatNumber } from "@/helpers/formatters";
 import { useSavedData } from "@/components/DownloadManager";
+import { Layer } from "@/app/type";
+import { Marker } from "@/components/mapping/analysis-map";
+import Link from "next/link";
 
 const GET_ASSEMBLY = gql`
   query Assembly($entityId: String) {
@@ -73,6 +76,11 @@ const GET_ASSEMBLY = gql`
 
       specimens {
         entityId
+        specimenId
+        collections {
+          latitude
+          longitude
+        }
       }
 
       libraries {
@@ -90,9 +98,13 @@ const GET_ASSEMBLY = gql`
   }
 `;
 
+type SpecimenCollection = Pick<Specimen, "entityId" | "specimenId"> & {
+  collections: Pick<Collection, "latitude" | "longitude" | "specimenId">[];
+};
+
 type Assembly = AssemblyDetails & {
   name: Pick<NameDetails, "canonicalName" | "authorship">;
-  specimens: Pick<Specimen, "entityId">;
+  specimens: SpecimenCollection[];
   libraries: Library[];
   annotations: Annotation[];
   depositions: Deposition[];
@@ -322,7 +334,7 @@ function Details({ assembly }: { assembly: Assembly }) {
           <DataAccess assembly={assembly} />
         </Grid.Col>
         <Grid.Col span={9}>
-          <SpecimenDetails />
+          <SpecimenDetails specimens={assembly.specimens} />
         </Grid.Col>
       </Grid>
     </Stack>
@@ -387,7 +399,20 @@ function DataAccess({ assembly }: { assembly: Assembly }) {
   );
 }
 
-function SpecimenDetails() {
+interface SpecimenDetailsProps {
+  specimens: SpecimenCollection[];
+}
+
+function SpecimenDetails({ specimens }: SpecimenDetailsProps) {
+  const specimen = specimens.at(0);
+  const markers = specimen?.collections.map((c) => ({
+    tooltip: c.specimenId,
+    latitude: c.latitude ?? 0,
+    longitude: c.longitude ?? 0,
+    color: [103, 151, 180, 220],
+    type: Layer.Specimens,
+  }));
+
   return (
     <Paper p="lg" radius="md" bg="shellfishBg.0" h="100%">
       <Grid>
@@ -397,17 +422,25 @@ function SpecimenDetails() {
               Specimen
             </Title>
             <DataTable>
-              <DataTable.RowValue label="Sample ID"></DataTable.RowValue>
+              <DataTable.RowValue label="Sample ID">{specimen?.specimenId}</DataTable.RowValue>
               <DataTable.RowValue label="Sample name"></DataTable.RowValue>
             </DataTable>
-            <Button mt="auto" radius="md" variant="subtle" color="midnight.9" leftSection={<IconMicroscope />}>
+            <Button
+              mt="auto"
+              radius="md"
+              variant="subtle"
+              color="midnight.9"
+              leftSection={<IconMicroscope />}
+              component={Link}
+              href="./specimens"
+            >
               view specimen
             </Button>
           </Stack>
         </Grid.Col>
         <Grid.Col span={5}>
           <Paper pos="relative" radius="xl" style={{ overflow: "hidden" }} h="100%">
-            <AnalysisMap markers={[]} />
+            <AnalysisMap markers={markers as Marker<null>[]} />
           </Paper>
         </Grid.Col>
       </Grid>
@@ -502,9 +535,9 @@ function MetadataCheck({ assembly }: { assembly?: Assembly }) {
         <DataCheck label="Specimen location" value={false} />
         <DataCheck label="Voucher accession" value={false} />
         <DataCheck label="Sequence read files" value={false} />
-        <DataCheck label="Sequencing platform" value={false} />
+        <DataCheck label="Sequencing platform" value={!!assembly?.systemUsed} />
         <DataCheck label="Assembly method" value={!!assembly?.method} />
-        <DataCheck label="Assembly statistics" value={false} />
+        <DataCheck label="Assembly statistics" value={!!assembly?.size} />
         <DataCheck label="Genome publication" value={false} />
       </Stack>
     </Paper>
