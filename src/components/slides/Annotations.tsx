@@ -1,8 +1,13 @@
 import { Annotation } from "@/generated/types";
-import { Group, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
+import { Box, Divider, Group, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
 import { IconAnnotation } from "../ArgaIcons";
 import { DataTable } from "../data-table";
 import { IconStarFilled } from "@tabler/icons-react";
+import { ParentSize } from "@visx/responsive";
+import { Group as SvgGroup } from "@visx/group";
+import { AxisBottom, AxisLeft } from "@visx/axis";
+import { scaleBand, scaleLinear } from "@visx/scale";
+import { formatNumber } from "@/helpers/formatters";
 
 interface AnnotationSlideProps {
   annotation: Annotation;
@@ -19,13 +24,24 @@ export function AnnotationSlide({ annotation }: AnnotationSlideProps) {
 
 function Summary({ annotation }: { annotation?: Annotation }) {
   return (
-    <Paper py="md" px="xl" radius="lg" bg="wheatBg.1" shadow="none">
+    <Group>
+      <Paper py="md" px="xl" radius="lg" bg="wheatBg.1" shadow="none">
+        <Stack>
+          <SummaryItem>{formatNumber(annotation?.numberOfGenes) ?? 0} genes</SummaryItem>
+          <SummaryItem>0 transcripts</SummaryItem>
+          <SummaryItem>{formatNumber(annotation?.numberOfCodingProteins) ?? 0} proteins</SummaryItem>
+        </Stack>
+      </Paper>
+      <Divider size="sm" orientation="vertical" color="shellfishBg.1" />
       <Stack>
-        <SummaryItem>{annotation?.numberOfGenes ?? 0} genes</SummaryItem>
-        <SummaryItem>0 transcripts</SummaryItem>
-        <SummaryItem>{annotation?.numberOfCodingProteins ?? 0} proteins</SummaryItem>
+        <Text fw={600} fz="sm" c="midnight.8">
+          Gene biotype distribution
+        </Text>
+        <Box h={100} w="100%">
+          {annotation && <DistributionGraph annotation={annotation} />}
+        </Box>
       </Stack>
-    </Paper>
+    </Group>
   );
 }
 
@@ -55,5 +71,82 @@ function AnnotationDetails({ annotation }: { annotation?: Annotation }) {
         <IconAnnotation size={200} />
       </Group>
     </Stack>
+  );
+}
+
+function DistributionGraph({ annotation }: { annotation: Annotation }) {
+  const theme = useMantineTheme();
+
+  return (
+    <ParentSize>
+      {(parent) => {
+        const width = parent.width;
+        const height = parent.height;
+
+        const xScale = scaleLinear<number>({
+          range: [0, width],
+          domain: [0, 100],
+        });
+
+        const yScale = scaleBand<string>({
+          range: [0, height],
+          domain: ["protein-coding", "non-coding", "pseudogenes", "other"],
+          padding: 0.3,
+        });
+
+        return (
+          <svg width={width} height={height}>
+            <SvgGroup left={75}>
+              <AxisLeft
+                scale={yScale}
+                hideTicks
+                tickLabelProps={{
+                  fill: theme.colors.midnight[7],
+                  fontSize: 9,
+                  fontWeight: 700,
+                  textAnchor: "end",
+                }}
+              />
+
+              <rect
+                x={0}
+                y={yScale("protein-coding")}
+                height={yScale.bandwidth()}
+                width={xScale(annotation.numberOfCodingProteins ?? 0)}
+                fill={theme.colors.shellfishBg[5]}
+              />
+
+              <rect
+                x={0}
+                y={yScale("non-coding")}
+                height={yScale.bandwidth()}
+                width={xScale(annotation.numberOfNonCodingProteins ?? 0)}
+                fill={theme.colors.shellfishBg[5]}
+              />
+
+              <rect
+                x={0}
+                y={yScale("pseudogenes")}
+                height={yScale.bandwidth()}
+                width={xScale(annotation.numberOfPseudogenes ?? 0)}
+                fill={theme.colors.shellfishBg[5]}
+              />
+
+              <rect
+                x={0}
+                y={yScale("other")}
+                height={yScale.bandwidth()}
+                width={xScale(annotation.numberOfOtherGenes ?? 0)}
+                fill={theme.colors.shellfishBg[5]}
+              />
+
+              <SvgGroup top={height - 1}>
+                <AxisBottom scale={xScale} hideTicks tickValues={[]} />
+              </SvgGroup>
+            </SvgGroup>
+          </svg>
+        );
+      }}
+    </ParentSize>
   );
 }
