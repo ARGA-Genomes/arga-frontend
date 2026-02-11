@@ -80,23 +80,13 @@ export function TopNav() {
             radius="lg"
             variant="filled"
             color="wheatBg.5"
-            title="Service delays over holidays."
+            title="Service delays."
             icon={<IconInfoCircle />}
             p="xs"
           >
             <Stack gap={0}>
-              <Text fz="xs">Thank you for visiting ARGA. The ARGA Team is taking a break until 12 January 2026. </Text>
-              <Text fz="xs">
-                For urgent matters, please contact: support@ala.org.au. For general enquiries, please use our{" "}
-                <a href="http://arga.org.au/contact" target="_blank">
-                  contact page
-                </a>
-                .
-              </Text>
-              <Text fz="xs">
-                We look forward to working with you again in the new year. Best wishes for your happy holidays, - ARGA
-                Team.
-              </Text>
+              <Text fz="xs">We are currently upgrading our systems and are working to restore functionality</Text>
+              <Text fz="xs">Thank you for your patience</Text>
             </Stack>
           </Alert>
 
