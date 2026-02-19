@@ -80,13 +80,16 @@ export function TopNav() {
             radius="lg"
             variant="filled"
             color="wheatBg.5"
-            title="Service delays."
+            title="Service interruptions."
             icon={<IconInfoCircle />}
             p="xs"
           >
             <Stack gap={0}>
-              <Text fz="xs">We are currently upgrading our systems and are working to restore functionality</Text>
-              <Text fz="xs">Thank you for your patience</Text>
+              <Text fz="xs">Our infrastructure service provider has advised us of planned service maintenance.</Text>
+              <Text fz="xs">
+                We may experience service interruptions and delays during the period 23 February until 3 March 2026.
+                Thank you for your patience.
+              </Text>
             </Stack>
           </Alert>
 
