@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 import { Annotation } from "@/generated/types";
 import { Box, Divider, Group, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
 import { IconAnnotation } from "../ArgaIcons";
@@ -85,7 +86,15 @@ function DistributionGraph({ annotation }: { annotation: Annotation }) {
 
         const xScale = scaleLinear<number>({
           range: [0, width],
-          domain: [0, 100],
+          domain: [
+            0,
+            d3.max([
+              annotation.numberOfCodingProteins ?? 0,
+              annotation.numberOfNonCodingProteins ?? 0,
+              annotation.numberOfPseudogenes ?? 0,
+              annotation.numberOfOtherGenes ?? 0,
+            ]) ?? 0,
+          ],
         });
 
         const yScale = scaleBand<string>({
