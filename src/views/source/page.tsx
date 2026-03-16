@@ -339,7 +339,7 @@ export default function SourcePage(props: SourceProps) {
   }, [name, group]);
 
   const { loading, error, data } = useQuery<{ source: ExtendedSource }>(GET_DETAILS, {
-    variables: { name: source, filters },
+    variables: { name: source, filters: [...filters, { filter: "DOMAIN", action: "INCLUDE", value: "Eukaryota" }] },
   });
 
   return (
@@ -391,7 +391,10 @@ export default function SourcePage(props: SourceProps) {
                 query={{
                   content: GET_SPECIES,
                   download: DOWNLOAD_SPECIES,
-                  variables: { name: source, filters },
+                  variables: {
+                    name: source,
+                    filters: [...filters, { filter: "DOMAIN", action: "INCLUDE", value: "Eukaryota" }],
+                  },
                 }}
                 values={{ datasets: data?.source.datasets }}
               />
