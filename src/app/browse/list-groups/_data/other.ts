@@ -14,7 +14,7 @@ export const other: GroupItem[] = [
   {
     category: "Invasives and Pests",
     image: "/icons/list-group/List group_ invasives and pests.svg",
-    source: "ARGA Exotic Species",
+    source: "ARGA Pests and Invasive Species",
   },
   {
     category: "Venomous and Poisonous",
