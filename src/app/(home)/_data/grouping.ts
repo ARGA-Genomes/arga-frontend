@@ -2,43 +2,36 @@ import { BrowseItem } from "../browse";
 
 export const grouping: BrowseItem[] = [
   {
-    // total: "sources.ARGA Commercial Species",
     category: "Agriculture",
     image: "/icons/list-group/List group_ Agriculture.svg",
     link: "/browse/list-groups/Agriculture",
   },
   {
-    // total: "sources.ARGA Commercial Species",
     category: "Aquaculture",
     image: "/icons/list-group/List group_ Aquaculture.svg",
     link: "/browse/list-groups/Aquaculture",
   },
   {
-    // total: "sources.ARGA Commercial Species",
     category: "Crop Wild Relatives",
     image: "/icons/list-group/List group_ crop wild relative.svg",
     link: "/browse/list-groups/Crop Wild Relatives",
   },
   {
-    // total: "sources.ARGA Commercial Species",
     category: "Medicinal and Bioactive",
     image: "/icons/list-group/List group_ medicinal and bioactive.svg",
     link: "/browse/list-groups/Medicinal and Bioactive",
   },
   {
-    // total: "sources.ARGA Venomous and Poisonous Species",
     category: "Venomous and Poisonous",
     image: "/icons/list-group/List group_ Venomous and poisonous.svg",
     link: "/browse/sources/ARGA Venomous and Poisonous Species",
   },
   {
-    // total: "sources.ARGA Threatened Species",
     category: "Threatened",
     image: "/icons/list-group/List group_ Threatened species.svg",
     link: "/browse/sources/ARGA Threatened Species",
   },
   {
-    // total: "sources.ARGA Bushfire Recovery",
     category: "Bushfire Vulnerable",
     image: "/icons/list-group/List group_ Bushfire vulnerable.svg",
     link: "/browse/sources/ARGA Bushfire Recovery",
