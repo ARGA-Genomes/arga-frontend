@@ -80,15 +80,14 @@ export function TopNav() {
             radius="lg"
             variant="filled"
             color="wheatBg.5"
-            title="Service interruptions."
+            title="Service interruption"
             icon={<IconInfoCircle />}
             p="xs"
           >
             <Stack gap={0}>
-              <Text fz="xs">Our infrastructure service provider has advised us of planned service maintenance.</Text>
+              <Text fz="xs">ARGA is currently transitioning our platform operations.</Text>
               <Text fz="xs">
-                We may experience service interruptions and delays during the period 23 February until 3 March 2026.
-                Thank you for your patience.
+                During this period, some datasets, integrations, and features may be incomplete or unavailable. Thank you for your patience.
               </Text>
             </Stack>
           </Alert>
