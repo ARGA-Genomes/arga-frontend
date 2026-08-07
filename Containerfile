@@ -4,15 +4,18 @@ LABEL org.opencontainers.image.description="A container image running the fronte
 LABEL org.opencontainers.image.licenses="AGPL-3.0"
 
 WORKDIR /usr/src/arga-frontend
+
 COPY . .
-RUN npm install -g pnpm && pnpm install && pnpm build && pnpm --legacy --filter arga-frontend --prod deploy pruned
+
+RUN npm install -g pnpm && \
+    pnpm install --config.onlyBuiltDependencies='["sharp", "@vaadin/vaadin-usage-statistics", "unrs-resolver"]' && \
+    pnpm build && \
+    pnpm --legacy --filter arga-frontend --prod deploy pruned
 
 
 FROM node:23-alpine
 WORKDIR /usr/src/arga-frontend
 
-EXPOSE 3000
-CMD ["pnpm", "start"]
 RUN npm install -g pnpm
 
 COPY --from=builder /usr/src/arga-frontend/.next ./.next
@@ -20,3 +23,6 @@ COPY --from=builder /usr/src/arga-frontend/pruned/node_modules ./node_modules
 COPY --from=builder /usr/src/arga-frontend/pruned/public ./public
 COPY --from=builder /usr/src/arga-frontend/pruned/package.json ./
 COPY --from=builder /usr/src/arga-frontend/pruned/next.config.js ./
+
+EXPOSE 3000
+CMD ["node_modules/.bin/next", "start"]
