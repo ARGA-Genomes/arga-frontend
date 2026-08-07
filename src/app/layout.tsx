@@ -9,6 +9,7 @@ import createClient from "../queries/client";
 
 import { AppShell, MantineProvider } from "@mantine/core";
 
+import { AnnouncementModal } from "@/components/announcement-modal";
 import Fathom from "@/components/fathom";
 import { TraceLoaderProvider } from "@/components/traces/context";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <AppShell header={{ height: 130 }} zIndex={2000} withBorder={false}>
+      <AnnouncementModal />
       <AppShell.Header className={classes.header}>
         <TopNav />
       </AppShell.Header>
