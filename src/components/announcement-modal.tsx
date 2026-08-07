@@ -1,16 +1,26 @@
 "use client";
 
 import { Anchor, Flex, Modal, Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useSessionStorage } from "@mantine/hooks";
 import { IconSpeakerphone } from "@tabler/icons-react";
 
 export function AnnouncementModal() {
-  const [opened, { close }] = useDisclosure(true);
+  const [showAnnouncement, setShowAnnouncement] = useSessionStorage({
+    key: "show-announcement",
+    defaultValue: true,
+    getInitialValueInEffect: false,
+  });
+  const [opened, { close }] = useDisclosure(showAnnouncement);
+
+  const closeAndDontShowAgain = () => {
+    setShowAnnouncement(false);
+    close();
+  };
 
   return (
     <Modal
       opened={opened}
-      onClose={close}
+      onClose={closeAndDontShowAgain}
       size="xl"
       radius="xl"
       centered
